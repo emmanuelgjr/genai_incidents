@@ -136,7 +136,29 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
+## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **investigating**
+
+**The manual `workflow_dispatch` (user-authorized) worked as a test of the persist fix.**
+- Run [`34858279213`](https://github.com/emmanuelgjr/genai_incidents/actions/runs/34858279213) on `main` @ `05f536ff`. **Persist ✅** for the first time since 2026-07-19; `origin/refresh-state` moved `f41ad68e` → **`bfbdec57`** (aiaaic, oecd and kev all `ok` / last_success 2026-09-14). Re-merge + render + validate ✅.
+- It then **failed at Unit tests (1 failed, 318 passed)**, a step no run had reached in 8 weeks, so **no refresh PR opened and nothing reached main.** The gate failed closed, as designed.
+
+**What fired:** `tests/test_e21_partA_inc00437_provenance.py::test_oecd_aiid_content_disagreement_is_unique_to_inc00437`. The E21 Part A invariant says exactly one aiid_id-bearing row (1574 / INC-00437) ships a description that is not AIID's template. The refreshed inputs produce **29**: `[1552, 1574, 1584, 1604, 1610, 1612, 1616, 1622, 1641, 1642, 1643, 1644, 1646, 1647, 1650, 1654, 1656, 1658, 1659, 1660, 1661, 1662, 1665, 1666, 1668, 1669, 1671, 1673, 1674]`.
+
+**Foreman's working hypothesis (NOT yet established; that is the investigation's job):**
+- `ingest/aiid_full.json` (the D1 sanctioned AIID snapshot) holds **1,548 rows, max aiid_id 1581**. Its last commit is `19fa2986` (OWASP migration); its last *content* refresh has not been checked.
+- `ingest_aiid_snapshot.py` runs from the **Makefile only, not from auto-refresh**. The weekly OECD AIM refresh therefore brings in rows cross-referencing AIID incidents newer than the snapshot. No AIID row competes for those `AIID-<n>` keys, so OECD's row wins the merge. That is INC-00437's exact mechanism, now at scale.
+- **1552 < 1581 does not fit this story** and needs its own explanation.
+- **Why it matters beyond a test:** these rows would ship OECD-template text under an AIID cross-reference signal. Whether that also mislabels `description_provenance` / `description_source` is the provenance question E21/E23 ruled on.
+
+**Note for next Sunday:** the scheduled 2026-09-20 run will fail at the same place, fail-closed with no PR. That is safe, but it means the refresh stays blocked until this is resolved.
+
+**AIRI:** still HTTP 404 (`consecutive_failures` 9). Its step's "success" label is `continue-on-error`, not a recovery.
+
+**Dispatched:** pipeline-engineer (fresh instance), investigation only, deliverable `docs/audits/E21-tripwire-refresh-2026-09-14.md` on branch `ws4/e21-tripwire-oecd-aiid`. **No data or override changes until the user rules on the options.**
+
 ## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
+
+**Post-merge `workflow_dispatch` result [R]:** Persist succeeded and refresh-state advanced to `bfbdec57`. The fix is confirmed against real GitHub. See the E21 tripwire entry above for why no PR opened.
 
 **User ruling on the escalation, 2026-09-14:**
 - Keep the line-number citation: `:59` becomes `:66`, not a content-based cite.
