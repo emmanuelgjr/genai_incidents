@@ -20,21 +20,28 @@
 #                checkout the caller is running from), of the JSON file to
 #                persist.
 #   <clone-dir>  scratch directory for the throwaway clone. Removed before
-#                use if it already exists, and removed again on exit.
+#                use if it already exists, and removed again on a
+#                successful run; on failure (the `set -e` below), it is
+#                left behind -- same as before this extraction -- including
+#                its `.git/config`, which embeds the token from <repo-url>
+#                if the caller passed one that way. The workflow's runner
+#                is torn down after each job regardless.
 #
 # Bug this fixes (regression since D5-impl, 2026-07-17; every scheduled run
-# from 2026-07-19 through 2026-09-13 failed here): `git clone --depth 1`
-# implies --single-branch, so the clone's `remote.origin.fetch` refspec only
-# tracks `main`. A plain `git fetch origin refresh-state` (no destination
-# refspec) therefore writes FETCH_HEAD only -- it never populates
-# `refs/remotes/origin/refresh-state` -- so the following `git checkout -B
-# refresh-state origin/refresh-state` dies with "fatal: 'origin/refresh-state'
-# is not a commit and a branch 'refresh-state' cannot be created from it"
-# (exit 128). This never fired before D5-impl merged because the
-# `refresh-state` branch didn't exist yet, so every run up to and including
-# 2026-07-19 took the `--orphan` path below, not this one. Fixed by fetching
-# into an explicit destination refspec, which is honored regardless of the
-# clone's configured (single-branch) fetch refspec.
+# from 2026-07-26 through 2026-09-13 -- 8 runs -- failed here): `git clone
+# --depth 1` implies --single-branch, so the clone's `remote.origin.fetch`
+# refspec only tracks `main`. A plain `git fetch origin refresh-state` (no
+# destination refspec) therefore writes FETCH_HEAD only -- it never
+# populates `refs/remotes/origin/refresh-state` -- so the following
+# `git checkout -B refresh-state origin/refresh-state` dies with "fatal:
+# 'origin/refresh-state' is not a commit and a branch 'refresh-state' cannot
+# be created from it" (exit 128). This never fired before D5-impl merged
+# because the `refresh-state` branch didn't exist yet: the 2026-07-19 run
+# took the `--orphan` path below (creating the branch), never exercised this
+# code, and failed later that same run at the unrelated, intended "Enforce
+# source health" step (AIRI stale) -- not here. Fixed by fetching into an
+# explicit destination refspec, which is honored regardless of the clone's
+# configured (single-branch) fetch refspec.
 set -euo pipefail
 
 REPO_URL="${1:?usage: persist_refresh_state.sh <repo-url> <state-file> <clone-dir>}"

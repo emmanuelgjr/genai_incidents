@@ -2,15 +2,17 @@
 
 Regression coverage for the D5-impl bug that made every scheduled
 `auto-refresh.yml` run fail at the "Persist source health counters to
-refresh-state branch" step from 2026-07-19 through 2026-09-13 (9 consecutive
-weeks): `git clone --depth 1` implies `--single-branch`, so a bare
-`git fetch origin refresh-state` (no destination refspec) only writes
-FETCH_HEAD -- it never populates `refs/remotes/origin/refresh-state` -- and
-the following `git checkout -B refresh-state origin/refresh-state` dies with
-exit 128 ("'origin/refresh-state' is not a commit ..."). The bug only shows
-up once the `refresh-state` branch already exists on the remote, which is
-why it slipped through review: the very first run that created the branch
-(2026-07-19) took the `--orphan` path and never exercised this code.
+refresh-state branch" step from 2026-07-26 through 2026-09-13 (8 runs):
+`git clone --depth 1` implies `--single-branch`, so a bare `git fetch
+origin refresh-state` (no destination refspec) only writes FETCH_HEAD --
+it never populates `refs/remotes/origin/refresh-state` -- and the following
+`git checkout -B refresh-state origin/refresh-state` dies with exit 128
+("'origin/refresh-state' is not a commit ..."). The bug only shows up once
+the `refresh-state` branch already exists on the remote, which is why it
+slipped through review: the 2026-07-19 run that created the branch took the
+`--orphan` path, never exercised this code, and failed later that same run
+at the unrelated, intended "Enforce source health" step (AIRI stale) --
+*not* here.
 
 These tests build a fully local bare-repo fixture (file:// URL, no network)
 covering all three states the step must handle:
@@ -19,10 +21,14 @@ covering all three states the step must handle:
   (c) `refresh-state` present, content unchanged -- the "left as-is" notice
 
 Working agreement 6 ("a gate nobody has seen fail is a gate nobody should
-cite"): test_case_b_fails_against_pre_fix_plain_fetch below reverts the
-fetch/checkout lines to the pre-fix form in-process (no working-tree
-mutation) and asserts it reproduces the exact exit-128 failure, proving this
-suite would have caught the regression.
+cite"): test_case_b_fails_against_pre_fix_plain_fetch below mutates a COPY
+of the actual on-disk script back to the pre-fix fetch/checkout lines,
+asserting each replacement happened exactly once first, runs that copy
+(not the git-plumbing steps re-derived by hand -- the script itself) against
+the case-(b) fixture, and asserts it reproduces the exact exit-128 failure.
+This is what proves the suite would have caught the regression: it fails
+when the script's fix-carrying lines are gone, and only passes because the
+real script on disk currently has them.
 """
 
 from __future__ import annotations
@@ -209,16 +215,78 @@ def test_case_c_refresh_state_present_unchanged(tmp_path, origin_repo):
     assert "unchanged this run" in result.stdout, result.stdout
 
 
+FIXED_FETCH_LINE = "git fetch --quiet origin refresh-state:refs/remotes/origin/refresh-state"
+FIXED_CHECKOUT_LINE = "git checkout -q -B refresh-state refs/remotes/origin/refresh-state"
+PRE_FIX_FETCH_LINE = "git fetch --quiet origin refresh-state"
+PRE_FIX_CHECKOUT_LINE = "git checkout -q -B refresh-state origin/refresh-state"
+
+
 def test_case_b_fails_against_pre_fix_plain_fetch(tmp_path, origin_repo):
-    """Working agreement 6 proof-of-fire: reproduce the pre-fix step
-    (plain `git fetch origin refresh-state` + `checkout -B refresh-state
-    origin/refresh-state`, no destination refspec) against the SAME case-(b)
-    fixture and show it dies with the exact exit-128 error this task fixes.
-    Does not touch scripts/persist_refresh_state.sh on disk -- runs the
-    pre-fix sequence directly so the real fix is never reverted."""
+    """Working agreement 6 proof-of-fire. Mutates a COPY of the real,
+    on-disk scripts/persist_refresh_state.sh back to the pre-fix
+    fetch/checkout lines (plain `git fetch origin refresh-state` +
+    `checkout -B refresh-state origin/refresh-state`, no destination
+    refspec) and RUNS THAT SCRIPT COPY -- not a hand-written re-derivation
+    of the git plumbing -- against the same case-(b) fixture used above.
+    Asserts each line is present exactly once before swapping it, so a
+    future edit to the script can't make this mutation silently a no-op
+    (which would make this test pass for the wrong reason no matter what
+    the script does). Never touches the real script file on disk."""
+    script_text = SCRIPT.read_text(encoding="utf-8")
+    assert script_text.count(FIXED_FETCH_LINE) == 1, (
+        f"expected exactly one occurrence of the fixed fetch line in {SCRIPT}; "
+        "the script changed -- update this mutation to match"
+    )
+    assert script_text.count(FIXED_CHECKOUT_LINE) == 1, (
+        f"expected exactly one occurrence of the fixed checkout line in {SCRIPT}; "
+        "the script changed -- update this mutation to match"
+    )
+    pre_fix_text = script_text.replace(
+        FIXED_FETCH_LINE, PRE_FIX_FETCH_LINE, 1
+    ).replace(
+        FIXED_CHECKOUT_LINE, PRE_FIX_CHECKOUT_LINE, 1
+    )
+
+    pre_fix_script = tmp_path / "persist_refresh_state.pre-fix.sh"
+    pre_fix_script.write_text(pre_fix_text, encoding="utf-8")
+    pre_fix_script.chmod(0o755)
+
+    seed_refresh_state(origin_repo, tmp_path, {"airi_navigator": {"consecutive_failures": 1}})
+    workdir = make_workdir(tmp_path, "work_prefix", {"airi_navigator": {"consecutive_failures": 2}})
+
+    result = run(
+        [
+            BASH,
+            to_posix(pre_fix_script),
+            to_posix(origin_repo.as_uri()),
+            STATE_REL_PATH,
+            to_posix(tmp_path / "clone_prefix"),
+        ],
+        cwd=workdir,
+    )
+    assert result.returncode == 128, (
+        f"expected the pre-fix script copy to die exit 128; got {result.returncode}\n"
+        f"stdout={result.stdout}\nstderr={result.stderr}"
+    )
+    assert "is not a commit" in result.stderr, result.stderr
+
+    # The real script on disk must be untouched by this test.
+    assert SCRIPT.read_text(encoding="utf-8") == script_text
+
+
+def test_manual_prefix_git_sequence_sanity_check(tmp_path, origin_repo):
+    """NOT a regression guard -- does not invoke scripts/persist_refresh_state.sh
+    at all, so it passes identically whether that script is fixed or broken;
+    it only checks that the underlying git plumbing behaves the way this
+    task's diagnosis says it does (plain `git fetch origin refresh-state`
+    writes FETCH_HEAD only, and the following `checkout -B refresh-state
+    origin/refresh-state` then dies exit 128). Kept as a small, separate,
+    honestly-named sanity check of that claim; the actual proof-of-fire is
+    test_case_b_fails_against_pre_fix_plain_fetch above, which runs the real
+    script (mutated back to this same pre-fix form)."""
     seed_refresh_state(origin_repo, tmp_path, {"airi_navigator": {"consecutive_failures": 1}})
 
-    clone_dir = tmp_path / "clone_prefix"
+    clone_dir = tmp_path / "clone_sanity"
     git(
         "clone", "--quiet", "--depth", "1", "--filter=blob:none", "--no-checkout",
         origin_repo.as_uri(), str(clone_dir),
