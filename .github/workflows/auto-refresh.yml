@@ -146,35 +146,11 @@ jobs:
         run: |
           set -e
           STATE_FILE="ingest/_state/source_health.json"
-          cp "$STATE_FILE" /tmp/source_health.json
 
-          rm -rf /tmp/refresh-state-clone
-          # --filter=blob:none --no-checkout: this repo's data/*.json blobs
-          # are tens of MB; a partial, uncheckout'd clone fetches only
-          # commit/tree metadata up front, and (via the two branches below)
-          # only the tiny refresh-state tree's blobs on demand — not main's.
-          git clone --quiet --depth 1 --filter=blob:none --no-checkout "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" /tmp/refresh-state-clone
-          cd /tmp/refresh-state-clone
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
-            git fetch --quiet origin refresh-state
-            git checkout -q -B refresh-state origin/refresh-state
-          else
-            git checkout -q --orphan refresh-state
-            git rm -rf . >/dev/null 2>&1 || true
-          fi
-          mkdir -p ingest/_state
-          cp /tmp/source_health.json ingest/_state/source_health.json
-          git add ingest/_state/source_health.json
-          if git diff --cached --quiet; then
-            echo "::notice::source_health.json unchanged this run; refresh-state left as-is."
-          else
-            git commit -q -m "chore(state): update source health counters [skip ci]"
-            git push --force origin HEAD:refresh-state
-          fi
-          cd "$GITHUB_WORKSPACE"
-          rm -rf /tmp/refresh-state-clone
+          bash scripts/persist_refresh_state.sh \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            "$STATE_FILE" \
+            "/tmp/refresh-state-clone"
 
           # Exclude the counter from the data-review PR (refresh-state,
           # above, is now the single source of truth): reset the
