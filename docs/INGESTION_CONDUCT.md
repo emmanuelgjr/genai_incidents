@@ -366,7 +366,7 @@ implemented in this one.
 
 ### Scoping note: excluded from this register
 
-`scripts/persist_refresh_state.sh:59`'s own `git clone` (invoked from
+`scripts/persist_refresh_state.sh:66`'s own `git clone` (invoked from
 `.github/workflows/auto-refresh.yml`'s "Persist source health counters to
 refresh-state branch" step, persisting `ingest/_state/source_health.json`
 to the `refresh-state` branch — extracted out of that workflow step into
