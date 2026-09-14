@@ -155,6 +155,23 @@ VERSIONING.md step should say which link forms survive the move.
 **AIRI:** still HTTP 404 (`consecutive_failures` 9). Its step's "success" label is `continue-on-error`, not a recovery.
 
 **Dispatched:** pipeline-engineer (fresh instance), investigation only, deliverable `docs/audits/E21-tripwire-refresh-2026-09-14.md` on branch `ws4/e21-tripwire-oecd-aiid`. **No data or override changes until the user rules on the options.**
+- **The first instance died on a session limit with nothing committed.** The foreman checked the tree (clean, one worktree) and redispatched a fresh instance with a commit-early instruction.
+
+**⚠ UPDATE 2026-09-14 — the OECD AIM ingest has COLLAPSED, and the tripwire may be its symptom, not the disease. [R] from CI logs** (`gh run view <id> --log | grep -E "\] (fetched|parsed|union|wrote)"`):
+
+| Run | Fetched | Parsed ok / unparseable | Time | Kept + existing → retained |
+|---|---|---|---|---|
+| 07-12 `29182692358` | 3000/3000 | 2,939 / 61 | 292s | 2,924 + 3,792 → 4,049 |
+| 07-19 `29676405074` | 3000/3000 | 2,940 / 60 | 358s | 2,926 + 4,049 → 4,160 |
+| **09-14 `34858279213`** | 2988/3000 | **1,098 / 1,890** | **3,026s** | 1,097 + 4,160 → **5,248** |
+
+- **The union column is the alarm.** In July ~2,815 of ~2,926 parsed rows overlapped existing source_ids. On 09-14 only **~9 of 1,097** did, so **~1,088 source_ids were never seen before**, while most known URLs return 404 (the local repro shows the same 404s).
+- **Hypothesis H2: OECD re-keyed its incident URLs/IDs.** If true, the refresh would add ~1,000 **duplicates** of held incidents under new source_ids. The 28 new tripwire rows, including the unexplained 1552, may be those duplicates rather than new AIID incidents (H1). The investigator has been told to separate H1 from H2 per row and to compare IDs, not totals (agreement 6 form d).
+- **Why this matters:** without the E21 tripwire, this would have reached a refresh PR as "+1,088 rows". A tripwire built for one provenance row caught what may be a source-wide re-keying. **The persist bug had been hiding all of this since 07-26.**
+
+**Interim findings from the investigator (testimony until the audit lands):**
+- **AIID snapshot** fetched 2026-07-18; a newer official one exists (`backup-20260907101103.tar.bz2`). Update is Makefile-only.
+- **The committed corpus already has a second AIID-template exception, 898 / INC-08183, outside the tripwire's two-file scope.** The tripwire cannot see it (a scope gap; route to tripwire evolution).
 
 ## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
 
