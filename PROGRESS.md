@@ -195,6 +195,23 @@ VERSIONING.md step should say which link forms survive the move.
 
 **⚠ Why this outranks the tripwire.** `id_deprecations.json` is append-only (invariant 9). **A refresh PR merged in this state would PERMANENTLY redirect unrelated incident IDs into each other**, with no way to undo it short of a new ruling. **The foreman is treating "no OECD refresh merges" as in force, pending the user's ruling.** The 09-20 scheduled run stays fail-closed at the tripwire, so nothing can reach main in the meantime. A 103-source_id cluster on a single crash also suggests over-merge chaining **already in the published corpus**; the gate has been asked to size it.
 
+**🚨 CONFIRMED 2026-09-14 — the published corpus contains a query-string over-merge, and its cause is a one-line URL normaliser.**
+- **Gate status message** (not the final verdict): INC-00554 is a published over-merge today, with ~100 of its 103 source_ids being unrelated Korean-news OECD rows. Root cause: `merge_and_dedupe.py:311`, `normalize_url`, strips query strings, so every `articleView.html?idxno=N` on one site collapses to one weak dedup key.
+- **Foreman re-derived it independently [R]:**
+  - `scripts/merge_and_dedupe.py:311` → `u = u.split("?")[0].split("#")[0]`.
+  - Published INC-00554 "Tesla Driver Reportedly Said Driver-Assistance Mode Was Engaged During Fatal Texas Home Crash" carries **103 source_ids: OECD 100 / AIID 3**, and **512 references**. Top hosts: oecd.ai 100 · yna.co.kr 54 · mk.co.kr 34 · asiae.co.kr 31. 34 of the references are `articleView` URLs.
+- **Other clusters in the published corpus's top 6 by source_id count** (not yet assessed; may be legitimate vendor-feed grouping or the same defect):
+  - INC-04106 promptfoo plugin agentic:memory-poisoning (174)
+  - INC-04260 TensorFlow CVE-2023-33976 (143)
+  - INC-01015 Flowise (120)
+  - INC-08766 OpenClaw (68)
+  - INC-08911 OpenClaw (47)
+- **Consequences, not yet quantified:**
+  - Published incident counts are understated by however many distinct incidents are collapsed.
+  - Per-incident fields (title, description, severity) on over-merged rows describe one incident while carrying another's sources.
+  - Any past tombstone produced by this chaining is a permanent wrong redirect.
+- **This is a WS4-T5 (dedupe audit) defect that is live in shipped data, not a refresh-only risk.** It predates this session and was caught only because a tripwire built for one provenance row fired.
+
 ## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
 
 **Post-merge `workflow_dispatch` result [R]:** Persist succeeded and refresh-state advanced to `bfbdec57`. The fix is confirmed against real GitHub. See the E21 tripwire entry above for why no PR opened.
