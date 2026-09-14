@@ -136,6 +136,100 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
+## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
+
+**User ruling on the escalation, 2026-09-14:**
+- Keep the line-number citation: `:59` becomes `:66`, not a content-based cite.
+- A third attempt, scoped to that one line. Advisory B (unguarded `--force` / `[skip ci]`) is deliberately not in scope and stays a follow-up.
+- **The user authorized one manual `workflow_dispatch` of auto-refresh after merge.**
+
+**Attempt 3** `99a0f8fe` (pipeline-engineer): `docs/INGESTION_CONDUCT.md:369` `:59` → `:66`, a one-line diff.
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-14, on `99a0f8fe`: PASS ───** *"The register citation now resolves to the git clone, the scope is one line, and the script and tests are byte-unchanged, so the gate-2 mutation evidence still holds."* **Defects: none.**
+
+**Evidence the gate measured [R]:**
+- **Refs.** HEAD = origin branch = `99a0f8fe`.
+- **Scope.** `56f6ce77..4779459c` touches PROGRESS.md only. `4779459c..99a0f8fe` touches INGESTION_CONDUCT.md only (1/1).
+- **The citation resolves, and this check can fail.** `git show 99a0f8fe:scripts/persist_refresh_state.sh | sed -n 66p` prints the `git clone` line. At gate 2 the same command showed `:59` was the trap line.
+- **Script and tests unchanged.** `git diff --quiet 56f6ce77 99a0f8fe -- scripts tests .github .gitattributes` exits 0, so the gate-2 mutation matrix carries over unchanged.
+- **Data untouched.** `git diff --stat 56702426 99a0f8fe -- data schema mappings ingest src legacy docs/data` is empty.
+- **Suite and tree.** 319 passed; tree clean; one worktree.
+
+**Advisories:**
+- **(A) Testimony miscount.** The specialist reported 3 hits for the citation grep; there are **4**, because `PROGRESS.md:143` was omitted. All PROGRESS hits are dated records, so the conclusion is unaffected. Do not repeat "three".
+- **(B) Carried, not bounced, per the user's ruling:**
+  - `--force` and `[skip ci]` are unguarded by tests. **Follow-up owed to WS4:** assert `[skip ci]` in case (b), and add a diverged / non-fast-forward case.
+  - Notice text and the commit-message inaccuracy are already corrected on this board.
+  - **Drift-stale first refresh PR** (render_docs_stats is not in the refresh workflow): re-render before merging it.
+  - `workflow_dispatch` once after merge (user-authorized, above).
+- **(C) The line-number citation will go stale again** on any comment edit above script line 66, the same failure as bounce #2. Whoever next edits the script header must re-resolve `INGESTION_CONDUCT.md:369`.
+
+**Foreman step-6 stray check:** `git status --porcelain --untracked-files=all` is empty before recording. **Step 7:** no counts, public claims, licensing text, taxonomy lists or version strings changed (a workflow step, a script, tests, and one register line cite), so docs-warden is not dispatched.
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-14, on `56f6ce77`: BOUNCE #2 ───** *"The only defect is a one-token stale line citation in the invariant-5 register. D1 and D2 are both genuinely fixed, and the new mutation test is load-bearing."*
+
+**Defect 1.** `docs/INGESTION_CONDUCT.md:369` cites `scripts/persist_refresh_state.sh:59`. At `56f6ce77`, line 59 is `trap 'rm -f "$TMP_STATE"' EXIT`; the `git clone` is now **line 66**. The bounce-fix commit grew the header comment by 7 lines and did not update the register (criterion 3, active invariant 5 / D22). **Foreman re-derived [R]:** `git show 56f6ce77:scripts/persist_refresh_state.sh | sed -n '59p;66p'` → trap, clone. Suggested fix: `:66`, or cite by content ("the `git clone` in `scripts/persist_refresh_state.sh`") so comment edits cannot break it again.
+
+**Evidence the gate measured [R]:**
+- **Scope.** `930e6045` touches PROGRESS.md only. `56f6ce77` touches only the script and the test. data, schema, mappings, ingest, src, legacy and docs/data are untouched across `56702426..56f6ce77`.
+- **Script diff is comments only.** The non-comment lines of `8debf617` and `56f6ce77` are identical.
+- **Cases a/b/c unchanged.** Their bodies and docstrings are untouched.
+- **Mutation test is load-bearing, by a different route.** Pre-fix inline shell from `56702426`: 3 fail. Fetch-only revert: 3 fail. Decoy (fixed lines kept as comments, real code broken): b and c fail. Clone without `--depth 1` (bug premise gone): the mutation test fails, so it detects when its own premise stops holding. **No mutant that breaks the fetch/checkout path passes the 5-test file.**
+- **Suite and D2.** Suite 319. D2 dates now match the run logs. Clean finish.
+
+**Advisories:**
+- **(A)** Ruling on the foreman's candidate: an **advisory, not a defect.** **Board correction, since commit messages are immutable:** `56f6ce77`'s message lists four of the five extraction changes. It omits the notice-text change (`source_health.json unchanged` → `ingest/_state/source_health.json unchanged`, ~:88), and its sentence *"None of these change what a correctly-configured caller observes"* is inaccurate, because log text is observable. No consumer parses it, and test (c)'s substring still matches.
+- **(B)** Two criterion-1 properties are **unguarded**: mutants dropping `--force` or `[skip ci]` pass all 5 tests. Proposed follow-up: assert `[skip ci]` in case (b), and add a diverged (non-fast-forward) case.
+- **(C)** The mutation-test precondition is exact-text, so rewording the fix lines will turn it red on purpose.
+- **(D)** Carried from gate 1: the drift-stale first refresh PR (render_docs_stats not in the refresh workflow), and a `workflow_dispatch` after merge.
+
+**Foreman correction.** Before the re-gate, the foreman spot-checked `56f6ce77` for the off-by-one phrasing but did not re-resolve the register's line citation, which it had checked at attempt 1. A line-number citation is invalidated by any edit above it. The check the foreman ran could not have caught this.
+
+**Escalation, awaiting the user.** Two bounces on the same task → stop, per step 6. Options put to the user:
+- (a) Authorize a third attempt limited to the one-line register fix plus advisory B, with a narrow re-gate.
+- (b) Accept with the defect routed as a follow-up note.
+- (c) Other.
+
+---
+
+**History: attempt 1 and BOUNCE #1** (preserved as written):
+
+**Why this exists: the corpus has been frozen at 13,060 since v2.9.0, because the weekly refresh has not opened a PR since #97.**
+`auto-refresh.yml` has gone red on **9 consecutive scheduled runs, 2026-07-19 → 2026-09-13**. They are **not all the same failure**:
+- **2026-07-19** (run `29676405074`) took the `--orphan` path, created `refresh-state` (`f41ad68e`), opened the PR, and failed at the **intended** "Enforce source health" step (AIRI stale).
+- **The 8 runs 2026-07-26 → 2026-09-13** (e.g. `30191177187`, `34748318826`) failed at **"Persist source health counters to refresh-state branch"**: `fatal: 'origin/refresh-state' is not a commit` (exit 128).
+
+**Mechanism:** `git clone --depth 1` implies `--single-branch`, so `git fetch origin refresh-state` writes only FETCH_HEAD and the checkout of `origin/refresh-state` dies. `set -e` then skips rebuild, tests, and the PR step. That throws away ~50 minutes of successful ingest every week. The "branch exists" path was never exercised before D5-impl merged. **Why nobody noticed:** the board had pre-announced the run would go RED by design (AIRI), so a *different* red read as the expected one. The Restore step is **not** affected: actions/checkout sets a wildcard refspec, and its logs say "Restored".
+
+**Branch** `ws4/refresh-state-persist-fix` (pushed) · owner pipeline-engineer · attempt 1 `8debf617`: extract the step to `scripts/persist_refresh_state.sh` with an explicit `refresh-state:refs/remotes/origin/refresh-state` refspec; `tests/test_persist_refresh_state.py` (local bare-repo fixture, cases a/b/c); INGESTION_CONDUCT register repointed to `scripts/persist_refresh_state.sh:59`; `.gitattributes` `*.sh text eol=lf`. Suite 318 (314 + 4).
+
+**─── VERDICT (agreement 5) — red-reviewer, 2026-09-14: BOUNCE #1 ───** *"The functional fix is verified correct … Both defects are committed-text fixes, so a narrow re-gate is enough."*
+
+**Evidence the gate measured [R]:**
+- It copied the **pre-fix inline shell mechanically from `56702426`** (not the specialist's revert) and ran the new tests against it: cases (b) and (c) failed, exit 128.
+- Committed script: 4/4 pass. Mutants: push-removed fails (a)(b); notice-changed fails (c); half-revert fails (b)(c).
+- Line-by-line equivalence with the old inline shell checked. Token exposure unchanged. Register line resolves. `git diff 56702426 8debf617 -- data schema mappings ingest src legacy` is empty.
+- Offline rebuild in a separate clone gave **every** generated file byte-identical (`data/incidents.json` MD5 `d5fedf96…`), 13060/13060 valid. The code reading shows the WS0-T3, E21 and OWASP-2026 forms live in the fetch scripts.
+- **[A]:** the live network re-ingest cannot be re-run offline, so "the first PR won't revert gated work" is partly verified.
+- 5.i confirmed from run `29676405074`'s log: **the PR opens, then the run ends red on AIRI** (refresh-state shows airi_navigator stale, 8 failures, no `paused_until`).
+
+**Defects:**
+1. **Test 4 (`test_case_b_fails_against_pre_fix_plain_fetch`, `tests/test_persist_refresh_state.py:212`; module docstring `:22-25`) never invokes the script.** It PASSED against the pre-fix shell. Its docstrings claim it "reverts the fetch/checkout lines" and "proves this suite would have caught the regression", and both claims are false: agreement-6 form (a)/(b). Fix, preferred: make it load-bearing. Swap the fixed lines in a copy of SCRIPT, asserting each replacement happened exactly once, run the copy on the case-(b) fixture, and assert exit 128. Otherwise: reword the docstrings to what it actually checks.
+2. **Wrong date range** at `scripts/persist_refresh_state.sh:25-26` and `tests/test_persist_refresh_state.py:5-6`. The text says every run 07-19 → 09-13 failed at Persist; 07-19 did not. It is 8 runs, 07-26 → 09-13. The script contradicts its own `:34`.
+
+**Advisories:**
+- **(A)** Undeclared but benign extraction changes; name them in the fix commit: `set -euo pipefail`, the state-file existence check, `mktemp` + trap, full-path notice text, `$WORKSPACE` via `pwd`.
+- **(B)** "removed again on exit" (`:23`) is true only on success.
+- **(C) ⚠ first-run risk:** the refresh workflow's rebuild step does not run `render_docs_stats.py`, and `check_stats_drift` runs only in validate.yml. GITHUB_TOKEN-opened PRs normally don't trigger pull_request workflows. So the first count-changing refresh PR can open drift-stale with no failing check, and merging it **recreates the post-#97 drift-red-main incident** (the CLASS fix owed to WS4 is still unlanded).
+- **(D)** Fixture portability low risk.
+- **(E)** History growth: no action.
+- **(F)** After merge, `workflow_dispatch` once to exercise the real-GitHub fetch.
+
+**Foreman routing:**
+- Defects 1–2 plus advisories A–B go to pipeline-engineer (same instance; small, well-defined scope).
+- **Advisory C is recorded here as an open item that must be closed before the first post-fix refresh PR is merged.** It is not folded into this task; its scope is the owed drift CLASS fix. The next scheduled run is **2026-09-20**.
+- **(F) is an outward action; it needs the user's go.**
+
 ## 🔤 OWASP LLM TOP 10 → 2026 EDITION — user-directed, OUT OF PLAN, landed 2026-08-17, **NOT GATED**
 
 **Not a WS task.** Direct user request during the Phase-1/Phase-2 interval, executed
@@ -369,6 +463,10 @@ Logged for the (not-yet-open) Phase-2 label-quality and corpus-bias tasks. Sourc
 - **PRECEDENT 2 — the scope of "never hand-edit `data/*.json`". It protects GENERATED OUTPUTS from being clobbered; it is not a blanket ban on hand-authored files under `data/`.** The foreman read it as unconditional and was wrong. **`data/curation_overrides.json` is the standing counter-example**: 53 KB, hand-maintained by humans across multiple PRs (#85/#91/#92), read by `merge_and_dedupe.py:905/947/1382`, and **written by zero scripts** — its own `_doc` says "Add entries here as incidents are reviewed." **A file nothing writes cannot be clobbered**, which is the harm the rule exists to prevent. **This does NOT relax the rule where it bites:** `data/incidents.json`, `data/stats.json`, the three `incidents.min.json` mirrors and every other build output remain absolutely off-limits to hand editing — those ARE regenerated, and a hand edit there is silently destroyed on the next build. **Test to apply: does any script write this file? If yes, never touch it by hand. If no, it is source, and it lives wherever it is most useful to readers.** Note the corollary schema-architect argued and the foreman accepted: burying such a file outside `data/` to satisfy a misread rule would keep the corpus's own freshness statement out of what ships — a smaller version of the dishonesty being fixed.
 
 ## Foreman corrections (audit trail)
+- **⚠ CORRECTION 2026-09-14: the foreman's brief carried an off-by-one into committed text, and the foreman had already retracted a second claim in chat.**
+  - **The off-by-one.** The refresh-state brief said *"9 consecutive scheduled runs … fail at Persist"*. The truth is **9 runs red, 8 at Persist**: the first, 2026-07-19, took the orphan path and failed later, on purpose. The specialist copied the error into the script and test headers, and red-reviewer bounced it (defect 2). The foreman had the per-run failing-step list in hand while diagnosing, and it showed 07-19 failing at Enforce, not Persist. The number came from counting reds, not from reading the per-run failing steps.
+  - **The retracted claim.** While diagnosing, the foreman told the user in chat that the Restore step "has never restored anything". It retracted that one tool call later, after the logs showed "Restored …". It is recorded here because a chat-only retraction is exactly the kind of record agreement 1 says does not survive.
+  - **Lesson.** A count of red runs is an aggregate that hides *which* step each run died in. That is agreement 6 form (d), in the foreman's own diagnosis.
 - **UA version bump — ✅ PASS (red-reviewer, 2026-07-31, after BOUNCE #1). MERGED to main. `.zenodo.json` (5a) gated in the same verdict.** **─── VERDICT (agreement 5) ───** *"No defects. `6c508f8b` is clean to merge, carrying the UA bump, the bounce-#1 fix, the gated `.zenodo.json` key, and your board entry."* **Defect 1 discharged, and the gate checked the FILE not the LINE** — it enumerated every version mention in `INGESTION_CONDUCT.md` rather than confirming `:75`, *"the check that could actually have found a fourth"*: **three mentions, `2.9.0` twice (`:40`, `:75`) and `2.8.0` once (`:57`), each correct in its own register.** **Form re-verified by RUNNING it, not reading D3's prose:** `split('/')[0].lower()` → `'genai_incidents'`, no `Mozilla` — so `urllib.robotparser` matching against AIID/AIAAIC/OECD is unchanged. Fence vs constant **byte-identical by sha256** (`f232eca4…`). Both historical mentions **byte-identical across both revisions** — the trap held through the fix. **`git diff 78fc638f..6c508f8b -- ingest/common.py .zenodo.json` EMPTY**, so gate #1's findings transfer **by measurement, not assumption.** **314 passed via TWO different invocations** (`--ignore=` and `tests/`) — *"a different route to the same number, which is the only kind of agreement worth anything."* **─── `.zenodo.json` GATED IN SCOPE, PASSES ───** field-level delta **parsed rather than diffed**, which mattered: `added: ['version']`, `removed: []`, **`CHANGED VALUES: []`** — the text diff also reflows `communities`, and *"the decoded value is identical, which the text diff alone could not have told you."* Three surfaces agree at `2.9.0` (`.zenodo.json`, `CITATION.cff:44`, `pyproject.toml`). **Both foreman limit-claims verified — and (b) UNDERSTATED the gap.** (a) confirmed two ways: `v2.9.0^{commit}` = `118a0141`, and `git show v2.9.0:.zenodo.json` → **version key absent**, so this does not reach the deposit. (b) WS6-T7's acceptance is **three** bullets, not two: **README cites the concept DOI — ALREADY MET before this task** (`README.md:8,20,324`, which also documents concept-vs-version usage); **release checklist step — NOT met, and no checklist exists anywhere to add it to**; **post-Phase-1 deposit — NOT met (with the user).** So **two bullets remain, not one.** **⚠ And the finding that matters for WS6-T7's scope: NOTHING reads or validates `.zenodo.json`** — grep across `tests/`, `scripts/` and the `Makefile` finds nothing. Good for this gate (inert to `make build`, no determinism exposure) but **the file had NO version key at all and no check noticed. Nothing stops it going stale again at v2.10.0.** **─── ADVISORIES ───** **(1)** no test enforces doc/code UA agreement, and a **fence-only test would have PASSED this defect** — any follow-up must assert **every** version mention in the file, with `:57` as an **explicit commented exclusion**, *"which forces the live-vs-record distinction into code where the next editor will see it."* **(2)** the UA remains hand-typed; derive-don't-type scope now covers `pyproject.toml`, `CITATION.cff` ×2, `.zenodo.json`, `merge_and_dedupe.py`, and the UA. **(3) it caught a FOREMAN error: the new board entry was dated `2026-08-01` while its commit and every neighbouring entry are `2026-07-31`** — *"in a project where dated records are load-bearing and superseding notes key off dates, a date that disagrees with its own commit is worth a one-character fix."* **Corrected.** **(4)** strays unchanged, **not the E9/D6 signature**, no attribution made; it endorsed asking the user before deleting a 25 MB artifact of unknown provenance, and noted the specialist's stated exclusion *"is what let me reproduce 314 on your exact command rather than take it."*
 
 - **⚠ CORRECTION 2026-07-31 — THE FOREMAN'S BRIEF NARROWED WHAT THE FOREMAN'S OWN BOARD ENTRY HAD ALREADY ESTABLISHED, AND THE SPECIALIST COULD NOT RECOVER WHAT THE BRIEF HAD LOST.** Dispatching the UA version bump, the foreman wrote a brief containing a **table of four occurrences** of the User-Agent string. **`PROGRESS.md`'s own board entry for that task — written by the foreman hours earlier — names THREE locations in one file: `docs/INGESTION_CONDUCT.md:40,57,75`.** The brief's table **dropped `:75`.** The specialist swept with `genai_incidents/2\.[89]\.0`, which is **structurally incapable** of matching `:75` because that line writes the version bare as `` `2.8.0` `` with no token — so the sweep could not recover what the brief had already lost, and `INGESTION_CONDUCT.md` shipped to the gate **self-contradictory about the current UA, 35 lines apart.** **─── WHY THIS IS ITS OWN FAILURE SHAPE, distinct from the seven already recorded ───** the others are **checks that cannot fail**. This one is upstream of any check: **an enumeration that was correct on the board, then narrowed in the instruction derived from it.** A specialist reasonably treats a brief's table as the boundary of the search; **the board entry was the better source and the specialist never saw it.** **The rule: when a brief enumerates, the enumeration is a HYPOTHESIS, not a boundary — and the foreman must diff the brief against the board entry it derives from before dispatching.** A brief is a lossy copy of the board, and lossy in exactly the direction that matters. **─── THE GATE'S DISTINCTION, which decided the defect and is worth keeping ───** `:57` frames itself as history (*"changed in WS0-T4 bounce #1, D3, from an earlier … form"*) and is correctly preserved; **`:75` has no such framing — it is a present-tense pointer into current code, and the DOC SUPPLIES THE NUMBER ITSELF.** The gate checked the referenced comment at `ingest/common.py:62-95` and found it states a version-sync **policy and no version number at all**, so `:75`'s parenthetical is the document's own live assertion about what the constant reads today. ***"Both of those describe a moment; `INGESTION_CONDUCT.md` describes now."*** Same live-vs-record test as agreement 4, applied within a single file. **─── ALSO THE FOREMAN'S: the `.zenodo.json` passenger ───** the foreman committed 5a (`0c417cf5`) onto `ws4/ua-version-2.9.0` because a specialist held the shared tree, so **merging the UA branch would deliver an ungated `.zenodo.json` change on a UA verdict.** The gate caught it and ruled correctly: *"do not let it merge as an unreviewed passenger."* **Committing an unrelated change onto a task branch to avoid a checkout hazard trades one hazard for another** — the right move was a separate branch once the tree was free, or waiting. Folded into the re-gate scope explicitly rather than merged quietly.

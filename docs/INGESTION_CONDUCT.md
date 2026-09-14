@@ -366,8 +366,12 @@ implemented in this one.
 
 ### Scoping note: excluded from this register
 
-`.github/workflows/auto-refresh.yml:156`'s own `git clone` (persisting
-`ingest/_state/source_health.json` to the `refresh-state` branch) and
+`scripts/persist_refresh_state.sh:66`'s own `git clone` (invoked from
+`.github/workflows/auto-refresh.yml`'s "Persist source health counters to
+refresh-state branch" step, persisting `ingest/_state/source_health.json`
+to the `refresh-state` branch — extracted out of that workflow step into
+this script 2026-09-14 so it is testable without a live GitHub repo; see
+`tests/test_persist_refresh_state.py`) and
 `peter-evans/create-pull-request`'s git operations opening the weekly
 refresh PR are **not** registered here. These are CI/CD operations on
 this repository's *own* git history — GitHub talking to GitHub via
