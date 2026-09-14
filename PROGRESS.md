@@ -136,7 +136,35 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **in-progress, BOUNCE #1**
+## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-14, on `56f6ce77`: BOUNCE #2 ───** *"The only defect is a one-token stale line citation in the invariant-5 register. D1 and D2 are both genuinely fixed, and the new mutation test is load-bearing."*
+
+**Defect 1.** `docs/INGESTION_CONDUCT.md:369` cites `scripts/persist_refresh_state.sh:59`. At `56f6ce77`, line 59 is `trap 'rm -f "$TMP_STATE"' EXIT`; the `git clone` is now **line 66**. The bounce-fix commit grew the header comment by 7 lines and did not update the register (criterion 3, active invariant 5 / D22). **Foreman re-derived [R]:** `git show 56f6ce77:scripts/persist_refresh_state.sh | sed -n '59p;66p'` → trap, clone. Suggested fix: `:66`, or cite by content ("the `git clone` in `scripts/persist_refresh_state.sh`") so comment edits cannot break it again.
+
+**Evidence the gate measured [R]:**
+- **Scope.** `930e6045` touches PROGRESS.md only. `56f6ce77` touches only the script and the test. data, schema, mappings, ingest, src, legacy and docs/data are untouched across `56702426..56f6ce77`.
+- **Script diff is comments only.** The non-comment lines of `8debf617` and `56f6ce77` are identical.
+- **Cases a/b/c unchanged.** Their bodies and docstrings are untouched.
+- **Mutation test is load-bearing, by a different route.** Pre-fix inline shell from `56702426`: 3 fail. Fetch-only revert: 3 fail. Decoy (fixed lines kept as comments, real code broken): b and c fail. Clone without `--depth 1` (bug premise gone): the mutation test fails, so it detects when its own premise stops holding. **No mutant that breaks the fetch/checkout path passes the 5-test file.**
+- **Suite and D2.** Suite 319. D2 dates now match the run logs. Clean finish.
+
+**Advisories:**
+- **(A)** Ruling on the foreman's candidate: an **advisory, not a defect.** **Board correction, since commit messages are immutable:** `56f6ce77`'s message lists four of the five extraction changes. It omits the notice-text change (`source_health.json unchanged` → `ingest/_state/source_health.json unchanged`, ~:88), and its sentence *"None of these change what a correctly-configured caller observes"* is inaccurate, because log text is observable. No consumer parses it, and test (c)'s substring still matches.
+- **(B)** Two criterion-1 properties are **unguarded**: mutants dropping `--force` or `[skip ci]` pass all 5 tests. Proposed follow-up: assert `[skip ci]` in case (b), and add a diverged (non-fast-forward) case.
+- **(C)** The mutation-test precondition is exact-text, so rewording the fix lines will turn it red on purpose.
+- **(D)** Carried from gate 1: the drift-stale first refresh PR (render_docs_stats not in the refresh workflow), and a `workflow_dispatch` after merge.
+
+**Foreman correction.** Before the re-gate, the foreman spot-checked `56f6ce77` for the off-by-one phrasing but did not re-resolve the register's line citation, which it had checked at attempt 1. A line-number citation is invalidated by any edit above it. The check the foreman ran could not have caught this.
+
+**Escalation, awaiting the user.** Two bounces on the same task → stop, per step 6. Options put to the user:
+- (a) Authorize a third attempt limited to the one-line register fix plus advisory B, with a narrow re-gate.
+- (b) Accept with the defect routed as a follow-up note.
+- (c) Other.
+
+---
+
+**History: attempt 1 and BOUNCE #1** (preserved as written):
 
 **Why this exists: the corpus has been frozen at 13,060 since v2.9.0, because the weekly refresh has not opened a PR since #97.**
 `auto-refresh.yml` has gone red on **9 consecutive scheduled runs, 2026-07-19 → 2026-09-13**. They are **not all the same failure**:
