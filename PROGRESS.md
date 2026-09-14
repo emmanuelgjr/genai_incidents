@@ -180,6 +180,21 @@ VERSIONING.md step should say which link forms survive the move.
 - **AIID snapshot** fetched 2026-07-18; a newer official one exists (`backup-20260907101103.tar.bz2`). Update is Makefile-only.
 - **The committed corpus already has a second AIID-template exception, 898 / INC-08183, outside the tripwire's two-file scope.** The tripwire cannot see it (a scope gap; route to tripwire evolution).
 
+**Audit landed:** `docs/audits/E21-tripwire-refresh-2026-09-14.md` (`fd1dc409`, `ef9ce6fb`; pushed). Gate is in progress (red-reviewer, fresh instance). **The gate's interim message leans BOUNCE; that is not the final verdict, which is pending its OECD re-fetch.** Its load-bearing interim points:
+- **(1)** The audit's H3 story for 1552 is false.
+- **(2)** Of the rebuild's 8 "merged" IDs, **≥4 join unrelated incidents.**
+- **(3)** ~38 new incidents per run are silently dropped by an 800 KB page cut.
+- **(4)** "Order-dependent" overstates it: identical inputs rebuilt twice are **byte-identical to the committed data**. The build IS deterministic; anchors flip when inputs change.
+- **(5)** Recommendation (b)'s blast radius is **3,666 published rows**, not raw-ingest rows.
+
+**Foreman re-derived two of these independently [R]:**
+- **The 800 KB cut is real:** `scripts/ingest_oecd_aim.py:129` → `return data[:800_000].decode("utf-8", errors="replace")`.
+- **The wrong-merge targets are real, per `data/incidents.json` titles:**
+  - INC-13037 "South Korea Launches AI-Enabled Construction Robot Research Hub" (1 source_id) → merged into INC-00554 "Tesla Driver … Fatal Texas Home Crash" (**103 source_ids**).
+  - INC-05013 "AI-Enabled TruDi Navigation System … Patient's Stroke" → INC-00699 "BMG Sues Anthropic Over AI Training …".
+
+**⚠ Why this outranks the tripwire.** `id_deprecations.json` is append-only (invariant 9). **A refresh PR merged in this state would PERMANENTLY redirect unrelated incident IDs into each other**, with no way to undo it short of a new ruling. **The foreman is treating "no OECD refresh merges" as in force, pending the user's ruling.** The 09-20 scheduled run stays fail-closed at the tripwire, so nothing can reach main in the meantime. A 103-source_id cluster on a single crash also suggests over-merge chaining **already in the published corpus**; the gate has been asked to size it.
+
 ## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
 
 **Post-merge `workflow_dispatch` result [R]:** Persist succeeded and refresh-state advanced to `bfbdec57`. The fix is confirmed against real GitHub. See the E21 tripwire entry above for why no PR opened.
