@@ -136,7 +136,35 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+## 🔧 WS4 REGRESSION — refresh-state persist fix (D5-impl) — opened 2026-09-14 — **✅ done — PASS (attempt 3) — MERGED to main**
+
+**User ruling on the escalation, 2026-09-14:**
+- Keep the line-number citation: `:59` becomes `:66`, not a content-based cite.
+- A third attempt, scoped to that one line. Advisory B (unguarded `--force` / `[skip ci]`) is deliberately not in scope and stays a follow-up.
+- **The user authorized one manual `workflow_dispatch` of auto-refresh after merge.**
+
+**Attempt 3** `99a0f8fe` (pipeline-engineer): `docs/INGESTION_CONDUCT.md:369` `:59` → `:66`, a one-line diff.
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-14, on `99a0f8fe`: PASS ───** *"The register citation now resolves to the git clone, the scope is one line, and the script and tests are byte-unchanged, so the gate-2 mutation evidence still holds."* **Defects: none.**
+
+**Evidence the gate measured [R]:**
+- **Refs.** HEAD = origin branch = `99a0f8fe`.
+- **Scope.** `56f6ce77..4779459c` touches PROGRESS.md only. `4779459c..99a0f8fe` touches INGESTION_CONDUCT.md only (1/1).
+- **The citation resolves, and this check can fail.** `git show 99a0f8fe:scripts/persist_refresh_state.sh | sed -n 66p` prints the `git clone` line. At gate 2 the same command showed `:59` was the trap line.
+- **Script and tests unchanged.** `git diff --quiet 56f6ce77 99a0f8fe -- scripts tests .github .gitattributes` exits 0, so the gate-2 mutation matrix carries over unchanged.
+- **Data untouched.** `git diff --stat 56702426 99a0f8fe -- data schema mappings ingest src legacy docs/data` is empty.
+- **Suite and tree.** 319 passed; tree clean; one worktree.
+
+**Advisories:**
+- **(A) Testimony miscount.** The specialist reported 3 hits for the citation grep; there are **4**, because `PROGRESS.md:143` was omitted. All PROGRESS hits are dated records, so the conclusion is unaffected. Do not repeat "three".
+- **(B) Carried, not bounced, per the user's ruling:**
+  - `--force` and `[skip ci]` are unguarded by tests. **Follow-up owed to WS4:** assert `[skip ci]` in case (b), and add a diverged / non-fast-forward case.
+  - Notice text and the commit-message inaccuracy are already corrected on this board.
+  - **Drift-stale first refresh PR** (render_docs_stats is not in the refresh workflow): re-render before merging it.
+  - `workflow_dispatch` once after merge (user-authorized, above).
+- **(C) The line-number citation will go stale again** on any comment edit above script line 66, the same failure as bounce #2. Whoever next edits the script header must re-resolve `INGESTION_CONDUCT.md:369`.
+
+**Foreman step-6 stray check:** `git status --porcelain --untracked-files=all` is empty before recording. **Step 7:** no counts, public claims, licensing text, taxonomy lists or version strings changed (a workflow step, a script, tests, and one register line cite), so docs-warden is not dispatched.
 
 **─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-14, on `56f6ce77`: BOUNCE #2 ───** *"The only defect is a one-token stale line citation in the invariant-5 register. D1 and D2 are both genuinely fixed, and the new mutation test is load-bearing."*
 
