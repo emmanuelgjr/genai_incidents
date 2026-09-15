@@ -275,6 +275,75 @@ budget.
 
 ### H3 — cluster-target reassignment (the actual mechanism behind 1552, and worse than either H1 or H2)
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defects 2 and 7) — the
+> mechanism below is FALSE for 1552. Read this block before the original
+> finding.**
+>
+> **What was wrong (defect 2).** `OECD-AIM-2026-06-10-3f61` is **not** a
+> member of the 103-row `INC-00554` cluster in the committed corpus — it is
+> a **singleton**, its own entry `INC-13037` ("South Korea Launches
+> AI-Enabled Construction Robot Research Hub"), with exactly one
+> `source_id`. The author's own scratch output for this row already said
+> `in cluster: False`; the finding below did not act on it. **[R],
+> re-derived directly from the committed corpus, not gate-attributed:**
+> ```
+> $ python -c "
+> import json
+> d = json.load(open('data/incidents.json', encoding='utf-8'))
+> e = next(x for x in d['incidents'] if x['id'] == 'INC-13037')
+> print(e['id'], e['title'], e['source_ids'])
+> "
+> INC-13037 South Korea Launches AI-Enabled Construction Robot Research Hub ['OECD-AIM-2026-06-10-3f61']
+> ```
+>
+> **The real mechanism [R] by red-reviewer, gate 2026-09-15, recorded
+> PROGRESS.md; not re-derived by the author:** a genuinely new row in the
+> refreshed input, `OECD-AIM-2026-09-07-53bc` (a wild-mushroom AI warning
+> story), carries two references whose **query-stripped** URL keys each
+> collide with a different existing anchor —
+> `domin.co.kr/news/articleview.html` (→ `INC-13037`/3f61) and
+> `m-i.kr/news/articleview.html` (→ `INC-00554`/1552's cluster). Its first
+> URL hit (`merge_and_dedupe.py:1359-1370`) lands on `INC-13037` (the
+> singleton) first, and the single-pass `_reindex`/`_claim` transitive-merge
+> loop (`merge_and_dedupe.py:1297-1315`) then absorbs the entire 103-row
+> `INC-00554` megacluster into it — bridged by one new row's two refs, not
+> by "38 more rows joining the cluster" as the original text below states.
+> **Root cause:** `normalize_url()` (`merge_and_dedupe.py:311`,
+> `u = u.split("?")[0].split("#")[0]`) drops query strings, so two distinct
+> article URLs that only share a path collapse to one dedup key.
+>
+> **Determinism (defect 7 — "order-dependent" overstates it).** The build
+> itself is deterministic: a control rebuild of the currently-committed
+> inputs, run twice, is byte-identical to what's committed — this is not
+> retry/thread nondeterminism. What is true, and reproduced independently
+> below with a synthetic fixture, is that the **anchor is sensitive to which
+> reference the bridging row lists first**: `dedupe_entries`
+> (`merge_and_dedupe.py:1239` docstring: "first hit wins: CVE > source_id >
+> URL > fuzzy title") resolves a row's references **in list order**, so
+> swapping a bridging row's two refs flips which pre-existing entry becomes
+> the surviving anchor — and therefore whose title/description survives.
+> The **stable INC-* ID** follows a separate, genuinely order-independent
+> rule (the minimum previously-assigned ID among the cluster's keys,
+> `merge_and_dedupe.py:1548-1552`), so the ID itself does not flip — only
+> the anchor's *content* does. **[R], independently re-derived** with a
+> synthetic fixture against the real `dedupe_entries()` (no network, temp
+> script deleted after use):
+> ```
+> # two pre-existing entries A (source_ids=['OECD-AIM-3f61']) and
+> # B (source_ids=['AIID-1552']), and a bridging row carrying both refs
+> order A-then-B refs -> surviving: A ["South Korea Robot Hub", ...]
+> order B-then-A refs -> surviving: B ["Tesla Driver Crash (AIID text)", ...]
+> ```
+> Both runs are deterministic given their input order; only the order
+> differs, and that alone flips the anchor. This confirms the phenomenon
+> (anchor change can discard a higher-trust description) while refuting the
+> specific 1552 story and the "order-dependent" framing as originally
+> stated.
+>
+> Original text below is preserved for the record; its 1552-specific claims
+> (`OECD-AIM-2026-06-10-3f61` as an existing cluster member, "38 more rows
+> joining the cluster") are superseded by the above.
+
 Tracing `aiid_id` 1552 directly: `AIID-1552` **is** in `aiid_full.json` (as
 established in Finding — "1552 observations"), and only **one** raw OECD row
 (`OECD-AIM-2026-06-30-4590`) explicitly cross-references `AIID-1552`. That
@@ -322,6 +391,33 @@ reconciliation charter (propagate downward severity revisions via status +
 conflicts, never silently) is meant to prevent, and this mechanism bypasses
 it entirely.
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 3) — the
+> paragraph above is REFUTED.** **What was wrong:** the "58 changed / 55
+> unrelated / severity regressions" figures came from running
+> `merge_and_dedupe.py` directly without first running `parse_existing.py`
+> (per `Makefile:11-13`, `merge` is the two-step sequence). With
+> `data/legacy_consolidated.json` absent (gitignored, produced only by
+> `parse_existing.py`), `merge_and_dedupe.py` **silently skips legacy input
+> entirely** (`scripts/merge_and_dedupe.py:1411-1424`: `if legacy_path.exists():`
+> guards the whole load, no else-branch, no warning) rather than failing —
+> see the new "build-sequence trap" finding below. **The correct
+> full-rebuild delta, [R] by red-reviewer, gate 2026-09-15, recorded
+> PROGRESS.md; not re-derived by the author:** `19,738 input → 14,048`
+> (not `19,517 → 14,063`), **996** new-only IDs (not 1,011), **24** common
+> rows changed (not 58), **4** description changes (not 58), **5 severity
+> changes, all UPWARD** (`INC-14517` M→H, `INC-00487` M→C, `INC-05170` M→H,
+> `INC-00699` H→C, `INC-14332` H→C) — **no downward severity revisions, and
+> no source_id-count shrinkage**. The claimed `INC-00627`/`INC-00813`
+> Critical→High drops and the `INC-00627`/`INC-00746` source_id shrinkage
+> are **artifacts of the misconfigured build, not real changes**. Invariant
+> 4 (every content change bumps `updated`) and invariant 9 (append-only
+> deprecations) both hold on the correct build. **This is a form (a)
+> agreement-6 failure at build level** (a scratch rebuild that silently
+> skips an input, indistinguishable from a correct build by its own
+> output) — caught only by a different route: a control build of the
+> currently-committed inputs, run twice, proven byte-identical to what's
+> committed.
+
 ### (iii) already answered in Finding 1 (rate limiter migration, dated commits, not retries).
 
 ### Per-row (iv) attribution — all 29 tripwire rows + the 898/INC-08183 blind spot
@@ -336,7 +432,70 @@ it entirely.
 20 + 7 + 2 + 1(pre-existing) = 30, matching the full-rebuild corpus-level
 exception count exactly (Finding — full rebuild, below).
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 5) —
+> "`INC-00699`/1659 …had real, correct AIID-template content" (row above,
+> H3-real-content-displaced) is FALSE.** **[R], re-derived directly from the
+> committed corpus, not gate-attributed:**
+> ```
+> $ python -c "
+> import json
+> d = json.load(open('data/incidents.json', encoding='utf-8'))
+> e = next(x for x in d['incidents'] if x['id'] == 'INC-00699')
+> print(e['title']); print('source_ids:', e['source_ids']); print('aiid_id:', e.get('aiid_id'))
+> "
+> BMG Sues Anthropic Over AI Training With Copyrighted Song Lyrics
+> source_ids: ['OECD-AIM-2026-03-18-eb49']
+> aiid_id: None
+> ```
+> The committed `INC-00699` has **one** OECD source_id, **no** `aiid_id`, and
+> an OECD-template description — it never carried AIID content to begin
+> with. Per red-reviewer's own note (**[R] by red-reviewer, gate 2026-09-15,
+> recorded PROGRESS.md**), the real AIID content for this story lives on
+> `INC-05013` instead. Whatever mechanism moved AIID-sourced content off
+> `1659`/`INC-00699` in the refreshed rebuild is not this document's
+> "cluster churn" story as stated; not re-investigated here.
+
 ## Finding — full rebuild, entry-count and ID-set delta, per agreement 6 (form d) [R]
+
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 3) — the entire
+> delta below is WRONG (a misconfigured build). Read this block before the
+> original finding; do not cite the figures below as current.**
+>
+> **What was wrong.** This rebuild ran `python scripts/merge_and_dedupe.py`
+> alone. `scripts/merge_and_dedupe.py:1411-1424` loads
+> `data/legacy_consolidated.json` only `if legacy_path.exists()`, with no
+> else-branch and no warning — and that file is gitignored, produced only by
+> `scripts/parse_existing.py` (`Makefile:11-13`'s `merge` target is the
+> two-step `parse_existing.py` then `merge_and_dedupe.py`). Running the
+> second step alone **silently proceeds without legacy input** instead of
+> failing. See the new "build-sequence trap" finding below.
+>
+> **The correct delta, [R] by red-reviewer, gate 2026-09-15, recorded
+> PROGRESS.md; not re-derived by the author** (correct build:
+> `parse_existing.py` → `merge_and_dedupe.py`; a control run of the
+> currently-committed inputs, run twice, proven byte-identical to what's
+> committed):
+> - Input: `19,738 = 18,650 + 1,088` new OECD rows (not `19,517`).
+> - Output: **14,048** unique (not `14,063`).
+> - New-only IDs: **996** (not `1,011`). Gone: **8** (same set as below —
+>   correct on that point).
+> - Common IDs: **13,052**; of those, **24** changed (not `58`) — breakdown:
+>   `source_ids`/`updated`/`last_seen`/`source_count` 24 each · `references`
+>   20 · `mitre_atlas` 14 · `mitre_atlas_tactics`/`owasp_llm`/`nist_ai_rmf` 13
+>   · `owasp_asi` 12 · `aiid_id`/`tier` 6 · `severity` 5 ·
+>   `description`/`tags` **4** (not 58) · `attack_vector`/`date`/`title` 3 ·
+>   `affected`/`source_freshness`/`corpus` 2 · `year` 1. `added` and
+>   `quality_tier`: 0.
+> - **Severity: 5 changes, ALL UPWARD** (`INC-14517` M→H, `INC-00487` M→C,
+>   `INC-05170` M→H, `INC-00699` H→C, `INC-14332` H→C) — **no downward
+>   revisions, no source_id-count shrinkage anywhere.**
+> - Invariant 4 (content change ⇒ `updated` bump) **holds**: 24 content
+>   changes = 24 `updated` bumps. Invariant 9 (append-only deprecations)
+>   **holds**: 1,051 prior deprecations preserved, 8 new, all reason
+>   `"merged"`.
+>
+> The below (55 "unrelated" rows, severity-regression examples) is
+> **refuted** and preserved only for the record.
 
 `python scripts/merge_and_dedupe.py` run to completion **inside the scratch
 worktree only** (its own `ROOT`/`DATA` resolve to the scratch tree; nothing
