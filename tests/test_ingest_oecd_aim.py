@@ -305,6 +305,14 @@ def test_fetch_page_extracts_ng_state_from_a_multi_mb_page(monkeypatch, tmp_path
     assert parsed["id"] == body["id"]
     assert parsed["title"] == body["title"]
 
+    # BOUNCE #2: production's main() no longer calls fetch_page()/
+    # extract_state() as a sequence -- it submits fetch_and_extract() to the
+    # thread pool. A test that only exercises fetch_page()+extract_state()
+    # cannot see a regression reintroduced solely at fetch_and_extract()'s
+    # entry point (e.g. `_extract_state_detail(text[:800_000])`). Go through
+    # the REAL fetch_page() here too (no stub) with the SAME cache seeding.
+    assert o.fetch_and_extract(url) == (o.REASON_OK, body)
+
 
 def _build_straddle_page() -> tuple[bytes, dict, int, int, int, int]:
     """BOUNCE #1 defect 2: construct a page where the ng-state JSON BODY
@@ -385,6 +393,11 @@ def test_fetch_page_extracts_ng_state_straddling_the_800kb_boundary(monkeypatch,
     assert parsed is not None
     assert parsed["id"] == body["id"]
     assert parsed["title"] == body["title"]  # the CJK character round-trips intact
+
+    # BOUNCE #2: also exercise fetch_and_extract(), production's real entry
+    # point, through the REAL fetch_page() (no stub) -- see the multi-MB
+    # test above for why this is required, not redundant.
+    assert o.fetch_and_extract(url) == (o.REASON_OK, body)
 
 
 def test_fetch_page_still_works_on_a_normal_small_page(monkeypatch, tmp_path):
@@ -479,6 +492,10 @@ def test_fetch_page_cold_path_does_not_truncate(monkeypatch, tmp_path):
     assert parsed is not None
     assert parsed["id"] == body["id"]
     assert parsed["title"] == body["title"]
+
+    # BOUNCE #2: also exercise fetch_and_extract() on the COLD branch --
+    # production's real entry point, through the REAL fetch_page() (no stub).
+    assert o.fetch_and_extract(url) == (o.REASON_OK, body)
 
 
 def test_extract_state_handles_multi_mb_page_without_pathological_backtracking():
@@ -596,3 +613,179 @@ def test_tally_reasons_counts_each_bucket_independently():
     # url exactly once -- the same total the old single ok/parse_fail split
     # always had, just no longer collapsed into an undifferentiated bucket.
     assert sum(counts.values()) == len(results)
+
+
+# --- WS4-T11 re-gate BOUNCE #2: offline end-to-end main() ------------------
+#
+# The gap BOUNCE #2 found: every test above calls fetch_page()+extract_state()
+# as a sequence, or stubs fetch_page() entirely -- neither is the sequence
+# production actually runs. main() submits fetch_and_extract() to the thread
+# pool and reads its (reason, body) result straight from `results`. A
+# regression planted solely at fetch_and_extract()'s own entry point (e.g.
+# `_extract_state_detail(text[:800_000])` at scripts/ingest_oecd_aim.py:255)
+# passed all 30 previously-committed tests and silently dropped a >800 KB
+# incident in an offline main() run. This test exercises main() itself, with
+# no network: load_sitemap() and ingest.common.fetch_once() are both
+# monkeypatched, CACHE and INGEST are redirected under tmp_path, and every
+# REASON_* bucket, a duplicate sitemap URL (advisory 2), and a 0-byte page
+# (point 4's benign accounting delta) are all present in one run.
+
+
+def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
+    """No network. Asserts on (i) the written output file's exact id set and
+    (ii) the exact printed summary numbers (fetched/ok/each unparseable
+    sub-bucket), which must sum to the fetched total. This is what kills the
+    reviewer's surviving main()-level mutants: dropping `no_shape` from the
+    unparseable total, computing `ok` wrongly, and printing `fetched` as
+    `len(urls)` (which would also be wrong here purely from the duplicate
+    URL, independent of the fetch failure)."""
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    ingest_dir = tmp_path / "ingest"
+    ingest_dir.mkdir()
+    monkeypatch.setattr(o, "CACHE", cache_dir)
+    monkeypatch.setattr(o, "INGEST", ingest_dir)
+    monkeypatch.delenv("OECD_AIM_LIMIT", raising=False)  # use the real default (3000), deterministic
+    # Skip real exponential-backoff sleeps on the simulated fetch failure
+    # below (2s + 4s otherwise) -- this test asserts no real network call is
+    # ever reached, so there is nothing to legitimately wait out.
+    monkeypatch.setattr(_common.time, "sleep", lambda *_a, **_k: None)
+
+    url_normal = "https://oecd.ai/en/incidents/2026-01-10-norm"
+    url_big = "https://oecd.ai/en/incidents/2026-01-11-big"
+    url_shell = "https://oecd.ai/en/incidents/447"
+    url_noscript = "https://oecd.ai/en/incidents/2026-01-13-nosc"
+    url_badjson = "https://oecd.ai/en/incidents/2026-01-14-badj"
+    url_fetchfail = "https://oecd.ai/en/incidents/2026-01-15-fail"
+    url_empty = "https://oecd.ai/en/incidents/2026-01-16-empty"
+    url_ok_not_relevant = "https://oecd.ai/en/incidents/2026-01-17-filt"
+
+    # url_normal appears TWICE -- load_sitemap() does not dedupe; proves
+    # advisory 2 (fetched must come from `results`, not `len(urls)`).
+    urls = [
+        url_normal, url_big, url_shell, url_noscript, url_badjson,
+        url_fetchfail, url_empty, url_ok_not_relevant, url_normal,
+    ]
+    monkeypatch.setattr(o, "load_sitemap", lambda: list(urls))
+
+    normal_body = {
+        "id": "2026-01-10-norm",
+        "title": "Deepfake voice clone scam empties retiree's bank account",
+        "date": "2026-01-10",
+        "summary": "Fraudsters used a deepfake voice clone to steal funds.",
+        "company": ["Example Bank"], "articles": [], "aiid_ids": [],
+    }
+    big_body = {
+        "id": "2026-01-11-big",
+        "title": "Ransomware attack cripples AI-driven hospital triage system",
+        "date": "2026-01-11",
+        "summary": "A ransomware gang crippled an AI-driven triage system.",
+        "company": ["Example Hospital"], "articles": [], "aiid_ids": [],
+    }
+    # Parses cleanly (REASON_OK -- has a valid id+title+date) but contains no
+    # SECURITY_KEYWORDS match, so normalize_body() filters it out of `out`.
+    # Without this fixture, `ok` (REASON_OK count) and `len(out)`
+    # (security-relevant-kept count) are numerically identical by
+    # coincidence, and a `main()` mutant that computes `ok` as `len(out)`
+    # instead of the real REASON_OK tally passes undetected.
+    ok_not_relevant_body = {
+        "id": "2026-01-17-filt",
+        "title": "AI system helps farmers optimize crop irrigation schedules",
+        "date": "2026-01-17",
+        "summary": "Researchers report improved yields using an AI irrigation planner.",
+        "company": ["AgriCo"], "articles": [], "aiid_ids": [],
+    }
+
+    # >=1000 bytes so robust_fetch()'s min_cache_bytes threshold is met and
+    # the warm-cache branch actually engages (below that it falls through to
+    # the cold branch, which for this URL isn't handled by the fake
+    # fetch_once below and would fail loudly instead of silently).
+    normal_page = _make_page(script_offset_bytes=700, tail_bytes=700, body=normal_body)
+    assert len(normal_page) >= 1000
+    # >=949 KB, ng-state blob starting beyond byte 900,000 -- real OECD AIM
+    # shell pages run ~949,653 bytes (BOUNCE #1 defect 1's own figure).
+    big_page = _make_page(script_offset_bytes=900_500, tail_bytes=50_000, body=big_body)
+    assert len(big_page) >= 949_000
+    ok_not_relevant_page = _make_page(script_offset_bytes=700, tail_bytes=700, body=ok_not_relevant_body)
+    assert len(ok_not_relevant_page) >= 1000
+
+    shell_shape = {"AppStateKey_0": {"h": "somehash", "s": "somestatus", "st": 1, "u": "/447", "rt": True}}
+    shell_page = (
+        f'<script id="ng-state">{json.dumps(shell_shape)}</script>'.encode("utf-8")
+        + b"<!-- padding --> " * 100
+    )
+    noscript_page = (
+        b"<html><body>no ng-state script here at all, just ordinary page content</body></html>"
+        + b"<!-- padding --> " * 100
+    )
+    badjson_page = (
+        b'<script id="ng-state">{this is not valid json at all</script>'
+        + b"<!-- padding --> " * 100
+    )
+
+    for url, page_bytes in (
+        (url_normal, normal_page),
+        (url_big, big_page),
+        (url_shell, shell_page),
+        (url_noscript, noscript_page),
+        (url_badjson, badjson_page),
+        (url_ok_not_relevant, ok_not_relevant_page),
+    ):
+        slug = url.rstrip("/").split("/")[-1]
+        (cache_dir / f"{slug}.html").write_bytes(page_bytes)
+    # url_fetchfail and url_empty are deliberately left UNcached -- they go
+    # through robust_fetch()'s cold branch, handled by the fake fetch_once
+    # below.
+
+    def _fake_fetch_once(url_, headers=None, timeout=60, min_interval=None):
+        if url_ == url_fetchfail:
+            raise ConnectionError("simulated fetch failure -- no real network reached")
+        if url_ == url_empty:
+            return b"", {}
+        raise AssertionError(f"unexpected live fetch attempted for {url_} -- cache seeding gap")
+
+    monkeypatch.setattr(_common, "fetch_once", _fake_fetch_once)
+
+    o.main()
+
+    captured = capsys.readouterr()
+    out_text = captured.out
+
+    # (i) the written output file: exact id set, large incident present.
+    # ok_not_relevant_body parsed fine but is correctly EXCLUDED here (not
+    # security-relevant) -- this is what makes it distinguish `ok` from
+    # `len(out)` below rather than merely testing the same thing twice.
+    out_path = ingest_dir / "oecd_aim_full_incidents.json"
+    written = json.loads(out_path.read_text(encoding="utf-8"))
+    ids = {e["source_id"] for e in written}
+    assert ids == {
+        f"OECD-AIM-{normal_body['id']}",
+        f"OECD-AIM-{big_body['id']}",
+    }
+    assert f"OECD-AIM-{big_body['id']}" in ids  # the >=949 KB incident specifically
+    assert f"OECD-AIM-{ok_not_relevant_body['id']}" not in ids
+
+    # (ii) the summary line via capsys, exact numbers.
+    # 8 unique urls (url_normal's duplicate collapses in `results`):
+    #   ok: normal, big, ok_not_relevant                = 3
+    #   no_ng_state_script: noscript, empty              = 2
+    #   json_decode_error: badjson                       = 1
+    #   no_incident_body_shape: shell                    = 1
+    #   fetch_failed: fetchfail                           = 1
+    # fetched = 8 unique - 1 fetch_failed = 7 (NOT 9 = len(urls), which
+    # double-counts the duplicate url_normal -- this is what kills the
+    # `fetched = len(urls)` mutant on THIS fixture, independent of any
+    # fetch failure).
+    # ok(3) + unparseable(2+1+1=4) == fetched(7).
+    # "2 security-relevant kept" (NOT 3): ok_not_relevant_body parsed fine
+    # (REASON_OK) but was filtered by normalize_body() -- this is what kills
+    # a `main()` mutant computing `ok` as `len(out)` instead of the real
+    # REASON_OK tally (the two would otherwise coincide at 2 and pass
+    # undetected).
+    assert "[aim] fetched 7/9 pages in" in out_text
+    assert (
+        "[aim] parsed: 3 ok, 4 unparseable "
+        "(no ng-state script: 2, JSON decode error: 1, "
+        "ng-state present but no incident-body shape: 1); "
+        "2 security-relevant kept"
+    ) in out_text

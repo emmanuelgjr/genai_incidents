@@ -519,6 +519,17 @@ def main():
         futures = {ex.submit(fetch_and_extract, u): u for u in urls}
         for i, fut in enumerate(as_completed(futures), 1):
             u = futures[fut]
+            # `results` is keyed by URL, so a duplicate sitemap URL (load_sitemap()
+            # does not dedupe) collapses to one entry here -- both submissions did
+            # real work, but only one survives to be counted. See the `fetched`
+            # derivation below (WS4-T11 re-gate BOUNCE #2 advisory 2).
+            #
+            # A 0-byte page (`fetch_page()` returns `""`, which is not None) is
+            # stored here too, and buckets to REASON_NO_SCRIPT_MATCH below -- an
+            # intentional, documented behavior change from the pre-WS4-T11-BOUNCE-1
+            # `pages` dict, which used `if text:` (truthy) and so silently dropped
+            # an empty-string page from BOTH the fetched and the unparseable counts.
+            # It is now counted honestly as fetched-but-unparseable, not vanished.
             results[u] = fut.result()
             if i % 200 == 0:
                 elapsed = time.time() - t0
@@ -526,7 +537,13 @@ def main():
                 print(f"  fetched {i}/{len(urls)} ({rate:.1f} pages/s)")
 
     counts = _tally_reasons(results)
-    fetched = len(urls) - counts.get(REASON_FETCH_FAILED, 0)
+    # Derived from `results` (deduped by URL), NOT `len(urls)`: `len(urls)` counts
+    # a duplicate sitemap URL once per occurrence, which would overcount `fetched`
+    # by exactly the duplicate count even though only one result was ever kept per
+    # URL. `len(urls)` remains in the printed denominator below as "how many
+    # sitemap entries were attempted", which legitimately can exceed the unique
+    # fetch count when duplicates are present.
+    fetched = len(results) - counts.get(REASON_FETCH_FAILED, 0)
     print(f"[aim] fetched {fetched}/{len(urls)} pages in {time.time()-t0:.0f}s")
 
     out = []
