@@ -1180,10 +1180,11 @@ BOUNCE #2, defect N / advisory x)` blocks placed immediately after the
 passage each one affects, per working agreement 4. The only deletion-like
 change is defect 2's strikethrough (the clause is struck, not removed).
 
-1. **Defect 1** (Finding 8, "~100 of 103 unrelated" bullet) — the pointer to
-   a nonexistent `git show` output is replaced with the actual `python -c`
-   command re-run against `data/incidents.json`, narrowing the author's own
-   [R] to the count/title only; the composition claim stays gate-attributed.
+1. **Defect 1** (Finding 8, "~100 of 103 unrelated" bullet) — added a note
+   after the original bracketed provenance claim, replacing its dangling
+   pointer with the actual `python -c` command re-run against
+   `data/incidents.json`, narrowing the author's own [R] to the count/title
+   only; the composition claim stays gate-attributed.
 2. **Defect 2** (REVISED RECOMMENDATION item A) — struck the invented "cannot
    be un-published without a distinct deprecation reason code" clause;
    restated the real freeze rationale (permanent append-only redirect under
@@ -1202,16 +1203,18 @@ change is defect 2's strikethrough (the clause is struck, not removed).
 5. **Advisory a** (the determinism paragraph under "H3 — cluster-target
    reassignment") — attributed the control-rebuild-is-byte-identical claim
    to the gate explicitly, rather than leaving it unmarked.
-6. **Advisory b** (the synthetic fixture) — replaced the abstract fixture
-   description with the exact reproducible URL shapes, the exact outputs
+6. **Advisory b** (the synthetic fixture) — added, after the original
+   abstract fixture, the exact reproducible URL shapes, the exact outputs
    for both ref orderings, and a new distinct-path control (3 survivors, 0
    tombstones) confirming the flip requires the query-string collapse
    specifically.
 7. **Advisory c** (the defect-5 correction on `INC-00699`, and the item-B
-   override-keying caveat) — corrected the AIID content attribution: the
-   real absorbed content is `INC-05013`'s `aiid_id` 1436, not `1659`; `1659`
-   is not present in `ingest/aiid_full.json` at all. Struck `1659` from the
-   caveat's example list, leaving `1552` (still sufficient to justify it).
+   override-keying caveat) — added notes correcting the AIID content
+   attribution: the real absorbed content is `INC-05013`'s `aiid_id` 1436,
+   not `1659`; `1659` is not present in `ingest/aiid_full.json` at all. The
+   item-B caveat's original `/`1659`` reference is left intact with a
+   correction note directly after it (not struck — only defect 2's clause
+   is struck in this round).
 
 ---
 
