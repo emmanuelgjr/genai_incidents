@@ -9,7 +9,27 @@ edit the original analysis to make it read as current (working agreement 4).
 **Owner of this document:** pipeline-engineer (WS4). **Depends on:**
 `docs/audits/E21-tripwire-refresh-2026-09-14.md` (Findings 8/9), D25, and the
 WS4-T10 Phase A/B work landed on branch `ws4/t10-normalize-url`
-(`75825299` code fix, this commit's predecessor for the Phase B numbers below).
+(`75825299` code fix, this commit's predecessor for the Phase B numbers below
+— **[Revision 2 dated note] superseded as the Phase A commit by `883707c7`;
+see §7**).
+
+> ## ⚠ REVISION 2 — 2026-09-15 (red-reviewer BOUNCE #1 on `c9424935`)
+> **Revision 2 (§7, at the end of this document) SUPERSEDES the
+> recommendation in §4 and several figures in §2 below.** Red-reviewer's
+> gate found the original Option 2 recommendation was measured only on
+> the 5 rows that already looked like content swaps — selection bias — and
+> that the FULL 47-row population tells a different story (43/47 keep
+> title continuity; only 4 break it). It also found `INC-08183` was a
+> **false split the code itself introduced** (a `web_view` blocklist
+> miss), corpus-wide reference restoration was undercounted, and
+> `validate.py` **already fails closed today** via one mis-keyed
+> `curation_overrides.json` entry. §1 is preserved as written and still
+> correct on the mechanism/why; §2, §3 and §4 below are preserved
+> VERBATIM as the ORIGINAL analysis and are marked in place at each
+> refuted passage — **read them as history, not as current** for anything
+> a Revision-2 marker flags; §7 has the corrected figures and
+> recommendation. `docs/audits/WS4-T10-phaseB-delta-2026-09-15.json` /
+> `.md` are the re-derived, committed evidence behind Revision 2.
 
 ## 1. Why this document exists, not just the code fix
 
@@ -75,6 +95,10 @@ working agreement 6.
   `mitre_atlas_tactics`/`owasp_asi` 30, `owasp_llm` 29, **`severity` 26**,
   `cve_ids` 11, `tags`/`capec_ids`/`cwe_ids` 9–10, `date`/`description`/
   `title` 5, others ≤3.
+  **[Revision 2, dated note]** This count was **48** against the ORIGINAL
+  `c9424935` code. After the BOUNCE #1 `web_view` blocklist fix (§7),
+  `INC-08183` no longer changes at all, so the figure is **47** as of
+  `883707c7` — see `docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`.
 - **Severity: 26 changes, all DOWNWARD** (e.g. `Critical`→`High`,
   `Critical`→`Medium`, `High`→`Medium`). Direction is exactly what's
   expected: splitting removes inflated-severity contamination that
@@ -102,6 +126,18 @@ working agreement 6.
   references that belonged to now-split-off unrelated content left with
   it); 1 gained (`INC-08183`, see §2.2, a byproduct of that row's own
   anchor changing).
+  **[Revision 2, dated note — this whole bullet is superseded, not just
+  refined.]** "1 gained" was a **per-row reference-COUNT** comparison,
+  which undercounts: it misses same-count swaps and doesn't measure the
+  corpus-wide picture. Red-reviewer's gate, measuring at the distinct-URL
+  level, found **7 common rows gain 8 never-shipped URLs; corpus-wide 379
+  distinct reference URLs newly shipped, 0 lost.** Re-derived against the
+  BOUNCE #1-fixed code (`883707c7`): **377 distinct, 0 lost** (the -2 is
+  the web_view fix removing `INC-08183`'s own false extra reference plus
+  one further blocklist-driven shift; see
+  `docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`'s defect-4 section for
+  the full accounting). `INC-08183` itself no longer gains a reference at
+  all post-fix (§7, §2.2's note below).
 
 ### 2.1 INC-00554's full decomposition
 
@@ -144,6 +180,23 @@ These are the exact same class of harm as §2.1, at smaller scale (2–14 old
 source_ids each, vs. 103). **Any option below must treat all 47 split rows
 uniformly** — §2.1 is not a special case requiring bespoke handling.
 
+**[Revision 2, dated note.]** `INC-08183` in this table is a **different
+kind of bug than the other four, and is now fixed.** Its `source_ids` were
+IDENTICAL in both builds (it was never a split at all) — the swap was
+caused by a `?&web_view=true`-tagged reference keying apart from its bare
+twin (a blocklist miss the code fix itself introduced, since `web_view`
+wasn't yet on the tracking-param blocklist when this table was written),
+which split the row's own references across two dedup keys and flipped
+its anchor. BOUNCE #1 fixed this (`883707c7`, blocklists `web_view`);
+`INC-08183` no longer appears in the delta at all as of that commit — see
+`docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`'s defect-2 section. It
+stays in this table, struck through in spirit but not in text (agreement
+4: this is the original analysis, preserved), as the found-then-fixed
+example of the DISTINCT harm class §7 discusses: a **non-split** stable-ID
+content swap, which is why the design's guard (§5.1(b)) must cover ALL
+common IDs' title/anchor continuity, not just IDs the split-detection
+logic flags.
+
 ### 2.3 The fix also RECOVERS a true duplicate the bug was hiding
 
 Not every population change is a split. `INC-07738` ("Anthropic's Mythos AI
@@ -159,6 +212,23 @@ fixed build wants to add. **This confirms the fix improves recall as well
 as precision**: it is not a blanket "un-merge everything" operation, and
 any unmerge design must not assume splitting is the only kind of change a
 fixed rebuild produces.
+
+**[Revision 2, advisory A5.]** Note what this merge does to `INC-07738`
+specifically: it is an **intact, previously-published id that gets
+retired into a fresh id (`INC-14757`) even though nothing was wrong with
+its own content** — it simply stops being its own row because a genuine
+duplicate was found. This is avoidable churn from the citer's perspective
+(a working id disappears for a reason that has nothing to do with THAT
+id being wrong), and neither this document's split-focused options (§3)
+nor §5's guard proposal originally covered it, because it isn't a split.
+**The design must also cover this shape**: any remediation/guard built
+for splits should treat a "merge that retires an intact id" the same
+way — flag it for the same D25(a)(2) same-incident human review a refresh
+merge gets, precisely because `merged` is supposed to be a same-incident
+assertion (§3, Option 1's discussion) and this is the first concrete case
+of the FIX itself producing one, not a refresh. No committed data changes
+under this decision; it's a scope note for whoever executes remediation
+and for D25(a)(2) review generally.
 
 ### 2.3b A curation override already mis-keys under the fix — measured, not hypothetical
 
@@ -354,6 +424,15 @@ also retire needlessly.
 
 ## 4. Recommendation
 
+> **[Revision 2, dated note — this ENTIRE section is SUPERSEDED, not
+> refined.]** This recommendation was built on a claim — "the mechanical
+> tie-break does not track the real incident even once" — that turned out
+> to be measured only on the 5 title-swap rows themselves (selection
+> bias), not the full 47-row population. Measured on all 47: **43 keep
+> title continuity, only 4 break it.** §4 as originally written below is
+> preserved verbatim for the record; **§7 has the corrected recommendation
+> (a hybrid, not pure Option 2) and is the one to act on.**
+
 **Option 2** (retire every split id; mint new ids for every successor;
 `reason: "split"`, `into` always array-valued), **with Option 3's
 opt-in curated-survivor escape hatch reserved for future splits that are
@@ -394,11 +473,29 @@ review of new merges. This document adds the structural piece condition
 
 1. **The code fix (Phase A, done) must not be allowed to touch the 47
    already-published split rows' identity resolution on an ordinary
-   scheduled rebuild** until the chosen remediation option (§4) has run.
+   scheduled rebuild** until the chosen remediation option (§4, superseded
+   by §7) has run.
    Concretely: a rebuild run today, with no further change, WOULD already
    silently produce §2's content swaps the next time CI runs `make build`
    — the fix being correct is not the same as it being safe to let run
-   unattended against the current committed corpus. This needs either (a)
+   unattended against the current committed corpus.
+   **[Revision 2, dated note — the mechanism was right, the described
+   FAILURE MODE was wrong; corrected in §7.]** This originally said the
+   risk was a FUTURE, hypothetical "next `make build`" silently shipping
+   swaps. Measured instead: `python scripts/validate.py` on the
+   BOUNCE #1-fixed build **already exits 1 TODAY** — "1 entr(ies) carry
+   discovery_method outside the landmark tier (e.g. `INC-14614`)", the
+   `CVE-2025-10875` mis-keyed override from §2.3b. That means
+   `.github/workflows/validate.yml` ("Validate incidents.json against
+   schema"), `auto-refresh.yml` and `cve-enrich.yml` (both "Re-merge +
+   render + validate") all **fail closed right now** if this branch's
+   code runs — a real safety net, but a single point of failure: it is
+   exactly the ONE override item 2 below tells remediation to re-key, and
+   once THAT alone is done with no continuity guard in place, an ordinary
+   rebuild would ship §2.1/§2.2's swaps with `validate.py` passing clean.
+   §7 restates this requirement with the override re-keying and the
+   continuity guard sequenced to land together, not the override first.
+   This needs either (a)
    the remediation (§4) landing in the SAME PR/session as the point where
    the freeze lifts (recommended — keeps the corpus from ever being in the
    swapped state, even transiently, in a published build), or (b) an
@@ -426,7 +523,127 @@ review of new merges. This document adds the structural piece condition
 ## 6. What this document does NOT decide
 
 Per protocol step 8, the following are the user's call, not pre-decided
-here: which option (§4 is a recommendation); whether remediation is its own
-task/PR separate from the freeze-lift PR or bundled with it; the exact
-`id_deprecations.json` schema shape (schema-architect's call, options
-listed in §3 only to inform that call, not to preempt it).
+here: which option (§4 is a recommendation, superseded by §7); whether
+remediation is its own task/PR separate from the freeze-lift PR or bundled
+with it; the exact `id_deprecations.json` schema shape (schema-architect's
+call, options listed in §3 only to inform that call, not to preempt it).
+
+## 7. Revision 2 — 2026-09-15 (red-reviewer BOUNCE #1 on `c9424935`)
+
+**This section supersedes §4's recommendation and the figures §2/§5.1
+mark above.** Evidence: `docs/audits/WS4-T10-phaseB-delta-2026-09-15.json`
+/ `.md`, re-derived against the BOUNCE #1-fixed code (`883707c7`), full
+47-row split population (not a sample), committed and re-runnable.
+
+### 7.1 What changed and why the recommendation flips
+
+§4's Option 2 rested on: "the mechanical tie-break does not track the real
+incident even once in the sample inspected." That sample was the 5 rows
+that already looked like swaps (§2.2's table) — a selection-biased sample
+BY CONSTRUCTION, since it was drawn by looking for swaps. Measured on the
+full 47-row split population (`splits.rows` in the JSON, every row, not a
+sample):
+
+- **43 of 47 splits keep title continuity**: the successor that keeps the
+  old id also keeps the old title — i.e. the CURRENTLY PUBLISHED content
+  matches what the fixed code's own tie-break naturally produces for that
+  id. `INC-02671` (Grok NCII, keeps 17/18 source_ids, sheds one unrelated
+  robotic-lawnmower row) is the representative case, not an outlier.
+- **Only 4 break continuity**: `INC-00311`, `INC-00554`, `INC-00754`,
+  `INC-01897` — the same four from §2.2's table (`INC-08183` is NOT one of
+  these four; it was never a split — §2.2's dated note).
+- **Continuity does not correlate with source-count retention.**
+  `INC-00861` keeps only 2/32 (6%) of its source_ids yet keeps the right
+  title; `INC-00554` similarly keeps only 2/103 (2%) but picks the WRONG
+  content. Source-count share is not the signal; **title continuity
+  between the currently-published row and the fixed code's own natural
+  output for that id IS the signal**, and it is directly measurable, once,
+  for a one-time remediation — see 7.2.
+
+### 7.2 Corrected recommendation: a measured hybrid, not blanket Option 2
+
+**For each of the 47 (and, in a future remediation, however many) split
+ids, compare the CURRENTLY PUBLISHED title/content to what the fixed
+code's own mechanical tie-break naturally produces for that same id**
+(exactly what the committed delta's `survivor_title_continuity` field
+measures). This single, one-time, per-id comparison decides the option:
+
+- **Where continuity holds (43/47 today): Option 1, and — this is the
+  simplification the original §3 discussion missed — it needs NO special
+  `id_deprecations.json` schema entry at all.** The split-off members
+  never had a separate published id of their own; they were always
+  embedded inside the single over-merged row. There is nothing to
+  "deprecate FROM" for them — they simply appear as ordinary new rows on
+  the next build, exactly like any newly-ingested content would. The old
+  id keeps its id, its title, and every existing citation resolves
+  correctly, because the content genuinely didn't change. **This is not
+  Option 1 as originally scoped ("keep IDs and hope a mechanical tie-break
+  picked right, or curate a choice") — it's a MEASURED confirmation that
+  the tie-break's choice matches today's published content**, which
+  removes the "purely mechanical tie-break cannot recover the real
+  incident" objection §3's Option 1 discussion raised, for exactly these
+  43 rows.
+- **Where continuity breaks (4/47 today: `INC-00311`, `INC-00554`,
+  `INC-00754`, `INC-01897`): Option 2.** These are the rows where the
+  measured evidence directly shows the mechanical tie-break picks WRONG
+  content — retire the old id with a NEW `reason: "split"` deprecation
+  record pointing at every successor (`into` array-valued, per §3's
+  Option 2 schema discussion, which stands unchanged), and mint a fresh
+  id for every one of that old id's successors, INCLUDING the piece that
+  would otherwise have mechanically inherited the old id. No survivor
+  keeps the old id for these four.
+- **`INC-08183`-shaped non-split swaps (§2.2's dated note): covered by the
+  SAME continuity check, run over ALL common ids, not just ids the
+  split-detector flags.** This is what closes BOUNCE #1 defect 2d: the
+  design's guard (§5.1(b), restated below) checks title/anchor continuity
+  on every common id every build, independent of whether that id's
+  source_ids changed at all — `INC-08183` had UNCHANGED source_ids and
+  still needed exactly this check to catch its swap (it's already fixed
+  as a bug, but the class of harm it represents needs the general guard,
+  not just the specific `web_view` blocklist entry).
+
+**This recommendation needs less schema work than §4's blanket Option 2,
+not more**: only 4 rows (today) need a `reason: "split"` deprecation
+record at all; 43 need nothing beyond what an ordinary rebuild already
+does correctly. The `reason: "split"` enum value and array-valued `into`
+are still needed (schema-architect's call on exact shape, per §3/§6) —
+just for a much smaller, precisely-identified population.
+
+### 7.3 Sequencing (supersedes §5's item order)
+
+The override re-keying (§5 item 2, `CVE-2025-10875`) and the continuity
+guard (§5 item 1(b)) **must land in the same change, not the override
+first.** §5.1's dated note above shows why: `validate.py` failing today is
+a real but SINGLE-POINT safety net — re-keying that one override without
+the guard removes the only thing currently standing between an ordinary
+rebuild and shipping §2.1/§2.2's swaps clean. Concretely, before the
+freeze can lift under D25(a):
+1. Apply 7.2's per-id decision to today's 47 (4 retirements + 349 total
+   successor rows, 43 of them needing no deprecation record).
+2. Re-key or fix the `CVE-2025-10875` override (§2.3b) as part of the same
+   change.
+3. Land the continuity guard (checks ALL common ids' title/anchor
+   consistency across a rebuild, not just split-flagged ones) in the same
+   PR, so `validate.py` (or an equivalent gate) would catch a FUTURE
+   instance of either harm class before it ships, not just the two
+   instances already found and fixed by hand.
+4. Then the freeze-lift conditions in D25(a) apply as originally stated.
+
+### 7.4 Advisory A5 — restated (see §2.3's dated note for the finding)
+
+The design must also treat a **merge that retires an intact published
+id** (the Mythos case, `INC-07738` → `INC-14757`) as needing the same
+D25(a)(2) same-incident human review a refresh merge gets — it is a
+`merged` deprecation, so the existing same-incident review already
+nominally covers it, but this document did not originally call it out as
+a case that review needs to specifically look for (an id disappearing not
+because it was wrong, but because a genuine duplicate was found). No
+schema change needed; a scope note for whoever runs D25(a)(2) review.
+
+### 7.5 What this section still escalates to the user (unchanged from §6)
+
+The hybrid in 7.2 is a recommendation, not a decision: the user still
+rules on (a) whether to adopt 7.2's per-id continuity-based hybrid over a
+blanket option, (b) remediation sequencing/PR structure, and (c) the exact
+`id_deprecations.json` schema shape for the `reason: "split"` records the
+4 continuity-breaking rows need (schema-architect's call).
