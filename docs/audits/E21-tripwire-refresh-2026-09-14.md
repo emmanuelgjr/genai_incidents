@@ -336,9 +336,24 @@ budget.
 > `merge_and_dedupe.py:1548-1552`), so the ID itself does not flip — only
 > the anchor's *content* does. **[R], independently re-derived** with a
 > synthetic fixture against the real `dedupe_entries()` (no network, temp
-> script deleted after use). **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2,
-> advisory b) — reproducible URL shapes and exact outputs, including a
-> distinct-path control the original text omitted:**
+> script deleted after use):
+> ```
+> # two pre-existing entries A (source_ids=['OECD-AIM-3f61']) and
+> # B (source_ids=['AIID-1552']), and a bridging row carrying both refs
+> order A-then-B refs -> surviving: A ["South Korea Robot Hub", ...]
+> order B-then-A refs -> surviving: B ["Tesla Driver Crash (AIID text)", ...]
+> ```
+> Both runs are deterministic given their input order; only the order
+> differs, and that alone flips the anchor. This confirms the phenomenon
+> (anchor change can discard a higher-trust description) while refuting the
+> specific 1552 story and the "order-dependent" framing as originally
+> stated.
+>
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory b) — the fixture
+> above is genuine but under-specified (no concrete URLs, abbreviated
+> output). Reproducible URL shapes, exact outputs for both orderings, and a
+> distinct-path control the original text omitted, all against the same
+> real `dedupe_entries()` (no network, temp script deleted after use):**
 > ```python
 > a = mk("A", "South Korea Robot Hub",
 >        ["https://domin.co.kr/news/articleView.html?idxno=111"], ["OECD-AIM-3f61"])
@@ -372,11 +387,9 @@ budget.
 > separately rebuilt and confirmed by red-reviewer at the re-gate
 > (2026-09-15, recorded PROGRESS.md); the exact URL shapes, code, and
 > outputs above are the author's own re-run, not copied from the gate.
-> Both collision runs are deterministic given their input order; only the
-> order differs, and that alone flips the anchor. This confirms the
-> phenomenon (anchor change can discard a higher-trust description) while
-> refuting the specific 1552 story and the "order-dependent" framing as
-> originally stated.
+>
+> Original text above is preserved for the record; its abbreviated output
+> notation is superseded by the exact figures just given.
 >
 > Original text below is preserved for the record; its 1552-specific claims
 > (`OECD-AIM-2026-06-10-3f61` as an existing cluster member, "38 more rows
@@ -503,9 +516,14 @@ exception count exactly (Finding — full rebuild, below).
 > ```
 > The committed `INC-00699` has **one** OECD source_id, **no** `aiid_id`, and
 > an OECD-template description — it never carried AIID content to begin
-> with.
+> with. Per red-reviewer's own note (**[R] by red-reviewer, gate 2026-09-15,
+> recorded PROGRESS.md**), the real AIID content for this story lives on
+> `INC-05013` instead. Whatever mechanism moved AIID-sourced content off
+> `1659`/`INC-00699` in the refreshed rebuild is not this document's
+> "cluster churn" story as stated; not re-investigated here.
+>
 > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory c):** the sentence
-> below ("the real AIID content for this story lives on `INC-05013`
+> just above ("the real AIID content for this story lives on `INC-05013`
 > instead") is correct but under-specified — **[R], re-derived directly
 > against the committed corpus, not gate-attributed:**
 > ```
@@ -913,11 +931,10 @@ decided.**
   radius (defect 9: 3,666 rows now / 4,657 post-refresh, no `updated` bump)
   and its caveat (the `INC-00437` step-4d override must be re-keyed to the
   anchor, or asserted, in the same PR — otherwise it can silently mislabel
-  again under the exact mechanism this document found for `1552`
-  ~~/`1659`~~).
-  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory c):** `1659` is
-  > struck above — it never had AIID content to lose (advisory c's
-  > correction at defect 5, above: `aiid_id` 1659 is not in
+  again under the exact mechanism this document found for `1552`/`1659`).
+  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory c):** `1659` in
+  > the sentence above is wrong — it never had AIID content to lose
+  > (advisory c's correction at defect 5, above: `aiid_id` 1659 is not in
   > `ingest/aiid_full.json` at all, and the genuine AIID content for that
   > story arc is `INC-05013`'s `aiid_id` 1436, a different row). The
   > override-keying caveat still holds on `1552` alone, which is sufficient
@@ -1027,13 +1044,17 @@ recorded PROGRESS.md; not re-derived by the author.**
   Of the entry's 103 (pre-refresh) `source_ids`, **roughly 100 are
   unrelated** — Korean defence MOUs, wildfire-drone programs, bank anti-
   phishing product launches, and other stories that share nothing with the
-  crash except a bridging path through a query-stripped URL key.
-  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 1):** the original
-  > bracketed provenance note here pointed at "the `git show` output quoted
-  > under defect 2's singleton check" — no such output exists anywhere in
-  > this file, and defect 2's check is a `python -c` reading `INC-13037`,
-  > not `INC-00554`. **Narrowed [R], re-derived directly against the
-  > committed corpus, not gate-attributed:**
+  crash except a bridging path through a query-stripped URL key. [R,
+  confirmed directly against the committed corpus by the author: the 103
+  `source_ids` and title above are visible in `data/incidents.json`'s
+  `INC-00554` row — see the `git show` output quoted under defect 2's
+  singleton check.]
+  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 1):** the bracketed
+  > provenance note directly above is wrong on its pointer — no `git show`
+  > output exists anywhere in this file, and defect 2's check (further up
+  > this section) is a `python -c` reading `INC-13037`, not `INC-00554`.
+  > **Narrowed [R], re-derived directly against the committed corpus, not
+  > gate-attributed, replacing that pointer:**
   > ```
   > $ python -c "
   > import json
