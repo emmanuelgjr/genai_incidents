@@ -136,7 +136,42 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **audit BOUNCE #1 (2026-09-15) · OECD refresh merges FROZEN pending user**
+## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **⛔ audit BOUNCE #2 (2026-09-15) — ESCALATED TO USER · OECD refresh merges FROZEN (D25a)**
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer (fresh instance), 2026-09-15, on `b18713ef`: BOUNCE #2 ───** *"This is not a bounce on substance. Every one of defects 1–12 is actually corrected… What remains are four defects introduced or left behind by the corrections."*
+
+**Corrections author:** a fresh pipeline-engineer. Commits `db00e877` / `eccb1dd3` / `b18713ef` touch only the audit.
+
+**Defects:**
+1. **:885-888 — a fabricated evidence pointer on an author [R] (agreement 6 form b).** It cites "the `git show` output quoted under defect 2's singleton check", but no `git show` output exists in the file (foreman [R]: `grep -n "git show"` hits only that line). Defect 2's check is a `python -c` on INC-13037, not INC-00554. The [R] sits on the "~100 unrelated" composition, which is the gate's measurement. Fix: narrow the author's [R] to "103 source_ids + title", with the real command.
+2. **:774-776 — an invented mechanism:** the IDs "cannot be un-published without a distinct deprecation reason code". This is false. A "merged" redirect is permanent under invariant 9; a reason code is only hygiene for *future* bridges. Fix: a dated note striking the clause.
+3. **:763-821 (+ :230, :802, :806, :909) — the revised recommendation ignores D25**, which was committed before it (`761310a7` precedes `b18713ef`). It still says "not yet on the plan — user's call" and "WS4-T5, P0/P1" (D25: **WS4-T10, P0**). It says WS4-T6 for the 800 KB cut (D25: **WS4-T11**); the build guard and crawl budget are WS4-T13; item C "not decided" (D25: **WS4-T14**). Item A omits D25(a)'s two freeze-lift conditions. Fix: one dated D25 cross-reference note at the top of the block.
+4. **Refuted figures still read as current outside the correction blocks:**
+   - :200, the Finding 5 heading, still says "H3 found instead [R]" unflagged;
+   - :429, the H3 table's 1552 half, restates the refuted mechanism;
+   - :432-433 and :593-594 cite the corpus-level "30" from the misconfigured build as corroboration. The correct build did not measure it, so it is **unverified**.
+
+   Fix: one-line dated notes at each.
+
+**Evidence [R] (gate):**
+- **Deletions:** exactly 4 deleted hunks. The header was re-added struck through at :12-15, so the author's claim holds; 1, 10 and 11 are logged.
+- **Code citations:** all exact. `common.py:187` is right; the board's ":186" is the docstring opener, a minor board slip.
+- **Committed-corpus facts confirmed:** INC-13037 is a singleton; INC-00699 is BMG with 1 OECD source; INC-00554 has 103 src and aiid 1552; **INC-05013 is aiid 1436** (1659 is not in the snapshot).
+- **The author's synthetic-fixture claim is TRUE, rebuilt independently:** A-then-B vs B-then-A flips the survivor. **Control:** the same bridge with *distinct* URL paths gives 3 survivors and 0 tombstones, so the flip **requires the query-string collapse** (the check fires).
+- **Arithmetic consistent.** Gate-attributed figures match this board verbatim. No refreshed-build figure is claimed as the author's own [R], except defect 1.
+
+**Gate advisories:**
+- **(a)** :316-318 gives the determinism result without gate attribution.
+- **(b)** The fixture description omits the query-string URL shapes, which are load-bearing, so it is not exactly reproducible.
+- **(c)** :454-456 says "moved AIID content off 1659/INC-00699"; INC-00699 never had it (the AIID content was INC-05013 / 1436). Also :781-782.
+- **(d)** The corrections log says "immediately after" where some blocks are correctly at the top.
+- **(e)** :228-229 over-conditions "~38 per run". The **board's own "7/7 pages" vs "38 truncated" pairing is unclear. Foreman clarification:** 7 of the gate's 250-page cached sample were >800 KB, and all 7 failed after truncation. The ~38 is the full-crawl count (1,136 − 1,098 extractable). Two different populations.
+- **(f)** :652 still cites "0/29" in the original (b) text; a pointer to the :610 block would help.
+- **(g)** No egress by the gate.
+
+**⚠ FOREMAN CORRECTION — defect 3 is substantially the foreman's.** The correction brief was dispatched **before** the user ruled D25, and **the foreman committed D25 while the author was mid-task without sending it an update.** The brief told the author to follow "the gate's remediation table", which is exactly what it did. **Lesson:** a decision landing mid-task must be pushed to the in-flight agent, not just committed to the board it was told to read at start.
+
+**Escalation (protocol step 6), awaiting the user.** The gate recommends a narrow fix pre-scoped to exactly these 4 defects (plus advisories a–c), with a foreman spot-check instead of a full third gate.
 
 **─── VERDICT (agreement 5) — red-reviewer (fresh instance), 2026-09-15, on `docs/audits/E21-tripwire-refresh-2026-09-14.md` @ `ef9ce6fb`: BOUNCE #1 ───** *"The recommendations mostly survive. But the load-bearing evidence behind H3 and the rebuild delta is wrong, and one material harm is missing."*
 
