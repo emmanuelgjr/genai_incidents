@@ -136,6 +136,44 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
+## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **in-progress, BOUNCE #1**
+
+**User authorization (2026-09-15): parallel execution.** WS4-T11 runs in an isolated worktree (`.claude/worktrees/agent-aa29a4fb974279b69`, gitignored), concurrently with WS4-T10 in the main tree, under AGENT_TEAM.md §7. Disjoint files only: WS4-T11 may touch `scripts/ingest_oecd_aim.py` and `tests/test_ingest_oecd_aim.py`. The foreman remains the only board writer. This board record lives on WS4-T11's branch so it does not move WS4-T10's branch while that branch is under gate.
+
+**Branch** `ws4/t11-oecd-800kb` (pushed) · owner pipeline-engineer · attempt 1 `9bbec137`:
+- Removed the `data[:800_000]` cap in `fetch_page`.
+- Added 4 tests that seed the warm cache and go through `fetch_page`.
+- Suite 323.
+
+**─── VERDICT (agreement 5) — red-reviewer, 2026-09-15, on `9bbec137`: BOUNCE #1 ───** *"The fix itself is correct… The bounce is about the guard: it does not protect against the regression it exists to prevent. That is agreement 6 in its purest form."*
+
+**Defects:**
+1. **The contract test only pins a cap below ~852 KB.** Mutants `data[:853_000]`, `[:900_000]` and `[:1_000_000]` in `fetch_page` pass all 19 tests. The largest page sent through `fetch_page` is 852,208 bytes; the multi-MB test (:282) calls `extract_state` directly. With a 900 KB cap, pages of 0.95, 1.5 and 5.2 MB are silently dropped [R], and real shell pages are ~949,653 bytes. **Fix:** send a ≥5 MB page through `fetch_page` and assert full length plus id and title.
+2. **The "straddle" test doesn't straddle the blob** (:237-260). The script tag starts at 799,995 and the JSON spans 800,041–800,155, so byte 800,000 falls inside the opening tag. The self-check at :249 is too loose to catch this. **Fix:** place the JSON across 800,000 and assert that span; ideally also put a multibyte UTF-8 character across the boundary.
+3. **Criterion 3 (honest accounting) is not met, and the stated reason is wrong.** "parse_fail now reflects only malformed pages" is false: ~1,852 numeric shell pages carry ng-state with the wrong shape and are still counted "unparseable" (`main()` :449-453). That is the same mixed bucket the 38 hid in. **Fix:** count no-ng-state-match, JSON decode error, and state-without-incident-body separately.
+4. **The committed memory justification is false** (`ingest_oecd_aim.py:147-148`, "10 threads holding a few pages"). `main()` (:432-439) retains **every** decoded page until the parse loop: ≥2.8 GB ASCII, ~5.7–11 GB if non-Latin-1. The fix adds ~+19% peak. The retention design is pre-existing; the false statement is the defect. **Fix:** correct the docstring; optionally parse inside the `as_completed` loop and drop the text.
+
+**Evidence [R]** (git archive of `9bbec137` into scratch, netguard plugin, mutants swapped one at a time; scratch hash-verified and deleted):
+- Suite 323. Chokepoint + OECD file 24.
+- The new tests against origin/main's script fail 2 (`800000 == 852208`, `800000 == 802178`), matching the specialist.
+- **Mutants:**
+  - Survive: M1 `fetch_page[:900_000]` · M2 `[:1_000_000]` · M3 `[:853_000]` · M8 latin-1 decode · M9 greedy `(.+)` · M10 cap on `robust_fetch` cold branch.
+  - Caught: M4 `extract_state[:800_000]` (3 fail) · M5 `extract_state[:900_000]` (1 fail) · M6 cache bypass (3 fail, netguard) · M7 decode-then-slice (2 fail).
+- Cold path: `robust_fetch` returns the full data (common.py:410-413) and `fetch_once` does `resp.read()` with no size (:373). `min_cache_bytes` is only a refetch threshold. The fixed code parses 0.95, 1.5 and 5.2 MB cold.
+- Regex cost is linear: 2.2 ms at 5.2 MB, 4.1 ms at 10.2 MB, 6.3 ms at 10.4 MB with 200k script tags.
+- Scope: only the 2 allowed files; the protected-paths diff is 0 lines; trailers present; invariant 5 holds. The main tree was untouched.
+
+**Advisories:**
+1. The new tests have no network guard; if cache seeding misses, a real request would hit oecd.ai. Monkeypatch `fetch_once` to raise.
+2. CI always takes the cold branch (no actions/cache), so add one cold-path test with `fetch_once` monkeypatched (this would catch M10).
+3. Use a non-ASCII title (catches M8, and backs the UTF-8 claim).
+4. Add script tags after ng-state (catches M9).
+5. The timing test is a smoke check only (no pytest-timeout installed).
+6. `errors="replace"` gives silent U+FFFD inside JSON strings; a non-UTF-8 page is undistinguished in parse_fail (pre-existing; covered by defect 3's split).
+7. Real-page validation is [A] by design.
+
+**Next:** redispatch the same pipeline-engineer instance with defects 1–4 and advisories 1–4.
+
 ## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **✅ audit done — foreman spot-check PASS per user ruling (2026-09-15) — MERGED to main · OECD refresh merges FROZEN (D25a) · remediation = WS4-T10…T14**
 
 **User ruling on BOUNCE #2 (2026-09-15):** a narrow fix scoped to exactly the 4 re-gate defects plus advisories a–c, **verified by a foreman spot-check instead of a third full gate.**
