@@ -136,7 +136,7 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **✅ done — foreman spot-check PASS per user ruling (one recorded test gap) — branch pushed, NOT merged**
+## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **✅ done — foreman spot-check PASS per user ruling (one recorded test gap) — MERGED to main (user-approved 2026-09-15)**
 
 **User ruling on bounce #2 (2026-09-15):** narrow third attempt, test-only plus advisory 2, verified by a foreman spot-check rather than a third full gate.
 
@@ -159,6 +159,7 @@ VERSIONING.md step should say which link forms survive the move.
 - **Carried reviewer advisories (not blocking):** `errors="ignore"` survives (no invalid-byte fixture); a cap above the largest fixture survives (inherent).
 
 **Merge status:** the branch is pushed. **Not merged.** This is a code-only change with no data, and scheduled refreshes stay fail-closed at the E21 tripwire under the D25(a) freeze, so merging is safe. Holding for the user's word, because the foreman previously told the user it would stay unmerged under the freeze. Expect a PROGRESS.md conflict with WS4-T10's branch, which adds a section at the same spot.
+**UPDATE 2026-09-15 — the user approved the merge.** Merged `--no-ff` to main from the WS4-T11 worktree; the main tree (WS4-T10) was left untouched. Scheduled refreshes remain fail-closed at the E21 tripwire (D25a), so no published data is affected.
 
 **Attempt 2** `95ca8ca1` (same instance) changed three things:
 - **Reason-coded extraction:** `_extract_state_detail` / `fetch_and_extract` / `_tally_reasons`, with `main()` printing three unparseable sub-buckets.
