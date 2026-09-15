@@ -136,7 +136,80 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **investigating**
+## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **audit BOUNCE #1 (2026-09-15) · OECD refresh merges FROZEN pending user**
+
+**─── VERDICT (agreement 5) — red-reviewer (fresh instance), 2026-09-15, on `docs/audits/E21-tripwire-refresh-2026-09-14.md` @ `ef9ce6fb`: BOUNCE #1 ───** *"The recommendations mostly survive. But the load-bearing evidence behind H3 and the rebuild delta is wrong, and one material harm is missing."*
+
+**Defects** (line numbers are the audit's own):
+1. **:42** — says CI didn't log the union line. It did: `[aim] union: 1097 kept + 4160 existing -> 5248 retained`.
+2. **:250-281** — the H3 mechanism for 1552 is **false**. `OECD-AIM-2026-06-10-3f61` is a **singleton**, INC-13037, not a cluster member; the author's own scratch output says `in cluster: False`.
+   - **Real mechanism [R]:** new row `OECD-AIM-2026-09-07-53bc` (wild-mushroom AI warning) has two refs whose **query-stripped** keys (`domin.co.kr/news/articleview.html` → 3f61; `m-i.kr/news/articleview.html` → INC-00554) bridge the two. Its URL hit (`merge_and_dedupe.py:1359-1370`) lands on 3f61 first, and `_reindex`/`_claim` (:1297-1315) absorb the megacluster into it.
+   - **Root cause:** `merge_and_dedupe.py:311` `normalize_url` drops query strings.
+3. **:283-295, :311-365, :466-468, :480-483** — **the full-rebuild delta came from a misconfigured build.** `merge_and_dedupe.py` was run without `parse_existing.py` (Makefile:11-13), so the gitignored `data/legacy_consolidated.json` was absent and merge **silently skips legacy** (:1411-1424). Reproduced exactly without legacy: `19517 → 14063`, 58 description changes, "severity regressions". **Correct build:** `19738 input → 14048`, 996 new IDs, 24 changed common rows, 4 description changes, **5 severity changes, all UPWARD**, 0 rows losing source_ids. **"55 unrelated rows" and "severity regressions" are REFUTED.**
+4. **:335-349** — presents the 8 deprecations as benign without checking identity. **≥4 of 8 join unrelated incidents:**
+   - INC-01271 (EU Grok deepfake probe) → INC-00487 (post-Trump-assassination-attempt misinformation)
+   - INC-01787 (Korean fake-news crackdown) → INC-00554 (Tesla Texas crash)
+   - INC-05013 (TruDi navigation) → INC-00699 (BMG v Anthropic)
+   - INC-13037 (robot hub) → INC-00554
+
+   **Stable IDs swap content:** INC-00554 retitles to the Korean robot hub; INC-00699 retitles to "Israel Funds AI Chatbot Manipulation Campaign…". **With append-only deprecations, merging writes permanent wrong redirects. This, not severity drops, is the freeze rationale.**
+5. **:305** — "INC-00699 / 1659 had real AIID content" is false. Committed INC-00699 is BMG v Anthropic (1 OECD source, OECD template); the AIID content was on INC-05013.
+6. **:201-203** — the 1136 vs 1098 gap is **`ingest_oecd_aim.py:129` `data[:800_000]`**, not normalize_body filtering. 7/7 cached date-hash pages >800 KB fail after truncation and 0 others fail: **~38 new incidents silently dropped per run.** 1890 = 1852 numeric + 38 truncated.
+7. **:187, :271-281, :455-457** — "order-dependent" overstates. The **build is deterministic**: the control rebuild of committed inputs, run twice, is byte-identical to committed. The anchor = whichever existing entry the bridging row hits first (CVE, then source_id, then URL, then title, then the bridging row's ref order). The stable ID follows the minimum prior ID (:1548-1552) while content follows the anchor. Synthetic fixture: swapping the bridge's two refs flips the surviving description.
+8. **:381-391** — the licensing check **cannot fail**: `( Entities named in the record: .*?\.)?` accepts prose (agreement 6 form a). The gate's **exact reconstruction** via `build_description()` gives **0/4,658** OECD-template corpus rows differing. **Conclusion holds on the gate's check, not the author's.**
+9. **:428-431** — (b)'s blast radius is given in raw ingest rows. **Published:** 3,666 rows move null → original/oecd-aim now (4,657 after this refresh); 162 OECD-sourced rows shipping AIID text correctly stay null; `description_provenance` is not in `_CONTENT_FIELDS` (:1113-1121), so there is **no `updated` bump**.
+10. **:72-73** — quoted docstring does not exist in `ingest/common.py`; the real text at :186 is "across ALL callers/threads".
+11. **:117-119** — the workflow has **four** ingest steps, not three.
+12. **:3-5** — still "WORKING DOCUMENT", with no do-not-regenerate marker. The file is pushed, so correct 2-9 as **dated corrections preserving the original text** (agreement 4).
+
+**Per-claim verdicts:**
+- **Claim 1 (repro): confirmed [R].** Gate's 3rd crawl 20:54-21:46Z: identical counts; the real tripwire test lists the identical 29.
+- **Claim 2 (rate limiter): confirmed [R] by a different route.** 07-26 run `30191177187` fetched in 261s (pre-`fbb61ff7`); 08-02 run `30735956140` in 3000s (first post-migration run).
+- **Claim 3 (legacy pages): partly confirmed, partly overstated.** "Never yield a source_id" is confirmed by code (:418-421). All 5 sampled numeric pages are exactly 949,653 bytes, which points to a generic shell page [A]. **Parse-collapse onset [R]:** 73 unparseable on 08-16 (`31926736331`), 2,213 on 08-30 (`33304582907`).
+- **Claim 4 (H3): refuted as stated.** The phenomenon (anchor change discards AIID text) is confirmed, via defect 2's mechanism.
+- **Claim 5 (rebuild delta): mostly refuted** (defect 3).
+- **Claim 6 (mislabel/licensing):** mislabel confirmed; licensing conclusion confirmed but method defective.
+- **Claim 7 (AIID snapshot): confirmed [R].**
+- **Claim 8 (recommendation (b)): mechanism confirmed [R].** `merge_into` (:1873-1884) never touches description or provenance, so they travel together. **Caveat:** step-4d curation overrides (:1498-1507) apply by ANY member source_id, so the INC-00437 override mislabels if 1574 stops being the anchor. Freeze: right conclusion, wrong evidence.
+
+**Gate's per-field rebuild delta [R]** (own script, proven to fire on a corrupted control; correct build `parse_existing` → `merge_and_dedupe`; control run twice is byte-identical to committed):
+- **ID sets:** old 13,060 · new **14,048** · new-only 996 · gone 8 (INC-01271, -01469, -01787, -02381, -05013, -08148, -13037, -14317) · common 13,052. Input 19,738 = 18,650 + 1,088 new OECD rows.
+- **24 common rows changed.** source_ids / updated / last_seen / source_count 24 each · references 20 · mitre_atlas 14 · mitre_atlas_tactics / owasp_llm / nist_ai_rmf 13 · owasp_asi 12 · aiid_id / tier 6 · severity 5 · description / tags 4 · attack_vector / date / title 3 · affected / source_freshness / corpus 2 · year 1. `added` and quality_tier: 0.
+- **Severity: 5, all upward** (INC-14517 M→H, INC-00487 M→C, INC-05170 M→H, INC-00699 H→C, INC-14332 H→C).
+- **Invariant 4 HOLDS:** 24 content changes = 24 `updated` bumps, no mismatch.
+- **Invariant 9 HOLDS:** 1,051 prior deprecations preserved; 8 new, all "merged".
+- **Sitemap tolerance:** CI, the author and the gate agree exactly at count level and on the 29-ID population. Not measured: min.json / STIX / HF deltas.
+
+**⚠ Published over-merge, independent of the refresh [R]:**
+- **INC-00554:** only AIID-1552 and OECD-AIM-2026-06-30-4590 are the Tesla crash; ~100 of 103 source_ids are unrelated (Korean defence MOUs, wildfire drones, bank anti-phishing launches…).
+- **Bridge keys:** wowtv read 16, asiatoday view.php 15, m-i.kr articleview 13, hankooki articleview 13, it.chosun articleview 11.
+- **Corpus-wide:** **151 normalized URL keys collapse distinct raw URLs across >1 source row, touching 1,225 source rows.** Top keys: bugzilla.redhat.com/show_bug.cgi 215, cve.org/cverecord 87, vuldb.com 83, github.com/mlflow/mlflow 74, moodle discuss.php 63. CVE rows are partly shielded by `cve_disjoint` (:1306).
+- **Top no-CVE clusters:** INC-04106 174 · INC-00554 103 · INC-03798 41 · INC-00861 32 · INC-00134 24. Whether the CVE megaclusters (INC-04260 143, INC-01015 120, INC-08766 68) are URL-bridged is [A].
+
+**Gate's remediation table:**
+- **A. Freeze OECD refresh merges: APPROVE**, on the wrong-merge / content-swap / permanent-redirect rationale.
+- **B. Option (b): APPROVE in principle.** Same PR should revisit the INC-00437 override and ship the tripwire replacement.
+- **C. AIID snapshot in the weekly workflow:** user scope call under D1.
+- **D. Per-row overrides: REJECT.**
+- **E. Tripwire evolution: APPROVE**, plus a **stable-ID continuity check** (a common ID whose title changes while its anchor source did not; it would have caught INC-00554 and INC-00699).
+- **F. Option (d): RE-SCOPE** to the `normalize_url` query-string collapse (WS4-T5).
+
+**Gate's proposed new tasks (not yet on the plan; the user's call):**
+1. **WS4-T5, P0/P1:** fix `normalize_url` (keep identifying query params, or refuse URL keys shared by distinct raw URLs), then audit megaclusters, INC-00554 first. **Unmerging published rows touches invariants 3 and 9; escalate the design.**
+2. **WS4-T6:** stop the 800 KB truncation, with a parser contract test using a >800 KB page.
+3. **WS4-T6/ops:** numeric slugs fill ~1,852 of the 3,000-URL window since late August. Skip them or budget by date-hash URLs, and check for a coverage gap. The job runs 51-52 min against a 60-min timeout.
+4. **Build guard:** `merge_and_dedupe.py` silently proceeds without `data/legacy_consolidated.json`. Fail loudly or run `parse_existing` itself. **This is exactly how the audit's delta went wrong.**
+5. **Deprecation hygiene:** before any refresh PR merges, review each new "merged" deprecation for same-incident identity; consider a distinct reason code for weak-key bridges.
+6. **Curation-override keying:** step 4d applies by any member source_id; key overrides to the anchor, or assert it.
+
+**Gate's advisories:**
+- Scope clean: foreman commits touch PROGRESS.md only; author commits touch the audit only.
+- Gate cleanup verified: worktrees removed, tree clean, its own process killed.
+- **Egress today:** three full OECD crawls (CI, author, gate), all via `ingest/common.py`. Any further verification must reuse measurements, not re-crawl.
+
+**⚠ FOREMAN CORRECTION 2026-09-15 — the foreman relayed the refuted figures to the user.** In chat on 2026-09-14 the foreman presented the author's "58 existing entries change description, 55 unrelated, ≥2 drop Critical→High" as the audit's findings, flagged as not yet gated. It also recorded "severity regressions" as a reason to freeze in the interim board entries below, which are kept as written per agreement 4. **Both came from a misconfigured build and are refuted** (defect 3). The foreman's own independent spot-checks that day (the 800 KB cut, the wrong-merge titles, `normalize_url:311`, INC-00554's composition) all **survive**. **Lesson:** a scratch rebuild that silently skips an input is agreement 6 form (a) at build level. Nobody could tell it from a correct build by its output. The different route (a control build proven byte-identical to committed) caught it.
+
+**Next:** audit corrections → a fresh pipeline-engineer (the prior instance went idle twice; agreement 3 says replace). Remediation and new tasks → the user.
 
 **The manual `workflow_dispatch` (user-authorized) worked as a test of the persist fix.**
 - Run [`34858279213`](https://github.com/emmanuelgjr/genai_incidents/actions/runs/34858279213) on `main` @ `05f536ff`. **Persist ✅** for the first time since 2026-07-19; `origin/refresh-state` moved `f41ad68e` → **`bfbdec57`** (aiaaic, oecd and kev all `ok` / last_success 2026-09-14). Re-merge + render + validate ✅.
