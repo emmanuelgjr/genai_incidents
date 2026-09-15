@@ -136,7 +136,51 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **in-progress, BOUNCE #1**
+## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+
+**Attempt 2** `95ca8ca1` (same instance) changed three things:
+- **Reason-coded extraction:** `_extract_state_detail` / `fetch_and_extract` / `_tally_reasons`, with `main()` printing three unparseable sub-buckets.
+- **Memory fixed at the root:** `main()` submits `fetch_and_extract`, so only `(reason, body)` is retained.
+- **Test hardening:** >5 MB through `fetch_page`, a true straddle with a CJK character across byte 800,000, a network guard, a cold path, non-ASCII, and trailing script tags. Suite 334.
+
+**Foreman pre-gate check [R]:** `git archive` into temp, COMMITTED tests. A `fetch_page` `[:900_000]` cap → 2 fail; latin-1 → 2 fail.
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-15, on `95ca8ca1`: BOUNCE #2 ───** *"The production code in 95ca8ca1 is correct… The single defect is again the guard, and it is new: the refactor moved the production entry point out from under the size tests."*
+
+**Defect 1.** The original bug, reinserted at the entry point `main()` actually calls, **passes all 30 committed tests**.
+- **Mutant:** `fetch_and_extract()` → `return _extract_state_detail(text[:800_000])` (and the `[:900_000]` variant).
+- **Why it survives:** every size test calls `o.fetch_page()` then `o.extract_state()`, a sequence production no longer runs. The two `fetch_and_extract` tests stub `fetch_page` to None or a small string.
+- **Offline `main()` with the mutant:** the 949 KB incident is silently dropped, and the suite stays green. Mitigation: it would surface as a nonzero "no ng-state script" count, which is 0 in all 2,988 real pages.
+- **Violates** criterion 2 and agreement 6.
+- **Fix (test-only):** assert `fetch_and_extract(url) == (REASON_OK, body)` in the multi-MB, straddle and cold-path tests; better, add an offline `main()` test.
+- **Foreman re-derived [R]:** `git archive 95ca8ca1` into temp, the sed mutant at :255, the committed OECD test file → `30 passed`.
+
+**Evidence [R] (gate):**
+- **Suite and mutant table:** 334 passed. Of 24 mutants against the COMMITTED tests, these survive:
+  - `fetch_and_extract` cap 800k / 900k (the defect)
+  - three `main()` summary lies (advisory 1)
+  - `fetch_page` cap 6 MB
+  - `errors="ignore"`
+  - `if not text`
+
+  All earlier survivors (853k / 900k / 1 MB caps, M8, M9, M10) are now caught.
+- **D2 straddle geometry verified by byte indexing:** JSON 799,925–800,051; the CJK character spans 799,999–800,001, and byte 800,000 is a continuation byte (0xB8).
+- **Offline end-to-end `main()`, old vs new** (9 stubbed URLs covering every case):
+  - **Output:** identical except the one intended delta (the 949 KB page is now kept). Same ok set, filtering, union and retention; the UTF-8 title round-trips; the buckets sum to the fetched total.
+  - **Undeclared benign delta:** an empty page now counts as fetched plus "no ng-state script". Previously it was excluded by `if text`.
+  - **Worker exceptions** still abort `main()` loudly, as before.
+- **Network guard fires** (cache-bypass mutant → the test's own guard message). Scope is 2 files; the protected-paths diff is 0; invariant 5 holds.
+
+**Advisories:**
+1. No test covers `main()`, so summary-line lies survive. An offline `main()` test would kill those and defect 1 together.
+2. `fetched = len(urls) − fetch_failed` double-counts duplicate sitemap URLs (`load_sitemap` doesn't dedupe; the old `len(pages)` did).
+3. `errors="ignore"` survives: no invalid-byte fixture.
+4. A cap above the largest fixture survives (inherent to fixtures).
+5. The memory docstring is now accurate.
+
+**⚠ FOREMAN CORRECTION — the foreman's pre-gate spot-check had the gate's defect as its own blind spot.** The foreman mutated `fetch_page` only, the function the tests exercise, not the entry point production calls. So it "confirmed" the guard on the same path the guard already covered: agreement 6 form (b), rerunning the author's route. **Lesson:** after a refactor, mutate at the production entry point (`main()` and whatever it submits), not at the function the tests happen to import.
+
+**Escalation.** The gate states the fix is correct and ready; the remaining gap is a small test-only change. Options put to the user: (a) a narrow third attempt (the `fetch_and_extract` assertions plus an offline `main()` test, plus advisory 2), then re-gate or foreman spot-check; (b) accept now with the test gap recorded as a follow-up.
 
 **User authorization (2026-09-15): parallel execution.** WS4-T11 runs in an isolated worktree (`.claude/worktrees/agent-aa29a4fb974279b69`, gitignored), concurrently with WS4-T10 in the main tree, under AGENT_TEAM.md §7. Disjoint files only: WS4-T11 may touch `scripts/ingest_oecd_aim.py` and `tests/test_ingest_oecd_aim.py`. The foreman remains the only board writer. This board record lives on WS4-T11's branch so it does not move WS4-T10's branch while that branch is under gate.
 
