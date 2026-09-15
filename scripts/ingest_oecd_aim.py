@@ -122,11 +122,43 @@ def load_sitemap() -> list[str]:
 
 
 def fetch_page(url: str) -> str | None:
+    """Fetch and decode one AIM incident page.
+
+    No size cap. The page was previously truncated to the first 800,000
+    bytes before decoding -- a page whose `<script id="ng-state">` JSON blob
+    starts at or straddles that offset was silently cut mid-tag or mid-JSON,
+    extract_state() found no (or a corrupt) match, and the page was folded
+    into "unparseable" with no distinguishing signal (gate-measured: 7/250
+    date-hash pages over 800 KB in a cached sample, ~38 incidents/run in the
+    2026-09-14 full crawl -- see PROGRESS.md "E21 TRIPWIRE FIRED", WS4-T11).
+
+    The cap bought nothing: `robust_fetch()` already downloads and caches
+    the FULL response body regardless of this cap (the slice was applied
+    only here, after the fetch and the disk write), so removing it changes
+    no network or disk-caching behavior -- only whether the bytes actually on
+    disk get handed to the parser whole. A raised-but-still-finite cap would
+    have the identical failure shape at a different (still arbitrary) byte
+    offset, plus it would require a new loud "oversize pages skipped"
+    counter to avoid re-introducing a silent drop -- removing the cap avoids
+    both. It also removes a real (if narrow) correctness bug: slicing raw
+    UTF-8 *bytes* at a fixed offset can land inside a multi-byte character,
+    which `errors="replace"` then silently mangles into U+FFFD.
+
+    Memory/CPU: AIM pages run KB-to-low-single-digit-MB; MAX_WORKERS=10
+    threads holding a few pages each in memory at once is negligible. The
+    ng-state regex (`(.+?)</script>`, DOTALL) is a lazy quantifier bounded by
+    a literal, fixed terminator -- linear in input length, not the
+    ambiguous-alternation shape that causes catastrophic backtracking. Timed
+    at >5,000,000 bytes in
+    tests/test_ingest_oecd_aim.py::test_extract_state_handles_multi_mb_page_without_pathological_backtracking
+    (well under the 5s generous bound; real measurement in the WS4-T11
+    report, not asserted here as an exact figure to avoid CI flakiness).
+    """
     slug = url.rstrip("/").split("/")[-1]
     cache_file = CACHE / f"{slug}.html"
     try:
         data = robust_fetch(url, cache_file, timeout=20, max_retries=3, min_cache_bytes=1000)
-        return data[:800_000].decode("utf-8", errors="replace")
+        return data.decode("utf-8", errors="replace")
     except RuntimeError as e:
         print(f"  ! {slug}: {e}", file=sys.stderr)
         return None

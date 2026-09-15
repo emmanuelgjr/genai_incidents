@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import time
+
 import ingest_oecd_aim as o
 
 
@@ -156,3 +159,140 @@ def test_normalize_body_description_never_contains_summary_or_evidences():
     assert entry["source_id"] in entry["description"]
     assert entry["corpus"] == "security"  # "voice clone" is a security keyword
     assert entry["attack_vector"] == "deepfake"
+
+
+# --- WS4-T11: the 800 KB page-truncation parser-integrity bug ---------------
+#
+# Gate-measured defect (E21 tripwire, PROGRESS.md "E21 TRIPWIRE FIRED"):
+# scripts/ingest_oecd_aim.py's old fetch_page() did
+# `return data[:800_000].decode("utf-8", errors="replace")`, which silently
+# truncates any page whose <script id="ng-state"> JSON blob starts at or
+# straddles byte 800,000. extract_state() then finds no (or a corrupt) match
+# and the page is folded into "unparseable" -- indistinguishable from a
+# genuinely broken page. In the 2026-09-14 full crawl this silently dropped
+# ~38 real incidents on every run.
+#
+# These tests exercise the REAL fetch_page() -> extract_state() path via
+# robust_fetch()'s warm-cache disk-read branch (ingest/common.py:404-405):
+# they write real HTML bytes to a cache file on disk and let fetch_page()
+# read it back exactly as it would a page cached from a prior conduct-checked
+# network fetch. No network call, no fetch_once()/robust_fetch() monkeypatch
+# of the network layer -- robots_allowed()/urlopen() are never even reached,
+# because the cache file already exists and is >= min_cache_bytes (the same
+# branch a real second run of this ingester takes for every page it already
+# has on disk).
+
+NG_STATE_INCIDENT = {"id": "2026-05-01-feed", "title": "Large OECD AIM page parser-integrity test incident"}
+
+
+def _ng_state_script_html(body: dict) -> str:
+    """The exact `<script id="ng-state">...</script>` shape extract_state()
+    parses: a dict whose value has a `"b"` key holding the incident body."""
+    state = {"AppStateKey_0": {"b": body}}
+    return f'<script id="ng-state" type="application/json">{json.dumps(state)}</script>'
+
+
+def _make_page(script_offset_bytes: int, tail_bytes: int = 2000, body: dict | None = None) -> bytes:
+    """Build a synthetic HTML page (as bytes) where the ng-state <script>
+    tag begins at approximately `script_offset_bytes` into the page, with
+    `tail_bytes` of filler after it (to simulate the rest of a real Angular
+    SPA page: footer markup, other scripts, etc.)."""
+    body = body or NG_STATE_INCIDENT
+    unit = b"<!-- padding-filler-text-for-large-oecd-aim-page-simulation --> "
+    before = (unit * (script_offset_bytes // len(unit) + 1))[:script_offset_bytes]
+    after = (unit * (tail_bytes // len(unit) + 1))[:tail_bytes]
+    script = _ng_state_script_html(body).encode("utf-8")
+    return b"<html><head></head><body>" + before + script + after + b"</body></html>"
+
+
+def _write_cached_page(monkeypatch, tmp_path, url: str, page_bytes: bytes) -> None:
+    """Point the module's on-disk cache at tmp_path and pre-seed it with
+    `page_bytes` so fetch_page()'s robust_fetch() call takes the warm-cache
+    read branch (no network) -- the real code path a second run over an
+    already-cached page takes."""
+    monkeypatch.setattr(o, "CACHE", tmp_path)
+    slug = url.rstrip("/").split("/")[-1]
+    (tmp_path / f"{slug}.html").write_bytes(page_bytes)
+
+
+def test_fetch_page_extracts_ng_state_from_page_well_beyond_800kb(monkeypatch, tmp_path):
+    """A page far larger than 800 KB, with the ng-state blob starting well
+    past byte 800,000, must still be fully readable and parseable -- this is
+    the direct regression case for the gate-measured 7/250 truncated pages."""
+    url = "https://oecd.ai/en/incidents/2026-05-01-feed"
+    page = _make_page(script_offset_bytes=850_000)
+    assert len(page) > 800_000
+    _write_cached_page(monkeypatch, tmp_path, url, page)
+
+    text = o.fetch_page(url)
+    assert text is not None
+    assert len(text) == len(page)  # not truncated
+
+    body = o.extract_state(text)
+    assert body is not None
+    assert body["id"] == NG_STATE_INCIDENT["id"]
+    assert body["title"] == NG_STATE_INCIDENT["title"]
+
+
+def test_fetch_page_extracts_ng_state_straddling_the_800kb_boundary(monkeypatch, tmp_path):
+    """Boundary case: the ng-state <script> tag OPENS just before byte
+    800,000 and its JSON payload/closing tag extend past it -- the old
+    `data[:800_000]` slice would cut the JSON mid-blob (json.loads failure)
+    or cut the closing `</script>` entirely (regex non-match)."""
+    url = "https://oecd.ai/en/incidents/2026-05-02-strd"
+    body = {"id": "2026-05-02-strd", "title": "Straddling-boundary parser-integrity test incident"}
+    page = _make_page(script_offset_bytes=799_970, body=body)
+    script_html = _ng_state_script_html(body).encode("utf-8")
+    script_start = page.index(script_html)
+    script_end = script_start + len(script_html)
+    # Confirm this synthetic page actually straddles the old cap -- otherwise
+    # the test isn't exercising the boundary condition it claims to.
+    assert script_start < 800_000 < script_end
+    _write_cached_page(monkeypatch, tmp_path, url, page)
+
+    text = o.fetch_page(url)
+    assert text is not None
+    assert len(text) == len(page)
+
+    parsed = o.extract_state(text)
+    assert parsed is not None
+    assert parsed["id"] == body["id"]
+    assert parsed["title"] == body["title"]
+
+
+def test_fetch_page_still_works_on_a_normal_small_page(monkeypatch, tmp_path):
+    """No behavior change for the common case: a small, ordinary page below
+    the old cap must still parse exactly as before."""
+    url = "https://oecd.ai/en/incidents/2026-05-03-tiny"
+    body = {"id": "2026-05-03-tiny", "title": "Ordinary small page"}
+    page = _make_page(script_offset_bytes=500, tail_bytes=500, body=body)
+    assert len(page) < 800_000
+    _write_cached_page(monkeypatch, tmp_path, url, page)
+
+    text = o.fetch_page(url)
+    assert text is not None
+    parsed = o.extract_state(text)
+    assert parsed is not None
+    assert parsed["id"] == body["id"]
+
+
+def test_extract_state_handles_multi_mb_page_without_pathological_backtracking():
+    """Performance/DoS sanity check: extract_state()'s
+    `<script[^>]*id="ng-state"[^>]*>(.+?)</script>` regex, run with re.S over
+    a several-megabyte body, must stay linear-time (a lazy `.+?` bounded by a
+    literal terminator has no catastrophic-backtracking shape), not the
+    exponential blowup pathological patterns can trigger. Generous 5s bound
+    to avoid CI flakiness; a pathological blowup would be orders of
+    magnitude slower than that, not merely over it."""
+    body = {"id": "2026-05-04-perf", "title": "Multi-megabyte page performance test incident"}
+    page_bytes = _make_page(script_offset_bytes=5_000_000, tail_bytes=200_000, body=body)
+    assert len(page_bytes) > 5_000_000
+    text = page_bytes.decode("utf-8")
+
+    t0 = time.time()
+    parsed = o.extract_state(text)
+    elapsed = time.time() - t0
+
+    assert parsed is not None
+    assert parsed["id"] == body["id"]
+    assert elapsed < 5.0, f"extract_state() took {elapsed:.2f}s on a {len(page_bytes)}-byte page"
