@@ -535,6 +535,36 @@ confirmation, via a completely different signal (ID consolidation records,
 not description-text comparison), that those two clusters are actively
 being restructured by this refresh, not merely relabeled.
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 4) — this
+> presents the 8 deprecations as benign relabeling. They are not: at least
+> half are wrong-incident merges writing permanent redirects.** These 8
+> deprecation rows exist only in the refreshed (unmerged) trial rebuild, not
+> in the committed `data/id_deprecations.json`, so the following is
+> **[R] by red-reviewer, gate 2026-09-15, recorded PROGRESS.md; not
+> re-derived by the author** (no refreshed build artifact exists locally to
+> check against, per this task's no-recrawl constraint): **≥4 of the 8 join
+> unrelated incidents**, not the same story under a new ID:
+> - `INC-01271` (EU Grok deepfake probe) → `INC-00487` (post-assassination-
+>   attempt misinformation) — unrelated.
+> - `INC-01787` (Korean fake-news crackdown) → `INC-00554` (Tesla Texas
+>   crash) — unrelated.
+> - `INC-05013` (TruDi navigation) → `INC-00699` (BMG v Anthropic) —
+>   unrelated.
+> - `INC-13037` (the South Korea robot hub, confirmed above as the real
+>   `defect 2` anchor) → `INC-00554` — unrelated; this is the same
+>   bridging mechanism as defect 2, not editorial consolidation.
+>
+> Because deprecations are append-only (invariant 9) and IDs are cited
+> externally, this **swaps stable IDs' content silently and permanently**:
+> `INC-00554` retitles from the Tesla crash to the Korean robot hub, and
+> `INC-00699` retitles from BMG v Anthropic to "Israel Funds AI Chatbot
+> Manipulation Campaign…". **This — not severity drops — is the gate's
+> stated freeze rationale** (see the rewritten recommendation below), and
+> it directly contradicts this finding's framing of the 8 deprecations as
+> "not silent deletions… invariant 3 held mechanically" as the end of the
+> story: invariant 3 (no deletion) holds, but a *content-correct* append-
+> only record does not, which is a distinct and more serious defect.
+
 **Corpus-level AIID-template-exception count**: 2 today (898, 1574) → **30**
 after a full rebuild with the refreshed input — exactly `29 (2-file scope)
 + 1 (898, the pre-existing blind spot, unaffected by the refresh)`. The
@@ -576,6 +606,25 @@ any of the 29 rows checked. The H3 mechanism changes *which* row's
 structural-template text ships, and mislabels its provenance, but does not
 by itself introduce any narrative/copyright exposure beyond what E21
 already assessed and reduced. **Count only, no legal opinion, per brief.**
+
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 8) — the check
+> above cannot fail, so "0/29" is not evidence of anything (agreement 6 form
+> a).** **What was wrong:** `build_description()`'s regex includes
+> `( Entities named in the record: .*?\.)?` — an optional group matching
+> **any** text up to the next period, i.e. it would accept arbitrary prose
+> stuffed into the "entities named" slot as long as it ends in a period.
+> Name the input that would make it wrongly pass: a hand-edited description
+> reading `"Tracked by the OECD AI Incidents and Hazards Monitor (AIM) as
+> X. Entities named in the record: <any narrative paragraph you like>. See
+> the AIM incident page (Y) ..."` matches the regex and would be counted as
+> "0 rows outside the template," identically to a genuine template row.
+> **The gate's exact-reconstruction check, which can fail (and is the
+> conclusion this document should rely on) — [R] by red-reviewer, gate
+> 2026-09-15, recorded PROGRESS.md; not re-derived by the author:**
+> byte-for-byte re-running `build_description()` on every OECD-template
+> corpus row and diffing against the shipped `description` gives **0/4,658**
+> differing. **The conclusion (no narrative/copyright exposure beyond what
+> E21 already assessed) holds — on the gate's method, not this section's.**
 
 ---
 
@@ -622,6 +671,27 @@ for the mislabeling defect** — it is small, safe, self-maintaining, and
 correct regardless of which mechanism (H1 or H3) produces the next
 disagreement.
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 9) — the blast
+> radius above is stated in raw ingest rows, not corpus rows; the real
+> number, plus a caveat this section omits, both matter for sizing the
+> change.** **[R] by red-reviewer, gate 2026-09-15, recorded PROGRESS.md;
+> not re-derived by the author:** at the corpus level, this change moves
+> **3,666** `data/incidents.json` rows' `description_provenance`/
+> `description_source` from null to `"original"`/`"oecd-aim"` on the
+> currently-committed corpus (**4,657** after this refresh lands); **162**
+> OECD-sourced rows that correctly ship AIID's own text stay null, as
+> intended. Because `description_provenance`/`description_source` are
+> **not** in `_CONTENT_FIELDS` (`merge_and_dedupe.py:1113-1121`), this
+> **does not bump `updated`** on any of those rows. **Caveat this section
+> misses:** step 4d's curation-override matching (`merge_and_dedupe.py:1498-1507`)
+> applies an override keyed by **any** of an entry's `source_ids`, not
+> specifically the anchor — so `INC-00437`'s existing per-row override
+> (option (a)-style) silently mislabels the row if `1574` ever stops being
+> the surviving anchor (the same H3 mechanism that hit `1552`/`1659`
+> applies here too). The gate's remediation table asks the implementing PR
+> to key the override to the anchor, or assert it, alongside shipping this
+> fix.
+
 **(c) Add the AIID snapshot ingest to `auto-refresh.yml`.**
 Reduces (does not eliminate) the H1 population by keeping
 `ingest/aiid_full.json` current — a newer snapshot already exists
@@ -661,6 +731,21 @@ target), invariant 3 (currently holds mechanically via
 worth a distinct reason code). **Not a small fix; scope and priority is a
 board decision, not this task's to make.**
 
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defects 3 and 7) — "58
+> rows moved… only 3 in the AIID population… at least 2 severity
+> regressions" is refuted; see the corrected rebuild delta above (defect
+> 3): the real figures are **24 rows changed, 5 severity changes, all
+> upward, no regressions**. The underlying defect this option targets is
+> real (defect 2's `normalize_url` query-string-drop bridging mechanism,
+> confirmed independently), but its blast radius is smaller than stated and
+> the root cause is narrower than generic "order-sensitivity" (defect 7):
+> it is specifically `normalize_url()`'s query-string collapse
+> (`merge_and_dedupe.py:311`), not the weak-key merge algorithm in general.
+> **The gate's remediation table RE-SCOPES option (d) to that specific fix**
+> (fold in query-identifying params, or refuse a URL key shared by distinct
+> raw URLs) under WS4-T5, rather than the broader
+> higher-trust-anchor-preference scheme proposed below.
+
 **Recommendation:** do **(b) now** — it is cheap, safe, general, and closes
 the actual defect this task was dispatched to investigate (mislabeled
 provenance) regardless of mechanism. Treat **(d) as a new, higher-priority
@@ -672,6 +757,68 @@ own remediation timeline turns out to be. **(a)** is not recommended as
 the primary mechanism (superseded by (b), and provably insufficient under
 H3). **(c)** is a separate, valid scope decision for the user/foreman,
 complementary to (b)/(d), not a substitute for either.
+
+---
+
+### ⚠ REVISED RECOMMENDATION — 2026-09-15 (red-reviewer BOUNCE #1)
+
+The recommendation above is preserved for the record; its (b)/(a)/(c)
+conclusions substantially survive, but its freeze rationale and (d)'s scope
+were wrong. This block is authoritative going forward. **[R] by
+red-reviewer, gate 2026-09-15, recorded PROGRESS.md** (gate's remediation
+table), except where noted as independently re-derived above.
+
+- **A. Freeze OECD refresh merges — approved**, but **on the corrected
+  rationale**: not severity drops (defect 3 refuted those), but **wrong-
+  incident merges, stable-ID content swaps, and permanent append-only
+  redirects** (defect 4 — `INC-00554` and `INC-00699` both retitle to
+  unrelated stories under IDs that are cited externally and cannot be
+  un-published without a distinct deprecation reason code).
+- **B. Option (b) (unconditional `description_provenance`/`description_source`
+  on OECD rows) — approved in principle.** Ship it with its corrected blast
+  radius (defect 9: 3,666 rows now / 4,657 post-refresh, no `updated` bump)
+  and its caveat (the `INC-00437` step-4d override must be re-keyed to the
+  anchor, or asserted, in the same PR — otherwise it can silently mislabel
+  again under the exact mechanism this document found for `1552`/`1659`).
+- **C. Add the AIID snapshot to `auto-refresh.yml` — a user/foreman scope
+  call under D1**, not decided here; unchanged from the original text.
+- **D. Per-row `curation_overrides.json` entries (option (a)) — reject**,
+  as the original text already concluded (superseded by (b), insufficient
+  under H3); unchanged.
+- **E. Tripwire evolution — approved** (Finding 7, below), **plus a new
+  stable-ID continuity check**: for any corpus ID present in both a pre-
+  and post-refresh trial build, if `title` changes while the row's
+  anchoring `source_id` content did not, flag it. This check would have
+  caught both `INC-00554` and `INC-00699`.
+- **F. Option (d) — RE-SCOPED**, not implemented as originally proposed.
+  Target specifically `normalize_url()`'s query-string collapse
+  (`merge_and_dedupe.py:311`) under WS4-T5's charter (fix the key, then
+  audit existing megaclusters it already produced — see the new "Published
+  over-merge" finding below, `INC-00554` first). The broader
+  higher-trust-anchor-preference scheme is not ruled out long-term but is
+  not the immediate ask.
+
+**Six new tasks proposed by the gate (not yet on the plan — user's call):**
+1. **WS4-T5, P0/P1:** fix `normalize_url` (keep identifying query params, or
+   refuse URL keys shared by distinct raw URLs), then audit existing
+   megaclusters, `INC-00554` first. Unmerging published rows touches
+   invariants 3 and 9 — escalate the design to the user.
+2. **WS4-T6:** remove or raise the 800 KB truncation (defect 6); add a
+   parser contract test using a >800 KB fixture page.
+3. **WS4-T6/ops:** numeric-slug legacy pages have filled ~1,852 of the
+   3,000-URL crawl window since late August; skip them or budget by
+   date-hash URLs, and check for a resulting coverage gap. The job already
+   runs 51-52 min against a 60-min timeout.
+4. **Build guard:** `merge_and_dedupe.py` must fail loudly, or run
+   `parse_existing.py` itself, when `data/legacy_consolidated.json` is
+   absent — this exact silent skip is how this document's original rebuild
+   delta went wrong (defect 3 / new "build-sequence trap" finding below).
+5. **Deprecation hygiene:** before any refresh PR merges, review each new
+   `"merged"` deprecation for genuine same-incident identity; consider a
+   distinct reason code for weak-key bridges versus true consolidations.
+6. **Curation-override keying:** step 4d applies an override by any member
+   `source_id`, not the anchor specifically; key overrides to the anchor,
+   or assert it (ties into item B above).
 
 ## Finding 7 — tripwire evolution
 
@@ -717,6 +864,128 @@ the pre- and post-refresh trial builds, if `description` changed, either
 the row's own primary `source_id`'s content changed, or the change is
 flagged for review" — this is a proposal for WS4-T5's charter to absorb,
 not a spec to implement here.
+
+---
+
+## Finding 8 — published over-merge, independent of this refresh (added 2026-09-15, red-reviewer BOUNCE #1)
+
+`normalize_url()`'s query-string collapse (`merge_and_dedupe.py:311`,
+confirmed above under defect 2) is not a new defect introduced by this
+refresh — it is already active in the **committed, currently-shipped**
+corpus, and `INC-00554` is itself a product of it, not merely a target the
+refresh happens to bridge into. **[R] by red-reviewer, gate 2026-09-15,
+recorded PROGRESS.md; not re-derived by the author.**
+
+- **`INC-00554` composition:** only `AIID-1552` and
+  `OECD-AIM-2026-06-30-4590` are genuinely about the Tesla Texas crash.
+  Of the entry's 103 (pre-refresh) `source_ids`, **roughly 100 are
+  unrelated** — Korean defence MOUs, wildfire-drone programs, bank anti-
+  phishing product launches, and other stories that share nothing with the
+  crash except a bridging path through a query-stripped URL key. [R,
+  confirmed directly against the committed corpus by the author: the 103
+  `source_ids` and title above are visible in `data/incidents.json`'s
+  `INC-00554` row — see the `git show` output quoted under defect 2's
+  singleton check.]
+- **Bridge keys** (query-stripped, colliding across genuinely distinct
+  articles): `wowtv` read-page path (16 rows), `asiatoday` `view.php` (15),
+  `m-i.kr` `articleview` (13), `hankooki` `articleview` (13), `it.chosun`
+  `articleview` (11).
+- **Corpus-wide scale:** **151** normalized URL keys each collapse distinct
+  raw URLs across more than one source row, touching **1,225** source rows
+  in total. Top offending keys: `bugzilla.redhat.com/show_bug.cgi` (215),
+  `cve.org/cverecord` (87), `vuldb.com` (83), `github.com/mlflow/mlflow`
+  (74), Moodle `discuss.php` (63). CVE-bearing rows are partly shielded by
+  `cve_disjoint()` (`merge_and_dedupe.py:1306`), which refuses a weak-key
+  merge when both sides' CVE sets are non-empty and disjoint — but rows
+  with no CVE at all get no such protection.
+- **Top no-CVE clusters by size:** `INC-04106` (174 source_ids), `INC-00554`
+  (103), `INC-03798` (41), `INC-00861` (32), `INC-00134` (24). Whether the
+  larger CVE-bearing megaclusters (`INC-04260` 143, `INC-01015` 120,
+  `INC-08766` 68) are themselves partly URL-bridged, versus genuinely one
+  CVE's worth of reporting, is **[A] — attested by the gate's run, not
+  independently re-derived; not measured per-row here.**
+
+This is why the gate's remediation table re-scopes option (d) (Finding 6)
+to `normalize_url` specifically (WS4-T5, P0/P1) rather than the broader
+anchor-preference scheme: the query-string collapse is already producing
+wrong merges in the shipped corpus, independent of whether this refresh
+ever lands, and `INC-00554` is the concrete example to start the audit
+from.
+
+## Finding 9 — the build-sequence trap: `merge_and_dedupe.py` without `parse_existing.py` silently skips legacy (added 2026-09-15, red-reviewer BOUNCE #1)
+
+This is the mechanism behind defect 3, named as its own finding because it
+is a defect in the pipeline, not just in how this document was produced,
+and because agreement 6 asks that a check's failure mode be named
+explicitly.
+
+`Makefile:11-13` defines `merge` as two steps run in sequence:
+```
+merge:
+	python scripts/parse_existing.py
+	python scripts/merge_and_dedupe.py
+```
+`parse_existing.py` is what produces `data/legacy_consolidated.json`, a
+gitignored intermediate file. `merge_and_dedupe.py:1411-1424` loads it
+conditionally:
+```python
+legacy_path = DATA / "legacy_consolidated.json"
+if legacy_path.exists():
+    legacy = json.loads(legacy_path.read_text(encoding="utf-8")).get("incidents", [])
+    ...
+    all_entries.extend(legacy)
+    print(f"[legacy] loaded {len(legacy)} entries")
+```
+There is no `else` branch and no error: if `merge_and_dedupe.py` is run on
+its own — exactly what this document's original "full rebuild" finding did
+— the legacy corpus is silently absent from the output, and the only
+observable trace is one `print` line that a scripted rebuild is unlikely to
+be watching for. `make build` (`Makefile:6`, `merge render
+render-docs-stats validate`) and `.github/workflows/auto-refresh.yml`'s
+"Re-merge + render + validate" step both run the correct two-step sequence,
+so this trap does not affect production builds — it only affects any ad hoc
+rebuild (scratch investigation, manual repro) that invokes
+`merge_and_dedupe.py` directly, which is exactly what produced this
+document's refuted rebuild delta (defect 3).
+
+**Name the input that would make a guard against this fail (agreement 6):**
+a build invoked without `data/legacy_consolidated.json` present. The
+gate's proposed fix (new task 4, Finding 6) is for `merge_and_dedupe.py`
+itself to fail loudly, or invoke `parse_existing.py`, when the file is
+missing — closing the gap at the tool boundary rather than relying on every
+caller to remember the two-step sequence.
+
+---
+
+## Corrections log (2026-09-15, red-reviewer BOUNCE #1)
+
+In-place factual fixes, logged here per the brief (defects 2-9 are corrected
+via inline dated blocks at each affected passage instead; see above):
+
+1. **Defect 1** (:42, original line numbering) — the table cell claiming CI
+   didn't log the union line was wrong; CI's own log has
+   `[aim] union: 1097 kept + 4160 existing -> 5248 retained`. Fixed in
+   place.
+2. **Defect 10** (:72-73) — the quoted `ingest/common.py::_rate_limit()`
+   docstring ("thread-safe and global per host, not per caller") does not
+   exist in that file. The real text, `ingest/common.py:187`, reads "across
+   ALL callers/threads -- not just this one." Fixed in place.
+3. **Defect 11** (:117-119) — `.github/workflows/auto-refresh.yml` has
+   **four** `python scripts/ingest_*.py` steps (AIRI, AIAAIC, OECD, CISA
+   KEV), not three. Fixed in place.
+4. **Defect 6** — folded into an inline correction block rather than this
+   log, since it also supplies new information (the 800 KB truncation
+   mechanism) beyond a simple fix; see the block after the "1136 vs. 1098"
+   parenthetical.
+5. **Defect 12** — the file's status header (WORKING DOCUMENT, no
+   do-not-regenerate marker) is replaced at the top of this file with a
+   final status line, per working agreement 4; original header preserved
+   inline for the record.
+
+All other defects (2, 3, 4, 5, 7, 8, 9) are corrected via dated
+`⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect N)` blocks placed
+immediately after the passage each one affects, per working agreement 4 —
+no original sentence was deleted.
 
 ---
 
