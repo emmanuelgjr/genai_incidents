@@ -136,7 +136,29 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+## 🔧 WS4-T11 — OECD AIM 800 KB page truncation (D25c) — opened 2026-09-15 — **✅ done — foreman spot-check PASS per user ruling (one recorded test gap) — branch pushed, NOT merged**
+
+**User ruling on bounce #2 (2026-09-15):** narrow third attempt, test-only plus advisory 2, verified by a foreman spot-check rather than a third full gate.
+
+**Attempt 3** `19fa9fa3` (same instance):
+- The multi-MB, straddle and cold-path tests now also assert `fetch_and_extract(url) == (REASON_OK, body)` through the real `fetch_page`.
+- New `test_main_end_to_end_offline` covers normal, ≥949 KB with the blob past 900 KB, numeric shell, no-script, broken JSON, fetch failure, empty page, a duplicate URL, and an OK-but-not-security-relevant page. It asserts the output id set exactly, plus the summary line.
+- `fetched` is now derived from `results`, fixing duplicate-URL double-counting.
+- An empty-page accounting comment is added.
+- The specialist caught its own coincidence: `ok == len(out)` in the first fixture, so mutant (d) passed. It added a divergent fixture.
+- Suite 335.
+
+**─── FOREMAN SPOT-CHECK (testimony-class, on the user's ruling) — 2026-09-15, on `19fa9fa3`: PASS, with one recorded gap ───**
+- **Scope [R]:** only `scripts/ingest_oecd_aim.py` + `tests/test_ingest_oecd_aim.py` (+ board); protected-paths diff 0 lines; porcelain empty (untracked-all).
+- **Different route from the author's proof [R]:** `git archive 19fa9fa3` into temp; COMMITTED test file; mutants **at the production entry point**, per the bounce-#2 lesson. Baseline 31 passed.
+  - **M-A** (the reviewer's defect) `fetch_and_extract` → `_extract_state_detail(text[:800_000])`: **4 failed**, including `test_main_end_to_end_offline`. **Caught.**
+  - **M-B** (the foreman's own) `fetch_and_extract` slices `text[:950_000]`, above the 949 KB fixture: **2 failed** (multi-MB, cold-path). **Caught.**
+  - **M-C** (the foreman's own) `main()` silently omits no-ng-state-script pages from `results`: **1 failed** (end-to-end). **Caught.**
+  - **M-D** (the foreman's own) the summary line swaps the "JSON decode error" and "no incident-body shape" values: **31 passed. SURVIVES.**
+- **Recorded gap (follow-up, WS4-T13 accounting scope).** The end-to-end fixture has one page in each of those two buckets, so a label swap is invisible. It is the same coincidental-equality shape the specialist fixed for `ok`, one bucket over. **Impact:** the printed summary mislabels two sub-counts; output data and totals are unaffected. **Fix:** give the two buckets different counts in the fixture. **Why not a fourth round:** this is a cosmetic log label after two bounces, and the user ruled spot-check. Recorded here so nobody cites the summary sub-counts as fully guarded.
+- **Carried reviewer advisories (not blocking):** `errors="ignore"` survives (no invalid-byte fixture); a cap above the largest fixture survives (inherent).
+
+**Merge status:** the branch is pushed. **Not merged.** This is a code-only change with no data, and scheduled refreshes stay fail-closed at the E21 tripwire under the D25(a) freeze, so merging is safe. Holding for the user's word, because the foreman previously told the user it would stay unmerged under the freeze. Expect a PROGRESS.md conflict with WS4-T10's branch, which adds a section at the same spot.
 
 **Attempt 2** `95ca8ca1` (same instance) changed three things:
 - **Reason-coded extraction:** `_extract_state_detail` / `fetch_and_extract` / `_tally_reasons`, with `main()` printing three unparseable sub-buckets.
