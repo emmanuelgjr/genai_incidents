@@ -307,44 +307,107 @@ def seed_frameworks_from_vector(entry: dict) -> None:
 # WS4-T10: params that carry no identifying information — campaign/referrer
 # tracking cruft appended by CMSes, email clients and ad platforms. Anything
 # NOT in this set is assumed to identify the resource (e.g. CMS query-string
-# article IDs like `idxno=`, `id=`, `p=`) and is KEPT in the dedup key.
-# Approach (i) from the WS4-T10 brief: keep the query string, normalized
-# (sorted, tracking params dropped), rather than an allowlist of identifying
-# params (ii, brittle — a param an ingest source doesn't yet know about would
-# silently collapse again) or refusing ambiguous keys outright (iii, would
-# also refuse true duplicates that differ only by a tracking param). The
-# false-merge risk this leaves is the SAME kind of query param appearing on
-# both a tracking blocklist miss and an identifying role, which WS4-T5's
-# later dedupe-error-rate audit measures — not over-engineered here.
+# article IDs like `idxno=`, `id=`, `p=`, `itemName=`, `page=`) and is KEPT
+# in the dedup key. Approach (i) from the WS4-T10 brief: keep the query
+# string, normalized (sorted, tracking params dropped), rather than an
+# allowlist of identifying params (ii, brittle — a param an ingest source
+# doesn't yet know about would silently collapse again) or refusing
+# ambiguous keys outright (iii, would also refuse true duplicates that
+# differ only by a tracking param). The false-merge risk this leaves is the
+# SAME kind of query param appearing on both a tracking blocklist miss and
+# an identifying role, which WS4-T5's later dedupe-error-rate audit
+# measures — not over-engineered here.
+#
+# WS4-T10 BOUNCE #1 (red-reviewer, 2026-09-15) named 9 real-data blocklist
+# misses. Classified against ingest/*.json evidence, each on whether the
+# param disambiguates the RESOURCE or is presentational/session noise —
+# not by name pattern alone, since a param name that is tracking cruft on
+# one host (`category=` on a Shopware advisory-listing page, `research=`
+# on an NCC Group search page — both a fixed/generic value, not a per-page
+# id) could in principle be an identifying id on another. Kept where a
+# clean counter-example wasn't found, per the same "assume identifying
+# unless clearly not" default the blocklist itself embodies — dropping a
+# borderline param is a false-merge risk (the harm this fix exists to
+# close), keeping one is at worst a missed-dedup, which is the safe
+# direction:
+#   - `iref` (Asahi Shimbun, e.g. `?iref=ogimage_rek`) — BLOCKLIST. Constant
+#     literal value across every sampled URL; the article slug in the path
+#     already fully identifies the page.
+#   - `edtsign`, `edtcode`, `scm` (Sohu CMS, e.g.
+#     `?edtsign=...&edtcode=...&scm=10001...`) — BLOCKLIST. CMS
+#     analytics/signature cruft; the numeric article id is in the path
+#     (`/a/<id>_<n>`), so these add nothing identifying.
+#   - `web_view` (e.g. a blog URL with `?&web_view=true`) — BLOCKLIST.
+#     Presentational rendering flag. THIS is the WS4-T10 BOUNCE #1 fix:
+#     its absence let a bare URL and its `?&web_view=true` twin key apart,
+#     producing a false split on INC-08183 (see
+#     tests/test_normalize_url_overmerge.py and the committed Phase B
+#     delta) even though both reference the identical resource.
+#   - Liferay portlet plumbing (e.g.
+#     `p_r_p_assetEntryId=...&_com_liferay_asset_publisher_..._redirect=
+#     https%3A%2F%2F...`) — the `_com_liferay_*` family (matched by
+#     prefix, since the portlet-instance id varies) and `p_p_id`/
+#     `p_p_lifecycle`/`p_p_state`/`p_p_mode`/`p_r_p_resetcur` are
+#     BLOCKLISTED: framework session/navigation state, and the
+#     `..._redirect` value is itself a huge percent-encoded return-to URL
+#     that would make near-identical page fetches key apart, a
+#     missed-dedup risk in the OTHER direction. `p_r_p_assetEntryId` is
+#     KEPT (genuinely identifying, a per-CVE numeric id) even though it's
+#     redundant with the path's own CVE slug.
+#   - `category` (e.g. a Shopware docs URL) and `research` (e.g. an NCC
+#     Group search URL) — KEPT. Both sampled uses are coarse/generic
+#     values on index-style pages, not per-article ids, so blocklisting
+#     wouldn't help disambiguate the sampled cases — but neither name is
+#     implausible as a genuine per-article category id on some other CMS,
+#     and no counter-example forces the call either way, so the
+#     conservative default (keep, i.e. treat as potentially identifying)
+#     applies per this comment's opening paragraph.
 _URL_TRACKING_PARAMS = re.compile(
-    r"^(utm(_[a-z]+)?|fbclid|gclid|msclkid|dclid|mc_[a-z]+|igshid|ref|"
-    r"ref_src|referrer|spm|cmpid|icid|yclid|_ga|_gl|s_cid|CMP)$",
+    r"^(utm(_[a-z]+)?|fbclid|gclid|msclkid|dclid|mc_[a-z]+|igshid|"
+    r"ref_src|referrer|spm|cmpid|icid|yclid|_ga|_gl|s_cid|cmp|"
+    r"iref|edtsign|edtcode|scm|web_view|"
+    r"_com_liferay_.*|p_p_id|p_p_lifecycle|p_p_state|p_p_mode|p_r_p_resetcur)$",
     re.IGNORECASE,
 )
+# `ref` (bare) is deliberately NOT in the blocklist above (WS4-T10 BOUNCE #1
+# advisory A4): on some hosts `ref=` is pure referrer tracking, but on
+# others (e.g. a GitHub raw/blob URL's `?ref=<branch>`) it identifies which
+# branch/tag the content came from — collapsing it would re-introduce a
+# false-merge risk for the sake of deduping an ambiguous tracking param.
+# Measured 0 collisions from keeping `ref` today; if that changes, prefer
+# host-scoping `ref` (block it only on hosts confirmed tracking-only) over
+# a blanket drop.
 
 
 def normalize_url(url: str) -> str:
     """Canonicalize a reference URL into a dedup key.
 
-    Strips scheme/``www.``/fragment/trailing-slash and lowercases as before,
-    but — unlike the pre-WS4-T10 version — keeps the query string (sorted,
-    with tracking params dropped) instead of discarding it outright. Dropping
-    the query string entirely collapsed distinct CMS articles that share a
-    path and differ only by an `?idxno=`/`?id=` query param onto one dedup
-    key (E21 tripwire investigation, docs/audits/E21-tripwire-refresh-2026-09-14.md
-    Finding 8/9) — e.g. INC-00554 accreted ~100 unrelated source rows this
-    way. See tests/test_normalize_url_overmerge.py.
+    Strips scheme/``www.``/fragment/trailing-slash and lowercases the
+    scheme+host+path as before, but — unlike the pre-WS4-T10 version —
+    keeps the query string (sorted, with tracking params dropped) instead
+    of discarding it outright. Dropping the query string entirely
+    collapsed distinct CMS articles that share a path and differ only by
+    an `?idxno=`/`?id=` query param onto one dedup key (E21 tripwire
+    investigation, docs/audits/E21-tripwire-refresh-2026-09-14.md Finding
+    8/9) — e.g. INC-00554 accreted ~100 unrelated source rows this way.
+
+    WS4-T10 BOUNCE #1 (advisory A4): query-parameter VALUES are no longer
+    lowercased (only the scheme/host/path and the parameter KEYS are) —
+    some identifying values are case-significant (e.g. a mixed-case CMS
+    slug or token), and folding their case was a latent false-merge risk
+    of the same shape this task exists to close, just not yet observed in
+    the committed corpus. See tests/test_normalize_url_overmerge.py.
     """
     if not url:
         return ""
-    u = url.strip().lower()
-    u = re.sub(r"^https?://(www\.)?", "", u)
-    u = u.split("#")[0]
+    u = url.strip()
+    u = re.sub(r"^https?://(www\.)?", "", u, flags=re.IGNORECASE)
+    u = u.split("#", 1)[0]
     path, _, query = u.partition("?")
-    path = path.rstrip("/")
+    path = path.lower().rstrip("/")
     if query:
         kept = sorted(
-            (k, v) for k, v in
+            (k.lower(), v) for k, v in
             (pair.split("=", 1) if "=" in pair else (pair, "")
              for pair in query.split("&") if pair)
             if not _URL_TRACKING_PARAMS.match(k)

@@ -167,18 +167,33 @@ def test_oecd_aiid_content_disagreement_is_unique_to_inc00437():
     introduced. The other two "other" rows are unaffected -- confirming the
     fix is precise, not a blanket un-merge.
 
+    **Correction (BOUNCE #1, red-reviewer [R], 2026-09-15): the paragraph
+    below originally, and wrongly, said 1575 "still ships the disagreement
+    in the committed corpus today."** It does not. In the COMMITTED corpus,
+    `AIID-1575` and `OECD-AIM-2026-01-21-eb71` sit MERGED INSIDE `INC-05013`
+    (the TruDi navigation-system row, whose surviving description is
+    AIID's own template for `AIID-1436`) -- so today's committed data ships
+    ZERO visible disagreement for 1575; it is masked exactly the way
+    INC-00437's was before ITS fix, which is the point this docstring's
+    prior paragraph was making about the MECHANISM, not (correctly) about
+    what's currently published. 1575 only becomes a standalone,
+    template-disagreeing row -- and only then would need a
+    `curation_overrides.json` entry the way 1574 has one -- once a rebuild
+    actually runs under the WS4-T10 fix (confirmed independently by
+    red-reviewer's own rebuild, which produced 1575 as a fresh row).
+
     **This is code-only, per WS4-T10's scope** (`git diff main -- data/
-    schema/ ingest/` stays empty for that task) -- 1575 does NOT yet have a
-    `data/curation_overrides.json` entry the way 1574 does, so it still
-    *ships* the disagreement in the committed corpus today. Adding that
-    override, and deciding whether/how any other rows split by the fix need
-    the same treatment, is exactly the unmerge design WS4-T10 Phase C
-    (docs/specs/WS4-T10-unmerge-design-2026-09-15.md) escalates to the user
-    -- not something this test should encode as a fait accompli by silently
-    widening its assertion. So the assertion below is intentionally an
-    explicit two-item list, not `>=`: a THIRD row appearing here (from either
-    an OECD refresh or a further merge-heuristic change) must still fail
-    loudly, exactly as the original tripwire intended."""
+    schema/ ingest/` stays empty for that task) -- no `curation_overrides.json`
+    entry for 1575 exists yet, and none should be added by this task; that
+    decision belongs to whoever executes the WS4-T10 Phase C unmerge design
+    (docs/specs/WS4-T10-unmerge-design-2026-09-15.md), which the user rules
+    on separately. This test should not encode the eventual fixed-rebuild
+    state as a fait accompli by silently widening its assertion beyond what
+    the CODE change (not a data change) actually does. So the assertion
+    below is intentionally an explicit two-item list, not `>=`: a THIRD row
+    appearing here (from either an OECD refresh or a further merge-heuristic
+    change) must still fail loudly, exactly as the original tripwire
+    intended."""
     surviving = _build_surviving()
     aiid_rows = [e for e in surviving if e.get("aiid_id")]
 

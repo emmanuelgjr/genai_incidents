@@ -9,9 +9,25 @@ unrelated source rows this way. See
 docs/audits/E21-tripwire-refresh-2026-09-14.md Findings 8/9 and PROGRESS.md's
 E21 tripwire entry.
 
-These tests fail on the pre-WS4-T10 ``normalize_url`` and pass on the fixed
-one — proven by running them with the pre-fix implementation restored via
-``git stash`` (see the WS4-T10 report for the paired failing/passing output).
+Most of these tests fail on the pre-WS4-T10 ``normalize_url`` and pass on
+the fixed one — proven by running them against a detached scratch worktree
+checked out at the pre-fix commit (``eeb7ca9c``), never via ``git stash``
+(the stash stack is shared across this session's worktrees). See
+``PROGRESS.md``'s WS4-T10 board entry and the committed Phase B delta
+artifact (``docs/audits/WS4-T10-phaseB-delta-2026-09-15.json``) for the
+paired failing/passing output and re-derivable evidence.
+
+**Advisory A1 (BOUNCE #1):** the "true duplicate still merges" cases (b)
+below CANNOT fail on pre-fix code by construction — the old
+``normalize_url`` dropped the whole query string unconditionally, so any
+two URLs differing only by query string (tracking param or otherwise)
+already collapsed onto the same key. They are regression guards, not
+before/after proofs. What DOES discriminate a too-narrow fix from a correct
+one is a mutant that keeps the query string but never drops tracking
+params (or only recognizes one CMS's identifying param, e.g. an
+``idxno``-only allowlist) — such a mutant fails (a)/(b) or the E21
+full-corpus tripwire respectively, which is what BOUNCE #1's gate used to
+prove these tests actually discriminate.
 """
 
 from __future__ import annotations
@@ -57,6 +73,128 @@ def test_normalize_url_sorts_identifying_params_for_stable_key():
     a = m.normalize_url("https://example.com/x?b=2&a=1")
     b = m.normalize_url("https://example.com/x?a=1&b=2")
     assert a == b
+
+
+# ---------------------------------------------------------------------------
+# WS4-T10 BOUNCE #1 defect 2: `web_view` false-split fix (INC-08183)
+# ---------------------------------------------------------------------------
+
+def test_normalize_url_drops_web_view_presentational_flag():
+    """The exact INC-08183 shape: a bare URL and its `?&web_view=true` twin
+    reference the SAME ReversingLabs blog post and must key identically --
+    on pre-BOUNCE#1 code `web_view` wasn't blocklisted, so the two keyed
+    apart, split the row's references across two dedup keys, and flipped
+    the row's anchor to unrelated content (see the committed Phase B delta
+    for the measured before/after)."""
+    bare = m.normalize_url(
+        "https://www.reversinglabs.com/blog/rl-identifies-malware-ml-model-hosted-on-hugging-face"
+    )
+    tagged = m.normalize_url(
+        "https://www.reversinglabs.com/blog/rl-identifies-malware-ml-model-hosted-on-hugging-face?&web_view=true"
+    )
+    assert bare == tagged
+
+
+def test_normalize_url_drops_other_bounce1_tracking_misses():
+    """The other confirmed-presentational/tracking blocklist misses named
+    in BOUNCE #1's advisory A3, each backed by a real ingest/*.json URL
+    (see the classification comment above `_URL_TRACKING_PARAMS`)."""
+    # Asahi Shimbun: constant `iref=ogimage_rek` referrer tag.
+    assert (
+        m.normalize_url("https://www.asahi.com/articles/ASV170TDGV17UTIL004M.html")
+        == m.normalize_url("https://www.asahi.com/articles/ASV170TDGV17UTIL004M.html?iref=ogimage_rek")
+    )
+    # Sohu CMS: edtsign/edtcode/scm tracking cruft, path already unique.
+    assert (
+        m.normalize_url("http://news.sohu.com/a/989338739_119659")
+        == m.normalize_url(
+            "http://news.sohu.com/a/989338739_119659"
+            "?edtsign=C985E43453F9FD552BC8CE887E7496B82A788452"
+            "&edtcode=xW5WLWm834RlWgB9uxAiFw%3D%3D&scm=10001.663_14-200000.0.0-0-0-0-0."
+        )
+    )
+    # Liferay portlet plumbing: framework navigation state, not identity.
+    assert (
+        m.normalize_url(
+            "https://liferay.dev/portal/security/known-vulnerabilities/-/asset_publisher/"
+            "jekt/content/cve-2021-33326-xss-with-the-title-of-a-modal-window"
+            "?p_p_id=com_liferay_asset_publisher&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view"
+        )
+        == m.normalize_url(
+            "https://liferay.dev/portal/security/known-vulnerabilities/-/asset_publisher/"
+            "jekt/content/cve-2021-33326-xss-with-the-title-of-a-modal-window"
+        )
+    )
+
+
+def test_normalize_url_keeps_liferay_asset_entry_id_as_identifying():
+    """`p_r_p_assetEntryId` IS kept (genuinely identifying, even though
+    redundant with the path's own CVE slug) -- only the `_com_liferay_*`
+    portlet-instance/redirect plumbing and the generic `p_p_*` state params
+    are dropped."""
+    a = m.normalize_url("https://liferay.dev/x/y?p_r_p_assetEntryId=121610771")
+    b = m.normalize_url("https://liferay.dev/x/y?p_r_p_assetEntryId=121611661")
+    assert a != b
+
+
+# ---------------------------------------------------------------------------
+# WS4-T10 BOUNCE #1 advisory A4: query-VALUE case is preserved; bare `ref`
+# is deliberately kept (not blocklisted)
+# ---------------------------------------------------------------------------
+
+def test_normalize_url_preserves_query_value_case():
+    """Only the scheme/host/path and query KEYS are lowercased -- a
+    case-significant identifying VALUE (e.g. a mixed-case token or slug)
+    must not fold two distinct resources onto one key."""
+    a = m.normalize_url("https://example.com/x?token=AbC123")
+    b = m.normalize_url("https://example.com/x?token=abc123")
+    assert a != b
+    # the key itself is still lowercased for stable sorting/matching
+    assert m.normalize_url("https://example.com/x?TOKEN=AbC123") == a
+
+
+def test_normalize_url_keeps_bare_ref_as_potentially_identifying():
+    """`ref=` is deliberately NOT blocklisted (advisory A4): on GitHub it
+    identifies a branch/tag (`?ref=main` vs `?ref=release-1.0`), so folding
+    it would risk a false merge, the exact harm this task exists to close."""
+    a = m.normalize_url("https://github.com/org/repo/blob/x/y.py?ref=main")
+    b = m.normalize_url("https://github.com/org/repo/blob/x/y.py?ref=release-1.0")
+    assert a != b
+    # `ref_src` and `referrer` (unambiguous tracking) are still dropped.
+    assert (
+        m.normalize_url("https://example.com/story")
+        == m.normalize_url("https://example.com/story?ref_src=twitter&referrer=fb")
+    )
+
+
+# ---------------------------------------------------------------------------
+# WS4-T10 BOUNCE #1 advisory A2: other real identifying query-param shapes
+# beyond the Korean-CMS `idxno=` case, so the general (not allowlisted)
+# design is exercised explicitly, not just incidentally via the E21 tripwire
+# ---------------------------------------------------------------------------
+
+def test_normalize_url_keeps_vscode_marketplace_item_name():
+    a = m.normalize_url("https://marketplace.visualstudio.com/items?itemName=rahmanazhar.saka-dev")
+    b = m.normalize_url("https://marketplace.visualstudio.com/items?itemName=tianguaduizhang.claude-dev-china")
+    assert a != b
+
+
+def test_normalize_url_keeps_mediawiki_page_param():
+    a = m.normalize_url("https://jspwiki-wiki.apache.org/Wiki.jsp?page=CVE-2022-34158")
+    b = m.normalize_url("https://jspwiki-wiki.apache.org/Wiki.jsp?page=CVE-2022-28731")
+    assert a != b
+
+
+def test_normalize_url_keeps_bare_id_and_p_params():
+    a = m.normalize_url("https://cve.org/CVERecord?id=CVE-2025-0001")
+    b = m.normalize_url("https://cve.org/CVERecord?id=CVE-2025-0002")
+    assert a != b
+    c = m.normalize_url("https://bugzilla.example.org/show_bug.cgi?id=111")
+    d = m.normalize_url("https://bugzilla.example.org/show_bug.cgi?id=222")
+    assert c != d
+    e = m.normalize_url("https://forum.example.org/viewtopic.php?p=111")
+    f = m.normalize_url("https://forum.example.org/viewtopic.php?p=222")
+    assert e != f
 
 
 # ---------------------------------------------------------------------------
