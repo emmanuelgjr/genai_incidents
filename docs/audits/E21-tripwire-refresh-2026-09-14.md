@@ -199,6 +199,12 @@ locally, from a live re-fetch, not assumed from the CI log.**
 
 ## Finding 5 (mechanism) — H2 literally refuted for the new-source_id question; a THIRD mechanism (H3) found instead [R]
 
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 4):** the H2-refutation
+> below (the 1852-legacy-slug analysis) stands. The H3 mechanism this
+> finding goes on to propose for `1552` is **refuted** — see the correction
+> at the top of "### H3 — cluster-target reassignment" below (~line 278)
+> for the real mechanism.
+
 ### (ii) What the "1890 unparseable" pages actually are
 
 Every one of the 2988 cached pages **does** carry an `<script id="ng-state">`
@@ -227,8 +233,9 @@ investigated further, immaterial to the finding.)
 > finding's own H2-refutation, still correct) + 38 truncated date-hash
 > pages**, not 1,852 + an unexplained residual. **This means ~38 new
 > incidents are silently dropped on every run that hits a >800 KB page** —
-> gate-recommended new task WS4-T6 (a parser contract test on a >800 KB
-> fixture, and removing or raising the truncation).
+> gate-recommended new task WS4-T6 (now WS4-T11 per D25, `PROGRESS.md`,
+> re-gate BOUNCE #2 defect 3) — a parser contract test on a >800 KB
+> fixture, and removing or raising the truncation.
 
 **The sitemap itself explains the 1852 figure exactly.** Re-fetching the
 sitemap live and inspecting the URL shape of the crawled window:
@@ -313,9 +320,11 @@ budget.
 > article URLs that only share a path collapse to one dedup key.
 >
 > **Determinism (defect 7 — "order-dependent" overstates it).** The build
-> itself is deterministic: a control rebuild of the currently-committed
-> inputs, run twice, is byte-identical to what's committed — this is not
-> retry/thread nondeterminism. What is true, and reproduced independently
+> itself is deterministic: **[R] by red-reviewer, gate 2026-09-15, recorded
+> PROGRESS.md; not independently re-derived by the author** — a control
+> rebuild of the currently-committed inputs, run twice, is byte-identical to
+> what's committed — this is not retry/thread nondeterminism (advisory a,
+> re-gate BOUNCE #2). What is true, and reproduced independently
 > below with a synthetic fixture, is that the **anchor is sensitive to which
 > reference the bridging row lists first**: `dedupe_entries`
 > (`merge_and_dedupe.py:1239` docstring: "first hit wins: CVE > source_id >
@@ -327,18 +336,47 @@ budget.
 > `merge_and_dedupe.py:1548-1552`), so the ID itself does not flip — only
 > the anchor's *content* does. **[R], independently re-derived** with a
 > synthetic fixture against the real `dedupe_entries()` (no network, temp
-> script deleted after use):
+> script deleted after use). **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2,
+> advisory b) — reproducible URL shapes and exact outputs, including a
+> distinct-path control the original text omitted:**
+> ```python
+> a = mk("A", "South Korea Robot Hub",
+>        ["https://domin.co.kr/news/articleView.html?idxno=111"], ["OECD-AIM-3f61"])
+> b = mk("B", "Tesla Driver Crash (AIID text)",
+>        ["https://m-i.kr/news/articleView.html?idxno=222"], ["AIID-1552"])
+> # bridging row, same two PATHS as the anchors (different idxno query values --
+> # normalize_url strips the query string, so the paths collide anyway)
+> bridge_refs_AB = ["https://domin.co.kr/news/articleView.html?idxno=333",
+>                    "https://m-i.kr/news/articleView.html?idxno=444"]
 > ```
-> # two pre-existing entries A (source_ids=['OECD-AIM-3f61']) and
-> # B (source_ids=['AIID-1552']), and a bridging row carrying both refs
-> order A-then-B refs -> surviving: A ["South Korea Robot Hub", ...]
-> order B-then-A refs -> surviving: B ["Tesla Driver Crash (AIID text)", ...]
 > ```
-> Both runs are deterministic given their input order; only the order
-> differs, and that alone flips the anchor. This confirms the phenomenon
-> (anchor change can discard a higher-trust description) while refuting the
-> specific 1552 story and the "order-dependent" framing as originally
-> stated.
+> order A-then-B refs         -> surviving=1 tombstoned=1
+>     South Korea Robot Hub ['AIID-1552', 'OECD-AIM-3f61', 'OECD-AIM-bridge']
+> order B-then-A refs (swapped)-> surviving=1 tombstoned=1
+>     Tesla Driver Crash (AIID text) ['AIID-1552', 'OECD-AIM-3f61', 'OECD-AIM-bridge']
+> control (bridge references two DISTINCT, non-colliding paths instead,
+>          e.g. https://example-news-site.com/story/abc and
+>          https://another-outlet.example/piece/xyz)
+>                              -> surviving=3 tombstoned=0
+>     South Korea Robot Hub ['OECD-AIM-3f61']
+>     Tesla Driver Crash (AIID text) ['AIID-1552']
+>     Wild mushroom AI warning ['OECD-AIM-bridge']
+> ```
+> (`surviving`/`tombstoned` count only entries that reach `dedupe_entries`'s
+> `deduped` list before being absorbed; the bridging row itself is merged
+> directly in the main loop and so is never separately tracked as a
+> tombstone — its content lives inside whichever anchor claims it.) The
+> control confirms the flip **specifically requires the query-string
+> collapse**: with genuinely distinct, non-colliding paths, all three rows
+> survive independently and nothing merges. This fixture design was
+> separately rebuilt and confirmed by red-reviewer at the re-gate
+> (2026-09-15, recorded PROGRESS.md); the exact URL shapes, code, and
+> outputs above are the author's own re-run, not copied from the gate.
+> Both collision runs are deterministic given their input order; only the
+> order differs, and that alone flips the anchor. This confirms the
+> phenomenon (anchor change can discard a higher-trust description) while
+> refuting the specific 1552 story and the "order-dependent" framing as
+> originally stated.
 >
 > Original text below is preserved for the record; its 1552-specific claims
 > (`OECD-AIM-2026-06-10-3f61` as an existing cluster member, "38 more rows
@@ -429,8 +467,24 @@ it entirely.
 | **H3 — cluster churn, real AIID content displaced** (cluster contains ≥1 `aiid_id` that **is** in the snapshot, previously template-matching, now flipped to OECD's text) | 2 | 1552, 1659 | The severe subclass: `INC-00554`/1552 (141 source_ids, was 103) and `INC-00699`/1659 (33 source_ids) both had real, correct AIID-template content before the refresh and ship OECD's own synthesized text after it, purely from new rows joining the cluster. |
 | **Pre-existing blind spot**, not caused by this refresh | 1 | 898 (`INC-08183`) | No `OECD-AIM-*` source at all — a research-blog-sourced entry, unrelated mechanism, invisible to the 2-file-scoped tripwire (Finding — blind spot, above). Unchanged by this refresh (byte-identical old vs. new). |
 
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 4):** `1552`'s row in
+> the table above is superseded — its mechanism is not "38 more rows
+> joining the cluster" but one new bridging row,
+> `OECD-AIM-2026-09-07-53bc`, whose two query-stripped references absorb
+> the 103-row `INC-00554` cluster into the singleton `INC-13037` (gate
+> [R]; see the correction under "### H3 — cluster-target reassignment,"
+> ~line 278, and defect 5's correction on `1659`/`INC-00699` just below).
+
 20 + 7 + 2 + 1(pre-existing) = 30, matching the full-rebuild corpus-level
 exception count exactly (Finding — full rebuild, below).
+
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 4):** the "matching…
+> exactly" claim above is not corroboration. The corpus-level "30" it
+> matches came from the same misconfigured build refuted at defect 3 (the
+> full-rebuild delta, run without `parse_existing.py`) — the corrected
+> build (defect 3's correction, above) did not re-measure this count. **The
+> corpus-level exception count is UNVERIFIED, not confirmed**, until
+> someone re-runs the full-corpus check against a correctly-built rebuild.
 
 > **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 5) —
 > "`INC-00699`/1659 …had real, correct AIID-template content" (row above,
@@ -449,11 +503,33 @@ exception count exactly (Finding — full rebuild, below).
 > ```
 > The committed `INC-00699` has **one** OECD source_id, **no** `aiid_id`, and
 > an OECD-template description — it never carried AIID content to begin
-> with. Per red-reviewer's own note (**[R] by red-reviewer, gate 2026-09-15,
-> recorded PROGRESS.md**), the real AIID content for this story lives on
-> `INC-05013` instead. Whatever mechanism moved AIID-sourced content off
-> `1659`/`INC-00699` in the refreshed rebuild is not this document's
-> "cluster churn" story as stated; not re-investigated here.
+> with.
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory c):** the sentence
+> below ("the real AIID content for this story lives on `INC-05013`
+> instead") is correct but under-specified — **[R], re-derived directly
+> against the committed corpus, not gate-attributed:**
+> ```
+> $ python -c "
+> import json
+> d = json.load(open('data/incidents.json', encoding='utf-8'))
+> e = next(x for x in d['incidents'] if x['id'] == 'INC-05013')
+> print(e['title']); print('source_ids:', e['source_ids']); print('aiid_id:', e.get('aiid_id'))
+> "
+> AI-Enabled TruDi Navigation System Was Alleged to Have Contributed to Patient's Stroke During June 2022 Sinus Procedure
+> source_ids: ['AIID-1436', 'AIID-1528', 'AIID-1575', 'OECD-AIM-2026-01-21-eb71', ...]
+> aiid_id: 1436
+> ```
+> The AIID content genuinely absorbed into `INC-05013` carries `aiid_id`
+> **1436** — not `1659`. Separately, **[R], re-derived directly against
+> `ingest/aiid_full.json`:** `aiid_id` **1659 is not present in
+> `aiid_full.json` at all** (`1659 in ids` → `False`, checked against the
+> full 1,548-row id set). So `1659`/`INC-00699` was never a case of AIID
+> content being displaced by anything — there was no AIID row `1659` to
+> displace in the first place; this row belongs to the H1 (staleness)
+> population's logic, not H3, once the refreshed OECD row cross-references
+> an `aiid_id` the snapshot has never heard of. Whatever moved `INC-05013`'s
+> genuine AIID-1436 content in the refreshed rebuild is a separate question,
+> not re-investigated here.
 
 ## Finding — full rebuild, entry-count and ID-set delta, per agreement 6 (form d) [R]
 
@@ -592,6 +668,15 @@ shipping OECD's own authored text under an `aiid_id`/`AIID-<n>` signal.
 **28/29 mislabeled, 1/29 correctly labeled.** At the full-corpus level
 (Finding — full rebuild), the same ratio holds for the 30-row population
 minus 1574: 29/30 mislabeled.
+
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 4):** the "30-row
+> population" figure above is the same UNVERIFIED corpus-level count flagged
+> in the correction after the per-row attribution table (Finding 5) — it
+> came from the refuted, misconfigured full rebuild (defect 3) and was not
+> re-measured on the corrected build. The **29-row, 2-file-scoped** count
+> this finding otherwise relies on (28/29 mislabeled) is unaffected — that
+> population was independently reproduced (Finding 2) and is not in
+> question.
 
 ## Finding 4 — licensing surface [R]
 
@@ -762,24 +847,81 @@ complementary to (b)/(d), not a substitute for either.
 
 ### ⚠ REVISED RECOMMENDATION — 2026-09-15 (red-reviewer BOUNCE #1)
 
+> **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 3) — the gate's
+> remediation table below (items A-F and the six proposed tasks) predates
+> the user's actual rulings and has since been superseded by decision D25
+> (`PROGRESS.md`, user, 2026-09-15). The gap is a foreman failure to relay
+> D25 to the author, not an author defect; recorded here so this document
+> reflects what actually happened.** D25, in substance:
+> - **D25(a) FREEZE CONFIRMED (user, 2026-09-15).** No OECD AIM refresh PR
+>   merges until BOTH (1) the `normalize_url` query-string over-merge fix
+>   lands AND (2) every new `"merged"` deprecation a refresh would write has
+>   been reviewed and confirmed to be the same incident. *(Maps to item A
+>   below.)*
+> - **D25(b) WS4-T10, P0, starts next, ahead of Phase-2 structural work.**
+>   Covers: the `normalize_url` fix plus proof it fires; measuring the
+>   published over-merge (`INC-00554` first, per Finding 8); a full
+>   field-level delta. The unmerge design for already-published rows
+>   returns to the user before any data change. **WS4-T10 is a NEW task,
+>   distinct from WS4-T5** (the existing P1 dedupe-audit plan task the gate's
+>   table cited). *(Maps to item F / task 1 below — read "WS4-T5" there as
+>   superseded by WS4-T10.)*
+> - **D25(c) four approved follow-up tasks:**
+>   - **WS4-T11** — the 800 KB page truncation, plus a parser contract test
+>     with a >800 KB fixture. *(Maps to task 2 below.)*
+>   - **WS4-T12** — option (b) OECD provenance at ingest, the tripwire
+>     replacement (zero unlabeled, full-corpus scope, stable-ID continuity
+>     check), and the step-4d override-keying fix. *(Maps to item B / task 6
+>     below.)*
+>   - **WS4-T13** — the build guard (fail without
+>     `data/legacy_consolidated.json`) plus the OECD crawl budget fix (skip
+>     numeric slugs; restore timeout headroom). *(Maps to task 4 / task 3
+>     below.)*
+>   - **WS4-T14** — option (c), the AIID snapshot in the weekly refresh,
+>     with a conduct/register review. *(Maps to item C below.)*
+>
+> Task 5 below (deprecation hygiene review) is folded into D25(a)'s freeze
+> condition (2) rather than tracked as its own task ID.
+
 The recommendation above is preserved for the record; its (b)/(a)/(c)
 conclusions substantially survive, but its freeze rationale and (d)'s scope
 were wrong. This block is authoritative going forward. **[R] by
 red-reviewer, gate 2026-09-15, recorded PROGRESS.md** (gate's remediation
-table), except where noted as independently re-derived above.
+table), except where noted as independently re-derived above. **The item-
+by-item table immediately below is the gate's own proposal, preserved for
+the record — see the D25 mapping just above for what the user actually
+decided.**
 
 - **A. Freeze OECD refresh merges — approved**, but **on the corrected
   rationale**: not severity drops (defect 3 refuted those), but **wrong-
   incident merges, stable-ID content swaps, and permanent append-only
   redirects** (defect 4 — `INC-00554` and `INC-00699` both retitle to
-  unrelated stories under IDs that are cited externally and cannot be
-  un-published without a distinct deprecation reason code).
+  unrelated stories under IDs that are cited externally and ~~cannot be
+  un-published without a distinct deprecation reason code~~).
+  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 2):** the struck
+  > clause above is invented and false — a distinct deprecation reason code
+  > does not un-publish anything, and none was claimed to. **What is true:**
+  > a written `"merged"` redirect is **permanent** under invariant 9
+  > (append-only deprecations) once it ships — that permanence, not a
+  > missing reason code, is the freeze rationale. A distinct reason code
+  > (e.g. distinguishing a genuine same-incident consolidation from a
+  > weak-key bridge like this one) is **hygiene for FUTURE deprecations**,
+  > so reviewers can tell the two apart going forward — it has no bearing
+  > on whether an already-written redirect can be un-published.
 - **B. Option (b) (unconditional `description_provenance`/`description_source`
   on OECD rows) — approved in principle.** Ship it with its corrected blast
   radius (defect 9: 3,666 rows now / 4,657 post-refresh, no `updated` bump)
   and its caveat (the `INC-00437` step-4d override must be re-keyed to the
   anchor, or asserted, in the same PR — otherwise it can silently mislabel
-  again under the exact mechanism this document found for `1552`/`1659`).
+  again under the exact mechanism this document found for `1552`
+  ~~/`1659`~~).
+  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, advisory c):** `1659` is
+  > struck above — it never had AIID content to lose (advisory c's
+  > correction at defect 5, above: `aiid_id` 1659 is not in
+  > `ingest/aiid_full.json` at all, and the genuine AIID content for that
+  > story arc is `INC-05013`'s `aiid_id` 1436, a different row). The
+  > override-keying caveat still holds on `1552` alone, which is sufficient
+  > to justify it.
 - **C. Add the AIID snapshot to `auto-refresh.yml` — a user/foreman scope
   call under D1**, not decided here; unchanged from the original text.
 - **D. Per-row `curation_overrides.json` entries (option (a)) — reject**,
@@ -799,12 +941,16 @@ table), except where noted as independently re-derived above.
   not the immediate ask.
 
 **Six new tasks proposed by the gate (not yet on the plan — user's call):**
-1. **WS4-T5, P0/P1:** fix `normalize_url` (keep identifying query params, or
-   refuse URL keys shared by distinct raw URLs), then audit existing
-   megaclusters, `INC-00554` first. Unmerging published rows touches
-   invariants 3 and 9 — escalate the design to the user.
-2. **WS4-T6:** remove or raise the 800 KB truncation (defect 6); add a
-   parser contract test using a >800 KB fixture page.
+*(re-gate BOUNCE #2, defect 3: superseded by D25, `PROGRESS.md` — see the
+mapping at the top of the REVISED RECOMMENDATION block above.)*
+1. **WS4-T5, P0/P1** *(now WS4-T10 per D25)***:** fix `normalize_url` (keep
+   identifying query params, or refuse URL keys shared by distinct raw
+   URLs), then audit existing megaclusters, `INC-00554` first. Unmerging
+   published rows touches invariants 3 and 9 — escalate the design to the
+   user.
+2. **WS4-T6** *(now WS4-T11 per D25)***:** remove or raise the 800 KB
+   truncation (defect 6); add a parser contract test using a >800 KB
+   fixture page.
 3. **WS4-T6/ops:** numeric-slug legacy pages have filled ~1,852 of the
    3,000-URL crawl window since late August; skip them or budget by
    date-hash URLs, and check for a resulting coverage gap. The job already
@@ -881,11 +1027,29 @@ recorded PROGRESS.md; not re-derived by the author.**
   Of the entry's 103 (pre-refresh) `source_ids`, **roughly 100 are
   unrelated** — Korean defence MOUs, wildfire-drone programs, bank anti-
   phishing product launches, and other stories that share nothing with the
-  crash except a bridging path through a query-stripped URL key. [R,
-  confirmed directly against the committed corpus by the author: the 103
-  `source_ids` and title above are visible in `data/incidents.json`'s
-  `INC-00554` row — see the `git show` output quoted under defect 2's
-  singleton check.]
+  crash except a bridging path through a query-stripped URL key.
+  > **⚠ CORRECTION 2026-09-15 (re-gate BOUNCE #2, defect 1):** the original
+  > bracketed provenance note here pointed at "the `git show` output quoted
+  > under defect 2's singleton check" — no such output exists anywhere in
+  > this file, and defect 2's check is a `python -c` reading `INC-13037`,
+  > not `INC-00554`. **Narrowed [R], re-derived directly against the
+  > committed corpus, not gate-attributed:**
+  > ```
+  > $ python -c "
+  > import json
+  > d = json.load(open('data/incidents.json', encoding='utf-8'))
+  > e = next(x for x in d['incidents'] if x['id'] == 'INC-00554')
+  > print(e['id'], '|', e['title'])
+  > print('source_ids count:', len(e['source_ids']))
+  > "
+  > INC-00554 | Tesla Driver Reportedly Said Driver-Assistance Mode Was Engaged During Fatal Texas Home Crash
+  > source_ids count: 103
+  > ```
+  > This confirms only the count and title. **The composition claim itself
+  > — "~100 of 103 unrelated," the specific unrelated story categories, and
+  > the bridge-key breakdown below — is the GATE's [R] only** (red-reviewer,
+  > gate 2026-09-15, recorded PROGRESS.md; not independently re-derived by
+  > the author, who did not enumerate or classify all 103 `source_ids`).
 - **Bridge keys** (query-stripped, colliding across genuinely distinct
   articles): `wowtv` read-page path (16 rows), `asiatoday` `view.php` (15),
   `m-i.kr` `articleview` (13), `hankooki` `articleview` (13), `it.chosun`
@@ -906,7 +1070,8 @@ recorded PROGRESS.md; not re-derived by the author.**
   independently re-derived; not measured per-row here.**
 
 This is why the gate's remediation table re-scopes option (d) (Finding 6)
-to `normalize_url` specifically (WS4-T5, P0/P1) rather than the broader
+to `normalize_url` specifically (WS4-T5, P0/P1 — now WS4-T10 per D25,
+`PROGRESS.md`, re-gate BOUNCE #2 defect 3) rather than the broader
 anchor-preference scheme: the query-string collapse is already producing
 wrong merges in the shipped corpus, independent of whether this refresh
 ever lands, and `INC-00554` is the concrete example to start the audit
@@ -986,6 +1151,46 @@ All other defects (2, 3, 4, 5, 7, 8, 9) are corrected via dated
 `⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect N)` blocks placed
 immediately after the passage each one affects, per working agreement 4 —
 no original sentence was deleted.
+
+## Corrections log, round 2 (2026-09-15, re-gate BOUNCE #2)
+
+All items below are corrected via dated `⚠ CORRECTION 2026-09-15 (re-gate
+BOUNCE #2, defect N / advisory x)` blocks placed immediately after the
+passage each one affects, per working agreement 4. The only deletion-like
+change is defect 2's strikethrough (the clause is struck, not removed).
+
+1. **Defect 1** (Finding 8, "~100 of 103 unrelated" bullet) — the pointer to
+   a nonexistent `git show` output is replaced with the actual `python -c`
+   command re-run against `data/incidents.json`, narrowing the author's own
+   [R] to the count/title only; the composition claim stays gate-attributed.
+2. **Defect 2** (REVISED RECOMMENDATION item A) — struck the invented "cannot
+   be un-published without a distinct deprecation reason code" clause;
+   restated the real freeze rationale (permanent append-only redirect under
+   invariant 9) and what a distinct reason code actually does (future
+   hygiene, not un-publishing).
+3. **Defect 3** (top of the REVISED RECOMMENDATION block, plus inline
+   pointers at the 800 KB-truncation correction, the six-tasks list items 1
+   and 2, and Finding 8's closing paragraph) — added decision D25
+   (`PROGRESS.md`, user, 2026-09-15) in full, mapped every gate item (A-F)
+   and task (1-6) to its D25 task ID (WS4-T10 through WS4-T14).
+4. **Defect 4** (Finding 5's heading, the H3 per-row table, the "20+7+2+1=30"
+   sentence, and Finding 3's "30-row population" sentence) — four notes
+   marking the refuted H3/1552 story and the misconfigured-build "30" count
+   as superseded/UNVERIFIED rather than confirmed, each pointing to where
+   the real figure or mechanism lives.
+5. **Advisory a** (the determinism paragraph under "H3 — cluster-target
+   reassignment") — attributed the control-rebuild-is-byte-identical claim
+   to the gate explicitly, rather than leaving it unmarked.
+6. **Advisory b** (the synthetic fixture) — replaced the abstract fixture
+   description with the exact reproducible URL shapes, the exact outputs
+   for both ref orderings, and a new distinct-path control (3 survivors, 0
+   tombstones) confirming the flip requires the query-string collapse
+   specifically.
+7. **Advisory c** (the defect-5 correction on `INC-00699`, and the item-B
+   override-keying caveat) — corrected the AIID content attribution: the
+   real absorbed content is `INC-05013`'s `aiid_id` 1436, not `1659`; `1659`
+   is not present in `ingest/aiid_full.json` at all. Struck `1659` from the
+   caveat's example list, leaving `1552` (still sufficient to justify it).
 
 ---
 
