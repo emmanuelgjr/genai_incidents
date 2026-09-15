@@ -30,6 +30,30 @@ see §7**).
 > a Revision-2 marker flags; §7 has the corrected figures and
 > recommendation. `docs/audits/WS4-T10-phaseB-delta-2026-09-15.json` /
 > `.md` are the re-derived, committed evidence behind Revision 2.
+>
+> ## ⚠ REVISION 3 — 2026-09-15 (red-reviewer BOUNCE #2 on `96ce135e`)
+> **Revision 3 (§8, at the very end) SUPERSEDES §7.2's "needs NO
+> deprecation entry" claim for continuity-holding splits, and resolves the
+> INC-07738 question §7.4 only flagged.** Red-reviewer's second gate found
+> Revision 2's core simplification was itself false: **8 EXISTING
+> `id_deprecations.json` entries already redirect into split ids** (6
+> directly, 2 by chain) — ids retired long before this fix, whose own
+> historical content has now scattered under the fix, same as any split
+> id's. Revision 2 said the 43 continuity-holding splits need nothing new
+> in `id_deprecations.json`; that is false **precisely because of these 8
+> inbound redirects**, two of which (`INC-08133`→`INC-07736`,
+> `INC-07771`→`INC-01271`) point INTO continuity-HOLDING splits — so a
+> split id's own continuity holding is NOT sufficient to guarantee every
+> id that redirects INTO it is still correct. §8.1 has the full
+> measurement (`docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`);
+> §8.2 specifies the append-only redirect model this requires; §8.3
+> extends the guard; §8.4 resolves INC-07738 (a code-defect explanation
+> with a scoped, deliberately NOT-fixed-here follow-up, not a design
+> ambiguity). §7 stays as Revision 2 left it, marked in place where
+> superseded — it is not wrong about the SPLIT recommendation (Option 1
+> for continuity-holding splits, Option 2 for continuity-breaking ones),
+> only incomplete about what ELSE besides the split id itself needs a
+> record.
 
 ## 1. Why this document exists, not just the code fix
 
@@ -268,7 +292,14 @@ query-string artifact.
 A title-similarity scan (`difflib.SequenceMatcher` > 0.55, a cheap proxy for
 "these two split-off rows might actually be the same incident wrongly
 separated") over all 47 split groups' sibling pairs found **58 pairs above
-threshold and, on manual review of the top matches, zero regressions**:
+threshold and, on manual review of the top matches, zero regressions**
+**[Revision 3, advisory A5 reconciliation, dated note: every re-measurement
+since this first pass — including the committed
+`docs/audits/WS4-T10-phaseB-delta-2026-09-15.md` and this attempt's own
+rerun — gives **59**, not 58. 59 is the current, reproducible figure; this
+original 58 is preserved as the first-pass count, not corrected in place,
+since the discrepancy doesn't change the finding (zero regressions either
+way)]**:
 every high-similarity pair inspected turned out to be **distinct** entities
 sharing a templated report format — e.g. two different VS Code extensions
 (`SakaDev` / `AI Code`) with disjoint CVEs (`CVE-2026-30306` /
@@ -570,8 +601,21 @@ measures). This single, one-time, per-id comparison decides the option:
 
 - **Where continuity holds (43/47 today): Option 1, and — this is the
   simplification the original §3 discussion missed — it needs NO special
-  `id_deprecations.json` schema entry at all.** The split-off members
-  never had a separate published id of their own; they were always
+  `id_deprecations.json` schema entry at all.**
+  **[Revision 3, dated note — this claim is FALSE as stated, corrected in
+  §8.1/§8.2.]** It is true that the split id ITSELF needs no new record —
+  but **8 EXISTING deprecations already redirect INTO split ids from
+  BEFORE this fix**, 2 of them directly into continuity-holding splits
+  (`INC-08133`→`INC-07736`, `INC-07771`→`INC-01271`). Their own retired
+  content has scattered under the fix exactly like a split id's would, and
+  their CURRENT record still points at a row that no longer holds it. "The
+  split-off members never had a separate published id" is true of the
+  content that moved WITHIN this fix's own build, but false of content
+  that had ALREADY been merged away, by an EARLIER build, into what is now
+  one of the 47 split ids — that content DID have a separate published id,
+  and still has a live (if wrong) record pointing at it. See §8.1 for the
+  full population and §8.2 for the record type this needs.
+  The split-off members never had a separate published id of their own; they were always
   embedded inside the single over-merged row. There is nothing to
   "deprecate FROM" for them — they simply appear as ordinary new rows on
   the next build, exactly like any newly-ingested content would. The old
@@ -582,7 +626,8 @@ measures). This single, one-time, per-id comparison decides the option:
   the tie-break's choice matches today's published content**, which
   removes the "purely mechanical tie-break cannot recover the real
   incident" objection §3's Option 1 discussion raised, for exactly these
-  43 rows.
+  43 rows **(for the split id's own identity — §8.1 shows this is not the
+  whole story for ids that redirect INTO one)**.
 - **Where continuity breaks (4/47 today: `INC-00311`, `INC-00554`,
   `INC-00754`, `INC-01897`): Option 2.** These are the rows where the
   measured evidence directly shows the mechanical tie-break picks WRONG
@@ -618,8 +663,13 @@ a real but SINGLE-POINT safety net — re-keying that one override without
 the guard removes the only thing currently standing between an ordinary
 rebuild and shipping §2.1/§2.2's swaps clean. Concretely, before the
 freeze can lift under D25(a):
-1. Apply 7.2's per-id decision to today's 47 (4 retirements + 349 total
-   successor rows, 43 of them needing no deprecation record).
+1. Apply 7.2's per-id decision to today's 47 split ids (4 retirements +
+   43 that keep their own id; the 349 figure is the total COUNT of
+   successor rows across all 47, not a count of ids needing no record —
+   **[Revision 3, advisory A6 correction, dated note]** the original
+   wording here conflated the two. Additionally apply §8.1/§8.2's 8
+   inbound-deprecation resplit records, which stand independently of
+   which of the 47 split ids they happen to redirect into.
 2. Re-key or fix the `CVE-2025-10875` override (§2.3b) as part of the same
    change.
 3. Land the continuity guard (checks ALL common ids' title/anchor
@@ -630,6 +680,11 @@ freeze can lift under D25(a):
 4. Then the freeze-lift conditions in D25(a) apply as originally stated.
 
 ### 7.4 Advisory A5 — restated (see §2.3's dated note for the finding)
+
+**[Revision 3, dated note — BOUNCE #2 found this section incoherent with
+the hybrid's own logic and asked for a decision, not just a flag; §8.4
+resolves it with a root-cause diagnosis and an explicit choice not to fix
+`merge_and_dedupe.py` in this attempt.]**
 
 The design must also treat a **merge that retires an intact published
 id** (the Mythos case, `INC-07738` → `INC-14757`) as needing the same
@@ -647,3 +702,240 @@ rules on (a) whether to adopt 7.2's per-id continuity-based hybrid over a
 blanket option, (b) remediation sequencing/PR structure, and (c) the exact
 `id_deprecations.json` schema shape for the `reason: "split"` records the
 4 continuity-breaking rows need (schema-architect's call).
+
+## 8. Revision 3 — 2026-09-15 (red-reviewer BOUNCE #2 on `96ce135e`)
+
+Evidence: `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`
+(script: `scripts/audit/ws4t10_inbound_deprecations.py`, committed and
+rerunnable), cross-referenced against `docs/ID_POLICY.md` §4 (the
+project's existing stable-ID policy) and `src/genai_incidents/__init__.py`
+(`_load_deprecations` :51-66, `resolve_id` :167-179).
+
+### 8.1 The measurement: 8 inbound deprecations, all wrong after the fix
+
+Every `data/id_deprecations.json` entry whose chain resolves into one of
+the 47 split ids (or into `INC-07738`) was found mechanically (no git
+history needed for this step — just walking the committed deprecation
+chains) and is exactly 8:
+
+| retired id | → resolves to | recovered sources | now land on |
+|---|---|---|---|
+| `INC-07771` | `INC-01271` (holds) | 1 | 1 fresh id (`INC-14814`) |
+| `INC-08109` | `INC-01412` (holds) | 1 | 1 fresh id (`INC-14847`) |
+| `INC-08133` | `INC-07736` (holds) | 1 | 1 fresh id (`INC-14850`) |
+| `INC-08146` | `INC-08139`→`INC-00554` (breaks) | 1 | 1 fresh id (`INC-14853`) |
+| `INC-08185` | `INC-08139`→`INC-00554` (breaks) | 65 | 63 different rows |
+| `INC-08139` | `INC-00554` (breaks) | 92 | 90 different rows |
+| `INC-00497` | `INC-00311` (breaks) | 8 | 8 different rows (1 still on `INC-00311`) |
+| `INC-03128` | `INC-00754` (breaks) | 10 | 9 different rows (2 still on `INC-00754`) |
+
+**All 8 are `WRONG_AFTER_FIX`: none still land, even partially and
+exclusively, on the id their current record names.** Each retired id's
+original source_ids were recovered from git history (`git show
+<sha>:data/incidents.json`, SHAs recorded in the artifact) — see
+`docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`'s "Inbound deprecations"
+section for the full per-row breakdown and the two corrected top-10 rows
+(`INC-07736`, `INC-01271`).
+
+**This falsifies §7.2's "the 43 continuity-holding splits need no new
+record" claim precisely because 2 of the 8 (`INC-08133`, `INC-07771`)
+point INTO continuity-holding splits (`INC-07736`, `INC-01271`).** A split
+id's own title/content staying correct says nothing about whether OTHER,
+earlier-retired ids that redirect into it are still correctly resolved —
+those are a different population, measured separately here, not a subset
+of "the 47."
+
+`INC-08139` and `INC-08185` are earlier snapshots of the SAME rolling
+Korean-CMS megacluster that later grew into `INC-00554` (their own
+historical source lists are near-total subsets of `INC-00554`'s eventual
+103) — which is why §8.2 recommends giving each retired id a DIRECT
+resplit record from its own recovered sources, rather than trying to
+chain everything through `INC-00554`'s eventual split record.
+
+### 8.2 The redirect model
+
+**Precedent already exists for this exact shape of fix.** `docs/ID_POLICY.md`
+§1.4(a) documents a different-but-structurally-identical defect (9
+published ids with no redirect at all) and prescribes: "append N records
+with an honest reason ... pointing at a successor where one can be
+identified." `docs/ID_POLICY.md` §4 rule 2 states the general mechanism
+this is an instance of: **"A record in `data/id_deprecations.json` is
+never edited to change its meaning and never deleted. Corrections are made
+by appending, not by rewriting history."** This design does not need to
+invent an append-only-correction pattern — it needs to apply the one
+already policy.
+
+**Record type.** For each of the 8 (and any future case the guard in §8.3
+finds), append a NEW `id_deprecations.json` entry:
+```
+{"from": "<retired-id>", "into": <single-id-or-array>,
+ "reason": "resplit", "date": "<today>",
+ "supersedes_date": "<original record's own date>"}
+```
+`reason: "resplit"` is deliberately DISTINCT from `"merged"` (a
+same-incident assertion the original record already made and which
+`invariant 9`/§4 rule 2 forbids altering) and from `"split"` (Revision
+2's §3 Option 2 record for a split id's own retirement) — a reader walking
+history needs to tell "this id was always the same incident as its
+target" from "this redirect was itself later corrected because the target
+changed out from under it." `supersedes_date` is optional metadata (not
+load-bearing for resolution) letting a human trace which original record
+a resplit corrects, without needing to diff the file.
+
+**Precedence rule: the LATEST-dated record for a given `from` wins.**
+**Verified [R] against the CURRENT `_load_deprecations()` implementation**
+(`src/genai_incidents/__init__.py:51-66`): it iterates
+`data["deprecations"]` in file order and does `out[f] = t` — plain
+dict-assignment, unconditional overwrite, not `setdefault`. Because
+`id_deprecations.json` is append-only and chronological, **whichever
+record for a given `from` was added LAST already wins today, with ZERO
+`resolve_id` code change required** — this is existing, correct, but
+UNDOCUMENTED and UNTESTED behavior. Recommended, not implemented here (the
+owner's call, per the brief):
+1. Add a test locking this in as intentional, not incidental — a mutant
+   changing `out[f] = t` to `out.setdefault(f, t)` should fail it.
+2. Consider building the map by explicitly sorting on `date` first, rather
+   than relying on file order, so correctness doesn't depend on nothing
+   ever reordering or compacting the JSON in the future.
+
+**Chains need no per-link changes.** `resolve_id`'s existing while-loop
+(`src/genai_incidents/__init__.py:167-179`) walks `from → into → into →
+...` until it lands on a live id. Superseding only the id whose OWN
+content actually moved is sufficient — anything that chains THROUGH it
+inherits the correction for free. Demonstrated directly by `INC-08146`: it
+chains through `INC-08139`, but its own recovered content (1 source) lands
+on a single different id (`INC-14853`) than `INC-08139`'s content does —
+so `INC-08146` gets its OWN direct resplit record straight to `INC-14853`,
+bypassing `INC-08139` entirely, rather than trying to route through
+`INC-08139`'s (much larger, multi-target) correction.
+
+**Multi-successor case: a genuine, and more general, `resolve_id` gap.**
+`resolve_id` as it exists today assumes a SCALAR `into`. `_load_deprecations()`
+stores whatever `into` is, verbatim; if a future record (this design's
+`reason: "resplit"`, OR Revision 2 §3's own `reason: "split"` for the 4
+continuity-breaking split ids) uses an ARRAY `into`, the very next chain
+hop through it calls `current not in seen` where `current` is now a
+**list** — `TypeError: unhashable type: 'list'`. **This is not a new
+requirement this design introduces; it is a pre-existing gap in Revision
+2's own Option 2 design that neither Revision 2 nor `resolve_id` noticed**
+— ANY multi-target split record breaks `resolve_id` today, resplit or not.
+Requirement for the `resolve_id` owner (not implemented here): treat a
+list-valued `into` as "not a single-target redirect" and return `None` (or
+a documented sentinel) instead of raising — this preserves every existing
+single-target chain's behavior unchanged and degrades safely, rather than
+crashing, for the multi-successor case. A richer disambiguation API (e.g.
+a `resolve_id_group()` that returns the full successor list) is a
+nice-to-have for whoever picks this up, not a blocker.
+
+**Data for the 8 measured cases**, precise per-id source→successor
+mappings, is in `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`
+— 4 are single-target (`INC-07771`, `INC-08109`, `INC-08133`, `INC-08146`),
+4 are multi-target (`INC-00497`: 8, `INC-03128`: 9, `INC-08139`: 90,
+`INC-08185`: 63 — all needing the array-`into` shape, hence needing the
+`resolve_id` fix above before they can be written and safely resolved).
+
+**Routing (per the brief, not this document's call to implement):**
+- `schema/` changes (the `resolve_id` shape needed to validate a
+  `reason: "resplit"` record, and array-valued `into` for both `"split"`
+  and `"resplit"`): **schema-architect**.
+- The `resolve_id` code change (list-valued `into` handling) and the
+  `docs/ID_POLICY.md` amendment (rule 3, "the surviving entry keeps the
+  lower-numbered ID," needs qualifying language for the multi-successor
+  and resplit cases; a new §1.4(c) documenting this defect class
+  alongside the existing §1.4(a)/(b) precedent): **the `resolve_id` /
+  `ID_POLICY.md` owner**. **This is a user decision** (ID_POLICY
+  amendments are policy, not implementation).
+
+### 8.3 Guard extension: deprecation integrity
+
+§7.3's continuity guard (checks a common id's title/anchor against its
+prior build) does not and cannot catch §8.1's harm — none of the 8 retired
+ids are COMMON ids (they don't exist as rows in either build), so a
+common-row-keyed check never sees them. A second, independent guard
+check is needed:
+
+> **For every LIVE entry in `id_deprecations.json` (every `from` whose
+> latest record has non-null `into`), the entry's CURRENT resolved
+> target(s) — following `resolve_id`'s chain — must still hold at least
+> one of that entry's recorded/recoverable source_ids.**
+
+**Name the input that makes it fail** (agreement 6): any deprecation
+record whose target id's `source_ids` set, in a freshly-built corpus, has
+EMPTY intersection with the retired id's own known source_ids. On today's
+corpus (post-remediation), the 8 records in §8.1 would each fail this
+check under Revision 2 alone (no resplit records yet) and each PASS once
+resplit records land pointing at the correct current target(s).
+`scripts/audit/ws4t10_phaseb_delta.py`'s new
+`common_rows_gained_source_ids`/`deprecations_deleted_or_modified` checks
+(advisory A1) are complementary, not a substitute: they catch invariant-9
+violations (editing/deleting a record) and unexpected new merges, not a
+STALE-but-untouched record whose target's content moved out from under
+it, which is exactly §8.1's shape.
+
+This check, alongside §7.3's continuity check, is required to land BEFORE
+or WITH the `CVE-2025-10875` override re-keying — unchanged from §7.3's
+sequencing rationale, now covering both harm classes the code fix can
+produce (a wrong split-id anchor, and a stale inbound redirect).
+
+### 8.4 Resolving INC-07738 (BOUNCE #2 new defect 2)
+
+**Root cause, precisely diagnosed [R].** `INC-07738` (Mythos, 1 source)
+and `INC-00623` (French Army Spot robot, 4 sources including 1 Mythos-tagged
+one) both pre-date this fix. Under the fix, the Mythos-tagged source
+correctly leaves `INC-00623` and joins `INC-07738`'s content — but the
+MERGED row ends up with a THIRD, brand-new id (`INC-14757`), not either
+existing one. `merge_and_dedupe.py`'s id-assignment loop
+(scripts/merge_and_dedupe.py:1660-1684) computes `ids_seen =
+sorted({INC-00623, INC-07738})` for this row and tries ONLY
+`ids_seen[0]` (`INC-00623`, the numerically smaller): if that id is
+already claimed by another surviving row — which it is here, since
+`INC-00623`'s own remaining 3 sources form their own continuing row that
+legitimately keeps the `INC-00623` id — **the code mints a fresh id
+instead of trying the next candidate (`INC-07738`) in `ids_seen`, which
+was sitting right there, unclaimed.** `INC-07738` was a singleton, so
+nothing else was competing to keep its number.
+
+**This is a real code defect** (the loop should try each `ids_seen`
+candidate in order, falling back only when ALL are taken, not just the
+first) but **it produces avoidable CHURN, not a WRONG redirect** — the
+resulting `INC-07738` → `INC-14757` `merged` deprecation is factually
+correct (that content really did move there); no citer is misled, unlike
+§8.1's harm class. This qualitatively differs from new defect 1, which is
+why it gets a different disposition.
+
+**Blast radius, measured [R]:** re-deriving the id-assignment loop's own
+decision points against the fixed build, **exactly 1 row in today's entire
+corpus** hits this exact pattern (`ids_seen` has >1 candidate AND the
+first is already claimed) — `INC-14757` itself. Every other case where a
+row's preferred id was already taken had only ONE candidate to begin with
+(the normal, correct shape for a split: the old megacluster's id, already
+claimed by whichever sibling got there first), so there was never an
+ignored alternative.
+
+**Decision: do NOT fix `merge_and_dedupe.py` in this attempt.** The bug is
+real and its diagnosis above is precise enough to fix directly, but the
+id-assignment loop is core, cross-cutting dedup logic — touching it needs
+full-corpus regression verification (would ANY other historical or future
+merge hit this path differently?) and its own dedicated review, not a
+bundled fix inside a design-record-focused attempt. Its CURRENT blast
+radius is exactly 1 occurrence, so the churn cost of leaving it unfixed a
+little longer is small. **Recommend a new follow-up task** (WS4-T-next,
+number TBD by the board) titled "fix the ids_seen collision fallback in
+merge_and_dedupe.py's id-assignment loop," scoped to: try each `ids_seen`
+candidate in order (not just the first) before minting fresh; a full
+before/after corpus diff proving no OTHER row's id assignment changes
+unexpectedly; and a regression test reproducing this exact
+`INC-07738`/`INC-00623` fixture. §8.2's redirect model is independent of
+whether this future fix ever lands — it operates on OBSERVED build
+output, not on an assumption that id assignment is optimal, so it remains
+correct either way.
+
+### 8.5 What this section still escalates to the user
+
+In addition to §7.5's items: (d) whether to accept the `reason: "resplit"`
+record type and its precedence rule (§8.2) as specified, including the
+`resolve_id` list-handling fix it (and Revision 2's own `"split"` records)
+depend on; (e) the `docs/ID_POLICY.md` rule-3 amendment §8.2 names;
+(f) whether to authorize the follow-up task §8.4 recommends for the
+`ids_seen` collision-fallback defect, and its priority relative to
+WS4-T11...T14.
