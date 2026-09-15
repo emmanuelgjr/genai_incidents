@@ -122,34 +122,137 @@ def load_sitemap() -> list[str]:
 
 
 def fetch_page(url: str) -> str | None:
+    """Fetch and decode one AIM incident page.
+
+    No size cap. The page was previously truncated to the first 800,000
+    bytes before decoding -- a page whose `<script id="ng-state">` JSON blob
+    starts at or straddles that offset was silently cut mid-tag or mid-JSON,
+    extract_state() found no (or a corrupt) match, and the page was folded
+    into "unparseable" with no distinguishing signal (gate-measured: 7/250
+    date-hash pages over 800 KB in a cached sample, ~38 incidents/run in the
+    2026-09-14 full crawl -- see PROGRESS.md "E21 TRIPWIRE FIRED", WS4-T11).
+
+    The cap bought nothing: `robust_fetch()` already downloads and caches
+    the FULL response body regardless of this cap (the slice was applied
+    only here, after the fetch and the disk write), so removing it changes
+    no network or disk-caching behavior -- only whether the bytes actually on
+    disk get handed to the parser whole. A raised-but-still-finite cap would
+    have the identical failure shape at a different (still arbitrary) byte
+    offset, plus it would require a new loud "oversize pages skipped"
+    counter to avoid re-introducing a silent drop -- removing the cap avoids
+    both. It also removes a real (if narrow) correctness bug: slicing raw
+    UTF-8 *bytes* at a fixed offset can land inside a multi-byte character,
+    which `errors="replace"` then silently mangles into U+FFFD.
+
+    Memory/CPU: this function alone is cheap -- one page's decoded text
+    transiently in memory per call. The real memory cost of removing the cap
+    lives in `main()`, NOT here: retaining every fetched page's full decoded
+    text in a `pages: dict[url, text]` until the parse loop (the pre-WS4-T11
+    BOUNCE #1 shape) would hold up to `len(urls)` pages (default 3000)
+    simultaneously -- red-reviewer estimated >=2.8 GB for all-ASCII content,
+    5.7-11 GB with non-Latin-1 characters present (Python's internal string
+    representation is 1/2/4 bytes/char depending on the widest codepoint in
+    the string), an ~19% peak increase versus the 800 KB-capped version.
+    `main()` now avoids that entirely: `fetch_and_extract()` below extracts
+    the ng-state body (or a failure reason) inside the SAME worker-thread
+    call that fetches the page, and only that small extracted result -- not
+    the page text -- crosses back to `main()`'s `as_completed` loop. The
+    decoded text goes out of scope and is garbage-collected per-worker, so
+    peak memory is bounded by `MAX_WORKERS` in-flight pages (~10), not by
+    the crawl window size.
+
+    The ng-state regex (`(.+?)</script>`, DOTALL) is a lazy quantifier
+    bounded by a literal, fixed terminator -- linear in input length, not
+    the ambiguous-alternation shape that causes catastrophic backtracking.
+    Measured directly: ~2 ms on a 5,200,203-byte synthetic page, ~5 ms on a
+    10,200,203-byte one (see
+    tests/test_ingest_oecd_aim.py::test_extract_state_handles_multi_mb_page_without_pathological_backtracking,
+    which asserts a generous <5s bound rather than the exact figure, to
+    avoid CI flakiness).
+    """
     slug = url.rstrip("/").split("/")[-1]
     cache_file = CACHE / f"{slug}.html"
     try:
         data = robust_fetch(url, cache_file, timeout=20, max_retries=3, min_cache_bytes=1000)
-        return data[:800_000].decode("utf-8", errors="replace")
+        return data.decode("utf-8", errors="replace")
     except RuntimeError as e:
         print(f"  ! {slug}: {e}", file=sys.stderr)
         return None
 
 
-def extract_state(text: str) -> dict | None:
-    """Parse the Angular ng-state script JSON blob."""
-    m = re.search(
-        r'<script[^>]*id="ng-state"[^>]*>(.+?)</script>', text, re.S
-    )
+# Reason codes returned by _extract_state_detail() -- WS4-T11 BOUNCE #1
+# defect 3: the previous single ok/"unparseable" split silently folded
+# fundamentally different page shapes into one undistinguished bucket. The
+# 2026-09-14 E21 audit (docs/audits/E21-tripwire-refresh-2026-09-14.md
+# ~:210-262) found that of 2988 crawled pages, ALL carry an ng-state tag and
+# ALL parse as JSON -- the 1852 "unparseable" legacy numeric-slug pages fail
+# for a THIRD reason entirely: their ng-state blob uses a different
+# top-level key shape (hashed keys with `b/h/s/st/u/rt` sub-fields) that
+# never satisfies the `isinstance(body, dict) and body.get("id") and
+# body.get("title")` shape check below. Distinguishing these three failure
+# modes is what makes a future truncation-shaped regression (or any other
+# new failure mode) visible again instead of vanishing into the same bucket
+# that hid the WS4-T11 800 KB truncation.
+REASON_NO_SCRIPT_MATCH = "no_ng_state_script"
+REASON_JSON_DECODE_ERROR = "json_decode_error"
+REASON_NO_BODY_SHAPE = "no_incident_body_shape"
+REASON_OK = "ok"
+REASON_FETCH_FAILED = "fetch_failed"
+
+_NG_STATE_RE = re.compile(r'<script[^>]*id="ng-state"[^>]*>(.+?)</script>', re.S)
+
+
+def _extract_state_detail(text: str) -> tuple[str, dict | None]:
+    """Parse the Angular ng-state script JSON blob, returning WHY extraction
+    failed (one of the REASON_* constants above), not just whether it did.
+
+    The regex's `(.+?)` is a LAZY quantifier bounded by the literal,
+    fixed `</script>` terminator: it matches the FIRST `</script>` after the
+    ng-state open tag, never swallowing past it into any later `<script>`
+    block that happens to follow on the page (a greedy `(.+)` would, and
+    would then typically fail to json.loads() -- see
+    tests/test_ingest_oecd_aim.py's trailing-script-tag fixtures).
+    """
+    m = _NG_STATE_RE.search(text)
     if not m:
-        return None
+        return REASON_NO_SCRIPT_MATCH, None
     try:
         state = json.loads(m.group(1))
     except json.JSONDecodeError:
-        return None
+        return REASON_JSON_DECODE_ERROR, None
     for k, v in state.items():
         if not isinstance(v, dict):
             continue
         body = v.get("b")
         if isinstance(body, dict) and body.get("id") and body.get("title"):
-            return body
-    return None
+            return REASON_OK, body
+    return REASON_NO_BODY_SHAPE, None
+
+
+def extract_state(text: str) -> dict | None:
+    """Parse the Angular ng-state script JSON blob. Thin public wrapper over
+    `_extract_state_detail()` that keeps the original dict-or-None contract
+    for callers (tests, and any future direct use) that only need the body,
+    not the failure reason."""
+    return _extract_state_detail(text)[1]
+
+
+def fetch_and_extract(url: str) -> tuple[str, dict | None]:
+    """Fetch one page and extract its ng-state body in the SAME call,
+    returning `(reason, body)` -- `body` is non-None iff `reason == REASON_OK`.
+
+    This is the memory-bounded replacement for `main()` previously
+    accumulating every fetched page's full decoded text in a `pages` dict
+    until a separate parse loop (see fetch_page()'s docstring). Submitting
+    THIS function to the thread pool instead of bare `fetch_page()` means
+    the page text lives only inside this call's local `text` variable and is
+    garbage-collected when this function returns; only the small `(reason,
+    body)` result crosses back to `main()`.
+    """
+    text = fetch_page(url)
+    if text is None:
+        return REASON_FETCH_FAILED, None
+    return _extract_state_detail(text)
 
 
 def collect_text(body: dict) -> str:
@@ -385,6 +488,16 @@ def union_with_existing(fresh: list[dict], existing: list[dict]) -> list[dict]:
     return sorted(by_id.values(), key=lambda e: e.get("source_id") or "")
 
 
+def _tally_reasons(results: dict[str, tuple[str, dict | None]]) -> dict[str, int]:
+    """Pure counting helper, factored out of main() so the accounting is
+    directly testable without a network-backed end-to-end run: one bucket
+    per REASON_* code. WS4-T11 BOUNCE #1 defect 3."""
+    counts: dict[str, int] = {}
+    for reason, _body in results.values():
+        counts[reason] = counts.get(reason, 0) + 1
+    return counts
+
+
 def main():
     limit_env = os.environ.get("OECD_AIM_LIMIT", str(DEFAULT_LIMIT))
     try:
@@ -397,27 +510,45 @@ def main():
         print(f"[aim] capped to {limit} URLs (set OECD_AIM_LIMIT=0 for all)")
 
     t0 = time.time()
-    pages: dict[str, str] = {}
+    # (reason, body) per url -- NOT the decoded page text. fetch_and_extract()
+    # fetches AND extracts inside the same worker call so the full page text
+    # never crosses back into this dict; see fetch_page()'s and
+    # fetch_and_extract()'s docstrings (WS4-T11 BOUNCE #1 defect 4).
+    results: dict[str, tuple[str, dict | None]] = {}
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
-        futures = {ex.submit(fetch_page, u): u for u in urls}
+        futures = {ex.submit(fetch_and_extract, u): u for u in urls}
         for i, fut in enumerate(as_completed(futures), 1):
             u = futures[fut]
-            text = fut.result()
-            if text:
-                pages[u] = text
+            # `results` is keyed by URL, so a duplicate sitemap URL (load_sitemap()
+            # does not dedupe) collapses to one entry here -- both submissions did
+            # real work, but only one survives to be counted. See the `fetched`
+            # derivation below (WS4-T11 re-gate BOUNCE #2 advisory 2).
+            #
+            # A 0-byte page (`fetch_page()` returns `""`, which is not None) is
+            # stored here too, and buckets to REASON_NO_SCRIPT_MATCH below -- an
+            # intentional, documented behavior change from the pre-WS4-T11-BOUNCE-1
+            # `pages` dict, which used `if text:` (truthy) and so silently dropped
+            # an empty-string page from BOTH the fetched and the unparseable counts.
+            # It is now counted honestly as fetched-but-unparseable, not vanished.
+            results[u] = fut.result()
             if i % 200 == 0:
                 elapsed = time.time() - t0
                 rate = i / max(elapsed, 0.001)
                 print(f"  fetched {i}/{len(urls)} ({rate:.1f} pages/s)")
 
-    print(f"[aim] fetched {len(pages)}/{len(urls)} pages in {time.time()-t0:.0f}s")
+    counts = _tally_reasons(results)
+    # Derived from `results` (deduped by URL), NOT `len(urls)`: `len(urls)` counts
+    # a duplicate sitemap URL once per occurrence, which would overcount `fetched`
+    # by exactly the duplicate count even though only one result was ever kept per
+    # URL. `len(urls)` remains in the printed denominator below as "how many
+    # sitemap entries were attempted", which legitimately can exceed the unique
+    # fetch count when duplicates are present.
+    fetched = len(results) - counts.get(REASON_FETCH_FAILED, 0)
+    print(f"[aim] fetched {fetched}/{len(urls)} pages in {time.time()-t0:.0f}s")
 
     out = []
-    parse_fail = 0
-    for url, text in pages.items():
-        body = extract_state(text)
-        if not body:
-            parse_fail += 1
+    for url, (reason, body) in results.items():
+        if reason != REASON_OK or body is None:
             continue
         norm = normalize_body(body, url)
         if norm:
@@ -428,8 +559,15 @@ def main():
                 norm["extra_source_ids"] = extras
             out.append(norm)
 
+    ok = counts.get(REASON_OK, 0)
+    no_script = counts.get(REASON_NO_SCRIPT_MATCH, 0)
+    json_err = counts.get(REASON_JSON_DECODE_ERROR, 0)
+    no_shape = counts.get(REASON_NO_BODY_SHAPE, 0)
+    unparseable = no_script + json_err + no_shape  # same total this line always meant
     print(
-        f"[aim] parsed: {len(pages) - parse_fail} ok, {parse_fail} unparseable; "
+        f"[aim] parsed: {ok} ok, {unparseable} unparseable "
+        f"(no ng-state script: {no_script}, JSON decode error: {json_err}, "
+        f"ng-state present but no incident-body shape: {no_shape}); "
         f"{len(out)} security-relevant kept"
     )
 
