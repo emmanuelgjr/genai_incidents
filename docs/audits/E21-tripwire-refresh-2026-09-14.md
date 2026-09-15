@@ -1,8 +1,18 @@
 # E21 tripwire refresh investigation — 2026-09-14
 
-**Status: WORKING DOCUMENT, being extended commit-by-commit as findings land.
-Do not regenerate the sections marked final; append/amend per working
-agreement 4 once this stabilizes.**
+**Status (2026-09-15, defect 12): FINAL — dated investigation record. Do
+not regenerate.** Corrected in place, original text preserved, per working
+agreement 4, after red-reviewer's BOUNCE #1 (2026-09-15) on the `ef9ce6fb`
+version of this file. Corrections are marked `⚠ CORRECTION 2026-09-15
+(red-reviewer BOUNCE #1, defect N)` inline at each affected passage; small
+in-place factual fixes (defects 1, 10, 11) are listed in the "Corrections
+log" section near the end. See `PROGRESS.md` ("E21 TRIPWIRE FIRED …audit
+BOUNCE #1") for the full gate verdict this file is responding to.
+
+> Original header, preserved for the record (superseded by the status line
+> above): ~~**Status: WORKING DOCUMENT, being extended commit-by-commit as
+> findings land. Do not regenerate the sections marked final; append/amend
+> per working agreement 4 once this stabilizes.**~~
 
 **Trigger:** the refresh-state persist fix (`05f536ff`) merged and, for the
 first time in 8 weeks, `.github/workflows/auto-refresh.yml` run
@@ -39,7 +49,7 @@ cd <scratch>; OECD_AIM_LIMIT=3000 python scripts/ingest_oecd_aim.py
 | Parsed ok | 1098 | 1098 |
 | Parsed unparseable | 1890 | 1890 |
 | Security-relevant kept | 1097 | 1097 |
-| Union (fresh + existing → retained) | not logged by CI (job failed before this line prints in my grep window — see below) | 1097 + 4160 existing → **5248 retained** |
+| Union (fresh + existing → retained) | **logged** (defect 1, fixed in place — CI's own log has the line): `[aim] union: 1097 kept + 4160 existing -> 5248 retained` | 1097 + 4160 existing → **5248 retained** |
 
 The four count fields that matter (fetched, parsed ok, unparseable,
 security-relevant kept) are **byte-identical** between CI and the local
@@ -69,8 +79,10 @@ Both the 07-12 and 07-19 runs **predate** this migration (2026-07-29). Before
 it, `ingest_oecd_aim.py`'s 10-worker pool evidently paced independently
 (~10 req/s aggregate against `oecd.ai`, matching 3000 pages in ~300s in both
 pre-migration runs). `ingest/common.py::_rate_limit()`'s own docstring
-states the limiter is "thread-safe and global per host, not per caller" —
-i.e. after the migration, all 10 workers queue behind ONE shared
+states the limiter blocks "across ALL callers/threads -- not just this one"
+(defect 10, quote fixed in place — the actual text, `ingest/common.py:187`;
+no docstring reading "thread-safe and global per host, not per caller"
+exists in that file) — i.e. after the migration, all 10 workers queue behind ONE shared
 `DEFAULT_MIN_INTERVAL = 1.0`s budget for `oecd.ai`, collapsing aggregate
 throughput to ~1 req/s regardless of worker count. 3000 pages / 1 req/s ≈
 3000s — matches both the CI run (3026s) and the local repro (3088s) almost
@@ -115,8 +127,9 @@ committed `ingest/aiid_full.json` reflects AIID's own database as of
 2026-07-13/18, ~2 months stale relative to today (2026-09-14).
 `scripts/ingest_aiid_snapshot.py` is a `make ingest-aiid`-only, manual step
 (`Makefile:90`) — it is **not** part of `.github/workflows/auto-refresh.yml`,
-confirmed by reading that workflow file directly (its three `python
-scripts/ingest_*.py` steps are AIRI/AIAAIC/OECD only).
+confirmed by reading that workflow file directly (its **four** — not three,
+defect 11, fixed in place — `python scripts/ingest_*.py` steps are
+AIRI/AIAAIC/OECD/CISA-KEV only; `.github/workflows/auto-refresh.yml:39,44,51,56`).
 
 ## Finding — the tripwire has a pre-existing blind spot: `aiid_id` 898 / INC-08183 [R]
 
@@ -201,6 +214,21 @@ of those with tag: body extracted (oecd.extract_state() succeeds): 1136
 (1136 vs. the ingest run's own "1098 ok" — the ~38-row gap is later-stage
 filtering inside `normalize_body`/`main()`, e.g. year-range rejection; not
 investigated further, immaterial to the finding.)
+
+> **⚠ CORRECTION 2026-09-15 (red-reviewer BOUNCE #1, defect 6):** the ~38-row
+> gap above is **not** immaterial and **not** `normalize_body` filtering.
+> **[R] by red-reviewer, gate 2026-09-15, recorded PROGRESS.md; not
+> re-derived by the author:** it is `fetch_page()`'s own 800 KB truncation —
+> `data[:800_000]` at `scripts/ingest_oecd_aim.py:129` (line confirmed by the
+> author directly: `data = robust_fetch(...); return data[:800_000]...`).
+> The gate found **7/7** sampled cached date-hash pages over 800 KB fail to
+> parse after truncation, and **0** other pages fail this way — i.e. the
+> 1,890 "unparseable" figure decomposes as **1,852 numeric-slug pages (this
+> finding's own H2-refutation, still correct) + 38 truncated date-hash
+> pages**, not 1,852 + an unexplained residual. **This means ~38 new
+> incidents are silently dropped on every run that hits a >800 KB page** —
+> gate-recommended new task WS4-T6 (a parser contract test on a >800 KB
+> fixture, and removing or raising the truncation).
 
 **The sitemap itself explains the 1852 figure exactly.** Re-fetching the
 sitemap live and inspecting the URL shape of the crawled window:
