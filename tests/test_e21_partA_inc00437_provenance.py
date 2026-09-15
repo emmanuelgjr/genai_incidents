@@ -151,7 +151,34 @@ def test_oecd_aiid_content_disagreement_is_unique_to_inc00437():
     corpus row that ALSO carries a different, real AIID-<n> id, so none of
     those three produces a corpus-level disagreement -- only a raw per-row
     join (not run through dedup) would over-count to 4. This test runs the
-    real dedup, not a raw join, precisely to avoid that over-count."""
+    real dedup, not a raw join, precisely to avoid that over-count.
+
+    **WS4-T10 update (2026-09-15), dated -- this population is expected to
+    change again and is not itself a defect.** The WS4-T10 `normalize_url`
+    fix (docs/audits/E21-tripwire-refresh-2026-09-14.md Findings 8/9) stopped
+    a query-string URL collapse that was silently weak-merging one of the
+    three "other" raw-ingest rows above -- aiid_id 1575 / source_ids
+    `AIID-1575` + `OECD-AIM-2026-01-21-eb71` ("Eightfold AI Sued for Secretly
+    Profiling Job Applicants with AI") -- into an unrelated corpus row that
+    happened to carry a real `AIID-<n>` id, masking its own OECD-vs-AIID
+    disagreement the same way INC-00437's was masked before its fix. Splitting
+    it back out is the fix working as intended (WS4-T10 Phase B measures
+    exactly this kind of population change), not a regression the code
+    introduced. The other two "other" rows are unaffected -- confirming the
+    fix is precise, not a blanket un-merge.
+
+    **This is code-only, per WS4-T10's scope** (`git diff main -- data/
+    schema/ ingest/` stays empty for that task) -- 1575 does NOT yet have a
+    `data/curation_overrides.json` entry the way 1574 does, so it still
+    *ships* the disagreement in the committed corpus today. Adding that
+    override, and deciding whether/how any other rows split by the fix need
+    the same treatment, is exactly the unmerge design WS4-T10 Phase C
+    (docs/specs/WS4-T10-unmerge-design-2026-09-15.md) escalates to the user
+    -- not something this test should encode as a fait accompli by silently
+    widening its assertion. So the assertion below is intentionally an
+    explicit two-item list, not `>=`: a THIRD row appearing here (from either
+    an OECD refresh or a further merge-heuristic change) must still fail
+    loudly, exactly as the original tripwire intended."""
     surviving = _build_surviving()
     aiid_rows = [e for e in surviving if e.get("aiid_id")]
 
@@ -163,12 +190,18 @@ def test_oecd_aiid_content_disagreement_is_unique_to_inc00437():
         f"{len(aiid_rows)} -- ingest/aiid_full.json may be empty/broken"
     )
 
+    _WS4_T10_KNOWN_SPLIT_AIID_ID = 1575  # see the docstring's dated note
+
     exceptions = [e for e in aiid_rows if not _AIID_TEMPLATE.match(e.get("description", ""))]
     exception_aiid_ids = sorted(e["aiid_id"] for e in exceptions)
-    assert exception_aiid_ids == [_INC_00437_AIID_ID], (
-        "expected exactly one aiid_id-bearing row whose description doesn't "
-        f"match AIID's own template (aiid_id {_INC_00437_AIID_ID} / INC-00437), "
-        f"found {len(exceptions)}: {exception_aiid_ids} -- a new "
-        "AIID-signal-vs-OECD-content disagreement has appeared and needs its "
-        "own curation_overrides.json entry, the same way INC-00437 got one"
+    expected = sorted([_INC_00437_AIID_ID, _WS4_T10_KNOWN_SPLIT_AIID_ID])
+    assert exception_aiid_ids == expected, (
+        f"expected exactly the two known aiid_id-bearing rows whose "
+        f"description doesn't match AIID's own template ({expected} -- "
+        f"1574/INC-00437 plus the WS4-T10-split 1575, see this test's "
+        f"docstring), found {len(exceptions)}: {exception_aiid_ids} -- a "
+        "NEW AIID-signal-vs-OECD-content disagreement has appeared and "
+        "needs its own curation_overrides.json entry, the same way "
+        "INC-00437 got one (1575 is a known, not-yet-overridden split -- "
+        "see this test's docstring)"
     )

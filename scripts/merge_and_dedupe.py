@@ -12,6 +12,7 @@ Run after the per-source aggregators have written into ingest/.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from datetime import date, datetime, timezone
@@ -303,14 +304,54 @@ def seed_frameworks_from_vector(entry: dict) -> None:
         entry["mitre_atlas"] = sorted(set((entry.get("mitre_atlas") or []) + list(atlas)))
 
 
+# WS4-T10: params that carry no identifying information — campaign/referrer
+# tracking cruft appended by CMSes, email clients and ad platforms. Anything
+# NOT in this set is assumed to identify the resource (e.g. CMS query-string
+# article IDs like `idxno=`, `id=`, `p=`) and is KEPT in the dedup key.
+# Approach (i) from the WS4-T10 brief: keep the query string, normalized
+# (sorted, tracking params dropped), rather than an allowlist of identifying
+# params (ii, brittle — a param an ingest source doesn't yet know about would
+# silently collapse again) or refusing ambiguous keys outright (iii, would
+# also refuse true duplicates that differ only by a tracking param). The
+# false-merge risk this leaves is the SAME kind of query param appearing on
+# both a tracking blocklist miss and an identifying role, which WS4-T5's
+# later dedupe-error-rate audit measures — not over-engineered here.
+_URL_TRACKING_PARAMS = re.compile(
+    r"^(utm(_[a-z]+)?|fbclid|gclid|msclkid|dclid|mc_[a-z]+|igshid|ref|"
+    r"ref_src|referrer|spm|cmpid|icid|yclid|_ga|_gl|s_cid|CMP)$",
+    re.IGNORECASE,
+)
+
+
 def normalize_url(url: str) -> str:
+    """Canonicalize a reference URL into a dedup key.
+
+    Strips scheme/``www.``/fragment/trailing-slash and lowercases as before,
+    but — unlike the pre-WS4-T10 version — keeps the query string (sorted,
+    with tracking params dropped) instead of discarding it outright. Dropping
+    the query string entirely collapsed distinct CMS articles that share a
+    path and differ only by an `?idxno=`/`?id=` query param onto one dedup
+    key (E21 tripwire investigation, docs/audits/E21-tripwire-refresh-2026-09-14.md
+    Finding 8/9) — e.g. INC-00554 accreted ~100 unrelated source rows this
+    way. See tests/test_normalize_url_overmerge.py.
+    """
     if not url:
         return ""
     u = url.strip().lower()
     u = re.sub(r"^https?://(www\.)?", "", u)
-    u = u.split("?")[0].split("#")[0]
-    u = u.rstrip("/")
-    return u
+    u = u.split("#")[0]
+    path, _, query = u.partition("?")
+    path = path.rstrip("/")
+    if query:
+        kept = sorted(
+            (k, v) for k, v in
+            (pair.split("=", 1) if "=" in pair else (pair, "")
+             for pair in query.split("&") if pair)
+            if not _URL_TRACKING_PARAMS.match(k)
+        )
+        if kept:
+            return path + "?" + "&".join(f"{k}={v}" if v else k for k, v in kept)
+    return path
 
 
 def title_key(t: str) -> str:
@@ -1409,6 +1450,25 @@ def main():
 
     # 1) Legacy consolidated first (highest priority — already curated)
     legacy_path = DATA / "legacy_consolidated.json"
+    if not legacy_path.exists() and os.environ.get("MERGE_ALLOW_MISSING_LEGACY") != "1":
+        # WS4-T10 build guard. This used to silently proceed without the
+        # legacy corpus, which is exactly how the E21 tripwire audit's first
+        # rebuild delta went wrong: run standalone (skipping
+        # parse_existing.py, which regenerates this gitignored file — see
+        # `make merge`), it produced a corpus 5,675 rows short with
+        # fabricated severity regressions that were reported as real
+        # (docs/audits/E21-tripwire-refresh-2026-09-14.md Finding 3). Fail
+        # loudly instead of yielding a materially wrong corpus with no
+        # indication anything is missing.
+        raise SystemExit(
+            f"[FATAL] {legacy_path} not found.\n"
+            "merge_and_dedupe.py must run after `python scripts/parse_existing.py`\n"
+            "(which regenerates this gitignored file), not standalone — see\n"
+            "`make merge` / Makefile:11-13. Running it alone silently drops the\n"
+            "legacy corpus and yields a materially wrong build.\n"
+            "If this is deliberate (e.g. a test harness building its own tmp\n"
+            "corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1."
+        )
     if legacy_path.exists():
         legacy = json.loads(legacy_path.read_text(encoding="utf-8")).get("incidents", [])
         # Legacy already in unified shape — backfill taxonomy and stamp a
@@ -1882,7 +1942,12 @@ def merge_into(target: dict, src: dict):
     for key in ("cvss_vector", "aiid_id", "disclosure_date", "impact"):
         if not target.get(key) and src.get(key):
             target[key] = src[key]
-    # References — dedupe by url
+    # References — dedupe by url. WS4-T10: deliberately reuses the SAME
+    # normalize_url as the dedup-key indexes above, not a stricter variant —
+    # a reference is a genuine duplicate under exactly the same identity
+    # rule that says two rows are the same incident, so splitting the
+    # definitions would only let two references for the very row being
+    # merged disagree with each other about whether they're duplicates.
     seen = {normalize_url(r["url"]): r for r in target.get("references", [])}
     for r in src.get("references", []):
         u = normalize_url(r.get("url", ""))
