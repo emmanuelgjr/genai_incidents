@@ -136,6 +136,56 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
+## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **in-progress, BOUNCE #1**
+
+**Branch** `ws4/t10-normalize-url` (pushed) · owner pipeline-engineer.
+- **Phase A** `75825299`: `normalize_url` keeps a sorted query and drops `_URL_TRACKING_PARAMS`; `merge_into` uses the same normalizer; a build guard fails loudly without `data/legacy_consolidated.json` (opt-out `MERGE_ALLOW_MISSING_LEGACY=1`); the E21 tripwire is widened to [1574, 1575]. Suite 332.
+- **Phase B/C** `c9424935`: measurement plus `docs/specs/WS4-T10-unmerge-design-2026-09-15.md`, which recommends Option 2 (retire every split ID, fresh IDs for all successors).
+- **Parallel with WS4-T11** (user-authorized; disjoint files). A board note on that branch covers the authorization.
+
+**─── VERDICT (agreement 5) — red-reviewer, 2026-09-15, on `c9424935`: BOUNCE #1 ───** *"The Phase A code is sound; the defects are in the Phase B/C record the user will rule on… the Phase C recommendation rests on a claim its own data contradicts."*
+
+**Defects:**
+1. **Option 2's rationale is contradicted by the full population** (doc :345-348, :362-365, :368-374: "does not track the real incident even once"). **[R] 43 of the 47 split rows keep their title on the old ID**; only INC-00311, -00554, -00754 and -01897 swap. The "sample" was the swaps themselves, i.e. selection bias. INC-02671 (Grok NCII) keeps 17 of 18 source_ids and sheds one German lawnmower-robot row. **Option 2 would retire 43 IDs whose content doesn't change.** Fix: restate on the full population and re-weigh Options 1/3.
+2. **INC-08183 is a false split the FIX introduced, not a split.** Its source_ids are identical in both builds, yet title, description, date, year and category flip ("Google Bard Conversation Exfiltration" → "Malicious Models on Hugging Face"). Cause: a `?&web_view=true` reference now keys apart from the bare URL (`web_view` is not in the blocklist), the row ships both copies, and the anchor changes. **This is an unintended delta (agreement 2).** Neither Option 2 nor the §5.1(b) guard catches it. Fix: record it as a regression, fix the blocklist miss with a test, and extend the design and guard to non-split stable-ID content swaps (a continuity check).
+3. **The §5.1 hazard is misstated** ("would silently produce content swaps next `make build`"). **[R] The fixed build FAILS `validate.py` (exit 1)**: "discovery_method outside the landmark tier (INC-14614)", which is the mis-keyed CVE-2025-10875 override. So `make build`, validate.yml, auto-refresh.yml "Re-merge + render + validate" and cve-enrich.yml all **fail closed today**. **But that one mis-keyed override is the only barrier, and §5.2 tells remediation to re-key it first**, removing it before any continuity guard exists. Merging this branch alone would also turn validate.yml on main red. Fix: state the measured behaviour, and require the continuity guard to land before or with the override re-keying.
+4. **Reference restoration under-reported** (doc :103, "1 gained"). **[R] 7 common rows gain 8 never-shipped URLs; corpus-wide 379 distinct reference URLs newly shipped, 0 lost** (66,025 → 66,404 distinct; 66,048 → 66,427 entries).
+5. **The per-entity delta and top-10 classification exist in NO committed artifact.** The doc has aggregates only (agreement 6 form d); `diff_corpus.py` and `phaseB_*.txt` are in the session scratchpad only (agreements 1/2). Fix: commit the 47 split IDs with successors, the 26 severity changes by ID and direction, the 48 changed IDs by field, and the top-10 classification with INC-08183 marked as a regression.
+6. **False docstring** at `tests/test_e21_partA_inc00437_provenance.py:173`: "1575 still ships the disagreement in the committed corpus". **[R]** In committed data, AIID-1575 and OECD-AIM-2026-01-21-eb71 sit **inside INC-05013** (TruDi, AIID-1436 template), masked. The full-corpus template exceptions today are only [898, 1574]. 1575 first ships as the new INC-14682 on a fixed rebuild. **The widening itself is justified.**
+
+**Evidence [R] (gate):**
+- **Builds.** Control incidents sha256 `facbf809…` and id_deprecations `f24f38f3…` both equal main. Fixed build is deterministic: 3 builds, identical incidents / deprecations / min.json.
+- **Gate's own delta** (keyed per source_id membership; proven to fire):
+  - rows 13,060 → 13,361 · 13,059 common · 1 control-only (INC-07738) · 302 fixed-only (INC-14605…14906);
+  - source_id universe 16,348 both sides; 47 split into 349; **0 common rows gained source_ids**;
+  - INC-14757 is the only new row drawn from >1 old row (INC-00623 + INC-07738, Mythos);
+  - 48 common rows changed (includes `last_seen`); 26 severity changes, all downward (C→H 12, H→M 8, C→M 5, M→L 1);
+  - invariant 4 clean;
+  - title+description changed on exactly 5 IDs: INC-00311, -00554, -00754, -01897, -08183;
+  - INC-00554 → 100 rows. INC-14609 = AIID-1552 + OECD-…4590 (Tesla); INC-00554 = AIID-1446 + OECD-…c3bb (KBS subtitles).
+- **Invariant 9.** All 1,051 deprecations verbatim, +1 (INC-07738 → INC-14757, merged); no revival.
+- **Override.** CVE-2025-10875 moves INC-02590 → INC-14614 (the NVD Mulesoft CVE). It is the only one of 176 override keys whose row changes.
+- **Megaclusters and splits.** CVE megaclusters untouched. 6 of the 58 similarity pairs sampled: all distinct. Splits INC-05013, -02671 and -02590 spot-checked as correct.
+- **Tests on pre-fix code** (a worktree, not stash): 6 failed / 120 passed. Tests (b) pass on pre-fix by construction; mutant M1 proves them.
+- **Mutants M1–M8 all caught.** M3 (an idxno-only allowlist) is caught **only** by the E21 real-data tripwire.
+- **E21 widening proven to fire:** a synthetic AIID-99999 row gives "found 3".
+- **Build guard.** Real CLI exit 1; the opt-out exists only in tests; all three workflows run parse_existing first.
+- **Normalizer over 72,430 distinct raw URLs:** 0 new-key groups span >1 old key (the fix creates no URL-level merges); 0 lowercase-only collisions; 9 `ref=` URLs with 0 collisions.
+
+**Advisories:**
+- **A1** (b) cannot fail on pre-fix code; say so.
+- **A2** Unit-test other identifying params (`itemName=`, `page=`, `id=`, `p=`); M3 is caught only incidentally.
+- **A3** 9 blocklist misses split query variants from bare URLs: `iref`, `research`, `edtsign`/`edtcode`/`scm`, a liferay `_redirect`, `p_r_p_assetentryid`, `category`, `web_view`. Only `web_view` swapped content.
+- **A4** Latent: lowercasing case-significant values; dropping `ref` globally.
+- **A5** The Mythos merge retires an intact published ID (INC-07738) into a fresh one: avoidable churn, and uncovered by the design.
+- **A6** The guard catches a missing legacy file, not a stale one (WS4-T13).
+- **A7** Test comment at `test_normalize_url_overmerge.py:14` cites `git stash`; reword.
+- **A8** STIX revocation and redirect stubs are thin; for schema-architect / distribution-engineer later.
+- **A9** No `benchmark_atlas.py`, so invariant 8 is N/A.
+- **A10** Phase A can stand. Redo doc defects 1–5 and docstring defect 6; if the blocklist changes, **Phase B must be re-run** (the INC-08183 figures move).
+
+**Next:** redispatch the same pipeline-engineer with defects 1–6 and advisories A1–A5 and A7. Commit the per-entity delta. The user rules on the design only after a PASS.
+
 ## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **✅ audit done — foreman spot-check PASS per user ruling (2026-09-15) — MERGED to main · OECD refresh merges FROZEN (D25a) · remediation = WS4-T10…T14**
 
 **User ruling on BOUNCE #2 (2026-09-15):** a narrow fix scoped to exactly the 4 re-gate defects plus advisories a–c, **verified by a foreman spot-check instead of a third full gate.**
