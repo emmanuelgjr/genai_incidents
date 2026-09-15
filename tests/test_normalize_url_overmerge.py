@@ -114,16 +114,37 @@ def test_normalize_url_drops_other_bounce1_tracking_misses():
         )
     )
     # Liferay portlet plumbing: framework navigation state, not identity.
+    # WS4-T10 ATTEMPT 3 (advisory A2 / mutant N5): uses the REAL
+    # `_com_liferay_..._redirect` shape (57 occurrences in
+    # ingest/cve_nvd_expanded.json), not a synthetic `p_p_*` shape -- a
+    # mutant that removes `_com_liferay_.*` from the blocklist must fail
+    # this test. `p_p_id`/`p_p_lifecycle`/`p_p_state`/`p_p_mode` were
+    # removed from the blocklist entirely (0 corpus occurrences, so they
+    # were speculative, not evidenced) -- see the classification comment.
     assert (
         m.normalize_url(
             "https://liferay.dev/portal/security/known-vulnerabilities/-/asset_publisher/"
             "jekt/content/cve-2021-33326-xss-with-the-title-of-a-modal-window"
-            "?p_p_id=com_liferay_asset_publisher&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view"
+            "?p_r_p_assetEntryId=121610771"
+            "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_jekt_redirect="
+            "https%3A%2F%2Fliferay.dev%3A443%2Fportal%2Fsecurity%2Fknown-vulnerabilities"
         )
         == m.normalize_url(
             "https://liferay.dev/portal/security/known-vulnerabilities/-/asset_publisher/"
             "jekt/content/cve-2021-33326-xss-with-the-title-of-a-modal-window"
+            "?p_r_p_assetEntryId=121610771"
         )
+    )
+
+
+def test_normalize_url_liferay_redirect_mutant_n5_fails_without_prefix_match():
+    """Direct regression guard for mutant N5 (BOUNCE #2): if
+    `_com_liferay_.*` were ever removed from `_URL_TRACKING_PARAMS`, this
+    fails -- the redirect param's own value is a huge percent-encoded URL
+    that would otherwise key two fetches of the identical Liferay page
+    apart."""
+    assert m._URL_TRACKING_PARAMS.match(
+        "_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_jekt_redirect"
     )
 
 

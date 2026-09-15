@@ -10,6 +10,20 @@ by `scripts/audit/ws4t10_phaseb_delta.py`, comparing:
   the web_view blocklist fix and related BOUNCE #1 corrections; NOT the
   original `c9424935` Phase B commit, whose numbers this supersedes)
 
+> ## ⚠ ATTEMPT 3 UPDATE — 2026-09-15 (red-reviewer BOUNCE #2)
+> BOUNCE #2 found this file's top-10 table WRONG on two rows: `INC-07736`
+> and `INC-01271` are called "safe under Option 1" below, but each has an
+> INBOUND deprecation (a historically-retired id whose `id_deprecations.json`
+> record still points at them) whose OWN content does NOT land there under
+> the fix. §"Inbound deprecations into split ids" (new, below) is the full
+> measurement; the two rows are corrected in place with a dated note rather
+> than silently edited (agreement 4). The JSON regenerated 2026-09-15 for
+> attempt 3 (same `883707c7`-equivalent code, plus the attempt-3 blocklist
+> hygiene fix that dropped 0-occurrence `p_p_*` entries — **zero effect on
+> these numbers**, confirmed by byte-identical sha256 before/after) also adds
+> `common_rows_gained_source_ids` and `deprecations_deleted_or_modified`
+> (advisory A1) and documents `new_deprecations_build_dates` (advisory A4).
+
 Both built via `python scripts/parse_existing.py && python
 scripts/merge_and_dedupe.py` in detached scratch worktrees (never `git
 stash` — the stash stack is shared with other worktrees in this session).
@@ -129,13 +143,13 @@ the gate's measurement report.
 | `INC-00554` | 103 | 100 | **BREAKS** | split itself plausibly correct (100 genuinely distinct Korean-language stories); **ID-continuity regression** — Option 2 needed |
 | `INC-00861` | 32 | 31 | holds | plausibly correct, safe under Option 1 |
 | `INC-00134` | 24 | 22 | holds | plausibly correct, safe under Option 1 |
-| `INC-07736` | 20 | 17 | holds | plausibly correct (Korean chatbot Luda vs Naver algorithm manipulation vs an EasyMile shuttle injury vs unrelated surveillance/facial-recognition stories — all distinct), safe under Option 1 |
-| `INC-02671` | 18 | 2 | holds | plausibly correct (Grok NCII vs an unrelated robotic-lawnmower/hedgehog story), safe under Option 1 |
-| `INC-00754` | 14 | 11 | **BREAKS** | split itself plausibly correct (FSU shooting vs Jason Momoa deepfake romance scam, clearly unrelated); **ID-continuity regression** |
+| `INC-07736` | 20 | 17 | holds | **[ATTEMPT 3 CORRECTION, dated 2026-09-15 — was wrongly "safe under Option 1"]** split itself plausibly correct (Korean chatbot Luda vs Naver algorithm manipulation vs an EasyMile shuttle injury vs unrelated surveillance/facial-recognition stories — all distinct); **but has an INBOUND deprecation** (`INC-08133`, "AI Robots Cause Harm...China", `reason: merged`, dated 2026-06-28) whose own recovered content now lands on a fresh id (`INC-14850`), not `INC-07736` — see the inbound-deprecations table below. Own-title continuity holding is NOT sufficient; **needs a resplit record for INC-08133**, same as a continuity-breaking row would |
+| `INC-02671` | 18 | 2 | holds | plausibly correct (Grok NCII vs an unrelated robotic-lawnmower/hedgehog story), safe under Option 1 (no inbound deprecations found) |
+| `INC-00754` | 14 | 11 | **BREAKS** | split itself plausibly correct (FSU shooting vs Jason Momoa deepfake romance scam, clearly unrelated); **ID-continuity regression** — also has an inbound deprecation (`INC-03128`, 9-way landing) needing its own resplit record |
 | `INC-01897` | 14 | 8 | **BREAKS** | split itself plausibly correct (distinct WordPress plugin CVEs); **ID-continuity regression** |
-| `INC-05013` | 14 | 11 | holds | plausibly correct (TruDi navigation system keeps its identity; sheds the AIID-1575/Eightfold-AI row that was masking a second AIID/OECD content disagreement — see `tests/test_e21_partA_inc00437_provenance.py`), safe under Option 1 |
-| `INC-00311` | 12 | 12 | **BREAKS** | split itself plausibly correct (12 genuinely distinct stories); **ID-continuity regression** |
-| `INC-01271` | 12 | 12 | holds | plausibly correct (EU Grok deepfake investigation keeps its identity), safe under Option 1 |
+| `INC-05013` | 14 | 11 | holds | plausibly correct (TruDi navigation system keeps its identity; sheds the AIID-1575/Eightfold-AI row that was masking a second AIID/OECD content disagreement — see `tests/test_e21_partA_inc00437_provenance.py`), safe under Option 1 (no inbound deprecations found) |
+| `INC-00311` | 12 | 12 | **BREAKS** | split itself plausibly correct (12 genuinely distinct stories); **ID-continuity regression** — also has an inbound deprecation (`INC-00497`, 8-way landing) needing its own resplit record |
+| `INC-01271` | 12 | 12 | holds | **[ATTEMPT 3 CORRECTION, dated 2026-09-15 — was wrongly "safe under Option 1"]** split itself plausibly correct (EU Grok deepfake investigation vs unrelated stories); **but has an INBOUND deprecation** (`INC-07771`, "Japan Considers Financial System Shutdowns", `reason: merged`, dated 2026-06-28) whose own recovered content now lands on a fresh id (`INC-14814`), not `INC-01271` — **needs a resplit record for INC-07771** |
 
 **`INC-08183`** is listed separately, not in this table, because it is not
 a split (identical source_ids both builds) — see defect 2 above. It was a
@@ -158,16 +172,73 @@ exhaustive check — WS4-T5 (P1) is the task that closes that gap properly.
 same titles) — confirms they were never URL-bridged, unaffected by the
 BOUNCE #1 blocklist changes too.
 
+## Inbound deprecations into split ids (ATTEMPT 3, new defect 1a)
+
+Full artifact: `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`,
+generated by `scripts/audit/ws4t10_inbound_deprecations.py`. Mechanically
+found (walking every `id_deprecations.json` chain to its live target, no
+git history needed for this step): **8 historically-retired ids whose
+current redirect points at one of the 47 split ids, or at `INC-07738`.**
+Each one's ORIGINAL source_ids were recovered from git history (commit SHA
++ `git show <sha>:data/incidents.json`, both recorded in the artifact) and
+located in the fixed build. **All 8 are `WRONG_AFTER_FIX`** — none still
+land, even partially and exclusively, on the id their `id_deprecations.json`
+record currently names:
+
+| retired id | recovered title | recorded redirect (chain) | recovered sources | lands on (fixed build) | classification |
+|---|---|---|---|---|---|
+| `INC-07771` | Japan Considers Financial System Shutdowns... | → `INC-01271` | 1 | `INC-14814` (1) | WRONG_AFTER_FIX |
+| `INC-08109` | Meta Secretly Embeds Facial Recognition... | → `INC-01412` | 1 | `INC-14847` (1) | WRONG_AFTER_FIX |
+| `INC-08133` | AI Robots Cause Harm and Raise Rights Concerns... | → `INC-07736` | 1 | `INC-14850` (1) | WRONG_AFTER_FIX |
+| `INC-08146` | SWM.AI and Lenovo Collaborate... | → `INC-08139` → `INC-00554` | 1 | `INC-14853` (1) | WRONG_AFTER_FIX |
+| `INC-00497` | Greek Tax Authority Plans AI System... | → `INC-00311` | 8 | 8 different rows, 1 each (only 1 still on `INC-00311`) | WRONG_AFTER_FIX |
+| `INC-03128` | Purportedly AI-Generated Jason Momoa Deepfake... | → `INC-00754` | 10 | 9 different rows (2 still on `INC-00754`, 1 each elsewhere) | WRONG_AFTER_FIX |
+| `INC-08139` | China Deploys Armed AI 'Wolf Robots'... | → `INC-00554` | 92 | 90 different rows, 1 each — **none is `INC-00554`** | WRONG_AFTER_FIX |
+| `INC-08185` | China Deploys Armed AI 'Wolf Robots'... (earlier snapshot) | → `INC-08139` → `INC-00554` | 65 | 63 different rows, 1 each — **none is `INC-00554`** | WRONG_AFTER_FIX |
+
+`INC-08139` and `INC-08185` are earlier stages of the SAME rolling
+Korean-CMS megacluster that later became `INC-00554` — their own historical
+content is a near-total subset of `INC-00554`'s eventual 103 source_ids, so
+their "lands on" sets overlap heavily with `INC-00554`'s own 100-way
+decomposition (§"INC-00554's full decomposition" in the design doc). This
+is why the redirect model (design doc §8) recommends giving EACH retired
+id its own direct resplit record from its OWN recovered sources, rather
+than trying to route them all through `INC-00554`'s eventual split record.
+
+**`INC-07736` and `INC-01271` corrections above.** Both are continuity-HOLD
+rows whose OWN identity is fine, but each has exactly one inbound
+deprecation (`INC-08133`, `INC-07771`) whose content moved elsewhere. This
+is the concrete demonstration that **"does the split id's own title still
+match" is not sufficient** — a retired id pointing INTO a perfectly healthy
+split id can still itself be wrong, independent of whether that split id's
+own continuity holds.
+
+## Advisory A5 reconciliation
+
+The design doc's §2.4 (written during the very first Phase B pass) cites
+**58** similarity pairs; this file (§"No regression among the 47 splits...",
+above) and every re-measurement since (including this attempt's rerun)
+give **59**. 59 is the current, reproducible figure — the design doc is
+corrected in place with a dated note pointing here (agreement 4: original
+text preserved, not silently changed).
+
 ## Regenerating this artifact
 
 ```
-git worktree add --detach <control_dir> main
+git worktree add --detach <control_dir> eeb7ca9c
 git worktree add --detach <fixed_dir> <this-branch-HEAD>
 # in each worktree:
 python scripts/parse_existing.py && python scripts/merge_and_dedupe.py
 # from the main checkout:
 python scripts/audit/ws4t10_phaseb_delta.py <control_dir> <fixed_dir> \
     docs/audits/WS4-T10-phaseB-delta-2026-09-15.json
+python scripts/audit/ws4t10_inbound_deprecations.py <fixed_dir> \
+    docs/audits/WS4-T10-phaseB-delta-2026-09-15.json \
+    docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json
 git worktree remove <control_dir> --force
 git worktree remove <fixed_dir> --force
 ```
+
+**Control must be pinned to `eeb7ca9c`, not the symbolic `main`** (advisory
+A3): once this branch merges, `main` will itself contain the fix and stop
+being a valid "unfixed" baseline.

@@ -345,15 +345,25 @@ def seed_frameworks_from_vector(entry: dict) -> None:
 #     delta) even though both reference the identical resource.
 #   - Liferay portlet plumbing (e.g.
 #     `p_r_p_assetEntryId=...&_com_liferay_asset_publisher_..._redirect=
-#     https%3A%2F%2F...`) — the `_com_liferay_*` family (matched by
-#     prefix, since the portlet-instance id varies) and `p_p_id`/
-#     `p_p_lifecycle`/`p_p_state`/`p_p_mode`/`p_r_p_resetcur` are
-#     BLOCKLISTED: framework session/navigation state, and the
+#     https%3A%2F%2F...`) — the `_com_liferay_*` family is BLOCKLISTED,
+#     matched by prefix since the portlet-instance id varies (57 real
+#     occurrences in ingest/cve_nvd_expanded.json, e.g.
+#     `_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_
+#     INSTANCE_jekt_redirect`): framework session/navigation state, and the
 #     `..._redirect` value is itself a huge percent-encoded return-to URL
 #     that would make near-identical page fetches key apart, a
 #     missed-dedup risk in the OTHER direction. `p_r_p_assetEntryId` is
 #     KEPT (genuinely identifying, a per-CVE numeric id) even though it's
 #     redundant with the path's own CVE slug.
+#     WS4-T10 ATTEMPT 3 (advisory A2) removed the earlier `p_p_id`/
+#     `p_p_lifecycle`/`p_p_state`/`p_p_mode`/`p_r_p_resetcur` entries: **0
+#     occurrences anywhere in `ingest/*.json`**, so they were speculative,
+#     not evidenced — this blocklist only adds params with a real sample
+#     backing the call, per this comment's opening paragraph. Any of them
+#     reappearing with the classic Liferay portlet-parameter shape would
+#     already be covered by `_com_liferay_.*`'s prefix match if it starts
+#     that way; a genuinely new, differently-named Liferay framework param
+#     would need its own justified addition, not a speculative one.
 #   - `category` (e.g. a Shopware docs URL) and `research` (e.g. an NCC
 #     Group search URL) — KEPT. Both sampled uses are coarse/generic
 #     values on index-style pages, not per-article ids, so blocklisting
@@ -366,7 +376,7 @@ _URL_TRACKING_PARAMS = re.compile(
     r"^(utm(_[a-z]+)?|fbclid|gclid|msclkid|dclid|mc_[a-z]+|igshid|"
     r"ref_src|referrer|spm|cmpid|icid|yclid|_ga|_gl|s_cid|cmp|"
     r"iref|edtsign|edtcode|scm|web_view|"
-    r"_com_liferay_.*|p_p_id|p_p_lifecycle|p_p_state|p_p_mode|p_r_p_resetcur)$",
+    r"_com_liferay_.*)$",
     re.IGNORECASE,
 )
 # `ref` (bare) is deliberately NOT in the blocklist above (WS4-T10 BOUNCE #1

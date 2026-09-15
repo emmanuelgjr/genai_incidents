@@ -20,8 +20,11 @@ also keep its old title?), corpus-wide reference-URL gains/losses, and
 the new deprecation(s).
 
 Usage, from two detached scratch worktrees (never `git stash` — see
-CLAUDE.md's git-safety rule for this session):
-    git worktree add --detach <control_dir> main
+CLAUDE.md's git-safety rule for this session). **Pin control to `eeb7ca9c`
+(the commit before this fix), not the symbolic `main`** (WS4-T10 attempt 3
+advisory A3): once this branch merges, `main` will itself contain the fix,
+so it stops being a valid "unfixed" baseline for this comparison.
+    git worktree add --detach <control_dir> eeb7ca9c
     git worktree add --detach <fixed_dir> <this-branch's-commit>
     # in each: python scripts/parse_existing.py && python scripts/merge_and_dedupe.py
     python scripts/audit/ws4t10_phaseb_delta.py <control_dir> <fixed_dir> \
@@ -196,11 +199,47 @@ def main():
         if gained or lost:
             per_row_ref_gains.append({"id": eid, "gained": gained, "lost": lost})
 
-    # --- new deprecations ---------------------------------------------------
-    def dep_key(d):
-        return (d.get("from"), d.get("into"), d.get("reason"))
-    old_dep_set = {dep_key(d) for d in old_dep}
-    new_only_deps = [d for d in new_dep if dep_key(d) not in old_dep_set]
+    # --- WS4-T10 attempt 3, advisory A1: common rows that GAINED source_ids.
+    # Splitting should only ever REMOVE source_ids from a common row (content
+    # leaving for a split-off sibling); a common row gaining a source_id it
+    # didn't have before is a NEW merge the code change introduced -- worth
+    # a name of its own, distinct from the generic per-field change list,
+    # because it's exactly the shape of a fresh over-merge (the opposite
+    # failure to the one this task exists to fix).
+    common_rows_gained_source_ids = []
+    for eid in sorted(common):
+        o_srcs = set(old[eid].get("source_ids") or [])
+        n_srcs = set(new[eid].get("source_ids") or [])
+        gained_srcs = sorted(n_srcs - o_srcs)
+        if gained_srcs:
+            common_rows_gained_source_ids.append({"id": eid, "gained_source_ids": gained_srcs})
+
+    # --- deprecations: full-record comparison, BOTH directions -------------
+    # WS4-T10 attempt 3, advisory A1: the prior version's dep_key ignored
+    # `date` and only checked one direction (new-only), so it could not
+    # evidence invariant 9 (append-only, never edited/removed) -- a
+    # deletion or in-place edit of an EXISTING record was invisible to it.
+    # Compares the FULL record (from, into, reason, date) as the identity,
+    # per the BOUNCE report: a historical entry's `date` is stable across
+    # rebuilds (it's carried through from the prior incidents.json/
+    # id_deprecations.json verbatim, never re-stamped -- only a genuinely
+    # NEW entry gets today's date, see the A4 note below on that).
+    def dep_key_full(d):
+        return (d.get("from"), d.get("into"), d.get("reason"), d.get("date"))
+
+    old_dep_by_key = {dep_key_full(d): d for d in old_dep}
+    new_dep_by_key = {dep_key_full(d): d for d in new_dep}
+    deleted_or_modified_keys = sorted(set(old_dep_by_key) - set(new_dep_by_key), key=str)
+    deleted_or_modified = [old_dep_by_key[k] for k in deleted_or_modified_keys]
+    new_only_deps = [new_dep_by_key[k] for k in sorted(set(new_dep_by_key) - set(old_dep_by_key), key=str)]
+    # WS4-T10 attempt 3, advisory A4: any record in `new_only_deps` was
+    # minted with today's wall-clock date (merge_and_dedupe.py's
+    # `today_str`), so THIS artifact reproduces byte-for-byte only when
+    # regenerated on the same UTC day as originally run -- documented
+    # here rather than silently varying; `new_deprecations_dates_are_build_day`
+    # names which field is date-volatile so a rerun's own diff doesn't
+    # get mistaken for a real change.
+    new_deprecations_build_dates = sorted({d.get("date") for d in new_only_deps if d.get("date")})
 
     result = {
         "control_commit": commit_of(control_dir), "fixed_commit": commit_of(fixed_dir),
@@ -229,7 +268,11 @@ def main():
             "distinct_urls_gained": gained_urls, "distinct_urls_lost": lost_urls,
             "per_row_gains_or_losses": per_row_ref_gains,
         },
+        "common_rows_gained_source_ids": common_rows_gained_source_ids,
         "new_deprecations": new_only_deps,
+        "deprecations_deleted_or_modified": deleted_or_modified,
+        "new_deprecations_dates_are_build_day": True,
+        "new_deprecations_build_dates": new_deprecations_build_dates,
     }
 
     with open(out_path, "w", encoding="utf-8") as f:
@@ -245,7 +288,11 @@ def main():
     print(f"references: distinct old={len(old_urls)} new={len(new_urls)} "
           f"gained={len(gained_urls)} lost={len(lost_urls)} "
           f"entries old={old_ref_entries} new={new_ref_entries}")
+    print(f"common rows gained source_ids: {len(common_rows_gained_source_ids)} "
+          f"-> {common_rows_gained_source_ids}")
     print(f"new deprecations: {len(new_only_deps)} -> {new_only_deps}")
+    print(f"deprecations DELETED or MODIFIED (invariant 9 check): "
+          f"{len(deleted_or_modified)} -> {deleted_or_modified}")
     print(f"wrote {out_path}")
 
 

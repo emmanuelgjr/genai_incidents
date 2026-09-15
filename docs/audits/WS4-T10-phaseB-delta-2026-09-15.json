@@ -1,6 +1,6 @@
 {
   "control_commit": "eeb7ca9c943efc0a8ce663fa9602a9f6381e733c",
-  "fixed_commit": "883707c705428e9bbc261d0a782141240cb90603",
+  "fixed_commit": "9c24d1817fe762f5702293130fefaf388c226e37",
   "id_sets": {
     "old_count": 13060,
     "new_count": 13361,
@@ -6576,6 +6576,7 @@
       }
     ]
   },
+  "common_rows_gained_source_ids": [],
   "new_deprecations": [
     {
       "from": "INC-07738",
@@ -6583,5 +6584,10 @@
       "reason": "merged",
       "date": "2026-09-15"
     }
+  ],
+  "deprecations_deleted_or_modified": [],
+  "new_deprecations_dates_are_build_day": true,
+  "new_deprecations_build_dates": [
+    "2026-09-15"
   ]
 }
