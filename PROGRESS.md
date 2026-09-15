@@ -136,7 +136,27 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **⛔ audit BOUNCE #2 (2026-09-15) — ESCALATED TO USER · OECD refresh merges FROZEN (D25a)**
+## 🚨 E21 TRIPWIRE FIRED on the first real refresh in 8 weeks — 28 new AIID-signal/OECD-content rows — opened 2026-09-14 — **✅ audit done — foreman spot-check PASS per user ruling (2026-09-15) — MERGED to main · OECD refresh merges FROZEN (D25a) · remediation = WS4-T10…T14**
+
+**User ruling on BOUNCE #2 (2026-09-15):** a narrow fix scoped to exactly the 4 re-gate defects plus advisories a–c, **verified by a foreman spot-check instead of a third full gate.**
+
+**Fix:** pipeline-engineer (same instance as round 2), `8a03fff0` / `980a4339` / `0bc65688`.
+- Its own fix-up commit `980a4339` caught that three edits in `8a03fff0` had *replaced* original sentences instead of appending. It restored them verbatim and appended the corrections after.
+
+**─── FOREMAN SPOT-CHECK (agreement 5: this is testimony-class, a foreman check rather than an independent gate, on the user's explicit ruling) — 2026-09-15, on `0bc65688`: PASS ───**
+- **Scope [R].** `git diff --stat a79caa13 HEAD -- . ':!<audit>'` is empty. `git status --porcelain` is empty; one worktree.
+- **No original text lost [R], by a different route than the author's line-by-line reading.** Punctuation-stripped word alignment (`difflib.SequenceMatcher`) of the audit at `a79caa13` vs `0bc65688`: **0 original words removed.** The single flagged run is `nondeterminism.` → `nondeterminism` plus an inline pointer (punctuation only). The defect-2 clause is preserved struck-through at :917-918.
+  - **The check was proven to fire:** deleting "is deterministic" from a copy flagged removed text (3 words).
+  - **Foreman's first attempt was itself a check that could not discriminate.** A greedy token-subsequence scan cascaded after a punctuation change and gave the same count (6,506) on the corrupted copy and the real file. It was discarded and replaced; noted per agreement 6.
+- **Item markers present [R]:** BOUNCE #2 defect 1 ×1, 2 ×1, 3 ×2, 4 ×4; advisory a ×2, b ×2, c ×4.
+- **Content [R]:**
+  - D25(a)'s two lift conditions present (:874-876); WS4-T10 ×6, T11 ×3, T12 ×1, T13 ×1, T14 ×2.
+  - Finding 5 heading flagged as refuted (:202-206); corpus-level "30" marked UNVERIFIED (:499, :691).
+  - Defect-1 note narrows the author's [R] to count and title, with the real `python -c` (:1052+).
+  - Advisory-b fixture reproducible with the query-string URL shapes (:364) and distinct-path control.
+- **Underlying facts [R]** against committed files: INC-05013 `aiid_id` **1436**; 1659 ∉ `ingest/aiid_full.json`; 1436 ∈; INC-00554 has 103 source_ids.
+
+**Board clarification (gate advisory e):** "7/7 pages" = the gate's 250-page cached sample, where all 7 pages over 800 KB failed after truncation. "~38 truncated" = the full crawl (1,136 extractable − 1,098 ok). Two populations.
 
 **─── RE-GATE VERDICT (agreement 5) — red-reviewer (fresh instance), 2026-09-15, on `b18713ef`: BOUNCE #2 ───** *"This is not a bounce on substance. Every one of defects 1–12 is actually corrected… What remains are four defects introduced or left behind by the corrections."*
 
