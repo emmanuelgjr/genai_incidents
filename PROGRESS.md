@@ -136,7 +136,65 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **in-progress, BOUNCE #1**
+## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+
+**Attempt 2** (same instance), HEAD `96ce135e`:
+- **`883707c7`** — blocklist changes, then A2 / A4 / A7:
+  - **Added:** `web_view`, `iref`, `edtsign`, `edtcode`, `scm`, and the Liferay `_com_liferay_*` / `p_p_*` families.
+  - **Kept as identifying:** `p_r_p_assetEntryId`, `category`, `research`.
+  - **Also:** query values no longer lowercased; bare `ref` no longer blocklisted.
+- **`92fb9975`** — committed delta: `scripts/audit/ws4t10_phaseb_delta.py` plus `docs/audits/WS4-T10-phaseB-delta-2026-09-15.{json,md}`.
+- **`96ce135e`** — design-doc Revision 2, a hybrid:
+  - Option 1 for the 43 continuity-holding splits, claimed to need "zero new deprecation entries";
+  - Option 2 for the 4 continuity-breaking splits.
+- **Suite:** 340.
+- **Foreman pre-gate check [R]:** clean tree; stash empty; protected-paths diff 0 lines; delta JSON counts as claimed; top supersede notice present.
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-15, on `96ce135e`: BOUNCE #2 ───** *"Five of my six bounce-1 defects are properly fixed. The revised recommendation adds a new invariant-9 error."* (All six gate-1 defects are verified fixed by the gate's own route; see evidence.)
+
+**New defects:**
+1. **§7.2's "Option 1 needs NO `id_deprecations.json` entry" rests on a false premise** (doc :572-577: split-off members "never had a separate published id"). **[R] 8 control deprecations redirect into split IDs (6 directly, 2 by chain).** Each retired ID's sources were recovered from `git show <sha>:data/incidents.json` history:
+   - INC-07771 "Japan Considers Financial System Shutdowns" → merged into INC-01271 (EU Grok, continuity HOLDS); its source now lands on fresh INC-14814.
+   - INC-08109 (Meta smart-glasses facial recognition) → INC-01412 (holds) → content on INC-14847.
+   - INC-08133 (AI robots, China) → INC-07736 (Luda, holds) → INC-14850.
+   - Breaking rows: INC-08146 and INC-08185 chain through INC-08139 → INC-00554.
+
+   Under the hybrid, the 43 rows get no new records, so **`resolve_id("INC-07771")` (`src/genai_incidents/__init__.py:167`; ID_POLICY rule 3 "Merged IDs redirect forever") keeps returning the EU Grok row, which no longer contains the Japan story, and the real successor has no inbound link.** This is **the silent wrong redirect D25 exists to prevent**, on the Option 1 population. The §7.3 continuity guard cannot see it (the targets keep their titles). The MD compounds it: `WS4-T10-phaseB-delta-2026-09-15.md:132,138` call INC-07736 and INC-01271 "safe under Option 1".
+   **Fix:**
+   - measure inbound deprecations into all 47 split IDs;
+   - route a superseding-redirect record type to schema-architect for the 43 as well as the 4 (invariant 9 forbids editing the existing `merged` records);
+   - extend the guard to check that every deprecation target still holds the retired ID's sources;
+   - correct the MD rows.
+
+   **Foreman re-derived [R]:** `data/id_deprecations.json` contains `INC-07771→INC-01271`, `INC-08109→INC-01412`, `INC-08133→INC-07736`, `INC-08139→INC-00554`, `INC-08146→INC-08139`, `INC-08185→INC-08139`, all `merged`; `resolve_id` follows chains while the ID is absent.
+2. **§7.4 / A5 is incoherent with the hybrid.** By its own continuity test INC-07738 should keep its ID: its title equals INC-14757's exactly, and the donor INC-00623 also holds. Yet the fixed build retires it into a fresh ID and §7.4 only "flags" it. **Fix:** state whether remediation keeps INC-07738, or why not.
+
+**Evidence [R] (gate):**
+- **Gate-1 defects 1–6 all fixed by the gate's own route:**
+  - **Continuity:** 43/4. The title-equality definition hides nothing: no case/punctuation-only differences; each breaking row's old title lands on exactly one successor; the 43 change only `cve_ids` / `cvss_vector` (+1 `attack_vector`).
+  - **INC-08183:** byte-equal between control and fixed.
+  - **Blocklist additions:** collapse exactly 3 URL groups of 72,431, all true duplicates (asahi iref, sohu edtsign/edtcode/scm, reversinglabs web_view).
+  - **validate.py:** still exits 1 (INC-14614).
+  - **References:** 377 gained, 0 lost. The −2 from 379 is the web_view URL on INC-08183 plus the asahi iref URL on INC-02671.
+  - **Committed JSON:** reproduces except `fixed_commit`.
+- **Builds:** control equals main. Fixed deprecations are byte-identical to gate 1: 1,051 kept, +1 (INC-07738 → INC-14757).
+- **Re-run delta:** 47 → 349 with an identical split map; 302 new; 0 rows gained source_ids; changed rows 48 → 47; 26 severity changes, all down; swaps 5 → 4; invariant 4 clean.
+- **Normalizer:** 0 new-key groups span more than one old key, so there are still no URL-level merges from the fix. Value case and keeping `ref` split nothing.
+- **Tests:** the 4 new tests fail on `c9424935`; 340 pass.
+- **Mutants:** N1–N4 and N6–N8 caught. **N5 (remove `_com_liferay_.*`) survives.**
+- **Committed script:** fires on title, severity, both invariant-4 directions and a modified deprecation. **Silent on a DELETED deprecation and a reorder-only change.**
+- **Agreement 4 on the design doc:** original text preserved (deletions are re-wraps with inline dated notes); the top notice is unmissable.
+
+**Advisories:**
+- **A1** The delta script has no deleted/modified check on existing deprecations (`dep_key` ignores date; one-directional), so it cannot evidence invariant 9. It also has no "row gained source_ids" check.
+- **A2** N5 survives: the Liferay test uses `p_p_*` (0 corpus occurrences) instead of the `_com_liferay_…_redirect` param 20 real URLs carry. The `p_p_*` entries have no corpus evidence.
+- **A3** The regeneration instructions say `git worktree add … main`; after merge that is meaningless. Pin to `eeb7ca9c`.
+- **A4** The new deprecation `date` comes from the build clock, so the JSON reproduces only on the same UTC day.
+- **A5** 59 vs 58 similarity pairs (MD vs doc).
+- **A6** §7.3 item 1 miscounts ("43 of [349 successor rows]" should refer to split IDs).
+- **A7** For the user: the Phase A code, tests and committed delta are sound; what is wrong is the §7 invariant-9 logic and the A5 coherence. Neither touches code or data.
+
+**Escalation, awaiting the user.**
 
 **Branch** `ws4/t10-normalize-url` (pushed) · owner pipeline-engineer.
 - **Phase A** `75825299`: `normalize_url` keeps a sorted query and drops `_URL_TRACKING_PARAMS`; `merge_into` uses the same normalizer; a build guard fails loudly without `data/legacy_consolidated.json` (opt-out `MERGE_ALLOW_MISSING_LEGACY=1`); the E21 tripwire is widened to [1574, 1575]. Suite 332.
