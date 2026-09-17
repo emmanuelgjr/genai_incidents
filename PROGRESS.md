@@ -136,7 +136,56 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
-## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **⛔ BOUNCE #2 — ESCALATED TO USER (protocol step 6)**
+## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **⛔ BOUNCE #3 — ESCALATED TO USER (protocol step 6; third bounce, past the two-bounce limit — NOT redispatched)**
+
+**Attempt 3** (pipeline-engineer), HEAD `be0d037f` (pushed) — gated 2026-09-17:
+- **`8c25c659`** (part 1/2) — BOUNCE #2 defect 1(a) measurement plus advisories A1–A4:
+  - new `scripts/audit/ws4t10_inbound_deprecations.py` + `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json` (8 inbound deprecations, all classified `WRONG_AFTER_FIX`), recovering each retired ID's original `source_ids` through a human-supplied commit-SHA table and `git show <sha>:data/incidents.json`;
+  - the delta MD rows for INC-07736 and INC-01271 corrected with dated notes;
+  - **A1** delta script now compares full deprecation records both directions and adds a gained-`source_ids` check; **A2** the N5 mutant test now uses the real `_com_liferay_…_redirect` shape and the unevidenced `p_p_*` entries were removed; **A3** control pinned to `eeb7ca9c`; **A4** build-clock dates documented.
+- **`be0d037f`** (part 2/2) — design-doc **Revision 3** (§8): §8.1 the measurement; §8.2 an append-only `reason: "resplit"` record claimed to need **zero `resolve_id` change**; §8.3 a deprecation-integrity guard; §8.4 the INC-07738 root cause (the `ids_seen[0]`-already-claimed fallback, blast radius 1, deliberately not fixed); §8.5 what remains a user decision.
+- **Suite:** 341.
+- **Foreman pre-gate check [R]:** clean tree, no stash; `git diff eeb7ca9c..HEAD -- data/ schema/ ingest/ .github/` empty; 341 passed; §8.1–8.5 present; inbound JSON is a list of 8.
+- **Board gap, recorded honestly:** the user's authorization to run a third attempt after the BOUNCE #2 escalation is **not captured in any commit** — the session that carried it ended. The attempt-3 commits are the only evidence it was given. Not reconstructed here; if the wording matters later it must come from the user.
+
+**─── VERDICT (agreement 5) — red-reviewer, 2026-09-17, on `be0d037f`: BOUNCE #3 ───** *"The code fix is fine… The redirect design in §8 is what fails. Its main claim (append a `resplit` record, change no code) breaks on the first rebuild, and the new guard in §8.3 cannot catch half of the cases it was written for."* The gate itself ruled: **third bounce → escalate, do not redispatch.**
+
+**Defects:**
+1. **§8.2's redirect model makes the build DELETE the original record — an active-invariant-9 violation** (design doc :785-799, against `scripts/merge_and_dedupe.py:1874-1897`). It is specified as append-only with "ZERO `resolve_id` code change", resting on the file being "append-only and chronological".
+   - **Gate [R]:** in a throwaway worktree at `96ce135e`, appending `{"from":"INC-07771","into":"INC-14814","reason":"resplit"}` and running `merge_and_dedupe.py` left **one** record for INC-07771 (the new one) and 1,052 total, down from 2 and 1,053. The original `merged` record dated 2026-06-28 was **deleted**. The specialist's own new A1 check flags it: `deprecations DELETED or MODIFIED (invariant 9 check): 1`.
+   - **Gate [R]:** the file is **not** chronological — 57 date inversions in file order; and precedence is **file order, not date** (records A-then-B → B wins; B-then-A → **A wins**; same-date ties → last wins). Last-dated only appears to win because the build sorts, and that same step drops the older record.
+   - **Foreman re-derived [R], independent route — read the code, did not rerun the gate's build:** `scripts/merge_and_dedupe.py:1875` is `seen_from = {d.get("from"): d for d in prev_deprec if d.get("from")}`. A dict comprehension over a list keeps the **last** occurrence per key, while the comment directly above it says *"keep the earliest record for each `from` id (preserves history)"*. The code and its comment disagree; the comment is wrong. `deprecations_new` is then merged with `setdefault`, and the whole dict is re-serialized sorted by `(from, date)` — so a second record for an existing `from` cannot survive, whatever its date.
+   - **Consequence:** any working version of §8.2 requires a deprecation-**persistence** change in `merge_and_dedupe.py`, which Revision 3 routes nowhere.
+2. **§8.3's guard cannot fire on 4 of the 8 cases it was written for, and its own failure claim is false** (design doc :857-867). It passes when a target holds *"at least one"* of the retired ID's sources; BOUNCE #2 required that the target still hold *the retired ID's sources*.
+   - **Gate [R]:** INC-00497→INC-00311 holds 1 of 8; INC-03128→INC-00754 2 of 10; INC-08139→INC-00554 **2 of 92**; INC-08185→INC-00554 **2 of 65**. All four **pass** the guard. §8.3's claim that "the 8 records in §8.1 would each fail this check" is false for exactly the megacluster cases.
+   - **Gate [R]:** the guard's input does not exist in the repo — a retired ID's source list is stored nowhere, and the inbound script's own docstring says recovering it takes manual git archaeology. **As specified the guard cannot run in CI.**
+   - **Violates** agreement 6 (a check that cannot fail on its named population) and the BOUNCE #2 defect-1 requirement.
+3. **Committed artifacts contradict their own JSON** (agreement 2, and agreement 6(c)).
+   - `docs/audits/WS4-T10-phaseB-delta-2026-09-15.md:196,197` say of INC-08139 and INC-08185: "90 / 63 different rows, 1 each — **none is `INC-00554`**". The inbound JSON for both records `INC-00554` among `lands_on_new_rows` with `current_target_still_holds_any_sources: true`.
+   - The same false summary sits at design doc :732 and in commit message `be0d037f` ("none still land, even partially") — **false for 4 of 8** (INC-00497, INC-03128, INC-08139, INC-08185).
+   - **Foreman re-derived [R], independent route — read the committed JSON directly, did not rerun the gate's mapping:** INC-08139's entry carries `'INC-00554': ['AIID-1446', 'OECD-AIM-2026-04-02-c3bb']` and `current_target_still_holds_any_sources: True`; INC-08185's carries the same two; INC-00497 and INC-03128 likewise have their own target in `lands_on_new_rows` with the flag `True`. Four of the eight JSON records set the flag `True` while the prose says none land at all. **The `WRONG_AFTER_FIX` classification may still be defensible — the bulk of the sources moved — but the sentence asserting it is not.**
+4. **Agreement 4 violated — original text rewritten, not superseded.** Design doc §7.3 item 1's original "(4 retirements + 349 total successor rows, 43 of them needing no deprecation record)" was rewritten **in place** under a "[dated note]" label; `git diff 9c24d181..HEAD -- docs/specs/WS4-T10-unmerge-design-2026-09-15.md` shows it only as a removed line. The delta-MD cells for INC-02671, INC-00754, INC-05013 and INC-00311 were edited in place with no dated marker. *(The two the bounce named — INC-07736, INC-01271 — were done correctly.)*
+
+**Advisories:**
+- **A-a (§8.4 / INC-07738):** root cause and blast radius 1 both **confirmed [R]**; the "why not fix now" answer is adequate. Missing: retirement is irreversible under invariant 9, so shipping remediation before the fallback fix makes INC-07738's churn **permanent**. That ordering belongs in the user decision, and "churn cost of leaving it unfixed is small" understates it.
+- **A-b:** the list-valued `into` TypeError is **real [R]** — `resolve_id` raises `TypeError: unhashable type: 'list'`. §8.2's finding stands, and it also breaks Revision 2's own array-valued `into` for the 4 continuity-breaking splits.
+- **A-c:** a `resplit` whose `from` is still live would be ignored by `resolve_id`; **does not bite here** — none of the 8 retired IDs is live in the fixed build [R]; the 4 breaking IDs are live and need Option 2 retirement first.
+- **A-d:** the "57 corpus occurrences" of `_com_liferay_…_redirect` (code comment, test comment, commit message) **did not reproduce — two routes give 40** [R].
+- **A-e:** the regenerated delta JSON records `fixed_commit: 9c24d181` (pre-blocklist-change) while the MD says it includes the attempt-3 hygiene fix. Harmless — the builds are identical — but the label is inaccurate.
+- **A-f:** invariant 8 is **not active** (no WS2-T1 done row); the attempt-3 build is byte-identical to attempt 2, so ATLAS F1 cannot have moved.
+- **A-g (proposed task):** **280 other `merged` records are unverifiable by any guard** until retired-ID `source_ids` are captured at deprecation time.
+- **A-h (pre-existing, outside this task):** the Issue #88 fixpoint at `merge_and_dedupe.py:1882-1893` **edits existing deprecation records in place** (`into`, `reason`) — latent invariant-9 exposure independent of WS4-T10.
+
+**Evidence [R] (gate):**
+- **Repo state:** HEAD `be0d037f` on `ws4/t10-normalize-url` before and after; `git status --porcelain --untracked-files=all` empty at end; `git stash list` 0. *(Gate's own scope note: working tree only — refs/index/reflog not covered.)*
+- **Worktrees:** `git worktree add --detach <scratch>/{wt_ctl,wt_a2,wt_a3} {eeb7ca9c,96ce135e,be0d037f}`, each `parse_existing.py && merge_and_dedupe.py`; all removed afterwards, `git worktree list` clean.
+- **Build equivalence (sha256):** **attempt 2 == attempt 3** (`incidents.json` `f6694f8b…`, `id_deprecations.json` `d2879e90…`); control == committed `data/` (`facbf809…` / `f24f38f3…`). **The attempt-3 blocklist change moved nothing.**
+- **Delta control→attempt 3:** 13,060 → 13,361; 47 splits / 349 successors; 43 hold / 4 break; references +377 / −0; 26 severity changes; 0 rows gained `source_ids`; 0 deprecations deleted or modified; 1 new record INC-07738 → INC-14757 (build-clock dated 2026-09-17, per A4).
+- *(The gate's message truncated twice in delivery; the remaining evidence bullets and its scoping answers were requested and are appended below when they arrive.)*
+
+**Foreman assessment for the user — what is and is not in question:** every defect lands on the **§8 design text, the §8.3 guard spec, or audit-artifact wording**. The Phase A code fix, its tests and the measured delta numbers were re-derived by the gate through its own build route and came back identical to attempt 2. **No defect asks for a code change to the fix.** *(Confirmation of this scoping was requested from the gate explicitly; recorded here as the foreman's reading of the four defects.)*
+
+**Escalation, awaiting the user.** Options put to the user, 2026-09-17: (a) split the design out as its own task, since defect 1 needs a `merge_and_dedupe.py` deprecation-persistence change and defect 2 needs a new persisted artifact (retired-ID `source_ids` captured at deprecation time — which A-g says 280 other records also need), while the code fix is gate-clean and could merge on its own; (b) a fourth attempt on the same task; (c) neither, and the branch holds.
 
 **Attempt 2** (same instance), HEAD `96ce135e`:
 - **`883707c7`** — blocklist changes, then A2 / A4 / A7:
