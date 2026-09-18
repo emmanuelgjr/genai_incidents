@@ -2234,7 +2234,7 @@ def main():
 
     # 9) Write outputs
     out = {
-        "version": "2.9.0",
+        "version": "2.10.0",
         "generated": generated,
         "description": (
             "A consolidated, machine-readable index of GenAI and agentic AI security "
