@@ -23,7 +23,7 @@
 
 ## What's in the data
 
-<!-- stats:incident_count -->13,060<!-- /stats:incident_count --> entries as of the <!-- stats:generated -->2026-09-18<!-- /stats:generated --> build, <!-- stats:landmark_count -->1,905<!-- /stats:landmark_count --> of them `tier: landmark` — the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition); cite the landmark count, not the full corpus, when you mean "notable incidents." Coverage spans <!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max -->. Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
+<!-- stats:incident_count -->13,361<!-- /stats:incident_count --> entries as of the <!-- stats:generated -->2026-09-18<!-- /stats:generated --> build, <!-- stats:landmark_count -->1,915<!-- /stats:landmark_count --> of them `tier: landmark` — the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition); cite the landmark count, not the full corpus, when you mean "notable incidents." Coverage spans <!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max -->. Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 
 Beyond the obvious title/description/severity fields, a few worth knowing about before you build on this data:
 
