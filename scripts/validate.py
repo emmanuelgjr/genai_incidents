@@ -101,6 +101,11 @@ def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[
             )
 
     if deprecations is not None:
+        # Latest-in-file record wins for a repeated `from` (WS4-T15): the
+        # build only ever appends, never reorders or collapses, so file
+        # order is chronological order and last-in-file is the current,
+        # authoritative record for that id. A dict comprehension already
+        # gives this for free (each repeat overwrites the previous value).
         into_map = {d.get("from"): d.get("into") for d in deprecations}
         # 'removal' deprecations (into=null, e.g. reason 'out-of-scope') legitimately
         # don't resolve to a live entry — the incident was dropped, not merged.
@@ -110,15 +115,97 @@ def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[
                 problems.append(f"deprecated id {frm} is still a live entry")
             if into is None:
                 continue  # removal, not a merge — nothing to resolve
-            seen: set[str] = set()
-            cur = into
-            while cur in into_map and cur not in live_ids and cur not in seen:
-                seen.add(cur)
-                cur = into_map[cur]
-            if cur not in live_ids and cur not in removed_ids:
+            if not _resolves_to_live(into, into_map, live_ids, removed_ids):
                 problems.append(
                     f"deprecation {frm} -> {into} does not resolve to a live entry"
                 )
+        problems.extend(check_deprecation_coverage(data, deprecations))
+    return problems
+
+
+def _resolves_to_live(
+    start_into, into_map: dict, live_ids: set[str], removed_ids: set[str],
+    _seen: set | None = None,
+) -> bool:
+    """Faithful generalization of the original scalar chain-walk (walk
+    `into_map` while the current node is a further `from`, not live, and
+    not already visited; a chain that ends live or on a recorded removal
+    resolves) to also handle list-valued `into` (WS4-T15 `split`/`resplit`
+    records, one retired id fanning out to several successors): a list
+    resolves only if EVERY element resolves under this same rule. Cycle
+    protection carries across the whole walk, including into list branches."""
+    seen = set(_seen or ())
+    if isinstance(start_into, list):
+        return bool(start_into) and all(
+            _resolves_to_live(t, into_map, live_ids, removed_ids, seen) for t in start_into
+        )
+    cur = start_into
+    while cur in into_map and cur not in live_ids and cur not in seen:
+        seen.add(cur)
+        nxt = into_map[cur]
+        if isinstance(nxt, list):
+            return _resolves_to_live(nxt, into_map, live_ids, removed_ids, seen)
+        cur = nxt
+    return cur in live_ids or cur in removed_ids
+
+
+def check_deprecation_coverage(
+    data: dict, deprecations: list[dict], threshold: float = 0.9
+) -> list[str]:
+    """WS4-T15 guard: for every LIVE (latest-per-`from`) deprecation record
+    that carries a persisted `retired_source_ids` (only true for records
+    written by a build after WS4-T15 landed — see `_retired_fields` in
+    `scripts/merge_and_dedupe.py`), the record's resolved target(s) must
+    still hold at least `threshold` of those source_ids in the CURRENT
+    corpus.
+
+    Named failing input (working agreement 6): a redirect whose target has
+    drifted to hold only a small minority of what the retired id actually
+    contained — exactly the shape the WS4-T10 unmerge design's own audit
+    found passing a bare "target holds >=1 shared source_id" check
+    (`INC-08139`: target held 2 of 92; `INC-08185`: 2 of 65 — both ~2-3%,
+    both would PASS a non-empty-intersection test and both FAIL this one).
+    A record with no persisted `retired_source_ids` (every `merged` record
+    written before this landed — 288 of them today, none yet carrying the
+    field) is counted as `unverifiable`, reported separately, and never
+    silently treated as passing — an all-zero-checked run must be visible
+    as zero, not indistinguishable from "everything passed".
+    """
+    problems: list[str] = []
+    id_to_sources: dict[str, set[str]] = {
+        e["id"]: set(e.get("source_ids") or []) for e in data.get("incidents", []) if e.get("id")
+    }
+    latest: dict[str, dict] = {}
+    for d in deprecations:
+        f = d.get("from")
+        if f:
+            latest[f] = d
+    checked = 0
+    unverifiable = 0
+    for frm, rec in latest.items():
+        retired = rec.get("retired_source_ids")
+        if not retired:
+            unverifiable += 1
+            continue
+        into = rec.get("into")
+        targets = into if isinstance(into, list) else ([into] if into else [])
+        held: set[str] = set()
+        for t in targets:
+            held |= id_to_sources.get(t, set())
+        retired_set = set(retired)
+        overlap = len(retired_set & held)
+        coverage = overlap / len(retired_set) if retired_set else 1.0
+        checked += 1
+        if coverage < threshold:
+            problems.append(
+                f"deprecation coverage: {frm} -> {into} resolved target(s) hold only "
+                f"{overlap}/{len(retired_set)} ({coverage:.0%}) of the retired id's "
+                f"persisted source_ids (threshold {threshold:.0%})"
+            )
+    print(
+        f"[deprecation-coverage] {checked} checked, {unverifiable} unverifiable "
+        "(no persisted retired_source_ids -- pre-WS4-T15 record)"
+    )
     return problems
 
 

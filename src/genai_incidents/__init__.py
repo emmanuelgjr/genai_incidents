@@ -168,7 +168,17 @@ def resolve_id(inc_id: str) -> str | None:
     """Map a (possibly deprecated) ``INC-NNNNN`` ID to its current
     canonical ID. Returns the input unchanged if it's still active,
     follows the deprecation chain otherwise, and returns ``None`` if
-    the chain doesn't terminate in an existing entry."""
+    the chain doesn't terminate in an existing entry.
+
+    A record whose ``into`` is a LIST (a multi-successor ``split``/
+    ``resplit`` record — WS4-T15) has no single canonical successor to
+    walk to, so this function treats it the same as a dangling/unknown
+    ID and returns ``None`` rather than raising. Before this fix, the
+    next chain hop did ``current in deprec`` with ``current`` bound to a
+    list, which raises ``TypeError: unhashable type: 'list'`` — verified
+    against WS4-T10's own array-valued ``split``/``resplit`` proposal.
+    Callers that need every successor of a multi-target record should use
+    :func:`resolve_id_group`, not this function."""
     if by_id(inc_id) is not None:
         return inc_id
     deprec = _load_deprecations()
@@ -177,6 +187,38 @@ def resolve_id(inc_id: str) -> str | None:
     while current in deprec and current not in seen:
         seen.add(current)
         current = deprec[current]
+        if isinstance(current, list):
+            return None
         if by_id(current) is not None:
             return current
     return None
+
+
+def resolve_id_group(inc_id: str) -> list[str]:
+    """Like :func:`resolve_id`, but returns EVERY successor a chain walk
+    reaches, handling list-valued (multi-successor) ``into`` records.
+    Returns ``[inc_id]`` if it's still active, ``[]`` if no live
+    successor is reachable at all, and otherwise every currently-live ID
+    the chain (fanning out through any list-valued hop) resolves to.
+    Cycle-safe: a ``from`` visited twice on any branch is not re-walked."""
+    if by_id(inc_id) is not None:
+        return [inc_id]
+    deprec = _load_deprecations()
+
+    def _walk(node: str, seen: set[str]) -> list[str]:
+        if node in seen:
+            return []
+        seen = seen | {node}
+        if by_id(node) is not None:
+            return [node]
+        target = deprec.get(node)
+        if target is None:
+            return []
+        targets = target if isinstance(target, list) else [target]
+        out: list[str] = []
+        for t in targets:
+            out.extend(_walk(t, seen))
+        return out
+
+    # dict.fromkeys preserves first-seen order while de-duplicating.
+    return list(dict.fromkeys(_walk(inc_id, set())))

@@ -1537,6 +1537,35 @@ def main():
     # 6) Assign stable INC-* IDs. Reuse the previous ID for any entry whose
     #    CVE / source_id appeared before; otherwise allocate from the
     #    monotonic counter that survives across builds.
+    # WS4-T15 item 3: capture retired IDs' own `source_ids`/`cve_ids` as of
+    # the LAST committed build, so a `merged`/`transitive-merge` deprecation
+    # can carry what the retired id actually held at retirement time. Without
+    # this, verifying a redirect later requires manual git archaeology (the
+    # WS4-T10 unmerge design's own audit had to do exactly that for 8 ids;
+    # 280 further `merged` records have no other way to recover it at all).
+    # Read once, from the same previously-published `incidents.json` that
+    # `_load_prev_state`/`prev_id_by_key` above are already derived from.
+    prev_by_id: dict[str, dict] = {
+        p["id"]: p for p in _load_prev_incidents() if p.get("id")
+    }
+
+    def _retired_fields(old_id: str) -> dict:
+        """Best-effort snapshot of `old_id`'s own source_ids/cve_ids from the
+        last committed build, for a deprecation record's `retired_source_ids`
+        / `retired_cve_ids`. Empty dict (no fields added) if `old_id` wasn't
+        in the previous build at all -- this must never invent data."""
+        prev = prev_by_id.get(old_id)
+        if prev is None:
+            return {}
+        out: dict = {}
+        src = sorted(set(prev.get("source_ids") or []))
+        cve = sorted(set(prev.get("cve_ids") or []))
+        if src:
+            out["retired_source_ids"] = src
+        if cve:
+            out["retired_cve_ids"] = cve
+        return out
+
     deprecations_new: list[dict] = []
     used_ids: set[str] = set()
     for e in surviving:
@@ -1557,7 +1586,8 @@ def main():
         for extra in ids_seen[1:]:
             if extra != e["id"]:
                 deprecations_new.append(
-                    {"from": extra, "into": e["id"], "reason": "merged", "date": today_str}
+                    {"from": extra, "into": e["id"], "reason": "merged", "date": today_str,
+                     **_retired_fields(extra)}
                 )
 
     # 6b) Record entries that lost a fight to a transitive merge.
@@ -1573,7 +1603,8 @@ def main():
         old_id = next((prev_id_by_key[k] for k in keys if k in prev_id_by_key), None)
         if old_id and old_id != target_id:
             deprecations_new.append(
-                {"from": old_id, "into": target_id, "reason": "transitive-merge", "date": today_str}
+                {"from": old_id, "into": target_id, "reason": "transitive-merge", "date": today_str,
+                 **_retired_fields(old_id)}
             )
 
     # 6c) Retention top-up: restore previously-published incidents that the
@@ -1738,30 +1769,62 @@ def main():
             )
         except (json.JSONDecodeError, OSError):
             prev_deprec = []
-    # Dedupe: keep the earliest record for each `from` id (preserves history).
-    seen_from = {d.get("from"): d for d in prev_deprec if d.get("from")}
+    # WS4-T15: `prev_deprec` IS the append-only history on disk. It is
+    # carried through VERBATIM and IN ORDER -- never re-derived, never
+    # collapsed, never re-sorted. This build only APPENDS a fresh record
+    # for a `from` id this build's own dedupe logic newly retires (matching
+    # the *old* code's `setdefault` refusal to double-write an id that
+    # already has some record); it never touches an id that already has a
+    # record on disk. That distinction matters: a plain
+    # `{d.get("from"): d for d in prev_deprec}` dict comprehension here
+    # previously collapsed EVERY prior record down to (whichever happened to
+    # be LAST when iterating `prev_deprec`) on every single rebuild, despite
+    # the removed comment above this claiming "keep the earliest" -- neither
+    # was true, and it silently deleted a deliberately-appended superseding
+    # record on the very next `make build` (invariant-9 violation,
+    # demonstrated: appending a `resplit` record for INC-07771 and
+    # rebuilding took 1,051 records to 1,050). See
+    # docs/specs/WS4-T15-redirect-persistence-2026-09-18.md.
+    #
+    # Precedence when a `from` has more than one record: LAST-IN-FILE wins,
+    # matching `_load_deprecations()` in `src/genai_incidents/__init__.py`
+    # (an unconditional `out[f] = t` walking the file in order) and
+    # `validate.py`'s `check_integrity` (same pattern). Because this build
+    # never reorders `prev_deprec` and only ever appends, file order IS
+    # append order IS chronological order, by construction -- nothing
+    # upstream of this point may sort or otherwise reorder the list, or that
+    # equivalence (and therefore precedence) breaks silently.
+    already_deprecated = {d.get("from") for d in prev_deprec if d.get("from")}
+    fresh: list[dict] = []
+    seen_fresh_from: set[str] = set()
     for d in deprecations_new:
-        seen_from.setdefault(d["from"], d)
+        f = d.get("from")
+        if f and f not in already_deprecated and f not in seen_fresh_from:
+            seen_fresh_from.add(f)
+            fresh.append(d)
+    deprecations_all = list(prev_deprec) + fresh
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
     # deprecation whose `into` was that bucket (or transitively resolves to it)
     # now dangles. Redirect the chain to a terminal out-of-scope removal so
     # every citation still resolves (`into: null`). Fixpoint for A->B-><removed>.
+    # `into` can now be list-valued (WS4-T15 `split`/`resplit` records) --
+    # skip those here rather than crash; a multi-successor record dangling
+    # into an EXCLUDE bucket is not fixed up automatically by this loop.
     if ISSUE88_EXCLUDE:
         removed_terminal = set(ISSUE88_EXCLUDE)
         changed = True
         while changed:
             changed = False
-            for d in seen_from.values():
-                if d.get("into") in removed_terminal:
+            for d in deprecations_all:
+                into = d.get("into")
+                if isinstance(into, list):
+                    continue
+                if into in removed_terminal:
                     d["into"] = None
                     d["reason"] = "out-of-scope"
                     if d.get("from") and d["from"] not in removed_terminal:
                         removed_terminal.add(d["from"])
                         changed = True
-    deprecations_all = sorted(
-        seen_from.values(),
-        key=lambda x: (x.get("from") or "", x.get("date") or ""),
-    )
     if deprecations_all:
         DEPRECATIONS_PATH.write_text(
             json.dumps(

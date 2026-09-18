@@ -480,6 +480,135 @@ def test_deprecated_id_is_not_resurrected(tmp_path, monkeypatch):
     assert "OECD-AIM-LIVE" in src_ids, "live incident must still be present"
 
 
+# --- WS4-T15: deprecation persistence -------------------------------------
+
+def test_second_deprecation_record_survives_rebuild(tmp_path, monkeypatch):
+    """A superseding record for a `from` id that ALREADY has one record must
+    survive an ordinary rebuild (invariant 9: append-only, never delete).
+
+    Demonstrated bug (WS4-T10 unmerge design, §8.2's superseding note):
+    `seen_from = {d.get("from"): d for d in prev_deprec if d.get("from")}`
+    is a plain dict comprehension keyed on `from` -- it silently collapses
+    two on-disk records for the same `from` down to one on the very next
+    `make build`, which is exactly what a deliberately-appended superseding
+    ("resplit") record needs NOT to happen. This test locks in the fix:
+    both records must still be on disk, in their original order, after a
+    rebuild that changes nothing about this `from` id."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    (data / "incidents.json").write_text(_json.dumps({
+        "incidents": [{
+            **m.normalize_entry(_oecd_entry("OECD-AIM-LIVE", "Live incident")),
+            "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+        }]
+    }), encoding="utf-8")
+    # Two records for the SAME `from`: an original `merged` record, and a
+    # later correcting record a remediation script appended -- exactly the
+    # shape WS4-T15's `resplit` record type is for. `merge_and_dedupe.py`
+    # itself never writes a second record for an already-deprecated `from`
+    # (that part of the old behaviour is intentionally preserved); this
+    # simulates the record already being on disk when an ORDINARY rebuild
+    # runs next, which is the case that broke.
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": "INC-09999", "into": "INC-00002", "reason": "merged",
+             "date": "2026-01-01"},
+            {"from": "INC-09999", "into": "INC-00001", "reason": "resplit",
+             "date": "2026-02-01", "supersedes_date": "2026-01-01"},
+        ]
+    }), encoding="utf-8")
+    (ingest / "src.json").write_text(_json.dumps(
+        [_oecd_entry("OECD-AIM-LIVE", "Live incident")]
+    ), encoding="utf-8")
+    m.main()
+    deps = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    for_from = [d for d in deps if d.get("from") == "INC-09999"]
+    assert len(for_from) == 2, (
+        "an ordinary rebuild must not collapse a superseding record away "
+        f"(invariant 9) -- got {for_from}"
+    )
+    assert for_from[0]["reason"] == "merged"
+    assert for_from[1]["reason"] == "resplit"
+    # Precedence: the LAST record in file order is authoritative --
+    # `_load_deprecations()` (src/genai_incidents/__init__.py) and
+    # `check_integrity` (scripts/validate.py) both resolve this way.
+    assert for_from[-1]["into"] == "INC-00001"
+
+
+def test_ordinary_rebuild_still_refuses_second_record_for_new_from(tmp_path, monkeypatch):
+    """The persistence fix must not turn off the EXISTING guard against an
+    ordinary rebuild silently double-writing a record for an id its own
+    dedupe logic retires (e.g. re-run with the same inputs, twice). Only a
+    deliberately-appended on-disk record (see the previous test) may create
+    a second entry for one `from`."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    prev_a = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-A", "Old incident A")),
+        "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+        "cve_ids": ["CVE-2026-0002"], "source_ids": ["OECD-AIM-OLD-A"],
+    }
+    prev_b = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-B", "Old incident B")),
+        "id": "INC-00002", "added": "2026-01-01", "updated": "2026-01-01",
+        "cve_ids": ["CVE-2026-0002"], "source_ids": ["OECD-AIM-OLD-B"],
+    }
+    (data / "incidents.json").write_text(
+        _json.dumps({"incidents": [prev_a, prev_b]}), encoding="utf-8"
+    )
+    fresh_a = _oecd_entry("OECD-AIM-OLD-A", "Old incident A")
+    fresh_a["cve_ids"] = ["CVE-2026-0002"]
+    fresh_b = _oecd_entry("OECD-AIM-OLD-B", "Old incident B")
+    fresh_b["cve_ids"] = ["CVE-2026-0002"]
+    (ingest / "src.json").write_text(_json.dumps([fresh_a, fresh_b]), encoding="utf-8")
+    m.main()  # first rebuild: merges A+B, writes one `merged` record for B
+    m.main()  # second, identical rebuild against the now-committed output
+    deps = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    ).get("deprecations", [])
+    for_b = [d for d in deps if d.get("from") == "INC-00002"]
+    assert len(for_b) == 1, (
+        f"an ordinary rebuild must not create a duplicate record: {for_b}"
+    )
+
+
+def test_merged_deprecation_persists_retired_source_ids(tmp_path, monkeypatch):
+    """WS4-T15 item 3: a `merged` deprecation record must capture the
+    retired id's own `source_ids` from the last committed build, so a
+    guard can check it later without manual git archaeology."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    # Prior build: two entries that are about to merge under a shared CVE.
+    prev_a = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-A", "Old incident A")),
+        "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+        "cve_ids": ["CVE-2026-0001"], "source_ids": ["OECD-AIM-OLD-A", "S-EXTRA-1"],
+    }
+    prev_b = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-B", "Old incident B")),
+        "id": "INC-00002", "added": "2026-01-01", "updated": "2026-01-01",
+        "cve_ids": ["CVE-2026-0001"], "source_ids": ["OECD-AIM-OLD-B"],
+    }
+    (data / "incidents.json").write_text(
+        _json.dumps({"incidents": [prev_a, prev_b]}), encoding="utf-8"
+    )
+    # Fresh ingest re-surfaces both under the same CVE -- they merge into one
+    # row, and the higher (INC-00002) id must be recorded as `merged` into
+    # the survivor (INC-00001), carrying INC-00002's OWN prior source_ids.
+    fresh_a = _oecd_entry("OECD-AIM-OLD-A", "Old incident A")
+    fresh_a["cve_ids"] = ["CVE-2026-0001"]
+    fresh_b = _oecd_entry("OECD-AIM-OLD-B", "Old incident B")
+    fresh_b["cve_ids"] = ["CVE-2026-0001"]
+    (ingest / "src.json").write_text(_json.dumps([fresh_a, fresh_b]), encoding="utf-8")
+    m.main()
+    deps = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    rec = next(d for d in deps if d.get("from") == "INC-00002")
+    assert rec["reason"] == "merged"
+    assert rec["into"] == "INC-00001"
+    assert rec.get("retired_source_ids") == ["OECD-AIM-OLD-B"]
+
+
 def test_build_is_deterministic_across_days(tmp_path, monkeypatch):
     data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
     (ingest / "src.json").write_text(_json.dumps(
