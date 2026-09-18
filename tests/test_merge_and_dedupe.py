@@ -536,6 +536,51 @@ def test_second_deprecation_record_survives_rebuild(tmp_path, monkeypatch):
     assert for_from[-1]["into"] == "INC-00001"
 
 
+def test_deprecations_file_order_is_never_resorted_even_with_date_inversions(
+    tmp_path, monkeypatch,
+):
+    """BOUNCE defect 3: "file order is append order is chronological
+    order, by construction" is a claim about CODE, and code can be edited
+    -- it needs a test that fails the moment anything re-sorts the
+    combined list, not just an argument. `data/id_deprecations.json` has
+    57 real date inversions (a later-appended record with an earlier
+    date), so precedence CANNOT be "sort by date": a rebuild that
+    reintroduced `sorted(deprecations_all, key=(from, date))` would flip
+    precedence on exactly this shape while the record COUNT stays
+    balanced at 2 -- an aggregate that looks fine while the thing it is
+    supposed to protect (which record is authoritative) is wrong
+    (working agreement 6, form d)."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    (data / "incidents.json").write_text(_json.dumps({
+        "incidents": [{
+            **m.normalize_entry(_oecd_entry("OECD-AIM-LIVE", "Live incident")),
+            "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+        }]
+    }), encoding="utf-8")
+    seed = [
+        {"from": "INC-09999", "into": "INC-00002", "reason": "merged",
+         "date": "2026-02-01"},   # appended FIRST, but dated LATER
+        {"from": "INC-09999", "into": "INC-00001", "reason": "resplit",
+         "date": "2026-01-01"},   # appended SECOND (authoritative), dated EARLIER
+    ]
+    (data / "id_deprecations.json").write_text(_json.dumps({"deprecations": seed}), encoding="utf-8")
+    (ingest / "src.json").write_text(_json.dumps(
+        [_oecd_entry("OECD-AIM-LIVE", "Live incident")]
+    ), encoding="utf-8")
+    m.main()
+    out = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    assert out == seed, (
+        f"the file must never be re-sorted -- append order alone carries "
+        f"precedence, regardless of date: {out}"
+    )
+    assert out[-1]["reason"] == "resplit", (
+        "the LAST record in file order must stay authoritative even "
+        f"though its date is earlier than the record before it: {out}"
+    )
+
+
 def test_ordinary_rebuild_still_refuses_second_record_for_new_from(tmp_path, monkeypatch):
     """The persistence fix must not turn off the EXISTING guard against an
     ordinary rebuild silently double-writing a record for an id its own
@@ -607,6 +652,91 @@ def test_merged_deprecation_persists_retired_source_ids(tmp_path, monkeypatch):
     assert rec["reason"] == "merged"
     assert rec["into"] == "INC-00001"
     assert rec.get("retired_source_ids") == ["OECD-AIM-OLD-B"]
+
+
+def test_issue88_fixpoint_ignores_a_superseded_record_and_never_mutates_it(
+    tmp_path, monkeypatch,
+):
+    """BOUNCE defect 1: the issue-88 EXCLUDE-bucket fixpoint must reason
+    about the AUTHORITATIVE (latest-per-`from`) record only, and must fix
+    a genuinely-dangling redirect by APPENDING a new terminal record, never
+    by mutating an existing one in place.
+
+    Demonstrated failure before this fix: a STALE record pointing into an
+    EXCLUDE bucket got rewritten to `into: null` even though a LATER,
+    authoritative record for the same `from` already pointed at a live id
+    -- and the bogus rewrite propagated `from` into `removed_terminal`,
+    wrongly nulling a THIRD PARTY's live redirect that cited it
+    (`INC-09998 -> INC-09999`, where `INC-09999`'s OWN authoritative
+    record pointed at a live id all along)."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    bucket = sorted(m.ISSUE88_EXCLUDE)[0]  # a real EXCLUDE-bucket id
+    live = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-LIVE", "Live incident")),
+        "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+    }
+    (data / "incidents.json").write_text(_json.dumps({"incidents": [live]}), encoding="utf-8")
+    seed = [
+        # Stale: into the EXCLUDE bucket.
+        {"from": "INC-09999", "into": bucket, "reason": "merged", "date": "2026-01-01"},
+        # Authoritative (later): superseding, points at a LIVE id.
+        {"from": "INC-09999", "into": "INC-00001", "reason": "resplit", "date": "2026-02-01"},
+        # A third party citing INC-09999.
+        {"from": "INC-09998", "into": "INC-09999", "reason": "merged", "date": "2026-03-01"},
+    ]
+    (data / "id_deprecations.json").write_text(_json.dumps({"deprecations": seed}), encoding="utf-8")
+    (ingest / "src.json").write_text(_json.dumps(
+        [_oecd_entry("OECD-AIM-LIVE", "Live incident")]
+    ), encoding="utf-8")
+    m.main()
+    out = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    assert out == seed, (
+        "no record may be mutated, and no spurious fix appended, when the "
+        f"AUTHORITATIVE record for every `from` already resolves live: {out}"
+    )
+
+
+def test_issue88_fixpoint_appends_a_fix_for_a_genuinely_dangling_authoritative_record(
+    tmp_path, monkeypatch,
+):
+    """The complementary, still-must-work case: when the AUTHORITATIVE
+    record for a `from` genuinely points into an EXCLUDE bucket, the
+    fixpoint must still append a terminal `out-of-scope` record for it
+    AND for anything transitively citing it -- without mutating the
+    original record, and idempotently across repeated rebuilds."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    bucket = sorted(m.ISSUE88_EXCLUDE)[0]
+    live = {
+        **m.normalize_entry(_oecd_entry("OECD-AIM-LIVE", "Live incident")),
+        "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
+    }
+    (data / "incidents.json").write_text(_json.dumps({"incidents": [live]}), encoding="utf-8")
+    seed = [
+        {"from": "INC-09999", "into": bucket, "reason": "merged", "date": "2026-01-01"},
+        {"from": "INC-09998", "into": "INC-09999", "reason": "merged", "date": "2026-03-01"},
+    ]
+    (data / "id_deprecations.json").write_text(_json.dumps({"deprecations": seed}), encoding="utf-8")
+    (ingest / "src.json").write_text(_json.dumps(
+        [_oecd_entry("OECD-AIM-LIVE", "Live incident")]
+    ), encoding="utf-8")
+    m.main()
+    m.main()  # rebuild again against the now-fixed, committed state
+    out = _json.loads(
+        (data / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    # The two ORIGINAL records survive verbatim (append-only)...
+    assert out[0] == seed[0]
+    assert out[1] == seed[1]
+    # ...and exactly one terminal fix was appended for each `from` --
+    # not two, even across two rebuilds (idempotent).
+    fixes = [d for d in out if d.get("reason") == "out-of-scope"]
+    assert len(fixes) == 2
+    by_from = {d["from"]: d for d in fixes}
+    assert by_from.keys() == {"INC-09999", "INC-09998"}
+    assert all(d["into"] is None for d in fixes)
+    assert len(out) == 4
 
 
 def test_build_is_deterministic_across_days(tmp_path, monkeypatch):

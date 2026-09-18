@@ -8,7 +8,8 @@ schema decision this document routes, §3). **Boarded by:** D26 (user,
 2026-09-17), blocked-by WS4-T10's correction pass merging first (it has:
 `docs/specs/WS4-T10-unmerge-design-2026-09-15.md` FINAL PASS on
 `9324cdf7`, per that branch's own board record — WS4-T10's *merge to
-main* is separately blocked by this document, §6). **Depends on:**
+main* is separately blocked by this document's sequencing analysis, §7).
+**Depends on:**
 `docs/specs/WS4-T10-unmerge-design-2026-09-15.md` §8.1's measurement and
 §8.4's `INC-07738` diagnosis (both stand); §8.2 and §8.3 of that document
 are SUPERSEDED and not built on here except for the two findings their own
@@ -41,6 +42,16 @@ independent question (should `from` *stay* the identity key, or should the
 project adopt an explicit, order-independent one) is real, separable, and
 routed to the user in §3 — but it does not block landing the persistence
 fix, because the persistence fix does not depend on its answer.
+
+**Addendum, dated 2026-09-18 (red-reviewer BOUNCE):** the persistence fix
+above was correct, but two of its *consumers* were not updated to match
+it, and its own "by construction" ordering claim was untested. §2.3 fixes
+the issue-88 fixpoint (it mutated stale, superseded records in place and
+mis-propagated their state to third-party citers); §2.4 adds the mutation
+test that actually guards the ordering claim; §6 fixes the coverage
+guard (it measured a literal `into` value instead of a resolved chain).
+All three are fixed, tested, and proven by mutant against the real bug
+shape below — not merely argued.
 
 ---
 
@@ -186,6 +197,21 @@ unhashable type: 'list'` on `in` against a `set` — reachable the moment a
 future `split`/`resplit` record exists, previously reachable by nothing in
 the committed data.
 
+> **[CORRECTION, dated 2026-09-18 — red-reviewer BOUNCE.]** The paragraph
+> above this ("The build only ever appends... it never touches an id that
+> already has a record on disk") and the code comment at
+> `scripts/merge_and_dedupe.py` it was drawn from were **FALSE as a claim
+> about this build overall**, though true of the persistence block in
+> isolation. The very next block in the same function — the issue #88
+> fixpoint just described — iterated EVERY record and MUTATED whichever
+> it visited in place; the persistence fix in §2.1 removed the only thing
+> (the one-record-per-`from` collapse) that had been keeping that loop
+> from ever seeing more than one record for a `from` and getting it
+> wrong. **This is BOUNCE defect 1, not a separate task — see §2.3.**
+> Preserved above per agreement 4 (the original claim, and the finding
+> that falsified it, are both part of the record); read §2.3 for what is
+> actually true today.
+
 ### 2.2 Proven by mutant, not just argued
 
 Per working agreement 6 ("test your design against an actual rebuild
@@ -219,6 +245,108 @@ protected and that the fix must not weaken: an ordinary rebuild run twice
 against unchanged inputs still writes **exactly one** record for a
 newly-retired id, not two.
 
+### 2.3 Defect 1 (BOUNCE, 2026-09-18) — the issue #88 fixpoint mutated stale records and mis-propagated
+
+**Found by red-reviewer's gate, with a repro script
+(`probe_issue88.py`), not by anything in this task's own verification —
+the persistence proof in §2.2 tested the thing this task changed, not the
+things that depended on what it changed.** §2.1's fix made `prev_deprec`
+carry through with **more than one record per `from` now possible** for
+the first time. The issue #88 EXCLUDE-bucket fixpoint (the block
+immediately after §2.1's, unwinding when an OECD "not on the OECD.AI
+platform anymore" bucket withdraws source content) was written when the
+old collapse guaranteed **exactly one** record per `from` always existed
+— so it iterated `deprecations_all` directly, with no notion of "which
+record is the authoritative one," and **mutated whichever record it
+visited in place**:
+
+```python
+for d in deprecations_all:
+    if d.get("into") in removed_terminal:
+        d["into"] = None
+        d["reason"] = "out-of-scope"
+        ...
+```
+
+**Demonstrated against the committed WS4-T15 code, with a real EXCLUDE
+bucket (`INC-00004`; 25 buckets exist today):** seed `INC-09999 ->
+INC-00004` (a STALE record, into the bucket) + `INC-09999 -> INC-00001`
+(the AUTHORITATIVE, later, live `resplit` record — exactly the shape §2
+exists to make possible) + `INC-09998 -> INC-09999` (a third party citing
+the retired id). Output: the stale record was rewritten to `into: null,
+reason: "out-of-scope"` **and** `INC-09998`'s record was nulled too,
+because the loop read the stale record first, decided `INC-09999` was
+terminally removed, and propagated that into `removed_terminal` before
+ever consulting the authoritative record that said otherwise. A citation
+of `INC-09998` would now resolve to "removed, out of scope" instead of
+the live `INC-00001`.
+
+**Two failures in one run**, both now fixed:
+
+1. **`prev_deprec` was not, in fact, carried through verbatim** the
+   moment this second block ran — §2.1's own claim ("never touches an id
+   that already has a record on disk") was true of the persistence block
+   alone and false of the build overall (§2.1's correction note, above).
+2. **The wrong-propagation is new with this task**, not a pre-existing
+   bug this task merely inherited: the old one-record-per-`from` collapse
+   meant the fixpoint's `deprecations_all` could never contain a stale
+   record shadowed by a live authoritative one, so it only ever saw the
+   authoritative record and the bug was unreachable. **Removing the
+   collapse removed a guarantee this downstream consumer silently
+   depended on, without updating that consumer.**
+
+**Fixed** (`scripts/merge_and_dedupe.py`) to (a) compute the same
+authoritative (latest-per-`from`) view every other consumer uses before
+reasoning about anything, and (b) **append** a new terminal record for a
+`from` that genuinely needs one, never mutate an existing record — editing
+a committed record's `into`/`reason` to change its meaning is itself the
+append-only violation `docs/ID_POLICY.md` rule 2 forbids, independent of
+whether it also mis-propagates. Re-running the exact repro above against
+the fix: the stale record and the third-party citation both survive
+**unmutated**, and — separately verified — when the authoritative record
+for a `from` genuinely does point into an EXCLUDE bucket, the fixpoint
+still correctly appends a terminal fix for it and for anything
+transitively citing it, and does so **idempotently** across repeated
+rebuilds (verified: 3 consecutive `m.main()` calls hold at 4 records, not
+growing).
+
+**Proven by mutant**, the same way as §2.2: reintroduced the exact old
+mutate-in-place loop, reran the two new regression tests
+(`test_issue88_fixpoint_ignores_a_superseded_record_and_never_mutates_it`,
+`test_issue88_fixpoint_appends_a_fix_for_a_genuinely_dangling_authoritative_record`),
+both failed reproducing exactly the bogus rewrite described above; restored
+the fix, both pass, full suite green.
+
+### 2.4 Defect 3 (BOUNCE, 2026-09-18) — the append-only ordering claim needed a test, not an argument
+
+§2.1 asserted "file order IS append order IS chronological order, by
+construction" and named that as the reason precedence is safe without an
+explicit ordering field (§3). **That claim is about code, and code can be
+edited — asserting it is not the same as guarding it.** Red-reviewer's
+gate reintroduced `sorted(deprecations_all, key=lambda x: (x.get("from")
+or "", x.get("date") or ""))` immediately after the concatenation in
+§2.1, and **the full 356-test suite still passed.** Only a test that
+specifically seeds a **date-inverted pair** — a later-appended
+(authoritative) record with an *earlier* date than the one it supersedes,
+exactly the shape **57 real records in `data/id_deprecations.json`**
+already have — catches it: the record **count** stays balanced at 2 while
+**which record is authoritative flips** to the stale one. This is working
+agreement 6's form (d) precisely: an aggregate (the count) that is
+invariant under the error.
+
+**Fixed by adding the missing test**, not by arguing harder:
+`tests/test_merge_and_dedupe.py::test_deprecations_file_order_is_never_resorted_even_with_date_inversions`
+seeds exactly that date-inverted pair and asserts the file is written in
+append order, unchanged, with the later-appended record still last (and
+still authoritative) regardless of its date. **Proven to fire**:
+reintroducing the same `sorted(...)` mutant against the fixed code makes
+this test fail with the authoritative record flipped to the stale
+`merged` one; removing the mutant restores a pass. This is the mutation
+test §3's Option A discussion originally deferred as "testing §2.1 a
+second way" — that reasoning was inverted: **the mutation test is what
+makes "by construction" a checked property instead of an assumption**,
+and it is now permanent, not deferred.
+
 ---
 
 ## 3. Item 2 — the record identity key (routed to the user)
@@ -243,14 +371,31 @@ order is guaranteed append-only by the code change in §2.1.
   list), not carried by an explicit field on the record itself. It is
   robust *as long as nothing between here and every future reader ever
   reorders the file* — which is exactly the invariant the code now
-  enforces mechanically (§2.1), and exactly the kind of invariant that
-  broke once already (a `sorted(...)` call nobody flagged as
-  precedence-bearing). A recommended, not-yet-implemented hardening: add a
-  mutation test locking `deprecations_all = list(prev_deprec) + fresh` in
-  as intentional — a mutant that reintroduces any `sorted(...)` over the
-  combined list should fail it. (Not added here because it would be
-  testing the exact code in §2.1 a second way rather than adding new
-  coverage; flagged for whoever next touches this block.)
+  enforces mechanically (§2.1) **and now tests directly (§2.4)**, not
+  merely argues.
+  > **[CORRECTION, dated 2026-09-18 — red-reviewer BOUNCE.]** This bullet
+  > originally ended here: *"A recommended, not-yet-implemented
+  > hardening: add a mutation test locking `deprecations_all =
+  > list(prev_deprec) + fresh` in as intentional... (Not added here
+  > because it would be testing the exact code in §2.1 a second way
+  > rather than adding new coverage; flagged for whoever next touches
+  > this block.)"* **That reasoning was inverted, and the gate said so
+  > directly: the mutation test IS the check.** "By construction" is a
+  > claim about code that can be edited; without a test that fails when
+  > someone re-adds a sort, the construction is an assumption, not an
+  > invariant. §2.4 adds exactly this test and proves it fires. Preserved
+  > here per agreement 4; treat §2.4 as current, not this parenthetical.
+- **Defect 1 (§2.3) is Option A's first real consumer, and it got
+  precedence wrong immediately** — not because "latest in file order"
+  was the wrong rule, but because a second piece of code (the issue #88
+  fixpoint) reasoned about `deprecations_all` without going through that
+  rule at all. This is evidence about Option A's fragility, stated here
+  for the Recommendation and §8 to weigh, not softened: **Option B is
+  immune to this specific failure by construction** — an explicit
+  `active: true` field lets any consumer ask "is this record
+  authoritative?" locally, per-record, without needing to know it must
+  first compute a latest-per-`from` view at all; Option A requires every
+  future consumer to remember to do that, and one already didn't.
 
 ### Option B — explicit, order-independent identity
 
@@ -276,15 +421,27 @@ becomes "find the record for this `from` with `active: true`" rather than
 ### Recommendation
 
 **Option A, now — it is what unblocks WS4-T10's remerge with zero schema
-risk added to an already time-pressured sequencing (§6) — with Option B
+risk added to an already time-pressured sequencing (§7) — with Option B
 recommended as a deliberate, separately-scheduled hardening task once the
 immediate remediation is off the critical path.** The persistence fix in
 §2 does not need Option B to be correct; it needs Option A's invariant
 (file order = append order) enforced in code, which is now the case and
-is tested. **This is my recommendation, not a decision** — the user rules
-on whether Option B's extra schema/migration cost is worth taking on now
-versus later, and schema-architect is the one who would design and land
-either option's schema shape (a fresh `schema/id_deprecations.schema.json`
+is tested (§2.4). **This recommendation is unchanged from before the
+gate's bounce, and it is not switched quietly: it is weighed against
+evidence that cuts against it, not around that evidence.** §2.3's defect
+is real, it is Option A's first real consumer getting precedence wrong,
+and it would not have been structurally possible under Option B (an
+explicit `active` field needs no "which view is authoritative" step at
+all). What changed is that Option A is now backed by a fixed and tested
+second consumer plus a mutation-tested ordering invariant, not by an
+untested argument — which is evidence for the recommendation, but the
+recommendation itself is a judgement call about cost-versus-risk, and
+**this is my recommendation, not a decision**: the user rules on whether
+Option B's extra schema/migration cost is worth taking on now, given that
+Option A already produced one real, found-by-review defect, versus later
+as a hardening task once the immediate remediation is off the critical
+path. Schema-architect is the one who would design and land either
+option's schema shape (a fresh `schema/id_deprecations.schema.json`
 either way).
 
 **Proposed `docs/ID_POLICY.md` amendment (text only, not committed to that
@@ -400,6 +557,62 @@ carrying a persisted `retired_source_ids` (§4), the record's resolved
 target(s) — unioned across every element if `into` is list-valued — must
 hold at least 90% of those source_ids in the CURRENT corpus.
 
+> **[CORRECTION, dated 2026-09-18 — red-reviewer BOUNCE defect 2.]** "The
+> record's resolved target(s)" was **not what the first version of this
+> guard measured** — it took `into` **literally**
+> (`targets = into if isinstance(into, list) else ([into] if into else
+> [])`), contradicting its own docstring and this line, while
+> `_resolves_to_live` (a chain-resolving walk) already existed in the
+> same file, unused for this purpose. On a chained record — `A -> B ->
+> C`, `C` live and holding everything `A` had — this reported `0/N` (0%)
+> coverage on a perfectly healthy redirect, wired into the path that
+> reaches `sys.exit(1)`: **a guard that fires on its own correct input,
+> which is the same class of failure as a guard that never fires at all**
+> (working agreement 6). Chained records already exist in committed data
+> (`INC-08146 -> INC-08139 -> INC-00554`, live). **Fixed** by adding
+> `_resolve_live_targets`, a single shared recursive walk (fanning out
+> through list-valued hops, cycle-safe) that both `_resolves_to_live` and
+> `check_deprecation_coverage` now call — reusing the existing resolution
+> logic rather than adding a second independent one, which is exactly how
+> the list-`into` `TypeError` ended up needing a fix in two places
+> earlier in this same task. **Proven on the real committed chain, not
+> only a synthetic one**
+> (`tests/test_validate.py::test_deprecation_coverage_resolves_a_real_committed_chain`,
+> read-only against `data/incidents.json`/`data/id_deprecations.json`):
+> fabricating `retired_source_ids` on `INC-08146`'s real record with a
+> source `INC-00554` (the chain's live end) actually holds, the fixed
+> guard reports zero problems; reproducing the OLD literal-`into` logic
+> against the same real record reports `0.0` coverage — verified directly,
+> both ways. `check_integrity` and `check_deprecation_coverage` now also
+> share ONE authoritative (latest-per-`from`) view, `_latest_by_from`,
+> instead of each building its own — the same fix pattern as §2.3's
+> issue-88 fixpoint: one canonical "what does this `from` currently mean"
+> answer, computed once, not re-derived per consumer.
+
+**On the 90% threshold — not a round number picked for looks.** It
+discriminates only on retired ids with enough sources to make a
+percentage meaningful at all: most retired ids carry 1-2 sources, where
+coverage can only be 0% or 100% regardless of where the threshold is set.
+On the population where it CAN discriminate, **90% permits one dropped
+source in a 10+ source set while catching every measured pathology by
+30x** — `INC-08139` (2/92 ≈ 2%) and `INC-08185` (2/65 ≈ 3%) are both
+caught by any threshold above ~3%, so 90% is chosen for margin against
+noise in a not-yet-observed real population, not because it was tuned to
+the two known cases; a threshold of 5% would have caught both known
+pathologies just as well and bought no headroom against anything else.
+
+**The guard goes live automatically the first time a post-WS4-T15 build
+retires an id** (`checked` becomes nonzero in its own printed line) — but
+**nothing today asserts that actually happens**, so it could in principle
+stay a guard nobody has ever seen fire on real data indefinitely, which is
+exactly the "checks that cannot fail" shape working agreement 6 warns
+against, from a different angle than defect 2's own false-negative. Coded
+recommendation, not implemented in this task: add a follow-up assertion
+(CI step or a monitoring check, owner's call) that `checked > 0` once the
+first real post-WS4-T15 retirement has landed, so a guard that has never
+actually fired on real data cannot be mistaken for one that has, or for
+one that never needs to.
+
 **Named failing input (working agreement 6):** the previous guard attempt
 (T10 audit §8.3, now superseded) tested "the target holds **at least
 one** shared source_id" and was shown to PASS on 4 of 8 measured cases —
@@ -434,13 +647,20 @@ zero and fails zero — **CI stays green today**, and starts doing real work
 the moment the first post-WS4-T15 `merged`/`transitive-merge` record is
 written by a future refresh.
 
-**Six permanent regression tests** (`tests/test_validate.py`) cover: a
+**Eight permanent regression tests** (`tests/test_validate.py`) cover: a
 list-`into` record resolving when every successor is live; one flagged
 when a successor is dangling; the exact crash-shape input surviving
 without raising; the coverage guard firing on the 2/92 shape; staying
-clean on a healthy redirect and a multi-target union; and a legacy
+clean on a healthy redirect and a multi-target union; a legacy
 (no-persisted-field) record being reported as unverifiable, not silently
-passing.
+passing; a synthetic chained redirect (`A -> B -> C`) NOT being
+misreported as 0% coverage; and the real committed
+`INC-08146 -> INC-08139 -> INC-00554` chain resolving cleanly. Two more in
+`tests/test_merge_and_dedupe.py` cover the issue-88 fixpoint (§2.3): a
+stale record shadowed by a live authoritative one is never mutated and
+never wrongly propagated; a genuinely-dangling authoritative record still
+gets a correct, idempotent, append-only fix. One more locks in §2.4's
+ordering invariant against a date-inverted pair.
 
 ---
 
@@ -474,46 +694,61 @@ authorized.
 
 **What actually closes the loop — the "deliberate guard" `8d1b241f`
 calls for — is a pre-authorization allowlist enforced at build time,
-not just at validate time:**
+not just at validate time.** Stated in plain terms, this is everything
+that must still happen before WS4-T10 can merge without turning `main`
+red:
 
-1. **A one-time, human-reviewed remediation** (a separate task/PR, not
-   this one) applies the T10 spec's own hybrid method (§7.2/§8 of that
-   document: per-id title/content continuity comparison between the
-   currently-published row and the fixed code's natural output) to
-   today's 47 splits, producing a reviewed, committed list of exactly
-   which `(from, reason)` pairs are AUTHORIZED for this one-time
-   transition — alongside the actual data change (the real unmerge,
-   reserved to the user per D25(b)).
-2. **A build-time guard in `merge_and_dedupe.py`** (not implemented here
-   — it needs the real unmerge to exist to be tested against, which this
-   task must not execute) that detects, for any previously-single
-   published id, that this build's own dedupe logic would now resolve its
-   member source_ids to more than one row — i.e. it would silently
-   produce a `split`/`resplit` deprecation — and **aborts the build
-   loudly** (nonzero exit, before any file is written) unless that
-   `(from, reason)` pair is present in the authorized list from step 1.
-   This is the mechanical form of D25(a) condition (2) ("every new
-   `merged` deprecation a refresh would write has been reviewed") —
-   turning a policy into something CI itself enforces, so a *future*
-   unreviewed OECD refresh cannot silently re-arm the same trap the way
-   the one this document exists because of just did.
-3. **WS4-T10 remerges in the SAME PR as step 1's remediation and step 2's
-   guard**, per the T10 spec's own §5.1 option (a) ("keeps the corpus from
-   ever being in the swapped state, even transiently, in a published
-   build"). Landing WS4-T10 alone, even with §2–§6's persistence fix, does
-   not satisfy this — it only makes the *next* silent rebuild's records
-   survive correctly, it does not stop that rebuild from happening
-   unauthorized.
+**(a) A human-reviewed remediation of the 47 splits.** A separate
+task/PR, not this one, applies the T10 spec's own hybrid method (§7.2/§8
+of that document: per-id title/content continuity comparison between the
+currently-published row and the fixed code's natural output) to today's
+47 splits, producing a reviewed, committed list of exactly which
+`(from, reason)` pairs are AUTHORIZED for this one-time 301-row
+transition, alongside the actual data change. **This is a judgement
+call, not a computation** — it is the thing actually standing between
+the user and an unfrozen corpus, and no code this task or its follow-up
+writes substitutes for it.
 
-**Why step 2 is not implemented as code in this task:** it can only be
-proven correct by running it against the actual 47-split transition,
-which is the unmerge this task is explicitly barred from executing. Its
-design is precise enough to hand to whoever runs that remediation (the
-task this document recommends the foreman open next, sequenced
-immediately behind this one and before WS4-T10's remerge); building it
-blind, without the real data to test the abort path against, would be
-exactly the "checks that cannot fail" failure mode this project keeps
-naming — a guard nobody has seen fire.
+**(b) A build-time pre-authorization guard.** Not implemented here — it
+can only be proven correct by running it against the real 47-split
+transition, which this task must not execute. It aborts the build
+loudly (nonzero exit, before any file is written) if this build's own
+dedupe logic would newly resolve a previously-single published id's
+member source_ids to more than one row — i.e. would silently produce a
+`split`/`resplit` deprecation — unless that `(from, reason)` pair is on
+(a)'s authorized list. This is the mechanical form of D25(a) condition
+(2) ("every new `merged` deprecation a refresh would write has been
+reviewed") — turning a policy into something CI itself enforces, so a
+*future* unreviewed OECD refresh cannot silently re-arm the same trap the
+one this document exists because of just did. **Correctly not built
+here**: building it blind, without the real transition to test the abort
+path against, would itself be a guard nobody has seen fire — exactly the
+failure mode this task keeps naming in everything else it built.
+
+**(c) The actual unmerge, in the same PR as (a) and (b).** Reserved to
+the user under D25(b). Landing WS4-T10 in the same PR as (a) and (b), per
+the T10 spec's own §5.1 option (a) ("keeps the corpus from ever being in
+the swapped state, even transiently, in a published build"). Landing
+WS4-T10 alone, even with §2–§6's fixes, does not satisfy this — it only
+makes the *next* silent rebuild's records survive and resolve correctly,
+it does not stop that rebuild from happening unauthorized.
+
+**What §2–§6 omitted, and what this bounce found:** landing this task's
+code alone does not merely leave (a)/(b)/(c) undone — **defects 1 and 2
+land on exactly the records (a)'s remediation writes.** The remediation
+in (a) is precisely what produces the first `split`/`resplit` records
+with more than one entry per `from` (a stale `merged` record shadowed by
+an authoritative correction) and the first genuine multi-hop chains
+through them — the exact shapes §2.3 and §6's corrected guard exist to
+handle. Had (a) run against the code as it stood before this bounce, its
+own remediation records would have been the first real input to both
+bugs: the issue-88 fixpoint could have wrongly nulled a live redirect the
+remediation had just written, and the coverage guard would have reported
+0% on the remediation's own healthy chained corrections, potentially
+blocking a legitimate, reviewed merge on a bug in the code meant to
+protect it. Fixing both here, before (a) ever runs, is what makes this
+task's code actually load-bearing for (a)/(b)/(c) rather than merely
+adjacent to them.
 
 ---
 
@@ -522,7 +757,21 @@ naming — a guard nobody has seen fire.
 1. **Item 2, §3: Option A (keep `from`, formalized append-only
    precedence — implemented, zero schema cost) vs. Option B (explicit
    `record_id`/`active` field, schema + migration cost).** Recommendation:
-   Option A now, Option B as a separately-scheduled hardening task.
+   Option A now, Option B as a separately-scheduled hardening task — but
+   **put fairly, not as a foregone conclusion**: §2.3's defect 1 is
+   Option A's first real consumer (the issue-88 fixpoint) getting
+   precedence wrong immediately, because it reasoned about
+   `deprecations_all` without going through the "which record is
+   authoritative" rule at all. **Option B is immune to this specific
+   failure by construction** — an explicit `active: true` field lets any
+   consumer ask "is this record authoritative?" locally and per-record,
+   with no dependency on first computing a latest-per-`from` view
+   correctly; Option A requires every future consumer to remember to do
+   that, and one already didn't. This evidence is presented for the
+   user's own weighing, not resolved by this document: Option A is
+   recommended because it is cheaper and because the one place it broke
+   is now fixed and tested, not because the failure mode it's exposed to
+   has gone away.
 2. **The `docs/ID_POLICY.md §1.4(c)` amendment text in §3** — policy
    language, not this task's file to edit.
 3. **§7's sequencing plan** — specifically, authorizing a follow-up task
@@ -553,17 +802,17 @@ naming — a guard nobody has seen fire.
 git fetch origin && git checkout ws4/t15-redirect-persistence
 pip install -r requirements.txt
 
-# Full suite — 352 passed (339 on main before this branch).
+# Full suite — 357 passed (339 on main before this branch).
 pytest -q
 
-# The persistence fix, retired-source capture, and refusal-to-duplicate
-# guard, isolated:
-pytest tests/test_merge_and_dedupe.py -q -k "deprecat or retired_source"
+# The persistence fix, retired-source capture, refusal-to-duplicate guard,
+# the date-inversion ordering proof, and the issue-88 fixpoint fix, isolated:
+pytest tests/test_merge_and_dedupe.py -q -k "deprecat or retired_source or issue88 or date_inversion"
 
 # resolve_id / resolve_id_group crash fix, isolated:
 pytest tests/test_package.py -q -k "resolve_id"
 
-# list-into resolution + coverage guard, isolated:
+# list-into resolution + coverage guard (including the real-chain proof), isolated:
 pytest tests/test_validate.py -q -k "integrity_list_into or deprecation_coverage"
 
 # Guard is a true no-op on today's real committed data (read-only --

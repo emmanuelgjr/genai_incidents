@@ -104,12 +104,18 @@ def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[
         # Latest-in-file record wins for a repeated `from` (WS4-T15): the
         # build only ever appends, never reorders or collapses, so file
         # order is chronological order and last-in-file is the current,
-        # authoritative record for that id. A dict comprehension already
-        # gives this for free (each repeat overwrites the previous value).
-        into_map = {d.get("from"): d.get("into") for d in deprecations}
+        # authoritative record for that id. `_latest_by_from` is the ONE
+        # place that computes this view -- every consumer below (the
+        # referential-integrity walk, the coverage guard, and the
+        # issue-88 fixpoint in merge_and_dedupe.py, which mirrors this
+        # same rule) must read it from here, not re-derive its own,
+        # because a second independent derivation is exactly how the
+        # list-`into` crash ended up fixed in two places instead of one.
+        latest = _latest_by_from(deprecations)
+        into_map = {f: r.get("into") for f, r in latest.items()}
         # 'removal' deprecations (into=null, e.g. reason 'out-of-scope') legitimately
         # don't resolve to a live entry — the incident was dropped, not merged.
-        removed_ids = {d.get("from") for d in deprecations if d.get("into") is None}
+        removed_ids = {f for f, r in latest.items() if r.get("into") is None}
         for frm, into in into_map.items():
             if frm in live_ids:
                 problems.append(f"deprecated id {frm} is still a live entry")
@@ -119,45 +125,108 @@ def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[
                 problems.append(
                     f"deprecation {frm} -> {into} does not resolve to a live entry"
                 )
-        problems.extend(check_deprecation_coverage(data, deprecations))
+        problems.extend(check_deprecation_coverage(data, deprecations, _latest=latest))
     return problems
+
+
+def _latest_by_from(deprecations: list[dict]) -> dict[str, dict]:
+    """The single authoritative (latest-in-file-wins) view over a
+    deprecations list, for a given `from`. WS4-T15's persistence fix
+    (`scripts/merge_and_dedupe.py`) guarantees file order is append order
+    is chronological order, so "latest in the list" is "most recently
+    decided" by construction -- every consumer that needs to know which
+    record is CURRENTLY authoritative for a `from` (not every record that
+    has ever existed for it) must go through this function."""
+    latest: dict[str, dict] = {}
+    for d in deprecations:
+        f = d.get("from")
+        if f:
+            latest[f] = d
+    return latest
+
+
+def _resolve_live_targets(
+    node, into_map: dict, live_ids: set[str], _seen: set | None = None,
+) -> set[str]:
+    """Every LIVE id `node` (a `from` or an `into` value) transitively
+    resolves to, walking `into_map` and fanning out through list-valued
+    `into` hops (WS4-T15 `split`/`resplit` records). Cycle-safe: a node
+    revisited on the current path contributes nothing further. Returns an
+    empty set if `node` dangles or terminates in a removal (`into: null`)
+    without ever reaching a live id -- callers that need to treat a
+    recorded removal as a valid resolution (referential-integrity
+    checking) handle that separately; callers measuring what a redirect
+    ACTUALLY points at today (the coverage guard) want exactly this: the
+    live id(s), or nothing.
+
+    This is the ONE place that walks a `from`/`into` chain with
+    list-fan-out — `_resolves_to_live` (does a chain resolve) and
+    `check_deprecation_coverage` (what does a chain resolve TO) both call
+    it rather than each re-implementing the walk; a second independent
+    walk is exactly how the `TypeError: unhashable type: 'list'` this
+    module already fixed once ended up needing fixing in two places."""
+    seen = set(_seen or ())
+    if isinstance(node, list):
+        out: set[str] = set()
+        for t in node:
+            out |= _resolve_live_targets(t, into_map, live_ids, seen)
+        return out
+    if node in live_ids:
+        return {node}
+    if node in seen or node not in into_map:
+        return set()
+    return _resolve_live_targets(into_map[node], into_map, live_ids, seen | {node})
 
 
 def _resolves_to_live(
     start_into, into_map: dict, live_ids: set[str], removed_ids: set[str],
-    _seen: set | None = None,
 ) -> bool:
-    """Faithful generalization of the original scalar chain-walk (walk
-    `into_map` while the current node is a further `from`, not live, and
-    not already visited; a chain that ends live or on a recorded removal
-    resolves) to also handle list-valued `into` (WS4-T15 `split`/`resplit`
-    records, one retired id fanning out to several successors): a list
-    resolves only if EVERY element resolves under this same rule. Cycle
-    protection carries across the whole walk, including into list branches."""
-    seen = set(_seen or ())
+    """True if `start_into` (a `from`'s `into` value) transitively
+    resolves to a live entry (every element, if list-valued — WS4-T15
+    `split`/`resplit`), OR terminates in a recorded `into: null` removal
+    (a citation of a withdrawn id is a valid, honest answer, not a
+    dangling one — `check_deprecation_coverage` does not need this half;
+    it wants live targets only, via `_resolve_live_targets` directly)."""
     if isinstance(start_into, list):
         return bool(start_into) and all(
-            _resolves_to_live(t, into_map, live_ids, removed_ids, seen) for t in start_into
+            _resolves_to_live(t, into_map, live_ids, removed_ids) for t in start_into
         )
+    if _resolve_live_targets(start_into, into_map, live_ids):
+        return True
+    # No live id reached -- still a valid resolution if the walk instead
+    # terminates in a node that is ITSELF a recorded removal.
+    seen: set[str] = set()
     cur = start_into
     while cur in into_map and cur not in live_ids and cur not in seen:
         seen.add(cur)
         nxt = into_map[cur]
         if isinstance(nxt, list):
-            return _resolves_to_live(nxt, into_map, live_ids, removed_ids, seen)
+            return _resolves_to_live(nxt, into_map, live_ids, removed_ids)
         cur = nxt
-    return cur in live_ids or cur in removed_ids
+    return cur in removed_ids
 
 
 def check_deprecation_coverage(
-    data: dict, deprecations: list[dict], threshold: float = 0.9
+    data: dict,
+    deprecations: list[dict],
+    threshold: float = 0.9,
+    _latest: dict[str, dict] | None = None,
 ) -> list[str]:
     """WS4-T15 guard: for every LIVE (latest-per-`from`) deprecation record
     that carries a persisted `retired_source_ids` (only true for records
     written by a build after WS4-T15 landed — see `_retired_fields` in
-    `scripts/merge_and_dedupe.py`), the record's resolved target(s) must
-    still hold at least `threshold` of those source_ids in the CURRENT
-    corpus.
+    `scripts/merge_and_dedupe.py`), the record's RESOLVED target(s) — the
+    live id(s) its `into` chain actually reaches today, via
+    `_resolve_live_targets`, not the literal `into` value on the record —
+    must still hold at least `threshold` of those source_ids in the
+    CURRENT corpus. A record whose `into` chains through one or more
+    further redirects before reaching a live id (already present in
+    committed data, e.g. `INC-08146 -> INC-08139 -> INC-00554`) is
+    measured against the CHAIN'S live end, not the immediate hop — taking
+    `into` literally previously reported 0% coverage on a perfectly healthy
+    chained redirect, which is exactly the "checks that cannot fail"
+    shape working agreement 6 warns about: a guard that fires on its own
+    correct input is worse than one that never fires at all.
 
     Named failing input (working agreement 6): a redirect whose target has
     drifted to hold only a small minority of what the retired id actually
@@ -165,21 +234,34 @@ def check_deprecation_coverage(
     found passing a bare "target holds >=1 shared source_id" check
     (`INC-08139`: target held 2 of 92; `INC-08185`: 2 of 65 — both ~2-3%,
     both would PASS a non-empty-intersection test and both FAIL this one).
+    The 90% threshold is deliberately far above the failure line, not a
+    round number picked for looks: it discriminates only on retired ids
+    with enough sources to make a percentage meaningful at all (most
+    retired ids carry 1-2 sources, where coverage can only be 0% or 100%
+    regardless of threshold); on the population where it CAN discriminate,
+    90% permits one dropped source in a 10+ source set while still
+    catching every measured pathology (2%, 3%) by roughly a 30x margin —
+    headroom against noise, not precision tuned to the two known cases.
+
     A record with no persisted `retired_source_ids` (every `merged` record
     written before this landed — 288 of them today, none yet carrying the
     field) is counted as `unverifiable`, reported separately, and never
     silently treated as passing — an all-zero-checked run must be visible
-    as zero, not indistinguishable from "everything passed".
+    as zero, not indistinguishable from "everything passed". **This guard
+    goes live automatically the first time a post-WS4-T15 build retires an
+    id** (`checked` becomes nonzero) — nothing today asserts that actually
+    happens; the recommended follow-up (§6 of the WS4-T15 design doc) is a
+    CI or monitoring assertion that `checked > 0` once the first real
+    retirement lands, so this does not quietly stay a guard nobody has
+    ever seen fire on real data.
     """
     problems: list[str] = []
     id_to_sources: dict[str, set[str]] = {
         e["id"]: set(e.get("source_ids") or []) for e in data.get("incidents", []) if e.get("id")
     }
-    latest: dict[str, dict] = {}
-    for d in deprecations:
-        f = d.get("from")
-        if f:
-            latest[f] = d
+    live_ids = set(id_to_sources.keys())
+    latest = _latest if _latest is not None else _latest_by_from(deprecations)
+    into_map = {f: r.get("into") for f, r in latest.items()}
     checked = 0
     unverifiable = 0
     for frm, rec in latest.items():
@@ -188,7 +270,7 @@ def check_deprecation_coverage(
             unverifiable += 1
             continue
         into = rec.get("into")
-        targets = into if isinstance(into, list) else ([into] if into else [])
+        targets = _resolve_live_targets(into, into_map, live_ids)
         held: set[str] = set()
         for t in targets:
             held |= id_to_sources.get(t, set())
@@ -198,9 +280,9 @@ def check_deprecation_coverage(
         checked += 1
         if coverage < threshold:
             problems.append(
-                f"deprecation coverage: {frm} -> {into} resolved target(s) hold only "
-                f"{overlap}/{len(retired_set)} ({coverage:.0%}) of the retired id's "
-                f"persisted source_ids (threshold {threshold:.0%})"
+                f"deprecation coverage: {frm} -> {into} (resolved: {sorted(targets)}) "
+                f"hold(s) only {overlap}/{len(retired_set)} ({coverage:.0%}) of the "
+                f"retired id's persisted source_ids (threshold {threshold:.0%})"
             )
     print(
         f"[deprecation-coverage] {checked} checked, {unverifiable} unverifiable "

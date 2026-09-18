@@ -151,6 +151,48 @@ def test_deprecation_coverage_multi_target_unions_successors():
     assert v.check_deprecation_coverage(data, deps) == []
 
 
+def test_deprecation_coverage_resolves_a_chain_not_the_literal_into():
+    # BOUNCE defect 2: the guard must measure against what a redirect
+    # CHAIN actually resolves to, not the literal `into` value on the
+    # record -- A -> B -> C (live), C holds everything the retired id had.
+    # Taking `into` literally reports A -> B (not live) -> held=empty ->
+    # 0% coverage on a perfectly healthy redirect.
+    data = _data({"id": "INC-C", "source_ids": ["s1", "s2"]})
+    deps = [
+        {"from": "INC-A", "into": "INC-B", "reason": "merged", "date": "2026-01-01",
+         "retired_source_ids": ["s1"]},
+        {"from": "INC-B", "into": "INC-C", "reason": "merged", "date": "2026-01-02"},
+    ]
+    problems = v.check_deprecation_coverage(data, deps)
+    assert problems == [], (
+        f"a healthy chained redirect must not be flagged as 0% coverage: {problems}"
+    )
+
+
+def test_deprecation_coverage_resolves_a_real_committed_chain():
+    # Prove it on a real committed chain, not only a synthetic one
+    # (BOUNCE defect 2's explicit ask). `data/id_deprecations.json` has a
+    # genuine 3-hop chain today: INC-08146 -> INC-08139 -> INC-00554
+    # (live). Read-only: this test never writes to data/.
+    data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
+    real_deps = json.loads(
+        (ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    live_end = next(e for e in data["incidents"] if e["id"] == "INC-00554")
+    a_real_source_the_chain_end_holds = live_end["source_ids"][0]
+    deps = [dict(d) for d in real_deps]
+    found = False
+    for d in deps:
+        if d.get("from") == "INC-08146":
+            d["retired_source_ids"] = [a_real_source_the_chain_end_holds]
+            found = True
+    assert found, "fixture assumption (INC-08146 chains to INC-00554) is stale -- update it"
+    problems = v.check_deprecation_coverage(data, deps)
+    assert problems == [], (
+        f"the real INC-08146 -> INC-08139 -> INC-00554 chain must resolve: {problems}"
+    )
+
+
 def test_deprecation_coverage_legacy_record_is_unverifiable_not_passing():
     # A record with no persisted retired_source_ids (every `merged` record
     # written before WS4-T15) must be visibly skipped, not silently counted

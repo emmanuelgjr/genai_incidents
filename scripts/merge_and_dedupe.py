@@ -1775,7 +1775,19 @@ def main():
     # for a `from` id this build's own dedupe logic newly retires (matching
     # the *old* code's `setdefault` refusal to double-write an id that
     # already has some record); it never touches an id that already has a
-    # record on disk. That distinction matters: a plain
+    # record on disk **in THIS block**.
+    # [CORRECTION, dated 2026-09-18] "It never touches an id that already
+    # has a record on disk" was FALSE as a claim about the build overall —
+    # the issue-88 fixpoint immediately below used to iterate every record
+    # in `deprecations_all` (not just the authoritative one per `from`)
+    # and MUTATE whichever it visited in place, so a stale, superseded
+    # record could be rewritten and its `from` wrongly propagated into
+    # `removed_terminal`, breaking a third party's live redirect. Fixed
+    # there (not here) to operate on the authoritative view only and to
+    # APPEND rather than mutate. See
+    # docs/specs/WS4-T15-redirect-persistence-2026-09-18.md §"Defect 1".
+    # This block's own claim -- appends only, for genuinely new `from`
+    # ids -- stands unchanged. That distinction matters: a plain
     # `{d.get("from"): d for d in prev_deprec}` dict comprehension here
     # previously collapsed EVERY prior record down to (whichever happened to
     # be LAST when iterating `prev_deprec`) on every single rebuild, despite
@@ -1804,26 +1816,64 @@ def main():
             fresh.append(d)
     deprecations_all = list(prev_deprec) + fresh
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
-    # deprecation whose `into` was that bucket (or transitively resolves to it)
-    # now dangles. Redirect the chain to a terminal out-of-scope removal so
-    # every citation still resolves (`into: null`). Fixpoint for A->B-><removed>.
-    # `into` can now be list-valued (WS4-T15 `split`/`resplit` records) --
-    # skip those here rather than crash; a multi-successor record dangling
-    # into an EXCLUDE bucket is not fixed up automatically by this loop.
+    # deprecation whose CURRENTLY AUTHORITATIVE `into` was that bucket (or
+    # transitively resolves to it) now dangles. Redirect it to a terminal
+    # out-of-scope removal so every citation still resolves (`into: null`).
+    # Fixpoint for A->B-><removed>. `into` can now be list-valued (WS4-T15
+    # `split`/`resplit` records) -- skip those here rather than crash; a
+    # multi-successor record dangling into an EXCLUDE bucket is not fixed
+    # up automatically by this loop.
+    #
+    # WS4-T15 fix (BOUNCE defect 1): this loop used to iterate EVERY
+    # record in `deprecations_all` and MUTATE whichever it visited in
+    # place. Once a `from` could carry more than one record (the whole
+    # point of §2.1's persistence fix), that meant a STALE, superseded
+    # record could be rewritten even though a LATER, authoritative record
+    # for the same `from` already pointed somewhere live -- and the bogus
+    # rewrite then propagated that `from` into `removed_terminal`,
+    # wrongly nulling any THIRD PARTY's redirect that cited the
+    # now-superseded id. Demonstrated: seed `INC-09999 -> INC-00004`
+    # (stale, into a real EXCLUDE bucket) + `INC-09999 -> INC-00001`
+    # (later, authoritative, live) + `INC-09998 -> INC-09999` (a citer of
+    # the retired id); the old loop nulled BOTH the harmless stale
+    # INC-09999 record AND INC-09998's live redirect. Fixed to (a) operate
+    # only on the AUTHORITATIVE (latest-per-`from`) view, mirroring the
+    # same last-in-file-wins rule as `_latest_by_from` in
+    # `scripts/validate.py` and `_load_deprecations()` in
+    # `src/genai_incidents/__init__.py` (a separate, small implementation
+    # here -- importing validate.py would be circular, since it already
+    # imports from this module -- but it MUST stay behaviourally
+    # identical to both); and (b) APPEND a new terminal record instead of
+    # mutating an existing one in place, since editing a committed
+    # record's `into`/`reason` to change its meaning is itself the kind
+    # of history-rewrite `docs/ID_POLICY.md` rule 2 forbids.
     if ISSUE88_EXCLUDE:
+        authoritative: dict[str, dict] = {}
+        for d in deprecations_all:
+            f = d.get("from")
+            if f:
+                authoritative[f] = d
         removed_terminal = set(ISSUE88_EXCLUDE)
+        fixed_from: set[str] = set()
         changed = True
         while changed:
             changed = False
-            for d in deprecations_all:
+            for f, d in list(authoritative.items()):
+                if f in fixed_from:
+                    continue
                 into = d.get("into")
                 if isinstance(into, list):
                     continue
                 if into in removed_terminal:
-                    d["into"] = None
-                    d["reason"] = "out-of-scope"
-                    if d.get("from") and d["from"] not in removed_terminal:
-                        removed_terminal.add(d["from"])
+                    fix = {
+                        "from": f, "into": None, "reason": "out-of-scope",
+                        "date": today_str,
+                    }
+                    deprecations_all.append(fix)
+                    authoritative[f] = fix
+                    fixed_from.add(f)
+                    if f not in removed_terminal:
+                        removed_terminal.add(f)
                         changed = True
     if deprecations_all:
         DEPRECATIONS_PATH.write_text(
