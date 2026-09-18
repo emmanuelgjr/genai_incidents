@@ -94,7 +94,7 @@ from urllib.parse import urlparse
 # earlier WAF-rejection concern that justified keeping `Mozilla/5.0` had no
 # supporting measurement and does not hold up against one).
 USER_AGENT = (
-    "genai_incidents/2.9.0 (+https://github.com/emmanuelgjr; "
+    "genai_incidents/2.10.0 (+https://github.com/emmanuelgjr; "
     "contact: emmanuelgjr@gmail.com)"
 )
 
