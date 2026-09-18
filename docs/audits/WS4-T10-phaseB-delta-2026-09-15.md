@@ -144,11 +144,11 @@ the gate's measurement report.
 | `INC-00861` | 32 | 31 | holds | plausibly correct, safe under Option 1 |
 | `INC-00134` | 24 | 22 | holds | plausibly correct, safe under Option 1 |
 | `INC-07736` | 20 | 17 | holds | **[ATTEMPT 3 CORRECTION, dated 2026-09-15 — was wrongly "safe under Option 1"]** split itself plausibly correct (Korean chatbot Luda vs Naver algorithm manipulation vs an EasyMile shuttle injury vs unrelated surveillance/facial-recognition stories — all distinct); **but has an INBOUND deprecation** (`INC-08133`, "AI Robots Cause Harm...China", `reason: merged`, dated 2026-06-28) whose own recovered content now lands on a fresh id (`INC-14850`), not `INC-07736` — see the inbound-deprecations table below. Own-title continuity holding is NOT sufficient; **needs a resplit record for INC-08133**, same as a continuity-breaking row would |
-| `INC-02671` | 18 | 2 | holds | plausibly correct (Grok NCII vs an unrelated robotic-lawnmower/hedgehog story), safe under Option 1 (no inbound deprecations found) |
-| `INC-00754` | 14 | 11 | **BREAKS** | split itself plausibly correct (FSU shooting vs Jason Momoa deepfake romance scam, clearly unrelated); **ID-continuity regression** — also has an inbound deprecation (`INC-03128`, 9-way landing) needing its own resplit record |
+| `INC-02671` | 18 | 2 | holds | plausibly correct (Grok NCII vs an unrelated robotic-lawnmower/hedgehog story), safe under Option 1. **[CORRECTION, dated 2026-09-18, restored 2026-09-18 per agreement 4 — attempt 3 edited this sentence in place with no marker, appending the clause below without a trace of the change; this is the original sentence, restored verbatim, with that addendum re-added as its own marked note]** No inbound deprecations found for this id. |
+| `INC-00754` | 14 | 11 | **BREAKS** | split itself plausibly correct (FSU shooting vs Jason Momoa deepfake romance scam, clearly unrelated); **ID-continuity regression**. **[CORRECTION, dated 2026-09-18, restored 2026-09-18 per agreement 4 — attempt 3 edited this sentence in place with no marker, appending the clause below without a trace of the change; this is the original sentence, restored verbatim, with that addendum re-added as its own marked note]** Also has an inbound deprecation (`INC-03128`, 9-way landing) needing its own resplit record. |
 | `INC-01897` | 14 | 8 | **BREAKS** | split itself plausibly correct (distinct WordPress plugin CVEs); **ID-continuity regression** |
-| `INC-05013` | 14 | 11 | holds | plausibly correct (TruDi navigation system keeps its identity; sheds the AIID-1575/Eightfold-AI row that was masking a second AIID/OECD content disagreement — see `tests/test_e21_partA_inc00437_provenance.py`), safe under Option 1 (no inbound deprecations found) |
-| `INC-00311` | 12 | 12 | **BREAKS** | split itself plausibly correct (12 genuinely distinct stories); **ID-continuity regression** — also has an inbound deprecation (`INC-00497`, 8-way landing) needing its own resplit record |
+| `INC-05013` | 14 | 11 | holds | plausibly correct (TruDi navigation system keeps its identity; sheds the AIID-1575/Eightfold-AI row that was masking a second AIID/OECD content disagreement — see `tests/test_e21_partA_inc00437_provenance.py`), safe under Option 1. **[CORRECTION, dated 2026-09-18, restored 2026-09-18 per agreement 4 — attempt 3 edited this sentence in place with no marker, appending the clause below without a trace of the change; this is the original sentence, restored verbatim, with that addendum re-added as its own marked note]** No inbound deprecations found for this id. |
+| `INC-00311` | 12 | 12 | **BREAKS** | split itself plausibly correct (12 genuinely distinct stories); **ID-continuity regression**. **[CORRECTION, dated 2026-09-18, restored 2026-09-18 per agreement 4 — attempt 3 edited this sentence in place with no marker, appending the clause below without a trace of the change; this is the original sentence, restored verbatim, with that addendum re-added as its own marked note]** Also has an inbound deprecation (`INC-00497`, 8-way landing) needing its own resplit record. |
 | `INC-01271` | 12 | 12 | holds | **[ATTEMPT 3 CORRECTION, dated 2026-09-15 — was wrongly "safe under Option 1"]** split itself plausibly correct (EU Grok deepfake investigation vs unrelated stories); **but has an INBOUND deprecation** (`INC-07771`, "Japan Considers Financial System Shutdowns", `reason: merged`, dated 2026-06-28) whose own recovered content now lands on a fresh id (`INC-14814`), not `INC-01271` — **needs a resplit record for INC-07771** |
 
 **`INC-08183`** is listed separately, not in this table, because it is not
@@ -184,6 +184,19 @@ Each one's ORIGINAL source_ids were recovered from git history (commit SHA
 located in the fixed build. **All 8 are `WRONG_AFTER_FIX`** — none still
 land, even partially and exclusively, on the id their `id_deprecations.json`
 record currently names:
+**[CORRECTION, dated 2026-09-18 — the preceding "none still land, even
+partially and exclusively" clause is FALSE for 4 of the 8: `INC-00497`,
+`INC-03128`, `INC-08139`, `INC-08185` DO still land partially on their
+recorded target, per this artifact's own `current_target_still_holds_any_sources:
+true` field for each. That is already visible in the `INC-00497`/`INC-03128`
+rows below ("only 1 still on `INC-00311`" / "2 still on `INC-00754`") —
+the `INC-08139`/`INC-08185` rows are corrected below to match, since they
+wrongly claimed "none is `INC-00554`" when `INC-00554` itself holds 2 of
+each id's recovered sources. The `WRONG_AFTER_FIX` classification is NOT
+overturned by this correction — in all 8 cases the bulk of the retired
+id's recovered sources moved away from the recorded target, so each
+record is still a wrong REDIRECT. What is false is only the stronger
+claim that none of the 8 land there at all.]**
 
 | retired id | recovered title | recorded redirect (chain) | recovered sources | lands on (fixed build) | classification |
 |---|---|---|---|---|---|
@@ -193,8 +206,8 @@ record currently names:
 | `INC-08146` | SWM.AI and Lenovo Collaborate... | → `INC-08139` → `INC-00554` | 1 | `INC-14853` (1) | WRONG_AFTER_FIX |
 | `INC-00497` | Greek Tax Authority Plans AI System... | → `INC-00311` | 8 | 8 different rows, 1 each (only 1 still on `INC-00311`) | WRONG_AFTER_FIX |
 | `INC-03128` | Purportedly AI-Generated Jason Momoa Deepfake... | → `INC-00754` | 10 | 9 different rows (2 still on `INC-00754`, 1 each elsewhere) | WRONG_AFTER_FIX |
-| `INC-08139` | China Deploys Armed AI 'Wolf Robots'... | → `INC-00554` | 92 | 90 different rows, 1 each — **none is `INC-00554`** | WRONG_AFTER_FIX |
-| `INC-08185` | China Deploys Armed AI 'Wolf Robots'... (earlier snapshot) | → `INC-08139` → `INC-00554` | 65 | 63 different rows, 1 each — **none is `INC-00554`** | WRONG_AFTER_FIX |
+| `INC-08139` | China Deploys Armed AI 'Wolf Robots'... | → `INC-00554` | 92 | **[CORRECTION, dated 2026-09-18 — was wrongly "none is `INC-00554`"]** 90 different rows total; 88 hold exactly 1 recovered source each, and 2 rows hold 2 each (`INC-00554` itself, and `INC-14607`) — `INC-00554` DOES still hold 2 of the 92 recovered sources, just not exclusively | WRONG_AFTER_FIX |
+| `INC-08185` | China Deploys Armed AI 'Wolf Robots'... (earlier snapshot) | → `INC-08139` → `INC-00554` | 65 | **[CORRECTION, dated 2026-09-18 — was wrongly "none is `INC-00554`"]** 63 different rows total; 61 hold exactly 1 recovered source each, and 2 rows hold 2 each (`INC-00554` itself, and `INC-14607`) — `INC-00554` DOES still hold 2 of the 65 recovered sources, just not exclusively | WRONG_AFTER_FIX |
 
 `INC-08139` and `INC-08185` are earlier stages of the SAME rolling
 Korean-CMS megacluster that later became `INC-00554` — their own historical

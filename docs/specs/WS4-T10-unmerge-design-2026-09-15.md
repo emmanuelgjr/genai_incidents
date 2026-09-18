@@ -663,11 +663,16 @@ a real but SINGLE-POINT safety net — re-keying that one override without
 the guard removes the only thing currently standing between an ordinary
 rebuild and shipping §2.1/§2.2's swaps clean. Concretely, before the
 freeze can lift under D25(a):
-1. Apply 7.2's per-id decision to today's 47 split ids (4 retirements +
-   43 that keep their own id; the 349 figure is the total COUNT of
-   successor rows across all 47, not a count of ids needing no record —
-   **[Revision 3, advisory A6 correction, dated note]** the original
-   wording here conflated the two. Additionally apply §8.1/§8.2's 8
+1. Apply 7.2's per-id decision to today's 47 (4 retirements + 349 total
+   successor rows, 43 of them needing no deprecation record).
+   **[Revision 3, advisory A6 correction, dated 2026-09-15, restored
+   2026-09-18 per agreement 4 — the sentence above was edited in place
+   with no marker on attempt 3, destroying the original; this is that
+   original, restored verbatim]** The original wording conflates two
+   different counts: 349 is the total COUNT of successor rows across all
+   47 split ids, not a count of ids needing no deprecation record. Of the
+   47, 4 are retirements (needing a new record) and 43 keep their own id
+   (needing no record). Additionally apply §8.1/§8.2's 8
    inbound-deprecation resplit records, which stand independently of
    which of the 47 split ids they happen to redirect into.
 2. Re-key or fix the `CVE-2025-10875` override (§2.3b) as part of the same
@@ -724,13 +729,26 @@ chains) and is exactly 8:
 | `INC-08109` | `INC-01412` (holds) | 1 | 1 fresh id (`INC-14847`) |
 | `INC-08133` | `INC-07736` (holds) | 1 | 1 fresh id (`INC-14850`) |
 | `INC-08146` | `INC-08139`→`INC-00554` (breaks) | 1 | 1 fresh id (`INC-14853`) |
-| `INC-08185` | `INC-08139`→`INC-00554` (breaks) | 65 | 63 different rows |
-| `INC-08139` | `INC-00554` (breaks) | 92 | 90 different rows |
+| `INC-08185` | `INC-08139`→`INC-00554` (breaks) | 65 | 63 different rows (2 still on `INC-00554`) **[CORRECTION, dated 2026-09-18 — see below]** |
+| `INC-08139` | `INC-00554` (breaks) | 92 | 90 different rows (2 still on `INC-00554`) **[CORRECTION, dated 2026-09-18 — see below]** |
 | `INC-00497` | `INC-00311` (breaks) | 8 | 8 different rows (1 still on `INC-00311`) |
 | `INC-03128` | `INC-00754` (breaks) | 10 | 9 different rows (2 still on `INC-00754`) |
 
 **All 8 are `WRONG_AFTER_FIX`: none still land, even partially and
-exclusively, on the id their current record names.** Each retired id's
+exclusively, on the id their current record names.**
+**[CORRECTION, dated 2026-09-18 — the preceding sentence is FALSE for 4
+of the 8. `INC-00497`, `INC-03128`, `INC-08139`, `INC-08185` DO still
+land partially on their recorded target — this was already visible in
+this table (the "(1 still on `INC-00311`)" / "(2 still on `INC-00754`)"
+parentheticals on the two rows directly above, and now the same is added
+to the `INC-08139`/`INC-08185` rows above: `INC-00554` itself retains 2
+of `INC-08139`'s 92 recovered sources and 2 of `INC-08185`'s 65). The
+`WRONG_AFTER_FIX` classification is NOT overturned by this — in all 8
+cases the bulk of the retired id's recovered sources moved away from the
+recorded target, so each record is still a wrong REDIRECT. What is false
+is only the stronger claim that none of the 8 land there AT ALL; see
+`docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`'s matching correction
+for the full per-id detail.]** Each retired id's
 original source_ids were recovered from git history (`git show
 <sha>:data/incidents.json`, SHAs recorded in the artifact) — see
 `docs/audits/WS4-T10-phaseB-delta-2026-09-15.md`'s "Inbound deprecations"
@@ -745,6 +763,24 @@ earlier-retired ids that redirect into it are still correctly resolved —
 those are a different population, measured separately here, not a subset
 of "the 47."
 
+**Finding for the follow-up task, added 2026-09-18: this 8-record
+measurement is not the full exposure.** `data/id_deprecations.json` has
+**288** `reason: "merged"` records total; the 8 measured above are only
+the ones whose chain happens to resolve into one of the 47 split ids (or
+`INC-07738`). The other **280** `merged` records are, today, equally
+unverifiable by any guard — §8.3's guard design (superseded below) needed
+each retired id's original `source_ids` to check against, and that data
+is not persisted anywhere in the repo at deprecation time; recovering it
+for even the 8 measured here required manual git archaeology (the commit
+SHAs recorded in `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`).
+Confirmed independently: `python -c "import json; d=json.load(open('data/id_deprecations.json'));
+deps=d['deprecations']; print(len(deps), len([x for x in deps if
+x.get('reason')=='merged']))"` gives `1051 288` against the current
+committed file. The follow-up task's guard cannot cover the other 280
+until retired-ID `source_ids` are captured and persisted going forward
+— this is a scope boundary for that task, not a defect in this
+measurement.
+
 `INC-08139` and `INC-08185` are earlier snapshots of the SAME rolling
 Korean-CMS megacluster that later grew into `INC-00554` (their own
 historical source lists are near-total subsets of `INC-00554`'s eventual
@@ -753,6 +789,34 @@ resplit record from its own recovered sources, rather than trying to
 chain everything through `INC-00554`'s eventual split record.
 
 ### 8.2 The redirect model
+
+> **[2026-09-18 correction, red-reviewer re-verify on attempt 3 —
+> this ENTIRE section is SUPERSEDED, not refined; preserved verbatim
+> below for the record, per agreement 4.]** §8.2's central claim — that
+> the LATEST-dated record for a given `from` already wins today "with
+> ZERO `resolve_id` code change required" — is FALSE as demonstrated.
+> `scripts/merge_and_dedupe.py:1874-1897` builds `seen_from` as
+> `{d.get("from"): d for d in prev_deprec if d.get("from")}` — a dict
+> comprehension keyed on `from` that keeps whichever record for a given
+> `from` occurs LAST when iterating `prev_deprec` (the comment directly
+> above the line says "keep the earliest," which is also wrong) — and
+> then rewrites the whole file sorted by `(from, date)`. Demonstrated
+> directly: appending a `resplit` record for `INC-07771` and rebuilding
+> **deleted** the original 2026-06-28 `merged` record outright — 1,053
+> records became 1,052, an **invariant-9 violation** (never delete;
+> append-only). Two more of this section's supporting claims are also
+> false: the file is **not chronological** (57 date inversions found),
+> and precedence is **file order, not date** — appending A then B makes B
+> win, appending B then A makes A win, and same-date ties are broken by
+> last-in-file-order, not by any date comparison. §8.2's proposed record
+> type (`reason: "resplit"`) and the `resolve_id` list-valued-`into`
+> crash finding below both stand as findings; the "no code change
+> required" claim and the append-only-safe characterization of the
+> CURRENT behavior do not. **The actual remediation — a
+> `merge_and_dedupe.py` deprecation-persistence fix plus a schema
+> decision on the superseding-record identity key — is routed to a new,
+> separate task (pipeline-engineer + schema-architect, user call), not
+> implemented in this document.**
 
 **Precedent already exists for this exact shape of fix.** `docs/ID_POLICY.md`
 §1.4(a) documents a different-but-structurally-identical defect (9
@@ -847,6 +911,26 @@ mappings, is in `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`
   amendments are policy, not implementation).
 
 ### 8.3 Guard extension: deprecation integrity
+
+> **[2026-09-18 correction, red-reviewer re-verify on attempt 3 —
+> this ENTIRE section is SUPERSEDED, not refined; preserved verbatim
+> below for the record, per agreement 4.]** §8.3's guard cannot fire on
+> half the population it exists to catch: its test — "the entry's
+> CURRENT resolved target still holds at least one of the retired id's
+> recorded source_ids" — PASSES on `INC-00497`, `INC-03128`, `INC-08139`,
+> and `INC-08185` (§8.1's own correction above shows all 4 land partially
+> on their recorded target), which are exactly the megacluster cases this
+> guard most needs to catch, since they are wrong AS REDIRECTS despite
+> passing a bare non-empty-intersection test. Separately, and more
+> fundamentally, the guard's INPUT does not exist in the repo today:
+> retired ids' `source_ids` are not persisted anywhere at deprecation
+> time, so the "recorded/recoverable source_ids" the check needs are only
+> recoverable via manual git archaeology (exactly how this document's own
+> §8.1 measurement was done) — a check whose input requires manual git
+> archaeology cannot run in CI. **The working guard design — which needs
+> retired-ID `source_ids` captured and persisted at deprecation time
+> before it can exist at all — is routed to the same new, separate task
+> as §8.2.**
 
 §7.3's continuity guard (checks a common id's title/anchor against its
 prior build) does not and cannot catch §8.1's harm — none of the 8 retired
