@@ -254,7 +254,35 @@ Four jobs, and for each, the input that makes it fail (working agreement 6):
    always held — if that one ever fails, the published figure is wrong and
    the xfails would be misleading.
 
-Result on this branch: **24 passed, 4 xfailed**.
+Result on this branch: **24 passed, 4 xfailed**; full suite **381 passed, 4
+xfailed**.
+
+### 6.1 Proof that each gate fires
+
+A gate nobody has seen fail is a gate nobody should cite, so every check was
+broken deliberately and restored. Each row is a real run on this branch.
+
+| Input corrupted | Tests that failed |
+|---|---|
+| `"tier"` line deleted from `_slim_entry` | `test_min_json_carries_tier_for_every_row`, `test_min_json_tier_is_never_null`, `test_landmark_count_reproducible_from_min_json`, `test_site_core_bundle_carries_tier` |
+| `"tier"` removed from `CORE_FIELDS` | `test_tier_is_a_core_field_not_a_lazy_detail_shard` (+ the core-bundle carry test) |
+| `x_tier` removed from `export_stix.py` | `test_stix_sdo_carries_x_tier` |
+| `"tier": tier` removed from `query`'s filter dict | `test_package_query_filters_on_tier` |
+| `category == "real-world"` re-added to `_derive_tier` (the historical defect) | `test_derive_tier_matches_the_published_definition`, `test_category_real_world_is_not_a_landmark_criterion`, `test_fixture_spans_both_tiers` |
+| one character changed in the package's schema copy | `test_schema_copies_are_byte_identical` |
+| `genai-incidents:tier` tag removed from `export_misp.py` | `test_misp_feed_tags_tier` |
+| a new `scripts/*.py` added that reads `data/incidents.json` | `test_no_unregistered_distribution_producer` |
+
+Two of those deserve a note. The `_derive_tier` break also tripped
+**`test_fixture_spans_both_tiers`**, the guard-on-the-guard: re-adding the
+retired criterion collapsed the test corpus to a single tier, which is
+exactly the condition under which the carry assertions would stop being able
+to catch a hardcoded value. It fired without being asked to.
+
+And the self-rearming claim in §6(4) was verified rather than assumed — a
+throwaway `@pytest.mark.xfail(strict=True)` test whose body passes reports
+`[XPASS(strict)] … FAILED`, confirming that the first post-freeze rebuild
+turns the two committed-artifact xfails into failures that must be cleared.
 
 ---
 
