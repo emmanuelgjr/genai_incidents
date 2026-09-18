@@ -1599,25 +1599,56 @@ def _verify_split_authorization_marker(data: dict, path: Path) -> bool:
     return True
 
 
-def _load_split_authorization(path: Path) -> set[str]:
-    """Read the WS4-T19 pre-authorization list's `from` ids, gated on the
-    D28 authorization marker (`_verify_split_authorization_marker`).
-    Missing file, unparseable JSON, or a marker that fails verification
-    all mean "nothing is authorized" (the safe default: a guard that
-    treats a missing/corrupt/unmarked allowlist as authorizing everything
-    is not a guard) -- returns an empty set, not an exception, so a build
-    with zero detected splits (today's normal case, pre-WS4-T10-merge)
-    never even looks at this file's presence."""
+def _load_verified_split_authorization_data(path: Path) -> dict | None:
+    """Parse `path` and verify its D28 marker (`_verify_split_authorization_marker`).
+    Returns the parsed dict only if the file exists, parses, AND the
+    marker verifies; returns None on every other outcome (fail closed).
+    Both `_load_split_authorization` (the guard's input) and
+    `_load_split_retirements` (the WS4-T21/D28 retirement-execution
+    step's input) share this single verification path, so a marker
+    failure blocks BOTH consumers identically -- there is no route to
+    "guard passes but retirement executes anyway" or vice versa."""
     if not path.exists():
-        return set()
+        return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
-        return set()
+        return None
     if not _verify_split_authorization_marker(data, path):
+        return None
+    return data
+
+
+def _load_split_authorization(path: Path) -> set[str]:
+    """Read the WS4-T19 pre-authorization list's `from` ids, gated on the
+    D28 authorization marker. Missing file, unparseable JSON, or a marker
+    that fails verification all mean "nothing is authorized" (the safe
+    default: a guard that treats a missing/corrupt/unmarked allowlist as
+    authorizing everything is not a guard) -- returns an empty set, not
+    an exception, so a build with zero detected splits (today's normal
+    case, pre-WS4-T10-merge) never even looks at this file's presence."""
+    data = _load_verified_split_authorization_data(path)
+    if data is None:
         return set()
     return {
         e.get("from") for e in data.get("entries", []) if e.get("from")
+    }
+
+
+def _load_split_retirements(path: Path) -> set[str]:
+    """`from` ids whose D28-authorized decision is "retire" -- WS4-T21:
+    docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2 requires that
+    "no survivor keeps the old id" for these; see the retirement-
+    execution step in `main()`. Same fail-closed verification as
+    `_load_split_authorization` (returns empty set on any marker
+    failure) -- a retirement never executes on an unverified list any
+    more than a split is ever authorized on one."""
+    data = _load_verified_split_authorization_data(path)
+    if data is None:
+        return set()
+    return {
+        e.get("from") for e in data.get("entries", [])
+        if e.get("from") and e.get("decision") == "retire"
     }
 
 
@@ -1991,6 +2022,65 @@ def main():
         covered_keys.update(keys)
         used_ids.add(pid)
         carried += 1
+
+    # 6e-bis) WS4-T21 / D28: execute the authorized RETIREMENT decisions.
+    #     docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2 ("Where
+    #     continuity breaks") is explicit: for these ids the ordinary
+    #     smallest-previous-id tie-break in step 6 above picks CONFIRMED
+    #     WRONG content (measured, not hypothetical -- see the same doc's
+    #     #2.1/#2.2). "No survivor keeps the old id for these four": mint a
+    #     fresh id for whichever row the tie-break gave the old number to,
+    #     and write a NEW `reason: "split"` deprecation record for the old
+    #     id with an ARRAY-valued `into` naming every one of its actual
+    #     successors (including the reassigned row) -- the shape
+    #     `scripts/validate.py`'s chain-resolving guard (WS4-T15) already
+    #     supports. Deliberately does NOT touch the 8 pre-existing inbound
+    #     `resplit_redirect` corrections the same authorized list flags:
+    #     this step's own successor list is fresh from THIS build (not the
+    #     authorized list's precomputed `new_targets`, which were computed
+    #     before any retirement executed and so, for 3 of the 8, still
+    #     name the retiring id itself as a target -- stale the moment this
+    #     step runs). Those 8 existing `from`/`into` records are left
+    #     untouched and chain-resolve automatically through the new
+    #     records this step writes, via the same generic multi-hop
+    #     resolver (`_resolve_live_targets` in validate.py) -- verified,
+    #     not assumed; see the WS4-T21 board report.
+    retire_ids = _load_split_retirements(SPLIT_AUTHORIZATION_PATH)
+    if retire_ids:
+        retired = 0
+        for old_id in sorted(retire_ids):
+            holder = next((e for e in surviving if e.get("id") == old_id), None)
+            if holder is None:
+                # Nothing in this build mechanically inherited the old id
+                # -- nothing to retire.
+                continue
+            # Every row in `surviving` whose id-continuity key set (its
+            # OWN historical member keys, via prev_id_by_key) traces back
+            # to old_id, recomputed fresh -- not read from the authorized
+            # list's precomputed (and, post-retirement, stale) figures.
+            successors: set[str] = set()
+            for e in surviving:
+                eid = e.get("id")
+                if not eid:
+                    continue
+                keys = list(e.get("source_ids") or []) + list(e.get("cve_ids") or [])
+                if any(prev_id_by_key.get(k) == old_id for k in keys):
+                    successors.add(eid)
+            new_id = slug_to_id(next_id)
+            used_ids.add(new_id)
+            next_id += 1
+            holder["id"] = new_id
+            successors.discard(old_id)
+            successors.add(new_id)
+            deprecations_new.append({
+                "from": old_id, "into": sorted(successors), "reason": "split",
+                "date": today_str, **_retired_fields(old_id),
+            })
+            retired += 1
+        if retired:
+            print(f"[retire] executed {retired} WS4-T19/D28-authorized "
+                  f"retirement(s): old id(s) fully deprecated, no survivor "
+                  f"keeps them (docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2)")
 
     # 6f) Stable out-of-scope removal deprecations. Derived only from the
     #     PREVIOUSLY-PUBLISHED data and the final live id set — no dependence on

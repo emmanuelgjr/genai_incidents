@@ -2174,3 +2174,63 @@ def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, 
     assert old_id_2 in detail, "the unauthorized second split must be named"
     assert old_id_3 in detail, "the unauthorized third split must be named"
     assert old_id_1 not in detail, "the authorized first split must NOT be listed as unauthorized"
+
+
+# --- WS4-T21 / D28: retirement execution (decision: "retire") --------------
+# docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2: "no survivor keeps
+# the old id" for an authorized retirement -- the ordinary id-continuity
+# tie-break (smallest previous id wins) must be overridden, the old id
+# minted a fresh replacement, and a NEW `reason: "split"` deprecation
+# record written with an array-valued `into` naming every successor.
+
+def test_retirement_reassigns_the_old_id_and_writes_a_split_record(tmp_path, monkeypatch):
+    """Name the input that makes it fail (agreement 6): an authorized
+    "retire" decision whose old id the ordinary tie-break would otherwise
+    keep. Must end with the old id NOT live, a fresh id holding what the
+    tie-break originally gave the old id, and a `reason: "split"` record
+    naming both successors."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-retire", "decision": "retire"}],
+    )
+
+    m.main()  # must NOT raise -- retirement is authorized, not unauthorized
+
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    live_ids = {e["id"] for e in out["incidents"]}
+    assert old_id not in live_ids, "no survivor may keep a retired id"
+    assert out["incident_count"] == 2, "both successors still land, just under fresh ids"
+
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    rec = next(d for d in deps if d["from"] == old_id)
+    assert rec["reason"] == "split"
+    assert isinstance(rec["into"], list) and len(rec["into"]) == 2
+    assert old_id not in rec["into"], "the retired id must not name itself as its own successor"
+    assert set(rec["into"]) <= live_ids, "every named successor must actually be live"
+
+
+def test_keep_id_decision_does_not_trigger_retirement(tmp_path, monkeypatch):
+    """Control: the SAME induced split, authorized as "keep_id" (the
+    default/ordinary decision), must NOT retire the old id -- the old id
+    stays live under the ordinary tie-break, exactly as the five
+    pre-existing split-guard tests already assume."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+    )
+
+    m.main()  # must NOT raise
+
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    live_ids = {e["id"] for e in out["incidents"]}
+    assert old_id in live_ids, "a keep_id decision must leave the old id live"
+
+    dep_path = data / "id_deprecations.json"
+    deps = (
+        _json.loads(dep_path.read_text(encoding="utf-8"))["deprecations"]
+        if dep_path.exists() else []
+    )
+    assert not any(d["from"] == old_id and d["reason"] == "split" for d in deps), \
+        "a keep_id decision must not write a retirement 'split' record"
