@@ -136,6 +136,34 @@ not a v2.9.0 quirk:** any future notes file written to live under `docs/` will
 break the same two ways when reused verbatim as a release body, so the
 VERSIONING.md step should say which link forms survive the move.
 
+## 🎯 USER GOAL set 2026-09-17 — finish the dispatch queue · refresh the webapp · cut a release
+
+**Standing directive from the user:** *"finish task dispatch and also work to make the webapp more appealing and updated, once all is done cut a release."* Running under it: WS6-T5 and WS4-T13 dispatched in parallel worktrees (below); the release is the endpoint and **collides with the open E24 version ruling** — see that entry. The foreman will not pick the version number unilaterally; it goes to the user as a single narrow question at the point of cutting, per E24's own terms.
+
+**Parallel execution, foreman decision:** two specialists in isolated worktrees on **disjoint files** — WS6-T5 owns `docs/*.{html,css,js}` and `pages.yml`; WS4-T13 owns `scripts/ingest_oecd_aim.py`, its tests and `auto-refresh.yml`. Neither touches `data/`, `schema/` or `ingest/`. The main tree stays on the escalated `ws4/t10-normalize-url` branch, untouched. Precedent: the user's 2026-09-15 authorization for WS4-T11 to run parallel with WS4-T10 under AGENT_TEAM.md §7.
+
+- **WS6-T5 · Website: scale, accessibility, integrity** (P2, L) → distribution-engineer, branch `ws6/t5-website`. Plan criteria verbatim, **with one criterion deferred by foreman ruling: "per-corpus pages" depends on the WS1 corpus split, which is Phase-2 work that has not started — there is one corpus today, and inventing a split would be undeclared scope.** The brief requires the page to be built so per-corpus routing can be added later. The user's "more appealing" half is scoped as a real design pass (`frontend-design` skill) over a no-build static page, under invariant 6: every published count stays inside its `<!-- stats:… -->` marker pair, which `scripts/stats_docs_lib.py` rewrites.
+- **WS4-T13 · OECD crawl budget** (D25c) → pipeline-engineer, branch `ws4/t13-crawl-budget`. **Foreman scope ruling: the build-guard half of D25(c) is ALREADY IMPLEMENTED** in WS4-T10 Phase A (`75825299`, unmerged) and must **not** be rebuilt — the specialist is instead asked to read it, confirm it satisfies D25(c)'s clause, and report any merge conflict. Scope is the crawl budget only: skip numeric slugs (~1,852 of the 3,000-URL window per D25c), evidenced per-URL against the real population rather than assumed, with a measured — not estimated — headroom change against `timeout-minutes: 60`, and a contract test proven to fire.
+
+**Both briefs carry agreement 6 explicitly** (name the input that makes each check fail; prove it fires by corrupting the input) and the active invariants. Both are code/site-only: **no published data moves while D25(a)'s freeze holds.**
+
+## 🔍 FOREMAN VERIFICATION 2026-09-17 — "is the incident count stale at 13,060?" (user question) — **the count is CORRECT; the corpus is FROZEN; the metadata around it is NOT correct**
+
+**13,060 is accurate [R], by three independent reads:** `len(data/incidents.json["incidents"])` = 13,060; that file's own `incident_count` field = 13,060; `data/stats.json` = 13,060. README renders from `stats.json` through the invariant-6 markers, so no doc drift. **17,498 is a different unit** — OWASP code assignments across 11,556 entries, re-counted in the current file as exactly 17,498, not an entry count.
+
+**Why the count has not moved in 52 days (last data-adding refresh `fe732a14`, 2026-07-27) — two unrelated causes, back to back:**
+1. **2026-07-26 → 2026-09-13, a silent CI failure.** `auto-refresh`'s Persist step shallow-cloned with `--depth 1`, so `origin/refresh-state` never existed and the checkout died exit 128 on every run, skipping rebuild, tests and the refresh PR. **8 weekly refreshes produced nothing, invisibly.** Fixed 2026-09-14 (`05f536ff`).
+2. **2026-09-14 → now, a deliberate freeze.** The first working refresh tripped the E21 tripwire; the audit found the URL over-merge; D25(a) froze OECD refresh merges until WS4-T10's fix lands and every new `merged` deprecation is reviewed. **The count is frozen by policy, and WS4-T10 is the thaw condition** — which is currently escalated at BOUNCE #3.
+
+**NEW FINDING — freshness metadata did not move with the OWASP migration [R].** The 2026-08-17 migration (`19fa2986`) rewrote 17,498 code assignments across 11,556 entries, yet:
+- **no entry carries an `updated` value at or after 2026-08-01** — the corpus maximum is 2026-07-31;
+- **`generated` is still 2026-07-31**, although the build defines it as today-if-anything-changed (`scripts/merge_and_dedupe.py:1863`, `generated = today if any_change or not prev_generated else prev_generated`);
+- README therefore tells readers "as of the 2026-07-31 build" while the corpus last changed 2026-08-17.
+
+**This no-bump decision is not declared anywhere [R]:** `docs/audits/owasp-llm-2026-migration-delta-2026-08-17.md` discusses superseded releases (:190) but states no decision about `updated`, `generated`, or the version field. Contrast WS4-T12, where "no `updated` bump" is an explicit boarded decision. **Undeclared field-level non-delta under agreement 2**, and an agreement-6(d) shape: every aggregate check passed precisely because no total moved.
+
+**Sharper form, and it is consumer-facing:** `data/incidents.json` self-identifies as `version: 2.9.0` while carrying 2026 codes, and CHANGELOG states that data "published up to and including v2.9.0 … carries 2025 codes." **The file's own label contradicts its contents.** This is the practical edge of the open **E24** version ruling — recorded there, not duplicated as a new escalation. Routing: the `updated`/`generated` question belongs with the version cut; the delta doc's missing declaration is a docs-warden item for the sweep that accompanies the release.
+
 ## 🔧 WS4-T10 — query-string URL over-merge (P0, D25b) — opened 2026-09-15 — **⛔ BOUNCE #3 — ESCALATED TO USER (protocol step 6; third bounce, past the two-bounce limit — NOT redispatched)**
 
 **Attempt 3** (pipeline-engineer), HEAD `be0d037f` (pushed) — gated 2026-09-17:
