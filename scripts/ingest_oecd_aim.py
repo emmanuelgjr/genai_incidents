@@ -121,6 +121,70 @@ def load_sitemap() -> list[str]:
     return urls
 
 
+# WS4-T13: OECD AIM's sitemap carries TWO incident-ID schemes. The modern one
+# is always `YYYY-MM-DD-<hex>` (e.g. `2026-09-10-1de6`) -- it can never
+# fullmatch this pattern because of its hyphens. The legacy one is OECD's own
+# original small-integer sequential numbering (e.g. `256`, `321`) and now
+# resurfaces inside the newest-N crawl window because the two schemes are
+# sorted together in the sitemap (see docs/audits/E21-tripwire-refresh-
+# 2026-09-14.md, "Finding 5", 2026-09-14 live measurement: 1852 numeric-slug
+# / 1148 date-hash-slug / 0 other, in the newest 3000). Every legacy-slug page
+# fetched so far has failed `_extract_state_detail()`'s body-shape check
+# (`REASON_NO_BODY_SHAPE`, 0 exceptions observed) because its `ng-state` blob
+# uses a different top-level key shape (hashed keys with `b/h/s/st/u/rt`
+# sub-fields) -- fetching it always spends one rate-limited request (see
+# `ingest/common.py::DEFAULT_MIN_INTERVAL`, 1.0s/host, shared across ALL
+# worker threads) for zero possible yield. Skipping it BEFORE the fetch
+# (not after, the way the REASON_NO_BODY_SHAPE bucket already silently
+# absorbed it) turns wasted requests into headroom against the workflow's
+# `timeout-minutes: 60` (`.github/workflows/auto-refresh.yml`) and, in the
+# same direction, reduces load on a third-party host (Invariant 5 conduct).
+#
+# The rule is deliberately narrow -- match ONLY a slug that is entirely
+# digits, never a prefix/substring test -- because that is the one shape a
+# genuine modern-scheme slug can never take (it always contains a hyphen).
+# A slug that mixes digits with anything else (a hex suffix, a stray letter)
+# is treated as unknown and IS fetched: this rule skips only what is
+# unambiguous, never guesses. See `is_numeric_slug()`'s docstring for the
+# boundary cases this was checked against (leading zeros, a bare year).
+_NUMERIC_SLUG_RE = re.compile(r"^\d+$")
+
+
+def is_numeric_slug(url: str) -> bool:
+    """True iff `url`'s final path segment is composed ENTIRELY of digits --
+    OECD AIM's legacy incident-ID scheme. Examples observed live in the
+    sitemap (docs/audits/E21-tripwire-refresh-2026-09-14.md): `/en/
+    incidents/256`, `/321`, `/281`, `/342`, `/359`.
+
+    Boundary cases, checked directly (tests/test_ingest_oecd_aim.py::
+    test_is_numeric_slug_classifies_legacy_vs_modern):
+      - Leading zeros (`007`): still all-digits -> True (still legacy-shaped;
+        OECD's own sequential counter, not reinterpreted).
+      - A bare slug that happens to look like a year (`2026`): all-digits ->
+        True. No such URL shape exists in OECD AIM's sitemap today (the
+        2026-09-14 audit found `other=0` in the crawled window -- only the
+        two schemes above appear), and the modern scheme NEVER emits a bare
+        year with no hyphen/hex suffix, so this cannot misclassify a real
+        modern-scheme URL. Flagged here, not silently assumed away, in case
+        OECD ever introduces a URL shape this project hasn't seen.
+      - Numeric-with-suffix (`256a`, `256-x`): NOT a full match -> False.
+        Treated as an unknown shape and fetched normally -- the rule never
+        skips on a partial/ambiguous match.
+    """
+    slug = url.rstrip("/").split("/")[-1]
+    return bool(_NUMERIC_SLUG_RE.fullmatch(slug))
+
+
+def partition_fetchable(urls: list[str]) -> tuple[list[str], list[str]]:
+    """Split `urls` into `(fetchable, skipped_numeric_slug)`, preserving
+    input order in both. Pure / no network call -- so it's testable directly
+    (`tests/test_ingest_oecd_aim.py::test_partition_fetchable_skips_only_
+    numeric_slugs`), independent of `main()`'s network-shaped flow."""
+    fetchable = [u for u in urls if not is_numeric_slug(u)]
+    skipped = [u for u in urls if is_numeric_slug(u)]
+    return fetchable, skipped
+
+
 def fetch_page(url: str) -> str | None:
     """Fetch and decode one AIM incident page.
 
@@ -509,6 +573,19 @@ def main():
         urls = urls[:limit]
         print(f"[aim] capped to {limit} URLs (set OECD_AIM_LIMIT=0 for all)")
 
+    # WS4-T13: drop legacy numeric-slug URLs from the fetch set BEFORE any
+    # request is made -- see is_numeric_slug()'s docstring above for why this
+    # is safe (the modern scheme can never fullmatch the all-digits pattern)
+    # and docs/audits/E21-tripwire-refresh-2026-09-14.md for the population
+    # this was measured against. `urls` (the full window, including the
+    # skipped ones) is retained for the printed denominator below.
+    fetch_urls, skipped_numeric = partition_fetchable(urls)
+    print(
+        f"[aim] skipping {len(skipped_numeric)}/{len(urls)} legacy numeric-slug "
+        "URLs (OECD AIM's pre-date-hash ID scheme; ng-state shape never "
+        f"parses -- see REASON_NO_BODY_SHAPE); fetching {len(fetch_urls)}"
+    )
+
     t0 = time.time()
     # (reason, body) per url -- NOT the decoded page text. fetch_and_extract()
     # fetches AND extracts inside the same worker call so the full page text
@@ -516,7 +593,7 @@ def main():
     # fetch_and_extract()'s docstrings (WS4-T11 BOUNCE #1 defect 4).
     results: dict[str, tuple[str, dict | None]] = {}
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
-        futures = {ex.submit(fetch_and_extract, u): u for u in urls}
+        futures = {ex.submit(fetch_and_extract, u): u for u in fetch_urls}
         for i, fut in enumerate(as_completed(futures), 1):
             u = futures[fut]
             # `results` is keyed by URL, so a duplicate sitemap URL (load_sitemap()
@@ -534,17 +611,19 @@ def main():
             if i % 200 == 0:
                 elapsed = time.time() - t0
                 rate = i / max(elapsed, 0.001)
-                print(f"  fetched {i}/{len(urls)} ({rate:.1f} pages/s)")
+                print(f"  fetched {i}/{len(fetch_urls)} ({rate:.1f} pages/s)")
 
     counts = _tally_reasons(results)
-    # Derived from `results` (deduped by URL), NOT `len(urls)`: `len(urls)` counts
-    # a duplicate sitemap URL once per occurrence, which would overcount `fetched`
-    # by exactly the duplicate count even though only one result was ever kept per
-    # URL. `len(urls)` remains in the printed denominator below as "how many
-    # sitemap entries were attempted", which legitimately can exceed the unique
-    # fetch count when duplicates are present.
+    # Derived from `results` (deduped by URL), NOT `len(fetch_urls)`:
+    # `len(fetch_urls)` counts a duplicate sitemap URL once per occurrence,
+    # which would overcount `fetched` by exactly the duplicate count even
+    # though only one result was ever kept per URL. `len(fetch_urls)` remains
+    # in the printed denominator below as "how many URLs were actually
+    # attempted" (i.e. the window minus the numeric-slug skips above), which
+    # legitimately can exceed the unique fetch count when duplicates are
+    # present.
     fetched = len(results) - counts.get(REASON_FETCH_FAILED, 0)
-    print(f"[aim] fetched {fetched}/{len(urls)} pages in {time.time()-t0:.0f}s")
+    print(f"[aim] fetched {fetched}/{len(fetch_urls)} pages in {time.time()-t0:.0f}s")
 
     out = []
     for url, (reason, body) in results.items():

@@ -615,6 +615,80 @@ def test_tally_reasons_counts_each_bucket_independently():
     assert sum(counts.values()) == len(results)
 
 
+# --- WS4-T13: OECD AIM crawl budget -- skip legacy numeric-slug URLs -------
+# The parser contract this task asks for: is_numeric_slug()/partition_
+# fetchable() must skip ONLY the legacy all-digits slug shape, never the
+# modern YYYY-MM-DD-<hex> shape, and never guess on an ambiguous partial
+# match. See scripts/ingest_oecd_aim.py's _NUMERIC_SLUG_RE comment block for
+# the population this was measured against
+# (docs/audits/E21-tripwire-refresh-2026-09-14.md).
+
+
+def test_is_numeric_slug_classifies_legacy_vs_modern():
+    # Legacy scheme: real examples observed live in the OECD AIM sitemap
+    # (E21 audit, 2026-09-14): /en/incidents/256, /321, /281, /342, /359.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256") is True
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/321") is True
+    # Leading zeros: still all-digits -- still the legacy shape.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/007") is True
+    # Trailing slash tolerated (matches load_sitemap()'s own URL shape).
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256/") is True
+    # Modern scheme: NEVER purely numeric (always carries hyphens) -- real
+    # example: /en/incidents/2026-09-10-1de6.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026-09-10-1de6") is False
+    # A bare slug that merely LOOKS like a year: all-digits -> treated as
+    # legacy/skippable. No such shape exists in OECD AIM's sitemap today
+    # (the E21 audit found `other=0` in the crawled window: only the legacy
+    # all-digits and modern date-hash shapes appear) -- documented here as a
+    # named boundary rather than silently assumed away.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026") is True
+    # Numeric WITH a non-digit suffix: NOT a full match -> conservative
+    # default is to fetch it (unknown shape), never guess-skip.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256a") is False
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256-x") is False
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/x256") is False
+
+
+def test_is_numeric_slug_rule_fires_when_corrupted():
+    """Names the input that must make this rule fail if it regresses: a
+    known legacy-scheme URL. (Manually verified per working agreement 6 by
+    temporarily replacing _NUMERIC_SLUG_RE with a pattern that never matches
+    and re-running this suite -- see the WS4-T13 report for the exact
+    command/output; not re-enacted here to avoid mutating module state in a
+    shared test run.) This test simply pins the passing baseline so a
+    regression is caught by CI without needing to hand-corrupt the source."""
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256") is True
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026-09-10-1de6") is False
+
+
+def test_partition_fetchable_skips_only_numeric_slugs():
+    urls = [
+        "https://oecd.ai/en/incidents/256",
+        "https://oecd.ai/en/incidents/2026-09-10-1de6",
+        "https://oecd.ai/en/incidents/321",
+        "https://oecd.ai/en/incidents/2026-09-07-e398",
+        "https://oecd.ai/en/incidents/256a",  # ambiguous -- must NOT be skipped
+    ]
+    fetchable, skipped = o.partition_fetchable(urls)
+    assert fetchable == [
+        "https://oecd.ai/en/incidents/2026-09-10-1de6",
+        "https://oecd.ai/en/incidents/2026-09-07-e398",
+        "https://oecd.ai/en/incidents/256a",
+    ]
+    assert skipped == [
+        "https://oecd.ai/en/incidents/256",
+        "https://oecd.ai/en/incidents/321",
+    ]
+    # Every input URL lands in exactly one bucket.
+    assert len(fetchable) + len(skipped) == len(urls)
+
+
+def test_partition_fetchable_empty_and_all_numeric():
+    assert o.partition_fetchable([]) == ([], [])
+    all_numeric = ["https://oecd.ai/en/incidents/1", "https://oecd.ai/en/incidents/2"]
+    assert o.partition_fetchable(all_numeric) == ([], all_numeric)
+
+
 # --- WS4-T11 re-gate BOUNCE #2: offline end-to-end main() ------------------
 #
 # The gap BOUNCE #2 found: every test above calls fetch_page()+extract_state()
@@ -653,18 +727,32 @@ def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
 
     url_normal = "https://oecd.ai/en/incidents/2026-01-10-norm"
     url_big = "https://oecd.ai/en/incidents/2026-01-11-big"
-    url_shell = "https://oecd.ai/en/incidents/447"
+    # Non-numeric on purpose (WS4-T13): still exercises REASON_NO_BODY_SHAPE
+    # for the (rare, non-legacy-scheme) case where a modern-shaped slug
+    # nonetheless carries the shell/hashed-key body shape.
+    url_shell = "https://oecd.ai/en/incidents/2026-01-12-shel"
     url_noscript = "https://oecd.ai/en/incidents/2026-01-13-nosc"
     url_badjson = "https://oecd.ai/en/incidents/2026-01-14-badj"
     url_fetchfail = "https://oecd.ai/en/incidents/2026-01-15-fail"
     url_empty = "https://oecd.ai/en/incidents/2026-01-16-empty"
     url_ok_not_relevant = "https://oecd.ai/en/incidents/2026-01-17-filt"
+    # WS4-T13: a legacy numeric-slug URL. Deliberately NOT cached and NOT
+    # handled by the fake fetch_once below -- if partition_fetchable() ever
+    # stops skipping it, robust_fetch() falls through to the cold branch,
+    # _fake_fetch_once()'s catch-all fires ("unexpected live fetch attempted"),
+    # and this test fails loudly instead of silently passing. This is the
+    # "prove it fires" check for the skip rule at the main()-integration level
+    # (see also test_is_numeric_slug_classifies_legacy_vs_modern and
+    # test_partition_fetchable_skips_only_numeric_slugs for the unit-level
+    # contract tests).
+    url_legacy_numeric = "https://oecd.ai/en/incidents/447"
 
     # url_normal appears TWICE -- load_sitemap() does not dedupe; proves
     # advisory 2 (fetched must come from `results`, not `len(urls)`).
     urls = [
         url_normal, url_big, url_shell, url_noscript, url_badjson,
         url_fetchfail, url_empty, url_ok_not_relevant, url_normal,
+        url_legacy_numeric,
     ]
     monkeypatch.setattr(o, "load_sitemap", lambda: list(urls))
 
@@ -709,7 +797,7 @@ def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
     ok_not_relevant_page = _make_page(script_offset_bytes=700, tail_bytes=700, body=ok_not_relevant_body)
     assert len(ok_not_relevant_page) >= 1000
 
-    shell_shape = {"AppStateKey_0": {"h": "somehash", "s": "somestatus", "st": 1, "u": "/447", "rt": True}}
+    shell_shape = {"AppStateKey_0": {"h": "somehash", "s": "somestatus", "st": 1, "u": "/2026-01-12-shel", "rt": True}}
     shell_page = (
         f'<script id="ng-state">{json.dumps(shell_shape)}</script>'.encode("utf-8")
         + b"<!-- padding --> " * 100
@@ -772,10 +860,23 @@ def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
     #   json_decode_error: badjson                       = 1
     #   no_incident_body_shape: shell                    = 1
     #   fetch_failed: fetchfail                           = 1
-    # fetched = 8 unique - 1 fetch_failed = 7 (NOT 9 = len(urls), which
-    # double-counts the duplicate url_normal -- this is what kills the
-    # `fetched = len(urls)` mutant on THIS fixture, independent of any
-    # fetch failure).
+    # WS4-T13: `urls` now has 10 entries (9 original + url_legacy_numeric).
+    # partition_fetchable() skips exactly url_legacy_numeric (1/10), leaving
+    # a 9-entry fetch_urls list (the duplicate url_normal still counted twice
+    # here -- partition happens before dedup). If the skip rule regresses
+    # (e.g. stops matching, or over-matches url_shell/url_normal/etc.), this
+    # exact line changes and the test fails.
+    assert (
+        "[aim] skipping 1/10 legacy numeric-slug URLs "
+        "(OECD AIM's pre-date-hash ID scheme; ng-state shape never parses "
+        "-- see REASON_NO_BODY_SHAPE); fetching 9"
+    ) in out_text
+    # fetched = 8 unique fetchable - 1 fetch_failed = 7 (NOT 9 = len(fetch_urls),
+    # which double-counts the duplicate url_normal -- this is what kills the
+    # `fetched = len(fetch_urls)` mutant on THIS fixture, independent of any
+    # fetch failure). url_legacy_numeric contributes to neither figure: it
+    # was removed from fetch_urls before the loop ever ran (see the
+    # AssertionError-on-live-fetch trap on its own definition above).
     # ok(3) + unparseable(2+1+1=4) == fetched(7).
     # "2 security-relevant kept" (NOT 3): ok_not_relevant_body parsed fine
     # (REASON_OK) but was filtered by normalize_body() -- this is what kills
