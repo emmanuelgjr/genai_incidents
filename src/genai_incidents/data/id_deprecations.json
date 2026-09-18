@@ -6640,6 +6640,38 @@
         "CVE-2026-6711",
         "CVE-2026-6712"
       ]
+    },
+    {
+      "from": "INC-07771",
+      "into": [
+        "INC-14814"
+      ],
+      "reason": "resplit",
+      "date": "2026-09-18"
+    },
+    {
+      "from": "INC-08109",
+      "into": [
+        "INC-14847"
+      ],
+      "reason": "resplit",
+      "date": "2026-09-18"
+    },
+    {
+      "from": "INC-08133",
+      "into": [
+        "INC-14850"
+      ],
+      "reason": "resplit",
+      "date": "2026-09-18"
+    },
+    {
+      "from": "INC-08146",
+      "into": [
+        "INC-14853"
+      ],
+      "reason": "resplit",
+      "date": "2026-09-18"
     }
   ]
 }
