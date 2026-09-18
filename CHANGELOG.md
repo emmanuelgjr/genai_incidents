@@ -5,7 +5,7 @@ The dataset uses [SemVer](https://semver.org/) — major bumps for breaking
 schema or ID changes, minor bumps for additive schema fields or large
 ingest expansions, patch bumps for routine refreshes and bug fixes.
 
-## [Unreleased]
+## [2.10.0] — 2026-09-18
 
 ### Changed (breaking for consumers of `owasp_llm`)
 - **Migrated every `owasp_llm` code from the OWASP Top 10 for LLM Applications

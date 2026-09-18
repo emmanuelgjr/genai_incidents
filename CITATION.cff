@@ -41,8 +41,8 @@ abstract: >-
   computed at export time. Aggregated from AIID, OECD AIM, AIAAIC, MITRE
   ATLAS, AVID, MIT FutureTech AI Risk Navigator, NVD/GHSA/OSV, garak,
   promptfoo, and dozens of researcher blogs and vendor threat reports.
-version: "2.9.0"
-date-released: "2026-07-31"
+version: "2.10.0"
+date-released: "2026-09-18"
 preferred-citation:
   type: dataset
   title: "GenAI & Agentic AI Security Incidents"
@@ -51,6 +51,6 @@ preferred-citation:
       given-names: "Emmanuel"
       alias: "emmanuelgjr"
   year: 2026
-  version: "2.9.0"
+  version: "2.10.0"
   doi: 10.5281/zenodo.20248675
   url: "https://doi.org/10.5281/zenodo.20248675"

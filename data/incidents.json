@@ -1,5 +1,5 @@
 {
-  "version": "2.9.0",
+  "version": "2.10.0",
   "generated": "2026-07-31",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Agentic ASI Top 10, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
