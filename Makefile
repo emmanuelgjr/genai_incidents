@@ -1,4 +1,4 @@
-.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data a11y
+.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -55,6 +55,14 @@ docs-data:
 # everything served under docs/data/. Run `make docs-data` first.
 verify-docs-data:
 	python scripts/verify_data_integrity.py
+
+# CI gate (WS6-T5 design pass): fails if a static filter <select> in
+# docs/index.html (severity/corpus/quality) reads an incident field that is
+# absent from EVERY row in docs/data/incidents.core.json -- the "Tier
+# filter" defect class, where a control is offered but can never match
+# anything. Run `make docs-data` first.
+check-dead-filters: docs-data
+	python scripts/check_dead_filters.py
 
 # axe-core + Lighthouse accessibility gates + the 380px layout check
 # (WS6-T5). Requires `make docs-data`, Node, and `npm install` in

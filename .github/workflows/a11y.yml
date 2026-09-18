@@ -6,6 +6,8 @@ name: Site accessibility + integrity (WS6-T5)
 #   - Lighthouse accessibility score >= 90
 #   - the table renders with no page-level horizontal overflow at 380px
 #   - docs/data/SHA256SUMS matches the files it publishes checksums for
+#   - no static filter control reads a field absent from the served data
+#     (the "Tier filter" defect: a control offered that can never match)
 #
 # Builds docs/data/ the same way the Pages deploy does (mirror
 # data/incidents.min.json, then scripts/gen_docs_core_data.py +
@@ -20,6 +22,7 @@ on:
       - "data/incidents.min.json"
       - "scripts/gen_docs_core_data.py"
       - "scripts/gen_data_integrity.py"
+      - "scripts/check_dead_filters.py"
       - "tests/a11y/**"
       - ".github/workflows/a11y.yml"
   pull_request:
@@ -28,6 +31,7 @@ on:
       - "data/incidents.min.json"
       - "scripts/gen_docs_core_data.py"
       - "scripts/gen_data_integrity.py"
+      - "scripts/check_dead_filters.py"
       - "tests/a11y/**"
       - ".github/workflows/a11y.yml"
   workflow_dispatch:
@@ -60,6 +64,9 @@ jobs:
 
       - name: Verify the integrity manifest matches what was just built
         run: python scripts/verify_data_integrity.py
+
+      - name: No dead filter controls (field must exist in served data)
+        run: python scripts/check_dead_filters.py
 
       - name: Install a11y test tooling
         working-directory: tests/a11y

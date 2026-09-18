@@ -6,12 +6,21 @@ Why: measured against the unmodified page, the ENTIRE first render was
 gated on one 15 MB fetch of data/incidents.min.json -- table, charts, and
 stats all waited on it, on every device including a phone on a slow link.
 A field-level byte audit of that file (see the WS6-T5 report) found that
-`description` + `primary_reference` + `tags` + `content_license` +
-`nist_ai_rmf` + `mitre_atlas` + `source_freshness` account for roughly 70%
-of the JSON's field bytes, and NONE of them are read by the initial
-table/filter/chart render in docs/app.js -- they are only needed when a row
-is expanded (description, primary_reference, tags) or exported to CSV (all
-seven).
+`description` + `tags` + `content_license` + `nist_ai_rmf` + `mitre_atlas`
++ `source_freshness` account for the bulk of the JSON's field bytes, and
+none of them are read by the initial table/filter/chart render in
+docs/app.js -- they are only needed when a row is expanded (description,
+tags) or exported to CSV (all six, plus primary_reference below).
+
+`primary_reference` is a CORE field, not a detail field, even though it's
+also only rendered on row-expand/CSV export: app.js's search predicate
+(matches(), ~line 217) reads it on every keystroke against the FULL
+dataset, so deferring it to a per-year shard made search silently
+state-dependent on which years happened to be expanded already (WS6-T5
+design-pass report, defect A2). It costs bytes -- see the printed summary
+below for the measured core-payload size with it included -- but a search
+box that gives different answers to the same query depending on invisible
+prior clicks is not an acceptable trade for those bytes.
 
 This script is READ-ONLY against data/incidents.min.json (never writes
 under data/, per the merge freeze) and writes two NEW derived artifacts
@@ -50,15 +59,29 @@ DETAIL_DIR = DOCS_DATA / "detail"
 
 # Fields the initial table/filter/chart render actually reads
 # (docs/app.js: matches(), renderTable(), renderStats(), renderAllCharts()).
+# `primary_reference` is here, not in DETAIL_FIELDS, because matches()'s
+# search predicate (app.js ~line 217) searches it on every keystroke --
+# putting it in a lazy per-year shard made search silently
+# state-dependent: a query against an unexpanded year returned nothing,
+# the same query after expanding one row in that year returned a
+# different, larger result set, with no error either time. Measured
+# control (searching "reuters.com" against `main`): 3/13,060 matches on
+# `main`, 0 on the split-payload branch before this fix, 2 after
+# expanding one unrelated row. See WS6-T5 design-pass report (A2).
 CORE_FIELDS = [
     "id", "date", "year", "title", "severity", "attack_vector",
     "owasp_llm", "owasp_asi", "cve_ids", "affected", "corpus", "quality_tier",
+    "primary_reference",
 ]
 
 # Everything else: only read on row-expand or CSV export, so it is deferred
-# to a per-year shard instead of shipping in the initial payload.
+# to a per-year shard instead of shipping in the initial payload. Every
+# field read by app.js's per-entry detail rendering (renderDetail) and CSV
+# export (CSV_COLUMNS) that ISN'T in CORE_FIELDS belongs here; primary_reference
+# moved to CORE_FIELDS above precisely because matches() -- the initial-load
+# search path -- reads it too.
 DETAIL_FIELDS = [
-    "description", "primary_reference", "tags",
+    "description", "tags",
     "content_license", "nist_ai_rmf", "mitre_atlas", "source_freshness",
 ]
 

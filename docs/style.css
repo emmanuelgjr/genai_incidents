@@ -592,6 +592,28 @@ th.sort-desc .caret::after { content: "▼"; font-size: 0.7em; }
 .incidents tbody tr.expanded { background: var(--accent-dim); }
 .incidents td { padding: 0.6rem 0.85rem; vertical-align: top; }
 td.date { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.date-cell { display: inline-flex; align-items: center; gap: 0.5rem; }
+/* Explicit expand/collapse control (A4): a real, focusable, labelled
+   <button> per row rather than relying on the whole <tr> being clickable
+   (mouse-only; unreachable by keyboard, silent to screen readers -- see
+   the WS6-T5 design-pass report). Sized to the WCAG 2.5.8 AA 24px minimum
+   target even though it sits in a dense table row. */
+.row-toggle {
+  flex: none;
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 0.85rem; line-height: 1;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.row-toggle:hover,
+tr[data-row]:hover .row-toggle { color: var(--accent); border-color: var(--accent-line); }
+tr.expanded .row-toggle { color: var(--accent); border-color: var(--accent-line); background: var(--accent-dim); }
 td.id { font-family: var(--mono); font-size: 0.8rem; white-space: nowrap; }
 td.id a { color: var(--accent); }
 td.title-cell { min-width: 22ch; line-height: 1.4; }
@@ -624,6 +646,13 @@ tr.detail td { padding: 0; background: var(--bg-2); }
   animation: rise 0.3s ease both;
 }
 .detail-body > p { margin: 0 0 0.8rem; color: var(--ink); max-width: 90ch; }
+/* A3: a real error state, not an endless "Loading details…" -- see the
+   detail-shard fetch failure branch in app.js's renderDetail(). */
+.detail-error .hint {
+  display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+  color: var(--high);
+}
+.detail-retry { flex: none; }
 .detail-meta {
   display: flex; flex-wrap: wrap; gap: 0.5rem 1.3rem;
   font-size: 0.8rem; color: var(--muted);
@@ -697,11 +726,17 @@ footer .meta code { color: var(--muted); }
 }
 /* Below this width the LLM/ASI/CVE columns are dropped from the table --
    not hidden data, just deferred: every one of those values is still shown
-   in the row's expand/detail panel (tap the row), which is already the
-   site's existing progressive-disclosure pattern rather than a new one.
-   This keeps the table itself an honest, unscrolled <table> down to the
-   380px floor instead of forcing horizontal scroll to see Date/ID/Title/
-   Severity, which is what "usable at 380px" means for a data table. */
+   in the row's expand/detail panel, which is already the site's existing
+   progressive-disclosure pattern rather than a new one, and is now
+   reachable by keyboard and announced to screen readers via the row's
+   .row-toggle <button> (aria-expanded/aria-controls -- see renderTable()
+   in app.js), not just a mouse click on the row. It is NOT lost data
+   either way: the ID cell (never hidden at any width) is a focusable link
+   to that row's entry on the per-year page, which carries the same
+   LLM/ASI/CVE fields as ordinary page content. This keeps the table
+   itself an honest, unscrolled <table> down to the 380px floor instead of
+   forcing horizontal scroll to see Date/ID/Title/Severity, which is what
+   "usable at 380px" means for a data table. */
 @media (max-width: 640px) {
   .col-llm, .col-asi, .col-cves { display: none; }
   .incidents td, .incidents th { padding: 0.55rem 0.6rem; }
@@ -718,6 +753,33 @@ footer .meta code { color: var(--muted); }
   .incidents th:nth-child(2), .incidents td:nth-child(2) { width: 24%; }
   .incidents th:nth-child(3), .incidents td:nth-child(3) { width: 32%; }
   .incidents th:nth-child(4), .incidents td:nth-child(4) { width: 24%; }
+  /* Belt-and-braces for the three hidden columns (nth-child 5-7:
+     .col-llm/.col-asi/.col-cves, already display:none above): pin their
+     width to 0 too, in case a fixed-layout column width is ever resolved
+     independently of display. */
+  .incidents th:nth-child(5), .incidents td:nth-child(5),
+  .incidents th:nth-child(6), .incidents td:nth-child(6),
+  .incidents th:nth-child(7), .incidents td:nth-child(7) { width: 0; }
+  /* Measured (WS6-T5 design pass): even with the four visible columns
+     summing to exactly 100% and the three hidden columns pinned to 0,
+     Chromium still reports table.scrollWidth ~7px above .table-wrap's
+     clientWidth at 380px -- reproduced identically with border-collapse:
+     separate and with the hidden cells removed from the DOM outright, so
+     it is Chromium's table-layout:fixed column-width rounding, not real
+     overflowing content: wrap.scrollLeft(7) "succeeds" but shifts no
+     rendered pixel (verified with a before/after screenshot diff). It was
+     invisible to the OLD document.documentElement.scrollWidth check
+     (.table-wrap's overflow-x:auto absorbed it) and is exactly the class
+     of bug tests/a11y/check_narrow_viewport.js was rebuilt to catch via
+     .table-wrap's own scrollWidth/clientWidth (see that file's
+     WRAP_TOLERANCE_PX comment for the measurement and the margin kept
+     against a real failure). Since the four visible columns are
+     deliberately sized to fill the full width with nothing left over,
+     there is nothing for a user to legitimately reach by scrolling this
+     wrap at this breakpoint anyway -- cut the internal scrollbar off
+     outright rather than leave a few px of dead, confusing scroll travel
+     that reveals nothing. */
+  .table-wrap { overflow-x: hidden; }
 }
 @media (max-width: 520px) {
   .stats { grid-template-columns: 1fr 1fr; }

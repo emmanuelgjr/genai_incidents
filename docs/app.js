@@ -36,7 +36,6 @@ const els = {
   llm: document.getElementById('llm'),
   asi: document.getElementById('asi'),
   vector: document.getElementById('vector'),
-  tier: document.getElementById('tier'),
   corpus: document.getElementById('corpus'),
   quality: document.getElementById('quality'),
   cveOnly: document.getElementById('cve_only'),
@@ -52,11 +51,11 @@ const els = {
   exportCsv: document.getElementById('export-csv'),
 };
 
-const FILTER_KEYS = ['q','year','severity','llm','asi','vector','tier','corpus','quality','cveOnly'];
+const FILTER_KEYS = ['q','year','severity','llm','asi','vector','corpus','quality','cveOnly'];
 const FILTER_LABEL = {
   q: 'Search', year: 'Year', severity: 'Severity',
   llm: 'OWASP LLM', asi: 'OWASP ASI', vector: 'Vector',
-  tier: 'Tier', corpus: 'Corpus', quality: 'Quality', cveOnly: 'CVE',
+  corpus: 'Corpus', quality: 'Quality', cveOnly: 'CVE',
 };
 
 let DATA = [];
@@ -68,38 +67,54 @@ let EXPANDED = new Set();
 
 // ----------------------------- Lazy detail loading ------------------------
 // The initial fetch is data/incidents.core.json -- table/filter/chart
-// fields only (~29% of the full dataset's bytes, measured). The remaining
-// fields (description, primary_reference, tags, content_license,
-// nist_ai_rmf, mitre_atlas, source_freshness) live in one
-// data/detail/<year>.json shard per publication year and are fetched only
-// when a row in that year is actually expanded, or on CSV export. Once a
-// year's shard resolves, its fields are merged directly onto the matching
-// objects in DATA, so every later read (including re-renders) is
-// synchronous with no cache-lookup indirection.
-const LOADED_DETAIL_YEARS = new Set();
+// fields PLUS primary_reference (~36.0% of the full dataset's bytes,
+// measured -- see scripts/gen_docs_core_data.py's printed summary).
+// primary_reference is core, not lazy, because matches() below searches it
+// on every keystroke against the FULL dataset (see the CORE_FIELDS comment
+// in that script for the search-correctness bug this fixes). The remaining
+// fields (description, tags, content_license, nist_ai_rmf, mitre_atlas,
+// source_freshness) live in one data/detail/<year>.json shard per
+// publication year and are fetched only when a row in that year is
+// actually expanded, or on CSV export. Once a year's shard resolves, its
+// fields are merged directly onto the matching objects in DATA, so every
+// later read (including re-renders) is synchronous with no cache-lookup
+// indirection.
+// Explicit per-year fetch status, not inferred from field presence: the
+// earlier version treated "loaded" as `description !== undefined`, which
+// made "not fetched yet" and "fetch failed" indistinguishable -- a failed
+// shard left every row of that year showing "Loading details…" forever
+// (renderDetail's early return never had a failure branch), and CSV export
+// (below) used Promise.allSettled and silently exported blank cells for
+// the failed year with no warning. Tracking 'unloaded' / 'loading' /
+// 'loaded' / 'failed' explicitly lets renderDetail show a real error state
+// with retry, and lets export detect and warn about partial data instead
+// of shipping a CSV that looks complete but silently isn't (WS6-T5
+// design-pass report, defect A3).
+const DETAIL_STATUS = new Map(); // year (string) -> 'loading' | 'loaded' | 'failed'
 const DETAIL_PROMISES = new Map();
-const DETAIL_FIELDS = ['description', 'primary_reference', 'tags',
+const DETAIL_FIELDS = ['description', 'tags',
   'content_license', 'nist_ai_rmf', 'mitre_atlas', 'source_freshness'];
 
 function hasDetail(e) { return e.description !== undefined; }
+function detailStatus(year) { return DETAIL_STATUS.get(String(year)) || 'unloaded'; }
 
 function ensureDetailLoaded(year) {
   const key = String(year);
-  if (LOADED_DETAIL_YEARS.has(key)) return Promise.resolve();
-  if (DETAIL_PROMISES.has(key)) return DETAIL_PROMISES.get(key);
+  const status = DETAIL_STATUS.get(key);
+  if (status === 'loaded') return Promise.resolve();
+  if (status === 'loading') return DETAIL_PROMISES.get(key);
+  DETAIL_STATUS.set(key, 'loading');
   const p = fetch(`data/detail/${encodeURIComponent(key)}.json`)
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(map => {
       for (const e of DATA) {
         if (String(e.year) === key && map[e.id]) Object.assign(e, map[e.id]);
       }
-      LOADED_DETAIL_YEARS.add(key);
+      DETAIL_STATUS.set(key, 'loaded');
     })
     .catch(err => {
-      // Leave the year out of LOADED_DETAIL_YEARS so a later expand retries;
-      // surface nothing louder than a console warning since the table/charts
-      // above remain fully usable without this year's detail fields.
       console.warn('detail shard load failed for', key, err);
+      DETAIL_STATUS.set(key, 'failed');
       DETAIL_PROMISES.delete(key);
       throw err;
     });
@@ -108,8 +123,11 @@ function ensureDetailLoaded(year) {
 }
 
 async function ensureDetailLoadedForRows(rows) {
+  // Returns the list of years that failed to load, so callers (CSV export)
+  // can warn instead of exporting silently-incomplete rows.
   const years = Array.from(new Set(rows.map(r => String(r.year))));
-  await Promise.allSettled(years.map(ensureDetailLoaded));
+  const results = await Promise.allSettled(years.map(ensureDetailLoaded));
+  return years.filter((_, i) => results[i].status === 'rejected');
 }
 
 // ----------------------------- Utilities ---------------------------------
@@ -204,7 +222,6 @@ function matches(e) {
   if (els.asi.value      && !(e.owasp_asi || []).includes(els.asi.value)) return false;
   if (els.vector.value   && e.attack_vector !== els.vector.value) return false;
   if (els.corpus.value   && e.corpus !== els.corpus.value)      return false;
-  if (els.tier && els.tier.value && e.tier !== els.tier.value) return false;
   if (els.quality.value  && e.quality_tier !== els.quality.value) return false;
   if (els.cveOnly.checked && !(e.cve_ids || []).length)         return false;
   const q = els.q.value.trim().toLowerCase();
@@ -309,8 +326,18 @@ function renderTable(slice, start) {
     const asi = (e.owasp_asi || []).join(', ');
     const expanded = EXPANDED.has(e.id);
     const cls = expanded ? ' class="expanded"' : '';
+    const detailId = `detail-${escapeHtml(e.id)}`;
+    // Explicit, keyboard-and-screen-reader-reachable expand control (A4):
+    // a native <button> gets Tab focus, Enter/Space activation and an
+    // implicit "button" role for free, so no custom keydown handling or
+    // ARIA role override on the <tr> itself is needed (overriding a <tr>'s
+    // implicit "row" role to "button" would also orphan the ID link inside
+    // it as nested interactive content). The whole-row click handler below
+    // still toggles too, for mouse users -- the button calls
+    // stopPropagation so a click on it doesn't double-toggle via bubbling.
+    const toggleBtn = `<button type="button" class="row-toggle" aria-expanded="${expanded}" aria-controls="${detailId}" aria-label="${expanded ? 'Hide' : 'Show'} details for ${escapeHtml(e.id)}"><span aria-hidden="true">${expanded ? '−' : '+'}</span></button>`;
     const main = `<tr${cls} data-row="${e.id}">
-      <td class="date">${escapeHtml(e.date || String(e.year || ''))}</td>
+      <td class="date"><span class="date-cell">${toggleBtn}${escapeHtml(e.date || String(e.year || ''))}</span></td>
       <td class="id">${idCell}</td>
       <td class="title-cell">${escapeHtml(e.title)}</td>
       <td><span class="sev-badge sev-${escapeHtml(e.severity)}">${escapeHtml(e.severity || '')}</span></td>
@@ -319,35 +346,63 @@ function renderTable(slice, start) {
       <td class="cves col-cves">${cveCell}</td>
     </tr>`;
     if (!expanded) return main;
-    return main + renderDetail(e);
+    return main + renderDetail(e, detailId);
   }).join('');
 
   els.body.innerHTML = rows || '<tr><td colspan="7" class="status">No matches.</td></tr>';
-  els.body.querySelectorAll('tr[data-row]').forEach(tr => {
-    tr.addEventListener('click', () => {
-      const id = tr.dataset.row;
-      if (EXPANDED.has(id)) {
-        EXPANDED.delete(id);
-        rerender();
-        return;
-      }
-      EXPANDED.add(id);
-      // Render immediately with whatever fields are already loaded (shows a
-      // "Loading details…" placeholder if this row's year hasn't been
-      // fetched yet), then re-render once the year's detail shard resolves.
+
+  function toggleRow(id) {
+    if (EXPANDED.has(id)) {
+      EXPANDED.delete(id);
       rerender();
-      const row = DATA.find(r => r.id === id);
-      if (row && !hasDetail(row)) {
-        ensureDetailLoaded(row.year).then(rerender).catch(() => rerender());
-      }
+      return;
+    }
+    EXPANDED.add(id);
+    // Render immediately with whatever fields are already loaded (shows a
+    // "Loading details…" placeholder if this row's year hasn't been
+    // fetched yet), then re-render once the year's detail shard resolves
+    // (or failed -- ensureDetailLoaded's rejection still re-renders so the
+    // error state in renderDetail below can show).
+    rerender();
+    const row = DATA.find(r => r.id === id);
+    if (row && !hasDetail(row)) {
+      ensureDetailLoaded(row.year).then(rerender).catch(() => rerender());
+    }
+  }
+
+  els.body.querySelectorAll('tr[data-row]').forEach(tr => {
+    tr.addEventListener('click', () => toggleRow(tr.dataset.row));
+  });
+  els.body.querySelectorAll('.row-toggle').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      toggleRow(btn.closest('tr[data-row]').dataset.row);
+    });
+  });
+  els.body.querySelectorAll('.detail-retry').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const year = btn.dataset.year;
+      rerender(); // shows "Loading details…" immediately (status flips to 'loading' synchronously below)
+      ensureDetailLoaded(year).then(rerender).catch(() => rerender());
     });
   });
 }
 
-function renderDetail(e) {
+function renderDetail(e, detailId) {
+  const idAttr = detailId ? ` id="${detailId}"` : '';
   if (!hasDetail(e)) {
-    return `<tr class="detail"><td colspan="7"><div class="detail-body">
-      <p class="hint">Loading details…</p>
+    const status = detailStatus(e.year);
+    if (status === 'failed') {
+      return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body detail-error">
+        <p class="hint" role="alert">
+          Couldn't load details for this row (network error).
+          <button type="button" class="btn-secondary detail-retry" data-year="${escapeHtml(String(e.year))}">Retry</button>
+        </p>
+      </div></td></tr>`;
+    }
+    return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body">
+      <p class="hint" aria-busy="true">Loading details…</p>
     </div></td></tr>`;
   }
   const cves = (e.cve_ids || []).map(c => `<code>${escapeHtml(c)}</code>`).join(' ');
@@ -358,7 +413,7 @@ function renderDetail(e) {
     ? `<a href="${escapeHtml(safeUrl(e.primary_reference))}" rel="noopener" target="_blank" title="Cite this incident from its primary source, not this site">cite this incident ↗</a>`
     : '';
   const shardLink = `<a href="incidents/${e.year}.html#${e.id.toLowerCase()}">full details ↗</a>`;
-  return `<tr class="detail"><td colspan="7"><div class="detail-body">
+  return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body">
     <p>${escapeHtml(e.description || 'No description.')}</p>
     <div class="detail-meta">
       ${e.affected ? `<span><strong>Affected:</strong> ${escapeHtml(e.affected)}</span>` : ''}
@@ -733,7 +788,26 @@ async function exportFilteredAsCsv() {
   const originalLabel = btn ? btn.textContent : null;
   if (btn) { btn.disabled = true; btn.textContent = 'Preparing export…'; }
   try {
-    await ensureDetailLoadedForRows(FILTERED);
+    const failedYears = await ensureDetailLoadedForRows(FILTERED);
+    if (failedYears.length) {
+      // Previously this was silent: Promise.allSettled swallowed the
+      // rejection and the export completed looking normal while rows from
+      // the failed year(s) had blank Description/Primary Reference/Tags/
+      // NIST AI RMF/MITRE ATLAS cells (WS6-T5 design-pass report, defect
+      // A3 -- measured: a 5,401-row export with one shard missing produced
+      // 5,377/5,401 empty Description cells and 4,509/5,401 empty NIST AI
+      // RMF cells, with the button returning to normal and no error).
+      // Ask before shipping a CSV the user would otherwise have no reason
+      // to distrust.
+      const proceed = window.confirm(
+        `Couldn't load full details for ${failedYears.length} year` +
+        `${failedYears.length === 1 ? '' : 's'} (${failedYears.join(', ')}). ` +
+        `Rows from ${failedYears.length === 1 ? 'that year' : 'those years'} will export with ` +
+        `blank Description / Primary Reference / Tags / NIST AI RMF / MITRE ATLAS cells. ` +
+        `Export anyway?`
+      );
+      if (!proceed) return;
+    }
 
     const lines = [];
     lines.push(CSV_COLUMNS.map(c => csvCell(c[1])).join(','));
