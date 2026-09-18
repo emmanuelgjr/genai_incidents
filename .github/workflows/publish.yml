@@ -25,7 +25,13 @@ jobs:
       - name: Build sdist + wheel
         run: python -m build
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        # v1.14.0's bundled twine rejects `Metadata-Version: 2.5`, which current
+        # setuptools emits — it failed the v2.10.0 release with
+        # `InvalidDistribution: '2.5' is not a valid metadata version` AFTER the
+        # GitHub Release was already published, so the tag existed with no PyPI
+        # artifact behind it. Pinned to the newest release by commit SHA rather
+        # than by tag, keeping this repo's supply-chain convention.
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           # Uses PyPI trusted-publishing (OIDC). Configure once in PyPI:
           # Account settings -> Publishing -> Add a new pending publisher.
