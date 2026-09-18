@@ -7,7 +7,12 @@ from the live dataset (incident count + year range). Run at Pages-build time
 (pages.yml), so the shared-link preview always reflects the current dataset.
 Not committed / not drift-checked — it's a build artifact.
 
-Pure Pillow; no network. Mirrors the site's "amber threat console" palette.
+Pure Pillow; no network. Mirrors the site's "Archive" palette (paper and
+ink, one rust accent) — updated alongside the WS6 colour-direction redesign
+so a shared link preview never shows the retired "amber threat console"
+look after the page itself has moved on. Renders on the LIGHT (paper)
+surface: it's the primary theme in this direction, and a static image can't
+follow the visitor's stored theme preference the way the page itself does.
 """
 
 from __future__ import annotations
@@ -21,11 +26,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "incidents.min.json"
 OUT = ROOT / "docs" / "og-image.png"
 
-BG = (10, 12, 16)        # --bg #0a0c10
-PANEL = (17, 21, 28)
-AMBER = (255, 176, 0)    # --accent #ffb000
-INK = (233, 237, 243)
-MUTED = (143, 156, 178)
+CANVAS = (255, 253, 248)  # --panel (light) #fffdf8 -- outer card surface
+PANEL = (247, 244, 237)   # --bg (light) #f7f4ed -- deeper paper tone, inset rect
+RUST = (154, 52, 18)      # --accent (light) #9a3412
+INK = (27, 26, 23)        # --ink (light) #1b1a17
+MUTED = (93, 90, 82)      # --muted (light) #5d5a52
 W, H = 1200, 630
 
 
@@ -67,15 +72,15 @@ def main() -> None:
         years = sorted({e.get("year") for e in incidents if e.get("year")})
     yr_range = f"{years[0]}–{years[-1]}" if years else ""
 
-    img = Image.new("RGB", (W, H), BG)
+    img = Image.new("RGB", (W, H), CANVAS)
     draw = ImageDraw.Draw(img)
 
-    # Amber top rule + subtle panel.
-    draw.rectangle([0, 0, W, 8], fill=AMBER)
+    # Rust top rule + a deeper-paper inset panel for the count.
+    draw.rectangle([0, 0, W, 8], fill=RUST)
     draw.rectangle([64, 360, 1136, 566], fill=PANEL)
 
     draw.text((64, 70), "GenAI & Agentic AI", font=_font(72, bold=True), fill=INK)
-    draw.text((64, 150), "Security Incidents", font=_font(72, bold=True), fill=AMBER)
+    draw.text((64, 150), "Security Incidents", font=_font(72, bold=True), fill=RUST)
 
     # Big number.
     draw.text((64, 384), f"{count:,}", font=_font(132, bold=True), fill=INK)
@@ -85,7 +90,7 @@ def main() -> None:
     draw.text((64, 280),
               "Mapped to OWASP LLM Top 10 · OWASP Agentic · NIST AI RMF · MITRE ATLAS",
               font=_font(28), fill=MUTED)
-    draw.text((760, 470), "open data · CC-BY-4.0", font=_font(26), fill=AMBER)
+    draw.text((760, 470), "open data · CC-BY-4.0", font=_font(26), fill=RUST)
     draw.text((760, 510), "emmanuelgjr.github.io/genai_incidents",
               font=_font(24), fill=MUTED)
 

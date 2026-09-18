@@ -12,6 +12,31 @@ const SEV_VARS = {
   Low: "var(--low)",
   Info: "var(--info)",
 };
+// Redundant shape coding for the severity ramp (Archive redesign, WS6): the
+// stacked-bar segments in "Severity composition over time" are the one
+// place severity is shown as an adjacent colour block with no persistent
+// text label of its own (a badge or legend key always pairs colour with
+// the word "Critical"/"High"/etc, satisfying WCAG 1.4.1 on its own -- this
+// is the one exception, since a floating tooltip on hover doesn't help a
+// user scanning the chart at a glance). These glyphs are drawn into the
+// chart's own SVG legend (matching the ::before glyphs style.css adds to
+// .sev-badge / .sev-legend .dot) so a colour-blind reader can match a bar
+// segment to its severity by SHAPE, not only by hue -- and the five are
+// deliberately picked to differ in apparent weight/fill too (solid square
+// -> solid triangle -> solid diamond -> solid disc -> hollow ring), not
+// just outline, so they still separate under a luminance-only simulation.
+const SEV_GLYPH = { Critical: "■", High: "▲", Medium: "◆", Low: "●", Info: "○" };
+
+// Keep the browser-chrome tint (mobile Safari/Chrome address bar colour)
+// matching the actual theme, in both themes -- not just the pre-paint <head>
+// script's initial guess. Values mirror style.css's --bg exactly; this is
+// the one hex pair duplicated outside style.css, because <meta
+// name="theme-color"> cannot read a CSS custom property.
+const THEME_COLOR = { light: '#f7f4ed', dark: '#14130f' };
+function setThemeColorMeta(theme) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', THEME_COLOR[theme] || THEME_COLOR.dark);
+}
 // OWASP Top 10 for LLM Applications 2026. Rank order matters: charts and
 // filter dropdowns render in insertion order.
 const LLM_NAMES = {
@@ -367,11 +392,26 @@ function renderTable(slice, start) {
     // still toggles too, for mouse users -- the button calls
     // stopPropagation so a click on it doesn't double-toggle via bubbling.
     const toggleBtn = `<button type="button" class="row-toggle" aria-expanded="${expanded}" aria-controls="${detailId}" aria-label="${expanded ? 'Hide' : 'Show'} details for ${escapeHtml(e.id)}"><span aria-hidden="true">${expanded ? '−' : '+'}</span></button>`;
+    // .sev-glyph is a real, separately-hideable span (same pattern as the
+    // row-toggle's aria-hidden +/- above) carrying the colour-blind-safety
+    // glyph (SEV_GLYPH, above) as REAL TEXT CONTENT, not CSS ::before
+    // content -- verified via Chrome's own CDP Accessibility.getFullAXTree
+    // (not assumed) that aria-hidden on a span whose only content comes
+    // from ::before does NOT suppress it from the actual accessibility
+    // tree in the Chromium build these gates run against (StaticText still
+    // reported the glyph, ignored:false, even with aria-hidden on the
+    // host). aria-hidden DOES correctly suppress REAL text content --
+    // proven against this page's own toggleBtn "+"/"−" span above (0
+    // StaticText hits for it) -- so the glyph moved to real text to match
+    // that working precedent. Split from the severity WORD (escapeHtml(e.
+    // severity)) that follows it specifically so aria-hidden can silence
+    // the glyph without also silencing the word a screen reader needs.
+    const sevBadge = `<span class="sev-badge sev-${escapeHtml(e.severity)}"><span class="sev-glyph" aria-hidden="true">${SEV_GLYPH[e.severity] || ''}</span>${escapeHtml(e.severity || '')}</span>`;
     const main = `<tr${cls} data-row="${e.id}">
       <td class="date"><span class="date-cell">${toggleBtn}${escapeHtml(e.date || String(e.year || ''))}</span></td>
       <td class="id">${idCell}</td>
       <td class="title-cell">${escapeHtml(e.title)}</td>
-      <td><span class="sev-badge sev-${escapeHtml(e.severity)}">${escapeHtml(e.severity || '')}</span></td>
+      <td>${sevBadge}</td>
       <td class="llm col-llm">${escapeHtml(llm)}</td>
       <td class="asi col-asi">${escapeHtml(asi)}</td>
       <td class="cves col-cves">${cveCell}</td>
@@ -698,7 +738,12 @@ function renderStackedColumnChart(containerId, years, byYearBySeverity, onClick)
   const legend = sevOrder.map((sev, i) => {
     const ly = M_TOP + i * 18;
     const lx = W - M_RIGHT + 6;
-    return `<rect x="${lx}" y="${ly}" width="11" height="11" fill="${colorForSeverity(sev)}"/>
+    // Glyph, not a plain colour swatch: see SEV_GLYPH above -- gives the
+    // legend a shape cue as well as a colour one. aria-hidden on the glyph
+    // <text> for the same reason as .sev-glyph in renderTable() above: it's
+    // a sighted colour-blind redundancy, silent to assistive tech, next to
+    // the severity word in the adjacent <text class="row-label">.
+    return `<text x="${lx}" y="${ly + 10}" fill="${colorForSeverity(sev)}" font-size="11" font-family="var(--mono)" aria-hidden="true">${SEV_GLYPH[sev]}</text>
       <text class="row-label" x="${lx + 16}" y="${ly + 9}">${sev}</text>`;
   }).join('');
 
@@ -952,6 +997,11 @@ function populateOptions(select, values) {
 
 async function init() {
   try {
+    // Sync the browser-chrome tint to whichever theme the pre-paint <head>
+    // script already resolved (localStorage / OS preference) before this
+    // script ever runs.
+    setThemeColorMeta(document.documentElement.getAttribute('data-theme') || 'dark');
+
     // The initial load is the trimmed core payload (table/filter/chart
     // fields only -- see scripts/gen_docs_core_data.py). Full per-incident
     // description/reference/tags/taxonomy-mapping fields are fetched lazily
@@ -1029,6 +1079,7 @@ async function init() {
           ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) { /* private mode */ }
+        setThemeColorMeta(next);
         renderAllCharts();
         if (DATA.length) renderStats(DATA);
       });
