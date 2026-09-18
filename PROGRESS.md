@@ -162,6 +162,25 @@ VERSIONING.md step should say which link forms survive the move.
 
 **🐛 PRE-EXISTING BUG found in passing, NOT a WS6-T5 defect — boarded so it is not lost:** `docs/app.js:207` tests `e.tier`, **a field that does not exist in the data** — the real field is `quality_tier` — so that filter predicate **can never match**. Present on `main` today. Owner WS6; no task yet.
 
+> **[CORRECTION, dated 2026-09-18 — the diagnosis above is WRONG, the conclusion is right. Foreman, re-derived [R]; preserved per agreement 4.]**
+> `tier` and `quality_tier` are **two different fields, not a renaming**, and the paragraph above misstates the cause:
+> - **`tier`** → `feed` **11,155** / `landmark` **1,905**. Exists in `data/incidents.json` **only**.
+> - **`quality_tier`** → `reviewed` **10,835** / `auto` **2,106** / `curated` **119**. Exists in the full file **and** in `data/incidents.min.json`.
+>
+> Measured: `collections.Counter` over both fields in both files. **The predicate is indeed dead, but because `tier` is stripped from every served variant — not because it was misnamed.** `gen_docs_core_data.py` derives the core bundle from `incidents.min.json`, so no `CORE_FIELDS` change can make it reachable.
+>
+> **It is worse than a dead predicate, and it is user-visible.** `docs/index.html:161-164` offers a **"Tier" filter with a `landmark` option**, and `docs/app.js:161` filters on `e.tier`. **Selecting "landmark" on the live site returns zero rows, today.** Routed to the WS6-T5 design specialist as a Part-A item: make the control honest (remove it, or repoint it to a field that reaches the page) **without touching frozen data or the generator's source**, plus a check that fails when a filter's option set cannot be satisfied by the loaded data.
+
+## 📦 WS6-T9 (NEW, P1) — the `landmark` subset is not identifiable in ANY distributed variant, while the README tells consumers to cite it
+
+**Found 2026-09-18 by the foreman while verifying a release-notes figure, [R] by direct measurement.** `tier` (`feed`/`landmark`) is present in `data/incidents.json` and **absent from every variant we distribute**: `data/incidents.min.json` (the site's source), the generated site bundles, and `src/genai_incidents/data/incidents.min.json` — **the copy shipped in the PyPI package**.
+
+**Why this matters more than a missing field.** `README.md:26` instructs readers: *"cite the landmark count, not the full corpus, when you mean 'notable incidents.'"* We publish the count (**1,905**) on every surface through the invariant-6 markers, and we publish data in which **no consumer can select those 1,905 rows.** A figure that cannot be reproduced from the artifact it describes is the agreement-6(c) shape — the claim survives, the ability to check it does not.
+
+**Scope for WS6-T9:** decide whether `tier` belongs in the distributed variants (a schema/distribution question for **schema-architect** with **corpus-surgeon**, under invariant 7's full-vs-sanitized split — note `quality_tier` already crosses that boundary, so the exclusion of `tier` looks accidental rather than principled), or whether the README's instruction must change. **Do not assume the first.** Either way the site's dead control is fixed separately, under WS6-T5.
+
+**Deliberately NOT blocking the v2.10.0 cut:** this is pre-existing — v2.9.0 shipped the same way — and fixing it means changing distributed data while the corpus is frozen under D25(a). **But the release notes must not claim or imply the landmark subset is usable by consumers**; that constraint was given to the notes gate.
+
 ## 🔧 WS4-T13 — OECD AIM crawl budget (D25c) — opened 2026-09-17 — **✅ done — PASS (red-reviewer, 2026-09-18) — MERGED to main**
 
 **Specialist:** pipeline-engineer in an isolated worktree, branch `ws4/t13-crawl-budget`, commit `35ac4eec` off `main` `45d05f4b`. Two files: `scripts/ingest_oecd_aim.py`, `tests/test_ingest_oecd_aim.py`. **Foreman scope ruling applied:** D25(c)'s build-guard half already exists in WS4-T10 Phase A (`75825299`, unmerged) and was explicitly out of scope — the gate confirmed `git diff main..35ac4eec -- scripts/merge_and_dedupe.py` is **0 lines**, so it was not silently rebuilt.
