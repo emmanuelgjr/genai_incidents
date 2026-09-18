@@ -265,6 +265,57 @@ request, so there is nothing to check permission for
 (`ingest/common.py:390-394`). This was previously true but undocumented;
 disclosed here per bounce #1 (R5).
 
+### 5. WS4-T17 — the OECD AIM skip-rule sampling probe reintroduces K requests/run
+
+WS4-T13 made `scripts/ingest_oecd_aim.py` skip legacy numeric-slug URLs
+(OECD AIM's pre-date-hash incident-ID scheme) **before** they ever reach the
+fetch pool, on the measured premise that every one of them fails the
+`ng-state` body-shape check (0 exceptions across 1852 pages,
+`docs/audits/E21-tripwire-refresh-2026-09-14.md`). That skip is what cut
+~59% of requests to `oecd.ai` (≈1,773 of a 3,000-URL crawl window). But a
+skip that is never fetched can never be re-checked, so WS4-T17 adds a small,
+rotating **sampling probe**: each run, `run_skip_sampling_probe()`
+(`scripts/ingest_oecd_aim.py`) fetches `K` (default `DEFAULT_PROBE_SAMPLE_SIZE
+= 5`, overridable via `OECD_AIM_PROBE_SAMPLE_SIZE`) of the URLs the budget
+skip decided NOT to fetch, and asserts each one still fails the body-shape
+check — routed through the exact same `fetch_and_extract()` →
+`fetch_page()` → `ingest.common.robust_fetch()` chokepoint the main crawl
+uses. **No new egress path**: invariant 5 (this module) still enforces the
+identifying User-Agent, the fail-closed robots.txt check, and
+`DEFAULT_MIN_INTERVAL` on every one of these K requests, exactly as it does
+for every other `oecd.ai` fetch.
+
+**Net conduct effect, with numbers:** on a representative 3,000-URL window
+(the 2026-09-14 measurement: 1,852 numeric-slug / 1,148 date-hash-slug),
+WS4-T13 cut the crawl from 3,000 requests to ≈1,227 (the fetchable,
+non-skipped set) — a reduction of ≈1,773 requests, ~59%. WS4-T17 adds
+`K=5` requests back on top of that ≈1,227, landing at ≈1,232 — **still a
+~58.9% reduction** versus the pre-WS4-T13 baseline; the probe consumes a
+negligible sliver (≈0.4%) of the headroom WS4-T13 recovered. Per-run wall-
+clock cost: at `DEFAULT_MIN_INTERVAL = 1.0` s/host (shared across all
+worker threads — §3 above) and `K=5` sequential probe fetches, the probe
+costs on the order of 5 seconds against the ~36 minutes of workflow-timeout
+headroom WS4-T13 recovered (the reviewer's own sizing, used as specified in
+the WS4-T17 brief rather than independently re-derived, since actual
+per-request latency to `oecd.ai` varies and 5 request-slots' worth of rate-
+limiter spacing is the dominant, measurable-in-code term either way).
+
+The probe never fetches the *whole* skipped set — it samples a rotating
+slice (`select_probe_sample()`), so coverage of the ~1,852-URL legacy
+population accumulates gradually across runs rather than being re-verified
+in one shot; see that function's docstring for why rotating (not random)
+sampling was chosen. A violation (a legacy numeric-slug URL that now
+returns a real incident body — `REASON_OK`) fails the scheduled workflow
+run loudly on the first occurrence, via its own dedicated gate (`--check-
+probe` / "Check OECD skip-rule sampling probe" + "Enforce OECD skip-rule
+sampling probe" in `.github/workflows/auto-refresh.yml`) — deliberately
+**not** routed through `ingest/_state/source_health.json`'s 3-consecutive-
+failures smoothing (WS4-T9), because a skip-rule violation is a
+deterministic correctness signal about data loss, not ordinary third-party
+flakiness. See `run_skip_sampling_probe()` and
+`check_probe_state_for_violations()`'s docstrings in
+`scripts/ingest_oecd_aim.py` for the full design.
+
 ## Per-source pacing
 
 Every real ingest target's chokepoint routing, robots verdict, and pacing is

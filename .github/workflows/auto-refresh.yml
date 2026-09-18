@@ -44,12 +44,68 @@ jobs:
         run: python scripts/ingest_aiaaic_sheet.py
         continue-on-error: true
 
+      # WS4-T17: is_numeric_slug()'s skip rule (WS4-T13) rests on a premise
+      # -- every legacy numeric-slug page fails the body-shape check -- that
+      # stops being observable the moment those URLs are never fetched. The
+      # probe below samples a small, ROTATING slice of the skipped set each
+      # run (see run_skip_sampling_probe()'s docstring in
+      # scripts/ingest_oecd_aim.py); its rotation cursor must be durable
+      # across runs the same way the source-health counter is (D5), so it's
+      # restored here BEFORE the ingest step that consumes/advances it, and
+      # persisted below alongside source_health.json. Unlike source_health.json
+      # (only read by the "Source health check" step further down), this one
+      # is read AND written by ingest_oecd_aim.py itself, so it must land on
+      # disk before that step runs, not after.
+      - name: Restore OECD skip-probe rotation cursor from refresh-state branch
+        run: |
+          STATE_FILE="ingest/_state/skip_probe_state.json"
+          mkdir -p "$(dirname "$STATE_FILE")"
+          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
+            git fetch --quiet origin refresh-state
+            if git cat-file -e "origin/refresh-state:${STATE_FILE}" 2>/dev/null; then
+              git show "origin/refresh-state:${STATE_FILE}" > "$STATE_FILE"
+              echo "::notice::Restored $STATE_FILE from refresh-state branch."
+            else
+              echo "::notice::refresh-state branch exists but has no $STATE_FILE yet; probe starts a fresh rotation cursor."
+            fi
+          else
+            echo "::notice::refresh-state branch does not exist yet; probe starts a fresh rotation cursor."
+          fi
+
       - name: Refresh OECD AI Incidents Monitor
         id: ingest_oecd
         env:
           OECD_AIM_LIMIT: ${{ github.event.inputs.oecd_aim_limit || '3000' }}
         run: python scripts/ingest_oecd_aim.py
         continue-on-error: true
+
+      # WS4-T17: a SEPARATE gate from the ingest step above on purpose -- see
+      # check_probe_state_for_violations()'s docstring
+      # (scripts/ingest_oecd_aim.py). A skip-rule violation (a legacy
+      # numeric-slug URL that now returns a real incident body) is a
+      # deterministic correctness signal, not third-party flakiness, and
+      # must fail the RUN loudly on the FIRST occurrence rather than being
+      # smoothed by source_health.json's 3-consecutive-failures threshold
+      # (WS4-T9). `continue-on-error: true` here (recorded via `id:
+      # skip_probe`) so a violation doesn't skip the rest of this job --
+      # the merge/render/validate/tests/PR steps below still need to run
+      # normally; a skip-rule violation says nothing about whether THIS
+      # week's actually-kept data is good. The loud, job-ending failure
+      # happens in the "Enforce OECD skip-rule sampling probe" step at the
+      # very end, mirroring "Enforce source health"'s own established
+      # end-of-job pattern (see that step's comment for the same rationale
+      # applied to source_health.json).
+      - name: Check OECD skip-rule sampling probe
+        id: skip_probe
+        continue-on-error: true
+        # Only when the ingest step itself completed cleanly -- if it failed
+        # for an unrelated reason (e.g. the sitemap fetch itself errored)
+        # main() never reached the probe section, so the persisted state is
+        # from a PRIOR run and checking it here would attribute a possibly-
+        # stale finding to this run. An ingest failure is already covered by
+        # source_health.json's own 3-consecutive-failures accounting below.
+        if: steps.ingest_oecd.outcome == 'success'
+        run: python scripts/ingest_oecd_aim.py --check-probe
 
       - name: Refresh CISA KEV catalog
         id: ingest_kev
@@ -157,6 +213,34 @@ jobs:
           # working-tree copy back to whatever's committed on `main`.
           git checkout -- "$STATE_FILE" 2>/dev/null || rm -f "$STATE_FILE"
 
+      # WS4-T17: same D5 durability pattern, applied to the skip-probe
+      # rotation cursor written/advanced by ingest_oecd_aim.py above -- a
+      # separate persist_refresh_state.sh invocation (own throwaway clone
+      # dir) so it lands as its own commit on `refresh-state`, then the
+      # same "exclude from the data-review PR" reset.
+      - name: Persist OECD skip-probe state to refresh-state branch
+        run: |
+          set -e
+          STATE_FILE="ingest/_state/skip_probe_state.json"
+
+          # The file may legitimately not exist yet: the very first run ever,
+          # on a crawl window where nothing was skipped this time (no
+          # numeric-slug URLs in the window -- see ingest_oecd_aim.py main()'s
+          # "nothing skipped this run" branch), so run_skip_sampling_probe()
+          # was never called and never wrote it. persist_refresh_state.sh
+          # itself errors on a missing file (nothing to persist), so skip the
+          # call entirely rather than failing this step for a state file that
+          # simply hasn't been created yet.
+          if [ -f "$STATE_FILE" ]; then
+            bash scripts/persist_refresh_state.sh \
+              "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+              "$STATE_FILE" \
+              "/tmp/refresh-state-clone-probe"
+            git checkout -- "$STATE_FILE" 2>/dev/null || rm -f "$STATE_FILE"
+          else
+            echo "::notice::$STATE_FILE does not exist yet (nothing skipped this run); nothing to persist."
+          fi
+
       - name: Re-merge + render + validate
         run: |
           python scripts/parse_existing.py
@@ -219,4 +303,16 @@ jobs:
         if: steps.health.outcome == 'failure'
         run: |
           echo "::error::A source has failed 3+ consecutive weekly refreshes (see 'Source health check' step above). Failing this run on purpose so it cannot be mistaken for success."
+          exit 1
+
+      # WS4-T17: same end-of-job pattern as "Enforce source health" above,
+      # for the SEPARATE reason explained on the "Check OECD skip-rule
+      # sampling probe" step: a violation must fail this run's overall
+      # conclusion loudly (GitHub's own failed-scheduled-workflow
+      # notification fires) without having blocked the PR that carries this
+      # week's actually-good data.
+      - name: Enforce OECD skip-rule sampling probe
+        if: steps.skip_probe.outcome == 'failure'
+        run: |
+          echo "::error::The OECD AIM skip-rule sampling probe found at least one legacy numeric-slug URL that now returns a real incident body (see 'Check OECD skip-rule sampling probe' step above for which one). is_numeric_slug()'s skip rule is dropping real incidents and needs attention before the next scheduled crawl. Failing this run on purpose so it cannot be mistaken for success."
           exit 1
