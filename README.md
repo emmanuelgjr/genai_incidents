@@ -23,7 +23,7 @@
 
 ## What's in the data
 
-<!-- stats:incident_count -->13,060<!-- /stats:incident_count --> entries as of the <!-- stats:generated -->2026-07-31<!-- /stats:generated --> build, <!-- stats:landmark_count -->1,905<!-- /stats:landmark_count --> of them `tier: landmark` — the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition); cite the landmark count, not the full corpus, when you mean "notable incidents." Coverage spans <!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max -->. Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
+<!-- stats:incident_count -->13,060<!-- /stats:incident_count --> entries as of the <!-- stats:generated -->2026-09-18<!-- /stats:generated --> build, <!-- stats:landmark_count -->1,905<!-- /stats:landmark_count --> of them `tier: landmark` — the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition); cite the landmark count, not the full corpus, when you mean "notable incidents." Coverage spans <!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max -->. Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 
 Beyond the obvious title/description/severity fields, a few worth knowing about before you build on this data:
 
@@ -68,7 +68,7 @@ That's six taxonomies total, not four — see [`docs/TAXONOMIES.md`](docs/TAXONO
 
 ## Latest release
 
-**<!-- stats:version -->2.9.0<!-- /stats:version --> — released 2026-07-31.** A licensing and provenance release (Phase 1, "Honest"): row-level content-licence marking, per-entry OECD AIM attribution, an AIID content-licensing ruling, source-freshness disclosure, and an orphaned, unmaintained ingest file retired with its rows tombstoned rather than deleted. Full release notes — the field-level delta, a consumer-impact section listing every affected ID, and the re-derivation recipe for every figure — are at [`docs/releases/v2.9.0.md`](docs/releases/v2.9.0.md); [`CHANGELOG.md`](CHANGELOG.md) carries the same entry.
+**<!-- stats:version -->2.10.0<!-- /stats:version --> — released 2026-09-18.** A **silent breaking change for anyone matching on `owasp_llm` code strings**: every code was migrated from the OWASP Top 10 for LLM Applications 2025 edition to the 2026 edition. The code space is identical before and after, so `LLM03` is still valid and now means *Excessive Agency* instead of *Supply Chain* — nothing errors, nothing fails validation. Concretely: a filter on `LLM03` matched roughly eight times as many rows at v2.9.0 as it matches today — the release notes give both exact counts and the command to re-derive them. Data at or before v2.9.0, including its Zenodo deposits, carries 2025 codes; the crosswalk is [`mappings/owasp_llm_2025_to_2026.json`](mappings/owasp_llm_2025_to_2026.json). Also fixes eight weeks of silently-dead weekly refreshes, an 800 KB page truncation that dropped ~38 incidents per run, and the OECD crawl budget. **Exactly one corpus row changed** — `INC-11516`'s description had the query string of an expired pre-signed URL removed; the entry count is unchanged, no row was added or removed, and OECD refresh merges remain frozen pending a URL over-merge fix. Full release notes — the consumer-impact section and the re-derivation recipe for every figure — are at [`docs/releases/v2.10.0.md`](docs/releases/v2.10.0.md); [`CHANGELOG.md`](CHANGELOG.md) carries the same entry.
 
 ---
 
