@@ -83,38 +83,96 @@ import genai_incidents as gi  # noqa: E402
 # 1. The definition of record, re-derived independently
 # ---------------------------------------------------------------------------
 
-def _documented_rule(entry: dict) -> str:
-    """The rule as published in docs/DATA_DICTIONARY.md and the schema.
+def _schema_tier() -> dict:
+    return json.loads(
+        (ROOT / "schema" / "incident.schema.json").read_text(encoding="utf-8")
+    )["properties"]["tier"]
 
-    Written from the prose, not copied from `_derive_tier`: copying would
-    make this a rerun of the path that produced the artifact, which cannot
-    fail (working agreement 6(b)).
+
+def _predicate_from(criteria: list[dict]):
+    """Turn `x-derivation`'s criteria list into a callable.
+
+    The published definition is READ, not transcribed. An earlier version of
+    this file hand-copied `_derive_tier` into a `_documented_rule` function
+    and called the comparison bidirectional; it was not. A hand-copy only
+    ever detects changes to the code -- the doc side of the comparison is
+    whatever the test author typed, so a criterion ADDED to the published
+    definition (the direction that inflated this field's definition 3.6x for
+    three months) could never fail it. Driving the predicate from the schema
+    makes both directions real: code-only changes and schema-only changes
+    each break the equality below.
     """
-    if (entry.get("quality_tier") == "curated"
-            or entry.get("aiid_id")
-            or entry.get("corpus") == "ai-harm"):
-        return "landmark"
-    return "feed"
+    def predicate(entry: dict) -> str:
+        for c in criteria:
+            value = entry.get(c["field"])
+            if "equals" in c:
+                if value == c["equals"]:
+                    return "landmark"
+            elif c.get("present") and value:
+                return "landmark"
+        return "feed"
+    return predicate
 
 
-def test_derive_tier_matches_the_published_definition():
-    quality = ["curated", "reviewed", "auto", None]
-    aiid = [None, 1234]
-    corpora = ["security", "ai-harm", None]
-    # `category` is in the matrix on purpose: the retired wording made
-    # category == "real-world" a landmark criterion, so if anyone restores
-    # it in code this comparison fails instead of silently re-inflating the
-    # published count.
-    categories = ["real-world", "vulnerability-disclosure", None]
-    for q, a, c, cat in itertools.product(quality, aiid, corpora, categories):
-        entry = {"quality_tier": q, "aiid_id": a, "corpus": c, "category": cat}
-        assert m._derive_tier(entry) == _documented_rule(entry), entry
+# Every field any criterion (live or retired) can read, so the truth table
+# below is exhaustive over the inputs the definition actually depends on.
+_TRUTH_TABLE_DOMAIN = {
+    "quality_tier": ["curated", "reviewed", "auto", None],
+    "aiid_id": [None, 1234],
+    "corpus": ["security", "ai-harm", None],
+    "category": ["real-world", "vulnerability-disclosure", None],
+}
 
 
-def test_category_real_world_is_not_a_landmark_criterion():
-    """The specific regression the published definition claimed for months."""
-    entry = {"quality_tier": "auto", "corpus": "security", "category": "real-world"}
-    assert m._derive_tier(entry) == "feed"
+def _truth_table() -> list[dict]:
+    keys = sorted(_TRUTH_TABLE_DOMAIN)
+    return [dict(zip(keys, combo))
+            for combo in itertools.product(*(_TRUTH_TABLE_DOMAIN[k] for k in keys))]
+
+
+def test_truth_table_covers_every_field_the_definition_reads():
+    """Guard on the guard: a criterion naming a field outside the domain
+    would be compared only at that field's default, which is how an
+    exhaustive-looking table stops being exhaustive."""
+    derivation = _schema_tier()["x-derivation"]
+    named = {c["field"] for c in derivation["landmark_if_any"]}
+    named |= {c["field"] for c in derivation["retired_criteria"]}
+    assert named <= set(_TRUTH_TABLE_DOMAIN), (
+        f"x-derivation reads {sorted(named - set(_TRUTH_TABLE_DOMAIN))}, which "
+        f"_TRUTH_TABLE_DOMAIN does not vary -- extend the domain"
+    )
+
+
+def test_derive_tier_matches_the_published_definition_in_both_directions():
+    derivation = _schema_tier()["x-derivation"]
+    documented = _predicate_from(derivation["landmark_if_any"])
+    assert derivation["otherwise"] == "feed"
+    for entry in _truth_table():
+        assert m._derive_tier(entry) == documented(entry), entry
+
+
+def test_retired_criteria_are_genuinely_retired_and_the_check_is_not_vacuous():
+    """Each entry in `retired_criteria` must (a) still change the outcome if
+    re-applied -- otherwise listing it proves nothing -- and (b) not be
+    honoured by the code.
+
+    (a) is the part that matters: a retired criterion nobody can distinguish
+    from the live rule is an assertion dressed as a test.
+    """
+    derivation = _schema_tier()["x-derivation"]
+    live = _predicate_from(derivation["landmark_if_any"])
+    assert derivation["retired_criteria"], "nothing listed as retired"
+    for retired in derivation["retired_criteria"]:
+        inflated = _predicate_from(derivation["landmark_if_any"] + [retired])
+        differing = [e for e in _truth_table() if inflated(e) != live(e)]
+        assert differing, (
+            f"re-applying retired criterion {retired['field']}="
+            f"{retired.get('equals')} changes nothing -- it is not actually a "
+            f"distinct criterion, so listing it as retired is unfalsifiable"
+        )
+        # The code must side with the live rule on every row where they differ.
+        for entry in differing:
+            assert m._derive_tier(entry) == live(entry) != inflated(entry), entry
 
 
 @pytest.mark.parametrize("doc", [
@@ -122,14 +180,26 @@ def test_category_real_world_is_not_a_landmark_criterion():
     ROOT / "schema" / "incident.schema.json",
     ROOT / "src" / "genai_incidents" / "schema" / "incident.schema.json",
 ])
-def test_published_definition_names_the_three_real_criteria(doc):
+def test_prose_definition_names_the_live_criteria(doc):
+    """Token presence only -- and that limit is the point of the test above.
+
+    This catches a criterion DELETED from the prose. It cannot catch one
+    ADDED, because prose has no structure to check an addition against; that
+    is exactly why `x-derivation` exists and why the bidirectional gate is
+    `test_derive_tier_matches_the_published_definition_in_both_directions`,
+    not this. Stated rather than implied, because the earlier version of this
+    module claimed a bidirectionality it did not have.
+    """
+    derivation = _schema_tier()["x-derivation"]
     text = doc.read_text(encoding="utf-8")
     # Narrow the window to the `tier` definition so unrelated prose (the
     # `category` field's own row, for instance) cannot satisfy or trip this.
     start = text.index("landmark")
     window = text[max(0, start - 2000): start + 4000]
-    for needle in ("quality_tier", "aiid_id", "ai-harm"):
-        assert needle in window, f"{doc.name}: tier definition omits {needle}"
+    for c in derivation["landmark_if_any"]:
+        needle = c.get("equals") or c["field"]
+        assert needle in window, f"{doc.name}: tier definition omits {needle!r}"
+        assert c["field"] in window, f"{doc.name}: tier definition omits {c['field']}"
 
 
 def test_schema_copies_are_byte_identical():
@@ -323,16 +393,27 @@ def test_package_query_exposes_tier_keyword():
 # ---------------------------------------------------------------------------
 #
 # Every distributed variant is ultimately derived from one of the two root
-# artifacts, so "reads data/incidents.json or data/incidents.min.json" is a
-# precise, greppable definition of "is a distribution producer (or a
-# consumer close enough to matter)". Discovery is by scan, not by a
-# hand-maintained list that nothing forces to grow; the list below only
-# records the DISPOSITION of each script, and a new one fails the gate until
-# somebody states its disposition.
+# artifacts, so "reads data/incidents.json or data/incidents.min.json (or a
+# file derived from them)" is a precise, greppable definition of "is a
+# distribution producer". Discovery is by scan, not by a hand-maintained list
+# that nothing forces to grow; the list below only records the DISPOSITION of
+# each producer, and a new one fails the gate until somebody states its
+# disposition.
+#
+# The scan covers `scripts/*.py` AND `docs/*.js`. The .js half was added
+# after review: the first version globbed only `scripts/*.py`, and the
+# registry's own stated definition -- "derived from one of the two root
+# artifacts" -- plainly covers `docs/app.js`, which fetches
+# `data/incidents.core.json` and writes the CSV a site visitor downloads.
+# Scoping discovery to the language the author happened to be working in is
+# how a gate against "the fix reached some variants and not others" misses a
+# variant. It missed the CSV export.
 #
 # CARRIES  -- emits `tier` (or x_tier / a MISP tag) into a distributed file.
 # INHERITS -- distributes it, but by reusing another producer's builder
 #             rather than naming the field itself.
+# PENDING  -- a distributed variant that does NOT carry it yet, with the
+#             blocking reason named and a test holding the gap open.
 # INTERNAL -- reads the corpus but distributes nothing derived from it
 #             (validators, audits, build inputs, one-shot migrations).
 REGISTERED_PRODUCERS = {
@@ -344,6 +425,14 @@ REGISTERED_PRODUCERS = {
     "export_stix.py": "CARRIES (x_tier on each x-genai-incident SDO)",
     "export_taxii.py": "INHERITS (imports build_bundle from export_stix; asserted structurally by test_taxii_mirror_inherits_the_stix_bundle)",
     "export_misp.py": "CARRIES (genai-incidents:tier tag)",
+    # -- a distributed variant still missing the field --
+    "app.js": (
+        "PENDING (the site's CSV export: CSV_COLUMNS is a hardcoded list and "
+        "has no `tier` row. Deferred to WS6 and sequenced AFTER the first "
+        "post-freeze rebuild -- adding the column now would ship a blank "
+        "column, because the payload it reads will not carry the field until "
+        "then. Held open by test_site_csv_export_carries_tier below.)"
+    ),
     # -- read the corpus, distribute nothing derived from it --
     "validate.py": "INTERNAL (schema + landmark-label gate)",
     "check_dead_filters.py": "INTERNAL (CI gate over the served payload)",
@@ -358,15 +447,33 @@ REGISTERED_PRODUCERS = {
     "migrate_owasp_llm_2026.py": "INTERNAL (one-shot migration over build inputs)",
 }
 
-_ROOT_ARTIFACT_RE = re.compile(r"incidents(\.min)?\.json")
+# `incidents.core.json` / `detail/<year>.json` are in the pattern because the
+# site was split into those two payloads by WS6-T5 -- a producer reading them
+# is reading min.json's content one hop removed, and excluding them would
+# re-open the hole in the language the site is actually written in.
+# `data/detail/` is anchored on the `data/` prefix on purpose: an unanchored
+# `detail/` matches NVD advisory URLs (`nvd.nist.gov/vuln/detail/CVE-...`) and
+# pulled two ingest scripts in as false positives. A discovery rule that
+# over-matches gets loosened by the next person until it under-matches.
+_ROOT_ARTIFACT_RE = re.compile(r"incidents(\.min|\.core)?\.json|data/detail/")
+
+_DISCOVERY_GLOBS = (("scripts", "*.py"), ("docs", "*.js"))
 
 
 def _discover_producers() -> set[str]:
     found = set()
-    for path in sorted((ROOT / "scripts").glob("*.py")):
-        if _ROOT_ARTIFACT_RE.search(path.read_text(encoding="utf-8")):
-            found.add(path.name)
+    for subdir, pattern in _DISCOVERY_GLOBS:
+        for path in sorted((ROOT / subdir).glob(pattern)):
+            if _ROOT_ARTIFACT_RE.search(path.read_text(encoding="utf-8")):
+                found.add(path.name)
     return found
+
+
+def test_discovery_covers_the_site_as_well_as_the_scripts():
+    """The gap that let the CSV export through. Named as its own assertion so
+    narrowing discovery back to Python fails here rather than silently."""
+    assert ("docs", "*.js") in _DISCOVERY_GLOBS
+    assert "app.js" in _discover_producers()
 
 
 def test_no_unregistered_distribution_producer():
@@ -389,15 +496,101 @@ def test_registry_has_no_stale_entries():
     assert not gone, f"registered but no longer reading the corpus: {sorted(gone)}"
 
 
-def test_every_carrying_producer_actually_mentions_tier():
-    """Cheap, but it fires: deleting the `tier` line from any CARRIES script
-    (which is exactly how this defect was introduced) fails here even if that
-    script has no behavioural test of its own."""
+# `quality_tier` and `x_tier` both CONTAIN the substring "tier". The first
+# version of the check below tested `"tier" in src` and was therefore vacuous
+# for four of its seven scripts: stripping every standalone `tier` token from
+# gen_docs_core_data.py left the test passing, because `quality_tier` in
+# CORE_FIELDS satisfied it. That is agreement 6(a) -- a check whose output is
+# the same whether or not the thing it guards is present -- inside the gate
+# written to enforce agreement 6. Masking the compound names first is what
+# makes it a check.
+_COMPOUND_TIER_RE = re.compile(r"\b(?:quality|x)_tier\b")
+
+
+def _names_tier_standalone(src: str) -> bool:
+    return '"tier"' in _COMPOUND_TIER_RE.sub("", src)
+
+
+def test_every_carrying_producer_actually_names_the_tier_field():
+    """Cheap, but non-vacuous: deleting the `tier` line from any CARRIES
+    producer (exactly how this defect was introduced) fails here even if that
+    producer has no behavioural test of its own."""
     for name, disposition in REGISTERED_PRODUCERS.items():
         if not disposition.startswith("CARRIES"):
             continue
         src = (ROOT / "scripts" / name).read_text(encoding="utf-8")
-        assert "tier" in src, f"{name} is registered as CARRIES but never names `tier`"
+        assert _names_tier_standalone(src), (
+            f"{name} is registered as CARRIES but names no standalone `tier` "
+            f"field -- `quality_tier` does not count, it is a different axis"
+        )
+
+
+def test_the_carries_check_is_not_satisfied_by_quality_tier():
+    """Prove the check above can fail, rather than asserting that it can.
+
+    This is the exact input that silently passed before review: a source that
+    mentions `quality_tier` and nothing else.
+    """
+    assert not _names_tier_standalone('CORE_FIELDS = ["corpus", "quality_tier"]')
+    assert not _names_tier_standalone('sdo = {"x_tier": i.get("x_tier")}')
+    assert _names_tier_standalone('item = {"quality_tier": q, "tier": e.get("tier")}')
+
+
+# ---------------------------------------------------------------------------
+# 3b. The site's CSV export -- a distributed variant, still PENDING
+# ---------------------------------------------------------------------------
+
+_APP_JS = ROOT / "docs" / "app.js"
+
+
+def _csv_columns() -> list[str]:
+    """Parse CSV_COLUMNS out of docs/app.js (a hardcoded [field, header] list)."""
+    src = _APP_JS.read_text(encoding="utf-8")
+    block = src[src.index("const CSV_COLUMNS = ["):]
+    block = block[: block.index("];")]
+    return re.findall(r"\[\s*'([^']+)'", block)
+
+
+def test_csv_columns_parse_is_not_vacuous():
+    """If the parse silently returned [], every assertion over it would pass."""
+    cols = _csv_columns()
+    assert len(cols) > 10 and "id" in cols and "quality_tier" in cols
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="WS6-T9 defect 3: docs/app.js CSV_COLUMNS has no `tier` row, so the "
+           "file a site visitor downloads would be the one distributed variant "
+           "without the selector. Deferred to WS6 and sequenced AFTER the first "
+           "post-freeze rebuild -- adding the column before the payload carries "
+           "the field ships a blank column. When WS6 adds it this XPASSes and "
+           "the marker must go (see "
+           "docs/specs/WS6-T9-landmark-distribution-2026-09-18.md sec 5).",
+)
+def test_site_csv_export_carries_tier():
+    assert "tier" in _csv_columns()
+
+
+def test_csv_columns_cover_every_core_field_that_is_a_filter_selector():
+    """Consistency check between the payload and the CSV built from it.
+
+    A selector the site can filter on but cannot export is a silent gap of
+    the same family as the original defect. `tier` is the known exception
+    while it is PENDING above; anything else is a new one.
+    """
+    cols = set(_csv_columns())
+    selectors = {"severity", "attack_vector", "corpus", "quality_tier", "year"}
+    missing = (selectors & set(core.CORE_FIELDS)) - cols
+    assert not missing, f"filterable core fields absent from CSV_COLUMNS: {sorted(missing)}"
+
+
+def test_csv_columns_reference_no_field_the_payload_cannot_supply():
+    """The other direction: a CSV column naming a field that is in neither
+    CORE_FIELDS nor DETAIL_FIELDS exports blank cells forever -- the dead-
+    filter defect wearing a different hat."""
+    known = set(core.CORE_FIELDS) | set(core.DETAIL_FIELDS)
+    orphans = [c for c in _csv_columns() if c not in known]
+    assert not orphans, f"CSV columns with no field in the served payload: {orphans}"
 
 
 # ---------------------------------------------------------------------------

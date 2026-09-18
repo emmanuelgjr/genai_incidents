@@ -159,12 +159,25 @@ def _derive_purls(entry: dict) -> list[str]:
 
 
 def _derive_tier(entry: dict) -> str:
-    """Two-tier split (INCLUSION.md §5): the curated/notable LANDMARK set vs
-    the comprehensive vulnerability/advisory FEED. landmark = hand-curated, a
-    real-world incident catalogued in the AI Incident Database (`aiid_id`), or
-    an AI-harm case; feed = the CVE/GHSA/OSV bulk. (The `real-world` *category*
-    is deliberately NOT used — it also tags exploited CVEs, which belong in the
-    feed.) Headline claims should cite the landmark count, not the raw total."""
+    """Two-tier split: the curated/notable LANDMARK set vs the comprehensive
+    vulnerability/advisory FEED. landmark = hand-curated, a real-world incident
+    catalogued in the AI Incident Database (`aiid_id`), or an AI-harm case;
+    feed = the CVE/GHSA/OSV bulk. (The `real-world` *category* is deliberately
+    NOT used — it also tags exploited CVEs, which belong in the feed.) Headline
+    claims should cite the landmark count, not the raw total.
+
+    THIS FUNCTION IS THE DEFINITION OF RECORD. The machine-readable statement
+    of the same rule lives in `schema/incident.schema.json` under the `tier`
+    property's `x-derivation`, and `tests/test_landmark_distribution.py`
+    compares the two over an exhaustive truth table — so the schema and this
+    code cannot drift apart in either direction without a test failing.
+
+    The cross-reference to INCLUSION.md §5 that this docstring used to open
+    with was removed on 2026-09-18 (WS6-T9): §5 describes the split in terms
+    of `quality_tier` (curated/reviewed vs auto), which is a different axis
+    and a much larger set than this function returns. Reconciling §5's prose
+    is an open maintainer item; until it closes, do not treat §5 as this
+    function's specification."""
     if (entry.get("quality_tier") == "curated"
             or entry.get("aiid_id")
             or entry.get("corpus") == "ai-harm"):
