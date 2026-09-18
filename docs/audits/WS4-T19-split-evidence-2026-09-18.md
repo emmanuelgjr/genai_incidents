@@ -13,6 +13,69 @@ guard): `docs/audits/WS4-T19-authorized-splits-2026-09-18.json`.
 plan (item (a): "A human-reviewed remediation of the 47 splits... a
 judgement call, not a computation").
 
+> ## ⚠ BOUNCE #1 — 2026-09-18 (red-reviewer)
+> **The 47 split decisions themselves are UNCHANGED and stand — a second
+> party independently reproduced every figure, agreed with all 47
+> decisions on the 15 hardest groups it hand-checked, and confirmed the
+> guard genuinely discriminates on the real transition.** The bounce is
+> entirely about how THIS DOCUMENT characterises its own evidence — six
+> defects, all fixed in place below with a dated note at each affected
+> passage (agreement 4), not silently rewritten:
+> 1. **The discrimination-proof test was vacuous.** With only two
+>    fabricated splits (one authorized, one not), mutating the guard to
+>    report only the FIRST unauthorized id — the exact defect the test's
+>    name describes — still passed, because there was only ever one
+>    unauthorized id for `[:1]` to not-truncate. Fixed: the fixture now
+>    uses THREE independent splits, authorizes one, and asserts BOTH
+>    remaining are named — confirmed by hand that the truncate-to-first
+>    mutant now fails this test while the other four guard tests stay
+>    green. See "Deliverable 3" below.
+> 2. **"Distinct source identity" was presented as evidence; it is a
+>    build invariant.** `validate.py` already rejects a build where a
+>    source_id appears on two rows — the check reads identically whether
+>    the 47 splits are right or catastrophically wrong. Restated below as
+>    what it is, not counted as one of the independent checks.
+> 3. **"Their underlying dates differ" is false for many OECD sibling
+>    pairs within a split group.** Re-derived directly (see "Judgement
+>    method" below): 51 same-date sibling pairs exist inside the 47
+>    groups (my own recount; close to, not identical to, the reviewer's
+>    48 — the small difference is a pair-counting convention, not a
+>    disagreement on the finding). None of the 47 split decisions is
+>    wrong because of this — every same-date pair's titles are
+>    unambiguously distinct (max similarity 0.522 in my recount, 0.531 in
+>    the reviewer's) — but the universal claim was false as stated.
+> 4. **"Zero unsure" overstated, and the flagging standard was applied
+>    inconsistently.** Two successor pairs inside `INC-00554` are MORE
+>    title-similar than the Mythos cross-split observation this document
+>    already flagged: `INC-14745`/`INC-14871` (0.914) and
+>    `INC-14808`/`INC-14838` (0.809). Both now flagged the same way
+>    Mythos was, and routed to WS4-T5. **This does not change
+>    `INC-00554`'s own split decision** (it unambiguously splits away
+>    from the old id regardless of whether these two successor pairs
+>    are, between themselves, actually one incident or two) and does not
+>    block authorization of any of the 47.
+> 5. **The "fresh, independent" difflib scan was the same method with a
+>    case-folding difference, not a different derivation path.** 49
+>    (case-sensitive, what this document ran) vs. 59 (case-insensitive,
+>    what the 2026-09-15 audit ran) is the exact same threshold and
+>    metric; confirmed directly — lower-casing the 49-pair scan's inputs
+>    reproduces 59 exactly, and the 10 pairs it had omitted were all
+>    independently checked by the reviewer and confirmed distinct.
+>    Reframed below as corroboration by the same method, not independent
+>    evidence per agreement 6.
+> 6. **The proof-of-fire / regeneration recipes omitted a required reset
+>    step.** The guard compares against the LAST WRITTEN build
+>    (`_load_prev_state()` reads `data/incidents.json` as it currently
+>    sits), so re-running the fixed build a second time in the same
+>    scratch tree — after a first run already wrote the split corpus —
+>    no longer finds the same splits "new," because they are no longer
+>    previously-single in the state the guard reads. The mechanism is
+>    correct and benign in CI (a real remediation lands the fix, the
+>    guard, and the authorized list in ONE PR against the committed
+>    baseline — never a sequence of two attacks); the reproduction
+>    recipes are the deliverable that needed the reset step spelled out.
+>    Added to both recipes below.
+
 ## THE HARD BOUNDARY, restated
 
 **This document and its companions propose; they do not apply.** No file
@@ -56,17 +119,23 @@ changes did not alter the split population or its classification.
 
 ## Summary: 47 splits, my judgement
 
-**All 47 are judged DISTINCT — genuinely separate incidents that the old
-`normalize_url`'s query-string collapse wrongly united, not incidents that
-belong together.** Zero were found ambiguous enough to mark unsure on the
-distinctness question itself (see "Confidence and its limits" below for
-what this claim does and does not cover). 43 keep title continuity (the
-row that would naturally keep the old id already has the old id's
-content) and need **no new deprecation record** for the split id's own
-identity. 4 break continuity (the mechanical mechanism hands the old id to
-unrelated content) and should be **retired**, with a fresh id minted for
-every successor including the piece that would otherwise have inherited
-the old id.
+**All 47 SPLIT DECISIONS are judged confident — genuinely separate
+incidents that the old `normalize_url`'s query-string collapse wrongly
+united with UNRELATED content, not incidents that belong together with
+what they were merged with.** **[BOUNCE #1 correction, dated 2026-09-18]**
+That is not the same claim as "every one of the 349 successors is
+confirmed distinct from every other successor in its own group" — three
+specific successor PAIRS (all inside a split whose own decision is not in
+doubt) are flagged as an honest "cannot tell from this evidence whether
+this is one incident told twice or two," routed to WS4-T5, and named in
+"Confidence and its limits" below rather than folded into a blanket
+"zero unsure." 43 splits keep title continuity (the row that would
+naturally keep the old id already has the old id's content) and need
+**no new deprecation record** for the split id's own identity. 4 break
+continuity (the mechanical mechanism hands the old id to unrelated
+content) and should be **retired**, with a fresh id minted for every
+successor including the piece that would otherwise have inherited the old
+id.
 
 | decision | count |
 |---|---|
@@ -136,44 +205,94 @@ companion.
 
 ## Judgement method, and what confirms it per-row
 
+**[BOUNCE #1 correction, dated 2026-09-18 — this whole section rewritten
+in place; the original "three independent lines of evidence" framing
+overstated what checks 1 and 2 actually establish. See the BOUNCE #1 box
+at the top of this document for the full defect list.]**
+
 Every split's successors were bridged by ONE specific query-string-bearing
 URL family (computed mechanically by running the OLD, buggy `normalize_url`
 over every successor's own reference URLs and grouping by key — the JSON
-companion's `bridging_url_keys` per row). Three independent lines of
-evidence, checked for every row, not asserted from a sample:
+companion's `bridging_url_keys` per row). What actually establishes
+distinctness, checked for every row, not asserted from a sample:
 
-1. **Distinct source identity.** Every successor traces to a distinct
-   `source_id` (a distinct OECD-AIM dated article, AIID entry, or CVE) —
-   never the same source_id split across two rows.
-2. **Distinct dates / distinct CVEs.** Where successors are OECD-AIM news
-   items, their underlying dates differ (often by weeks or months — e.g.
-   INC-00554's decomposition spans 2020–2026); where they are CVE/security
-   advisories, their CVE numbers are always disjoint, including in every
-   case where titles are near-identical boilerplate (confirmed directly:
-   `INC-12120`/`INC-14628`/`INC-14629`, three "phpMyAdmin ... Cross-Site
-   Scripting"-shaped titles, carry `CVE-2010-2958`/`CVE-2011-1940`/
-   `CVE-2011-2505` and their paired CVEs — three different advisories, one
-   templated report format).
-3. **Title-similarity cross-check.** An independent `difflib` scan across
-   every split's own successor-title pairs (not reused from the 2026-09-15
-   audit's own scan, run fresh here) found 49 pairs above a 0.55
-   similarity threshold; every one manually checked resolves to (1) or (2)
-   above — distinct source_ids, distinct dates, or distinct CVEs. This
-   corroborates, via a different derivation path, the 2026-09-15 audit's
-   own 59-pair scan (design doc §2.4 / phaseB.md), which found zero
-   regressions.
+0. **A build invariant, not evidence — stated for precision, not counted
+   below.** `scripts/validate.py` already rejects a build where a
+   source_id or CVE appears on more than one row; a successor sharing its
+   own source identity with a sibling is therefore structurally
+   impossible in a validated build, and this reads identically whether
+   the 47 splits are correct or catastrophically wrong. It is *why* two
+   successors can never literally be "the same row wearing two ids," but
+   it says nothing about whether two DIFFERENT rows happen to describe
+   the same real-world incident — which is exactly the open question for
+   the three pairs flagged below.
+1. **Disjoint CVEs, where CVEs exist.** For every split whose successors
+   are CVE/security advisories, their CVE numbers are always disjoint,
+   including in every case where titles are near-identical boilerplate
+   (confirmed directly: `INC-12120`/`INC-14628`/`INC-14629`, three
+   "phpMyAdmin ... Cross-Site Scripting"-shaped titles, carry
+   `CVE-2010-2958`/`CVE-2011-1940`/`CVE-2011-2505` and their paired CVEs —
+   three different advisories, one templated report format). This check
+   is genuine evidence (a shared CVE would mean the same advisory, and
+   none is shared) and covers every CVE-bearing split in the table
+   (`INC-01192`, `INC-01897`, `INC-02590`, `INC-07224`, `INC-07657`,
+   `INC-07688`, `INC-11452`, `INC-11831`, `INC-12064`, `INC-12120`,
+   `INC-12180`).
+2. **Distinct dates, for MOST but not all OECD-AIM sibling pairs — the
+   claim does not hold universally.** Re-derived directly from each
+   successor's `OECD-AIM-YYYY-MM-DD-xxxx` source_id: **51 same-date
+   sibling pairs exist inside the 47 groups** (my own independent
+   recount; the reviewer's own recount gives 48 — the small difference is
+   a pair-counting convention, not a disagreement on the finding that
+   same-date pairs are common, mostly concentrated in `INC-00554`'s
+   100-way decomposition where a single high-volume news day produces
+   several unrelated OECD-AIM entries). **This does not put any split
+   decision in doubt**: every same-date pair's titles are unambiguously
+   distinct by content — max title similarity among all 51 same-date
+   pairs is **0.522** (my recount; 0.531 in the reviewer's), well below
+   even the loose 0.55 threshold used elsewhere in this document. Date
+   alone is therefore NOT a universal distinguishing signal for the
+   OECD-AIM majority; what actually distinguishes same-date siblings is
+   their disjoint reference-URL sets and their titles' plain content —
+   which is checked directly below, not inferred from dates.
+3. **Reference-URL disjointness**, checked for every successor within
+   every group: no two successors in the same split group share a
+   reference URL. This is genuine, non-tautological evidence (unlike
+   check 0) — two rows covering the same real event COULD, in principle,
+   cite overlapping coverage, and none do.
+4. **Title-similarity scan, corroborating by the SAME method, not an
+   independent derivation.** A `difflib` scan across every split's own
+   successor-title pairs, run fresh here, found 49 pairs above a 0.55
+   threshold (case-sensitive). **[BOUNCE #1 correction]** This was
+   originally framed as "an independent derivation path" corroborating
+   the 2026-09-15 audit's 59-pair scan; it is not independent — it is the
+   identical method and threshold, and the 49-vs-59 gap is exactly a
+   case-folding difference (confirmed: lower-casing the same 49-pair
+   scan's inputs reproduces 59 exactly). The 10 pairs the case-sensitive
+   scan omitted were checked by the reviewer directly; all 10 resolve
+   cleanly to distinct source_ids/dates/CVEs, nothing material hidden.
+   Stated plainly: this check corroborates (same method, wider net when
+   run correctly) rather than independently confirms, and two of the 59
+   pairs it surfaces are flagged below rather than being waved through.
 
 ### Confidence and its limits
 
-**Confident, not merely asserted**, for the distinctness call itself: it
-rests on structural evidence (distinct source_ids + dates/CVEs + reference
-URLs) checked for all 47 splits, not a read of every one of the 349
-successors' full source article text — that would not scale to a
-one-time, 349-row remediation, and is not what the three checks above
-need in order to be conclusive (a duplicate incident cannot share zero
-source_ids, zero CVEs, and a different date). Where this document is
-NOT confident, it says so explicitly below rather than rolling it into
-the 47/47 "distinct" figure:
+**[BOUNCE #1 correction, dated 2026-09-18 — "zero unsure" below is
+replaced with an accurate count; two more pairs are now flagged the same
+way the Mythos observation was, per the reviewer's finding that the
+flagging standard was applied inconsistently.]**
+
+**Confident** for the split DECISION on all 47 rows (keep_id vs. retire):
+every decision rests on the successor that keeps the id actually holding
+the id's own historical title/content (the `survivor_title_continuity`
+measurement), independent of whether any two SUCCESSORS are themselves
+duplicates of each other — even if two successors within a group turned
+out to be the same event, the group as a whole is still correctly
+separated from the OTHER, unrelated content the old id had absorbed.
+**Not confident, and said so explicitly**, on a narrower, different
+question — whether three specific successor PAIRS are themselves
+duplicates of each other — which does not change any of the 47 decisions
+but is flagged for a separate review:
 
 - **Not this document's call, flagged for a separate fix**: `INC-02590`
   (ForcedLeak/Salesforce Agentforce) — the split itself is confidently
@@ -183,29 +302,59 @@ the 47/47 "distinct" figure:
   fix, per `docs/specs/WS4-T10-unmerge-design-2026-09-15.md` §2.3b. This
   needs re-keying as part of remediation, independent of the split
   decision.
-- **A cross-split observation, not a per-split judgement, routed to
-  WS4-T5**: `INC-00620`'s survivor ("Anthropic's Mythos AI Model Sparks
-  Global Cybersecurity and Financial System Fears", 1 source, dated
-  2026-04-18, Taiwanese/Singaporean press) and `INC-00623`'s successor
-  `INC-14757` ("Anthropic's Mythos AI Raises Global Cybersecurity
-  Concerns", 2 sources, dated 2026-04-08, Swedish/French/Belgian press)
-  cover the same underlying "Mythos AI model" story from different
-  regional press cycles on different dates. Checked directly: different
-  OECD-AIM source_ids, different dates, disjoint reference-URL sets — by
-  this document's own distinctness test they ARE distinct, and neither is
-  a member of the OTHER's split group (the query-string bug never bridged
-  them to each other), so this is not a defect in either split judgement
-  above. It is flagged here because it is exactly the shape of question
-  WS4-T5 (P1, dedupe error-rate audit, 100 merges + 100 near-misses) is
-  scoped to answer for the corpus generally — whether OECD-AIM's
-  per-dated-article granularity should ever collapse near-simultaneous
-  coverage of one product story across different split groups. Out of
-  this document's scope; not an "unsure" on the 47 splits themselves.
+- **Three cross-successor observations, not per-split judgements, all
+  routed to WS4-T5** (same treatment, applied consistently):
+  - `INC-00620`'s survivor ("Anthropic's Mythos AI Model Sparks Global
+    Cybersecurity and Financial System Fears", 1 source, dated
+    2026-04-18, Taiwanese/Singaporean press) and `INC-00623`'s successor
+    `INC-14757` ("Anthropic's Mythos AI Raises Global Cybersecurity
+    Concerns", 2 sources, dated 2026-04-08, Swedish/French/Belgian press)
+    cover the same underlying "Mythos AI model" story from different
+    regional press cycles on different dates.
+  - **[BOUNCE #1 addition]** Within `INC-00554`: `INC-14745` ("AI
+    Adoption Leads to Significant Job Losses Among Young Professionals in
+    South Korea", dated 2026-03-28) and `INC-14871` ("AI Adoption Leads to
+    Significant Job Losses Among Young Workers in South Korea", dated
+    2026-06-14) — title similarity **0.914**, the highest of any pair in
+    this corpus. Two separate OECD-AIM entries, 78 days apart, disjoint
+    reference URLs (both anchored on `chosun.com` but different article
+    paths), possibly two write-ups of the same underlying labour-market
+    trend rather than two incidents.
+  - **[BOUNCE #1 addition]** Within `INC-00554`: `INC-14808` ("South
+    Korean Government Launches Joint Response Team for AI-Driven
+    Cybersecurity Threats", dated 2026-05-13) and `INC-14838` ("South
+    Korea Launches Joint Public-Private Response to AI-Driven
+    Cybersecurity Threats", dated 2026-05-29) — title similarity **0.809**
+    (case-insensitive), 16 days apart, disjoint reference URLs
+    (`yonhapnewstv.co.kr` vs. `yna.co.kr`) — possibly the same policy
+    announcement covered twice, or a genuine follow-up.
 
-No other case surfaced ambiguity worth flagging: every high-similarity
-title pair inspected under check 3 resolved cleanly to distinct
-source_ids/dates/CVEs, and no successor within any of the 47 groups shares
-a source_id, CVE, or reference URL with a sibling in the same group.
+  For all three: checked directly and by this document's own
+  distinctness tests — different source_ids, different dates, disjoint
+  reference-URL sets — so **by the tests applied here they ARE distinct**,
+  and none is a member of another's split group (the query-string bug
+  never bridged any of these three pairs to each other). **This does not
+  change `INC-00554`'s own split decision** (it unambiguously separates
+  from the unrelated content the old id had absorbed regardless of how
+  these two internal pairs resolve) **and does not block authorization of
+  any of the 47.** They are flagged because they are exactly the shape of
+  question WS4-T5 (P1, dedupe error-rate audit, 100 merges + 100
+  near-misses) is scoped to answer for the corpus generally — whether
+  OECD-AIM's per-dated-article granularity should ever collapse
+  near-simultaneous or follow-up coverage of one story into one incident.
+  Out of this document's scope; **an honest "I cannot tell from this
+  evidence whether these are one incident or two" for these three pairs
+  specifically** — not a blanket "unsure" on the 47 splits, and not
+  silently omitted either.
+
+**Every other high-similarity pair inspected** (57 of the 59
+case-insensitive within-group pairs — the corrected, wider count per
+check 4 above) resolved cleanly to distinct source_ids, distinct CVEs, or
+a same-date pair whose content is unambiguously different (per check 2's
+0.522/0.531 ceiling); the remaining 2 are the `INC-14745`/`INC-14871` and
+`INC-14808`/`INC-14838` pairs flagged above. (The Mythos observation is a
+separate, cross-split comparison — it is not one of the 59 within-group
+pairs this count covers.) No further ambiguity surfaced.
 
 ## The 4 continuity-breaking splits, in detail
 
@@ -306,31 +455,54 @@ partial-list case (some real splits authorized, at least one not).
 
 **Proof of fire, against the REAL transition** (not merely a unit-test
 fixture — done in the `fixed` scratch worktree described above, never
-committed):
+committed). **[BOUNCE #1 correction, dated 2026-09-18]** The two steps
+below MUST run against a `data/` tree still in its pre-fix (control)
+state — the guard compares against the LAST WRITTEN build
+(`_load_prev_state()` reads whatever `data/incidents.json` currently
+holds), so re-running step 2 a second time without resetting `data/`
+first would spuriously "pass" even with an empty list, because a
+previously-split id is no longer previously-SINGLE in the state the
+guard would then be reading. Benign in CI (a real remediation lands the
+fix, guard, and authorized list in ONE PR against the committed
+baseline — never two sequential attacks); **named explicitly here because
+a reproduction recipe that omits it can be misread as evidence the guard
+doesn't fire.**
 
 1. **Empty list** (no `docs/audits/WS4-T19-authorized-splits-2026-09-18.json`
-   in the scratch tree): `python scripts/merge_and_dedupe.py` exits
+   in the scratch tree; `data/` freshly reset to the control commit via
+   `git checkout -- data/incidents.json data/id_deprecations.json
+   data/incidents.min.json`): `python scripts/merge_and_dedupe.py` exits
    **1**, prints `[split-guard] ABORT: this build would silently split 47
    previously-single PUBLISHED id(s)...`, enumerates all 47 old ids and
    their new row sets, and `git status --porcelain -- data` in that
    worktree shows **zero changes** — nothing was written.
 2. **Full list added** (the 55-entry proposed list from Deliverable 2,
-   copied into the scratch tree only): the same build now prints
-   `[split-guard] 47 previously-single published id(s) resolve to >1 row
-   this build; all are on the authorized list ... -- proceeding.`, exits
-   **0**, and writes `data/incidents.json` (13,361 rows) /
-   `data/id_deprecations.json` (1,052 entries) — matching the design
-   doc's and this document's own independently re-derived numbers exactly.
+   copied into the scratch tree only — `data/` is STILL in the reset
+   state from step 1, since step 1's abort never wrote anything): the
+   same build now prints `[split-guard] 47 previously-single published
+   id(s) resolve to >1 row this build; all are on the authorized list
+   ... -- proceeding.`, exits **0**, and writes `data/incidents.json`
+   (13,361 rows) / `data/id_deprecations.json` (1,052 entries) — matching
+   the design doc's and this document's own independently re-derived
+   numbers exactly.
 
 **Proof it discriminates, not merely toggles** (the predecessor's
 integrity guard, per the brief, passed on only 4 of the 8 cases it was
-written for — this guard is proven against a case that specifically tests
-partial authorization, both in a scratch build and as a committed unit
-test): `tests/test_merge_and_dedupe.py`'s
-`test_split_guard_reports_every_unauthorized_id_not_just_the_first`
-authorizes ONE of two independent, fabricated splits and asserts the
-guard still aborts, naming only the unauthorized one. Four more guard
-tests (`test_split_guard_fires_with_empty_authorization_list`,
+written for). **[BOUNCE #1 correction, dated 2026-09-18]** The original
+version of this proof was itself vacuous: with only TWO fabricated
+splits (one authorized, one not), a mutant truncating the guard's report
+to the first unauthorized id — `sorted(unauthorized)[:1]` — has nothing
+to truncate, since there is only ever one unauthorized id, and the test
+still passed. Fixed: `test_split_guard_reports_every_unauthorized_id_not_just_the_first`
+now uses THREE independent, fabricated splits, authorizes only the
+first, and asserts the OTHER TWO are both named. **Confirmed by hand**:
+patching `scripts/merge_and_dedupe.py`'s
+`for old_id in sorted(unauthorized):` to
+`for old_id in sorted(unauthorized)[:1]:` now makes this test FAIL
+(`AssertionError: the unauthorized third split must be named`) while the
+other four guard tests stay green — then reverted; `git diff` on this
+branch carries the correct, untruncated loop. Four more guard tests
+(`test_split_guard_fires_with_empty_authorization_list`,
 `test_split_guard_fires_when_authorization_list_is_missing_this_pair`,
 `test_split_guard_passes_once_the_pair_is_authorized`,
 `test_split_guard_ignores_ordinary_merges_and_retention`) cover the
@@ -359,10 +531,18 @@ repository was written. Full JSON:
    gets a new, additional `reason: "resplit"` record pointing at its
    actual current landing row(s) (append-only — the original `merged`
    record is preserved, per invariant 9 / `docs/ID_POLICY.md` rule 2).
-3. **Two flagged follow-ups, not part of this authorization**: re-key
+3. **Flagged follow-ups, not part of this authorization**: re-key
    `curation_overrides.json`'s `CVE-2025-10875` entry from `INC-14614` to
    `INC-02590` (§2.3b of the T10 design doc); and a WS4-T5 cross-check on
-   the `INC-00620`/`INC-14757` Mythos-coverage observation.
+   three cross-successor pairs that may (or may not) be the same
+   underlying story told twice — `INC-00620`/`INC-14757` (Mythos AI,
+   cross-split), and, **[BOUNCE #1 addition]**, two pairs INSIDE
+   `INC-00554`'s own decomposition: `INC-14745`/`INC-14871` (South Korean
+   AI-adoption job losses, 0.914 title similarity, 78 days apart) and
+   `INC-14808`/`INC-14838` (South Korean government cyber-response team,
+   0.809 title similarity, 16 days apart). **None of the three blocks
+   `INC-00554`'s split decision** — it separates from the old id's
+   unrelated absorbed content regardless of how these pairs resolve.
 4. **Net effect if approved and executed**: corpus 13,060 → 13,361
    (+301), `id_deprecations.json` 1,051 → at least 1,061 (+4 `split`
    records for the retirements, +8 `resplit` records for the inbound

@@ -7561,5 +7561,68 @@
       "judgement_confidence": "confident",
       "judgement_note": "Distinct incidents bridged only by a query-string article id on issues.apache.org/jira/secure/releasenote.jspa (old normalizer stripped the query, collapsing e.g. \"Cross-site Scripting in Apache ActiveMQ\" and \"Apache Geronimo console 1.0 vulnerable to cross-site scripting\" onto one key). Title continuity holds -- keep the id, no new deprecation record needed."
     }
+  ],
+  "bounce_1_corrections_2026-09-18": "See docs/audits/WS4-T19-split-evidence-2026-09-18.md's BOUNCE #1 box for the full defect list. This JSON's per-row data (successors, source_ids, reference URLs, inbound-deprecation detail) was not wrong and is unchanged; the corrections are entirely in how the markdown companion characterised distinctness confidence.",
+  "methodology_notes": {
+    "distinct_source_identity": "A build invariant (validate.py rejects duplicate source_ids/CVEs across rows), not independent evidence of distinctness -- it reads identically whether the 47 splits are correct or wrong.",
+    "same_date_oecd_sibling_pairs": {
+      "count": 51,
+      "note": "Independent recount from each successor's OECD-AIM-YYYY-MM-DD source_id; the reviewer's own recount gives 48 (pair-counting convention difference, not a disagreement on the finding). Dates do NOT universally differ within a split group -- this corrects the original claim. No split decision is affected: max title similarity among all same-date pairs is 0.522 (this recount) / 0.531 (reviewer's).",
+      "max_title_similarity_case_sensitive": 0.522
+    },
+    "title_similarity_scan": {
+      "case_sensitive_pairs_above_0_55": 49,
+      "case_insensitive_pairs_above_0_55": 59,
+      "note": "Same method and threshold as the 2026-09-15 audit's own scan, not an independent derivation path -- the 49-vs-59 gap is exactly a case-folding difference. The 10 pairs the case-sensitive scan omitted were checked by red-reviewer and confirmed distinct."
+    }
+  },
+  "flagged_cross_successor_pairs": [
+    {
+      "kind": "cross_split",
+      "split_group_a": "INC-00620",
+      "id_a": "INC-00620",
+      "title_a": "Anthropic's Mythos AI Model Sparks Global Cybersecurity and Financial System Fears",
+      "date_a": "2026-04-18",
+      "split_group_b": "INC-00623",
+      "id_b": "INC-14757",
+      "title_b": "Anthropic's Mythos AI Raises Global Cybersecurity Concerns",
+      "date_b": "2026-04-08",
+      "days_apart": 10,
+      "routed_to": "WS4-T5",
+      "blocks_split_decision": false,
+      "note": "Different regional press cycles covering the same product story; disjoint source_ids and reference URLs. Neither is in the other's split group (the query-string bug never bridged them to each other)."
+    },
+    {
+      "kind": "intra_split",
+      "split_group_a": "INC-00554",
+      "id_a": "INC-14745",
+      "title_a": "AI Adoption Leads to Significant Job Losses Among Young Professionals in South Korea",
+      "date_a": "2026-03-28",
+      "split_group_b": "INC-00554",
+      "id_b": "INC-14871",
+      "title_b": "AI Adoption Leads to Significant Job Losses Among Young Workers in South Korea",
+      "date_b": "2026-06-14",
+      "days_apart": 78,
+      "title_similarity": 0.914,
+      "routed_to": "WS4-T5",
+      "blocks_split_decision": false,
+      "note": "Highest title-similarity pair in the corpus. Disjoint OECD-AIM source_ids and reference URLs (both chosun.com but different article paths). Flagged 2026-09-18 (BOUNCE #1) -- does not change INC-00554's own split decision."
+    },
+    {
+      "kind": "intra_split",
+      "split_group_a": "INC-00554",
+      "id_a": "INC-14808",
+      "title_a": "South Korean Government Launches Joint Response Team for AI-Driven Cybersecurity Threats",
+      "date_a": "2026-05-13",
+      "split_group_b": "INC-00554",
+      "id_b": "INC-14838",
+      "title_b": "South Korea Launches Joint Public-Private Response to AI-Driven Cybersecurity Threats",
+      "date_b": "2026-05-29",
+      "days_apart": 16,
+      "title_similarity": 0.809,
+      "routed_to": "WS4-T5",
+      "blocks_split_decision": false,
+      "note": "Disjoint OECD-AIM source_ids and reference URLs (yonhapnewstv.co.kr vs yna.co.kr). Flagged 2026-09-18 (BOUNCE #1) -- does not change INC-00554's own split decision."
+    }
   ]
 }

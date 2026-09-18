@@ -7,6 +7,14 @@ intended delta is justified; an unintended delta is a defect. **Produced
 entirely in detached scratch worktrees; no file under `data/` or
 `schema/` in this repository was read for writing, or written.**
 
+> **BOUNCE #1, 2026-09-18**: the reviewer independently reproduced every
+> figure in this document (headline numbers, the 25-field breakdown, the
+> invariant checks) and found none of them wrong. The bounce was on the
+> companion evidence document's characterisation of its own confidence
+> (see `docs/audits/WS4-T19-split-evidence-2026-09-18.md`'s BOUNCE #1
+> box) and on this document's own regeneration recipe omitting a required
+> `data/` reset step — fixed below.
+
 - **control**: `origin/main` HEAD, commit `00b889c7` — today's committed
   13,060-row corpus, unchanged `normalize_url`.
 - **fixed**: `origin/main` HEAD with `fe3a4845` ("Revert 'Merge WS4-T10'")
@@ -30,6 +38,22 @@ python scripts/audit/ws4t10_phaseb_delta.py <control_dir> <fixed_dir> \
 git worktree remove <control_dir> --force
 git worktree remove <fixed_dir> --force
 ```
+**[BOUNCE #1 correction, dated 2026-09-18]** As written, `<fixed_dir>`'s
+`data/` starts at the control commit and this recipe builds it exactly
+ONCE, so it is not exposed to the stale-comparison risk below. **If you
+extend this recipe to also demonstrate the guard's abort path in the same
+tree** (e.g. running once WITHOUT the authorized list first, to see it
+abort, before copying the list in and running again) — do that BEFORE
+this recipe's own build, or reset `data/` in between:
+`git checkout -- data/incidents.json data/id_deprecations.json
+data/incidents.min.json` in `<fixed_dir>`. The guard compares against
+whatever `data/incidents.json` currently holds
+(`_load_prev_state()`), not a frozen baseline, so a second run in the
+same tree after a first run already wrote the split corpus will not
+detect the same splits as new — see
+`docs/audits/WS4-T19-split-evidence-2026-09-18.md`'s Deliverable 3
+section for the full explanation and the corrected two-step proof-of-fire
+recipe.
 
 ## Headline numbers
 

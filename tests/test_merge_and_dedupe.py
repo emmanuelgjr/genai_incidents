@@ -1976,12 +1976,23 @@ def test_split_guard_ignores_ordinary_merges_and_retention(tmp_path, monkeypatch
 def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, monkeypatch):
     """A guard that stops at the first unauthorized id could be satisfied
     by authorizing only one of several real splits and silently missing
-    the rest. Two independent splits, only one authorized: must still
-    abort, and must name BOTH in the message."""
+    the rest. THREE independent splits, only one authorized: must still
+    abort, and must name BOTH remaining unauthorized ids in the message.
+
+    Regression-proven, not merely asserted (BOUNCE #1 defect 1): with only
+    two splits (one authorized, one not), the message necessarily contains
+    exactly one unauthorized id, so a mutant that truncates the report to
+    `unauthorized[:1]` (the exact defect this test is named for) still
+    passes -- there is nothing for `[:1]` to drop. With three splits and
+    only one authorized, TWO must be named; `[:1]` reporting only one of
+    them makes this test fail. Confirmed by hand: patching
+    `_check_split_authorization` to `for old_id in sorted(unauthorized)[:1]:`
+    fails this test (only one of old_id_2/old_id_3 present) while leaving
+    the OTHER four split-guard tests green."""
     data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
-    # Two INDEPENDENT previously-merged rows (hand-seeded, high ids --
+    # THREE independent previously-merged rows (hand-seeded, high ids --
     # see _seed_prior_merged_row for why real ids are avoided).
-    old_id_1, old_id_2 = "INC-90001", "INC-95001"
+    old_id_1, old_id_2, old_id_3 = "INC-90001", "INC-95001", "INC-97001"
     row1 = m.normalize_entry(_entry_with_url(
         "OECD-AIM-X", "Incident X", "https://example.com/prior-merged-1"
     ))
@@ -1994,9 +2005,15 @@ def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, 
     row2["source_ids"] = ["OECD-AIM-P", "OECD-AIM-Q"]
     row2["id"] = old_id_2
     row2["added"] = row2["updated"] = "2026-01-01"
+    row3 = m.normalize_entry(_entry_with_url(
+        "OECD-AIM-M", "Incident M", "https://example.com/prior-merged-3"
+    ))
+    row3["source_ids"] = ["OECD-AIM-M", "OECD-AIM-N"]
+    row3["id"] = old_id_3
+    row3["added"] = row3["updated"] = "2026-01-01"
     data.mkdir(parents=True, exist_ok=True)
     (data / "incidents.json").write_text(_json.dumps(
-        {"incidents": [row1, row2], "incident_count": 2}
+        {"incidents": [row1, row2, row3], "incident_count": 3}
     ), encoding="utf-8")
 
     (ingest / "src.json").write_text(_json.dumps([
@@ -2004,8 +2021,10 @@ def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, 
         _entry_with_url("OECD-AIM-Y", "Incident Y", "https://example.com/y-story"),
         _entry_with_url("OECD-AIM-P", "Incident P", "https://example.com/p-story"),
         _entry_with_url("OECD-AIM-Q", "Incident Q", "https://example.com/q-story"),
+        _entry_with_url("OECD-AIM-M", "Incident M", "https://example.com/m-story"),
+        _entry_with_url("OECD-AIM-N", "Incident N", "https://example.com/n-story"),
     ]), encoding="utf-8")
-    # Only authorize the FIRST split, not the second.
+    # Only authorize the FIRST split, not the second or third.
     (data / "split_authorization.json").write_text(_json.dumps({
         "entries": [{"from": old_id_1, "reason": "test-authorized-split"}]
     }), encoding="utf-8")
@@ -2015,4 +2034,6 @@ def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, 
     msg = str(excinfo.value)
     detail = msg.split("Unauthorized split(s) detected", 1)[1]
     assert old_id_2 in detail, "the unauthorized second split must be named"
+    assert old_id_3 in detail, "the unauthorized third split must be named"
     assert old_id_1 not in detail, "the authorized first split must NOT be listed as unauthorized"
+
