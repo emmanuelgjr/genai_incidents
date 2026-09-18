@@ -71,6 +71,25 @@ never put model calls in the deterministic build path.
    published figure) sat local-only on an unmerged branch until a durability
    check caught it. **The check is one command:** `git ls-remote --heads origin
    <branch>` — empty means the record does not exist anywhere but this machine.
+   **1b. Verify the ref ACTUALLY ADVANCED — a push that sent nothing is the
+   failure mode, not the success (added 2026-09-18, user ruling D29).**
+   After any board push, confirm origin moved: compare `git ls-remote` against
+   the local SHA, or read the push output for `<old>..<new>`. **"Everything
+   up-to-date" after a board commit is a FAILURE signal, not a success.**
+   A record is not recorded until origin has it.
+   **Motivating example, found by a gate rather than by the foreman:** the main
+   tree sat on a *branch* while board commits were made, so `git reset --hard
+   origin/main` moved that branch rather than `main`, and `git push origin main`
+   then pushed a stale local `main` ref — sending nothing, silently, eight
+   times, reporting success every time. **Seven board records and TWO user
+   decisions existed only on one machine**: D27's identity-key ruling and
+   47-split authorization, and D28's approval of an irreversible 301-row data
+   change. **Same-day twice is a rate, not bad luck:** earlier that day a revert
+   deleted board records that had reached `main` only inside a feature merge.
+   Both failures share one shape — *the record looked filed and was not* — and
+   nothing catches either except checking that origin actually has it.
+   **Do board work in a worktree where `main` is genuinely checked out**, and
+   never `reset --hard` a tree whose HEAD is a branch you are not rewriting.
 2. **Field-level delta rule.** Any transformative data operation (a rebuild,
    reduction, relabel, migration) publishes a full field-level before/after
    delta across every affected field plus entry-count/ID-set. Unintended
