@@ -349,7 +349,23 @@ function renderTable(slice, start) {
     return main + renderDetail(e, detailId);
   }).join('');
 
-  els.body.innerHTML = rows || '<tr><td colspan="7" class="status">No matches.</td></tr>';
+  els.body.innerHTML = rows || (
+    activeFiltersCount() > 0
+      ? `<tr><td colspan="7" class="status">
+          <p>No incidents match the current filters.</p>
+          <button type="button" class="btn-secondary" id="clear-filters-empty">Clear filters</button>
+        </td></tr>`
+      : '<tr><td colspan="7" class="status"><p>No incidents.</p></td></tr>'
+  );
+  const clearEmpty = document.getElementById('clear-filters-empty');
+  if (clearEmpty) {
+    clearEmpty.addEventListener('click', () => {
+      for (const k of FILTER_KEYS) setFilter(k, k === 'cveOnly' ? false : '');
+      PAGE = 1;
+      EXPANDED.clear();
+      rerender();
+    });
+  }
 
   function toggleRow(id) {
     if (EXPANDED.has(id)) {
