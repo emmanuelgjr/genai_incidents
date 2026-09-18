@@ -392,11 +392,26 @@ function renderTable(slice, start) {
     // still toggles too, for mouse users -- the button calls
     // stopPropagation so a click on it doesn't double-toggle via bubbling.
     const toggleBtn = `<button type="button" class="row-toggle" aria-expanded="${expanded}" aria-controls="${detailId}" aria-label="${expanded ? 'Hide' : 'Show'} details for ${escapeHtml(e.id)}"><span aria-hidden="true">${expanded ? '−' : '+'}</span></button>`;
+    // .sev-glyph is a real, separately-hideable span (same pattern as the
+    // row-toggle's aria-hidden +/- above) carrying the colour-blind-safety
+    // glyph (SEV_GLYPH, above) as REAL TEXT CONTENT, not CSS ::before
+    // content -- verified via Chrome's own CDP Accessibility.getFullAXTree
+    // (not assumed) that aria-hidden on a span whose only content comes
+    // from ::before does NOT suppress it from the actual accessibility
+    // tree in the Chromium build these gates run against (StaticText still
+    // reported the glyph, ignored:false, even with aria-hidden on the
+    // host). aria-hidden DOES correctly suppress REAL text content --
+    // proven against this page's own toggleBtn "+"/"−" span above (0
+    // StaticText hits for it) -- so the glyph moved to real text to match
+    // that working precedent. Split from the severity WORD (escapeHtml(e.
+    // severity)) that follows it specifically so aria-hidden can silence
+    // the glyph without also silencing the word a screen reader needs.
+    const sevBadge = `<span class="sev-badge sev-${escapeHtml(e.severity)}"><span class="sev-glyph" aria-hidden="true">${SEV_GLYPH[e.severity] || ''}</span>${escapeHtml(e.severity || '')}</span>`;
     const main = `<tr${cls} data-row="${e.id}">
       <td class="date"><span class="date-cell">${toggleBtn}${escapeHtml(e.date || String(e.year || ''))}</span></td>
       <td class="id">${idCell}</td>
       <td class="title-cell">${escapeHtml(e.title)}</td>
-      <td><span class="sev-badge sev-${escapeHtml(e.severity)}">${escapeHtml(e.severity || '')}</span></td>
+      <td>${sevBadge}</td>
       <td class="llm col-llm">${escapeHtml(llm)}</td>
       <td class="asi col-asi">${escapeHtml(asi)}</td>
       <td class="cves col-cves">${cveCell}</td>
@@ -724,8 +739,11 @@ function renderStackedColumnChart(containerId, years, byYearBySeverity, onClick)
     const ly = M_TOP + i * 18;
     const lx = W - M_RIGHT + 6;
     // Glyph, not a plain colour swatch: see SEV_GLYPH above -- gives the
-    // legend a shape cue as well as a colour one.
-    return `<text x="${lx}" y="${ly + 10}" fill="${colorForSeverity(sev)}" font-size="11" font-family="var(--mono)">${SEV_GLYPH[sev]}</text>
+    // legend a shape cue as well as a colour one. aria-hidden on the glyph
+    // <text> for the same reason as .sev-glyph in renderTable() above: it's
+    // a sighted colour-blind redundancy, silent to assistive tech, next to
+    // the severity word in the adjacent <text class="row-label">.
+    return `<text x="${lx}" y="${ly + 10}" fill="${colorForSeverity(sev)}" font-size="11" font-family="var(--mono)" aria-hidden="true">${SEV_GLYPH[sev]}</text>
       <text class="row-label" x="${lx + 16}" y="${ly + 9}">${sev}</text>`;
   }).join('');
 

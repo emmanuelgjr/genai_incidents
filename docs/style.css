@@ -18,11 +18,16 @@
    LIGHT (primary)
      --ink       #1b1a17  17.12:1 on panel #fffdf8 · 15.84:1 on bg #f7f4ed
      --muted     #5d5a52   6.77:1 on panel        ·  6.27:1 on bg
-     --faint     #8a8578   3.62:1 on panel        ·  3.35:1 on bg
-                 (decorative only — chart tick labels / sub-stats; same role
-                 and a HIGHER ratio than this project's prior faint tokens,
-                 which axe-core passed at 2.9–3.1:1 — see the precedent note
-                 above .status below)
+     --faint     #6f6a5d   5.30:1 on panel        ·  4.91:1 on bg
+                 (used for the chart axis tick labels — the y-axis values
+                 and the x-axis year labels a reader uses to know which
+                 year a bar is, and for input placeholders. Originally
+                 shipped at #8a8578 / 3.62:1 on the theory that tick labels
+                 were decorative; corrected before merge — they're the
+                 informational text a reader actually navigates a chart by,
+                 not decoration, and the WCAG 1.4.3 "incidental/pure
+                 decoration" exception doesn't cover them. Placeholder text
+                 remains the one legitimately AA-exempt use of this token.)
      --accent    #9a3412   7.19:1 on panel        ·  6.65:1 on bg
      --accent-2  #7c2a0d   9.42:1 on panel        ·  8.71:1 on bg
      --critical  #a4161a   7.63:1 on panel        ·  7.06:1 on bg
@@ -52,12 +57,14 @@
    not a translucent rgba(). Two reasons: (1) the badge text is measured
    against its REAL rendered background, not assumed (badge text-on-tint
    ratios: light 4.75–6.15:1, dark 5.23–7.55:1, all ≥4.5:1 small-text AA —
-   see check_badges.py in this branch's report); (2) a prior version of this
-   stylesheet hardcoded the badge tint as a literal rgba() built from the
-   DARK theme's severity RGB regardless of which theme was active, which is
-   a latent correctness bug (the light-theme badge was always tinted with
-   dark-theme severity hues) this pass fixes by giving each theme its own
-   token instead of sharing one constant.
+   computed by blending each severity hex at 12% over that theme's panel and
+   re-measuring the result, not assumed from the unblended severity colour);
+   (2) a prior version of this stylesheet hardcoded the badge tint as a
+   literal rgba() built from the DARK theme's severity RGB regardless of
+   which theme was active, which is a latent correctness bug (the
+   light-theme badge was always tinted with dark-theme severity hues) this
+   pass fixes by giving each theme its own token instead of sharing one
+   constant.
 
    Colour-blind distinguishability of the severity ramp: the fixed hexes
    above pair hue with two more channels wherever severity is shown —
@@ -72,10 +79,28 @@
    time" chart — draws the SAME glyphs into its own SVG legend (app.js,
    SEV_GLYPH) and, unmodified from the prior design, always stacks segments
    in the same fixed order (Critical at the baseline through Info at the
-   top) so position is a second, redundant cue there too. What this pass did
-   NOT do: per-segment pattern/hatch fills on the stacked bars themselves —
+   top) so position is a second, redundant cue there too. Every glyph is
+   silent to assistive tech: it's REAL TEXT CONTENT inside a real
+   aria-hidden="true" element (.sev-badge's nested .sev-glyph span,
+   .sev-legend's .dot span), not CSS ::before content. Two more obvious-
+   looking approaches were tried first and both REJECTED after verifying
+   via Chrome's own CDP Accessibility.getFullAXTree, not assumed: CSS
+   generated-content alt text (`content: "…" / ""`) does not suppress
+   generated content from the real accessibility tree in the tested
+   Chromium build, and neither does plain aria-hidden on a span whose only
+   content comes from ::before -- both left the glyph's StaticText node
+   present with ignored:false. aria-hidden DOES correctly suppress real
+   text content (proven against this page's pre-existing row-toggle
+   "+"/"−" span), which is why the glyph is real text now. Without the
+   fix, every glyph was exposed as its own StaticText node read aloud
+   ahead of the severity word already sitting next to it (261 extra nodes
+   on one 250-row page); the glyphs are a sighted, colour-blind-safety
+   redundancy and should not charge a verbosity cost on a different
+   accessibility axis. See the .sev-badge and .sev-key .dot rules below for
+   the full detail. What this pass did NOT do: per-segment pattern/hatch
+   fills on the stacked bars themselves —
    considered, and rejected as disproportionate given (b) and (c) already
-   apply to every segment in that chart; see the branch report.
+   apply to every segment in that one chart.
    ========================================================================= */
 
 :root {
@@ -161,7 +186,10 @@
 
   --ink:       #1b1a17;
   --muted:     #5d5a52;
-  --faint:     #8a8578;
+  /* 5.30:1 on panel / 4.91:1 on bg -- see header note. Darkened from an
+     initial #8a8578 (3.62:1 on panel) once the chart tick labels this
+     feeds were correctly classified as informational, not decorative. */
+  --faint:     #6f6a5d;
 
   --accent:     #9a3412;
   --accent-2:   #7c2a0d;
@@ -409,10 +437,15 @@ main { padding-bottom: 5rem; }
    decorative label -- see the header note's precedent on where --faint is
    and isn't AA-exempt. Measured 6.27:1 (light) / 8.52:1 (dark) on bg. */
 .stat .sub { font-size: 0.76rem; color: var(--muted); }
-/* Same glyph set as .sev-badge / .sev-legend, for the one stat that
-   surfaces a severity outside the table (Critical count) — consistency,
-   not strictly required since the word "Critical" is already adjacent. */
-.stat .num.sev-Critical::before { content: "\25A0 "; font-size: 0.7em; }
+/* No glyph here (unlike .sev-badge / .sev-legend below): this ::before
+   would sit directly on .num, which also contains the real text (the
+   number itself), so hiding it from assistive tech would need a nested
+   span the way .sev-badge's .sev-glyph is -- not worth the markup for a
+   glyph that was already "not strictly required" (the word "Critical" is
+   the very next element, .label, a few pixels away) once CSS
+   generated-content alt text turned out not to suppress it from the
+   accessibility tree (see the .sev-badge comment below for how that was
+   verified). Colour + the adjacent word label still carry the meaning. */
 
 /* ------------------------------- Severity legend --------------------- */
 .sev-legend {
@@ -428,14 +461,33 @@ main { padding-bottom: 5rem; }
 }
 .sev-key { display: inline-flex; align-items: center; gap: 0.45rem; }
 /* Glyph, not a plain dot: see the header note on colour-blind
-   distinguishability. content lives on ::before so the empty <span
-   class="dot"> in index.html needs no markup change. */
+   distinguishability. The glyph character is REAL text content in
+   index.html's <span class="dot" aria-hidden="true">■</span> (etc.), not
+   CSS ::before content -- CSS generated-content alt text (`content: "x" /
+   ""`) was tried first, and plain aria-hidden on a ::before-only span was
+   tried second, and BOTH were rejected after verifying via Chrome's CDP
+   Accessibility.getFullAXTree, not assumed: neither suppresses the glyph
+   from the real accessibility tree in the tested Chromium build (the
+   StaticText node still reported the glyph as its name either way, even
+   with ignored:false on an aria-hidden ::before host -- a genuine
+   Chromium gap between aria-hidden and pseudo-element-generated content).
+   aria-hidden DOES correctly suppress real text content: proven against
+   this page's own pre-existing row-toggle "+"/"−" span (0 StaticText hits
+   for it), which is the working precedent this glyph fix now matches.
+   Without the fix, every badge/legend glyph was exposed as its own
+   StaticText node -- "black square, Critical" read aloud on every row of
+   the primary table -- a real verbosity cost on a DIFFERENT accessibility
+   axis than the one the glyph exists to serve. The word "Critical" is
+   already adjacent and already read; the glyph adds nothing for a screen
+   reader user and should stay silent for one, the way a purely decorative
+   icon would. Colour still comes from CSS (currentColor via the .dot
+   rule below), not the character itself. */
 .sev-key .dot { display: inline-flex; width: 1em; justify-content: center; }
-.sev-Critical .dot::before { content: "\25A0"; color: var(--critical); }
-.sev-High     .dot::before { content: "\25B2"; color: var(--high); }
-.sev-Medium   .dot::before { content: "\25C6"; color: var(--medium); }
-.sev-Low      .dot::before { content: "\25CF"; color: var(--low); }
-.sev-Info     .dot::before { content: "\25CB"; color: var(--info); }
+.sev-Critical .dot { color: var(--critical); }
+.sev-High     .dot { color: var(--high); }
+.sev-Medium   .dot { color: var(--medium); }
+.sev-Low      .dot { color: var(--low); }
+.sev-Info     .dot { color: var(--info); }
 
 /* ------------------------------- CTA row ----------------------------- */
 /* A hairline-bounded strip, not a filled/dashed callout box — the accent
@@ -755,7 +807,28 @@ td.cves { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); whi
 /* severity badge: glyph + left tick + pill. Background tokens are the
    pre-blended --*-bg custom properties (see header note); text stays the
    full-strength severity colour, so contrast is measured against the real
-   rendered background, not assumed. */
+   rendered background, not assumed.
+   The glyph is REAL TEXT CONTENT inside a nested `.sev-glyph` span
+   (app.js, SEV_GLYPH), not CSS ::before content, and that span carries
+   `aria-hidden="true"` in the markup -- split from the severity WORD that
+   follows it specifically so aria-hidden silences only the glyph. Two
+   mechanisms were tried first and both REJECTED, verified via Chrome's own
+   CDP Accessibility.getFullAXTree rather than assumed from the spec: (1)
+   CSS generated-content alt text (`content: "x" / ""`) does not suppress
+   the glyph from the real accessibility tree in the tested Chromium build
+   -- the StaticText node still reported name "■"; (2) aria-hidden on a
+   span whose only content comes from ::before ALSO does not suppress it
+   (ignored:false regardless). aria-hidden DOES correctly suppress real
+   text content -- proven against this page's own pre-existing row-toggle
+   "+"/"−" span (0 StaticText hits) -- which is why the glyph moved off
+   ::before entirely. Without the fix, every badge glyph was exposed as
+   its own StaticText node (261 on a 250-row page), read aloud ahead of
+   the severity word on every row of the primary table. The glyph is
+   redundant coding for sighted colour-blind readers; it should not charge
+   a verbosity cost on a screen-reader user, who already gets the word.
+   .sev-glyph needs no per-severity colour rule of its own: it inherits
+   `color` from its `.sev-badge.sev-X` ancestor via normal CSS
+   inheritance, same full-strength severity colour as the badge text. */
 .sev-badge {
   display: inline-flex;
   align-items: center;
@@ -769,17 +842,12 @@ td.cves { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); whi
   border-left: 3px solid currentColor;
   white-space: nowrap;
 }
-.sev-badge::before { font-size: 0.9em; line-height: 1; }
+.sev-glyph { font-size: 0.9em; line-height: 1; }
 .sev-badge.sev-Critical { color: var(--critical); background: var(--critical-bg); }
-.sev-badge.sev-Critical::before { content: "\25A0"; }
 .sev-badge.sev-High     { color: var(--high);     background: var(--high-bg); }
-.sev-badge.sev-High::before     { content: "\25B2"; }
 .sev-badge.sev-Medium   { color: var(--medium);   background: var(--medium-bg); }
-.sev-badge.sev-Medium::before   { content: "\25C6"; }
 .sev-badge.sev-Low      { color: var(--low);      background: var(--low-bg); }
-.sev-badge.sev-Low::before      { content: "\25CF"; }
 .sev-badge.sev-Info     { color: var(--info);     background: var(--info-bg); }
-.sev-badge.sev-Info::before     { content: "\25CB"; }
 
 /* expanded dossier row */
 tr.detail td { padding: 0; background: var(--bg-2); }
@@ -882,10 +950,16 @@ footer p:not(.meta) a { border-bottom: 1px solid var(--accent-line); }
 footer p:not(.meta) a:hover { border-color: var(--accent); text-decoration: none; }
 /* --muted, not --faint (measured, axe-core color-contrast, this pass): the
    dataset-version/generated-date line and the integrity "verify" link are
-   real informational text a visitor is meant to read, not a de-emphasised
-   decoration -- --faint's ~3.3-3.6:1 here fell short of the 4.5:1 small-text
-   floor. --faint stays reserved for genuinely decorative text (SVG chart
-   tick labels, input placeholders) that axe-core does not evaluate. */
+   real informational text a visitor is meant to read. This was caught when
+   --faint was still #8a8578 (3.62:1 on panel, short of the 4.5:1
+   small-text floor); --faint has since been darkened to #6f6a5d (5.30:1)
+   because the chart tick labels it feeds turned out to be informational
+   too, not decorative -- see the header note. --muted is kept here anyway,
+   not reverted back to the now-AA-compliant --faint: this line and the
+   "verify" link sit at the bottom of the page competing with true
+   decoration (the .meta timestamp styling) for attention, and --muted's
+   extra headroom is the more legible choice for something a visitor is
+   specifically checking (the dataset version, the integrity manifest). */
 footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); margin-top: 0.7rem; }
 footer .meta a { color: var(--muted); border-bottom: 1px solid var(--line-2); }
 footer .meta a:hover { color: var(--accent); border-color: var(--accent-line); }
