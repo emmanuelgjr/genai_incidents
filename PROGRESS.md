@@ -160,7 +160,29 @@ VERSIONING.md step should say which link forms survive the move.
 
 **What still stands between an armed `main` and a published unmerge**, recorded so nobody mistakes the barrier for a design: the fixed build **fails `validate.py` (exit 1, INC-14614)** [R, gate BOUNCE #1 defect 3], the E21 tripwire fails closed, and D25(a) is policy. That is **three accidental barriers and no deliberate one.** WS4-T15 owes a deliberate guard; until then, **no rebuild is to be committed on `main` after the fix merges** except by a task that names the unmerge as its subject.
 
-## 🔁 WS4-T10 CORRECTION PASS (per D26a) — `efd72c51` — **⛔ BOUNCE #4, fix dispatched, user informed (protocol step 6)**
+## 🔁 WS4-T10 CORRECTION PASS (per D26a) — **✅ PASS (red-reviewer, 2026-09-18, on `53556e3d`) — HELD FOR MERGE UNTIL AFTER THE v2.10.0 CUT (ordering hazard above)**
+
+**─── RE-GATE VERDICT (agreement 5) — red-reviewer, 2026-09-18, on `53556e3d`: PASS ───**
+
+**⚠ The gate corrected the foreman's process, and the correction is kept because it generalises.** The foreman's pre-gate check reported a clean tree; **when the gate looked, the tree was dirty** — the specialist was actively writing the same file (mtime 14 seconds earlier), and those edits landed as `53556e3d` mid-review. The gate verified the branch **tip** rather than the SHA it was handed. Its instruction, now standing practice: *"a pre-gate check taken before an agent goes idle attests to a moment, not to the merge — re-run `git status --porcelain` before merging."* **Foreman re-verified at merge time [R]:** tip `53556e3d`, porcelain empty, frozen-code diff empty, origin matches.
+
+**Three judgement calls the gate was asked to rule on, all ruled, all recorded as precedent:**
+1. **Bucket 1 — the two live §7.2 references are CORRECTLY left unflagged**, verified against the note rather than accepted: §8.2's superseding note at `:823` says verbatim that *"§8.2's proposed record type (`reason: \"resplit\"`) and the `resolve_id` list-valued-`into` crash finding below **both stand as findings**"*, and `:627` references precisely that exempted half. `:616` ("corrected in §8.1/§8.2") is true because §8.1 is live and corrected.
+2. **In-place amendment of a same-day, unmerged, self-authored dated note is NOT an agreement-4 violation** when it refines only the routing pointer and retracts no claim — *"that is agreement 4's live-surface half"*. The protected pre-2026-09-18 originals were verified untouched, not assumed.
+3. **D4's inline parentheticals** interpolate into preserved sentences rather than appending, which is acceptable: they add no claim, retract nothing, and match `:771`'s established form.
+
+**Evidence [R] (gate):**
+- **All four defects fixed as pure appends** except D4's two inline flags — `difflib` opcodes over `efd72c51→17be38b9` = 3 inserts (banner `:58-65`, §8.4 `:1029-1035`, §8.5 `:1047-1056`) + 2 one-line replaces. **Nothing above any note rewritten.**
+- **Protected originals byte-unchanged at the tip:** §8.2/§8.3 preserved bodies byte-identical to `be0d037f` once only the new `> **[2026-09-18 correction` blockquotes are removed; §7.3 item 1 still verbatim from `9c24d181`; `53556e3d`'s two hunks removed **only** lines beginning `>`.
+- **The sweep is now real** — the gate enumerated **every** §8.2/§8.3 reference at the tip with section attribution (**23 hits**); every live one is flagged or immediately followed by a dated correction, and the only unflagged live ones are bucket 1's two, ruled correct.
+- **Independent vocabulary sweep by a different route** (`chronological` / `latest-dated` / `zero code change` outside §8.2–§8.3): 2 hits, both inside the new correction notes. Clean.
+- **Bucket 4 confirmed and corrected upward:** the audit doc has **5** `resplit` mentions, not the specialist's 4 (`:146,148,151,152,218`); all assert only that a record is *needed*, none asserts the retracted mechanics, so leaving that file unchanged was right.
+- **§8.5 now reads correctly as a decision surface — the defect that mattered.** A user arriving to rule reads (d)/(e) and immediately below that the rule is false, why (file order not date; 57 inversions), that nothing is left to ratify, and that WS4-T15 decides. **Leaving (f) unaffected is correct**: §8.4's INC-07738 diagnosis is untouched by the supersession.
+- **Frozen code still frozen:** `git diff --stat be0d037f..53556e3d -- scripts/ tests/ data/ schema/ ingest/ .github/` **empty**. Suite **341**. Scope: 1 file in both commits. No strays.
+
+**MERGE STATUS — deliberately NOT merged yet.** The branch is PASS-clean and pushed, but merging it **arms the 301-row unmerge** (see the ordering-hazard entry above), and the v2.10.0 cut rebuilds. **Merge order: WS6-T5 → cut v2.10.0 → then this branch.** D26(b) is satisfied by merging it, not by merging it first.
+
+## 🔁 WS4-T10 CORRECTION PASS (per D26a) — `efd72c51` — BOUNCE #4 history (superseded by the PASS above)
 
 **Pass scope:** prose-only, two committed artifacts, so the branch merges without carrying false claims onto `main`. **Code and tests frozen** — the prior gate's byte-identical-build evidence is only valid while they are untouched. Specialist: a **fresh** pipeline-engineer (agreement 3's replace-over-re-prompt).
 
