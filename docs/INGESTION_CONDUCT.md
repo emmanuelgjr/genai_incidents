@@ -291,9 +291,26 @@ fetch.
 `K` is split 50/50 (`select_probe_sample()` / `select_recent_biased_sample()`
 in `scripts/ingest_oecd_aim.py`) into a ROTATING half (sorted by numeric
 slug value, advances a persisted cursor — guarantees monotonic, eventual
-full coverage of the population on a fixed schedule) and a RECENCY-BIASED
-half (the front of the population in its own sitemap order — where a shape
-change is most likely to appear first). A `REASON_FETCH_FAILED` result
+full coverage of the population on a fixed schedule) and a second,
+front-of-population half (the front of the population in its own sitemap
+order). **WS4-T20 (2026-09-18) correction:** this second half was
+originally named and documented as "recency-biased," on the unverified
+premise that sitemap position for a legacy numeric-slug page correlated
+with how recently it was touched. That premise was checked against the
+sitemap's own `<lastmod>` element and found false: `<lastmod>` is present
+for every legacy numeric-slug URL (2,415/2,415 in the current 3,000-URL
+crawl window, live-measured) but is IDENTICAL across the entire legacy
+population — `2024-11-21`, zero variance — while the modern date-hash
+population in the same window carries 22 distinct `<lastmod>` values. No
+recency ordering is derivable from the sitemap for this population, so
+`select_recent_biased_sample()` does not sort by `<lastmod>` (there is
+nothing to sort by — every key ties) and its docstring no longer claims a
+recency mechanism. It remains, functionally, a second slice of the
+population ordered by the sitemap's own (recency-uncorrelated, as far as
+verified) listing order — see that function's docstring for the traced,
+run-to-run behavior this produces (it stabilizes on a fixed set of 25 URLs
+for long stretches once the rotating cursor's value range no longer
+overlaps the front of that order). A `REASON_FETCH_FAILED` result
 (ordinary network flakiness) is excluded from the pass/fail verdict, but
 IS surfaced in the run's own log line and persisted state (`fetch_failed`,
 `observed`) — a run that observes nothing must not print an affirmative
@@ -325,9 +342,11 @@ line on any live run, don't assume they hold indefinitely.
 the default `K=50`) completes one full guaranteed-coverage pass of the
 current population in `ceil(1773 / 25) = 71` runs — about **1.4 years** at
 this workflow's weekly cadence. This is why `K=5` (the original sizing) was
-rejected: it gave a 355-run, ~6.8-year cycle. The recency-biased half adds
-extra, earlier scrutiny of the population's most-recently-active slugs on
-top of that guarantee, not instead of it. A **coverage ledger**
+rejected: it gave a 355-run, ~6.8-year cycle. The second (front-of-
+population) half adds extra probe volume on top of that guarantee, not
+instead of it, but (WS4-T20 correction above) carries no demonstrated bias
+toward where a shape change is more likely to appear — that claim did not
+survive checking. A **coverage ledger**
 (`_coverage_ledger()`, persisted in `skip_probe_state.json` as
 `coverage_ledger`, and printed every run) tracks how much of the CURRENT
 population has actually been observed at least once, lifetime — a measured

@@ -1024,6 +1024,12 @@ def test_select_probe_sample_cursor_stale_against_a_changed_population():
 
 
 # --- WS4-T17 BOUNCE #1: select_recent_biased_sample() -----------------------
+# WS4-T20 (2026-09-18): these tests already assert exactly what this function
+# does -- front-of-`skipped`-order selection -- and needed no behavior change
+# when the recency CLAIM was corrected. See select_recent_biased_sample()'s
+# docstring in scripts/ingest_oecd_aim.py for the checked negative result
+# (sitemap <lastmod> exists but is identical across the entire legacy
+# population, so no recency ordering is derivable from it).
 
 
 def test_select_recent_biased_sample_prefers_front_of_original_order():
@@ -1054,6 +1060,52 @@ def test_select_recent_biased_sample_k_zero_or_negative_is_a_noop():
 
 def test_select_recent_biased_sample_empty_population():
     assert o.select_recent_biased_sample([], set(), 3) == []
+
+
+def test_select_recent_biased_sample_stabilizes_once_rotating_cursor_moves_on(): # WS4-T20
+    """Traces several consecutive runs the way the WS4-T20 gate did, wired
+    exactly as run_skip_sampling_probe() wires the two halves together
+    (rotate first, then recent excluding rotate's picks, cursor carried
+    forward run to run). Demonstrates -- doesn't just assert -- the behavior
+    this task's report documents: once the rotating half's cursor moves past
+    the value range that dominates the FRONT of `skipped`'s own order, the
+    second half stops changing and returns the identical set every
+    subsequent run (until the rotating cursor wraps around a full cycle,
+    which is 71 runs / ~1.4 years at this workflow's real weekly cadence --
+    not exercised here).
+
+    Population: values 0..8 sit at the FRONT of `skipped`'s order (mimicking
+    the live sitemap, where low legacy-slug values cluster near the front of
+    the numeric-slug block); values 9..29 follow. k_rotate=k_recent=3.
+
+    Proof this isn't a vacuous check: run 1 -> run 2 DIFFER (the rotating
+    half's first draw overlaps the front block, so `exclude` changes what
+    the second half falls back to) -- an equality assertion between two
+    genuinely different runs would fail here, which is what a mutation that
+    broke the exclude-based fallback would also produce. Only from run 2
+    onward, once the rotating cursor's value range (3, 5, 8, 11, ...) no
+    longer intersects the front block (0..8), does the second half stop
+    moving.
+    """
+    front_block = _numeric_urls(*range(0, 9))
+    tail_block = _numeric_urls(*range(9, 30))
+    skipped = front_block + tail_block
+
+    cursor = None
+    recent_samples = []
+    for _run in range(1, 6):
+        rotate_sample, new_cursor = o.select_probe_sample(skipped, cursor, 3)
+        recent_sample = o.select_recent_biased_sample(skipped, set(rotate_sample), 3)
+        recent_samples.append(recent_sample)
+        cursor = new_cursor
+
+    run1, run2, run3, run4, run5 = recent_samples
+    assert run1 == _numeric_urls(3, 4, 5)
+    # Proof-of-fire: runs 1 and 2 are NOT equal -- the check below (runs 2-5
+    # all equal) would also fail if this stabilization never happened, so
+    # this asserts the discriminating case exists at all.
+    assert run1 != run2
+    assert run2 == run3 == run4 == run5 == _numeric_urls(0, 1, 2)
 
 
 # --- WS4-T17 BOUNCE #1: _coverage_ledger() -----------------------------------
@@ -1305,7 +1357,8 @@ def test_main_invokes_skip_sampling_probe_when_enabled(monkeypatch, tmp_path, ca
     monkeypatch.delenv("OECD_AIM_LIMIT", raising=False)
     # k=2 (not 1): k_rotate = 2//2 = 1 keeps the rotating half active even
     # against a 1-URL population -- k=1 would zero out k_rotate (1//2=0) and
-    # this test would only ever exercise the recency-biased half.
+    # this test would only ever exercise the second (front-of-population,
+    # WS4-T20: not recency-ordered) half.
     monkeypatch.setenv("OECD_AIM_PROBE_SAMPLE_SIZE", "2")
     monkeypatch.setattr(_common.time, "sleep", lambda *_a, **_k: None)
 

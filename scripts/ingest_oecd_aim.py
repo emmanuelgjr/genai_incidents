@@ -216,9 +216,24 @@ def partition_fetchable(urls: list[str]) -> tuple[list[str], list[str]]:
 # years at this workflow's weekly cadence, against a population that never
 # stops shifting. DEFAULT_PROBE_SAMPLE_SIZE is now 50, split evenly into a
 # ROTATING half (guarantees monotonic full coverage -- select_probe_sample())
-# and a RECENCY-BIASED half (select_recent_biased_sample(), below) that
-# prioritizes the legacy slugs most likely to show a shape change first.
-# Measured at the default split (25/25):
+# and a SECOND, front-of-population half (select_recent_biased_sample(),
+# below).
+#
+# WS4-T20 (2026-09-18): that second half's name and docstring used to assert
+# it was recency-biased -- that a page fetching CLOSER TO THE FRONT of the
+# numeric-slug sitemap block had been more recently touched. Nobody had
+# checked that against the sitemap's actual <lastmod> element before this
+# task looked. It does not hold: <lastmod> IS present for every legacy
+# numeric-slug URL (live check, 2026-09-18, full sitemap: 9,415/9,415; within
+# the current 3,000-URL crawl window: 2,415/2,415) but it is IDENTICAL for
+# all of them -- "2024-11-21", with zero variance -- while the modern
+# date-hash population in the same window carries 22 distinct <lastmod>
+# values. The field is real and it works for modern-scheme pages; it is
+# simply a flat placeholder for the entire legacy population, so no
+# recency ordering can be derived from the sitemap for the slugs this half
+# selects from. See select_recent_biased_sample()'s docstring for what this
+# half actually does now that the recency claim is gone, and this task's
+# report for the measurement script. Measured at the default split (25/25):
 #   cycle length (rotating half) = ceil(1773 / 25) = 71 runs (~1.4 years at
 #     this workflow's weekly cadence)
 #   time cost    = 50 sequential fetches * ~1s DEFAULT_MIN_INTERVAL ~= 50s,
@@ -232,7 +247,7 @@ def partition_fetchable(urls: list[str]) -> tuple[list[str], list[str]]:
 # for a live third-party count exists (same caveat as USER_AGENT's version
 # string in ingest/common.py) -- these are point-in-time, hand-kept in sync.
 
-DEFAULT_PROBE_SAMPLE_SIZE = 50  # total per run, split 50/50 rotating+recency-biased -- see the module comment above for the cycle-length/cost math this was chosen against.
+DEFAULT_PROBE_SAMPLE_SIZE = 50  # total per run, split 50/50 rotating+front-of-population (WS4-T20: not recency -- see the module comment above) -- see the module comment above for the cycle-length/cost math this was chosen against.
 PROBE_STATE_PATH = ROOT / "ingest" / "_state" / "skip_probe_state.json"
 
 
@@ -315,23 +330,43 @@ def select_recent_biased_sample(
     """Return up to `k` URLs from `skipped`, preferring entries EARLIEST in
     `skipped`'s OWN order -- i.e. `partition_fetchable()`'s output order,
     which preserves the raw sitemap order (that function's own docstring:
-    "preserving input order in both"), and `load_sitemap()` lists newest-
-    first by the sitemap's own ordering. A legacy numeric-slug page that was
-    recently touched -- an edit, a re-publish, a migration -- sorts CLOSER
-    TO THE FRONT of the numeric-slug block (nearer the date-hash/numeric-
-    slug boundary) than an untouched one, even though its URL is still
-    legacy-numbered. This is the half of the sample biased toward where a
-    shape change is MOST LIKELY to appear first: recently-active pages, not
-    an arbitrary numeric-value-sorted slice (that guaranteed, eventual-full-
-    coverage property is what the ROTATING half, `select_probe_sample()`
-    above, already provides on its own fixed schedule).
+    "preserving input order in both").
+
+    WS4-T20 (2026-09-18) -- READ THIS BEFORE TRUSTING THE NAME: this
+    function's name and this docstring used to claim that URL position in
+    the sitemap's numeric-slug block was a proxy for recency (a page
+    "recently touched -- an edit, a re-publish, a migration -- sorts CLOSER
+    TO THE FRONT of the numeric-slug block"). That was never checked against
+    the sitemap's own `<lastmod>` element, and when WS4-T20 checked it, it
+    turned out to be false: `<lastmod>` IS published for every legacy
+    numeric-slug URL, but it is the SAME value -- "2024-11-21" -- for all of
+    them (live measurement, 2026-09-18: 2,415/2,415 in the current 3,000-URL
+    crawl window, 9,415/9,415 sitewide; contrast the 22 distinct `<lastmod>`
+    values the modern date-hash population carries over the same window).
+    There is no per-URL recency signal available anywhere in the sitemap for
+    this population -- sorting by it is a no-op (every key ties), so this
+    function does NOT sort by `<lastmod>` and does not attempt to.
+
+    What this function actually does, and the one real property it has:
+    it is a SECOND, mechanically-distinct slice of the same population,
+    ordered by the sitemap's own (recency-uncorrelated, as far as this
+    project has verified) listing order rather than by numeric slug value
+    like the rotating half. It carries NO coverage guarantee of its own --
+    that property belongs entirely to `select_probe_sample()` above -- and,
+    because `skipped`'s order is stable run to run, it is NOT random either:
+    once the rotating half's cursor moves past whatever value range
+    dominates the front of `skipped`'s order, this half returns the SAME set
+    of URLs every run until the cursor wraps back around (traced directly,
+    see this task's report). Kept as-is (not removed, not given a new
+    heuristic) per this task's brief: a checked negative result is the
+    right outcome here, not an unverified replacement claim stacked on top
+    of the first one.
 
     `exclude` (typically this run's rotating-half sample, as a set of URLs)
     is skipped so the two halves of a combined sample don't waste probe
     budget re-fetching the same URL twice in one run; remaining entries are
     still taken in `skipped`'s own order once the excluded ones are filtered
-    out, so this stays a pure front-of-population bias, not a second
-    rotation with its own guarantee.
+    out.
 
     `k<=0` returns `[]`.
     """
@@ -402,12 +437,13 @@ def run_skip_sampling_probe(
 ) -> dict:
     """The WS4-T17 tripwire itself: fetch a real sample of `skipped` --
     HALF rotating (`select_probe_sample()`, guaranteed eventual full
-    coverage on a fixed schedule) and HALF recency-biased
-    (`select_recent_biased_sample()`, prioritizing the legacy slugs most
-    likely to show a shape change first) -- through the same conduct-
-    checked path the main crawl uses, and assert each OBSERVED one still
-    fails the ng-state body-shape check -- i.e. the skip rule's premise
-    still holds for what was actually observed this run.
+    coverage on a fixed schedule) and HALF a second, front-of-population
+    slice (`select_recent_biased_sample()` -- WS4-T20: despite the name,
+    NOT recency-ordered; see that function's docstring for the checked
+    negative result) -- through the same conduct-checked path the main
+    crawl uses, and assert each OBSERVED one still fails the ng-state
+    body-shape check -- i.e. the skip rule's premise still holds for what
+    was actually observed this run.
 
     `fetch_fn` defaults to `fetch_and_extract` (the real, network-touching
     path); tests inject a stub returning canned `(reason, body)` pairs so
@@ -1111,7 +1147,7 @@ def main():
         n_sample = min(probe_k, len(skipped_numeric))
         print(
             f"[aim] skip-rule sampling probe: fetching up to {n_sample}/{len(skipped_numeric)} "
-            "skipped legacy numeric-slug URLs (rotating + recency-biased halves) to confirm "
+            "skipped legacy numeric-slug URLs (rotating + front-of-population halves) to confirm "
             "the body-shape-check premise still holds (WS4-T17)"
         )
         probe_result = run_skip_sampling_probe(skipped_numeric, k=probe_k)
