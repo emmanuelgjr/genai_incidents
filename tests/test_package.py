@@ -77,3 +77,33 @@ def test_load_deprecations_dict_shape():
     for k, v in list(d.items())[:5]:
         assert k.startswith("INC-")
         assert v.startswith("INC-")
+
+
+# --- WS4-T15: resolve_id must degrade, not crash, on a list-valued `into` --
+
+def test_resolve_id_list_into_returns_none_not_typeerror(monkeypatch):
+    # Verified crash today: `current in deprec` with `current` bound to a
+    # list raises TypeError: unhashable type: 'list'. A `split`/`resplit`
+    # record (WS4-T15) is list-valued by design, so this must degrade
+    # safely rather than blow up every caller's first hop into one.
+    monkeypatch.setattr(gi, "_load_deprecations", lambda: {"INC-1": ["INC-2", "INC-3"]})
+    monkeypatch.setattr(gi, "by_id", lambda x: None)
+    assert gi.resolve_id("INC-1") is None
+
+
+def test_resolve_id_group_scalar_chain(monkeypatch):
+    targets = {"INC-1": "INC-2", "INC-2": "INC-3"}
+    live = {"INC-3"}
+    monkeypatch.setattr(gi, "_load_deprecations", lambda: targets)
+    monkeypatch.setattr(gi, "by_id", lambda x: {"id": x} if x in live else None)
+    assert gi.resolve_id_group("INC-1") == ["INC-3"]
+    assert gi.resolve_id_group("INC-3") == ["INC-3"]
+    assert gi.resolve_id_group("INC-99999999") == []
+
+
+def test_resolve_id_group_multi_successor(monkeypatch):
+    deprec = {"INC-1": ["INC-2", "INC-3"]}
+    live = {"INC-2", "INC-3"}
+    monkeypatch.setattr(gi, "_load_deprecations", lambda: deprec)
+    monkeypatch.setattr(gi, "by_id", lambda x: {"id": x} if x in live else None)
+    assert set(gi.resolve_id_group("INC-1")) == {"INC-2", "INC-3"}
