@@ -174,6 +174,21 @@ VERSIONING.md step should say which link forms survive the move.
 
 **Merge ordering reaffirmed by the gate in its own words:** merging arms the 301-row unmerge and the cut rebuilds, so **WS6-T5 → v2.10.0 cut → this branch. D26(b) is satisfied by merging it, not by merging it first.** Standing instruction it repeated: **re-run `git status --porcelain` at the moment of merge** — a pre-gate check attests to a moment, not to the merge.
 
+## 🔍 THE BLOCKED STRING, CLASSIFIED 2026-09-18 [R] — a GitHub pre-signed URL, not a credential → **NEW TASK WS4-T18 (P3)**
+
+**What it actually is.** The `AKIA…` match sits inside a URL pasted into the **upstream CVE-2023-36464 description**, in `INC-11516`'s `description` field:
+`https://objects.githubusercontent.com/github-production-repository-file-…?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA…%2F20230627%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230627T201018Z&X-Amz-Expires=300`
+
+**Four measured facts, each independently checkable:**
+1. **`X-Amz-Credential` carries an access key *ID* — a public identifier, not a secret.** The secret never appears in a pre-signed URL; only a signature derived from it does. **Verified: no 40-character secret-key pattern exists anywhere in that description.**
+2. **It is GitHub's key ID, not this project's** — host `objects.githubusercontent.com`, a GitHub attachment-download link for a PoC file referenced by the advisory.
+3. **It expired on 2023-06-27.** `X-Amz-Expires=300` (five minutes) from `X-Amz-Date=20230627T201018Z`.
+4. **It has been public since 2026-06-10** (`afea57e8`, PR #50) and **is present in the published `v2.9.0` tag**, hence in that release's Zenodo deposit. **Blocking this push protects nothing that is not already published.**
+
+**Conclusion:** push protection is working correctly on a pattern that in this instance carries no secret. **The unblock decision is the user's** — it is their repository's security control and the judgement belongs on their record, not the foreman's.
+
+**NEW TASK WS4-T18 (P3) — strip query strings from imported reference URLs in descriptions.** Owner **pipeline-engineer**. Pre-signed and tracking-laden URLs are noise in a published dataset and **will re-block every future push touching `data/incidents.json`** until allowlisted or removed. **This is a data change under the D25(a) freeze and needs its own ruling before execution** — boarded, not actioned. Note the overlap with WS4-T10's `normalize_url` work: both concern query strings in URLs, but this one is about *stored description text*, not merge keys.
+
 ## 🛑 v2.10.0 CUT COMPLETE THROUGH STEP 5 — **PUBLISH BLOCKED BY GITHUB SECRET SCANNING, ESCALATED TO THE USER 2026-09-18**
 
 **Recorded on this branch, not `main`, deliberately:** any push to `main` now carries the blocked cut commit `967fc04b`, so `main` cannot receive board records until the block is resolved. This entry moves to `main` with the rest.
