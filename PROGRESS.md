@@ -174,6 +174,18 @@ VERSIONING.md step should say which link forms survive the move.
 
 **Merge ordering reaffirmed by the gate in its own words:** merging arms the 301-row unmerge and the cut rebuilds, so **WS6-T5 → v2.10.0 cut → this branch. D26(b) is satisfied by merging it, not by merging it first.** Standing instruction it repeated: **re-run `git status --porcelain` at the moment of merge** — a pre-gate check attests to a moment, not to the merge.
 
+## 🔢 WS4-T15 INHERITS AN UNRECONCILED ±1 — found 2026-09-18 by the release-notes gate (its advisory A9), **must be settled BEFORE WS4-T15 designs against either number**
+
+**The conflict, inside `docs/specs/WS4-T10-unmerge-design-2026-09-15.md`:**
+- `:103` — **"control 13,060 unique rows; fixed 13,361 (+301)"**, the measured corpus delta.
+- `:408-411` — the §2 distribution table sums to **349 successor rows from 47 old rows**, and states "47 of those 349 keep an existing id and **302** are freshly minted (exactly the measured new-only count)". 47 old rows resolving to 349 is a net **+302**.
+
+**Both cannot be right, and Option 2's consumer-impact arithmetic is built directly on 349.** The document *does* reconcile a different confusion at `:676-687` (that 349 is a count of successor rows, not of IDs needing no deprecation record) — **but it never reconciles +302 against +301.**
+
+**Foreman hypothesis, UNVERIFIED — offered as a lead, not a finding [A]:** the gap is probably **INC-07738**, which the fixed build retires into a fresh ID (`INC-14757`) **without adding a row** — a replacement rather than an addition. Earlier gate measurements are consistent with this: "changed rows 48 → 47" and exactly one new deprecation record, `INC-07738 → INC-14757`. If INC-14757 is among the 302 "freshly minted" rows while INC-07738 leaves, the net is +301 with 349 successors intact and both figures survive. **WS4-T15 must verify or refute this per-entity, not by re-running either aggregate** — it is exactly the shape agreement 6(d) warns about, a total that balances while the composition inside it is described two ways.
+
+**Not a defect in the v2.10.0 release notes**, and the gate said so explicitly: the notes cite `+301` correctly and the load-bearing distinction survives in the published prose — *"the size of the population a future unmerge would split back out"*, plus *"Published IDs and redirects are unchanged by v2.10.0."*
+
 ## ⏸ SESSION INTERRUPTION 2026-09-18 — both specialists killed mid-task by a session rate limit
 
 Recorded because the recovery shape matters and the tree looked misleading afterwards. The **website design/fix specialist** and the **release-notes drafter** both terminated on an API session limit (HTTP 429), the drafter mid-research and the designer one edit into `docs/index.html`. **Neither had committed anything**, so nothing reached origin and the only trace was an uncommitted ` M docs/index.html` in an orphaned worktree — *which reads exactly like a specialist idling with work in progress rather than a dead one* (working agreement 3's known failure shape, arriving by a new route). Both were re-dispatched from scratch with full self-sufficient briefs once the limit reset; no partial work was salvaged, and none was worth salvaging. **WS4-T10's and WS4-T13's completed work was unaffected — both were committed and pushed before the interruption**, which is agreement 1a doing precisely the job it exists for.
