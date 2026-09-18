@@ -170,6 +170,7 @@ carried by every variant this project distributes:
 | `data/incidents.stix.json` / TAXII mirror | `x_tier` |
 | MISP feed | `genai-incidents:tier="…"` tag |
 | `data/stats.json` | `landmark_count` (the published total) |
+| Site CSV export (`docs/app.js`) | **not yet** — see the carry-in note below |
 
 Counting `tier == "landmark"` in any of those must give the same number as
 `data/stats.json`'s `landmark_count`. `tests/test_landmark_distribution.py`
@@ -185,9 +186,14 @@ landmark because they carry an `aiid_id`, which says nothing about
 of WS6-T9, but `data/` is frozen, so the *committed* slim artifacts do not
 carry `tier` yet — they gain it on the first rebuild after the freeze lifts.
 Until then the landmark count is reproducible from `data/incidents.json`,
-the Hugging Face export and the MISP feed only. The gate holds the remaining
-variants as strict-xfail so the day they start carrying it is the day the
-test demands the marker be removed; see
+the Hugging Face export and the MISP feed only — measured against a full
+rebuild in a scratch tree, the rebuilt `incidents.min.json` yields
+`landmark` = the published `landmark_count` exactly, with `tier` as the only
+field the rebuild adds. The site's **CSV export** needs one further change
+(a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately sequenced
+after the rebuild so it does not ship a blank column in the meantime. The
+gate holds each remaining variant as strict-xfail, so the day one starts
+carrying the field is the day the test demands its marker be removed; see
 [`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
 ## Access

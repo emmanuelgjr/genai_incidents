@@ -185,6 +185,22 @@ source repository.
 
 
 def build(out_dir: Path) -> tuple[int, Path]:
+    # NOTE FOR WS3-T6 (invariant 7, `description_safe`) -- read before you
+    # change the line that writes each row.
+    #
+    # Today this dumps each row of data/incidents.json VERBATIM, so the HF
+    # export is a full dump, not a sanitized variant; invariant 7's gate is
+    # "WS3-T6 done" and WS3-T6 is not done. When you implement the sanitized
+    # variant, the natural shape is an allow-list projection of fields --
+    # and an allow-list projection is EXACTLY how `tier` was lost from
+    # incidents.min.json for three months (WS6-T9). `tier` is the only way a
+    # consumer can select the landmark subset README tells them to cite; it
+    # is a derived enum with no upstream text, so nothing about invariant 7
+    # argues for dropping it.
+    #
+    # tests/test_landmark_distribution.py::test_huggingface_jsonl_carries_tier
+    # will fail if it goes missing. Do not silence it -- fix the projection.
+    # Rationale in docs/specs/WS6-T9-landmark-distribution-2026-09-18.md sec 4.
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
     out_dir.mkdir(parents=True, exist_ok=True)
