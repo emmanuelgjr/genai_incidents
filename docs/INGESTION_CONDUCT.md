@@ -270,49 +270,85 @@ disclosed here per bounce #1 (R5).
 WS4-T13 made `scripts/ingest_oecd_aim.py` skip legacy numeric-slug URLs
 (OECD AIM's pre-date-hash incident-ID scheme) **before** they ever reach the
 fetch pool, on the measured premise that every one of them fails the
-`ng-state` body-shape check (0 exceptions across 1852 pages,
-`docs/audits/E21-tripwire-refresh-2026-09-14.md`). That skip is what cut
-~59% of requests to `oecd.ai` (≈1,773 of a 3,000-URL crawl window). But a
-skip that is never fetched can never be re-checked, so WS4-T17 adds a small,
-rotating **sampling probe**: each run, `run_skip_sampling_probe()`
-(`scripts/ingest_oecd_aim.py`) fetches `K` (default `DEFAULT_PROBE_SAMPLE_SIZE
-= 5`, overridable via `OECD_AIM_PROBE_SAMPLE_SIZE`) of the URLs the budget
-skip decided NOT to fetch, and asserts each one still fails the body-shape
-check — routed through the exact same `fetch_and_extract()` →
-`fetch_page()` → `ingest.common.robust_fetch()` chokepoint the main crawl
-uses. **No new egress path**: invariant 5 (this module) still enforces the
-identifying User-Agent, the fail-closed robots.txt check, and
-`DEFAULT_MIN_INTERVAL` on every one of these K requests, exactly as it does
-for every other `oecd.ai` fetch.
+`ng-state` body-shape check. That premise was FIRST measured
+2026-09-14, 0 exceptions across 1,852 legacy-slug pages
+(`docs/audits/E21-tripwire-refresh-2026-09-14.md`) — a figure superseded by
+WS4-T13's own re-gate re-measurement (below); **do not cite 1,852/1,148 as
+current**, it is the historical baseline the re-gate's "equal and opposite"
+delta is measured against, not today's population. But a skip that is never
+fetched can never be re-checked, so WS4-T17 adds a real **sampling probe**:
+each run, `run_skip_sampling_probe()` (`scripts/ingest_oecd_aim.py`) fetches
+`K` (default `DEFAULT_PROBE_SAMPLE_SIZE = 50`, overridable via
+`OECD_AIM_PROBE_SAMPLE_SIZE`) of the URLs the budget skip decided NOT to
+fetch, and asserts each OBSERVED one still fails the body-shape check —
+routed through the exact same `fetch_and_extract()` → `fetch_page()` →
+`ingest.common.robust_fetch()` chokepoint the main crawl uses. **No new
+egress path**: invariant 5 (this module) still enforces the identifying
+User-Agent, the fail-closed robots.txt check, and `DEFAULT_MIN_INTERVAL` on
+every one of these K requests, exactly as it does for every other `oecd.ai`
+fetch.
 
-**Net conduct effect, with numbers:** on a representative 3,000-URL window
-(the 2026-09-14 measurement: 1,852 numeric-slug / 1,148 date-hash-slug),
-WS4-T13 cut the crawl from 3,000 requests to ≈1,227 (the fetchable,
-non-skipped set) — a reduction of ≈1,773 requests, ~59%. WS4-T17 adds
-`K=5` requests back on top of that ≈1,227, landing at ≈1,232 — **still a
-~58.9% reduction** versus the pre-WS4-T13 baseline; the probe consumes a
-negligible sliver (≈0.4%) of the headroom WS4-T13 recovered. Per-run wall-
-clock cost: at `DEFAULT_MIN_INTERVAL = 1.0` s/host (shared across all
-worker threads — §3 above) and `K=5` sequential probe fetches, the probe
-costs on the order of 5 seconds against the ~36 minutes of workflow-timeout
-headroom WS4-T13 recovered (the reviewer's own sizing, used as specified in
-the WS4-T17 brief rather than independently re-derived, since actual
-per-request latency to `oecd.ai` varies and 5 request-slots' worth of rate-
-limiter spacing is the dominant, measurable-in-code term either way).
+`K` is split 50/50 (`select_probe_sample()` / `select_recent_biased_sample()`
+in `scripts/ingest_oecd_aim.py`) into a ROTATING half (sorted by numeric
+slug value, advances a persisted cursor — guarantees monotonic, eventual
+full coverage of the population on a fixed schedule) and a RECENCY-BIASED
+half (the front of the population in its own sitemap order — where a shape
+change is most likely to appear first). A `REASON_FETCH_FAILED` result
+(ordinary network flakiness) is excluded from the pass/fail verdict, but
+IS surfaced in the run's own log line and persisted state (`fetch_failed`,
+`observed`) — a run that observes nothing must not print an affirmative
+"premise holds" attestation, and does not.
 
-The probe never fetches the *whole* skipped set — it samples a rotating
-slice (`select_probe_sample()`), so coverage of the ~1,852-URL legacy
-population accumulates gradually across runs rather than being re-verified
-in one shot; see that function's docstring for why rotating (not random)
-sampling was chosen. A violation (a legacy numeric-slug URL that now
-returns a real incident body — `REASON_OK`) fails the scheduled workflow
-run loudly on the first occurrence, via its own dedicated gate (`--check-
-probe` / "Check OECD skip-rule sampling probe" + "Enforce OECD skip-rule
-sampling probe" in `.github/workflows/auto-refresh.yml`) — deliberately
-**not** routed through `ingest/_state/source_health.json`'s 3-consecutive-
-failures smoothing (WS4-T9), because a skip-rule violation is a
-deterministic correctness signal about data loss, not ordinary third-party
-flakiness. See `run_skip_sampling_probe()` and
+**Net conduct effect, with numbers (re-measured at WS4-T13's own re-gate,
+not the 2026-09-14 audit figure above):** on the current 3,000-URL window,
+the population is **1,773 legacy numeric-slug / 1,227 date-hash-slug**
+(PROGRESS.md: "today 1773/1227", moving equal-and-opposite against the
+2026-09-14 baseline as the window's date-hash head grows — see WS4-T13's
+own re-gate for the re-measurement). WS4-T13 alone cut the crawl from 3,000
+requests to 1,227 (the fetchable, non-skipped set) — a reduction of 1,773
+requests, **~59.1%**. WS4-T17 adds up to `K=50` requests back on top of
+that 1,227, landing at ≈1,277 — **still a ~57.4% reduction** versus the
+pre-WS4-T13 baseline. The probe's own request cost is ≈2.8% of the
+1,773-request headroom WS4-T13 recovered (`50/1773`); the ROTATING half
+alone — the portion carrying the guaranteed-coverage property — is ≈1.4%
+(`25/1773`). Per-run wall-clock cost: at `DEFAULT_MIN_INTERVAL = 1.0` s/host
+(shared across all worker threads — §3 above) and up to 50 sequential probe
+fetches, the probe costs on the order of 50 seconds against the ~36 minutes
+of workflow-timeout headroom WS4-T13 recovered — **≈2.3%** (`50s / 2160s`).
+These are point-in-time figures, hand-kept in sync with the code (no single
+source of truth for a live third-party count exists, the same caveat as
+`USER_AGENT`'s version string above) — re-derive them from `scripts/
+ingest_oecd_aim.py`'s printed `[aim] skipping N/M legacy numeric-slug URLs`
+line on any live run, don't assume they hold indefinitely.
+
+**Measured cycle length:** the rotating half (`k_rotate = K // 2 = 25` at
+the default `K=50`) completes one full guaranteed-coverage pass of the
+current population in `ceil(1773 / 25) = 71` runs — about **1.4 years** at
+this workflow's weekly cadence. This is why `K=5` (the original sizing) was
+rejected: it gave a 355-run, ~6.8-year cycle. The recency-biased half adds
+extra, earlier scrutiny of the population's most-recently-active slugs on
+top of that guarantee, not instead of it. A **coverage ledger**
+(`_coverage_ledger()`, persisted in `skip_probe_state.json` as
+`coverage_ledger`, and printed every run) tracks how much of the CURRENT
+population has actually been observed at least once, lifetime — a measured
+number, not this design argument alone.
+
+The probe never fetches the *whole* skipped set in one run — coverage of
+the ~1,773-URL legacy population accumulates gradually across runs (see the
+cycle length above and `select_probe_sample()`'s docstring for why rotating,
+not random, sampling was chosen). A violation (a legacy numeric-slug URL
+that now returns a real incident body — `REASON_OK`) fails the scheduled
+workflow run loudly on the first occurrence, via its own dedicated gate
+(`--check-probe` / "Check OECD skip-rule sampling probe" + "Enforce OECD
+skip-rule sampling probe" in `.github/workflows/auto-refresh.yml`) —
+deliberately **not** routed through `ingest/_state/source_health.json`'s
+3-consecutive-failures smoothing (WS4-T9), because a skip-rule violation is
+a deterministic correctness signal about data loss, not ordinary
+third-party flakiness. The persisted state also stamps `last_run_id`
+(`GITHUB_RUN_ID`, or a `local-<timestamp>` fallback outside CI) on every
+write, so a caller checking it can tell whether the state it's reading was
+actually produced by the run checking it, rather than trusting unverified-
+fresh state by default. See `run_skip_sampling_probe()` and
 `check_probe_state_for_violations()`'s docstrings in
 `scripts/ingest_oecd_aim.py` for the full design.
 
