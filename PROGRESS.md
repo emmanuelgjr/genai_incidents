@@ -2,6 +2,22 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## ⚖ D28 — **USER APPROVES THE 47-SPLIT REMEDIATION, 2026-09-18** — the corpus unfreezes
+
+**The authorization D25(b) reserved to the user, now given.** Approved: the **43 keep-ID splits**, the **4 retirements** (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897`), and the **8 inbound redirect corrections** — the list at `docs/audits/WS4-T19-authorized-splits-2026-09-18.json` (55 entries). **Published effect: 13,060 → 13,361 rows (+301), four published IDs retired, eight existing redirects corrected. Irreversible** — deprecations are append-only under invariant 9.
+
+**Ruling on how it lands: ONE PR.** The authorized list, the pre-authorization guard, the `CVE-2025-10875` re-key and the unmerge itself land together, so **the corpus is never transiently half-changed**.
+
+**What the approval rests on, recorded so a future reader can weigh it:**
+- **Two independent parties agree on all 47 split decisions.** The gate rebuilt the corpus itself and examined **15 groups it chose**, including the corpus's most similar pair (`INC-01192`, **0.969** — four distinct VS Code extension CVEs collapsed by a `?itemName=` query string) and the specialist's own `INC-12120` worked example, which checked out exactly.
+- **Three successor-PAIR questions are flagged, not resolved** — `INC-14745`/`INC-14871` (0.914), `INC-14808`/`INC-14838` (0.809), and the Mythos pair — and the gate established *why* they are unresolvable: **299 of the 312 OECD-AIM rows involved carry boilerplate descriptions with no narrative text.** *"That is a limit of the source data, not of this review."* They are **merge** questions between two new rows, logically independent of whether the ID splits, and routed to WS4-T5.
+- **The document earned the approval only on its second version.** The gate's judgement, quoted: *"The first version… offered three supporting checks of which one could not fail and one was false in 51 pairs, and then reported zero uncertainty across 47 editorial judgements. A careful reader would have concluded distinctness was structurally established, when for 89% of the affected rows it rested on reading headlines."* The corrected version *"names its own tautology inside the check list, says which check does not hold universally, identifies which check is the real evidence, and states plainly where the author cannot tell. That is the difference between being handed a conclusion and being handed evidence."*
+
+**⚠ A GUARD THAT IS PRE-SATISFIED IS NOT A GUARD — carried into the remediation brief.** The gate's advisory: the authorized list was committed **pre-ruling**, and the guard reads it **by filename**, so once the list and the fix are both on `main` the guard is **already satisfied for the very transition it gates**. **The remediation must make the authorization explicit** — the list carries an approval marker naming **D28**, and the guard requires that marker rather than treating file-presence as consent. Otherwise the deliberate barrier this project lacked degenerates into the accidental ones it was built to replace.
+
+**Also required in the same PR:** `CVE-2025-10875` is still mis-keyed onto `INC-14614` — outside the split judgement, but it **ships wrong** unless re-keyed alongside. And the delta doc's "no field outside this list changed" is literally inaccurate: `updated` moves on all 47 rows, declared under invariant 4 rather than in the 25-field table.
+
+
 ## ⚠ SESSION HANDOFF — written 2026-07-16 before a user session restart
 **Restart reason:** `.claude/agents/license-auditor.md` changed in `c23b39b5` (new absence-finding standing rule); agent definitions load only at session start.
 **WS4-T9 re-gate verdict ARRIVED before the restart — PASS, recorded. No re-gate needed.** (An earlier version of this block said it was lost; it was not. It landed after an explicit request.)
