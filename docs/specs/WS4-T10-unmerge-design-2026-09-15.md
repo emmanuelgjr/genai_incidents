@@ -54,6 +54,16 @@ see §7**).
 > for continuity-holding splits, Option 2 for continuity-breaking ones),
 > only incomplete about what ELSE besides the split id itself needs a
 > record.
+>
+> **[CORRECTION, dated 2026-09-18]** The "§8.2 specifies the append-only
+> redirect model" and "§8.3 extends the guard" clauses above are no longer
+> current: §8.2 and §8.3 are themselves SUPERSEDED (see the dated notes at
+> the top of each section) — the append-only, zero-code-change model §8.2
+> specified is FALSE as demonstrated, and §8.3's guard cannot fire on 4 of
+> the 8 measured cases and has no persisted input to run on. §8.1's
+> measurement and §8.4's INC-07738 diagnosis still stand. The working
+> redirect/guard design is routed to **WS4-T15** (superseding-redirect
+> design and persistence), not this document.
 
 ## 1. Why this document exists, not just the code fix
 
@@ -673,7 +683,8 @@ freeze can lift under D25(a):
    47 split ids, not a count of ids needing no deprecation record. Of the
    47, 4 are retirements (needing a new record) and 43 keep their own id
    (needing no record). Additionally apply §8.1/§8.2's 8
-   inbound-deprecation resplit records, which stand independently of
+   inbound-deprecation resplit records (§8.2's model is
+   superseded below — see WS4-T15), which stand independently of
    which of the 47 split ids they happen to redirect into.
 2. Re-key or fix the `CVE-2025-10875` override (§2.3b) as part of the same
    change.
@@ -784,9 +795,10 @@ measurement.
 `INC-08139` and `INC-08185` are earlier snapshots of the SAME rolling
 Korean-CMS megacluster that later grew into `INC-00554` (their own
 historical source lists are near-total subsets of `INC-00554`'s eventual
-103) — which is why §8.2 recommends giving each retired id a DIRECT
-resplit record from its own recovered sources, rather than trying to
-chain everything through `INC-00554`'s eventual split record.
+103) — which is why §8.2 (superseded below — see WS4-T15) recommends
+giving each retired id a DIRECT resplit record from its own recovered
+sources, rather than trying to chain everything through `INC-00554`'s
+eventual split record.
 
 ### 8.2 The redirect model
 
@@ -1014,6 +1026,14 @@ whether this future fix ever lands — it operates on OBSERVED build
 output, not on an assumption that id assignment is optimal, so it remains
 correct either way.
 
+**[CORRECTION, dated 2026-09-18]** §8.2 is itself SUPERSEDED (see the
+dated note at the top of that section) — its "zero code change required"
+persistence/precedence model is false. The narrow independence claim above
+survives on its own terms (whether THIS fix lands or not is orthogonal to
+HOW a superseding record gets persisted), but "so it remains correct
+either way" does not: nothing about §8.2 is currently correct as
+specified. The actual persistence design is routed to **WS4-T15**.
+
 ### 8.5 What this section still escalates to the user
 
 In addition to §7.5's items: (d) whether to accept the `reason: "resplit"`
@@ -1023,3 +1043,14 @@ depend on; (e) the `docs/ID_POLICY.md` rule-3 amendment §8.2 names;
 (f) whether to authorize the follow-up task §8.4 recommends for the
 `ids_seen` collision-fallback defect, and its priority relative to
 WS4-T11...T14.
+
+**[CORRECTION, dated 2026-09-18]** Item (d) as written asks the user to
+ratify §8.2's precedence rule "as specified" — that rule is FALSE as
+demonstrated (see §8.2's superseding note): precedence is file order, not
+date, and the file is not chronological (57 date inversions found). There
+is nothing left "as specified" for the user to accept in (d)/(e); both
+are superseded by **WS4-T15** (superseding-redirect design and
+persistence), which is where the record type, its persistence mechanics,
+the precedence rule, and the `docs/ID_POLICY.md` amendment are actually
+decided. Item (f) is unaffected — §8.4's INC-07738 diagnosis and
+follow-up recommendation still stand.
