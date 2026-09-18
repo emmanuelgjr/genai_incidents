@@ -172,11 +172,23 @@ def test_deprecation_coverage_resolves_a_chain_not_the_literal_into():
 def test_deprecation_coverage_resolves_a_real_committed_chain():
     # Prove it on a real committed chain, not only a synthetic one
     # (BOUNCE defect 2's explicit ask). `data/id_deprecations.json` has a
-    # genuine chain today: INC-08146 -> INC-08139 -> INC-00554 -> [100 live
+    # genuine chain today: INC-08185 -> INC-08139 -> INC-00554 -> [100 live
     # successors] -- INC-00554 was ITSELF retired (WS4-T21/D28: "no
     # survivor keeps the old id" for a continuity-breaking split), so the
-    # chain is now 4 hops deep rather than 3, and the resolvable live end
-    # is any one of INC-00554's own successors, not INC-00554 itself.
+    # chain is 4 hops deep, and the resolvable live end is any one of
+    # INC-00554's own successors, not INC-00554 itself.
+    #
+    # [WS4-T21 BOUNCE #1, dated note] The ORIGINAL fixture id here was
+    # INC-08146, which chained the SAME way before this bounce's defect-1
+    # fix: it turned out D28 approved INC-08146 a single, SPECIFIC
+    # successor (INC-14853), not the full 100-way fan-out this multi-hop
+    # chain produces -- exactly the bug the fix corrects, by giving
+    # INC-08146 its own direct, single-target record. Using INC-08146
+    # here after that fix would have locked the wrong resolution in as
+    # "expected" (the gate's advisory A2). INC-08185 is a DIFFERENT one of
+    # the same 8 inbound redirects, confirmed still genuinely multi-hop
+    # post-fix (D28 approved it the full fan-out, matching what this
+    # chain already produces -- see docs/audits/WS4-T19-authorized-splits-2026-09-18.json).
     # Read-only: this test never writes to data/.
     data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
     real_deps = json.loads(
@@ -185,9 +197,9 @@ def test_deprecation_coverage_resolves_a_real_committed_chain():
     live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
     latest = v._latest_by_from(real_deps)
     into_map = {f: r.get("into") for f, r in latest.items()}
-    assert "INC-08146" in latest, "fixture assumption (INC-08146 is a recorded redirect) is stale -- update it"
-    resolved = v._resolve_live_targets(latest["INC-08146"].get("into"), into_map, live_ids)
-    assert resolved, "fixture assumption (INC-08146 chains to a live id) is stale -- update it"
+    assert "INC-08185" in latest, "fixture assumption (INC-08185 is a recorded redirect) is stale -- update it"
+    resolved = v._resolve_live_targets(latest["INC-08185"].get("into"), into_map, live_ids)
+    assert len(resolved) > 1, "fixture assumption (INC-08185 chains to MULTIPLE live ids) is stale -- update it"
     id_to_sources = {e["id"]: e.get("source_ids") or [] for e in data["incidents"]}
     a_real_source_a_chain_end_holds = next(
         s for t in sorted(resolved) for s in id_to_sources.get(t, []) if s
@@ -195,13 +207,13 @@ def test_deprecation_coverage_resolves_a_real_committed_chain():
     deps = [dict(d) for d in real_deps]
     found = False
     for d in deps:
-        if d.get("from") == "INC-08146":
+        if d.get("from") == "INC-08185":
             d["retired_source_ids"] = [a_real_source_a_chain_end_holds]
             found = True
-    assert found, "fixture assumption (INC-08146 chains to INC-00554) is stale -- update it"
+    assert found, "fixture assumption (INC-08185 chains to INC-08139) is stale -- update it"
     problems = v.check_deprecation_coverage(data, deps)
     assert problems == [], (
-        f"the real INC-08146 -> INC-08139 -> INC-00554 -> [...] chain must resolve: {problems}"
+        f"the real INC-08185 -> INC-08139 -> INC-00554 -> [...] chain must resolve: {problems}"
     )
 
 

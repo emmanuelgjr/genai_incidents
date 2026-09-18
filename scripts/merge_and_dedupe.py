@@ -1055,6 +1055,23 @@ SPLIT_AUTHORIZATION_PATH = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits
 # and the entries it approved must hash-match the entries actually
 # present -- see `_verify_split_authorization_marker`.
 REQUIRED_SPLIT_AUTHORIZATION_DECISION = "D28"
+# WS4-T21 BOUNCE #1 advisory A1: pinning the marker's OWN declared
+# `entries_sha256` against a freshly-computed hash of its OWN `entries`
+# closes 16 of 17 attempted attack shapes, but leaves exactly one open --
+# tamper the entries AND recompute+rewrite the marker's declared hash to
+# match, which is indistinguishable in the file alone from a legitimate
+# re-ruling (see `_verify_split_authorization_marker`'s own docstring,
+# unchanged, which says this honestly). Pinning the EXPECTED hash here,
+# in code, closes it: a tampered file now has to match something outside
+# itself. Re-deriving this constant is exactly the recipe in
+# `_entries_sha256`'s own use, run against the currently-committed file:
+#   python -c "import json,hashlib; d=json.load(open('docs/audits/WS4-T19-authorized-splits-2026-09-18.json')); print(hashlib.sha256(json.dumps(d['entries'],sort_keys=True,separators=(',',':')).encode()).hexdigest())"
+# Changing this constant is itself the kind of code change that needs its
+# own dated board decision naming a NEW ruling -- it is not something a
+# routine PR should ever need to touch.
+REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256 = (
+    "873c29a2b999335f9f1703510bbfec301028ae6ad6cb21a1d2a4e3db99654a4f"
+)
 
 
 def load_cwe_vector_map() -> dict[str, str]:
@@ -1560,13 +1577,16 @@ def _verify_split_authorization_marker(data: dict, path: Path) -> bool:
       - `authorization.decision` missing or naming a different decision,
       - `authorization.entries_sha256` missing or not matching a fresh
         hash of this file's own `entries` array (entries edited, added,
-        or removed after the marker was written -- including the case
-        where someone bumps `entries_sha256` to match tampered entries
-        without a NEW dated board decision approving the new content,
-        which this check cannot distinguish from a legitimate re-ruling
-        and does not try to -- that distinction is the board's job, not
-        this function's; this function's job is only to refuse an
-        entries/marker mismatch).
+        or removed after the marker was written),
+      - that fresh hash not matching REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256,
+        the value pinned in CODE at the time D28 was ruled on (WS4-T21
+        BOUNCE #1, advisory A1). The previous check alone left exactly
+        one attack shape open: tamper the entries AND rewrite the
+        marker's OWN declared `entries_sha256` to match the tampered
+        entries -- indistinguishable, from the file alone, from a
+        legitimate re-ruling. Pinning the expected value outside the
+        file closes it: a tampered file now has to match something it
+        cannot itself rewrite.
     Prints a specific reason to stderr in every failure case so a bad
     marker is diagnosable, not just silently empty."""
     auth = data.get("authorization")
@@ -1594,6 +1614,17 @@ def _verify_split_authorization_marker(data: dict, path: Path) -> bool:
             f"hash of its own `entries` array ({actual_hash!r}) -- the "
             "approved entries and the entries on disk have diverged; "
             "refusing to authorize any split.",
+        )
+        return False
+    if actual_hash != REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256:
+        print(
+            f"[split-guard] {path.name}'s entries hash ({actual_hash!r}) "
+            f"does not match the value pinned in code at D28's ruling "
+            f"({REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256!r}) -- even "
+            "though the marker's own declared entries_sha256 matches its "
+            "own entries, refusing to authorize any split. A legitimate "
+            "re-ruling updates this constant with its own dated board "
+            "decision; a self-consistent-but-unpinned file does not.",
         )
         return False
     return True
@@ -2250,6 +2281,85 @@ def main():
             seen_fresh_from.add(f)
             fresh.append(d)
     deprecations_all = list(prev_deprec) + fresh
+
+    # 8a) WS4-T21 BOUNCE #1 defect 1: correct the pre-existing inbound
+    #     `resplit_redirect` entries the D28-authorized list flags,
+    #     whenever their EXISTING on-disk record no longer chain-resolves
+    #     to what D28 approved. Four of the eight regressed or were
+    #     already wrong: three chain into a `keep_id` survivor that only
+    #     holds PART of what it used to (the old inbound id's own content
+    #     moved to a DIFFERENT successor when its group split -- the
+    #     survivor keeping its number does not mean it kept everything);
+    #     the fourth already fanned out through a retired id's FULL
+    #     successor set when D28 approved a single, specific one. These
+    #     ids already carry a prior record on disk, so a plain append to
+    #     `deprecations_new` above would be silently dropped by the
+    #     `already_deprecated` guard (by design -- see the comment on
+    #     that guard, which names this exact id, INC-07771, as the
+    #     original motivating case for allowing a deliberate supersede).
+    #     This mirrors the ISSUE88_EXCLUDE fixpoint immediately below:
+    #     append a NEW record directly to `deprecations_all`, never edit
+    #     the old one (invariant 9).
+    #
+    #     Mechanical, not a new judgement call: for each `resplit_redirect`
+    #     entry, compare what its CURRENT recorded chain resolves to
+    #     against what its D28-approved `new_targets` resolves to (expanding
+    #     any of new_targets' own elements that are themselves a NOW-RETIRED
+    #     id through ITS chain too, exactly like the current-chain side) --
+    #     write a corrective record only where the two sets actually differ.
+    #     The four entries whose sets already agree get nothing appended.
+    _resplit_auth = _load_verified_split_authorization_data(SPLIT_AUTHORIZATION_PATH)
+    if _resplit_auth:
+        _live_ids_now = {e["id"] for e in deduped if e.get("id")}
+        _latest_deprec_map: dict[str, dict] = {}
+        for _d in deprecations_all:
+            _f = _d.get("from")
+            if _f:
+                _latest_deprec_map[_f] = _d
+        _into_map = {f: r.get("into") for f, r in _latest_deprec_map.items()}
+
+        def _resolve_live(node, _seen: frozenset = frozenset()) -> set[str]:
+            if isinstance(node, list):
+                out: set[str] = set()
+                for t in node:
+                    out |= _resolve_live(t, _seen)
+                return out
+            if node in _live_ids_now:
+                return {node}
+            if node is None or node in _seen or node not in _into_map:
+                return set()
+            return _resolve_live(_into_map[node], _seen | {node})
+
+        _resplit_corrected = 0
+        for entry in _resplit_auth.get("entries", []):
+            if entry.get("decision") != "resplit_redirect":
+                continue
+            frm = entry.get("from")
+            approved = entry.get("new_targets") or []
+            if not frm or not approved:
+                continue
+            approved_resolved = _resolve_live(approved)
+            current_rec = _latest_deprec_map.get(frm)
+            current_resolved = (
+                _resolve_live(current_rec.get("into")) if current_rec else set()
+            )
+            if current_resolved == approved_resolved:
+                continue  # already correct -- nothing to append
+            new_rec = {
+                "from": frm,
+                "into": sorted(approved_resolved),
+                "reason": entry.get("eventual_deprecation_reason") or "resplit",
+                "date": today_str,
+            }
+            deprecations_all.append(new_rec)
+            _latest_deprec_map[frm] = new_rec
+            _into_map[frm] = new_rec["into"]
+            _resplit_corrected += 1
+        if _resplit_corrected:
+            print(f"[resplit-redirect] corrected {_resplit_corrected} pre-existing "
+                  f"inbound redirect(s) to match D28's approved new_targets "
+                  f"(docs/audits/WS4-T19-authorized-splits-2026-09-18.json)")
+
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
     # deprecation whose CURRENTLY AUTHORITATIVE `into` was that bucket (or
     # transitively resolves to it) now dangles. Redirect it to a terminal
