@@ -147,6 +147,19 @@ VERSIONING.md step should say which link forms survive the move.
 
 **Both briefs carry agreement 6 explicitly** (name the input that makes each check fail; prove it fires by corrupting the input) and the active invariants. Both are code/site-only: **no published data moves while D25(a)'s freeze holds.**
 
+## ⚠ ORDERING HAZARD found by the foreman 2026-09-18 — merging the WS4-T10 fix ARMS an unauthorized 301-row data change; the release cut is what would fire it
+
+**The hazard, stated plainly.** D26(b) merges WS4-T10's `normalize_url` fix to `main`. The fix changes how the build keys URLs, so **the next `make build` on `main` produces 13,361 rows instead of 13,060** — the 301-row unmerge. That is exactly the data change **D25(b) reserved to the user** ("the unmerge design for already-published rows … comes back to the user before any data change"), and WS4-T15 has not been designed, let alone ruled on.
+
+**Why this surfaces now and not later:** the **release cut procedure itself rebuilds.** The v2.9.0 cut (`be020058`) bumped the version constant in `scripts/merge_and_dedupe.py` and then **rebuilt so `data/stats.json` was regenerated rather than hand-edited**, per the standing never-hand-edit rule. Run that same procedure on a `main` that already carries the fix and the cut silently performs the unmerge — a release that changes 301 rows while its notes describe a version bump. **Every check in the cut procedure would pass**, because the v2.9.0 recipe verifies "0 corpus rows changed by the cut" against the *post-rebuild* tree: the aggregate form of agreement 6(d), on the exact procedure this project uses to publish.
+
+**Foreman sequencing decision, to keep both rulings intact:**
+1. Merge **WS6-T5** (site only) and **WS4-T13** (ingest code only — a rebuild does not re-crawl, so data cannot move) once each is gated.
+2. **Cut `v2.10.0` while a rebuild is still a no-op**, i.e. **before** WS4-T10's fix reaches `main`. Verified today that a full build on `main` is reproducible and moves nothing (WS4-T13's specialist ran `parse_existing → merge_and_dedupe → render_markdown → validate` and got a clean `git status` at 13,060/13,060 valid).
+3. **Merge WS4-T10's fix after the cut** — satisfying D26(b) — and treat the armed unmerge as WS4-T15's opening condition.
+
+**What still stands between an armed `main` and a published unmerge**, recorded so nobody mistakes the barrier for a design: the fixed build **fails `validate.py` (exit 1, INC-14614)** [R, gate BOUNCE #1 defect 3], the E21 tripwire fails closed, and D25(a) is policy. That is **three accidental barriers and no deliberate one.** WS4-T15 owes a deliberate guard; until then, **no rebuild is to be committed on `main` after the fix merges** except by a task that names the unmerge as its subject.
+
 ## ⚖ D26 — THREE USER RULINGS, 2026-09-17, on the WS4-T10 BOUNCE #3 escalation and the open E24 version question
 
 **(a) WS4-T10: SPLIT THE DESIGN OUT.** WS4-T10 keeps the code fix and corrects its false claims; the remediation design for already-published rows becomes **a new task**. Rationale as put to the user: the gate established that defect 1 cannot be fixed inside WS4-T10 — it needs a deprecation-persistence change in `merge_and_dedupe.py` **plus a schema decision on the superseding-record identity key** — and defect 2's guard cannot exist in any form until retired IDs' `source_ids` are persisted in the repo (advisory A-g: **280 other `merged` records need that same artifact**). A fourth attempt was explicitly rejected as spending another cycle to reach the same escalation.
