@@ -1943,8 +1943,23 @@ def main():
             "affected": _short(e.get("affected"), limit=120),
             "tags": (e.get("tags") or [])[:8],
             "quality_tier": e.get("quality_tier"),
+            "tier": e.get("tier"),
             "corpus": e.get("corpus"),
         }
+        # WS6-T9: `tier` is carried unconditionally (unlike content_license /
+        # source_freshness below, which are conditional because absence is
+        # meaningful for them). Every row has a tier -- it is re-derived for
+        # all of them in step 6g -- and it is the ONLY way a consumer can
+        # select the landmark subset that README tells them to cite. It was
+        # omitted here from #68 (the commit that introduced the field) until
+        # 2026-09-18: that commit shipped the schema entry, the dictionary
+        # row, stats.landmark_count, the site's Tier <select> and app.js's
+        # `e.tier` filter, and did not touch this function -- so the site
+        # filter matched zero rows from the day it shipped. The omission was
+        # never a decision; nothing downstream depends on the field's
+        # absence. `tier` is a one-word derived enum computed by this script
+        # from our own fields, so it carries no upstream text and invariant 7
+        # (raw upstream text stays in the full JSON) does not reach it.
         # D12(a): min.json carries the D11(b) marker on affected rows ONLY —
         # added conditionally (never as a null) so the slim shape stays slim
         # on every unmarked row (schema-architect memo Sec 4 item 3).
