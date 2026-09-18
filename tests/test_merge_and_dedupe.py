@@ -420,6 +420,12 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # WS4-T10 build guard: this harness deliberately builds from a
+    # from-scratch tmp corpus with no legacy_consolidated.json, which is
+    # exactly the shape main() otherwise refuses to build from silently
+    # (see test_missing_legacy_consolidated_fails_loudly). Opt in via the
+    # same env var a real standalone run would need.
+    monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
     return data, ingest
 
 
@@ -1591,3 +1597,62 @@ def test_oecd_attribution_removed_would_fail_the_stability_test(tmp_path, monkey
     requirement."""
     import inspect
     assert "_apply_oecd_attribution" in inspect.getsource(m._apply_history)
+
+
+# ---------------------------------------------------------------------------
+# WS4-T10 build guard: merge_and_dedupe.py must fail loudly, not silently
+# skip the legacy corpus, when data/legacy_consolidated.json is missing.
+# This is exactly the failure mode that produced the E21 tripwire audit's
+# first (wrong) rebuild delta -- run standalone without parse_existing.py
+# first, the corpus came out 5,675 rows short with fabricated severity
+# regressions (docs/audits/E21-tripwire-refresh-2026-09-14.md Finding 3).
+# ---------------------------------------------------------------------------
+
+def test_missing_legacy_consolidated_fails_loudly(tmp_path, monkeypatch):
+    data = tmp_path / "data"
+    ingest = tmp_path / "ingest"
+    data.mkdir()
+    ingest.mkdir()
+    monkeypatch.setattr(m, "DATA", data)
+    monkeypatch.setattr(m, "INGEST", ingest)
+    monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
+    monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
+    monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
+    # No legacy_consolidated.json written into `data` -- the real-world
+    # mistake of running merge_and_dedupe.py standalone (skipping
+    # `python scripts/parse_existing.py`, which regenerates that gitignored
+    # file -- see `make merge` / Makefile:11-13).
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    try:
+        m.main()
+    except SystemExit as exc:
+        assert "legacy_consolidated.json" in str(exc)
+        assert "parse_existing.py" in str(exc)
+    else:
+        raise AssertionError(
+            "main() must refuse to build silently when "
+            "data/legacy_consolidated.json is missing"
+        )
+    assert not (data / "incidents.json").exists(), \
+        "no output should be written on the guard's fatal path"
+
+
+def test_missing_legacy_consolidated_opt_out_still_builds(tmp_path, monkeypatch):
+    """The explicit opt-out (MERGE_ALLOW_MISSING_LEGACY=1) is what every
+    other test in this file relies on via _setup_tmp_repo -- confirm it
+    actually lets a legacy-free build proceed, rather than merely silencing
+    the guard's exception without exercising the accepted path."""
+    data = tmp_path / "data"
+    ingest = tmp_path / "ingest"
+    data.mkdir()
+    ingest.mkdir()
+    monkeypatch.setattr(m, "DATA", data)
+    monkeypatch.setattr(m, "INGEST", ingest)
+    monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
+    monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
+    monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    m.main()
+    assert (data / "incidents.json").exists()
