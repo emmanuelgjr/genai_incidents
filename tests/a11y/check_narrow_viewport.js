@@ -113,23 +113,21 @@ async function main() {
     // exists to close.
     const TOLERANCE_PX = 1;
 
-    // .table-wrap's own scrollWidth needs a wider, still-tiny tolerance:
-    // measured against the CURRENT, correctly-fitting CSS (four visible
-    // columns fixed to 20/24/32/24%, three hidden columns pinned to 0
-    // width), Chromium's table-layout:fixed + border-collapse column-width
-    // resolution still reports .table-wrap.scrollWidth ~7px above
-    // .clientWidth -- reproduced with border-collapse:separate, with the
-    // hidden columns removed from the DOM entirely, and with the sticky
-    // thead cells de-sticky'd, so it is not caused by any of those and is
-    // not remotely visible or reachable in practice (wrap.scrollLeft(7)
-    // "succeeds" but shifts no rendered content -- confirmed by screenshot
-    // diff). This is two orders of magnitude below the failure signal this
-    // check exists to catch: forcing the table to min-width:1200px (the A1
-    // repro below) pushes wrapScrollWidth to ~1200, roughly 850px past
-    // clientWidth. WRAP_TOLERANCE_PX is set to double the measured noise
-    // floor -- enough margin for that reporting quirk across Chromium point
-    // releases, nowhere near enough to hide a real overflow.
-    const WRAP_TOLERANCE_PX = 16;
+    // CORRECTED (BOUNCE #2 / D1): this used to be 16, on the theory that
+    // the ~7px .table-wrap.scrollWidth excess measured against the CSS at
+    // the time was Chromium table-layout:fixed rounding noise that "shifts
+    // no rendered content". That was wrong on both counts -- it was one
+    // real element (th.sortable > .caret) overflowing its own header cell
+    // by exactly 7px, and `wrap.scrollLeft(7)` moved real content
+    // (`rowLeftBefore 16.203 -> rowLeftAfter 9.203`), which a same-route
+    // recheck (border-collapse:separate, hidden columns removed, thead
+    // de-sticky'd -- all layout variations, none of them a different
+    // detection method) could not have told apart from rounding. Fixed at
+    // the source in style.css (the header cell now clips its own content
+    // instead of relying on this check to absorb the excess), so the
+    // measured noise floor is 0, not 7 -- any nonzero wrap overflow now
+    // means something is actually escaping a header or data cell again.
+    const WRAP_TOLERANCE_PX = 0;
 
     let failed = false;
     if (report.docScrollWidth > WIDTH) {

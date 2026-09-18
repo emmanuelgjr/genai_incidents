@@ -311,6 +311,37 @@ function renderChips() {
 
 // ----------------------------- Table -------------------------------------
 
+// BOUNCE #2 / D3: renderTable() replaces els.body.innerHTML wholesale on
+// every toggle, which destroys and recreates every row's .row-toggle
+// button as a brand-new DOM node -- including whichever one the keyboard
+// user just pressed Enter on. The browser has nothing sensible to move
+// focus to afterwards and drops it to <body>, so a second Enter press is a
+// no-op and the only way back to any toggle is Tab-ing from the top of the
+// page (measured: 23 hops). Mouse clicks don't reliably focus a button in
+// every browser, so this only bites keyboard users -- exactly the users
+// A4 was for. Fix: remember whether the CURRENTLY FOCUSED element is the
+// row's own toggle/retry control before re-rendering, and if so, refocus
+// the equivalent freshly-rendered node afterwards (never steal focus that
+// wasn't already there -- a mouse click that didn't focus anything first
+// shouldn't suddenly move focus after rerender()).
+function focusRowControl(id, selector) {
+  // The control being restored may live in the data row itself
+  // (.row-toggle, inside tr[data-row]) or in the following detail row
+  // (.detail-retry, inside the SIBLING tr#detail-<id> -- not a descendant
+  // of tr[data-row]), so search both explicitly rather than assuming one
+  // is an ancestor of the other.
+  const dataRow = els.body.querySelector(`tr[data-row="${id}"]`);
+  const detailRow = document.getElementById(`detail-${id}`);
+  const el = (dataRow && dataRow.querySelector(selector)) || (detailRow && detailRow.querySelector(selector));
+  if (el) { el.focus(); return; }
+  // The control that was focused no longer exists after this render (e.g.
+  // a successful retry removes .detail-retry) -- fall back to the row's
+  // own toggle so focus lands somewhere on the same row rather than being
+  // silently dropped again.
+  const fallback = dataRow && dataRow.querySelector('.row-toggle');
+  if (fallback) fallback.focus();
+}
+
 function renderTable(slice, start) {
   const rows = slice.map((e, i) => {
     const cves = (e.cve_ids || []);
@@ -368,9 +399,17 @@ function renderTable(slice, start) {
   }
 
   function toggleRow(id) {
+    // Was the keyboard focus already on THIS row's own toggle button
+    // before we blow away and recreate the DOM? Only then is it our job
+    // to put it back -- see focusRowControl() above.
+    const active = document.activeElement;
+    const hadFocus = !!(active && active.classList && active.classList.contains('row-toggle')
+      && active.closest('tr[data-row]') && active.closest('tr[data-row]').dataset.row === id);
+
     if (EXPANDED.has(id)) {
       EXPANDED.delete(id);
       rerender();
+      if (hadFocus) focusRowControl(id, '.row-toggle');
       return;
     }
     EXPANDED.add(id);
@@ -380,9 +419,12 @@ function renderTable(slice, start) {
     // (or failed -- ensureDetailLoaded's rejection still re-renders so the
     // error state in renderDetail below can show).
     rerender();
+    if (hadFocus) focusRowControl(id, '.row-toggle');
     const row = DATA.find(r => r.id === id);
     if (row && !hasDetail(row)) {
-      ensureDetailLoaded(row.year).then(rerender).catch(() => rerender());
+      ensureDetailLoaded(row.year)
+        .then(() => { rerender(); if (hadFocus) focusRowControl(id, '.row-toggle'); })
+        .catch(() => { rerender(); if (hadFocus) focusRowControl(id, '.row-toggle'); });
     }
   }
 
@@ -398,9 +440,19 @@ function renderTable(slice, start) {
   els.body.querySelectorAll('.detail-retry').forEach(btn => {
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
+      // .detail-retry lives inside <tr class="detail" id="detail-<ID>">
+      // (a SIBLING of the data row, not a descendant of it), so the data
+      // row's id has to come from that id attribute, not from a
+      // tr[data-row] ancestor.
+      const detailTr = btn.closest('tr.detail');
+      const id = detailTr ? detailTr.id.replace(/^detail-/, '') : null;
       const year = btn.dataset.year;
+      const hadFocus = document.activeElement === btn;
       rerender(); // shows "Loading details…" immediately (status flips to 'loading' synchronously below)
-      ensureDetailLoaded(year).then(rerender).catch(() => rerender());
+      if (hadFocus && id) focusRowControl(id, '.detail-retry');
+      ensureDetailLoaded(year)
+        .then(() => { rerender(); if (hadFocus && id) focusRowControl(id, '.detail-retry'); })
+        .catch(() => { rerender(); if (hadFocus && id) focusRowControl(id, '.detail-retry'); });
     });
   });
 }
@@ -808,18 +860,28 @@ async function exportFilteredAsCsv() {
     if (failedYears.length) {
       // Previously this was silent: Promise.allSettled swallowed the
       // rejection and the export completed looking normal while rows from
-      // the failed year(s) had blank Description/Primary Reference/Tags/
-      // NIST AI RMF/MITRE ATLAS cells (WS6-T5 design-pass report, defect
-      // A3 -- measured: a 5,401-row export with one shard missing produced
-      // 5,377/5,401 empty Description cells and 4,509/5,401 empty NIST AI
-      // RMF cells, with the button returning to normal and no error).
-      // Ask before shipping a CSV the user would otherwise have no reason
-      // to distrust.
+      // the failed year(s) had blank detail-shard cells, with the button
+      // returning to normal and no error (WS6-T5 design-pass report,
+      // defect A3). Ask before shipping a CSV the user would otherwise
+      // have no reason to distrust.
+      //
+      // Primary Reference is NOT one of the affected columns -- BOUNCE #2 /
+      // D4 caught this message still listing it after A2 (same pass, same
+      // commit) moved primary_reference into CORE_FIELDS, so it's already
+      // populated before this function ever runs and a failed *detail*
+      // shard can't blank it. Measured directly (one shard aborted, real
+      // export): `rows 972 | blankDesc 972 | blankTags 972 | blankRef 0`.
+      // DETAIL_FIELDS (declared above) is the authoritative list of what
+      // a failed shard actually blanks; this message is derived from it
+      // by name so it can't silently drift out of sync with CORE_FIELDS
+      // again the next time a field moves between the two.
+      const blankable = DETAIL_FIELDS.map(f => CSV_COLUMNS.find(c => c[0] === f))
+        .filter(Boolean).map(c => c[1]);
       const proceed = window.confirm(
         `Couldn't load full details for ${failedYears.length} year` +
         `${failedYears.length === 1 ? '' : 's'} (${failedYears.join(', ')}). ` +
         `Rows from ${failedYears.length === 1 ? 'that year' : 'those years'} will export with ` +
-        `blank Description / Primary Reference / Tags / NIST AI RMF / MITRE ATLAS cells. ` +
+        `blank ${blankable.join(' / ')} cells. ` +
         `Export anyway?`
       );
       if (!proceed) return;

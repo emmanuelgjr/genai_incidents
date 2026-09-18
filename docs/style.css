@@ -293,12 +293,20 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
 .subtitle a { border-bottom: 1px solid var(--accent-line); }
 
 /* Trust strip: the concrete, checkable claims a researcher decides
-   credibility on (licence, code licence, integrity manifest, citation
+   credibility on (licence, code licence, integrity manifest, reference
    completeness) stated plainly at the point of first impression, not
    buried in the footer alone. Every item here is something a visitor can
    verify in one click (see the header's Verify/DOI/JSON links) or from the
-   dataset itself -- "every entry cites a primary source" is measured
-   (13,060/13,060 in docs/data/incidents.core.json), not aspirational. */
+   dataset itself.
+   BOUNCE #2 advisory (a): the reference-completeness claim originally read
+   "every entry cites a primary source". 13,060/13,060 do carry a non-empty
+   http(s) reference (still true, still measured), but 51% of those
+   (6,647 -- oecd.ai 3,667, aiaaic.org 1,516, incidentdatabase.ai 1,464)
+   resolve to aggregators this project treats as upstream sources, not to
+   the original reporting. "Cites a primary source" overstated what was
+   actually measured given that mix; softened to "carries a source
+   reference", which is true of literally all 13,060 without implying
+   anything about what's on the other end of the link. */
 .trust-strip {
   display: flex;
   flex-wrap: wrap;
@@ -642,7 +650,16 @@ table.incidents { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
   border-bottom: 1px solid var(--line-2);
   white-space: nowrap;
 }
-.incidents th.sortable { cursor: pointer; user-select: none; }
+/* BOUNCE #2 / D1: the 7px .table-wrap overflow this pass previously
+   attributed to Chromium table-layout:fixed rounding was actually one
+   element -- th.sortable > .caret -- overflowing its own <th> box at
+   narrow widths, because .caret sits inline after "Severity"/"Date" text
+   with `white-space: nowrap` and no room budgeted for it. `position:
+   relative` + `overflow: hidden` here makes the <th> itself the
+   containing/clipping box for that content, so nothing inside a header
+   cell can ever leak into .table-wrap's scroll region again -- not just
+   this one glyph. */
+.incidents th.sortable { cursor: pointer; user-select: none; position: relative; overflow: hidden; }
 .incidents th.sortable:hover { color: var(--accent); }
 /* Make the active sort column legible at a glance, not just via the caret
    glyph -- a 2px accent underline reads faster when scanning a dense
@@ -862,25 +879,38 @@ footer .meta code { color: var(--muted); }
   .incidents th:nth-child(5), .incidents td:nth-child(5),
   .incidents th:nth-child(6), .incidents td:nth-child(6),
   .incidents th:nth-child(7), .incidents td:nth-child(7) { width: 0; }
-  /* Measured (WS6-T5 design pass): even with the four visible columns
-     summing to exactly 100% and the three hidden columns pinned to 0,
-     Chromium still reports table.scrollWidth ~7px above .table-wrap's
-     clientWidth at 380px -- reproduced identically with border-collapse:
-     separate and with the hidden cells removed from the DOM outright, so
-     it is Chromium's table-layout:fixed column-width rounding, not real
-     overflowing content: wrap.scrollLeft(7) "succeeds" but shifts no
-     rendered pixel (verified with a before/after screenshot diff). It was
-     invisible to the OLD document.documentElement.scrollWidth check
-     (.table-wrap's overflow-x:auto absorbed it) and is exactly the class
-     of bug tests/a11y/check_narrow_viewport.js was rebuilt to catch via
-     .table-wrap's own scrollWidth/clientWidth (see that file's
-     WRAP_TOLERANCE_PX comment for the measurement and the margin kept
-     against a real failure). Since the four visible columns are
-     deliberately sized to fill the full width with nothing left over,
-     there is nothing for a user to legitimately reach by scrolling this
-     wrap at this breakpoint anyway -- cut the internal scrollbar off
-     outright rather than leave a few px of dead, confusing scroll travel
-     that reveals nothing. */
+  /* CORRECTED (BOUNCE #2 / D1): an earlier version of this comment claimed
+     the ~7px .table-wrap.scrollWidth excess measured here was Chromium
+     table-layout:fixed column-width ROUNDING, and that wrap.scrollLeft(7)
+     "shifts no rendered pixel". Both claims were false -- the gate
+     measured it directly: `rowLeftBefore 16.203 -> rowLeftAfter 9.203`,
+     a real 7px content shift. The cause was a single element:
+     `th.sortable > .caret` (the sort-direction triangle) sitting inline
+     after "Severity"/"Date" text with `white-space: nowrap` and no width
+     budgeted for it in the fixed 20/24/32/24% column split, so it
+     overflowed its own <th> and into .table-wrap's scroll region --
+     visible cell widths alone summed to 347.6, inside clientWidth 348,
+     confirming the four DATA columns were never the problem.
+     Fix (not "give the caret room", which would re-open the width budget
+     this layout exists to close -- see .incidents th.sortable above and
+     the .caret override below): contain it. `overflow: hidden` on
+     th.sortable now makes the header cell its own clipping box, and the
+     caret is repositioned absolutely within the padding already reserved
+     for it instead of adding to the inline text flow, so it can no
+     longer push anything past the cell's own right edge, at this or any
+     other viewport width. */
+  .incidents th.sortable { padding-right: 1.35em; }
+  .caret {
+    position: absolute;
+    right: 0.35em;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  /* Now that nothing can overflow a header cell, .table-wrap has nothing
+     left to legitimately scroll to at this breakpoint either (the four
+     visible columns are deliberately sized to fill exactly 100%) --
+     dropping the internal scrollbar avoids a few px of dead, confusing
+     scroll travel that would reveal nothing. */
   .table-wrap { overflow-x: hidden; }
 }
 @media (max-width: 520px) {

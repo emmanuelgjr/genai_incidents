@@ -72,7 +72,7 @@
         <span>CC BY 4.0 data</span><span class="dot" aria-hidden="true">·</span>
         <span>MIT code</span><span class="dot" aria-hidden="true">·</span>
         <span>SHA-256 checksums published</span><span class="dot" aria-hidden="true">·</span>
-        <span>every entry cites a primary source</span>
+        <span>every entry carries a source reference</span>
       </p>
     </div>
   </header>
@@ -145,11 +145,11 @@
         </div>
         <div class="filter">
           <label for="year">Year</label>
-          <select id="year"><option value="">all</option></select>
+          <select id="year" data-filter-field="year"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="severity">Severity</label>
-          <select id="severity">
+          <select id="severity" data-filter-field="severity">
             <option value="">all</option>
             <option>Critical</option><option>High</option>
             <option>Medium</option><option>Low</option><option>Info</option>
@@ -157,19 +157,19 @@
         </div>
         <div class="filter">
           <label for="llm">OWASP LLM</label>
-          <select id="llm"><option value="">all</option></select>
+          <select id="llm" data-filter-field="owasp_llm"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="asi">OWASP ASI</label>
-          <select id="asi"><option value="">all</option></select>
+          <select id="asi" data-filter-field="owasp_asi"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="vector">Vector</label>
-          <select id="vector"><option value="">all</option></select>
+          <select id="vector" data-filter-field="attack_vector"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="corpus">Corpus</label>
-          <select id="corpus">
+          <select id="corpus" data-filter-field="corpus">
             <option value="">all</option>
             <option value="security">security</option>
             <option value="ai-harm">ai-harm</option>
@@ -177,7 +177,7 @@
         </div>
         <div class="filter">
           <label for="quality">Quality</label>
-          <select id="quality">
+          <select id="quality" data-filter-field="quality_tier">
             <option value="">all</option>
             <option value="curated">curated</option>
             <option value="reviewed">reviewed</option>
@@ -191,7 +191,11 @@
         </div>
         <div class="filter">
           <label for="page_size">Per page</label>
-          <select id="page_size"></select>
+          <!-- data-filter-field="none": pagination control, not a data filter --
+               explicit opt-out so scripts/check_dead_filters.py's discovery
+               (every <select> in .filters) doesn't need a select to be
+               registered elsewhere to be accounted for; see that script. -->
+          <select id="page_size" data-filter-field="none"></select>
         </div>
       </div>
 

@@ -11,13 +11,38 @@ with no error -- the same failure SHAPE as A1-A4 in the WS6-T5 design-pass
 report (a check/control that reports success while doing nothing), just on
 a filter control instead of a test gate.
 
-This script has two severities, deliberately not conflated:
+CORRECTED (BOUNCE #2 / D2): the first version of this script discovered
+filters through a hand-maintained `FILTER_FIELD` dict of three ids. That
+dict IS the hole it exists to close: reintroducing the dead Tier <select>
+as markup only (exactly what a contributor adding a new dead filter does)
+was measured to give `PASS, exit 0`, because nothing makes the dict grow
+when the markup does. The docstring also claimed a `data-filter-field`
+selector mechanism that did not exist anywhere in the tree (`git grep
+data-filter-field` had exactly one hit: this docstring).
 
-  FAIL (exit 1): the FIELD a filter control reads (`select[data-filter-field]`
-  in docs/index.html) is absent from EVERY incident in the core payload --
-  this is the Tier bug exactly: not "this option currently has zero
-  matches" but "this field cannot ever match, structurally". This is the
-  check the coordinator asked for.
+Fixed for real, not just in prose: docs/index.html now carries a literal
+`data-filter-field="<incident field>"` attribute on every <select> inside
+`.filters`, INCLUDING an explicit `data-filter-field="none"` opt-out on
+the one select that genuinely isn't a data filter (#page_size, a
+pagination control). Discovery below finds every <select id> in the
+filter bar via markup, with no separate registry to fall out of sync --
+a <select> with no data-filter-field attribute at all is now itself a
+FAIL (can't verify it, and the missing-attribute case is exactly how a
+reintroduced dead filter would look), not a silent skip.
+
+This script has three outcomes, deliberately not conflated:
+
+  FAIL (exit 1), unverifiable: a <select id> inside .filters has no
+  data-filter-field attribute at all -- discovery cannot tell whether
+  it's a real filter or a pagination-style control, so it cannot be
+  cleared. This is what closes the original hole: reintroducing the
+  Tier <select> markup with no attribute now fails here, immediately,
+  with no dict to remember to update.
+
+  FAIL (exit 1), dead field: the field a filter control reads is absent
+  from EVERY incident in the core payload -- the Tier bug exactly: not
+  "this option currently has zero matches" but "this field cannot ever
+  match, structurally".
 
   WARN (exit 0, printed): a specific hardcoded <option value="..."> has
   zero CURRENT matches even though its field exists -- e.g. a severity
@@ -39,32 +64,57 @@ ROOT = Path(__file__).resolve().parents[1]
 INDEX_HTML = ROOT / "docs" / "index.html"
 CORE_JSON = ROOT / "docs" / "data" / "incidents.core.json"
 
-# Filter <select> id -> incident field it filters on (docs/app.js `matches()`).
-# Only the ones with a STATIC, hardcoded <option> list are checkable here --
-# year/llm/asi/vector are populated by app.js directly from the loaded data
-# (populateOptions()), so they cannot go stale independently of the data.
-FILTER_FIELD = {
-    "severity": "severity",
-    "corpus": "corpus",
-    "quality": "quality_tier",
-}
+
+def discover_selects() -> list[tuple[str, str | None, str]]:
+    """Every <select id="..."> inside the .filters bar, in document order.
+
+    Returns (select_id, data_filter_field_or_None, inner_html) tuples.
+    data_filter_field is None when the attribute is missing entirely
+    (the unverifiable/FAIL case), and the literal string "none" is a
+    legitimate, explicit non-filter opt-out (e.g. #page_size).
+    """
+    html = INDEX_HTML.read_text(encoding="utf-8")
+    # The filter bar isn't a single balanced regex-friendly block (nested
+    # divs), so instead of trying to match its closing tag, anchor on the
+    # opening tag and the immediately-following chips container, which is
+    # always the next sibling section in docs/index.html.
+    start = html.index('<div class="filters"')
+    end = html.index('id="filter-chips"', start)
+    filters_html = html[start:end]
+    # Strip HTML comments first: a comment that happens to mention the
+    # literal text "<select>" (as explanatory prose about this very
+    # mechanism, for instance) would otherwise be matched as a real
+    # opening tag by the naive regex below, and its non-greedy content
+    # group would then swallow the REAL next <select>...</select> as its
+    # own body -- silently dropping that select from discovery. Caught by
+    # this script's own self-test during the BOUNCE #2 / D2 fix.
+    filters_html = re.sub(r'<!--.*?-->', '', filters_html, flags=re.S)
+
+    selects = []
+    for sel_m in re.finditer(r'<select\b([^>]*)>(.*?)</select>', filters_html, re.S):
+        attrs, inner = sel_m.group(1), sel_m.group(2)
+        id_m = re.search(r'id="([^"]*)"', attrs)
+        if not id_m:
+            continue  # can't identify it; nothing meaningful to check
+        field_m = re.search(r'data-filter-field="([^"]*)"', attrs)
+        field = field_m.group(1) if field_m else None
+        selects.append((id_m.group(1), field, inner))
+    return selects
 
 
-def extract_options(select_id: str) -> list[str]:
-    m = re.search(
-        rf'<select id="{re.escape(select_id)}">(.*?)</select>',
-        INDEX_HTML.read_text(encoding="utf-8"),
-        re.S,
-    )
-    if not m:
-        raise SystemExit(f"::error::no <select id=\"{select_id}\"> found in docs/index.html")
-    # Two markup forms in this file: `<option value="x">x</option>` (corpus,
-    # quality) and `<option>Text</option>` with no `value` attribute, where
-    # the element's own text IS the option's value per the HTML spec
-    # (severity). Handle both; the empty `value=""` "all" sentinel is
-    # dropped either way since it never has meaningful inner text either.
+def extract_options(inner_html: str) -> list[str]:
+    # Two markup forms in this file: `<option value="x">x</option>`
+    # (corpus, quality) and `<option>Text</option>` with no `value`
+    # attribute, where the element's own text IS the option's value per
+    # the HTML spec (severity). Handle both; the empty `value=""` "all"
+    # sentinel is dropped either way since it never has meaningful inner
+    # text either. Dynamically-populated selects (year/llm/asi/vector)
+    # have no static <option>s beyond that sentinel, so this naturally
+    # returns [] for them -- nothing to check, which is correct: their
+    # options come from populateOptions() in app.js, straight out of the
+    # loaded data, so they cannot go stale independently of it.
     opts = []
-    for opt_match in re.finditer(r'<option([^>]*)>([^<]*)</option>', m.group(1)):
+    for opt_match in re.finditer(r'<option([^>]*)>([^<]*)</option>', inner_html):
         attrs, text = opt_match.group(1), opt_match.group(2).strip()
         value_m = re.search(r'value="([^"]*)"', attrs)
         value = value_m.group(1) if value_m else text
@@ -81,11 +131,41 @@ def main() -> int:
     payload = json.loads(CORE_JSON.read_text(encoding="utf-8"))
     incidents = payload["incidents"]
 
+    selects = discover_selects()
+    if not selects:
+        print("::error::no <select> elements found inside .filters -- discovery is broken", file=sys.stderr)
+        return 1
+
     failed = False
     warned = False
-    for select_id, field in FILTER_FIELD.items():
-        options = extract_options(select_id)
-        field_values = {e[field] for e in incidents if field in e and e[field] is not None}
+    for select_id, field, inner in selects:
+        if field is None:
+            print(
+                f"::error::#{select_id} is a <select> inside .filters with no "
+                f"data-filter-field attribute -- cannot verify it, and an unannotated "
+                f"select is exactly how a reintroduced dead filter looks. Add "
+                f"data-filter-field=\"<incident field>\", or =\"none\" if it isn't a "
+                f"data filter (see #page_size)."
+            )
+            failed = True
+            continue
+        if field == "none":
+            print(f"[dead-filters] #{select_id}: explicitly not a data filter (data-filter-field=\"none\") -- skipped")
+            continue
+
+        options = extract_options(inner)
+        field_values = set()
+        for e in incidents:
+            v = e.get(field)
+            if v is None:
+                continue
+            # LLM/ASI/etc. filter on membership in a list field (owasp_llm,
+            # owasp_asi); everything else is a scalar equality filter
+            # (severity, corpus, quality_tier, attack_vector, year).
+            if isinstance(v, list):
+                field_values.update(v)
+            else:
+                field_values.add(v)
         field_present = any(field in e for e in incidents)
 
         if not field_present:
@@ -95,6 +175,10 @@ def main() -> int:
                 f"match anything (the Tier-filter defect class)"
             )
             failed = True
+            continue
+
+        if not options:
+            print(f"[dead-filters] #{select_id} ({field}): dynamically populated from loaded data -- OK")
             continue
 
         dead = [o for o in options if o not in field_values]
@@ -110,7 +194,7 @@ def main() -> int:
     if failed:
         print("\n::error::dead filter control(s) found -- see above")
         return 1
-    print(f"\n[dead-filters] PASS{' (with warnings above)' if warned else ''}")
+    print(f"\n[dead-filters] PASS -- {len(selects)} select(s) discovered{' (with warnings above)' if warned else ''}")
     return 0
 
 
