@@ -42,6 +42,16 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   releases at or before v2.9.0 cannot be read correctly without it.
 
 ### Fixed
+- **Sanitized one description.** `INC-11516` (`CVE-2023-36464`) quoted a GitHub
+  attachment link from its upstream CVE text; that link was an S3 pre-signed URL
+  whose `X-Amz-Credential` parameter is an AWS access key **ID** (a public
+  identifier, not a secret), bound to a signature that expired five minutes after
+  2023-06-27. `scripts/strip_presigned_urls.py` removes `X-Amz-*` parameters from
+  URLs in the ingest snapshot, preserving the object path, any other query
+  parameter, and prose mentions of `X-Amz-*` HTTP header names elsewhere. One
+  entry, three fields (`description`, `updated`, `last_seen`); no row added or
+  removed. Secret scanners match the `AKIA` pattern regardless of whether a
+  secret is present, which blocked this release from being pushed.
 - Retain-on-drop rows (entries carried verbatim out of the previous
   `data/incidents.json` after every source drops them) are a build **input**, not
   just an output. An inputs-only migration missed 9 of them — visible only as a

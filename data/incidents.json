@@ -1,6 +1,6 @@
 {
   "version": "2.10.0",
-  "generated": "2026-07-31",
+  "generated": "2026-09-18",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Agentic ASI Top 10, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
   "incident_count": 13060,
@@ -711834,7 +711834,7 @@
       "date": "2023-06",
       "year": 2023,
       "category": "vulnerability-disclosure",
-      "description": "### Impact An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop if `__parse_content_stream` is executed. This infinite loop blocks the current process and can utilize a single core of the CPU by 100%. It does not affect memory usage. That is, for example, the case if the user extracted text from such a PDF. Example Code and a PDF that causes the issue: ```python from pypdf import PdfReader # https://objects.githubusercontent.com/github-production-repository-file-5c1aeb/3119517/11367871?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20230627%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230627T201018Z&X-Amz-Expires=300&X-Amz-Signature=d71c8fd9181c4875f0c04d563b6d32f1d4da6e7b2e6be2f14479ce4ecdc9c8b2&X-Amz-SignedHeaders=host&actor_id=1658117&key_id=0&repo_id=3119517&response-content-disposition=attachment%3Bfilename%3DMiFO_LFO_FEIS_NOA_Published.3.pdf&response-content-type=application%2Fpdf reader = PdfReader(\"MiFO_LFO_FEIS_NOA_Published.3.pdf\") page = reader.pages[0] page.extract_text() ``` The issue was introduced with https://github.com/py-pdf/pypdf/pull/969 ### Patches The issue was fixed with https://github.com/py-pdf/pypdf/pull/1828 ### Workarounds It is recommended to upgrade to `pypdf>=3.9.0`. PyPDF2 users should migrate to pypdf. If you cannot update your version of pypdf, you should modify `pypdf/generic/_data_structures.py`: ``` OLD: while peek not in (b\"\\r\", b\"\\n\"): NEW: while peek not in (b\"\\r\", b",
+      "description": "### Impact An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop if `__parse_content_stream` is executed. This infinite loop blocks the current process and can utilize a single core of the CPU by 100%. It does not affect memory usage. That is, for example, the case if the user extracted text from such a PDF. Example Code and a PDF that causes the issue: ```python from pypdf import PdfReader # https://objects.githubusercontent.com/github-production-repository-file-5c1aeb/3119517/11367871?actor_id=1658117&key_id=0&repo_id=3119517&response-content-disposition=attachment%3Bfilename%3DMiFO_LFO_FEIS_NOA_Published.3.pdf&response-content-type=application%2Fpdf reader = PdfReader(\"MiFO_LFO_FEIS_NOA_Published.3.pdf\") page = reader.pages[0] page.extract_text() ``` The issue was introduced with https://github.com/py-pdf/pypdf/pull/969 ### Patches The issue was fixed with https://github.com/py-pdf/pypdf/pull/1828 ### Workarounds It is recommended to upgrade to `pypdf>=3.9.0`. PyPDF2 users should migrate to pypdf. If you cannot update your version of pypdf, you should modify `pypdf/generic/_data_structures.py`: ``` OLD: while peek not in (b\"\\r\", b\"\\n\"): NEW: while peek not in (b\"\\r\", b",
       "attack_vector": "other",
       "affected": "pip/PyPDF2, pip/pypdf",
       "severity": "Medium",
@@ -711892,7 +711892,7 @@
         "pypdf2"
       ],
       "added": "2026-06-10",
-      "updated": "2026-06-10",
+      "updated": "2026-09-18",
       "cve_ids": [
         "CVE-2023-36464"
       ],
@@ -711912,7 +711912,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
+      "last_seen": "2026-09-18",
       "purl": [
         "pkg:pypi/PyPDF2",
         "pkg:pypi/pypdf"
