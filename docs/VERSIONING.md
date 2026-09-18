@@ -42,13 +42,22 @@ verified against it rather than against memory.
 
 `docs/releases/v2.10.0.md` is published as the Release body verbatim (step
 7), so it must hold to both constraints — and "must hold to" is a claim
-worth checking rather than asserting: `grep -n '](#' docs/releases/v2.10.0.md`
-should return no matches (no in-body anchor links), and `grep -n '](\.\./\|](docs/\|](\./' docs/releases/v2.10.0.md`
-should also return none (no relative links). A prior draft of this
-checklist asserted compliance here without running either check, and the
-release notes at the time contained exactly one live in-body anchor link in
-their own opening paragraph — caught at gate review, not by this file. Run
-both greps as part of step 1's gate, not just once at drafting time.
+worth checking rather than asserting: `grep -n '](#' docs/releases/v<version>.md`
+should return no matches (no in-body anchor links). For relative links, do
+not grep a list of prefixes you hope is exhaustive (`](\.\./`, `](docs/`,
+`](\./` — an earlier draft of this checklist used exactly that pattern, and
+it would not catch `](mappings/x.json)`, a same-repo relative link with no
+leading `./`, `../`, or `docs/`). Instead enumerate every link target and
+exclude the ones that are already absolute:
+```bash
+grep -nE '\]\([^)]*\)' docs/releases/v<version>.md | grep -vE '\]\(https?://'
+```
+Any line this returns is a non-absolute link and must be fixed before
+publishing. A prior draft of this checklist asserted compliance here
+without running either check, and the release notes at the time contained
+exactly one live in-body anchor link in their own opening paragraph —
+caught at gate review, not by this file. Run both checks as part of step
+1's gate, not just once at drafting time.
 
 ## The release-cut checklist
 
@@ -125,8 +134,11 @@ both greps as part of step 1's gate, not just once at drafting time.
    b_ids = {e["id"] for e in before["incidents"]}
    a_ids = {e["id"] for e in after["incidents"]}
    print("ID set changed:", b_ids != a_ids)      # expect False
+   # Index once (O(n)); a linear scan per entry over ~13,000 rows is ~85M
+   # comparisons and needlessly slow for a step run on every cut.
+   before_by_id = {e["id"]: e for e in before["incidents"]}
    changed_entries = [e["id"] for e in after["incidents"]
-                      if e != next((x for x in before["incidents"] if x["id"] == e["id"]), None)]
+                      if e != before_by_id.get(e["id"])]
    print("entries with any field changed:", len(changed_entries))  # expect 0
    EOF
    ```
@@ -158,12 +170,23 @@ both greps as part of step 1's gate, not just once at drafting time.
      (`grep -n '^- \*\*Version:\*\*' INCIDENTS.md`) as part of step 5.
    - **The Hugging Face card** is *not* templated by `render_docs_stats.py`
      despite reading like one of "the" doc surfaces — it is generated
-     separately, at export time, by `scripts/export_huggingface.py`, which
-     reads `data/incidents.json`'s own `"version"` field directly (already
+     separately, by `scripts/export_huggingface.py`, which reads
+     `data/incidents.json`'s own `"version"` field directly (already
      correct after step 2/3, by a different mechanism than invariant 6's
-     marker sweep). Confirm the card's own output
-     (`dist/hf/README.md`'s `Dataset version <x>` line, after running the
-     export) rather than assuming step 4 covers it.
+     marker sweep). **Nothing in steps 1–9 of this checklist runs that
+     export.** The *shipped* card is correct because `huggingface.yml`
+     runs `export_huggingface.py` itself, triggered by `release: published`
+     (step 7) — so by the time step 9 checks that workflow's run, the
+     published card is already generated fresh from the bumped data file,
+     independent of this checklist. What is **not** current is any
+     `dist/hf/README.md` already sitting in a local working tree from
+     before this cut — that file is stale until something runs the export
+     locally, and this checklist deliberately does not do that (it is
+     redundant with what the workflow already does on publish). If you
+     want to eyeball the card's content before trusting the workflow, run
+     `make huggingface` locally and read `dist/hf/README.md`'s
+     `Dataset version <x>` line yourself — but treat that as an optional
+     spot-check, not a step this checklist requires.
 
 5. **Sweep live surfaces for prose the bump just made false.** The
    drift check in step 4 catches stale *numbers* inside markers; it does
@@ -179,6 +202,18 @@ both greps as part of step 1's gate, not just once at drafting time.
    read-through, not a script; it is the step most likely to be skipped
    under time pressure, which is exactly why it has its own numbered line
    here rather than being folded into step 4.
+
+   **This step has now caught the same failure class twice.** On the
+   `v2.10.0` cut — this checklist's first real use — after the version
+   marker auto-updated to `2.10.0`, README's "Latest release" paragraph
+   still described `v2.9.0`'s licensing work, still carried `v2.9.0`'s
+   date, and still linked to `v2.9.0`'s own release notes: the identical
+   shape as the `v2.9.0` failure this step was written to catch (a stale
+   English paragraph sitting next to a correctly-bumped marker),
+   reproduced verbatim on the very next cut. This is not evidence the
+   underlying problem is fixed — it is evidence this class of failure
+   recurs on every cut by default, and evidence that a manual, non-marker
+   read-through step is currently the only thing that catches it.
 
 6. **Tag, and push the tag.** `git tag -a v<version> -m "v<version>"` on
    the commit that carries the bumped strings, then `git push origin
@@ -254,3 +289,56 @@ both greps as part of step 1's gate, not just once at drafting time.
    else (no rows, or rows with a different event) means the release
    silently failed to trigger its downstream publications and step 9 is
    not satisfied by a green `gh run list` alone.
+
+   **Wait for `status: "completed"` before reading `conclusion` — do not
+   run the check above immediately after step 7.** Both workflows are
+   still `in_progress` with `conclusion: null` for some time right after
+   the release publishes, and `null` is neither success nor failure. An
+   operator who runs the assertion the moment step 7 finishes will see
+   `null`, reasonably conclude the check itself is broken, and skip it —
+   **a correct step that appears broken gets skipped, which is worse than
+   the step being absent**, so this needs an explicit wait rather than a
+   note to "run it a bit later." Poll status first, then read conclusion
+   only once it is completed:
+   ```bash
+   gh run list --workflow=huggingface.yml -b v<version> \
+     --json databaseId,status --limit 1 --jq '.[0].databaseId' \
+     | xargs -I{} gh run watch {} --exit-status
+   ```
+   `gh run watch --exit-status` blocks until the run reaches `completed`
+   and itself exits non-zero on failure, so it doubles as the assertion —
+   repeat for `publish.yml`'s run. Only after both watches return should
+   the `conclusion: "success"` check above be treated as meaningful; a
+   `null` conclusion at any point before that is the workflow still
+   running, not a defect in this step.
+
+## A known gap this checklist does not close: the window between step 7 and step 9
+
+**The Release object is created (step 7) before its downstream artifacts
+are known to have succeeded (step 9) — that ordering exists by
+construction, not by oversight, since step 7 is what *triggers*
+`huggingface.yml`/`publish.yml` in the first place, and they cannot
+succeed or fail before they run.** The consequence: for the real duration
+of those workflow runs, **a release can be publicly "cut" — visible on the
+Releases page, tagged, gate-passed — while a distribution channel has
+silently failed**, and nothing before step 9 would show it.
+
+This is not hypothetical: on the `v2.10.0` cut, **PyPI publication failed**
+after the Release was already public —
+`InvalidDistribution: '2.5' is not a valid metadata version`, a
+twine/setuptools version mismatch, surfaced only when step 9's workflow
+check was run. Nobody watching the Releases page during that window would
+have known; the GitHub Release itself gave no signal.
+
+**This checklist does not close that window — it cannot, since the trigger
+ordering is what GitHub's `release: published` event model requires — but
+it should not go unnamed, and step 9 should not be read as "the release
+didn't really happen until this step passes."** The release did happen at
+step 7; step 9 is where you find out whether everything it was supposed to
+trigger actually worked. **When step 9 finds a failure like this one:**
+fix the underlying cause first (here: pin or fix the `twine`/`setuptools`
+versions the publish workflow uses), then re-trigger the specific failed
+workflow manually against the already-published release rather than
+re-cutting anything — `gh workflow run publish.yml` — which is how the
+`v2.10.0` PyPI failure was actually resolved. Re-run step 9's check
+afterward to confirm the re-triggered run completed successfully.
