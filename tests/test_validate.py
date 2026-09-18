@@ -89,6 +89,82 @@ def test_integrity_reversibility_gate_flags_non_landmark():
     assert any("reversibility_class" in p for p in v.check_integrity(data, []))
 
 
+# --- WS4-T15: list-valued `into` (split/resplit) and the coverage guard ---
+
+def test_integrity_list_into_resolves_when_every_successor_is_live():
+    data = _data({"id": "INC-2"}, {"id": "INC-3"})
+    deps = [{"from": "INC-1", "into": ["INC-2", "INC-3"], "reason": "split",
+             "date": "2026-01-01"}]
+    assert v.check_integrity(data, deps) == []
+
+
+def test_integrity_list_into_flags_when_one_successor_is_dangling():
+    data = _data({"id": "INC-2"})
+    deps = [{"from": "INC-1", "into": ["INC-2", "INC-9"], "reason": "split",
+             "date": "2026-01-01"}]  # INC-9 not live
+    assert any("does not resolve" in p for p in v.check_integrity(data, deps))
+
+
+def test_integrity_list_into_does_not_crash_check_integrity():
+    # Regression for the exact crash the WS4-T10 unmerge design found:
+    # `current in into_map` raising TypeError: unhashable type: 'list' the
+    # moment a chain hop lands on a list-valued `into`. This must return a
+    # problem list, not raise.
+    data = _data({"id": "INC-4"})
+    deps = [
+        {"from": "INC-1", "into": "INC-2", "reason": "merged", "date": "2026-01-01"},
+        {"from": "INC-2", "into": ["INC-3", "INC-4"], "reason": "split",
+         "date": "2026-01-02"},
+        {"from": "INC-3", "into": "INC-4", "reason": "merged", "date": "2026-01-03"},
+    ]
+    problems = v.check_integrity(data, deps)  # must not raise
+    assert problems == []  # INC-1 -> INC-2 -> [INC-3 -> INC-4 (live), INC-4 (live)]
+
+
+def test_deprecation_coverage_fires_on_a_minority_redirect():
+    # Named failing input (agreement 6): a retired id had 92 sources; its
+    # recorded target now holds only 2 of them -- the exact shape
+    # (INC-08139/INC-08185) that passed a bare non-empty-intersection test
+    # in the WS4-T10 unmerge design's own audit.
+    data = _data({"id": "INC-A", "source_ids": ["s1", "s2"]})
+    retired = [f"s{i}" for i in range(1, 93)]
+    deps = [{"from": "INC-OLD", "into": "INC-A", "reason": "merged",
+              "date": "2026-01-01", "retired_source_ids": retired}]
+    problems = v.check_deprecation_coverage(data, deps)
+    assert any("INC-OLD" in p and "2/92" in p for p in problems)
+
+
+def test_deprecation_coverage_clean_when_target_holds_the_source_ids():
+    data = _data({"id": "INC-A", "source_ids": ["s1", "s2"]})
+    deps = [{"from": "INC-OLD", "into": "INC-A", "reason": "merged",
+              "date": "2026-01-01", "retired_source_ids": ["s1", "s2"]}]
+    assert v.check_deprecation_coverage(data, deps) == []
+
+
+def test_deprecation_coverage_multi_target_unions_successors():
+    data = _data(
+        {"id": "INC-A", "source_ids": ["s1"]},
+        {"id": "INC-B", "source_ids": ["s2"]},
+    )
+    deps = [{"from": "INC-OLD", "into": ["INC-A", "INC-B"], "reason": "resplit",
+              "date": "2026-01-01", "retired_source_ids": ["s1", "s2"]}]
+    assert v.check_deprecation_coverage(data, deps) == []
+
+
+def test_deprecation_coverage_legacy_record_is_unverifiable_not_passing():
+    # A record with no persisted retired_source_ids (every `merged` record
+    # written before WS4-T15) must be visibly skipped, not silently counted
+    # as a pass -- checks that cannot fail are the failure mode this guards
+    # against (working agreement 6).
+    data = _data({"id": "INC-A"})
+    deps = [{"from": "INC-OLD", "into": "INC-A", "reason": "merged",
+              "date": "2026-01-01"}]
+    assert v.check_deprecation_coverage(data, deps) == []  # not a failure...
+    # ...but check_integrity's own printed accounting (captured via capsys
+    # in a real CI log) is what makes "0 checked" visible; see
+    # scripts/validate.py's check_deprecation_coverage docstring.
+
+
 def test_integrity_reversibility_gate_allows_landmark():
     data = _data({"id": "INC-1", "tier": "landmark",
                   "reversibility_class": "read-only"})
