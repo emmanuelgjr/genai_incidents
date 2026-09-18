@@ -824,11 +824,25 @@ eventual split record.
 > type (`reason: "resplit"`) and the `resolve_id` list-valued-`into`
 > crash finding below both stand as findings; the "no code change
 > required" claim and the append-only-safe characterization of the
-> CURRENT behavior do not. **The actual remediation — a
-> `merge_and_dedupe.py` deprecation-persistence fix plus a schema
-> decision on the superseding-record identity key — is routed to a new,
-> separate task (pipeline-engineer + schema-architect, user call), not
-> implemented in this document.**
+> CURRENT behavior do not. **The actual remediation is routed to
+> WS4-T15 · superseding-redirect design and persistence** (P0,
+> pipeline-engineer + schema-architect, blocked by this branch merging),
+> **not implemented in this document**, scoped to: (1) the
+> deprecation-persistence change so a superseding record survives a
+> rebuild — today `merge_and_dedupe.py:1875` collapses to one record per
+> `from`; (2) the record identity key, a schema decision that goes to the
+> user; (3) persisting retired IDs' `source_ids` at deprecation time,
+> without which no integrity guard can run in CI (§8.3, below); (4) the
+> `resolve_id` multi-successor gap this section's own finding below
+> already names.
+>
+> **Advisory, not a defect in this pass** (red-reviewer's advisory 2):
+> because the build rewrites `id_deprecations.json` from exactly this
+> one-record-per-`from` map, **invariant 9 has no enforcement machinery
+> today** — a colliding record for an existing `from` is deleted silently
+> on the next rebuild, with nothing in `validate.py` or elsewhere to
+> catch it. WS4-T15 needs this as a starting condition, not just a board
+> note.
 
 **Precedent already exists for this exact shape of fix.** `docs/ID_POLICY.md`
 §1.4(a) documents a different-but-structurally-identical defect (9
@@ -941,8 +955,9 @@ mappings, is in `docs/audits/WS4-T10-inbound-deprecations-2026-09-15.json`
 > §8.1 measurement was done) — a check whose input requires manual git
 > archaeology cannot run in CI. **The working guard design — which needs
 > retired-ID `source_ids` captured and persisted at deprecation time
-> before it can exist at all — is routed to the same new, separate task
-> as §8.2.**
+> before it can exist at all — is routed to the same task as §8.2:
+> WS4-T15 · superseding-redirect design and persistence** (item 3 of its
+> boarded scope).
 
 §7.3's continuity guard (checks a common id's title/anchor against its
 prior build) does not and cannot catch §8.1's harm — none of the 8 retired
