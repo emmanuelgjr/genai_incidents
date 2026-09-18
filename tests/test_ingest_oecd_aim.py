@@ -647,16 +647,58 @@ def test_is_numeric_slug_classifies_legacy_vs_modern():
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/256a") is False
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/256-x") is False
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/x256") is False
+    # WS4-T17 BOUNCE #1 defect 2: a modern-scheme URL whose hex suffix
+    # HAPPENS TO BE all-digits (a real, plausible shape -- the hex alphabet
+    # is 0-9a-f, and any given 4-char suffix has roughly a 1-in-1600 chance
+    # of landing all-digit by chance alone). This is the ONE input that
+    # distinguishes the correct `^\d+$` regex from a hyphen-inclusive mutant
+    # such as `^[0-9-]+$`/`^[\d-]+$`: every other case in this test (a
+    # legacy slug, a real hyphenated-hex modern slug, an ambiguous partial
+    # match) reads identically under both patterns -- independently verified
+    # by direct regex comparison against all 9 cases above plus this one, in
+    # this task's report. Without this case, a mutant that starts treating
+    # ANY digit-or-hyphen string as legacy-numeric would WRONGLY skip a real
+    # modern-scheme incident -- silently dropping data -- and every test in
+    # this file would still pass.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026-09-10-1234") is False
 
 
-def test_is_numeric_slug_rule_fires_when_corrupted():
-    """Names the input that must make this rule fail if it regresses: a
-    known legacy-scheme URL. (Manually verified per working agreement 6 by
-    temporarily replacing _NUMERIC_SLUG_RE with a pattern that never matches
-    and re-running this suite -- see the WS4-T13 report for the exact
-    command/output; not re-enacted here to avoid mutating module state in a
-    shared test run.) This test simply pins the passing baseline so a
-    regression is caught by CI without needing to hand-corrupt the source."""
+def test_is_numeric_slug_minimal_baseline_pin():
+    """WS4-T17 carry-along rename (was `test_is_numeric_slug_rule_fires_
+    when_corrupted`): its OWN two assertions are a strict subset of
+    `test_is_numeric_slug_classifies_legacy_vs_modern` above (same two
+    URLs, same expected values) -- it does not corrupt anything, and never
+    did; the "fires when corrupted" name asserted a property (agreement-6
+    style, hand-mutate-and-watch-it-fail evidence) that this test itself
+    does not produce. It IS still a real, discriminating test on its own
+    two assertions -- it catches an always-True or always-False rewrite of
+    `_NUMERIC_SLUG_RE` -- so it is kept, not deleted, just renamed to
+    describe what it actually is: a minimal, fast, two-assertion baseline
+    pin, redundant with the fuller test above on purpose (a cheap early-fail
+    signal in a long file), not a corruption exercise.
+
+    WS4-T17 BOUNCE #1 defect 2, corrected here: an EARLIER version of this
+    docstring additionally claimed these two assertions catch a
+    hyphen-inclusive rewrite of `_NUMERIC_SLUG_RE` (e.g. `^[0-9-]+$`). That
+    claim was FALSE and independently measured as such (this task's
+    report): both `"256"` and `"2026-09-10-1de6"` read identically under
+    the correct digits-only regex and a hyphen-inclusive one, so neither
+    THIS test nor the fuller one above it actually caught that mutant --
+    the fuller test above it now does, via one added case
+    (`"2026-09-10-1234"`, a modern-scheme URL whose hex suffix happens to be
+    all-digits). A name/docstring asserting a property the test lacks is
+    exactly what agreement 6 warns about, so the claim is corrected here
+    rather than left standing on THIS test, which still doesn't exercise
+    that case itself (by design -- it stays a minimal two-assertion pin).
+
+    The corruption exercise itself (temporarily replacing `_NUMERIC_SLUG_RE`
+    with a pattern that never matches and re-running this suite) was
+    performed by hand for WS4-T13 per working agreement 6 -- see that
+    task's report for the exact command/output -- and is not re-enacted
+    here, to avoid mutating shared module state mid-suite. See
+    `test_run_skip_sampling_probe_flags_violation_when_body_shape_present`
+    below for WS4-T17's OWN "prove it fires" exercise, which the reviewer
+    asked for on the PROBE itself, not on `is_numeric_slug()`."""
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/256") is True
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026-09-10-1de6") is False
 
@@ -720,6 +762,15 @@ def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(o, "CACHE", cache_dir)
     monkeypatch.setattr(o, "INGEST", ingest_dir)
     monkeypatch.delenv("OECD_AIM_LIMIT", raising=False)  # use the real default (3000), deterministic
+    # WS4-T17: disable the skip-rule sampling probe for THIS test. It is
+    # covered by its own dedicated tests below (test_run_skip_sampling_probe_*
+    # / test_main_invokes_skip_sampling_probe_when_enabled) with a stubbed
+    # fetch_fn; left enabled here it would attempt a REAL fetch for
+    # url_legacy_numeric (deliberately uncached/unhandled below, see that
+    # URL's own comment), which is exactly the "unexpected live fetch"
+    # AssertionError trap this test relies on for the skip rule itself --
+    # this test's job is main()'s pre-existing accounting, not the probe.
+    monkeypatch.setenv("OECD_AIM_PROBE_SAMPLE_SIZE", "0")
     # Skip real exponential-backoff sleeps on the simulated fetch failure
     # below (2s + 4s otherwise) -- this test asserts no real network call is
     # ever reached, so there is nothing to legitimately wait out.
@@ -890,3 +941,479 @@ def test_main_end_to_end_offline(monkeypatch, tmp_path, capsys):
         "ng-state present but no incident-body shape: 1); "
         "2 security-relevant kept"
     ) in out_text
+
+
+# --- WS4-T17: skip-rule sampling probe --------------------------------------
+#
+# WS4-T13's crawl-budget skip erases its own evidence: is_numeric_slug()'s
+# premise (every legacy numeric-slug page fails the body-shape check) was
+# TRUE when measured, but stops being observable once those URLs are never
+# fetched. This probe samples a small, rotating slice of the skipped set
+# every run, fetches it for REAL through the same conduct-checked path the
+# main crawl uses, and fails loudly if the premise no longer holds. See
+# scripts/ingest_oecd_aim.py's own "WS4-T17" comment block for the full
+# design rationale (rotating-not-random sampling, value-based cursor,
+# REASON_OK-only hard failure, REASON_FETCH_FAILED exclusion).
+
+
+def _numeric_urls(*ns: int) -> list[str]:
+    return [f"https://oecd.ai/en/incidents/{n}" for n in ns]
+
+
+def test_select_probe_sample_first_run_starts_from_beginning():
+    skipped = _numeric_urls(30, 10, 20, 5, 15)  # deliberately unsorted input
+    sample, new_cursor = o.select_probe_sample(skipped, None, 3)
+    assert sample == _numeric_urls(5, 10, 15)  # sorted ascending, first 3
+    assert new_cursor == 15
+
+
+def test_select_probe_sample_rotates_across_runs_without_overlap():
+    skipped = _numeric_urls(*range(1, 11))  # 1..10
+    sample1, cursor1 = o.select_probe_sample(skipped, None, 3)
+    assert sample1 == _numeric_urls(1, 2, 3)
+    assert cursor1 == 3
+    sample2, cursor2 = o.select_probe_sample(skipped, cursor1, 3)
+    assert sample2 == _numeric_urls(4, 5, 6)
+    assert cursor2 == 6
+    sample3, cursor3 = o.select_probe_sample(skipped, cursor2, 3)
+    assert sample3 == _numeric_urls(7, 8, 9)
+    assert cursor3 == 9
+    # Coverage accumulates: after 3 rotating runs over a 10-item population
+    # with k=3, 9 DISTINCT items have been probed -- a random per-run draw
+    # has no such guarantee.
+    covered = set(sample1) | set(sample2) | set(sample3)
+    assert len(covered) == 9
+
+
+def test_select_probe_sample_wraps_around_at_the_end():
+    skipped = _numeric_urls(*range(1, 11))  # 1..10
+    # Cursor at 9 (near the end) with k=3 must wrap: 10, then back to 1, 2.
+    sample, new_cursor = o.select_probe_sample(skipped, 9, 3)
+    assert sample == _numeric_urls(10, 1, 2)
+    assert new_cursor == 2
+
+
+def test_select_probe_sample_caps_k_to_population_size():
+    skipped = _numeric_urls(1, 2)
+    sample, new_cursor = o.select_probe_sample(skipped, None, 5)
+    assert sample == _numeric_urls(1, 2)
+    assert new_cursor == 2
+
+
+def test_select_probe_sample_empty_population_returns_cursor_unchanged():
+    assert o.select_probe_sample([], None, 5) == ([], None)
+    assert o.select_probe_sample([], 42, 5) == ([], 42)
+
+
+def test_select_probe_sample_k_zero_or_negative_is_a_noop():
+    skipped = _numeric_urls(1, 2, 3)
+    assert o.select_probe_sample(skipped, None, 0) == ([], None)
+    assert o.select_probe_sample(skipped, 7, -1) == ([], 7)
+
+
+def test_select_probe_sample_cursor_stale_against_a_changed_population():
+    # The crawl window slid: the old cursor's value (50) no longer appears
+    # in `skipped` at all, and everything left is SMALLER than it (the
+    # population aged further down, e.g. new URLs pushed the largest legacy
+    # slugs out of the newest-N window entirely). No entry is > cursor, so
+    # this must fall back to the start rather than sampling nothing forever.
+    skipped = _numeric_urls(5, 10, 15)
+    sample, new_cursor = o.select_probe_sample(skipped, 50, 2)
+    assert sample == _numeric_urls(5, 10)
+    assert new_cursor == 10
+
+
+# --- WS4-T17 BOUNCE #1: select_recent_biased_sample() -----------------------
+
+
+def test_select_recent_biased_sample_prefers_front_of_original_order():
+    skipped = _numeric_urls(30, 10, 20, 5, 15)  # deliberately unsorted
+    sample = o.select_recent_biased_sample(skipped, set(), 3)
+    # First 3 in the GIVEN (sitemap) order, NOT numeric-value-sorted order --
+    # this is what distinguishes it from select_probe_sample() above.
+    assert sample == _numeric_urls(30, 10, 20)
+
+
+def test_select_recent_biased_sample_excludes_given_set():
+    skipped = _numeric_urls(30, 10, 20, 5, 15)
+    sample = o.select_recent_biased_sample(skipped, {"https://oecd.ai/en/incidents/30"}, 3)
+    assert sample == _numeric_urls(10, 20, 5)
+
+
+def test_select_recent_biased_sample_caps_at_available_after_exclusions():
+    skipped = _numeric_urls(30, 10, 20)
+    sample = o.select_recent_biased_sample(skipped, set(skipped[:2]), 5)
+    assert sample == _numeric_urls(20)  # only one left after excluding two of three
+
+
+def test_select_recent_biased_sample_k_zero_or_negative_is_a_noop():
+    skipped = _numeric_urls(30, 10, 20)
+    assert o.select_recent_biased_sample(skipped, set(), 0) == []
+    assert o.select_recent_biased_sample(skipped, set(), -1) == []
+
+
+def test_select_recent_biased_sample_empty_population():
+    assert o.select_recent_biased_sample([], set(), 3) == []
+
+
+# --- WS4-T17 BOUNCE #1: _coverage_ledger() -----------------------------------
+
+
+def test_coverage_ledger_measures_current_population_only():
+    population = _numeric_urls(1, 2, 3, 4, 5)
+    # Observed 1,2,3 ever (lifetime) plus 99, which has since aged OUT of the
+    # current population -- must not inflate coverage of what's live now.
+    ledger = o._coverage_ledger([1, 2, 3, 99], population)
+    assert ledger["observed_of_current_population"] == 3
+    assert ledger["current_population_size"] == 5
+    assert ledger["coverage_fraction"] == 3 / 5
+
+
+def test_coverage_ledger_empty_population_is_none_fraction():
+    ledger = o._coverage_ledger([1, 2], [])
+    assert ledger["current_population_size"] == 0
+    assert ledger["coverage_fraction"] is None
+
+
+# --- WS4-T17 BOUNCE #1: run_skip_sampling_probe() combines both halves,
+# reports fetch failures honestly, and ships a measured coverage ledger -----
+
+
+def test_run_skip_sampling_probe_combines_rotating_and_recent_biased_halves(tmp_path):
+    state_path = tmp_path / "skip_probe_state.json"
+    # Deliberately unsorted -- mirrors sitemap order, NOT numeric-value
+    # order, so the two halves are provably picking different things.
+    skipped = _numeric_urls(30, 10, 20, 5, 15, 25, 1, 40, 8, 12)  # 10 items
+
+    def _fake_fetch(_url):
+        return o.REASON_NO_BODY_SHAPE, None
+
+    result = o.run_skip_sampling_probe(skipped, k=4, state_path=state_path, fetch_fn=_fake_fetch)
+    # k=4 -> k_rotate=2, k_recent=2.
+    # Rotating half: sorted ascending [1,5,8,10,12,15,20,25,30,40], cursor
+    # None -> first 2 -> [1, 5].
+    rotate_expected = _numeric_urls(1, 5)
+    # Recency-biased half: first 2 entries of `skipped` in ITS OWN order not
+    # already in the rotating set -> 30, 10.
+    recent_expected = _numeric_urls(30, 10)
+    assert result["sample"] == rotate_expected + recent_expected
+    assert result["observed"] == 4
+    assert result["fetch_failed"] == []
+
+
+def test_run_skip_sampling_probe_no_violations_persists_rotating_state(tmp_path):
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(*range(1, 21))  # 20 items
+
+    def _fake_fetch(_url):
+        return o.REASON_NO_BODY_SHAPE, None
+
+    result1 = o.run_skip_sampling_probe(
+        skipped, k=6, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    # k=6 -> k_rotate=3, k_recent=3: rotate=[1,2,3] (cursor->3); recent
+    # (excluding 1,2,3) walks original order 1..20 and picks [4,5,6].
+    assert result1["sample"] == _numeric_urls(1, 2, 3, 4, 5, 6)
+    assert result1["violations"] == []
+    assert result1["soft_anomalies"] == []
+    assert result1["fetch_failed"] == []
+    assert result1["observed"] == 6
+    assert result1["population_size"] == 20
+
+    persisted = json.loads(state_path.read_text(encoding="utf-8"))
+    assert persisted["cursor"] == 3  # rotating half's OWN cursor (3 items rotated)
+    assert persisted["last_violations"] == []
+    assert persisted["total_sampled_lifetime"] == 6
+    assert persisted["total_observed_lifetime"] == 6
+
+    # Second run: rotation continues from the persisted cursor, and the
+    # lifetime counters accumulate rather than resetting.
+    result2 = o.run_skip_sampling_probe(
+        skipped, k=6, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    assert result2["sample"] == _numeric_urls(4, 5, 6, 1, 2, 3)
+    persisted2 = json.loads(state_path.read_text(encoding="utf-8"))
+    assert persisted2["cursor"] == 6
+    assert persisted2["total_sampled_lifetime"] == 12
+    assert persisted2["total_observed_lifetime"] == 12
+
+
+def test_run_skip_sampling_probe_coverage_ledger_grows_as_cursor_advances(tmp_path):
+    """A MEASURED number, not a design argument (WS4-T17 BOUNCE #1): the
+    lifetime coverage ledger must not double-count a slug re-observed on a
+    later run, and must grow once the rotating cursor reaches genuinely new
+    territory."""
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(*range(1, 21))  # 20 items
+
+    def _fake_fetch(_url):
+        return o.REASON_NO_BODY_SHAPE, None
+
+    r1 = o.run_skip_sampling_probe(skipped, k=6, state_path=state_path, fetch_fn=_fake_fetch)
+    assert r1["coverage_ledger"] == {
+        "observed_of_current_population": 6,
+        "current_population_size": 20,
+        "coverage_fraction": 6 / 20,
+    }
+
+    r2 = o.run_skip_sampling_probe(skipped, k=6, state_path=state_path, fetch_fn=_fake_fetch)
+    # Run 2's sample is [4,5,6,1,2,3] -- every one of those slugs was
+    # ALREADY observed in run 1, so lifetime coverage must NOT grow yet.
+    assert r2["coverage_ledger"]["observed_of_current_population"] == 6
+
+    r3 = o.run_skip_sampling_probe(skipped, k=6, state_path=state_path, fetch_fn=_fake_fetch)
+    # The rotating cursor has now moved past slug 6 into [7,8,9] -- genuinely
+    # new territory -- so lifetime coverage grows for the first time.
+    assert r3["coverage_ledger"]["observed_of_current_population"] == 9
+
+
+def test_run_skip_sampling_probe_flags_violation_when_body_shape_present(tmp_path, capsys):
+    """THE "prove it fires" exercise agreement 6 requires of this specific
+    task: seed a fixture where a numeric-slug URL returns a MODERN body
+    shape (REASON_OK, as if OECD's legacy page now parses like a real
+    incident) and watch the probe fail -- i.e. report it as a violation,
+    not silently pass. See this task's report for the same scenario run as
+    a standalone command."""
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(256, 321, 447)
+    poisoned_body = {"id": "256", "title": "A modern-shaped body now sits behind a legacy numeric slug"}
+
+    def _fake_fetch(url):
+        if url == "https://oecd.ai/en/incidents/256":
+            # The exact regression this probe exists to catch: a legacy
+            # numeric-slug URL that NOW extracts a valid incident body.
+            return o.REASON_OK, poisoned_body
+        return o.REASON_NO_BODY_SHAPE, None
+
+    result = o.run_skip_sampling_probe(
+        skipped, k=3, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    assert result["violations"] == ["https://oecd.ai/en/incidents/256"]
+    assert result["soft_anomalies"] == []
+
+    persisted = json.loads(state_path.read_text(encoding="utf-8"))
+    assert persisted["last_violations"] == ["https://oecd.ai/en/incidents/256"]
+
+    # And the separate enforcement gate must fail loudly on it.
+    exit_code = o.check_probe_state_for_violations(state_path)
+    assert exit_code == 1
+    err = capsys.readouterr().err
+    assert "::error::" in err
+    assert "DROPPING REAL INCIDENTS" in err
+    assert "https://oecd.ai/en/incidents/256" in err
+
+
+def test_run_skip_sampling_probe_soft_anomaly_does_not_trip_hard_gate(tmp_path):
+    """A reason other than REASON_OK / REASON_NO_BODY_SHAPE / REASON_
+    FETCH_FAILED (e.g. REASON_JSON_DECODE_ERROR) is logged as a soft
+    anomaly -- a deviation from the measured 100%-NO_BODY_SHAPE pattern --
+    but is NOT itself evidence of data loss, so it must NOT trip the hard
+    "::error::" gate the way an actual REASON_OK violation does."""
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(256)
+
+    def _fake_fetch(_url):
+        return o.REASON_JSON_DECODE_ERROR, None
+
+    result = o.run_skip_sampling_probe(
+        skipped, k=1, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    assert result["violations"] == []
+    assert result["soft_anomalies"] == ["https://oecd.ai/en/incidents/256"]
+    assert o.check_probe_state_for_violations(state_path) == 0
+
+
+def test_run_skip_sampling_probe_excludes_fetch_failed_from_verdict_buckets(tmp_path):
+    """Ordinary network flakiness (REASON_FETCH_FAILED) says nothing about
+    whether the skip rule's premise still holds -- counting it as a
+    violation or even a soft anomaly would make this probe noisy for a
+    reason unrelated to what it exists to catch. WS4-T17 BOUNCE #1: this
+    exclusion from the VERDICT buckets is correct and unchanged; what was
+    wrong (fixed below and in test_run_skip_sampling_probe_reports_fetch_
+    failures_honestly) was excluding it from REPORTING too."""
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(256)
+
+    def _fake_fetch(_url):
+        return o.REASON_FETCH_FAILED, None
+
+    result = o.run_skip_sampling_probe(
+        skipped, k=1, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    assert result["violations"] == []
+    assert result["soft_anomalies"] == []
+    assert o.check_probe_state_for_violations(state_path) == 0
+
+
+def test_run_skip_sampling_probe_reports_fetch_failures_honestly(tmp_path):
+    """WS4-T17 BOUNCE #1 defect 1, at the pure-function level: a run where
+    EVERY sampled URL hits REASON_FETCH_FAILED must report `fetch_failed`
+    populated and `observed == 0` -- distinguishable from "checked and
+    clean" by any caller, not silently folded away."""
+    state_path = tmp_path / "skip_probe_state.json"
+    skipped = _numeric_urls(100, 200, 300)
+
+    def _fake_fetch(_url):
+        return o.REASON_FETCH_FAILED, None
+
+    result = o.run_skip_sampling_probe(
+        skipped, k=3, state_path=state_path, fetch_fn=_fake_fetch
+    )
+    assert result["violations"] == []
+    assert result["soft_anomalies"] == []
+    assert sorted(result["fetch_failed"]) == sorted(result["sample"])
+    assert result["observed"] == 0
+
+    persisted = json.loads(state_path.read_text(encoding="utf-8"))
+    assert persisted["last_observed_count"] == 0
+    assert len(persisted["last_fetch_failed"]) == len(persisted["last_sample"])
+    assert persisted["total_sampled_lifetime"] == len(persisted["last_sample"])
+    assert persisted["total_observed_lifetime"] == 0
+    # A 0-observation run must not inflate the coverage ledger either.
+    assert persisted["coverage_ledger"]["observed_of_current_population"] == 0
+
+
+def test_check_probe_state_for_violations_no_state_file_is_clean(tmp_path):
+    # A fresh checkout / a repo where the probe has never run yet must not
+    # fail this check -- "no evidence of a problem" is not "a problem".
+    missing = tmp_path / "does_not_exist.json"
+    assert o.check_probe_state_for_violations(missing) == 0
+
+
+def test_check_probe_state_for_violations_clean_last_run(tmp_path):
+    state_path = tmp_path / "skip_probe_state.json"
+    state_path.write_text(json.dumps({"last_violations": []}), encoding="utf-8")
+    assert o.check_probe_state_for_violations(state_path) == 0
+
+
+def test_main_invokes_skip_sampling_probe_when_enabled(monkeypatch, tmp_path, capsys):
+    """Integration-level check that main() actually wires the probe up using
+    the real skipped_numeric partition it already computed -- not just that
+    the probe function works in isolation. No network: fetch_and_extract is
+    monkeypatched directly (both the main crawl's ThreadPoolExecutor and the
+    probe route through the same module-level name), so this exercises
+    main()'s OWN call to run_skip_sampling_probe(), the env var parsing, and
+    end-to-end wiring through to the persisted state file."""
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    ingest_dir = tmp_path / "ingest"
+    ingest_dir.mkdir()
+    probe_state_path = tmp_path / "skip_probe_state.json"
+    monkeypatch.setattr(o, "CACHE", cache_dir)
+    monkeypatch.setattr(o, "INGEST", ingest_dir)
+    monkeypatch.setattr(o, "PROBE_STATE_PATH", probe_state_path)
+    monkeypatch.delenv("OECD_AIM_LIMIT", raising=False)
+    # k=2 (not 1): k_rotate = 2//2 = 1 keeps the rotating half active even
+    # against a 1-URL population -- k=1 would zero out k_rotate (1//2=0) and
+    # this test would only ever exercise the recency-biased half.
+    monkeypatch.setenv("OECD_AIM_PROBE_SAMPLE_SIZE", "2")
+    monkeypatch.setattr(_common.time, "sleep", lambda *_a, **_k: None)
+
+    url_normal = "https://oecd.ai/en/incidents/2026-02-01-abcd"
+    url_legacy = "https://oecd.ai/en/incidents/991"  # the only skipped URL
+    monkeypatch.setattr(o, "load_sitemap", lambda: [url_normal, url_legacy])
+
+    normal_body = {
+        "id": "2026-02-01-abcd",
+        "title": "Ransomware attack disrupts AI-driven logistics platform",
+        "date": "2026-02-01",
+        "summary": "A ransomware attack disrupted an AI logistics platform.",
+        "company": [], "articles": [], "aiid_ids": [],
+    }
+    normal_page = _make_page(script_offset_bytes=700, tail_bytes=700, body=normal_body)
+    (cache_dir / "abcd.html").write_bytes(normal_page)
+
+    def _fake_fetch_and_extract(url):
+        if url == url_normal:
+            return o._extract_state_detail(normal_page.decode("utf-8"))
+        if url == url_legacy:
+            # The probe fetches this "for real" -- still fails the
+            # body-shape check, as the premise predicts.
+            return o.REASON_NO_BODY_SHAPE, None
+        raise AssertionError(f"unexpected fetch_and_extract call for {url}")
+
+    monkeypatch.setattr(o, "fetch_and_extract", _fake_fetch_and_extract)
+
+    o.main()
+
+    out_text = capsys.readouterr().out
+    assert "skip-rule sampling probe: fetching up to 1/1" in out_text
+    assert "0 violations -- premise still holds" in out_text
+    assert "coverage ledger: 1/1 (100.0%)" in out_text
+
+    persisted = json.loads(probe_state_path.read_text(encoding="utf-8"))
+    assert persisted["last_sample"] == [url_legacy]
+    assert persisted["last_violations"] == []
+    assert persisted["last_fetch_failed"] == []
+    assert persisted["last_observed_count"] == 1
+    assert persisted["cursor"] == 991
+    assert persisted["last_run_id"]  # WS4-T17 BOUNCE #1 advisory 2: freshness stamp always present
+
+
+def test_main_probe_all_fetch_failures_does_not_attest_premise_holds(monkeypatch, tmp_path, capsys):
+    """WS4-T17 BOUNCE #1 defect 1, reproduced at the exact level the
+    reviewer drove it: main() with EVERY probed URL returning
+    REASON_FETCH_FAILED must NOT print the "premise still holds"
+    attestation (0 observations is not evidence the premise holds), must
+    surface the fetch-failure count/URLs, and must not silently fold a
+    0-observed run into the lifetime "observed" counter as if real evidence
+    had been collected."""
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    ingest_dir = tmp_path / "ingest"
+    ingest_dir.mkdir()
+    probe_state_path = tmp_path / "skip_probe_state.json"
+    monkeypatch.setattr(o, "CACHE", cache_dir)
+    monkeypatch.setattr(o, "INGEST", ingest_dir)
+    monkeypatch.setattr(o, "PROBE_STATE_PATH", probe_state_path)
+    monkeypatch.delenv("OECD_AIM_LIMIT", raising=False)
+    monkeypatch.setenv("OECD_AIM_PROBE_SAMPLE_SIZE", "3")
+    monkeypatch.setattr(_common.time, "sleep", lambda *_a, **_k: None)
+
+    url_normal = "https://oecd.ai/en/incidents/2026-03-01-feed"
+    legacy_urls = [f"https://oecd.ai/en/incidents/{n}" for n in (100, 200, 300)]
+    monkeypatch.setattr(o, "load_sitemap", lambda: [url_normal] + legacy_urls)
+
+    normal_body = {
+        "id": "2026-03-01-feed",
+        "title": "Prompt injection attack breaches AI customer support bot",
+        "date": "2026-03-01",
+        "summary": "A prompt injection attack breached a support bot.",
+        "company": [], "articles": [], "aiid_ids": [],
+    }
+    normal_page = _make_page(script_offset_bytes=700, tail_bytes=700, body=normal_body)
+    (cache_dir / "feed.html").write_bytes(normal_page)
+
+    def _fake_fetch_and_extract(url):
+        if url == url_normal:
+            return o._extract_state_detail(normal_page.decode("utf-8"))
+        if url in legacy_urls:
+            # The exact scenario the reviewer drove: every probed legacy URL
+            # fails to fetch at all -- zero observations, not zero violations.
+            return o.REASON_FETCH_FAILED, None
+        raise AssertionError(f"unexpected fetch_and_extract call for {url}")
+
+    monkeypatch.setattr(o, "fetch_and_extract", _fake_fetch_and_extract)
+
+    o.main()
+    captured = capsys.readouterr()
+    out_text = captured.out
+    err_text = captured.err
+
+    # The announcement line ("...to confirm the body-shape-check premise
+    # still holds (WS4-T17)") is printed unconditionally before the probe
+    # runs and legitimately contains this substring -- what must NEVER
+    # appear is the AFFIRMATIVE ATTESTATION phrase specific to the "checked
+    # and clean" branch.
+    assert "0 violations -- premise still holds" not in out_text
+    assert "0 violations -- premise still holds" not in err_text
+    assert "observed NOTHING this run" in err_text
+    for u in legacy_urls:
+        assert u in err_text
+
+    persisted = json.loads(probe_state_path.read_text(encoding="utf-8"))
+    assert persisted["last_observed_count"] == 0
+    assert sorted(persisted["last_fetch_failed"]) == sorted(legacy_urls)
+    assert persisted["total_observed_lifetime"] == 0
+    assert persisted["total_sampled_lifetime"] == 3
+    assert persisted["coverage_ledger"]["observed_of_current_population"] == 0

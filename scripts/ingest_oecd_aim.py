@@ -25,6 +25,7 @@ import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -183,6 +184,420 @@ def partition_fetchable(urls: list[str]) -> tuple[list[str], list[str]]:
     fetchable = [u for u in urls if not is_numeric_slug(u)]
     skipped = [u for u in urls if is_numeric_slug(u)]
     return fetchable, skipped
+
+
+# --- WS4-T17: the sampling probe that restores the tripwire WS4-T13's skip
+# erased. -------------------------------------------------------------------
+#
+# is_numeric_slug()'s skip rule rests on a premise that was TRUE when
+# measured (docs/audits/E21-tripwire-refresh-2026-09-14.md, "Finding 5": 1852
+# legacy numeric-slug pages fetched, ALL 1852 failed the ng-state body-shape
+# check, 0 exceptions) -- but the whole point of the skip is to stop fetching
+# those pages. The moment it does, the evidence that would ever show OECD
+# changed the legacy page's shape (or that the "always fails" premise was
+# simply wrong for some slug this project never sampled) stops being
+# collected -- silently, and permanently. The in-window legacy population has
+# since been RE-MEASURED at 1,773 (WS4-T13's own re-gate: "today 1773/1227",
+# PROGRESS.md -- moving equal-and-opposite against the 2026-09-14 E21
+# baseline as the window's date-hash head grows). Its exact size SHIFTS run
+# to run as the newest-N window slides -- currently shrinking, as more
+# modern-scheme content claims a larger share of a fixed-size window, not
+# growing -- and this probe's design does not depend on which direction it
+# moves. This is the one advisory that gets WORSE by merging the skip:
+# reviewer finding, WS4-T17 brief.
+#
+# The fix is a small, real (network) sample of the skipped set, every run,
+# through the SAME conduct-checked fetch path (fetch_and_extract() ->
+# fetch_page() -> ingest.common.robust_fetch()) the main crawl already uses
+# -- no new egress path, see docs/INGESTION_CONDUCT.md.
+#
+# WS4-T17 BOUNCE #1 (resize): k=5 was theatre against a ~1,773-URL
+# population -- a full cycle would have taken ceil(1773/5) = 355 runs, ~6.8
+# years at this workflow's weekly cadence, against a population that never
+# stops shifting. DEFAULT_PROBE_SAMPLE_SIZE is now 50, split evenly into a
+# ROTATING half (guarantees monotonic full coverage -- select_probe_sample())
+# and a RECENCY-BIASED half (select_recent_biased_sample(), below) that
+# prioritizes the legacy slugs most likely to show a shape change first.
+# Measured at the default split (25/25):
+#   cycle length (rotating half) = ceil(1773 / 25) = 71 runs (~1.4 years at
+#     this workflow's weekly cadence)
+#   time cost    = 50 sequential fetches * ~1s DEFAULT_MIN_INTERVAL ~= 50s,
+#                  ~2.3% of the ~36-minute headroom WS4-T13 recovered
+#   request cost = 50 / 1773 ~= 2.8% of the request-count headroom WS4-T13
+#                  recovered; the rotating half alone (25/1773 ~= 1.4%) is
+#                  the portion carrying the guaranteed-coverage property
+# See docs/INGESTION_CONDUCT.md's WS4-T17 section for the same figures
+# re-derived against the population as measured there, and this task's
+# report for the command used to measure them. No single source of truth
+# for a live third-party count exists (same caveat as USER_AGENT's version
+# string in ingest/common.py) -- these are point-in-time, hand-kept in sync.
+
+DEFAULT_PROBE_SAMPLE_SIZE = 50  # total per run, split 50/50 rotating+recency-biased -- see the module comment above for the cycle-length/cost math this was chosen against.
+PROBE_STATE_PATH = ROOT / "ingest" / "_state" / "skip_probe_state.json"
+
+
+def _numeric_slug_value(url: str) -> int:
+    """Integer value of a numeric-slug URL's final path segment. Callers must
+    only pass URLs that satisfy is_numeric_slug(url) -- this is NOT
+    defensive against a non-numeric slug (ValueError propagates), by design:
+    every caller below only ever calls this on the `skipped_numeric` half of
+    partition_fetchable()'s output, which is already guaranteed all-digit."""
+    slug = url.rstrip("/").split("/")[-1]
+    return int(slug)
+
+
+def select_probe_sample(
+    skipped: list[str], cursor: int | None, k: int
+) -> tuple[list[str], int | None]:
+    """Pick up to `k` URLs from `skipped` (this run's legacy numeric-slug
+    population that partition_fetchable() decided NOT to fetch) to
+    sample-probe this run. Returns `(sample, new_cursor)`.
+
+    DESIGN DECISION -- rotating, not random, and why: `skipped` is sorted by
+    its numeric slug VALUE ascending, and the sample is the next `k` entries
+    strictly after `cursor` (wrapping to the start once the cursor runs off
+    the end). Each run therefore advances through a DIFFERENT slice of the
+    skipped population instead of a fresh random draw every time. A purely
+    random per-run sample covers only `1 - (1 - k/n)^N` of a size-`n`
+    population in expectation after `N` runs, and can -- by chance -- keep
+    re-sampling the same handful of URLs indefinitely while leaving others
+    completely untouched forever; a rotating cursor instead guarantees
+    monotonic progress through the whole population, turning a per-run
+    spot-check into EVENTUAL FULL COVERAGE deterministically. That is the
+    property the reviewer asked for explicitly ("coverage accumulates across
+    runs") and it is why this is not `random.sample()`.
+
+    DESIGN DECISION -- advance by VALUE, not list position: the skipped
+    population is not fixed between runs (the crawl window slides; which
+    numeric slugs even appear in `skipped` shifts week to week as the newest-
+    N window's tail moves). A position-based index (`state["i"] += k`) would
+    silently skip or re-visit entries whenever the population's size or
+    membership changes between runs. Comparing the next candidate's VALUE
+    against the last value actually probed is robust to that: it always
+    resumes just past the last real URL this rule confirmed, regardless of
+    how the surrounding population reshuffled meanwhile.
+
+    `cursor=None` (no prior state, e.g. first run ever, or state lost) starts
+    from the beginning. `k<=0` or an empty `skipped` returns `([], cursor)`
+    unchanged -- nothing to sample, state carries over untouched.
+
+    MEASURED CYCLE LENGTH (WS4-T17 BOUNCE #1, agreement 6(c) -- a design
+    argument alone is not a measured claim): `run_skip_sampling_probe()`
+    calls this with `k = DEFAULT_PROBE_SAMPLE_SIZE // 2 = 25` (the rotating
+    half of the default 50-URL sample). Against the population as measured
+    at WS4-T13's own re-gate (1,773 in-window legacy numeric-slug URLs,
+    PROGRESS.md), a full guaranteed-coverage cycle is
+    `ceil(1773 / 25) = 71` runs -- about 1.4 years at this workflow's weekly
+    cadence. This number moves if the population size moves (it is
+    recomputed from `len(skipped)` every run, never hardcoded) or if `k`
+    changes; it is NOT re-derived automatically anywhere -- see
+    docs/INGESTION_CONDUCT.md's WS4-T17 section, kept in sync by hand.
+    """
+    if not skipped or k <= 0:
+        return [], cursor
+    ordered = sorted(skipped, key=_numeric_slug_value)
+    n = len(ordered)
+    k = min(k, n)
+    if cursor is None:
+        start = 0
+    else:
+        start = next(
+            (i for i, u in enumerate(ordered) if _numeric_slug_value(u) > cursor), 0
+        )
+    sample = [ordered[(start + i) % n] for i in range(k)]
+    new_cursor = _numeric_slug_value(sample[-1])
+    return sample, new_cursor
+
+
+def select_recent_biased_sample(
+    skipped: list[str], exclude: set[str], k: int
+) -> list[str]:
+    """Return up to `k` URLs from `skipped`, preferring entries EARLIEST in
+    `skipped`'s OWN order -- i.e. `partition_fetchable()`'s output order,
+    which preserves the raw sitemap order (that function's own docstring:
+    "preserving input order in both"), and `load_sitemap()` lists newest-
+    first by the sitemap's own ordering. A legacy numeric-slug page that was
+    recently touched -- an edit, a re-publish, a migration -- sorts CLOSER
+    TO THE FRONT of the numeric-slug block (nearer the date-hash/numeric-
+    slug boundary) than an untouched one, even though its URL is still
+    legacy-numbered. This is the half of the sample biased toward where a
+    shape change is MOST LIKELY to appear first: recently-active pages, not
+    an arbitrary numeric-value-sorted slice (that guaranteed, eventual-full-
+    coverage property is what the ROTATING half, `select_probe_sample()`
+    above, already provides on its own fixed schedule).
+
+    `exclude` (typically this run's rotating-half sample, as a set of URLs)
+    is skipped so the two halves of a combined sample don't waste probe
+    budget re-fetching the same URL twice in one run; remaining entries are
+    still taken in `skipped`'s own order once the excluded ones are filtered
+    out, so this stays a pure front-of-population bias, not a second
+    rotation with its own guarantee.
+
+    `k<=0` returns `[]`.
+    """
+    if k <= 0:
+        return []
+    out: list[str] = []
+    for u in skipped:
+        if u in exclude:
+            continue
+        out.append(u)
+        if len(out) >= k:
+            break
+    return out
+
+
+def _load_probe_state(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (ValueError, OSError):
+        return {}
+
+
+def _save_probe_state(path: Path, state: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(state, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def _coverage_ledger(observed_values: list[int], population: list[str]) -> dict:
+    """A MEASURED coverage number, not a design argument (WS4-T17 BOUNCE #1:
+    "ship a coverage ledger with it so the coverage claim is a measured
+    number rather than a design argument"). How much of the CURRENT skipped
+    population has this probe directly OBSERVED (fetched with a
+    determinate, non-`REASON_FETCH_FAILED` outcome) at least once, ever,
+    across its whole lifetime -- not just this run.
+
+    `observed_values` is the full lifetime set persisted in state
+    (`observed_slugs`, numeric slug values); `population` is THIS run's
+    `skipped` list. A value observed historically that has since aged out
+    of the window (no longer in `population`, e.g. that page fell off the
+    tail of the newest-N crawl) doesn't count toward coverage of the
+    CURRENT population -- it's a claim about what's true of the population
+    as it stands right now, not a lifetime total that can outlive the URLs
+    it was measured against.
+    """
+    population_values = {_numeric_slug_value(u) for u in population}
+    covered = population_values & set(observed_values)
+    total = len(population_values)
+    return {
+        "observed_of_current_population": len(covered),
+        "current_population_size": total,
+        "coverage_fraction": (len(covered) / total) if total else None,
+    }
+
+
+def run_skip_sampling_probe(
+    skipped: list[str],
+    *,
+    k: int = DEFAULT_PROBE_SAMPLE_SIZE,
+    state_path: Path | None = None,
+    fetch_fn=None,
+) -> dict:
+    """The WS4-T17 tripwire itself: fetch a real sample of `skipped` --
+    HALF rotating (`select_probe_sample()`, guaranteed eventual full
+    coverage on a fixed schedule) and HALF recency-biased
+    (`select_recent_biased_sample()`, prioritizing the legacy slugs most
+    likely to show a shape change first) -- through the same conduct-
+    checked path the main crawl uses, and assert each OBSERVED one still
+    fails the ng-state body-shape check -- i.e. the skip rule's premise
+    still holds for what was actually observed this run.
+
+    `fetch_fn` defaults to `fetch_and_extract` (the real, network-touching
+    path); tests inject a stub returning canned `(reason, body)` pairs so
+    this function's SELECTION/ACCOUNTING/PERSISTENCE logic is fully testable
+    offline, while `fetch_and_extract` itself is exercised by its own
+    (also-offline, cache-seeded) tests elsewhere in this suite.
+
+    `state_path` resolves to the module-level `PROBE_STATE_PATH` at CALL
+    time if not given (not bound as an early default), so tests can
+    monkeypatch `PROBE_STATE_PATH` and have it take effect here exactly like
+    `CACHE`/`INGEST` already do elsewhere in this module.
+
+    Returns (and persists to `state_path`) a result dict:
+      - "sample": the URLs probed this run (rotating half then recent half)
+      - "findings": [{"url", "reason"}] per probed URL
+      - "violations": URLs that came back REASON_OK -- a legacy numeric-slug
+        page that NOW parses as a real incident body. This is the ONLY
+        outcome treated as a hard failure: it means is_numeric_slug()'s skip
+        rule is CURRENTLY DROPPING REAL INCIDENTS.
+      - "soft_anomalies": URLs that still failed the body-shape check, but
+        via a reason OTHER than REASON_NO_BODY_SHAPE (i.e.
+        REASON_NO_SCRIPT_MATCH / REASON_JSON_DECODE_ERROR) -- not itself
+        evidence of data loss (no incident body was ever extracted), but a
+        deviation from the SPECIFIC 100%-NO_BODY_SHAPE pattern the
+        2026-09-14 measurement found for every legacy page it fetched.
+        Logged for visibility; never fatal on its own.
+      - "fetch_failed": URLs that hit REASON_FETCH_FAILED -- ordinary
+        network flakiness, carrying NO information either way about whether
+        the skip rule's premise holds. WS4-T17 BOUNCE #1 defect 1:
+        excluding these from "violations"/"soft_anomalies" is correct
+        (counting them there would make the probe noisy for a reason
+        unrelated to what it exists to catch), but the ORIGINAL version of
+        this function ALSO excluded them from all reporting, which meant a
+        run where every probed URL failed to fetch still printed "0
+        violations -- premise still holds" -- an affirmative attestation
+        having observed nothing, the exact failure shape this probe exists
+        to close, one layer up, inside its own remedy. This key exists so
+        callers can distinguish "checked and clean" from "checked nothing".
+      - "observed": `len(sample) - len(fetch_failed)` -- how many URLs this
+        run ACTUALLY produced a determinate signal for. Callers (main()'s
+        wiring) must not print an affirmative "premise holds" attestation
+        when this is 0.
+      - "population_size": len(skipped) this run
+      - "coverage_ledger": see `_coverage_ledger()` -- a measured, lifetime,
+        current-population-relative coverage fraction, persisted and
+        returned every run.
+
+    Lifetime state persisted (not just this run's numbers): `cursor` (the
+    rotating half's own progress marker), `total_sampled_lifetime` (every
+    URL ever handed to `fetch_fn`, regardless of outcome) and
+    `total_observed_lifetime` (only those that produced a determinate
+    signal -- WS4-T17 BOUNCE #1: "track lifetime observed separately from
+    sampled", since conflating them is exactly what let a
+    fetch-failure-only run silently count as if real evidence had been
+    collected). `last_run_id` stamps `GITHUB_RUN_ID` (or a `local-<utc
+    timestamp>` fallback outside CI) so a caller can tell whether the state
+    it's reading was actually produced by the run checking it -- see
+    `check_probe_state_for_violations()`'s docstring (WS4-T17 BOUNCE #1
+    advisory 2).
+    """
+    if fetch_fn is None:
+        fetch_fn = fetch_and_extract
+    path = state_path if state_path is not None else PROBE_STATE_PATH
+
+    state = _load_probe_state(path)
+    cursor = state.get("cursor")
+
+    k_rotate = k // 2
+    k_recent = k - k_rotate
+    rotate_sample, new_cursor = select_probe_sample(skipped, cursor, k_rotate)
+    recent_sample = select_recent_biased_sample(skipped, set(rotate_sample), k_recent)
+    sample = rotate_sample + recent_sample
+
+    findings: list[dict] = []
+    violations: list[str] = []
+    soft_anomalies: list[str] = []
+    fetch_failed: list[str] = []
+    for url in sample:
+        reason, _body = fetch_fn(url)
+        findings.append({"url": url, "reason": reason})
+        if reason == REASON_FETCH_FAILED:
+            fetch_failed.append(url)
+        elif reason == REASON_OK:
+            violations.append(url)
+        elif reason != REASON_NO_BODY_SHAPE:
+            soft_anomalies.append(url)
+
+    fetch_failed_set = set(fetch_failed)
+    observed_urls = [u for u in sample if u not in fetch_failed_set]
+    observed_count = len(observed_urls)
+
+    observed_values_lifetime = set(state.get("observed_slugs") or [])
+    observed_values_lifetime.update(_numeric_slug_value(u) for u in observed_urls)
+    coverage = _coverage_ledger(sorted(observed_values_lifetime), skipped)
+
+    run_id = os.environ.get("GITHUB_RUN_ID") or f"local-{datetime.now(timezone.utc).isoformat()}"
+
+    state["cursor"] = new_cursor if new_cursor is not None else cursor
+    state["last_run_utc"] = datetime.now(timezone.utc).isoformat()
+    state["last_run_id"] = run_id
+    state["last_sample"] = sample
+    state["last_findings"] = findings
+    state["last_violations"] = violations
+    state["last_soft_anomalies"] = soft_anomalies
+    state["last_fetch_failed"] = fetch_failed
+    state["last_observed_count"] = observed_count
+    state["total_sampled_lifetime"] = int(state.get("total_sampled_lifetime", 0)) + len(sample)
+    state["total_observed_lifetime"] = int(state.get("total_observed_lifetime", 0)) + observed_count
+    state["observed_slugs"] = sorted(observed_values_lifetime)
+    state["population_size_last_run"] = len(skipped)
+    state["coverage_ledger"] = coverage
+    _save_probe_state(path, state)
+
+    return {
+        "sample": sample,
+        "findings": findings,
+        "violations": violations,
+        "soft_anomalies": soft_anomalies,
+        "fetch_failed": fetch_failed,
+        "observed": observed_count,
+        "population_size": len(skipped),
+        "coverage_ledger": coverage,
+    }
+
+
+def check_probe_state_for_violations(state_path: Path | None = None) -> int:
+    """Read the LAST-persisted probe state and return a process exit code:
+    1 if that run recorded any violations, 0 otherwise (including "no probe
+    has ever run" -- a fresh checkout never fails this check).
+
+    Deliberately a SEPARATE gate from the "Refresh OECD AI Incidents
+    Monitor" ingest step's own outcome (see .github/workflows/auto-
+    refresh.yml): that step is `continue-on-error: true` and its outcome
+    feeds ingest/_state/source_health.json's CONSECUTIVE-failure counter,
+    which exists specifically to smooth over ordinary third-party
+    flakiness over several weeks before alerting loudly (WS4-T9). A skip-
+    rule violation is not that kind of failure -- it is a deterministic
+    correctness signal (a real incident is being silently dropped RIGHT
+    NOW) that must fail the run loudly on the FIRST occurrence, not the
+    third. Conflating the two would either mute a real-incident-loss signal
+    for up to two extra weeks (if routed through source_health's threshold)
+    or pollute source_health's flakiness counter with a correctness
+    finding unrelated to source availability -- so this is its own gate,
+    wired as its own workflow step, invoked via `--check-probe`.
+
+    WS4-T17 BOUNCE #1 advisory 2 -- freshness: the workflow's OWN `if:
+    steps.ingest_oecd.outcome == 'success'` step-ordering guard is, today,
+    the only thing preventing this function from checking STALE state (a
+    prior run's leftovers, never refreshed this run). That guard is correct
+    for the production workflow but gives no protection to a manual, local,
+    or future differently-wired call to this function -- so
+    `run_skip_sampling_probe()` stamps `last_run_id` (from `GITHUB_RUN_ID`,
+    or a `local-<timestamp>` fallback) into the state on every write, and
+    this function compares it against the CURRENT `GITHUB_RUN_ID` (when one
+    is set, i.e. we're actually inside a CI run) as a second, independent
+    check. A mismatch is surfaced loudly as a warning -- not hard-failed,
+    since a legitimate reason can still exist -- rather than silently
+    trusting unverified-fresh state, which is exactly the failure shape
+    this whole task exists to close.
+    """
+    path = state_path if state_path is not None else PROBE_STATE_PATH
+    state = _load_probe_state(path)
+
+    current_run_id = os.environ.get("GITHUB_RUN_ID")
+    stamped_run_id = state.get("last_run_id")
+    if current_run_id and stamped_run_id and stamped_run_id != current_run_id:
+        print(
+            f"::warning::WS4-T17 skip-rule probe state at {path} is stamped "
+            f"last_run_id={stamped_run_id!r}, which does not match this CI "
+            f"run's GITHUB_RUN_ID={current_run_id!r} -- the state being "
+            "checked may not be from THIS run. Verify the workflow's step "
+            "ordering (the probe state must be written by the SAME run that "
+            "checks it) before trusting a clean result.",
+            file=sys.stderr,
+        )
+
+    violations = state.get("last_violations") or []
+    if violations:
+        print(
+            f"::error::WS4-T17 skip-rule sampling probe recorded {len(violations)} "
+            f"violation(s) in its last run: {violations}. A legacy numeric-slug OECD "
+            "AIM URL now returns a real incident body (REASON_OK) -- is_numeric_slug()'s "
+            f"skip rule is DROPPING REAL INCIDENTS. See {path} ('last_findings') and the "
+            "'Refresh OECD AI Incidents Monitor' step's own log for the fetched detail. "
+            "Fix the rule (or the underlying page-shape assumption) before the next "
+            "scheduled crawl.",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
 
 
 def fetch_page(url: str) -> str | None:
@@ -671,6 +1086,91 @@ def main():
     )
     print(f"[aim] wrote -> {out_path}")
 
+    # WS4-T17: sample-probe a rotating slice of the numeric-slug URLs the
+    # budget skip (WS4-T13, above) decided NOT to fetch, to confirm the
+    # skip rule's premise still holds -- see run_skip_sampling_probe()'s
+    # docstring. Deliberately does NOT raise/exit here: this function's own
+    # exit status feeds ingest/_state/source_health.json's THIRD-PARTY-
+    # flakiness counter (via the "Refresh OECD AI Incidents Monitor" step's
+    # outcome), and a skip-rule violation is a different, more urgent kind
+    # of signal that must fail loudly on the FIRST occurrence -- see
+    # check_probe_state_for_violations()'s docstring for the separate gate
+    # that enforces that, and .github/workflows/auto-refresh.yml for how
+    # it's wired as its own step.
+    probe_k_env = os.environ.get("OECD_AIM_PROBE_SAMPLE_SIZE", str(DEFAULT_PROBE_SAMPLE_SIZE))
+    try:
+        probe_k = int(probe_k_env)
+    except ValueError:
+        probe_k = DEFAULT_PROBE_SAMPLE_SIZE
+
+    if probe_k <= 0:
+        print("[aim] skip-rule sampling probe disabled (OECD_AIM_PROBE_SAMPLE_SIZE<=0)")
+    elif not skipped_numeric:
+        print("[aim] skip-rule sampling probe: nothing skipped this run, nothing to sample")
+    else:
+        n_sample = min(probe_k, len(skipped_numeric))
+        print(
+            f"[aim] skip-rule sampling probe: fetching up to {n_sample}/{len(skipped_numeric)} "
+            "skipped legacy numeric-slug URLs (rotating + recency-biased halves) to confirm "
+            "the body-shape-check premise still holds (WS4-T17)"
+        )
+        probe_result = run_skip_sampling_probe(skipped_numeric, k=probe_k)
+        n_failed = len(probe_result["fetch_failed"])
+        n_observed = probe_result["observed"]
+        ledger = probe_result["coverage_ledger"]
+        if probe_result["violations"]:
+            print(
+                "::error::WS4-T17 skip-rule sampling probe found "
+                f"{len(probe_result['violations'])} legacy numeric-slug URL(s) that now "
+                f"return a real incident body: {probe_result['violations']} -- the "
+                "is_numeric_slug() skip rule is DROPPING REAL INCIDENTS. See "
+                "run_skip_sampling_probe()'s docstring / docs/INGESTION_CONDUCT.md.",
+                file=sys.stderr,
+            )
+        elif probe_result["soft_anomalies"]:
+            print(
+                "::warning::WS4-T17 skip-rule sampling probe: "
+                f"{len(probe_result['soft_anomalies'])} legacy numeric-slug URL(s) failed "
+                f"the body-shape check via an unexpected reason: {probe_result['soft_anomalies']} "
+                "-- not a confirmed data-loss case (no REASON_OK), but a deviation from the "
+                "measured 100%-NO_BODY_SHAPE pattern; worth a look.",
+                file=sys.stderr,
+            )
+        elif n_observed == 0:
+            # WS4-T17 BOUNCE #1 defect 1: do NOT print an affirmative "premise
+            # still holds" attestation when nothing was actually observed --
+            # a run where every probed URL hits REASON_FETCH_FAILED carries
+            # zero information either way, and the correlated-failure case
+            # this matters for (OECD starting to 403/404 specifically on
+            # legacy pages, a plausible retirement path) would otherwise make
+            # this probe report green forever while seeing nothing.
+            print(
+                "::warning::WS4-T17 skip-rule sampling probe observed NOTHING this run -- "
+                f"all {len(probe_result['sample'])} sampled URL(s) hit REASON_FETCH_FAILED "
+                f"({probe_result['fetch_failed']}). This is NOT an attestation that the "
+                "skip-rule premise holds -- no evidence was collected either way this run. "
+                "If this persists across runs, the premise could silently become false while "
+                "this probe keeps reporting green elsewhere.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"[aim] skip-rule sampling probe: {n_observed}/{len(probe_result['sample'])} "
+                f"observed ({n_failed} fetch failure(s) excluded), 0 violations -- premise "
+                "still holds for what was observed this run"
+            )
+        print(
+            f"[aim] skip-rule sampling probe coverage ledger: "
+            f"{ledger['observed_of_current_population']}/{ledger['current_population_size']} "
+            f"({(ledger['coverage_fraction'] or 0) * 100:.1f}%) of the current skipped "
+            "population directly observed at least once (lifetime)"
+        )
+
 
 if __name__ == "__main__":
+    if "--check-probe" in sys.argv[1:]:
+        # WS4-T17: separate CLI mode, wired as its own workflow step (see
+        # check_probe_state_for_violations()'s docstring for why this is
+        # not folded into main()'s own exit status).
+        sys.exit(check_probe_state_for_violations())
     main()
