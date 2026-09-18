@@ -921,6 +921,14 @@ CURATION_OVERRIDES_PATH = DATA / "curation_overrides.json"
 CISA_KEV_PATH = INGEST / "cisa_kev.json"
 CWE_VECTOR_PATH = MAPPINGS / "cwe_attack_vector.json"
 SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
+# WS4-T19: the pre-authorization guard's input. A committed, docs/-only
+# PROPOSAL (never data/, never schema/) of which previously-single
+# published ids are authorized to newly resolve to more than one row on
+# the transition that lands WS4-T10's normalize_url fix. See
+# docs/audits/WS4-T19-split-evidence-2026-09-18.md and
+# docs/audits/WS4-T19-authorized-splits-2026-09-18.json (the file this
+# constant points at -- proposed, not yet user-ruled; see D25(b)).
+SPLIT_AUTHORIZATION_PATH = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
 
 
 def load_cwe_vector_map() -> dict[str, str]:
@@ -1400,6 +1408,123 @@ def dedupe_entries(
     return surviving, tombstones
 
 
+class SplitAuthorizationError(SystemExit):
+    """Raised by :func:`_check_split_authorization` to abort the build
+    BEFORE any output file is written. Subclasses SystemExit so a plain
+    ``make build`` run stops with a nonzero exit and the message below,
+    without a Python traceback obscuring it."""
+
+
+def _load_split_authorization(path: Path) -> set[str]:
+    """Read the WS4-T19 pre-authorization list's `from` ids. Missing file
+    or unparseable JSON both mean "nothing is authorized" (the safe
+    default: a guard that treats a missing/corrupt allowlist as
+    authorizing everything is not a guard) -- returns an empty set, not
+    an exception, so a build with zero detected splits (today's normal
+    case, pre-WS4-T10-merge) never even looks at this file's presence."""
+    if not path.exists():
+        return set()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return set()
+    return {
+        e.get("from") for e in data.get("entries", []) if e.get("from")
+    }
+
+
+def _check_split_authorization(
+    prev_id_by_key: dict[str, str],
+    deduped: list[dict],
+    authorized_path: Path = SPLIT_AUTHORIZATION_PATH,
+) -> None:
+    """WS4-T19 build-time pre-authorization guard.
+
+    Aborts LOUDLY, before any output file is written (call this before
+    step 8's `id_deprecations.json` write and step 9's `incidents.json`
+    write), if this build's own dedupe logic would cause a previously
+    single PUBLISHED id's member keys (the union of `source_ids` +
+    `cve_ids` it held in the last committed build) to newly resolve onto
+    MORE THAN ONE row of `deduped` -- i.e. would silently produce a
+    `split`/`resplit`-shaped change -- unless that id is present in the
+    authorized list at `authorized_path` (the `from` field of a
+    docs/-committed, human-reviewed, PROPOSED list; see
+    docs/audits/WS4-T19-split-evidence-2026-09-18.md and D25(b): the user
+    rules on the list, not this function).
+
+    This is the mechanical form of D25(a) condition (2) and the
+    "deliberate guard" named in board entry `8d1b241f` / WS4-T15 spec §7(b)
+    -- until now the project had three ACCIDENTAL barriers (a mis-keyed
+    curation override that made `validate.py` fail closed, CI running
+    `make build` before `validate.py`, and nothing else) and no
+    DELIBERATE one. Name the input that makes this fail: any build whose
+    dedupe output would split a previously-single published id's own
+    historical member keys across >1 new row, where that id is NOT on the
+    authorized list -- including the empty-list case (nothing is
+    authorized) and the case where exactly one of several detected splits
+    is missing from an otherwise-complete list (this function reports
+    every unauthorized id, not just the first, so a partially-correct list
+    cannot hide behind an early return).
+    """
+    new_key_to_id: dict[str, str] = {}
+    for e in deduped:
+        eid = e.get("id")
+        if not eid:
+            continue
+        for k in list(e.get("source_ids") or []) + list(e.get("cve_ids") or []):
+            new_key_to_id[k] = eid
+
+    split_map: dict[str, set[str]] = {}
+    for key, old_id in prev_id_by_key.items():
+        new_id = new_key_to_id.get(key)
+        if new_id is None:
+            continue
+        split_map.setdefault(old_id, set()).add(new_id)
+    detected_splits = {
+        old_id: ids for old_id, ids in split_map.items() if len(ids) > 1
+    }
+    if not detected_splits:
+        return
+
+    authorized = _load_split_authorization(authorized_path)
+    unauthorized = {
+        old_id: ids for old_id, ids in detected_splits.items()
+        if old_id not in authorized
+    }
+    if not unauthorized:
+        print(
+            f"[split-guard] {len(detected_splits)} previously-single "
+            f"published id(s) resolve to >1 row this build; all are on "
+            f"the authorized list ({authorized_path.name}) -- proceeding."
+        )
+        return
+
+    lines = [
+        "[split-guard] ABORT: this build would silently split "
+        f"{len(unauthorized)} previously-single PUBLISHED id(s) into "
+        "more than one row, and no authorization for them was found at "
+        f"{authorized_path}.",
+        "No output file was written.",
+        "",
+        "Unauthorized split(s) detected (old id -> new row ids):",
+    ]
+    for old_id in sorted(unauthorized):
+        new_ids = sorted(unauthorized[old_id])
+        shown = new_ids[:8]
+        suffix = f" ... (+{len(new_ids) - 8} more)" if len(new_ids) > 8 else ""
+        lines.append(f"  - {old_id} -> {shown}{suffix}  ({len(new_ids)} rows)")
+    lines.append("")
+    lines.append(
+        "This is the WS4-T19 pre-authorization guard (D25(b): the user "
+        "rules on which splits are authorized for a one-time transition; "
+        "the build never decides this for itself). To authorize a "
+        "reviewed split, add {\"from\": \"<old-id>\", \"reason\": "
+        "\"<...>\"} to " + str(authorized_path) + ". "
+        "See docs/audits/WS4-T19-split-evidence-2026-09-18.md."
+    )
+    raise SplitAuthorizationError("\n".join(lines))
+
+
 def main():
     # 0) Load the previous output: timestamps, the id-by-key map (so stable
     #    INC-* IDs survive a rebuild), and the monotonic ID counter.
@@ -1759,6 +1884,14 @@ def main():
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         prev_generated = ""
     generated = today if any_change or not prev_generated else prev_generated
+
+    # 7b) WS4-T19 pre-authorization guard. Must run AFTER id assignment
+    #     (deduped rows already carry their final `id`) and BEFORE any
+    #     output write below -- both the id_deprecations.json write in
+    #     step 8 and the incidents.json write in step 9. Raises
+    #     SplitAuthorizationError (a SystemExit subclass) and writes
+    #     nothing if an unauthorized split is detected.
+    _check_split_authorization(prev_id_by_key, deduped, SPLIT_AUTHORIZATION_PATH)
 
     # 8) Merge deprecations with the on-disk history and persist.
     prev_deprec: list[dict] = []
