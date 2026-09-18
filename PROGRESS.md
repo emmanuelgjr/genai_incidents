@@ -174,6 +174,46 @@ VERSIONING.md step should say which link forms survive the move.
 
 **Merge ordering reaffirmed by the gate in its own words:** merging arms the 301-row unmerge and the cut rebuilds, so **WS6-T5 → v2.10.0 cut → this branch. D26(b) is satisfied by merging it, not by merging it first.** Standing instruction it repeated: **re-run `git status --porcelain` at the moment of merge** — a pre-gate check attests to a moment, not to the merge.
 
+## 🛑 v2.10.0 CUT COMPLETE THROUGH STEP 5 — **PUBLISH BLOCKED BY GITHUB SECRET SCANNING, ESCALATED TO THE USER 2026-09-18**
+
+**Recorded on this branch, not `main`, deliberately:** any push to `main` now carries the blocked cut commit `967fc04b`, so `main` cannot receive board records until the block is resolved. This entry moves to `main` with the rest.
+
+**What is blocked.** `git push origin main` was rejected by **GitHub push protection (GH013)**: an **Amazon AWS Access Key ID** pattern at `data/incidents.json:711837`. **No tag exists** — the command chain stopped at the failed push, so `git tag` never ran; `git tag -l v2.10.0` is empty. **Nothing was published.**
+
+**Established before escalating [R]:**
+- **The cut did NOT introduce it.** `git diff origin/main HEAD --numstat -- data/incidents.json` = **1 line changed** (the version string). The same pattern count (1) exists on `origin/main` today.
+- It sits in **INC-11516**, inside the imported description for **CVE-2023-36464** (pypdf infinite loop), `added: 2026-06-10`, sourced from upstream CVE data.
+- **It is not a placeholder:** not the canonical AWS documentation example key and does not end in `EXAMPLE`. Masked: `AKIA************H53A`.
+- **It is confined to the full file.** Present in `data/incidents.json`; **absent** from `data/incidents.min.json`, `docs/data/incidents.min.json`, and **`src/genai_incidents/data/incidents.min.json` — the PyPI-packaged copy.** So it is **not** in the artifacts this release would publish to PyPI or Hugging Face.
+
+**Why the foreman stopped rather than resolving it.** Three independent reasons, any one sufficient: bypassing secret scanning is a **security control on the user's repository**; the string may be a **third party's live credential** republished from upstream, which is a disclosure matter belonging to WS5's PII/redaction policy; and redacting it edits **published data under the D25(a) freeze**. Options put to the user: allow via the GitHub unblock URL, research the upstream CVE record first, or redact as its own ruled task.
+
+**Everything else in the cut is done and verified [R]** — see commit `967fc04b`. Highlights: all **five** version strings moved together; full `make build`; `validate` exit 0; suite 339; and the field-level check **matched the gate's expectation recorded BEFORE the run** — only `version` changed, `generated` stayed `2026-07-31`, 13,060 entries, ID set unchanged, **zero** entries differing.
+
+**Two checks proved themselves during this cut, which is the point of having them:**
+1. **Checklist step 5 caught the exact failure it was written for, on its first use.** README's `stats:version` marker had auto-updated to `2.10.0` while the paragraph around it still described v2.9.0's licensing work, dated it 2026-07-31, and linked to v2.9.0's notes — **the v2.9.0 cut's documented mistake, reproduced verbatim.** Rewritten to describe this release.
+2. **Invariant 6's drift check then fired on the foreman's own rewrite.** `6,162` is a comma-formatted number outside a `stats:` marker, and `NUMBER_LITERAL_RE` cannot distinguish a historical taxonomy count from a corpus total. **The check was right.** The sentence now states the ratio (7.87×, "roughly eight times") and routes readers to the notes for both exact figures. **That check has now been seen to fail — the only basis on which agreement 6 permits citing it.**
+
+## 🎨 WS6-T5 — **⛔ BOUNCE #2 (red-reviewer, 2026-09-18, on `f5f88795`) — ESCALATED per protocol step 6; fixes dispatched with the user informed**
+
+**Defect 1 — the 16px tolerance was sized on a MISDIAGNOSIS, and the fix's own comments assert a falsifiable claim that is false.** The specialist attributed a 7px `.table-wrap` overhang to Chromium `table-layout:fixed` column rounding. The gate enumerated **every** element overflowing the wrapper: **exactly one — `span.caret` in the Severity `<th>`**, overhanging by precisely that 7px, while the visible cells sum to **347.6** inside `clientWidth` 348. **The cells fit; the glyph does not.**
+- **The comments' supporting claim is directly falsified [R]:** both files state `wrap.scrollLeft(7)` "shifts no rendered pixel (verified with a screenshot diff)". Measured: `rowLeftBefore 16.203 → rowLeftAfter 9.203, moved: 7`.
+- **User-visible [R]:** clicking Severity at 380px puts the caret at `l:362.5 r:371.2` against a clip edge of `364.2` — `caretVisibleFraction 0.196`, ~80% cut off, with `overflow-x: hidden` leaving nothing to scroll to. **Sorting by severity on a phone loses the direction indicator.**
+- **Why the wrong cause survived:** the specialist's three controls — `border-collapse: separate`, hidden columns removed, thead de-stickied — **all vary table layout**, so none could discriminate a caret hypothesis. **Agreement 6's "a different route, not a more careful one", demonstrated by counter-example.**
+- **The gate quantified rather than merely condemned:** the check still fires above ~9px of additional overflow (exit 1 at +15, +17, +50, +100). *"The defect is not the width of the window — it is that a real clipped glyph is sitting inside it right now, documented as noise."*
+- **PROVENANCE [R] — this branch introduced it, so it blocks the merge:** `origin/main:docs/style.css` has no `table-layout: fixed`, no fixed column percentages, and `overflow-x` only at `:549` with no `hidden`; the caret rules at `:571-573` are byte-identical. **On `main` the caret is auto-sized and reachable by scrolling.**
+- **Ruling (gate, foreman concurring):** contain the caret, do **not** widen the column — widening re-opens the width budget the fixed layout exists to close and fixes one glyph rather than the class. Then **`WRAP_TOLERANCE_PX = 0`**, because the measured noise floor is **0**; after the real fix a tolerance absorbs nothing and is purely a blind window. **Demonstrate 0 by injecting +1px, not by asserting it.**
+
+**Defect 2 — `check_dead_filters.py` does not fire on the defect it was written for.** Discovery is a hand-maintained dict of three ids. **Reintroducing the dead Tier control as markup only — what a contributor would actually do — gives `PASS, exit 0`** [R]; it exits 1 only when the map entry is *also* added by hand. The failure path works; **discovery is the hole.** Its docstring at `:16` claims a `data-filter-field` mechanism that **exists nowhere** — `git grep` returns one hit, the docstring itself. WARN/FAIL split could not be inverted and is kept.
+
+**Defect 3 — keyboard users can expand a row but never collapse it [R].** The toggle re-renders the table and replaces the button node, so after the first Enter `sameNode:false` and `activeElement` is `BODY`; every later Enter is a no-op and the user needs **23 Tab hops** to return. Mouse works. **axe reports 0 violations because axe cannot observe focus loss on activation** — fails A4's "keyboard-operable" and WCAG 2.4.3.
+
+**Defect 4 — the CSV failure dialog states something the same commit's own A2 fix made false.** It promises blank *Primary Reference* cells; A2 moved that field into `CORE_FIELDS`. Real export with a shard aborted: `rows 972 | blankDesc 972 | blankTags 972 | **blankRef 0**`.
+
+**Advisories:** **(a)** the trust strip's "every entry cites a primary source" is **measured and true** (13,060/13,060 carry a non-empty http(s) reference) **but 51% (6,647) resolve to aggregators this project treats as upstream** — oecd.ai 3,667, aiaaic.org 1,516, incidentdatabase.ai 1,464. **Foreman requiring the softer "carries a source reference"**, keeping the 100%, given this project's overclaim history. **(b)** `check_axe.js` never forces a theme, so **CI only ever scans the headless default** — the "both themes" result is a manual claim CI will not hold (the gate verified all four combinations itself: clean). **(e)** the axe gate fires only on `critical`, matching the plan verbatim — **but the one real regression this task hit was `[serious]` and would have shipped.** Foreman requiring `serious`. **(c)** the active-sort underline is genuinely a non-text component under 1.4.11; the specialist's self-caught revert was correct. **(d)** branch is behind `main` with zero file overlap — merge, do not rebase.
+
+**Note for the record:** the specialist reported the `Skill` tool absent from its tool set and located the design skill file with a bounded `find`, reading it directly rather than skipping the guidance — a worked-around capability gap, not a shortcut.
+
 ## 🔢 WS4-T15 INHERITS AN UNRECONCILED ±1 — found 2026-09-18 by the release-notes gate (its advisory A9), **must be settled BEFORE WS4-T15 designs against either number**
 
 **The conflict, inside `docs/specs/WS4-T10-unmerge-design-2026-09-15.md`:**
