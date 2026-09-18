@@ -70,10 +70,17 @@
   --accent-dim: rgba(154, 100, 0, 0.10);
   --accent-line: rgba(154, 100, 0, 0.40);
 
-  --critical:  #d31f3a;
-  --high:      #bd5a16;
-  --medium:    #8a6f00;
-  --low:       #0e9a7f;
+  /* Darkened from the initial pass (#d31f3a / #bd5a16 / #8a6f00 / #0e9a7f) --
+     those read fine as swatches but fell to 3.1-4.3:1 against the sev-badge's
+     tinted background once the border/text combination was actually
+     measured (axe-core color-contrast, WS6-T5), short of WCAG AA's 4.5:1 for
+     small text. Every value below clears 4.7:1 against its own badge
+     background with margin (see tests/a11y/diag_contrast.js). --info was
+     already compliant and is unchanged. */
+  --critical:  #c71d37;
+  --high:      #a64f13;
+  --medium:    #7f6600;
+  --low:       #0b7661;
   --info:      #586172;
   --bar:       #3f6a99;
 
@@ -496,7 +503,11 @@ main { padding-bottom: 5rem; }
   font-family: var(--mono); font-size: 0.78rem; color: var(--ink);
   text-transform: none; letter-spacing: 0; cursor: pointer;
 }
-.filter-toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+/* 24px is the WCAG 2.5.8 AA minimum target size; a native checkbox's own
+   box is the actual hit target (the wrapping <label> is clickable too, but
+   that doesn't help a screen magnifier or switch-access user aiming at the
+   control itself). */
+.filter-toggle input { accent-color: var(--accent); width: 24px; height: 24px; }
 
 .btn-secondary {
   font-family: var(--mono);
@@ -666,6 +677,9 @@ footer {
 }
 footer strong { color: var(--ink); }
 footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--faint); margin-top: 0.6rem; }
+footer .meta a { color: var(--faint); border-bottom: 1px solid var(--line-2); }
+footer .meta a:hover { color: var(--accent); border-color: var(--accent-line); }
+footer .meta code { color: var(--muted); }
 
 /* ------------------------------- Scrollbar --------------------------- */
 * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
@@ -681,9 +695,41 @@ footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--faint)
   .chart-card.chart-wide { grid-column: span 1; }
   .filter-search { grid-column: 1 / -1; }
 }
+/* Below this width the LLM/ASI/CVE columns are dropped from the table --
+   not hidden data, just deferred: every one of those values is still shown
+   in the row's expand/detail panel (tap the row), which is already the
+   site's existing progressive-disclosure pattern rather than a new one.
+   This keeps the table itself an honest, unscrolled <table> down to the
+   380px floor instead of forcing horizontal scroll to see Date/ID/Title/
+   Severity, which is what "usable at 380px" means for a data table. */
+@media (max-width: 640px) {
+  .col-llm, .col-asi, .col-cves { display: none; }
+  .incidents td, .incidents th { padding: 0.55rem 0.6rem; }
+  td.title-cell { min-width: 0; overflow-wrap: break-word; }
+  /* auto table-layout sizes Title generously (it CAN wrap, so the browser
+     under-prioritises shrinking it) and the four visible columns end up
+     wider than 380px combined, pushing Severity off the right edge and
+     into the table's own horizontal scrollbar. Fixed layout + explicit
+     percentages instead guarantee all four fit the viewport with zero
+     scrolling, at the cost of the Title column wrapping to more lines --
+     an explicit, deliberate trade given the alternative is a hidden column. */
+  table.incidents { table-layout: fixed; width: 100%; }
+  .incidents th:nth-child(1), .incidents td:nth-child(1) { width: 20%; }
+  .incidents th:nth-child(2), .incidents td:nth-child(2) { width: 24%; }
+  .incidents th:nth-child(3), .incidents td:nth-child(3) { width: 32%; }
+  .incidents th:nth-child(4), .incidents td:nth-child(4) { width: 24%; }
+}
 @media (max-width: 520px) {
   .stats { grid-template-columns: 1fr 1fr; }
   .title-row { flex-direction: column; }
+}
+@media (max-width: 420px) {
+  .incidents td, .incidents th { padding: 0.5rem 0.45rem; font-size: 0.8rem; }
+  td.date { font-size: 0.72rem; }
+  td.id a { font-size: 0.72rem; }
+  .sev-badge { padding: 0.14rem 0.36rem; font-size: 0.6rem; }
+  .filters { padding: 0.85rem; }
+  .cta-row { padding: 0.75rem 0.85rem; }
 }
 
 /* ------------------------------- Reduced motion ---------------------- */

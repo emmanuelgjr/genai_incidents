@@ -32,7 +32,7 @@
   <!-- stats:incident_count:line -->
   <meta name="twitter:description" content="13,060 GenAI &amp; agentic-AI security incidents, mapped to four core taxonomies (OWASP LLM Top 10, OWASP Agentic, NIST AI RMF, MITRE ATLAS) plus companion and experimental frameworks.">
   <meta name="twitter:image" content="https://emmanuelgjr.github.io/genai_incidents/og-image.png">
-  <link rel="preload" href="data/incidents.min.json" as="fetch" type="application/json" crossorigin>
+  <link rel="preload" href="data/incidents.core.json" as="fetch" type="application/json" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -53,6 +53,7 @@
           <a href="https://pypi.org/project/genai-incidents/"><code>pip install genai-incidents</code></a>
           <a href="https://doi.org/10.5281/zenodo.20248675">DOI</a>
           <a href="data/incidents.min.json">JSON</a>
+          <a href="data/SHA256SUMS" title="SHA-256 checksums for every data file this site serves">Verify ↗</a>
         </p>
       </div>
       <p class="subtitle">
@@ -203,9 +204,9 @@
               <th>ID</th>
               <th>Title</th>
               <th data-sort="severity" class="sortable">Severity <span class="caret"></span></th>
-              <th>LLM</th>
-              <th>ASI</th>
-              <th>CVE</th>
+              <th class="col-llm">LLM</th>
+              <th class="col-asi">ASI</th>
+              <th class="col-cves">CVE</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -216,7 +217,9 @@
     </section>
   </main>
 
-  <a href="#" class="back-to-top" id="back-to-top" aria-label="back to top">↑</a>
+  <nav aria-label="page">
+    <a href="#" class="back-to-top" id="back-to-top" aria-label="back to top">↑</a>
+  </nav>
 
   <footer>
     <div class="wrap">
@@ -227,6 +230,7 @@
         Cite with DOI <a href="https://doi.org/10.5281/zenodo.20248675"><code>10.5281/zenodo.20248675</code></a>.
       </p>
       <p class="meta" id="dataset-meta"></p>
+      <p class="meta" id="integrity-note" aria-label="data integrity"></p>
     </div>
   </footer>
 

@@ -1,0 +1,17 @@
+{
+  "name": "genai-incidents-a11y-checks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CI-only tooling for WS6-T5 (axe-core + Lighthouse accessibility gates, 380px viewport-overflow check). Not part of the site's runtime -- docs/ stays a static, no-build, no-framework page; these devDependencies never ship to docs/.",
+  "scripts": {
+    "check:axe": "node check_axe.js",
+    "check:lighthouse": "node check_lighthouse.js",
+    "check:viewport": "node check_narrow_viewport.js"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.3",
+    "chrome-launcher": "^1.1.2",
+    "lighthouse": "^12.6.1",
+    "puppeteer-core": "^23.11.1"
+  }
+}

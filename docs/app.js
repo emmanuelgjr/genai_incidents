@@ -66,6 +66,52 @@ let SORT_BY = 'date';
 let SORT_DIR = 'desc';
 let EXPANDED = new Set();
 
+// ----------------------------- Lazy detail loading ------------------------
+// The initial fetch is data/incidents.core.json -- table/filter/chart
+// fields only (~29% of the full dataset's bytes, measured). The remaining
+// fields (description, primary_reference, tags, content_license,
+// nist_ai_rmf, mitre_atlas, source_freshness) live in one
+// data/detail/<year>.json shard per publication year and are fetched only
+// when a row in that year is actually expanded, or on CSV export. Once a
+// year's shard resolves, its fields are merged directly onto the matching
+// objects in DATA, so every later read (including re-renders) is
+// synchronous with no cache-lookup indirection.
+const LOADED_DETAIL_YEARS = new Set();
+const DETAIL_PROMISES = new Map();
+const DETAIL_FIELDS = ['description', 'primary_reference', 'tags',
+  'content_license', 'nist_ai_rmf', 'mitre_atlas', 'source_freshness'];
+
+function hasDetail(e) { return e.description !== undefined; }
+
+function ensureDetailLoaded(year) {
+  const key = String(year);
+  if (LOADED_DETAIL_YEARS.has(key)) return Promise.resolve();
+  if (DETAIL_PROMISES.has(key)) return DETAIL_PROMISES.get(key);
+  const p = fetch(`data/detail/${encodeURIComponent(key)}.json`)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(map => {
+      for (const e of DATA) {
+        if (String(e.year) === key && map[e.id]) Object.assign(e, map[e.id]);
+      }
+      LOADED_DETAIL_YEARS.add(key);
+    })
+    .catch(err => {
+      // Leave the year out of LOADED_DETAIL_YEARS so a later expand retries;
+      // surface nothing louder than a console warning since the table/charts
+      // above remain fully usable without this year's detail fields.
+      console.warn('detail shard load failed for', key, err);
+      DETAIL_PROMISES.delete(key);
+      throw err;
+    });
+  DETAIL_PROMISES.set(key, p);
+  return p;
+}
+
+async function ensureDetailLoadedForRows(rows) {
+  const years = Array.from(new Set(rows.map(r => String(r.year))));
+  await Promise.allSettled(years.map(ensureDetailLoaded));
+}
+
 // ----------------------------- Utilities ---------------------------------
 
 const escapeHtml = s => (s || '').replace(/[&<>"']/g,
@@ -268,9 +314,9 @@ function renderTable(slice, start) {
       <td class="id">${idCell}</td>
       <td class="title-cell">${escapeHtml(e.title)}</td>
       <td><span class="sev-badge sev-${escapeHtml(e.severity)}">${escapeHtml(e.severity || '')}</span></td>
-      <td class="llm">${escapeHtml(llm)}</td>
-      <td class="asi">${escapeHtml(asi)}</td>
-      <td class="cves">${cveCell}</td>
+      <td class="llm col-llm">${escapeHtml(llm)}</td>
+      <td class="asi col-asi">${escapeHtml(asi)}</td>
+      <td class="cves col-cves">${cveCell}</td>
     </tr>`;
     if (!expanded) return main;
     return main + renderDetail(e);
@@ -280,15 +326,34 @@ function renderTable(slice, start) {
   els.body.querySelectorAll('tr[data-row]').forEach(tr => {
     tr.addEventListener('click', () => {
       const id = tr.dataset.row;
-      if (EXPANDED.has(id)) EXPANDED.delete(id); else EXPANDED.add(id);
+      if (EXPANDED.has(id)) {
+        EXPANDED.delete(id);
+        rerender();
+        return;
+      }
+      EXPANDED.add(id);
+      // Render immediately with whatever fields are already loaded (shows a
+      // "Loading details…" placeholder if this row's year hasn't been
+      // fetched yet), then re-render once the year's detail shard resolves.
       rerender();
+      const row = DATA.find(r => r.id === id);
+      if (row && !hasDetail(row)) {
+        ensureDetailLoaded(row.year).then(rerender).catch(() => rerender());
+      }
     });
   });
 }
 
 function renderDetail(e) {
+  if (!hasDetail(e)) {
+    return `<tr class="detail"><td colspan="7"><div class="detail-body">
+      <p class="hint">Loading details…</p>
+    </div></td></tr>`;
+  }
   const cves = (e.cve_ids || []).map(c => `<code>${escapeHtml(c)}</code>`).join(' ');
   const tags = (e.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const llm = (e.owasp_llm || []).join(', ');
+  const asi = (e.owasp_asi || []).join(', ');
   const refLink = e.primary_reference
     ? `<a href="${escapeHtml(safeUrl(e.primary_reference))}" rel="noopener" target="_blank" title="Cite this incident from its primary source, not this site">cite this incident ↗</a>`
     : '';
@@ -300,6 +365,8 @@ function renderDetail(e) {
       ${e.attack_vector ? `<span><strong>Vector:</strong> <code>${escapeHtml(e.attack_vector)}</code></span>` : ''}
       ${e.corpus ? `<span><strong>Corpus:</strong> ${escapeHtml(e.corpus)}</span>` : ''}
       ${e.quality_tier ? `<span><strong>Quality:</strong> ${escapeHtml(e.quality_tier)}</span>` : ''}
+      ${llm ? `<span><strong>OWASP LLM:</strong> ${escapeHtml(llm)}</span>` : ''}
+      ${asi ? `<span><strong>OWASP ASI:</strong> ${escapeHtml(asi)}</span>` : ''}
       ${cves ? `<span><strong>CVEs:</strong> ${cves}</span>` : ''}
     </div>
     ${tags ? `<div class="detail-tags">${tags}</div>` : ''}
@@ -654,25 +721,68 @@ function csvCell(value) {
   return s;
 }
 
-function exportFilteredAsCsv() {
+async function exportFilteredAsCsv() {
   if (!FILTERED.length) return;
-  const lines = [];
-  lines.push(CSV_COLUMNS.map(c => csvCell(c[1])).join(','));
-  for (const row of FILTERED) {
-    lines.push(CSV_COLUMNS.map(c => csvCell(row[c[0]])).join(','));
+  // CSV includes detail-only columns (description, NIST/ATLAS mappings);
+  // those live in per-year lazy shards, so make sure every year present in
+  // the filtered set is loaded before building rows. This is the one path
+  // that can need every shard at once (a filter matching all years), which
+  // is why it stays an explicit, user-initiated action rather than
+  // something the initial page load or a single row-expand ever triggers.
+  const btn = els.exportCsv;
+  const originalLabel = btn ? btn.textContent : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Preparing export…'; }
+  try {
+    await ensureDetailLoadedForRows(FILTERED);
+
+    const lines = [];
+    lines.push(CSV_COLUMNS.map(c => csvCell(c[1])).join(','));
+    for (const row of FILTERED) {
+      lines.push(CSV_COLUMNS.map(c => csvCell(row[c[0]])).join(','));
+    }
+    // Prepend UTF-8 BOM so Excel opens it as UTF-8.
+    const blob = new Blob(['﻿' + lines.join('\r\n')],
+      { type: 'text/csv;charset=utf-8' });
+    const today = new Date().toISOString().slice(0, 10);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `genai-incidents-${today}-${FILTERED.length}rows.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  } finally {
+    if (btn) { btn.disabled = FILTERED.length === 0; btn.textContent = originalLabel; }
   }
-  // Prepend UTF-8 BOM so Excel opens it as UTF-8.
-  const blob = new Blob(['﻿' + lines.join('\r\n')],
-    { type: 'text/csv;charset=utf-8' });
-  const today = new Date().toISOString().slice(0, 10);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `genai-incidents-${today}-${FILTERED.length}rows.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+// ----------------------------- Integrity note ------------------------------
+// GitHub Pages has no published SLA for content integrity, so the served
+// data files' SHA-256 hashes are published alongside them (see
+// scripts/gen_data_integrity.py + docs/data/SHA256SUMS) and surfaced here so
+// a visitor can verify a downloaded copy without leaving the page. Loaded
+// after the main render so a slow/failed fetch never blocks the table.
+async function loadIntegrityNote() {
+  const el = document.getElementById('integrity-note');
+  if (!el) return;
+  try {
+    const r = await fetch('data/SHA256SUMS');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text();
+    const line = text.split('\n').find(l => l.includes('incidents.min.json'));
+    const hash = line ? line.trim().split(/\s+/)[0] : null;
+    if (hash) {
+      el.innerHTML = `<code title="${escapeHtml(hash)}">sha256:${escapeHtml(hash.slice(0, 12))}…</code> ` +
+        `<a href="data/SHA256SUMS">verify ↗</a>`;
+    } else {
+      el.innerHTML = `<a href="data/SHA256SUMS">SHA-256 checksums ↗</a>`;
+    }
+  } catch (e) {
+    // Non-fatal: the checksums file link in the header still works even if
+    // this fetch-and-summarize fails.
+    el.textContent = '';
+  }
 }
 
 // ----------------------------- Bootstrap ---------------------------------
@@ -690,7 +800,14 @@ function populateOptions(select, values) {
 
 async function init() {
   try {
-    const r = await fetch('data/incidents.min.json');
+    // The initial load is the trimmed core payload (table/filter/chart
+    // fields only -- see scripts/gen_docs_core_data.py). Full per-incident
+    // description/reference/tags/taxonomy-mapping fields are fetched lazily
+    // per publication year, on row-expand or CSV export (see
+    // ensureDetailLoaded above). The full, untrimmed data/incidents.min.json
+    // is still published unchanged for direct download (see the JSON link
+    // in the header) and is what the integrity manifest hashes.
+    const r = await fetch('data/incidents.core.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const payload = await r.json();
     DATA = payload.incidents || [];
@@ -711,6 +828,16 @@ async function init() {
       opt.textContent = n.toLocaleString();
       els.pageSize.appendChild(opt);
     }
+
+    // On a narrow viewport, titles wrap to several lines each (the LLM/ASI/
+    // CVE columns are already dropped below 640px -- see style.css -- so
+    // Title gets more of the remaining width, not less), so the 250-row
+    // desktop default would mean tens of thousands of pixels of scroll per
+    // page. Start narrow viewports at the smallest page size instead;
+    // `readFiltersFromUrl()` below still overrides this if the URL already
+    // has an explicit `ps` param (e.g. a shared link), so this is only a
+    // first-load default, never a forced setting.
+    if (window.innerWidth < 640) PAGE_SIZE = PAGE_SIZE_OPTIONS[0];
 
     readFiltersFromUrl();
     els.pageSize.value = String(PAGE_SIZE);
@@ -783,6 +910,7 @@ async function init() {
       `Dataset v${payload.version || '?'} · generated ${payload.generated || '?'} · ${fmtNum(DATA.length)} incidents`;
 
     rerender();
+    loadIntegrityNote();
   } catch (err) {
     els.status.textContent = 'Failed to load dataset: ' + err.message;
     console.error(err);

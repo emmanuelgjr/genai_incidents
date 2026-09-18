@@ -10,6 +10,8 @@ on:
       - "scripts/export_stix.py"
       - "scripts/export_taxii.py"
       - "scripts/export_misp.py"
+      - "scripts/gen_docs_core_data.py"
+      - "scripts/gen_data_integrity.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -34,6 +36,10 @@ jobs:
         run: |
           mkdir -p docs/data
           cp data/incidents.min.json docs/data/incidents.min.json
+      - name: Split into a trimmed core payload + lazy per-year detail shards (WS6-T5, scale)
+        run: python scripts/gen_docs_core_data.py
+      - name: Publish SHA-256 checksums for every served data file (WS6-T5, integrity)
+        run: python scripts/gen_data_integrity.py
       - name: Generate STIX 2.1 bundle for download
         run: python scripts/export_stix.py
       - name: Generate static TAXII-compatible discovery document
