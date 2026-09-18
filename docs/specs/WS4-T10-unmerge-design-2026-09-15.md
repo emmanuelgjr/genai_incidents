@@ -840,9 +840,11 @@ eventual split record.
 > because the build rewrites `id_deprecations.json` from exactly this
 > one-record-per-`from` map, **invariant 9 has no enforcement machinery
 > today** — a colliding record for an existing `from` is deleted silently
-> on the next rebuild, with nothing in `validate.py` or elsewhere to
-> catch it. WS4-T15 needs this as a starting condition, not just a board
-> note.
+> on the next rebuild, with nothing in the build or CI path to catch it.
+> `scripts/audit/ws4t10_phaseb_delta.py`'s `deprecations_deleted_or_modified`
+> (see §8.3's preserved text, below) catches it only in a manual two-tree
+> audit, not automatically. WS4-T15 needs this as a starting condition,
+> not just a board note.
 
 **Precedent already exists for this exact shape of fix.** `docs/ID_POLICY.md`
 §1.4(a) documents a different-but-structurally-identical defect (9
@@ -1046,8 +1048,12 @@ dated note at the top of that section) — its "zero code change required"
 persistence/precedence model is false. The narrow independence claim above
 survives on its own terms (whether THIS fix lands or not is orthogonal to
 HOW a superseding record gets persisted), but "so it remains correct
-either way" does not: nothing about §8.2 is currently correct as
-specified. The actual persistence design is routed to **WS4-T15**.
+either way" overshoots: it is the persistence/precedence MECHANICS that
+are not correct as specified, not §8.2 in its entirety — the proposed
+`reason: "resplit"` record type and the `resolve_id` list-valued-`into`
+crash finding are explicitly exempted in §8.2's own superseding note,
+above, and still stand as findings WS4-T15 inherits. The actual
+persistence design is routed to **WS4-T15**.
 
 ### 8.5 What this section still escalates to the user
 
