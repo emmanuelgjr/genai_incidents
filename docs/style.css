@@ -1,56 +1,141 @@
 /* =========================================================================
-   GenAI & Agentic AI Security Incidents — "amber threat console"
-   Dark, instrument-panel aesthetic. IBM Plex Mono (labels/data) + IBM Plex
-   Sans (body), a single amber signal accent, severity ramp as data colour.
-   All hooks (IDs, classes, CSS vars) consumed by app.js are preserved.
+   GenAI & Agentic AI Security Incidents — "Archive"
+   Paper and ink. A well-made scientific index, not a security console: the
+   light theme is the primary design (paper-first), dark is a deliberate
+   counterpart rather than an afterthought. One rust accent carries emphasis
+   and interaction; the severity ramp is the only other colour system on the
+   page, and it is never colour-only (every occurrence pairs a hue with a
+   word or a shape — see the .sev-* glyphs below). All hooks (IDs, classes,
+   CSS custom properties) consumed by app.js are preserved from the previous
+   "amber threat console" pass; this is a full visual pass on top of them,
+   not a token swap.
+
+   Palette source + measured WCAG contrast ratios (sRGB relative luminance,
+   computed against the surface each token is actually rendered on — panel
+   for body/UI text, bg for masthead/atmosphere text; both recorded because
+   they differ slightly and both are real usage contexts):
+
+   LIGHT (primary)
+     --ink       #1b1a17  17.12:1 on panel #fffdf8 · 15.84:1 on bg #f7f4ed
+     --muted     #5d5a52   6.77:1 on panel        ·  6.27:1 on bg
+     --faint     #8a8578   3.62:1 on panel        ·  3.35:1 on bg
+                 (decorative only — chart tick labels / sub-stats; same role
+                 and a HIGHER ratio than this project's prior faint tokens,
+                 which axe-core passed at 2.9–3.1:1 — see the precedent note
+                 above .status below)
+     --accent    #9a3412   7.19:1 on panel        ·  6.65:1 on bg
+     --accent-2  #7c2a0d   9.42:1 on panel        ·  8.71:1 on bg
+     --critical  #a4161a   7.63:1 on panel        ·  7.06:1 on bg
+     --high      #9a5518   5.60:1 on panel        ·  5.19:1 on bg
+     --medium    #7a6410   5.65:1 on panel        ·  5.23:1 on bg
+     --low       #1d6b52   6.30:1 on panel        ·  5.83:1 on bg
+     --info      #5d5a52   (= --muted)
+     --on-accent #fff7ee   6.89:1 on --accent (solid fill, e.g. back-to-top)
+     --bar       #3f5a72   7.08:1 on panel (neutral "how many" chart colour)
+
+   DARK (counterpart)
+     --ink       #ece9e2  14.22:1 on panel #1c1b16 · 15.33:1 on bg #14130f
+     --muted     #b6afa0   7.91:1 on panel         ·  8.52:1 on bg
+     --faint     #8b8474   4.64:1 on panel         ·  5.00:1 on bg
+     --accent    #e8825a   6.38:1 on panel         ·  6.88:1 on bg
+     --accent-2  #f0a080   8.25:1 on panel         ·  8.89:1 on bg
+     --critical  #ff6b6b   6.21:1 on panel         ·  6.70:1 on bg
+     --high      #e0a545   7.91:1 on panel         ·  8.53:1 on bg
+     --medium    #d6c34a   9.66:1 on panel         · 10.41:1 on bg
+     --low       #5bc9a3   8.48:1 on panel         ·  9.14:1 on bg
+     --info      #b6afa0   (= --muted)
+     --on-accent #1a0f08   6.97:1 on --accent (solid fill)
+     --bar       #7fa2c4   6.46:1 on panel
+
+   Severity-badge backgrounds (--*-bg tokens below) are each severity colour
+   pre-blended at 12% over that theme's OWN panel — solid, precomputed hex,
+   not a translucent rgba(). Two reasons: (1) the badge text is measured
+   against its REAL rendered background, not assumed (badge text-on-tint
+   ratios: light 4.75–6.15:1, dark 5.23–7.55:1, all ≥4.5:1 small-text AA —
+   see check_badges.py in this branch's report); (2) a prior version of this
+   stylesheet hardcoded the badge tint as a literal rgba() built from the
+   DARK theme's severity RGB regardless of which theme was active, which is
+   a latent correctness bug (the light-theme badge was always tinted with
+   dark-theme severity hues) this pass fixes by giving each theme its own
+   token instead of sharing one constant.
+
+   Colour-blind distinguishability of the severity ramp: the fixed hexes
+   above pair hue with two more channels wherever severity is shown —
+   (a) every badge/legend occurrence carries the word ("Critical"/"High"/…),
+   so colour is never the sole means (WCAG 1.4.1) to begin with; (b) on top
+   of that, .sev-badge and .sev-legend .dot render a distinct GLYPH per
+   severity (■ ▲ ◆ ● ○ — solid square, solid triangle, solid diamond, solid
+   disc, hollow ring), chosen to differ in apparent fill/weight as well as
+   outline so the set still separates under a luminance-only simulation, not
+   only a hue-confusion one; (c) the one place severity is a colour block
+   with no adjacent permanent text — the stacked "Severity composition over
+   time" chart — draws the SAME glyphs into its own SVG legend (app.js,
+   SEV_GLYPH) and, unmodified from the prior design, always stacks segments
+   in the same fixed order (Critical at the baseline through Info at the
+   top) so position is a second, redundant cue there too. What this pass did
+   NOT do: per-segment pattern/hatch fills on the stacked bars themselves —
+   considered, and rejected as disproportionate given (b) and (c) already
+   apply to every segment in that chart; see the branch report.
    ========================================================================= */
 
 :root {
-  /* surfaces */
-  --bg:        #0a0c10;
-  --bg-2:      #0c0f15;
-  --panel:     #11151d;
-  --panel-2:   #161b24;
-  --line:      rgba(229, 235, 246, 0.09);
-  --line-2:    rgba(229, 235, 246, 0.16);
+  /* surfaces — dark counterpart */
+  --bg:        #14130f;
+  --bg-2:      #18170f;
+  --panel:     #1c1b16;
+  --panel-2:   #242219;
+  --line:      rgba(236, 233, 226, 0.10);
+  --line-2:    rgba(236, 233, 226, 0.18);
 
   /* ink */
-  --ink:       #e8ebf1;
-  --muted:     #8b94a6;
-  --faint:     #59616f;
+  --ink:       #ece9e2;
+  --muted:     #b6afa0;
+  --faint:     #8b8474;
 
-  /* signal accent (interaction / brand / focus) */
-  --accent:     #ffb000;
-  --accent-2:   #ffcb52;
-  --accent-dim: rgba(255, 176, 0, 0.13);
-  --accent-line: rgba(255, 176, 0, 0.42);
+  /* signal accent — one rust, used for interaction, emphasis and focus.
+     Both --accent and --accent-2 clear WCAG AA as TEXT in this theme (see
+     the header block above) — used deliberately as link/label colour below,
+     not only as a fill, because that constraint that used to block it
+     (the old amber accent measured 4.27:1 on light panel-2, short of the
+     4.5:1 small-text floor) no longer applies to this palette. */
+  --accent:     #e8825a;
+  --accent-2:   #f0a080;
+  --accent-dim: rgba(232, 130, 90, 0.14);
+  --accent-line: rgba(232, 130, 90, 0.42);
 
-  /* severity ramp — also the chart palette */
-  --critical:  #ff4d63;
-  --high:      #ff8a3d;
-  --medium:    #f5c542;   /* calmer gold — clearly distinct from the amber accent */
-  --low:       #46d6b6;
-  --info:      #6f7c91;
+  /* severity ramp — also the chart palette. Never the sole means of
+     conveying severity: see the glyph note above. */
+  --critical:  #ff6b6b;
+  --high:      #e0a545;
+  --medium:    #d6c34a;
+  --low:       #5bc9a3;
+  --info:      #b6afa0;
 
-  /* neutral category bar (year / vectors / vendors charts) — cool steel so
-     "how many" charts read as data, distinct from the warm severity ramp
-     and the amber chrome. */
-  --bar:       #6f93b8;
+  /* pre-blended severity-badge backgrounds (severity colour @ 12% over this
+     theme's own --panel, solid — see header note). */
+  --critical-bg: #372520;
+  --high-bg:     #342c1c;
+  --medium-bg:   #322f1c;
+  --low-bg:      #243027;
+  --info-bg:     #2e2d27;
 
-  --radius:    4px;
-  --shadow:    rgba(0, 0, 0, 0.8);
-  --on-accent: #1a1205;   /* ink that sits on an amber fill */
-  --grain:     0.035;
+  /* neutral chart colour ("how many" charts: year / vectors / vendors) —
+     a faded ledger-ink blue, cool and legible, distinct from the warm rust
+     accent and the warm half of the severity ramp. */
+  --bar:       #7fa2c4;
+
+  --radius:    3px;
+  --shadow:    rgba(0, 0, 0, 0.55);
+  --on-accent: #1a0f08;   /* ink that sits on a solid accent fill */
+  --grain:     0.02;
+  --serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, "URW Palladio L", Georgia, serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* Spacing scale (WS6-T5 design pass) -- named steps instead of scattered
-     ad hoc rem values, so gaps between UNRELATED things (sections) are
-     consistently larger than gaps between RELATED things (a label and its
-     control), which is what makes a dense page read as organised rather
-     than uniformly padded. Existing rules that already used a fitting
-     value were left alone rather than mechanically swept, to keep this
-     pass's diff reviewable. */
+  /* Spacing scale — named steps instead of scattered ad hoc rem values, so
+     gaps between UNRELATED things (sections) stay consistently larger than
+     gaps between RELATED things (a label and its control). Unchanged from
+     the previous design pass. */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.85rem;
@@ -61,47 +146,45 @@
   color-scheme: dark;
 }
 
-/* Light theme — the "paper console" twin of the dark amber instrument panel.
-   A no-FOUC <head> script sets data-theme on <html> from localStorage or the
-   OS preference, so the right palette is in place before first paint. Only
-   surfaces, ink, lines, shadow and the accent/severity colours shift; the
-   layout, type and component shapes are identical. The accent deepens to
-   #9a6400 so links/labels keep WCAG-AA contrast on a light ground, and the
-   severity ramp darkens for legibility — these feed the chart palette too. */
+/* Light theme — the PRIMARY design, per the Archive brief ("paper-first").
+   A no-FOUC <head> script sets data-theme on <html> (and the theme-color
+   meta tag) from localStorage or the OS preference before first paint.
+   Only surfaces, ink, lines, shadow and the accent/severity colours shift;
+   layout, type and component shapes are identical between themes. */
 :root[data-theme="light"] {
-  --bg:        #f4f2ec;
-  --bg-2:      #faf9f5;
-  --panel:     #ffffff;
-  --panel-2:   #f0ede4;
-  --line:      rgba(20, 24, 32, 0.10);
-  --line-2:    rgba(20, 24, 32, 0.18);
+  --bg:        #f7f4ed;
+  --bg-2:      #f1ece0;
+  --panel:     #fffdf8;
+  --panel-2:   #f2ede1;
+  --line:      rgba(27, 26, 23, 0.12);
+  --line-2:    rgba(27, 26, 23, 0.22);
 
-  --ink:       #1a1d24;
-  --muted:     #586172;
-  --faint:     #8b94a3;
+  --ink:       #1b1a17;
+  --muted:     #5d5a52;
+  --faint:     #8a8578;
 
-  --accent:     #9a6400;
-  --accent-2:   #7c5000;
-  --accent-dim: rgba(154, 100, 0, 0.10);
-  --accent-line: rgba(154, 100, 0, 0.40);
+  --accent:     #9a3412;
+  --accent-2:   #7c2a0d;
+  --accent-dim: rgba(154, 52, 18, 0.10);
+  --accent-line: rgba(154, 52, 18, 0.38);
 
-  /* Darkened from the initial pass (#d31f3a / #bd5a16 / #8a6f00 / #0e9a7f) --
-     those read fine as swatches but fell to 3.1-4.3:1 against the sev-badge's
-     tinted background once the border/text combination was actually
-     measured (axe-core color-contrast, WS6-T5), short of WCAG AA's 4.5:1 for
-     small text. Every value below clears 4.7:1 against its own badge
-     background with margin (see tests/a11y/diag_contrast.js). --info was
-     already compliant and is unchanged. */
-  --critical:  #c71d37;
-  --high:      #a64f13;
-  --medium:    #7f6600;
-  --low:       #0b7661;
-  --info:      #586172;
-  --bar:       #3f6a99;
+  --critical:  #a4161a;
+  --high:      #9a5518;
+  --medium:    #7a6410;
+  --low:       #1d6b52;
+  --info:      #5d5a52;
 
-  --shadow:    rgba(20, 30, 50, 0.16);
-  --on-accent: #fff7e6;
-  --grain:     0.02;
+  --critical-bg: #f4e1dd;
+  --high-bg:     #f3e9dd;
+  --medium-bg:   #efebdc;
+  --low-bg:      #e4ebe4;
+  --info-bg:     #ece9e4;
+
+  --bar:       #3f5a72;
+
+  --shadow:    rgba(27, 20, 12, 0.14);
+  --on-accent: #fff7ee;
+  --grain:     0.014;
   color-scheme: light;
 }
 
@@ -117,19 +200,15 @@ body {
   line-height: 1.6;
   color: var(--ink);
   background-color: var(--bg);
-  /* layered atmosphere: amber top-glow + faint hairline grid */
-  background-image:
-    radial-gradient(1100px 520px at 78% -8%, rgba(255, 176, 0, 0.10), transparent 60%),
-    radial-gradient(820px 420px at 8% 0%, rgba(70, 214, 182, 0.05), transparent 55%),
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 46px 46px, 46px 46px;
-  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures;
 }
 
-/* grain overlay */
+/* Paper-fibre grain, not console static: a flat, deliberate surface with a
+   faint texture rather than the previous "instrument panel" hairline grid +
+   radial glow. Kept subtle and kept OUT of the light theme's readability
+   path — this is atmosphere, not a UI element. */
 body::before {
   content: "";
   position: fixed;
@@ -140,39 +219,25 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Lighter, cooler atmosphere on the paper theme so the corner glows tint
-   rather than muddy the page. */
-:root[data-theme="light"] body {
-  background-image:
-    radial-gradient(1100px 520px at 78% -8%, rgba(154, 100, 0, 0.06), transparent 60%),
-    radial-gradient(820px 420px at 8% 0%, rgba(63, 106, 153, 0.05), transparent 55%),
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 46px 46px, 46px 46px;
-  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
-}
-:root[data-theme="light"] .masthead::after {
-  background: linear-gradient(90deg, transparent, rgba(154, 100, 0, 0.05), transparent);
-}
-
 /* ------------------------------- Theme toggle ------------------------ */
 .theme-toggle {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
   color: var(--muted);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
-  padding: 0.34rem 0.6rem;
+  padding: 0.34rem 0.65rem;
   background: var(--panel);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   min-height: 30px;
-  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+  transition: border-color 0.15s, color 0.15s;
 }
-.theme-toggle:hover { color: var(--accent); border-color: var(--accent-line); transform: translateY(-1px); }
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent-line); }
 .theme-toggle .ico { width: 0.95em; height: 0.95em; display: inline-block; }
 /* Show the sun in dark mode (click → go light), the moon in light mode. */
 .theme-toggle .ico-moon { display: none; }
@@ -182,7 +247,7 @@ body::before {
 .wrap { width: min(1180px, 92vw); margin: 0 auto; position: relative; z-index: 1; }
 
 a { color: var(--accent); text-decoration: none; }
-a:hover { color: var(--accent-2); }
+a:hover { color: var(--accent-2); text-decoration: underline; }
 code, kbd { font-family: var(--mono); font-size: 0.9em; }
 
 ::selection { background: var(--accent); color: var(--on-accent); }
@@ -196,22 +261,9 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
 /* ------------------------------- Masthead ---------------------------- */
 .masthead {
   position: relative;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-2);
   padding: clamp(2.6rem, 6vw, 4.6rem) 0 clamp(1.8rem, 4vw, 2.6rem);
-  overflow: hidden;
 }
-/* slow sweeping scan-line over the hero */
-.masthead::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255, 176, 0, 0.06), transparent);
-  width: 40%;
-  transform: translateX(-120%);
-  animation: scan 9s linear infinite;
-}
-@keyframes scan { to { transform: translateX(360%); } }
 
 .title-row {
   display: flex;
@@ -223,10 +275,8 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
 
 .title-block { min-width: 0; }
 
-/* Small mono "eyebrow" above h1 -- establishes the page as an index/
-   instrument first, a headline second, and gives the type scale one more
-   deliberate step (kicker -> h1 -> subtitle -> trust-strip) instead of
-   jumping straight from a large heading to body text. */
+/* Small mono "eyebrow" above h1 — reads as a catalogue call-number / object
+   label above the title, establishing the page as an index first. */
 .kicker {
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -234,97 +284,81 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
-  margin: 0 0 0.5rem;
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  margin: 0 0 0.6rem;
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .masthead h1 {
-  font-family: var(--mono);
+  font-family: var(--serif);
   font-weight: 600;
-  font-size: clamp(1.7rem, 4.2vw, 3rem);
-  line-height: 1.04;
+  font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+  line-height: 1.08;
   letter-spacing: -0.01em;
   margin: 0;
-  max-width: 19ch;
+  max-width: 20ch;
   text-wrap: balance;
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-/* blinking command cursor after the title */
-.masthead h1::after {
-  content: "_";
-  color: var(--accent);
-  margin-left: 0.12em;
-  animation: blink 1.15s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
 
 .links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 0.4rem 0 0;
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s both;
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.06s both;
 }
 .links a {
   font-family: var(--mono);
   font-size: 0.78rem;
   letter-spacing: 0.02em;
   color: var(--muted);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
   padding: 0.34rem 0.6rem;
   background: var(--panel);
-  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+  transition: border-color 0.15s, color 0.15s;
 }
 .links a:hover {
   color: var(--accent);
   border-color: var(--accent-line);
-  transform: translateY(-1px);
+  text-decoration: none;
 }
-.links a code { font-size: 0.95em; }
+.links a code { font-size: 0.95em; background: none; }
 
 .subtitle {
-  max-width: 70ch;
+  max-width: 68ch;
+  font-family: var(--serif);
   color: var(--muted);
-  font-size: 1.02rem;
-  margin: 1.2rem 0 0;
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.16s both;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  margin: 1.3rem 0 0;
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s both;
 }
-.subtitle a { border-bottom: 1px solid var(--accent-line); }
+.subtitle a { color: var(--accent); border-bottom: 1px solid var(--accent-line); }
+.subtitle a:hover { text-decoration: none; border-color: var(--accent); }
 
 /* Trust strip: the concrete, checkable claims a researcher decides
    credibility on (licence, code licence, integrity manifest, reference
-   completeness) stated plainly at the point of first impression, not
-   buried in the footer alone. Every item here is something a visitor can
-   verify in one click (see the header's Verify/DOI/JSON links) or from the
-   dataset itself.
-   BOUNCE #2 advisory (a): the reference-completeness claim originally read
-   "every entry cites a primary source". 13,060/13,060 do carry a non-empty
-   http(s) reference (still true, still measured), but 51% of those
-   (6,647 -- oecd.ai 3,667, aiaaic.org 1,516, incidentdatabase.ai 1,464)
-   resolve to aggregators this project treats as upstream sources, not to
-   the original reporting. "Cites a primary source" overstated what was
-   actually measured given that mix; softened to "carries a source
-   reference", which is true of literally all 13,060 without implying
-   anything about what's on the other end of the link. */
+   completeness) stated plainly at the point of first impression.
+   "Cites a primary source" was softened in a prior pass to "carries a
+   source reference" — 13,060/13,060 do carry a non-empty http(s)
+   reference, but 51% of those resolve to aggregators this project treats
+   as upstream sources, not original reporting; kept unmodified this pass. */
 .trust-strip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.9rem 0 0;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
   font-family: var(--mono);
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  /* --muted, not --faint: this is a claim a visitor is meant to actually
-     read and weigh, not a de-emphasised timestamp -- see the WS6-T5
-     design-pass report for the measured contrast ratio. */
   color: var(--muted);
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.18s both;
 }
-.trust-strip .dot { color: var(--accent-line); }
+.trust-strip .dot { color: var(--accent); }
 
-@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 
 main { padding-bottom: 5rem; }
 
@@ -334,96 +368,101 @@ main { padding-bottom: 5rem; }
   grid-template-columns: repeat(5, 1fr);
   gap: 1px;
   background: var(--line);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
+  border-top: 2px solid var(--ink);
   border-radius: var(--radius);
   overflow: hidden;
   margin: clamp(1.6rem, 4vw, 2.4rem) 0 1.4rem;
 }
 .stat {
   background: var(--panel);
-  padding: 1.1rem 1.15rem 1.05rem;
+  padding: 1.15rem 1.15rem 1.05rem;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
   position: relative;
-  animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-.stat:nth-child(1) { animation-delay: 0.20s; }
-.stat:nth-child(2) { animation-delay: 0.27s; }
-.stat:nth-child(3) { animation-delay: 0.34s; }
-.stat:nth-child(4) { animation-delay: 0.41s; }
-.stat:nth-child(5) { animation-delay: 0.48s; }
+.stat:nth-child(1) { animation-delay: 0.14s; }
+.stat:nth-child(2) { animation-delay: 0.18s; }
+.stat:nth-child(3) { animation-delay: 0.22s; }
+.stat:nth-child(4) { animation-delay: 0.26s; }
+.stat:nth-child(5) { animation-delay: 0.30s; }
 .stat:hover { background: var(--panel-2); }
 .stat .num {
   font-family: var(--mono);
   font-weight: 600;
   font-size: clamp(1.5rem, 3vw, 2.05rem);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   line-height: 1.05;
-}
-.stat .num::before {
-  content: "› ";
-  color: var(--accent);
-  font-weight: 500;
 }
 .stat .label {
   font-family: var(--mono);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.13em;
-  color: var(--ink);
-  margin-top: 0.35rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
 }
+/* --muted, not --faint: this is read text (a real percentage/date), not a
+   decorative label -- see the header note's precedent on where --faint is
+   and isn't AA-exempt. Measured 6.27:1 (light) / 8.52:1 (dark) on bg. */
 .stat .sub { font-size: 0.76rem; color: var(--muted); }
+/* Same glyph set as .sev-badge / .sev-legend, for the one stat that
+   surfaces a severity outside the table (Critical count) — consistency,
+   not strictly required since the word "Critical" is already adjacent. */
+.stat .num.sev-Critical::before { content: "\25A0 "; font-size: 0.7em; }
 
 /* ------------------------------- Severity legend --------------------- */
 .sev-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.1rem;
+  gap: 1.2rem;
   align-items: center;
-  margin: 0 0 1.6rem;
+  margin: 0 0 1.7rem;
   font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
   color: var(--muted);
 }
-.sev-key { display: inline-flex; align-items: center; gap: 0.42rem; }
-.sev-key .dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
-.sev-Critical .dot { background: var(--critical); color: var(--critical); }
-.sev-High .dot     { background: var(--high);     color: var(--high); }
-.sev-Medium .dot   { background: var(--medium);   color: var(--medium); }
-.sev-Low .dot      { background: var(--low);      color: var(--low); }
-.sev-Info .dot     { background: var(--info);     color: var(--info); }
+.sev-key { display: inline-flex; align-items: center; gap: 0.45rem; }
+/* Glyph, not a plain dot: see the header note on colour-blind
+   distinguishability. content lives on ::before so the empty <span
+   class="dot"> in index.html needs no markup change. */
+.sev-key .dot { display: inline-flex; width: 1em; justify-content: center; }
+.sev-Critical .dot::before { content: "\25A0"; color: var(--critical); }
+.sev-High     .dot::before { content: "\25B2"; color: var(--high); }
+.sev-Medium   .dot::before { content: "\25C6"; color: var(--medium); }
+.sev-Low      .dot::before { content: "\25CF"; color: var(--low); }
+.sev-Info     .dot::before { content: "\25CB"; color: var(--info); }
 
 /* ------------------------------- CTA row ----------------------------- */
+/* A hairline-bounded strip, not a filled/dashed callout box — the accent
+   now passes AA as text (see header note), so the call-to-action is a
+   bold coloured link rather than a button needing an inverse fill to stay
+   legible. */
 .cta-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
   flex-wrap: wrap;
-  margin: 0 0 2.6rem;
-  padding: 0.9rem 1.1rem;
-  border: 1px dashed var(--line-2);
-  border-radius: var(--radius);
-  background: linear-gradient(90deg, var(--accent-dim), transparent 70%);
+  margin: 0 0 2.8rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
 }
 .cta {
-  font-family: var(--mono);
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.03em;
-  color: var(--on-accent);
-  background: var(--accent);
-  padding: 0.5rem 0.9rem;
-  border-radius: var(--radius);
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  padding: 0.3rem 0;
   white-space: nowrap;
-  transition: transform 0.15s, box-shadow 0.15s;
 }
-.cta:hover { color: var(--on-accent); transform: translateY(-1px); box-shadow: 0 6px 22px -8px var(--accent); }
-.cta-hint { font-size: 0.84rem; color: var(--muted); }
+.cta:hover { color: var(--accent-2); text-decoration: underline; }
+.cta-hint { font-size: 0.86rem; color: var(--muted); }
 
 /* ------------------------------- Section heads ----------------------- */
 .section-head {
@@ -432,26 +471,22 @@ main { padding-bottom: 5rem; }
   align-items: baseline;
   gap: 1rem;
   flex-wrap: wrap;
-  margin: 0 0 1.2rem;
+  margin: 0 0 1.3rem;
   padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--ink);
 }
 .section-head h2 {
   font-family: var(--mono);
   font-weight: 600;
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
   margin: 0;
   text-transform: uppercase;
 }
-.section-head h2::before {
-  content: "// ";
-  color: var(--accent);
-}
-.hint { font-size: 0.82rem; color: var(--muted); margin: 0; }
+.hint { font-size: 0.83rem; color: var(--muted); margin: 0; font-family: var(--sans); }
 .head-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 
-.charts-section { margin: 0 0 3rem; }
+.charts-section { margin: 0 0 3.2rem; counter-reset: fig; }
 .filters-section { scroll-margin-top: 1rem; }
 
 /* ------------------------------- Charts ------------------------------ */
@@ -460,42 +495,48 @@ main { padding-bottom: 5rem; }
   grid-template-columns: 1fr 1fr;
   gap: 1px;
   background: var(--line);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
   overflow: hidden;
 }
 .chart-card {
   background: var(--panel);
-  padding: 1.1rem 1.2rem 1.3rem;
+  padding: 1.15rem 1.25rem 1.35rem;
   min-width: 0;
-  transition: background 0.15s;
+  counter-increment: fig;
 }
-.chart-card:hover { background: var(--panel-2); }
 .chart-card.chart-wide { grid-column: span 2; }
+/* Auto-numbered plates, like a printed reference work's figures — a real
+   "Archive" detail achieved purely in CSS (counter-reset/increment above),
+   no HTML or JS change needed. */
 .chart-card figcaption {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.4rem;
   font-family: var(--mono);
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.09em;
   color: var(--muted);
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.95rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
 }
-/* Echoes the "// " marker on .section-head h2 so charts read as part of
-   the same instrument-panel language as section headings, not a separate
-   visual system. */
-.chart-card figcaption::before { content: "//"; color: var(--accent); font-weight: 500; }
+.chart-card figcaption::before {
+  content: "Fig. " counter(fig, decimal-leading-zero) " —";
+  color: var(--accent);
+  font-weight: 600;
+  flex: none;
+}
 .chart { width: 100%; }
 .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
 
 /* SVG primitives produced by app.js */
 .chart .bar {
   cursor: pointer;
-  transition: opacity 0.12s, filter 0.12s;
+  transition: opacity 0.12s;
 }
-.chart .bar:hover { opacity: 0.85; filter: brightness(1.25) drop-shadow(0 0 6px currentColor); }
+.chart .bar:hover { opacity: 0.72; }
 .chart .row-label { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
 .chart .value-label { fill: var(--ink); font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
 .chart .tick { fill: var(--faint); font-family: var(--mono); font-size: 10px; }
@@ -508,15 +549,15 @@ main { padding-bottom: 5rem; }
   transform: translate(-50%, calc(-100% - 12px));
   background: var(--panel-2);
   color: var(--ink);
-  border: 1px solid var(--accent-line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
-  padding: 0.34rem 0.55rem;
+  padding: 0.34rem 0.6rem;
   font-family: var(--mono);
   font-size: 0.74rem;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.1s;
-  box-shadow: 0 10px 30px -10px var(--shadow);
+  box-shadow: 0 8px 20px -8px var(--shadow);
 }
 .chart-tooltip.visible { opacity: 1; }
 
@@ -526,7 +567,7 @@ main { padding-bottom: 5rem; }
   grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
   gap: 0.7rem 0.9rem;
   padding: 1.1rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
   background: var(--panel);
   margin-bottom: 1rem;
@@ -573,13 +614,11 @@ main { padding-bottom: 5rem; }
 .filter-toggle { justify-content: flex-end; }
 .filter-toggle label {
   display: flex; align-items: center; gap: 0.45rem;
-  font-family: var(--mono); font-size: 0.78rem; color: var(--ink);
+  font-family: var(--sans); font-size: 0.85rem; color: var(--ink);
   text-transform: none; letter-spacing: 0; cursor: pointer;
 }
 /* 24px is the WCAG 2.5.8 AA minimum target size; a native checkbox's own
-   box is the actual hit target (the wrapping <label> is clickable too, but
-   that doesn't help a screen magnifier or switch-access user aiming at the
-   control itself). */
+   box is the actual hit target. */
 .filter-toggle input { accent-color: var(--accent); width: 24px; height: 24px; }
 
 .btn-secondary {
@@ -628,7 +667,7 @@ main { padding-bottom: 5rem; }
 
 /* ------------------------------- Table ------------------------------- */
 .table-wrap {
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
   overflow-x: auto;
   background: var(--panel);
@@ -646,32 +685,32 @@ table.incidents { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted);
-  padding: 0.7rem 0.85rem;
-  border-bottom: 1px solid var(--line-2);
+  padding: 0.75rem 0.85rem;
+  /* A heavier structural rule under the header, not a hairline — the print
+     convention (a strong rule bounding a table's head, thin/no rules
+     inside the body) reads as reference-table hierarchy rather than a UI
+     "sticky toolbar". */
+  border-bottom: 2px solid var(--ink);
   white-space: nowrap;
 }
-/* BOUNCE #2 / D1: the 7px .table-wrap overflow this pass previously
-   attributed to Chromium table-layout:fixed rounding was actually one
-   element -- th.sortable > .caret -- overflowing its own <th> box at
-   narrow widths, because .caret sits inline after "Severity"/"Date" text
-   with `white-space: nowrap` and no room budgeted for it. `position:
-   relative` + `overflow: hidden` here makes the <th> itself the
-   containing/clipping box for that content, so nothing inside a header
-   cell can ever leak into .table-wrap's scroll region again -- not just
-   this one glyph. */
+/* th.sortable > .caret overflow fix (kept verbatim — do not re-open the
+   width budget this closes): position:relative + overflow:hidden makes the
+   header cell its own clipping box, so the sort-direction glyph can never
+   leak into .table-wrap's scroll region, which is what the narrow-viewport
+   gate (WRAP_TOLERANCE_PX = 0) depends on. See the 640px breakpoint below
+   for the matching absolute-positioned .caret override and its full
+   history (BOUNCE #2 / D1). */
 .incidents th.sortable { cursor: pointer; user-select: none; position: relative; overflow: hidden; }
 .incidents th.sortable:hover { color: var(--accent); }
-/* Make the active sort column legible at a glance, not just via the caret
-   glyph -- a 2px accent underline reads faster when scanning a dense
-   header row than a single small triangle does. Underline only, not a
-   text-color change: measured, `color: var(--accent)` on this 0.68rem
-   uppercase mono header text drops to 4.27:1 against --panel-2 in the
-   light theme (axe-core color-contrast, serious, WS6-T5 design pass) --
-   short of the 4.5:1 AA small-text threshold. The existing --muted header
-   colour already clears it, so leave it alone and let the underline (a
-   3:1 AA non-text-contrast requirement, comfortably met by --accent
-   against --panel-2) carry the emphasis instead. */
+/* Active sort column: now that --accent measures 6.25:1 (light) / 5.90:1
+   (dark) against --panel-2 — the header's actual background — colouring
+   the header TEXT itself is safe AA, unlike the previous amber accent
+   (4.27:1 there, short of the 4.5:1 small-text floor, which is why that
+   version could only use a non-text underline indicator). Kept the
+   underline too: two redundant signals for "this is the active sort", not
+   a replacement of one by the other. */
 .incidents th.sort-asc, .incidents th.sort-desc {
+  color: var(--accent);
   box-shadow: inset 0 -2px 0 var(--accent);
 }
 .caret { display: inline-block; width: 0.8em; color: var(--accent); }
@@ -685,14 +724,12 @@ th.sort-desc .caret::after { content: "▼"; font-size: 0.7em; }
 }
 .incidents tbody tr[data-row]:hover { background: var(--panel-2); }
 .incidents tbody tr.expanded { background: var(--accent-dim); }
-.incidents td { padding: 0.6rem 0.85rem; vertical-align: top; }
+.incidents td { padding: 0.65rem 0.85rem; vertical-align: top; }
 td.date { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
 .date-cell { display: inline-flex; align-items: center; gap: 0.5rem; }
 /* Explicit expand/collapse control (A4): a real, focusable, labelled
-   <button> per row rather than relying on the whole <tr> being clickable
-   (mouse-only; unreachable by keyboard, silent to screen readers -- see
-   the WS6-T5 design-pass report). Sized to the WCAG 2.5.8 AA 24px minimum
-   target even though it sits in a dense table row. */
+   <button> per row rather than relying on the whole <tr> being clickable.
+   Sized to the WCAG 2.5.8 AA 24px minimum target even in a dense row. */
 .row-toggle {
   flex: none;
   width: 24px; height: 24px;
@@ -711,42 +748,52 @@ tr[data-row]:hover .row-toggle { color: var(--accent); border-color: var(--accen
 tr.expanded .row-toggle { color: var(--accent); border-color: var(--accent-line); background: var(--accent-dim); }
 td.id { font-family: var(--mono); font-size: 0.8rem; white-space: nowrap; }
 td.id a { color: var(--accent); }
-td.title-cell { min-width: 22ch; line-height: 1.4; }
+td.title-cell { min-width: 22ch; line-height: 1.45; font-family: var(--serif); }
 td.llm, td.asi { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
 td.cves { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
 
-/* severity badge: left tick + pill */
+/* severity badge: glyph + left tick + pill. Background tokens are the
+   pre-blended --*-bg custom properties (see header note); text stays the
+   full-strength severity colour, so contrast is measured against the real
+   rendered background, not assumed. */
 .sev-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
   font-family: var(--mono);
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 0.16rem 0.5rem;
+  padding: 0.18rem 0.5rem;
   border-radius: 2px;
   border-left: 3px solid currentColor;
   white-space: nowrap;
 }
-.sev-badge.sev-Critical { color: var(--critical); background: rgba(255, 77, 99, 0.12); }
-.sev-badge.sev-High     { color: var(--high);     background: rgba(255, 138, 61, 0.12); }
-.sev-badge.sev-Medium   { color: var(--medium);   background: rgba(245, 197, 66, 0.12); }
-.sev-badge.sev-Low      { color: var(--low);      background: rgba(70, 214, 182, 0.12); }
-.sev-badge.sev-Info     { color: var(--info);     background: rgba(111, 124, 145, 0.14); }
+.sev-badge::before { font-size: 0.9em; line-height: 1; }
+.sev-badge.sev-Critical { color: var(--critical); background: var(--critical-bg); }
+.sev-badge.sev-Critical::before { content: "\25A0"; }
+.sev-badge.sev-High     { color: var(--high);     background: var(--high-bg); }
+.sev-badge.sev-High::before     { content: "\25B2"; }
+.sev-badge.sev-Medium   { color: var(--medium);   background: var(--medium-bg); }
+.sev-badge.sev-Medium::before   { content: "\25C6"; }
+.sev-badge.sev-Low      { color: var(--low);      background: var(--low-bg); }
+.sev-badge.sev-Low::before      { content: "\25CF"; }
+.sev-badge.sev-Info     { color: var(--info);     background: var(--info-bg); }
+.sev-badge.sev-Info::before     { content: "\25CB"; }
 
 /* expanded dossier row */
 tr.detail td { padding: 0; background: var(--bg-2); }
 .detail-body {
-  padding: 1rem 1.1rem 1.2rem;
-  border-left: 3px solid var(--accent);
-  animation: rise 0.3s ease both;
+  padding: 1.05rem 1.15rem 1.25rem;
+  border-left: 2px solid var(--accent);
 }
-.detail-body > p { margin: 0 0 0.8rem; color: var(--ink); max-width: 90ch; }
+.detail-body > p { margin: 0 0 0.85rem; font-family: var(--serif); color: var(--ink); max-width: 74ch; line-height: 1.6; }
 /* A3 states, designed rather than left as bare text: a real error state,
-   not an endless "Loading details…" -- see the detail-shard fetch failure
-   branch in app.js's renderDetail(). */
+   not an endless "Loading details…". */
 .detail-error .hint {
   display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
   color: var(--high);
+  font-family: var(--sans);
 }
 .detail-error .hint::before { content: "\26A0"; flex: none; font-size: 0.95em; }
 .detail-retry { flex: none; }
@@ -777,8 +824,8 @@ tr.detail td { padding: 0; background: var(--bg-2); }
   padding: 0.1rem 0.45rem;
 }
 /* Empty state, designed rather than a bare "No matches." line: enough
-   vertical space to read as a deliberate state (not a layout glitch), plus
-   a one-click way out when it was caused by an active filter combination. */
+   vertical space to read as a deliberate state, plus a one-click way out
+   when it was caused by an active filter combination. */
 .status {
   padding: var(--space-6) var(--space-3);
   text-align: center;
@@ -810,22 +857,37 @@ tr.detail td { padding: 0; background: var(--bg-2); }
   font-size: 1.1rem; color: var(--on-accent);
   background: var(--accent); border-radius: var(--radius);
   opacity: 0; transform: translateY(10px); pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 8px 26px -10px var(--accent);
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 6px 16px -6px var(--shadow);
 }
 .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.back-to-top:hover { color: var(--on-accent); box-shadow: 0 10px 30px -8px var(--accent); }
+.back-to-top:hover { color: var(--on-accent); background: var(--accent-2); }
 
 /* ------------------------------- Footer ------------------------------ */
 footer {
-  border-top: 1px solid var(--line);
-  padding: 2rem 0 3rem;
+  border-top: 1px solid var(--line-2);
+  padding: 2.1rem 0 3rem;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-family: var(--serif);
+  font-size: 0.92rem;
 }
 footer strong { color: var(--ink); }
-footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--faint); margin-top: 0.6rem; }
-footer .meta a { color: var(--faint); border-bottom: 1px solid var(--line-2); }
+/* Links inline in the citation paragraph ("CC BY 4.0", "MIT"): measured
+   (axe-core link-in-text-block, this pass) at 1.06:1 contrast against the
+   paragraph's own --muted text colour -- short of the rule's 3:1
+   "distinguishable from surrounding text by colour alone" floor, and with
+   no other visual affordance to fall back on. A permanent border-bottom
+   (not hover-only) is the fix, matching .subtitle a below. */
+footer p:not(.meta) a { border-bottom: 1px solid var(--accent-line); }
+footer p:not(.meta) a:hover { border-color: var(--accent); text-decoration: none; }
+/* --muted, not --faint (measured, axe-core color-contrast, this pass): the
+   dataset-version/generated-date line and the integrity "verify" link are
+   real informational text a visitor is meant to read, not a de-emphasised
+   decoration -- --faint's ~3.3-3.6:1 here fell short of the 4.5:1 small-text
+   floor. --faint stays reserved for genuinely decorative text (SVG chart
+   tick labels, input placeholders) that axe-core does not evaluate. */
+footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); margin-top: 0.7rem; }
+footer .meta a { color: var(--muted); border-bottom: 1px solid var(--line-2); }
 footer .meta a:hover { color: var(--accent); border-color: var(--accent-line); }
 footer .meta code { color: var(--muted); }
 
@@ -845,17 +907,14 @@ footer .meta code { color: var(--muted); }
 }
 /* Below this width the LLM/ASI/CVE columns are dropped from the table --
    not hidden data, just deferred: every one of those values is still shown
-   in the row's expand/detail panel, which is already the site's existing
-   progressive-disclosure pattern rather than a new one, and is now
-   reachable by keyboard and announced to screen readers via the row's
-   .row-toggle <button> (aria-expanded/aria-controls -- see renderTable()
-   in app.js), not just a mouse click on the row. It is NOT lost data
-   either way: the ID cell (never hidden at any width) is a focusable link
-   to that row's entry on the per-year page, which carries the same
-   LLM/ASI/CVE fields as ordinary page content. This keeps the table
-   itself an honest, unscrolled <table> down to the 380px floor instead of
-   forcing horizontal scroll to see Date/ID/Title/Severity, which is what
-   "usable at 380px" means for a data table. */
+   in the row's expand/detail panel, reachable by keyboard and announced to
+   screen readers via the row's .row-toggle <button> (aria-expanded/
+   aria-controls -- see renderTable() in app.js), not just a mouse click on
+   the row. It is NOT lost data either way: the ID cell (never hidden at any
+   width) is a focusable link to that row's entry on the per-year page,
+   which carries the same LLM/ASI/CVE fields as ordinary page content. This
+   keeps the table itself an honest, unscrolled <table> down to the 380px
+   floor instead of forcing horizontal scroll to see Date/ID/Title/Severity. */
 @media (max-width: 640px) {
   .col-llm, .col-asi, .col-cves { display: none; }
   .incidents td, .incidents th { padding: 0.55rem 0.6rem; }
@@ -923,7 +982,7 @@ footer .meta code { color: var(--muted); }
   td.id a { font-size: 0.72rem; }
   .sev-badge { padding: 0.14rem 0.36rem; font-size: 0.6rem; }
   .filters { padding: 0.85rem; }
-  .cta-row { padding: 0.75rem 0.85rem; }
+  .cta-row { padding: 0.75rem 0; }
 }
 
 /* ------------------------------- Reduced motion ---------------------- */

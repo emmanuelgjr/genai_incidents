@@ -3,21 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!-- Set the theme before first paint to avoid a flash of the wrong palette. -->
+  <!-- Default before the pre-paint script below runs (must exist in the DOM
+       before that script queries it -- meta tags after a synchronous
+       <script> aren't parsed yet). Archive light --bg; the script updates
+       this to match the resolved theme (localStorage / OS preference)
+       before first paint, same as it does for data-theme. -->
+  <meta name="theme-color" content="#f7f4ed">
+  <!-- Set the theme before first paint to avoid a flash of the wrong palette.
+       Also updates <meta name="theme-color"> to match, so the browser-chrome
+       tint (mobile address bar) is never wrong for a frame -- these two hex
+       values are the "Archive" palette's --bg for each theme (style.css);
+       duplicated here only because a <meta> can't read a CSS custom
+       property before the stylesheet loads. -->
   <script>
     (function () {
+      var THEME_BG = { light: '#f7f4ed', dark: '#14130f' };
       try {
         var t = localStorage.getItem('theme');
         if (t !== 'light' && t !== 'dark') {
           t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         document.documentElement.setAttribute('data-theme', t);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', THEME_BG[t]);
       } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
     })();
   </script>
   <title>GenAI & Agentic AI Security Incidents</title>
   <meta name="description" content="Searchable, filterable dataset of GenAI and agentic-AI security incidents, mapped to four core taxonomies (OWASP LLM Top 10, OWASP Agentic Top 10, NIST AI RMF, MITRE ATLAS) plus companion MAESTRO and an experimental VERIS crosswalk.">
-  <meta name="theme-color" content="#0a0c10">
   <!-- Open Graph / Twitter — rich link previews when shared -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="GenAI &amp; Agentic AI Security Incidents">
@@ -35,7 +47,15 @@
   <link rel="preload" href="data/incidents.core.json" as="fetch" type="application/json" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Three-role type system for the "Archive" direction: Source Serif 4
+       for reading prose (headings, subtitle, table titles, footer copy) --
+       a text serif built for screens, the closest fit to "well-made
+       scientific index" without reaching for a display face; IBM Plex Sans
+       kept for interface chrome (buttons, inputs, nav); IBM Plex Mono kept
+       for data (dates, IDs, stat numerals, table headers, severity badges,
+       CVE/LLM/ASI cells) -- mono for anything that reads as a reference
+       code or a column of numbers, exactly like a card-catalogue index. -->
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
