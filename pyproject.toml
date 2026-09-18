@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "genai-incidents"
-version = "2.9.0"
+version = "2.10.0"
 description = "Curated dataset of GenAI & agentic-AI security incidents mapped to OWASP LLM Top 10, OWASP Agentic Top 10, NIST AI RMF, and MITRE ATLAS."
 readme = "README.md"
 license = "MIT"

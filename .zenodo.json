@@ -1,6 +1,6 @@
 {
   "title": "GenAI & Agentic AI Security Incidents",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "description": "A continuously-maintained, consolidated index of publicly disclosed GenAI and agentic-AI security incidents, vulnerabilities, and red-team findings. Every applicable entry is mapped to four core taxonomies (OWASP Top 10 for LLM Applications (2026), OWASP Agentic Top 10 (ASI), NIST AI Risk Management Framework (AI 100-1), MITRE ATLAS). A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time.",
   "upload_type": "dataset",
   "access_right": "open",
