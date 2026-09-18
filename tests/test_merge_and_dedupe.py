@@ -1991,14 +1991,30 @@ def test_split_guard_fires_with_empty_authorization_list(tmp_path, monkeypatch):
     assert before == after, "guard must abort BEFORE any output write"
 
 
+def _write_authorized_split_file(path, entries, decision="D28"):
+    """Write a split_authorization.json with a VALID marker (WS4-T21/D28)
+    for the given entries, using the module's own hash function so tests
+    stay correct if the canonicalization ever changes. `decision` is a
+    parameter so tests can also write a deliberately WRONG marker."""
+    data = {"entries": entries}
+    data["authorization"] = {
+        "decision": decision,
+        "decided": "2026-09-18",
+        "decided_by": "test",
+        "entries_sha256": m._entries_sha256(entries),
+    }
+    path.write_text(_json.dumps(data), encoding="utf-8")
+
+
 def test_split_guard_fires_when_authorization_list_is_missing_this_pair(tmp_path, monkeypatch):
     """A partially-correct authorization list (authorizing some OTHER id,
     not the one that actually split) must still abort -- proves the guard
     checks per-id, not just 'is the list non-empty'."""
     data, old_id = _induce_a_split(tmp_path, monkeypatch)
-    (data / "split_authorization.json").write_text(_json.dumps({
-        "entries": [{"from": "INC-99999", "reason": "unrelated"}]
-    }), encoding="utf-8")
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": "INC-99999", "reason": "unrelated"}],
+    )
 
     with pytest.raises(m.SplitAuthorizationError):
         m.main()
@@ -2006,18 +2022,72 @@ def test_split_guard_fires_when_authorization_list_is_missing_this_pair(tmp_path
 
 def test_split_guard_passes_once_the_pair_is_authorized(tmp_path, monkeypatch):
     """The other half of 'name the input that makes it fail': add the
-    correct (from, reason) pair and the SAME transition proceeds and
-    writes output."""
+    correct (from, reason) pair AND a valid D28 marker, and the SAME
+    transition proceeds and writes output."""
     data, old_id = _induce_a_split(tmp_path, monkeypatch)
-    (data / "split_authorization.json").write_text(_json.dumps({
-        "entries": [{"from": old_id, "reason": "test-authorized-split"}]
-    }), encoding="utf-8")
+    entries = [{"from": old_id, "reason": "test-authorized-split"}]
+    _write_authorized_split_file(data / "split_authorization.json", entries)
 
     m.main()  # must NOT raise
     second = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
     assert second["incident_count"] == 2, "the authorized split must actually land"
     srcs = {s for e in second["incidents"] for s in e["source_ids"]}
     assert {"OECD-AIM-X", "OECD-AIM-Y"} <= srcs
+
+
+# --- WS4-T21 / D28: the authorization marker itself must be required,
+# not just the entries -- a guard satisfied by file-presence alone is not
+# a guard. Each test below names one input that must make the guard fail
+# even though the (from, reason) entry is entirely correct.
+
+def test_split_guard_fires_on_unmarked_list_even_with_correct_entry(tmp_path, monkeypatch):
+    """An authorization list with the right `from` entry but NO
+    `authorization` marker at all must still abort -- file presence is
+    not consent."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    (data / "split_authorization.json").write_text(_json.dumps({
+        "entries": [{"from": old_id, "reason": "test-authorized-split"}]
+        # deliberately no "authorization" key
+    }), encoding="utf-8")
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_fires_on_marker_naming_wrong_decision(tmp_path, monkeypatch):
+    """A marker naming a DIFFERENT board decision (not D28) must abort,
+    even with the right entry and a correct hash."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-authorized-split"}],
+        decision="D25",
+    )
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_fires_when_entries_diverge_from_the_marked_hash(tmp_path, monkeypatch):
+    """Entries edited (here: an extra entry appended) after the marker's
+    entries_sha256 was computed must abort -- the marker only vouches for
+    the exact entries it hashed."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    hashed_entries = [{"from": old_id, "reason": "test-authorized-split"}]
+    tampered_entries = hashed_entries + [{"from": "INC-99999", "reason": "snuck-in"}]
+    authorization = {
+        "decision": "D28",
+        "decided": "2026-09-18",
+        "decided_by": "test",
+        "entries_sha256": m._entries_sha256(hashed_entries),  # stale
+    }
+    (data / "split_authorization.json").write_text(_json.dumps({
+        "entries": tampered_entries,
+        "authorization": authorization,
+    }), encoding="utf-8")
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
 
 
 def test_split_guard_ignores_ordinary_merges_and_retention(tmp_path, monkeypatch):
@@ -2089,10 +2159,13 @@ def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, 
         _entry_with_url("OECD-AIM-M", "Incident M", "https://example.com/m-story"),
         _entry_with_url("OECD-AIM-N", "Incident N", "https://example.com/n-story"),
     ]), encoding="utf-8")
-    # Only authorize the FIRST split, not the second or third.
-    (data / "split_authorization.json").write_text(_json.dumps({
-        "entries": [{"from": old_id_1, "reason": "test-authorized-split"}]
-    }), encoding="utf-8")
+    # Only authorize the FIRST split, not the second or third. Uses a
+    # VALID D28 marker so the abort below is attributable to the missing
+    # entries, not to marker verification failing first.
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id_1, "reason": "test-authorized-split"}],
+    )
 
     with pytest.raises(m.SplitAuthorizationError) as excinfo:
         m.main()

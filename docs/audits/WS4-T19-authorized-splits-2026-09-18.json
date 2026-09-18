@@ -3,6 +3,15 @@
   "generated": "2026-09-18",
   "transition": "WS4-T10 normalize_url query-string over-merge fix -- one-time 47-split + 8-inbound-redirect remediation",
   "status": "PROPOSED",
+  "authorization": {
+    "$note": "WS4-T21 / dated 2026-09-18. Added AFTER the ruling below, as a distinct edit from this file's original PROPOSED commit -- the $schema_note and status fields above are preserved as-written (agreement 4: specs/audits are records, not rewritten) and describe this list's state before the ruling. This object is what scripts/merge_and_dedupe.py::_check_split_authorization actually requires (REQUIRED_SPLIT_AUTHORIZATION_DECISION): file presence alone does not authorize anything.",
+    "decision": "D28",
+    "decided": "2026-09-18",
+    "decided_by": "user",
+    "board_record": "PROGRESS.md, board decision D28 (\"USER APPROVES THE 47-SPLIT REMEDIATION, 2026-09-18\")",
+    "approved": "All 55 entries below exactly as committed: the 43 keep-id splits, the 4 retirements (INC-00311, INC-00554, INC-00754, INC-01897), and the 8 inbound redirect corrections. Three successor-pair questions (INC-14745/INC-14871, INC-14808/INC-14838, the Mythos pair) were explicitly NOT part of this authorization and remain routed to WS4-T5.",
+    "entries_sha256": "873c29a2b999335f9f1703510bbfec301028ae6ad6cb21a1d2a4e3db99654a4f"
+  },
   "counts": {
     "splits_total": 47,
     "splits_keep_id": 43,

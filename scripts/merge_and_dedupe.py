@@ -11,6 +11,7 @@ Run after the per-source aggregators have written into ingest/.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -1036,13 +1037,24 @@ CISA_KEV_PATH = INGEST / "cisa_kev.json"
 CWE_VECTOR_PATH = MAPPINGS / "cwe_attack_vector.json"
 SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
 # WS4-T19: the pre-authorization guard's input. A committed, docs/-only
-# PROPOSAL (never data/, never schema/) of which previously-single
-# published ids are authorized to newly resolve to more than one row on
-# the transition that lands WS4-T10's normalize_url fix. See
+# list (never data/, never schema/) of which previously-single published
+# ids are authorized to newly resolve to more than one row on the
+# transition that lands WS4-T10's normalize_url fix. See
 # docs/audits/WS4-T19-split-evidence-2026-09-18.md and
 # docs/audits/WS4-T19-authorized-splits-2026-09-18.json (the file this
-# constant points at -- proposed, not yet user-ruled; see D25(b)).
+# constant points at).
 SPLIT_AUTHORIZATION_PATH = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
+# WS4-T21 / board decision D28: the ONLY board decision this guard accepts
+# as authorization. A guard that treats the authorized list's mere
+# presence-on-main as consent is not a guard -- the list was committed
+# BEFORE the ruling and is read by filename, so once both the list and
+# the WS4-T10 fix are on main, a filename-only check is already satisfied
+# for the very transition it exists to gate (red-reviewer's finding on
+# WS4-T19, carried into D28's board record). The list must therefore
+# carry an explicit `authorization` marker naming this exact decision id,
+# and the entries it approved must hash-match the entries actually
+# present -- see `_verify_split_authorization_marker`.
+REQUIRED_SPLIT_AUTHORIZATION_DECISION = "D28"
 
 
 def load_cwe_vector_map() -> dict[str, str]:
@@ -1529,18 +1541,80 @@ class SplitAuthorizationError(SystemExit):
     without a Python traceback obscuring it."""
 
 
+def _entries_sha256(entries: list[dict]) -> str:
+    """Canonical (sort_keys, no whitespace) sha256 of an `entries` array,
+    so the hash is stable regardless of formatting and detects ANY change
+    to the approved content -- added, removed, or edited entries alike."""
+    canonical = json.dumps(entries, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _verify_split_authorization_marker(data: dict, path: Path) -> bool:
+    """WS4-T21 / D28: a guard that authorizes on file-presence alone is
+    not a guard (see REQUIRED_SPLIT_AUTHORIZATION_DECISION's comment).
+    Requires an `authorization` object naming EXACTLY the board decision
+    that ruled on this list, plus a content hash proving the `entries`
+    array is byte-for-byte what that decision approved. Fails closed
+    (returns False, never raises) on every deviation:
+      - no `authorization` key at all (an unmarked list),
+      - `authorization.decision` missing or naming a different decision,
+      - `authorization.entries_sha256` missing or not matching a fresh
+        hash of this file's own `entries` array (entries edited, added,
+        or removed after the marker was written -- including the case
+        where someone bumps `entries_sha256` to match tampered entries
+        without a NEW dated board decision approving the new content,
+        which this check cannot distinguish from a legitimate re-ruling
+        and does not try to -- that distinction is the board's job, not
+        this function's; this function's job is only to refuse an
+        entries/marker mismatch).
+    Prints a specific reason to stderr in every failure case so a bad
+    marker is diagnosable, not just silently empty."""
+    auth = data.get("authorization")
+    if not isinstance(auth, dict):
+        print(
+            f"[split-guard] {path.name} carries no `authorization` marker "
+            "-- file presence alone does not authorize any split.",
+        )
+        return False
+    decision = auth.get("decision")
+    if decision != REQUIRED_SPLIT_AUTHORIZATION_DECISION:
+        print(
+            f"[split-guard] {path.name}'s authorization marker names "
+            f"decision {decision!r}, not the required "
+            f"{REQUIRED_SPLIT_AUTHORIZATION_DECISION!r} -- refusing to "
+            "authorize any split.",
+        )
+        return False
+    expected_hash = auth.get("entries_sha256")
+    actual_hash = _entries_sha256(data.get("entries", []))
+    if not expected_hash or expected_hash != actual_hash:
+        print(
+            f"[split-guard] {path.name}'s authorization marker's "
+            f"entries_sha256 ({expected_hash!r}) does not match a fresh "
+            f"hash of its own `entries` array ({actual_hash!r}) -- the "
+            "approved entries and the entries on disk have diverged; "
+            "refusing to authorize any split.",
+        )
+        return False
+    return True
+
+
 def _load_split_authorization(path: Path) -> set[str]:
-    """Read the WS4-T19 pre-authorization list's `from` ids. Missing file
-    or unparseable JSON both mean "nothing is authorized" (the safe
-    default: a guard that treats a missing/corrupt allowlist as
-    authorizing everything is not a guard) -- returns an empty set, not
-    an exception, so a build with zero detected splits (today's normal
-    case, pre-WS4-T10-merge) never even looks at this file's presence."""
+    """Read the WS4-T19 pre-authorization list's `from` ids, gated on the
+    D28 authorization marker (`_verify_split_authorization_marker`).
+    Missing file, unparseable JSON, or a marker that fails verification
+    all mean "nothing is authorized" (the safe default: a guard that
+    treats a missing/corrupt/unmarked allowlist as authorizing everything
+    is not a guard) -- returns an empty set, not an exception, so a build
+    with zero detected splits (today's normal case, pre-WS4-T10-merge)
+    never even looks at this file's presence."""
     if not path.exists():
         return set()
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
+        return set()
+    if not _verify_split_authorization_marker(data, path):
         return set()
     return {
         e.get("from") for e in data.get("entries", []) if e.get("from")
@@ -1631,10 +1705,15 @@ def _check_split_authorization(
     lines.append(
         "This is the WS4-T19 pre-authorization guard (D25(b): the user "
         "rules on which splits are authorized for a one-time transition; "
-        "the build never decides this for itself). To authorize a "
-        "reviewed split, add {\"from\": \"<old-id>\", \"reason\": "
-        "\"<...>\"} to " + str(authorized_path) + ". "
-        "See docs/audits/WS4-T19-split-evidence-2026-09-18.md."
+        "the build never decides this for itself). Authorizing a split "
+        "requires BOTH an entry ({\"from\": \"<old-id>\", \"reason\": "
+        "\"<...>\"} in " + str(authorized_path) + ") AND a valid "
+        f"`authorization` marker naming decision "
+        f"{REQUIRED_SPLIT_AUTHORIZATION_DECISION!r} whose entries_sha256 "
+        "matches the file's own entries -- file presence alone does not "
+        "authorize anything (see _verify_split_authorization_marker). "
+        "See docs/audits/WS4-T19-split-evidence-2026-09-18.md and D28 "
+        "in PROGRESS.md."
     )
     raise SplitAuthorizationError("\n".join(lines))
 
