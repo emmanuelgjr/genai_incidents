@@ -36,7 +36,6 @@ const els = {
   llm: document.getElementById('llm'),
   asi: document.getElementById('asi'),
   vector: document.getElementById('vector'),
-  tier: document.getElementById('tier'),
   corpus: document.getElementById('corpus'),
   quality: document.getElementById('quality'),
   cveOnly: document.getElementById('cve_only'),
@@ -52,11 +51,11 @@ const els = {
   exportCsv: document.getElementById('export-csv'),
 };
 
-const FILTER_KEYS = ['q','year','severity','llm','asi','vector','tier','corpus','quality','cveOnly'];
+const FILTER_KEYS = ['q','year','severity','llm','asi','vector','corpus','quality','cveOnly'];
 const FILTER_LABEL = {
   q: 'Search', year: 'Year', severity: 'Severity',
   llm: 'OWASP LLM', asi: 'OWASP ASI', vector: 'Vector',
-  tier: 'Tier', corpus: 'Corpus', quality: 'Quality', cveOnly: 'CVE',
+  corpus: 'Corpus', quality: 'Quality', cveOnly: 'CVE',
 };
 
 let DATA = [];
@@ -65,6 +64,71 @@ let PAGE = 1;
 let SORT_BY = 'date';
 let SORT_DIR = 'desc';
 let EXPANDED = new Set();
+
+// ----------------------------- Lazy detail loading ------------------------
+// The initial fetch is data/incidents.core.json -- table/filter/chart
+// fields PLUS primary_reference (~36.0% of the full dataset's bytes,
+// measured -- see scripts/gen_docs_core_data.py's printed summary).
+// primary_reference is core, not lazy, because matches() below searches it
+// on every keystroke against the FULL dataset (see the CORE_FIELDS comment
+// in that script for the search-correctness bug this fixes). The remaining
+// fields (description, tags, content_license, nist_ai_rmf, mitre_atlas,
+// source_freshness) live in one data/detail/<year>.json shard per
+// publication year and are fetched only when a row in that year is
+// actually expanded, or on CSV export. Once a year's shard resolves, its
+// fields are merged directly onto the matching objects in DATA, so every
+// later read (including re-renders) is synchronous with no cache-lookup
+// indirection.
+// Explicit per-year fetch status, not inferred from field presence: the
+// earlier version treated "loaded" as `description !== undefined`, which
+// made "not fetched yet" and "fetch failed" indistinguishable -- a failed
+// shard left every row of that year showing "Loading details…" forever
+// (renderDetail's early return never had a failure branch), and CSV export
+// (below) used Promise.allSettled and silently exported blank cells for
+// the failed year with no warning. Tracking 'unloaded' / 'loading' /
+// 'loaded' / 'failed' explicitly lets renderDetail show a real error state
+// with retry, and lets export detect and warn about partial data instead
+// of shipping a CSV that looks complete but silently isn't (WS6-T5
+// design-pass report, defect A3).
+const DETAIL_STATUS = new Map(); // year (string) -> 'loading' | 'loaded' | 'failed'
+const DETAIL_PROMISES = new Map();
+const DETAIL_FIELDS = ['description', 'tags',
+  'content_license', 'nist_ai_rmf', 'mitre_atlas', 'source_freshness'];
+
+function hasDetail(e) { return e.description !== undefined; }
+function detailStatus(year) { return DETAIL_STATUS.get(String(year)) || 'unloaded'; }
+
+function ensureDetailLoaded(year) {
+  const key = String(year);
+  const status = DETAIL_STATUS.get(key);
+  if (status === 'loaded') return Promise.resolve();
+  if (status === 'loading') return DETAIL_PROMISES.get(key);
+  DETAIL_STATUS.set(key, 'loading');
+  const p = fetch(`data/detail/${encodeURIComponent(key)}.json`)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(map => {
+      for (const e of DATA) {
+        if (String(e.year) === key && map[e.id]) Object.assign(e, map[e.id]);
+      }
+      DETAIL_STATUS.set(key, 'loaded');
+    })
+    .catch(err => {
+      console.warn('detail shard load failed for', key, err);
+      DETAIL_STATUS.set(key, 'failed');
+      DETAIL_PROMISES.delete(key);
+      throw err;
+    });
+  DETAIL_PROMISES.set(key, p);
+  return p;
+}
+
+async function ensureDetailLoadedForRows(rows) {
+  // Returns the list of years that failed to load, so callers (CSV export)
+  // can warn instead of exporting silently-incomplete rows.
+  const years = Array.from(new Set(rows.map(r => String(r.year))));
+  const results = await Promise.allSettled(years.map(ensureDetailLoaded));
+  return years.filter((_, i) => results[i].status === 'rejected');
+}
 
 // ----------------------------- Utilities ---------------------------------
 
@@ -158,7 +222,6 @@ function matches(e) {
   if (els.asi.value      && !(e.owasp_asi || []).includes(els.asi.value)) return false;
   if (els.vector.value   && e.attack_vector !== els.vector.value) return false;
   if (els.corpus.value   && e.corpus !== els.corpus.value)      return false;
-  if (els.tier && els.tier.value && e.tier !== els.tier.value) return false;
   if (els.quality.value  && e.quality_tier !== els.quality.value) return false;
   if (els.cveOnly.checked && !(e.cve_ids || []).length)         return false;
   const q = els.q.value.trim().toLowerCase();
@@ -248,6 +311,37 @@ function renderChips() {
 
 // ----------------------------- Table -------------------------------------
 
+// BOUNCE #2 / D3: renderTable() replaces els.body.innerHTML wholesale on
+// every toggle, which destroys and recreates every row's .row-toggle
+// button as a brand-new DOM node -- including whichever one the keyboard
+// user just pressed Enter on. The browser has nothing sensible to move
+// focus to afterwards and drops it to <body>, so a second Enter press is a
+// no-op and the only way back to any toggle is Tab-ing from the top of the
+// page (measured: 23 hops). Mouse clicks don't reliably focus a button in
+// every browser, so this only bites keyboard users -- exactly the users
+// A4 was for. Fix: remember whether the CURRENTLY FOCUSED element is the
+// row's own toggle/retry control before re-rendering, and if so, refocus
+// the equivalent freshly-rendered node afterwards (never steal focus that
+// wasn't already there -- a mouse click that didn't focus anything first
+// shouldn't suddenly move focus after rerender()).
+function focusRowControl(id, selector) {
+  // The control being restored may live in the data row itself
+  // (.row-toggle, inside tr[data-row]) or in the following detail row
+  // (.detail-retry, inside the SIBLING tr#detail-<id> -- not a descendant
+  // of tr[data-row]), so search both explicitly rather than assuming one
+  // is an ancestor of the other.
+  const dataRow = els.body.querySelector(`tr[data-row="${id}"]`);
+  const detailRow = document.getElementById(`detail-${id}`);
+  const el = (dataRow && dataRow.querySelector(selector)) || (detailRow && detailRow.querySelector(selector));
+  if (el) { el.focus(); return; }
+  // The control that was focused no longer exists after this render (e.g.
+  // a successful retry removes .detail-retry) -- fall back to the row's
+  // own toggle so focus lands somewhere on the same row rather than being
+  // silently dropped again.
+  const fallback = dataRow && dataRow.querySelector('.row-toggle');
+  if (fallback) fallback.focus();
+}
+
 function renderTable(slice, start) {
   const rows = slice.map((e, i) => {
     const cves = (e.cve_ids || []);
@@ -263,43 +357,139 @@ function renderTable(slice, start) {
     const asi = (e.owasp_asi || []).join(', ');
     const expanded = EXPANDED.has(e.id);
     const cls = expanded ? ' class="expanded"' : '';
+    const detailId = `detail-${escapeHtml(e.id)}`;
+    // Explicit, keyboard-and-screen-reader-reachable expand control (A4):
+    // a native <button> gets Tab focus, Enter/Space activation and an
+    // implicit "button" role for free, so no custom keydown handling or
+    // ARIA role override on the <tr> itself is needed (overriding a <tr>'s
+    // implicit "row" role to "button" would also orphan the ID link inside
+    // it as nested interactive content). The whole-row click handler below
+    // still toggles too, for mouse users -- the button calls
+    // stopPropagation so a click on it doesn't double-toggle via bubbling.
+    const toggleBtn = `<button type="button" class="row-toggle" aria-expanded="${expanded}" aria-controls="${detailId}" aria-label="${expanded ? 'Hide' : 'Show'} details for ${escapeHtml(e.id)}"><span aria-hidden="true">${expanded ? '−' : '+'}</span></button>`;
     const main = `<tr${cls} data-row="${e.id}">
-      <td class="date">${escapeHtml(e.date || String(e.year || ''))}</td>
+      <td class="date"><span class="date-cell">${toggleBtn}${escapeHtml(e.date || String(e.year || ''))}</span></td>
       <td class="id">${idCell}</td>
       <td class="title-cell">${escapeHtml(e.title)}</td>
       <td><span class="sev-badge sev-${escapeHtml(e.severity)}">${escapeHtml(e.severity || '')}</span></td>
-      <td class="llm">${escapeHtml(llm)}</td>
-      <td class="asi">${escapeHtml(asi)}</td>
-      <td class="cves">${cveCell}</td>
+      <td class="llm col-llm">${escapeHtml(llm)}</td>
+      <td class="asi col-asi">${escapeHtml(asi)}</td>
+      <td class="cves col-cves">${cveCell}</td>
     </tr>`;
     if (!expanded) return main;
-    return main + renderDetail(e);
+    return main + renderDetail(e, detailId);
   }).join('');
 
-  els.body.innerHTML = rows || '<tr><td colspan="7" class="status">No matches.</td></tr>';
-  els.body.querySelectorAll('tr[data-row]').forEach(tr => {
-    tr.addEventListener('click', () => {
-      const id = tr.dataset.row;
-      if (EXPANDED.has(id)) EXPANDED.delete(id); else EXPANDED.add(id);
+  els.body.innerHTML = rows || (
+    activeFiltersCount() > 0
+      ? `<tr><td colspan="7" class="status">
+          <p>No incidents match the current filters.</p>
+          <button type="button" class="btn-secondary" id="clear-filters-empty">Clear filters</button>
+        </td></tr>`
+      : '<tr><td colspan="7" class="status"><p>No incidents.</p></td></tr>'
+  );
+  const clearEmpty = document.getElementById('clear-filters-empty');
+  if (clearEmpty) {
+    clearEmpty.addEventListener('click', () => {
+      for (const k of FILTER_KEYS) setFilter(k, k === 'cveOnly' ? false : '');
+      PAGE = 1;
+      EXPANDED.clear();
       rerender();
+    });
+  }
+
+  function toggleRow(id) {
+    // Was the keyboard focus already on THIS row's own toggle button
+    // before we blow away and recreate the DOM? Only then is it our job
+    // to put it back -- see focusRowControl() above.
+    const active = document.activeElement;
+    const hadFocus = !!(active && active.classList && active.classList.contains('row-toggle')
+      && active.closest('tr[data-row]') && active.closest('tr[data-row]').dataset.row === id);
+
+    if (EXPANDED.has(id)) {
+      EXPANDED.delete(id);
+      rerender();
+      if (hadFocus) focusRowControl(id, '.row-toggle');
+      return;
+    }
+    EXPANDED.add(id);
+    // Render immediately with whatever fields are already loaded (shows a
+    // "Loading details…" placeholder if this row's year hasn't been
+    // fetched yet), then re-render once the year's detail shard resolves
+    // (or failed -- ensureDetailLoaded's rejection still re-renders so the
+    // error state in renderDetail below can show).
+    rerender();
+    if (hadFocus) focusRowControl(id, '.row-toggle');
+    const row = DATA.find(r => r.id === id);
+    if (row && !hasDetail(row)) {
+      ensureDetailLoaded(row.year)
+        .then(() => { rerender(); if (hadFocus) focusRowControl(id, '.row-toggle'); })
+        .catch(() => { rerender(); if (hadFocus) focusRowControl(id, '.row-toggle'); });
+    }
+  }
+
+  els.body.querySelectorAll('tr[data-row]').forEach(tr => {
+    tr.addEventListener('click', () => toggleRow(tr.dataset.row));
+  });
+  els.body.querySelectorAll('.row-toggle').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      toggleRow(btn.closest('tr[data-row]').dataset.row);
+    });
+  });
+  els.body.querySelectorAll('.detail-retry').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      // .detail-retry lives inside <tr class="detail" id="detail-<ID>">
+      // (a SIBLING of the data row, not a descendant of it), so the data
+      // row's id has to come from that id attribute, not from a
+      // tr[data-row] ancestor.
+      const detailTr = btn.closest('tr.detail');
+      const id = detailTr ? detailTr.id.replace(/^detail-/, '') : null;
+      const year = btn.dataset.year;
+      const hadFocus = document.activeElement === btn;
+      rerender(); // shows "Loading details…" immediately (status flips to 'loading' synchronously below)
+      if (hadFocus && id) focusRowControl(id, '.detail-retry');
+      ensureDetailLoaded(year)
+        .then(() => { rerender(); if (hadFocus && id) focusRowControl(id, '.detail-retry'); })
+        .catch(() => { rerender(); if (hadFocus && id) focusRowControl(id, '.detail-retry'); });
     });
   });
 }
 
-function renderDetail(e) {
+function renderDetail(e, detailId) {
+  const idAttr = detailId ? ` id="${detailId}"` : '';
+  if (!hasDetail(e)) {
+    const status = detailStatus(e.year);
+    if (status === 'failed') {
+      return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body detail-error">
+        <p class="hint" role="alert">
+          Couldn't load details for this row (network error).
+          <button type="button" class="btn-secondary detail-retry" data-year="${escapeHtml(String(e.year))}">Retry</button>
+        </p>
+      </div></td></tr>`;
+    }
+    return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body">
+      <p class="hint" aria-busy="true">Loading details…</p>
+    </div></td></tr>`;
+  }
   const cves = (e.cve_ids || []).map(c => `<code>${escapeHtml(c)}</code>`).join(' ');
   const tags = (e.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+  const llm = (e.owasp_llm || []).join(', ');
+  const asi = (e.owasp_asi || []).join(', ');
   const refLink = e.primary_reference
     ? `<a href="${escapeHtml(safeUrl(e.primary_reference))}" rel="noopener" target="_blank" title="Cite this incident from its primary source, not this site">cite this incident ↗</a>`
     : '';
   const shardLink = `<a href="incidents/${e.year}.html#${e.id.toLowerCase()}">full details ↗</a>`;
-  return `<tr class="detail"><td colspan="7"><div class="detail-body">
+  return `<tr class="detail"${idAttr}><td colspan="7"><div class="detail-body">
     <p>${escapeHtml(e.description || 'No description.')}</p>
     <div class="detail-meta">
       ${e.affected ? `<span><strong>Affected:</strong> ${escapeHtml(e.affected)}</span>` : ''}
       ${e.attack_vector ? `<span><strong>Vector:</strong> <code>${escapeHtml(e.attack_vector)}</code></span>` : ''}
       ${e.corpus ? `<span><strong>Corpus:</strong> ${escapeHtml(e.corpus)}</span>` : ''}
       ${e.quality_tier ? `<span><strong>Quality:</strong> ${escapeHtml(e.quality_tier)}</span>` : ''}
+      ${llm ? `<span><strong>OWASP LLM:</strong> ${escapeHtml(llm)}</span>` : ''}
+      ${asi ? `<span><strong>OWASP ASI:</strong> ${escapeHtml(asi)}</span>` : ''}
       ${cves ? `<span><strong>CVEs:</strong> ${cves}</span>` : ''}
     </div>
     ${tags ? `<div class="detail-tags">${tags}</div>` : ''}
@@ -654,25 +844,97 @@ function csvCell(value) {
   return s;
 }
 
-function exportFilteredAsCsv() {
+async function exportFilteredAsCsv() {
   if (!FILTERED.length) return;
-  const lines = [];
-  lines.push(CSV_COLUMNS.map(c => csvCell(c[1])).join(','));
-  for (const row of FILTERED) {
-    lines.push(CSV_COLUMNS.map(c => csvCell(row[c[0]])).join(','));
+  // CSV includes detail-only columns (description, NIST/ATLAS mappings);
+  // those live in per-year lazy shards, so make sure every year present in
+  // the filtered set is loaded before building rows. This is the one path
+  // that can need every shard at once (a filter matching all years), which
+  // is why it stays an explicit, user-initiated action rather than
+  // something the initial page load or a single row-expand ever triggers.
+  const btn = els.exportCsv;
+  const originalLabel = btn ? btn.textContent : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Preparing export…'; }
+  try {
+    const failedYears = await ensureDetailLoadedForRows(FILTERED);
+    if (failedYears.length) {
+      // Previously this was silent: Promise.allSettled swallowed the
+      // rejection and the export completed looking normal while rows from
+      // the failed year(s) had blank detail-shard cells, with the button
+      // returning to normal and no error (WS6-T5 design-pass report,
+      // defect A3). Ask before shipping a CSV the user would otherwise
+      // have no reason to distrust.
+      //
+      // Primary Reference is NOT one of the affected columns -- BOUNCE #2 /
+      // D4 caught this message still listing it after A2 (same pass, same
+      // commit) moved primary_reference into CORE_FIELDS, so it's already
+      // populated before this function ever runs and a failed *detail*
+      // shard can't blank it. Measured directly (one shard aborted, real
+      // export): `rows 972 | blankDesc 972 | blankTags 972 | blankRef 0`.
+      // DETAIL_FIELDS (declared above) is the authoritative list of what
+      // a failed shard actually blanks; this message is derived from it
+      // by name so it can't silently drift out of sync with CORE_FIELDS
+      // again the next time a field moves between the two.
+      const blankable = DETAIL_FIELDS.map(f => CSV_COLUMNS.find(c => c[0] === f))
+        .filter(Boolean).map(c => c[1]);
+      const proceed = window.confirm(
+        `Couldn't load full details for ${failedYears.length} year` +
+        `${failedYears.length === 1 ? '' : 's'} (${failedYears.join(', ')}). ` +
+        `Rows from ${failedYears.length === 1 ? 'that year' : 'those years'} will export with ` +
+        `blank ${blankable.join(' / ')} cells. ` +
+        `Export anyway?`
+      );
+      if (!proceed) return;
+    }
+
+    const lines = [];
+    lines.push(CSV_COLUMNS.map(c => csvCell(c[1])).join(','));
+    for (const row of FILTERED) {
+      lines.push(CSV_COLUMNS.map(c => csvCell(row[c[0]])).join(','));
+    }
+    // Prepend UTF-8 BOM so Excel opens it as UTF-8.
+    const blob = new Blob(['﻿' + lines.join('\r\n')],
+      { type: 'text/csv;charset=utf-8' });
+    const today = new Date().toISOString().slice(0, 10);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `genai-incidents-${today}-${FILTERED.length}rows.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  } finally {
+    if (btn) { btn.disabled = FILTERED.length === 0; btn.textContent = originalLabel; }
   }
-  // Prepend UTF-8 BOM so Excel opens it as UTF-8.
-  const blob = new Blob(['﻿' + lines.join('\r\n')],
-    { type: 'text/csv;charset=utf-8' });
-  const today = new Date().toISOString().slice(0, 10);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `genai-incidents-${today}-${FILTERED.length}rows.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+// ----------------------------- Integrity note ------------------------------
+// GitHub Pages has no published SLA for content integrity, so the served
+// data files' SHA-256 hashes are published alongside them (see
+// scripts/gen_data_integrity.py + docs/data/SHA256SUMS) and surfaced here so
+// a visitor can verify a downloaded copy without leaving the page. Loaded
+// after the main render so a slow/failed fetch never blocks the table.
+async function loadIntegrityNote() {
+  const el = document.getElementById('integrity-note');
+  if (!el) return;
+  try {
+    const r = await fetch('data/SHA256SUMS');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text();
+    const line = text.split('\n').find(l => l.includes('incidents.min.json'));
+    const hash = line ? line.trim().split(/\s+/)[0] : null;
+    if (hash) {
+      el.innerHTML = `<code title="${escapeHtml(hash)}">sha256:${escapeHtml(hash.slice(0, 12))}…</code> ` +
+        `<a href="data/SHA256SUMS">verify ↗</a>`;
+    } else {
+      el.innerHTML = `<a href="data/SHA256SUMS">SHA-256 checksums ↗</a>`;
+    }
+  } catch (e) {
+    // Non-fatal: the checksums file link in the header still works even if
+    // this fetch-and-summarize fails.
+    el.textContent = '';
+  }
 }
 
 // ----------------------------- Bootstrap ---------------------------------
@@ -690,7 +952,14 @@ function populateOptions(select, values) {
 
 async function init() {
   try {
-    const r = await fetch('data/incidents.min.json');
+    // The initial load is the trimmed core payload (table/filter/chart
+    // fields only -- see scripts/gen_docs_core_data.py). Full per-incident
+    // description/reference/tags/taxonomy-mapping fields are fetched lazily
+    // per publication year, on row-expand or CSV export (see
+    // ensureDetailLoaded above). The full, untrimmed data/incidents.min.json
+    // is still published unchanged for direct download (see the JSON link
+    // in the header) and is what the integrity manifest hashes.
+    const r = await fetch('data/incidents.core.json');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const payload = await r.json();
     DATA = payload.incidents || [];
@@ -711,6 +980,16 @@ async function init() {
       opt.textContent = n.toLocaleString();
       els.pageSize.appendChild(opt);
     }
+
+    // On a narrow viewport, titles wrap to several lines each (the LLM/ASI/
+    // CVE columns are already dropped below 640px -- see style.css -- so
+    // Title gets more of the remaining width, not less), so the 250-row
+    // desktop default would mean tens of thousands of pixels of scroll per
+    // page. Start narrow viewports at the smallest page size instead;
+    // `readFiltersFromUrl()` below still overrides this if the URL already
+    // has an explicit `ps` param (e.g. a shared link), so this is only a
+    // first-load default, never a forced setting.
+    if (window.innerWidth < 640) PAGE_SIZE = PAGE_SIZE_OPTIONS[0];
 
     readFiltersFromUrl();
     els.pageSize.value = String(PAGE_SIZE);
@@ -783,6 +1062,7 @@ async function init() {
       `Dataset v${payload.version || '?'} · generated ${payload.generated || '?'} · ${fmtNum(DATA.length)} incidents`;
 
     rerender();
+    loadIntegrityNote();
   } catch (err) {
     els.status.textContent = 'Failed to load dataset: ' + err.message;
     console.error(err);

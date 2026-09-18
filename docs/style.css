@@ -43,6 +43,21 @@
   --grain:     0.035;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Spacing scale (WS6-T5 design pass) -- named steps instead of scattered
+     ad hoc rem values, so gaps between UNRELATED things (sections) are
+     consistently larger than gaps between RELATED things (a label and its
+     control), which is what makes a dense page read as organised rather
+     than uniformly padded. Existing rules that already used a fitting
+     value were left alone rather than mechanically swept, to keep this
+     pass's diff reviewable. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.85rem;
+  --space-4: 1.25rem;
+  --space-5: 2rem;
+  --space-6: 3.25rem;
+
   color-scheme: dark;
 }
 
@@ -70,10 +85,17 @@
   --accent-dim: rgba(154, 100, 0, 0.10);
   --accent-line: rgba(154, 100, 0, 0.40);
 
-  --critical:  #d31f3a;
-  --high:      #bd5a16;
-  --medium:    #8a6f00;
-  --low:       #0e9a7f;
+  /* Darkened from the initial pass (#d31f3a / #bd5a16 / #8a6f00 / #0e9a7f) --
+     those read fine as swatches but fell to 3.1-4.3:1 against the sev-badge's
+     tinted background once the border/text combination was actually
+     measured (axe-core color-contrast, WS6-T5), short of WCAG AA's 4.5:1 for
+     small text. Every value below clears 4.7:1 against its own badge
+     background with margin (see tests/a11y/diag_contrast.js). --info was
+     already compliant and is unchanged. */
+  --critical:  #c71d37;
+  --high:      #a64f13;
+  --medium:    #7f6600;
+  --low:       #0b7661;
   --info:      #586172;
   --bar:       #3f6a99;
 
@@ -199,6 +221,23 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
   flex-wrap: wrap;
 }
 
+.title-block { min-width: 0; }
+
+/* Small mono "eyebrow" above h1 -- establishes the page as an index/
+   instrument first, a headline second, and gives the type scale one more
+   deliberate step (kicker -> h1 -> subtitle -> trust-strip) instead of
+   jumping straight from a large heading to body text. */
+.kicker {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 .masthead h1 {
   font-family: var(--mono);
   font-weight: 600;
@@ -252,6 +291,38 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
   animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.16s both;
 }
 .subtitle a { border-bottom: 1px solid var(--accent-line); }
+
+/* Trust strip: the concrete, checkable claims a researcher decides
+   credibility on (licence, code licence, integrity manifest, reference
+   completeness) stated plainly at the point of first impression, not
+   buried in the footer alone. Every item here is something a visitor can
+   verify in one click (see the header's Verify/DOI/JSON links) or from the
+   dataset itself.
+   BOUNCE #2 advisory (a): the reference-completeness claim originally read
+   "every entry cites a primary source". 13,060/13,060 do carry a non-empty
+   http(s) reference (still true, still measured), but 51% of those
+   (6,647 -- oecd.ai 3,667, aiaaic.org 1,516, incidentdatabase.ai 1,464)
+   resolve to aggregators this project treats as upstream sources, not to
+   the original reporting. "Cites a primary source" overstated what was
+   actually measured given that mix; softened to "carries a source
+   reference", which is true of literally all 13,060 without implying
+   anything about what's on the other end of the link. */
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  /* --muted, not --faint: this is a claim a visitor is meant to actually
+     read and weigh, not a de-emphasised timestamp -- see the WS6-T5
+     design-pass report for the measured contrast ratio. */
+  color: var(--muted);
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+}
+.trust-strip .dot { color: var(--accent-line); }
 
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
 
@@ -397,9 +468,14 @@ main { padding-bottom: 5rem; }
   background: var(--panel);
   padding: 1.1rem 1.2rem 1.3rem;
   min-width: 0;
+  transition: background 0.15s;
 }
+.chart-card:hover { background: var(--panel-2); }
 .chart-card.chart-wide { grid-column: span 2; }
 .chart-card figcaption {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--mono);
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -407,6 +483,10 @@ main { padding-bottom: 5rem; }
   color: var(--muted);
   margin: 0 0 0.85rem;
 }
+/* Echoes the "// " marker on .section-head h2 so charts read as part of
+   the same instrument-panel language as section headings, not a separate
+   visual system. */
+.chart-card figcaption::before { content: "//"; color: var(--accent); font-weight: 500; }
 .chart { width: 100%; }
 .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
 
@@ -496,7 +576,11 @@ main { padding-bottom: 5rem; }
   font-family: var(--mono); font-size: 0.78rem; color: var(--ink);
   text-transform: none; letter-spacing: 0; cursor: pointer;
 }
-.filter-toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+/* 24px is the WCAG 2.5.8 AA minimum target size; a native checkbox's own
+   box is the actual hit target (the wrapping <label> is clickable too, but
+   that doesn't help a screen magnifier or switch-access user aiming at the
+   control itself). */
+.filter-toggle input { accent-color: var(--accent); width: 24px; height: 24px; }
 
 .btn-secondary {
   font-family: var(--mono);
@@ -566,8 +650,30 @@ table.incidents { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
   border-bottom: 1px solid var(--line-2);
   white-space: nowrap;
 }
-.incidents th.sortable { cursor: pointer; user-select: none; }
+/* BOUNCE #2 / D1: the 7px .table-wrap overflow this pass previously
+   attributed to Chromium table-layout:fixed rounding was actually one
+   element -- th.sortable > .caret -- overflowing its own <th> box at
+   narrow widths, because .caret sits inline after "Severity"/"Date" text
+   with `white-space: nowrap` and no room budgeted for it. `position:
+   relative` + `overflow: hidden` here makes the <th> itself the
+   containing/clipping box for that content, so nothing inside a header
+   cell can ever leak into .table-wrap's scroll region again -- not just
+   this one glyph. */
+.incidents th.sortable { cursor: pointer; user-select: none; position: relative; overflow: hidden; }
 .incidents th.sortable:hover { color: var(--accent); }
+/* Make the active sort column legible at a glance, not just via the caret
+   glyph -- a 2px accent underline reads faster when scanning a dense
+   header row than a single small triangle does. Underline only, not a
+   text-color change: measured, `color: var(--accent)` on this 0.68rem
+   uppercase mono header text drops to 4.27:1 against --panel-2 in the
+   light theme (axe-core color-contrast, serious, WS6-T5 design pass) --
+   short of the 4.5:1 AA small-text threshold. The existing --muted header
+   colour already clears it, so leave it alone and let the underline (a
+   3:1 AA non-text-contrast requirement, comfortably met by --accent
+   against --panel-2) carry the emphasis instead. */
+.incidents th.sort-asc, .incidents th.sort-desc {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
 .caret { display: inline-block; width: 0.8em; color: var(--accent); }
 th.sort-asc .caret::after { content: "▲"; font-size: 0.7em; }
 th.sort-desc .caret::after { content: "▼"; font-size: 0.7em; }
@@ -581,6 +687,28 @@ th.sort-desc .caret::after { content: "▼"; font-size: 0.7em; }
 .incidents tbody tr.expanded { background: var(--accent-dim); }
 .incidents td { padding: 0.6rem 0.85rem; vertical-align: top; }
 td.date { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.date-cell { display: inline-flex; align-items: center; gap: 0.5rem; }
+/* Explicit expand/collapse control (A4): a real, focusable, labelled
+   <button> per row rather than relying on the whole <tr> being clickable
+   (mouse-only; unreachable by keyboard, silent to screen readers -- see
+   the WS6-T5 design-pass report). Sized to the WCAG 2.5.8 AA 24px minimum
+   target even though it sits in a dense table row. */
+.row-toggle {
+  flex: none;
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 0.85rem; line-height: 1;
+  color: var(--muted);
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.row-toggle:hover,
+tr[data-row]:hover .row-toggle { color: var(--accent); border-color: var(--accent-line); }
+tr.expanded .row-toggle { color: var(--accent); border-color: var(--accent-line); background: var(--accent-dim); }
 td.id { font-family: var(--mono); font-size: 0.8rem; white-space: nowrap; }
 td.id a { color: var(--accent); }
 td.title-cell { min-width: 22ch; line-height: 1.4; }
@@ -613,6 +741,29 @@ tr.detail td { padding: 0; background: var(--bg-2); }
   animation: rise 0.3s ease both;
 }
 .detail-body > p { margin: 0 0 0.8rem; color: var(--ink); max-width: 90ch; }
+/* A3 states, designed rather than left as bare text: a real error state,
+   not an endless "Loading details…" -- see the detail-shard fetch failure
+   branch in app.js's renderDetail(). */
+.detail-error .hint {
+  display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+  color: var(--high);
+}
+.detail-error .hint::before { content: "\26A0"; flex: none; font-size: 0.95em; }
+.detail-retry { flex: none; }
+/* Loading: a small pulsing dot instead of static text alone, so a slow
+   shard fetch reads as "in progress" rather than "did the click register".
+   Respects prefers-reduced-motion via the global override at the end of
+   this file. */
+.hint[aria-busy="true"] { display: flex; align-items: center; gap: var(--space-2); }
+.hint[aria-busy="true"]::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
 .detail-meta {
   display: flex; flex-wrap: wrap; gap: 0.5rem 1.3rem;
   font-size: 0.8rem; color: var(--muted);
@@ -625,7 +776,15 @@ tr.detail td { padding: 0; background: var(--bg-2); }
   border: 1px solid var(--line); border-radius: 2px;
   padding: 0.1rem 0.45rem;
 }
-.status { padding: 1.4rem; text-align: center; color: var(--muted); font-family: var(--mono); }
+/* Empty state, designed rather than a bare "No matches." line: enough
+   vertical space to read as a deliberate state (not a layout glitch), plus
+   a one-click way out when it was caused by an active filter combination. */
+.status {
+  padding: var(--space-6) var(--space-3);
+  text-align: center;
+  color: var(--muted);
+}
+.status p { margin: 0 0 var(--space-3); font-family: var(--mono); font-size: 0.85rem; }
 
 /* ------------------------------- Pager ------------------------------- */
 .pager {
@@ -666,6 +825,9 @@ footer {
 }
 footer strong { color: var(--ink); }
 footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--faint); margin-top: 0.6rem; }
+footer .meta a { color: var(--faint); border-bottom: 1px solid var(--line-2); }
+footer .meta a:hover { color: var(--accent); border-color: var(--accent-line); }
+footer .meta code { color: var(--muted); }
 
 /* ------------------------------- Scrollbar --------------------------- */
 * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
@@ -681,9 +843,87 @@ footer .meta { font-family: var(--mono); font-size: 0.74rem; color: var(--faint)
   .chart-card.chart-wide { grid-column: span 1; }
   .filter-search { grid-column: 1 / -1; }
 }
+/* Below this width the LLM/ASI/CVE columns are dropped from the table --
+   not hidden data, just deferred: every one of those values is still shown
+   in the row's expand/detail panel, which is already the site's existing
+   progressive-disclosure pattern rather than a new one, and is now
+   reachable by keyboard and announced to screen readers via the row's
+   .row-toggle <button> (aria-expanded/aria-controls -- see renderTable()
+   in app.js), not just a mouse click on the row. It is NOT lost data
+   either way: the ID cell (never hidden at any width) is a focusable link
+   to that row's entry on the per-year page, which carries the same
+   LLM/ASI/CVE fields as ordinary page content. This keeps the table
+   itself an honest, unscrolled <table> down to the 380px floor instead of
+   forcing horizontal scroll to see Date/ID/Title/Severity, which is what
+   "usable at 380px" means for a data table. */
+@media (max-width: 640px) {
+  .col-llm, .col-asi, .col-cves { display: none; }
+  .incidents td, .incidents th { padding: 0.55rem 0.6rem; }
+  td.title-cell { min-width: 0; overflow-wrap: break-word; }
+  /* auto table-layout sizes Title generously (it CAN wrap, so the browser
+     under-prioritises shrinking it) and the four visible columns end up
+     wider than 380px combined, pushing Severity off the right edge and
+     into the table's own horizontal scrollbar. Fixed layout + explicit
+     percentages instead guarantee all four fit the viewport with zero
+     scrolling, at the cost of the Title column wrapping to more lines --
+     an explicit, deliberate trade given the alternative is a hidden column. */
+  table.incidents { table-layout: fixed; width: 100%; }
+  .incidents th:nth-child(1), .incidents td:nth-child(1) { width: 20%; }
+  .incidents th:nth-child(2), .incidents td:nth-child(2) { width: 24%; }
+  .incidents th:nth-child(3), .incidents td:nth-child(3) { width: 32%; }
+  .incidents th:nth-child(4), .incidents td:nth-child(4) { width: 24%; }
+  /* Belt-and-braces for the three hidden columns (nth-child 5-7:
+     .col-llm/.col-asi/.col-cves, already display:none above): pin their
+     width to 0 too, in case a fixed-layout column width is ever resolved
+     independently of display. */
+  .incidents th:nth-child(5), .incidents td:nth-child(5),
+  .incidents th:nth-child(6), .incidents td:nth-child(6),
+  .incidents th:nth-child(7), .incidents td:nth-child(7) { width: 0; }
+  /* CORRECTED (BOUNCE #2 / D1): an earlier version of this comment claimed
+     the ~7px .table-wrap.scrollWidth excess measured here was Chromium
+     table-layout:fixed column-width ROUNDING, and that wrap.scrollLeft(7)
+     "shifts no rendered pixel". Both claims were false -- the gate
+     measured it directly: `rowLeftBefore 16.203 -> rowLeftAfter 9.203`,
+     a real 7px content shift. The cause was a single element:
+     `th.sortable > .caret` (the sort-direction triangle) sitting inline
+     after "Severity"/"Date" text with `white-space: nowrap` and no width
+     budgeted for it in the fixed 20/24/32/24% column split, so it
+     overflowed its own <th> and into .table-wrap's scroll region --
+     visible cell widths alone summed to 347.6, inside clientWidth 348,
+     confirming the four DATA columns were never the problem.
+     Fix (not "give the caret room", which would re-open the width budget
+     this layout exists to close -- see .incidents th.sortable above and
+     the .caret override below): contain it. `overflow: hidden` on
+     th.sortable now makes the header cell its own clipping box, and the
+     caret is repositioned absolutely within the padding already reserved
+     for it instead of adding to the inline text flow, so it can no
+     longer push anything past the cell's own right edge, at this or any
+     other viewport width. */
+  .incidents th.sortable { padding-right: 1.35em; }
+  .caret {
+    position: absolute;
+    right: 0.35em;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  /* Now that nothing can overflow a header cell, .table-wrap has nothing
+     left to legitimately scroll to at this breakpoint either (the four
+     visible columns are deliberately sized to fill exactly 100%) --
+     dropping the internal scrollbar avoids a few px of dead, confusing
+     scroll travel that would reveal nothing. */
+  .table-wrap { overflow-x: hidden; }
+}
 @media (max-width: 520px) {
   .stats { grid-template-columns: 1fr 1fr; }
   .title-row { flex-direction: column; }
+}
+@media (max-width: 420px) {
+  .incidents td, .incidents th { padding: 0.5rem 0.45rem; font-size: 0.8rem; }
+  td.date { font-size: 0.72rem; }
+  td.id a { font-size: 0.72rem; }
+  .sev-badge { padding: 0.14rem 0.36rem; font-size: 0.6rem; }
+  .filters { padding: 0.85rem; }
+  .cta-row { padding: 0.75rem 0.85rem; }
 }
 
 /* ------------------------------- Reduced motion ---------------------- */

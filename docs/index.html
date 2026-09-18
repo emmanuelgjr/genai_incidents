@@ -32,7 +32,7 @@
   <!-- stats:incident_count:line -->
   <meta name="twitter:description" content="13,060 GenAI &amp; agentic-AI security incidents, mapped to four core taxonomies (OWASP LLM Top 10, OWASP Agentic, NIST AI RMF, MITRE ATLAS) plus companion and experimental frameworks.">
   <meta name="twitter:image" content="https://emmanuelgjr.github.io/genai_incidents/og-image.png">
-  <link rel="preload" href="data/incidents.min.json" as="fetch" type="application/json" crossorigin>
+  <link rel="preload" href="data/incidents.core.json" as="fetch" type="application/json" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,7 +42,10 @@
   <header class="masthead">
     <div class="wrap">
       <div class="title-row">
-        <h1>GenAI &amp; Agentic AI Security Incidents</h1>
+        <div class="title-block">
+          <p class="kicker">Open Security Research Index</p>
+          <h1>GenAI &amp; Agentic AI Security Incidents</h1>
+        </div>
         <p class="links">
           <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme">
             <svg class="ico ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
@@ -53,6 +56,7 @@
           <a href="https://pypi.org/project/genai-incidents/"><code>pip install genai-incidents</code></a>
           <a href="https://doi.org/10.5281/zenodo.20248675">DOI</a>
           <a href="data/incidents.min.json">JSON</a>
+          <a href="data/SHA256SUMS" title="SHA-256 checksums for every data file this site serves">Verify ↗</a>
         </p>
       </div>
       <p class="subtitle">
@@ -63,6 +67,12 @@
         <a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI RMF</a>, and
         <a href="https://atlas.mitre.org/">MITRE ATLAS</a> —
         plus a companion MAESTRO architectural-layer mapping and an experimental VERIS 1.4.1 crosswalk.
+      </p>
+      <p class="trust-strip">
+        <span>CC BY 4.0 data</span><span class="dot" aria-hidden="true">·</span>
+        <span>MIT code</span><span class="dot" aria-hidden="true">·</span>
+        <span>SHA-256 checksums published</span><span class="dot" aria-hidden="true">·</span>
+        <span>every entry carries a source reference</span>
       </p>
     </div>
   </header>
@@ -135,11 +145,11 @@
         </div>
         <div class="filter">
           <label for="year">Year</label>
-          <select id="year"><option value="">all</option></select>
+          <select id="year" data-filter-field="year"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="severity">Severity</label>
-          <select id="severity">
+          <select id="severity" data-filter-field="severity">
             <option value="">all</option>
             <option>Critical</option><option>High</option>
             <option>Medium</option><option>Low</option><option>Info</option>
@@ -147,27 +157,19 @@
         </div>
         <div class="filter">
           <label for="llm">OWASP LLM</label>
-          <select id="llm"><option value="">all</option></select>
+          <select id="llm" data-filter-field="owasp_llm"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="asi">OWASP ASI</label>
-          <select id="asi"><option value="">all</option></select>
+          <select id="asi" data-filter-field="owasp_asi"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="vector">Vector</label>
-          <select id="vector"><option value="">all</option></select>
-        </div>
-        <div class="filter">
-          <label for="tier">Tier</label>
-          <select id="tier">
-            <option value="">all</option>
-            <option value="landmark">landmark</option>
-            <option value="feed">feed</option>
-          </select>
+          <select id="vector" data-filter-field="attack_vector"><option value="">all</option></select>
         </div>
         <div class="filter">
           <label for="corpus">Corpus</label>
-          <select id="corpus">
+          <select id="corpus" data-filter-field="corpus">
             <option value="">all</option>
             <option value="security">security</option>
             <option value="ai-harm">ai-harm</option>
@@ -175,7 +177,7 @@
         </div>
         <div class="filter">
           <label for="quality">Quality</label>
-          <select id="quality">
+          <select id="quality" data-filter-field="quality_tier">
             <option value="">all</option>
             <option value="curated">curated</option>
             <option value="reviewed">reviewed</option>
@@ -189,7 +191,11 @@
         </div>
         <div class="filter">
           <label for="page_size">Per page</label>
-          <select id="page_size"></select>
+          <!-- data-filter-field="none": pagination control, not a data filter --
+               explicit opt-out so scripts/check_dead_filters.py's discovery
+               (every <select> in .filters) doesn't need a select to be
+               registered elsewhere to be accounted for; see that script. -->
+          <select id="page_size" data-filter-field="none"></select>
         </div>
       </div>
 
@@ -203,9 +209,9 @@
               <th>ID</th>
               <th>Title</th>
               <th data-sort="severity" class="sortable">Severity <span class="caret"></span></th>
-              <th>LLM</th>
-              <th>ASI</th>
-              <th>CVE</th>
+              <th class="col-llm">LLM</th>
+              <th class="col-asi">ASI</th>
+              <th class="col-cves">CVE</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -216,7 +222,9 @@
     </section>
   </main>
 
-  <a href="#" class="back-to-top" id="back-to-top" aria-label="back to top">↑</a>
+  <nav aria-label="page">
+    <a href="#" class="back-to-top" id="back-to-top" aria-label="back to top">↑</a>
+  </nav>
 
   <footer>
     <div class="wrap">
@@ -227,6 +235,7 @@
         Cite with DOI <a href="https://doi.org/10.5281/zenodo.20248675"><code>10.5281/zenodo.20248675</code></a>.
       </p>
       <p class="meta" id="dataset-meta"></p>
+      <p class="meta" id="integrity-note" aria-label="data integrity"></p>
     </div>
   </footer>
 

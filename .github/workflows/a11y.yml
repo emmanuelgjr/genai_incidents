@@ -1,0 +1,123 @@
+name: Site accessibility + integrity (WS6-T5)
+
+# Gates the plan's WS6-T5 acceptance criteria against a live copy of the
+# site, not a re-read of the markup:
+#   - axe-core, no critical violations (desktop + 380px viewport)
+#   - Lighthouse accessibility score >= 90
+#   - the table renders with no page-level horizontal overflow at 380px
+#   - docs/data/SHA256SUMS matches the files it publishes checksums for
+#   - no static filter control reads a field absent from the served data
+#     (the "Tier filter" defect: a control offered that can never match)
+#
+# Builds docs/data/ the same way the Pages deploy does (mirror
+# data/incidents.min.json, then scripts/gen_docs_core_data.py +
+# scripts/gen_data_integrity.py) so this is testing the same artifacts a
+# visitor would actually receive, not a hand assembled stand-in.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "data/incidents.min.json"
+      - "scripts/gen_docs_core_data.py"
+      - "scripts/gen_data_integrity.py"
+      - "scripts/check_dead_filters.py"
+      - "tests/a11y/**"
+      - ".github/workflows/a11y.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "data/incidents.min.json"
+      - "scripts/gen_docs_core_data.py"
+      - "scripts/gen_data_integrity.py"
+      - "scripts/check_dead_filters.py"
+      - "tests/a11y/**"
+      - ".github/workflows/a11y.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: tests/a11y/package-lock.json
+
+      - name: Build docs/data/ (mirror + core split + integrity manifest)
+        run: |
+          mkdir -p docs/data
+          cp data/incidents.min.json docs/data/incidents.min.json
+          python scripts/gen_docs_core_data.py
+          python scripts/gen_data_integrity.py
+
+      - name: Verify the integrity manifest matches what was just built
+        run: python scripts/verify_data_integrity.py
+
+      - name: No dead filter controls (field must exist in served data)
+        run: python scripts/check_dead_filters.py
+
+      - name: Install a11y test tooling
+        working-directory: tests/a11y
+        run: npm ci
+
+      - name: Install Chrome for Testing
+        # puppeteer-core / chrome-launcher need an actual browser binary;
+        # this repo intentionally doesn't depend on puppeteer's bundled
+        # download (blocked by allow-scripts policy in some environments --
+        # see tests/a11y/find_chrome.js), so CI installs one explicitly and
+        # points CHROME_PATH at it.
+        uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+
+      - name: Serve docs/ locally
+        run: |
+          python -m http.server 8123 --directory docs &
+          echo $! > /tmp/http-server.pid
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8123/ > /dev/null && break
+            sleep 0.5
+          done
+
+      - name: axe-core (no critical violations, desktop + 380px)
+        working-directory: tests/a11y
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: node check_axe.js http://127.0.0.1:8123/
+
+      - name: Lighthouse accessibility (>= 90)
+        working-directory: tests/a11y
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: node check_lighthouse.js http://127.0.0.1:8123/
+
+      - name: 380px layout (no page-level overflow, usable table, touch targets)
+        working-directory: tests/a11y
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: node check_narrow_viewport.js http://127.0.0.1:8123/
+
+      - name: Stop local server
+        if: always()
+        run: kill "$(cat /tmp/http-server.pid)" 2>/dev/null || true
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-reports
+          path: |
+            tests/a11y/axe-report.json
+            tests/a11y/lighthouse-a11y-report.json
+          if-no-files-found: ignore

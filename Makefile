@@ -1,4 +1,4 @@
-.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift
+.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -40,6 +40,43 @@ taxii:
 # MISP feed under docs/misp/ (Pages artifact, not committed).
 misp:
 	python scripts/export_misp.py
+
+# WS6-T5: mirror data/incidents.min.json into docs/data/ (matching the Pages
+# workflow), then split it into the trimmed core payload + lazy per-year
+# detail shards the site actually fetches. Pages artifacts, not committed
+# (see .gitignore) -- run this to reproduce docs/data/ for local testing.
+docs-data:
+	mkdir -p docs/data
+	cp data/incidents.min.json docs/data/incidents.min.json
+	python scripts/gen_docs_core_data.py
+	python scripts/gen_data_integrity.py
+
+# CI gate: docs/data/SHA256SUMS must match the files it lists and must list
+# everything served under docs/data/. Run `make docs-data` first.
+verify-docs-data:
+	python scripts/verify_data_integrity.py
+
+# CI gate (WS6-T5 design pass): fails if a static filter <select> in
+# docs/index.html (severity/corpus/quality) reads an incident field that is
+# absent from EVERY row in docs/data/incidents.core.json -- the "Tier
+# filter" defect class, where a control is offered but can never match
+# anything. Run `make docs-data` first.
+check-dead-filters: docs-data
+	python scripts/check_dead_filters.py
+
+# axe-core + Lighthouse accessibility gates + the 380px layout check
+# (WS6-T5). Requires `make docs-data`, Node, and `npm install` in
+# tests/a11y/ first; serves docs/ on :8123 for the duration of the checks.
+a11y: docs-data
+	python -m http.server 8123 --directory docs & \
+	SERVER_PID=$$!; \
+	sleep 1; \
+	( cd tests/a11y && node check_axe.js http://127.0.0.1:8123/ \
+	  && node check_lighthouse.js http://127.0.0.1:8123/ \
+	  && node check_narrow_viewport.js http://127.0.0.1:8123/ ); \
+	STATUS=$$?; \
+	kill $$SERVER_PID; \
+	exit $$STATUS
 
 # Hugging Face dataset package (dist/hf/); add --push with HF_TOKEN set to upload.
 huggingface:
