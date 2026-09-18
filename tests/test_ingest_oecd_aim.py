@@ -647,6 +647,20 @@ def test_is_numeric_slug_classifies_legacy_vs_modern():
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/256a") is False
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/256-x") is False
     assert o.is_numeric_slug("https://oecd.ai/en/incidents/x256") is False
+    # WS4-T17 BOUNCE #1 defect 2: a modern-scheme URL whose hex suffix
+    # HAPPENS TO BE all-digits (a real, plausible shape -- the hex alphabet
+    # is 0-9a-f, and any given 4-char suffix has roughly a 1-in-1600 chance
+    # of landing all-digit by chance alone). This is the ONE input that
+    # distinguishes the correct `^\d+$` regex from a hyphen-inclusive mutant
+    # such as `^[0-9-]+$`/`^[\d-]+$`: every other case in this test (a
+    # legacy slug, a real hyphenated-hex modern slug, an ambiguous partial
+    # match) reads identically under both patterns -- independently verified
+    # by direct regex comparison against all 9 cases above plus this one, in
+    # this task's report. Without this case, a mutant that starts treating
+    # ANY digit-or-hyphen string as legacy-numeric would WRONGLY skip a real
+    # modern-scheme incident -- silently dropping data -- and every test in
+    # this file would still pass.
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/2026-09-10-1234") is False
 
 
 def test_is_numeric_slug_minimal_baseline_pin():
@@ -656,18 +670,32 @@ def test_is_numeric_slug_minimal_baseline_pin():
     URLs, same expected values) -- it does not corrupt anything, and never
     did; the "fires when corrupted" name asserted a property (agreement-6
     style, hand-mutate-and-watch-it-fail evidence) that this test itself
-    does not produce. It still discriminates a real regression in
-    `is_numeric_slug()` (confirmed: fails under all three of the
-    boundary-flipping mutants `_NUMERIC_SLUG_RE` could plausibly take --
-    always-True, always-False, and hyphen-inclusive), so it is kept, not
-    deleted -- just renamed to describe what it actually is: a minimal,
-    fast, two-assertion baseline pin, redundant with the fuller test above
-    on purpose (cheap early-fail signal in a long file), not a corruption
-    exercise. The corruption exercise itself (temporarily replacing
-    `_NUMERIC_SLUG_RE` with a pattern that never matches and re-running this
-    suite) was performed by hand for WS4-T13 per working agreement 6 -- see
-    that task's report for the exact command/output -- and is not
-    re-enacted here, to avoid mutating shared module state mid-suite. See
+    does not produce. It IS still a real, discriminating test on its own
+    two assertions -- it catches an always-True or always-False rewrite of
+    `_NUMERIC_SLUG_RE` -- so it is kept, not deleted, just renamed to
+    describe what it actually is: a minimal, fast, two-assertion baseline
+    pin, redundant with the fuller test above on purpose (a cheap early-fail
+    signal in a long file), not a corruption exercise.
+
+    WS4-T17 BOUNCE #1 defect 2, corrected here: an EARLIER version of this
+    docstring additionally claimed these two assertions catch a
+    hyphen-inclusive rewrite of `_NUMERIC_SLUG_RE` (e.g. `^[0-9-]+$`). That
+    claim was FALSE and independently measured as such (this task's
+    report): both `"256"` and `"2026-09-10-1de6"` read identically under
+    the correct digits-only regex and a hyphen-inclusive one, so neither
+    THIS test nor the fuller one above it actually caught that mutant --
+    the fuller test above it now does, via one added case
+    (`"2026-09-10-1234"`, a modern-scheme URL whose hex suffix happens to be
+    all-digits). A name/docstring asserting a property the test lacks is
+    exactly what agreement 6 warns about, so the claim is corrected here
+    rather than left standing on THIS test, which still doesn't exercise
+    that case itself (by design -- it stays a minimal two-assertion pin).
+
+    The corruption exercise itself (temporarily replacing `_NUMERIC_SLUG_RE`
+    with a pattern that never matches and re-running this suite) was
+    performed by hand for WS4-T13 per working agreement 6 -- see that
+    task's report for the exact command/output -- and is not re-enacted
+    here, to avoid mutating shared module state mid-suite. See
     `test_run_skip_sampling_probe_flags_violation_when_body_shape_present`
     below for WS4-T17's OWN "prove it fires" exercise, which the reviewer
     asked for on the PROBE itself, not on `is_numeric_slug()`."""
