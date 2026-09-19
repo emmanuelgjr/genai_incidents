@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import merge_and_dedupe as m
 import validate as v
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -229,6 +230,84 @@ def test_deprecation_coverage_legacy_record_is_unverifiable_not_passing():
     # ...but check_integrity's own printed accounting (captured via capsys
     # in a real CI log) is what makes "0 checked" visible; see
     # scripts/validate.py's check_deprecation_coverage docstring.
+
+
+def test_real_resplit_redirects_match_d28_approved_targets():
+    """WS4-T21 BOUNCE #2 (the user's third requirement, quoted in the
+    ruling): "A committed test must assert this, so redirect-target
+    correctness survives the next refactor rather than resting on this
+    review." Reads the REAL, marker-verified D28 authorized list and the
+    REAL committed corpus + deprecations -- NOT a synthetic fixture (the
+    mechanism tests in tests/test_merge_and_dedupe.py cover the mechanism
+    on a 2-row fixture; this covers the DATA, which the gate proved a
+    passing fixture test does not: it repointed the real INC-08133
+    corrective record back to its pre-fix, still-live-but-wrong target
+    and got validate.py exit 0 and the full suite green).
+
+    For every `resplit_redirect` entry, asserts what its CURRENT recorded
+    `into` chain-resolves to EQUALS what its D28-approved `new_targets`
+    resolves to -- both sides via validate.py's own
+    `_resolve_live_targets`, exactly the function
+    scripts/merge_and_dedupe.py's step 8a uses (expanding any of
+    `new_targets`' own elements that are themselves a retired id through
+    ITS chain too, same as that step). Asserts the checked count is
+    exactly 8, not merely that no mismatch was found -- a loop over an
+    empty or mis-filtered list would otherwise report success vacuously.
+    Names the four chained-split cases explicitly, since that is the
+    regression shape: they regress precisely because they chain into a
+    `keep_id` survivor that only holds PART of what it used to."""
+    auth_path = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
+    auth = json.loads(auth_path.read_text(encoding="utf-8"))
+    assert m._verify_split_authorization_marker(auth, auth_path), (
+        "the committed authorized list's D28 marker must verify -- if this "
+        "fails, nothing below is a claim about an authorized transition"
+    )
+
+    data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
+    deps = json.loads(
+        (ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
+    latest = v._latest_by_from(deps)
+    into_map = {f: r.get("into") for f, r in latest.items()}
+
+    def resolve(node):
+        return v._resolve_live_targets(node, into_map, live_ids)
+
+    resplit_entries = [e for e in auth["entries"] if e.get("decision") == "resplit_redirect"]
+    assert len(resplit_entries) == 8, (
+        f"expected exactly 8 resplit_redirect entries in the authorized "
+        f"list, found {len(resplit_entries)} -- fixture/list assumption is stale"
+    )
+
+    checked = 0
+    mismatches = []
+    for entry in resplit_entries:
+        frm = entry["from"]
+        approved = entry.get("new_targets") or []
+        assert frm in latest, f"{frm} has no recorded deprecation -- corpus assumption is stale"
+        current_resolved = resolve(latest[frm].get("into"))
+        approved_resolved = resolve(approved)
+        checked += 1
+        if current_resolved != approved_resolved:
+            mismatches.append((frm, sorted(current_resolved), sorted(approved_resolved)))
+
+    # Not vacuous: the loop must actually have visited all 8, not an
+    # accidentally-empty or mis-filtered subset.
+    assert checked == 8, f"must check all 8 real inbound redirects, checked {checked}"
+    assert mismatches == [], f"redirect(s) not matching D28-approved targets: {mismatches}"
+
+    # Named on the four chained-split (BOUNCE #1 defect-1) cases
+    # specifically: each must resolve to EXACTLY its one approved id.
+    for frm, expected_single in [
+        ("INC-07771", "INC-14814"),
+        ("INC-08109", "INC-14847"),
+        ("INC-08133", "INC-14850"),
+        ("INC-08146", "INC-14853"),
+    ]:
+        assert resolve(latest[frm].get("into")) == {expected_single}, (
+            f"{frm} must resolve to exactly {{'{expected_single}'}}"
+        )
 
 
 def test_integrity_reversibility_gate_allows_landmark():
