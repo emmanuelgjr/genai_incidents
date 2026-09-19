@@ -109,6 +109,7 @@ def query(
     owasp_asi: str | None = None,
     corpus: str | None = None,
     quality_tier: str | None = None,
+    tier: str | None = None,
     has_cve: bool | None = None,
     text: str | None = None,
 ) -> Iterator[dict[str, Any]]:
@@ -118,6 +119,17 @@ def query(
     accept a single code (e.g. ``"LLM01"``) and test membership in the
     entry's list. ``text`` does a case-insensitive substring match
     against ``id`` + ``title`` + ``cve_ids`` + ``primary_reference``.
+
+    ``tier`` (``"landmark"`` / ``"feed"``) selects the notable subset the
+    project's README asks consumers to cite, and is a different axis from
+    ``quality_tier`` (vetting level) — neither substitutes for the other.
+
+    **Carry-in caveat (WS6-T9, 2026-09-18):** the packaged
+    ``incidents.min.json`` gained ``tier`` in the build code but the
+    committed copy predates that change, so ``tier=`` matches nothing until
+    the dataset is rebuilt and re-shipped. This filter is wired now, with the
+    field, rather than after — a kwarg that silently ignores an argument is
+    worse than one that is explicitly not yet populated.
     """
     filters = {
         "year": year,
@@ -127,6 +139,7 @@ def query(
         "owasp_asi": owasp_asi,
         "corpus": corpus,
         "quality_tier": quality_tier,
+        "tier": tier,
     }
     needle = text.lower().strip() if text else None
     for e in _load_raw().get("incidents", []):
