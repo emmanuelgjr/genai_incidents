@@ -43,6 +43,23 @@
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### 🗣 WHAT THE 8 AMBIGUOUS IDs MUST BE TOLD — drafting constraints for the notes fix (red-reviewer, 2026-09-20)
+
+**The inversion that makes this more than a documentation nicety:** a consumer on v2.10.0 **cannot call `resolve_id_group`, because it does not exist in the package they hold.** Normally you tell people how to translate their old identifiers *before* they move; here the translation tool only exists *after* they move. Any migration line that just says "use `resolve_id_group`" is advice the affected reader cannot take.
+
+Required, in this order:
+1. **That it happened.** The ID resolved to a live single successor under the v2.10.0 package and now returns `None`. Not "may now be a retirement record" — **it went silent.** Eight of these were already tombstones that were working fine, so **they appear in none of the "which IDs changed" lists the document currently gives** — they are invisible precisely to the reader who needs them.
+2. **That `None` here means ambiguity, not loss** — the ID has 8–100 real successors and `resolve_id` declines rather than picking one, which is the honest answer; the content is all still there. **The single most important sentence for this reader, because `None` from a resolver reads as "your data is gone" and it is not.**
+3. **Two ways to act, and the first needs no upgrade:** read `data/id_deprecations.json` directly — `into` is the full successor array, a plain JSON document joinable **without any of this project's code**. Only the second path requires upgrading.
+
+### 📐 D31 SCOPING — the patch measured before it was written (red-reviewer, 2026-09-20) [R]
+
+The gate **implemented the proposed patch itself and swept 1,056 published IDs** — every tombstoned `from` plus the five that left the live set — comparing patched against current behaviour **per-entity**, then reported before the specialist was dispatched.
+
+- **(i) Exactly 4 would newly resolve:** `INC-07771 → INC-14814` · `INC-08109 → INC-14847` · `INC-08133 → INC-14850` · `INC-08146 → INC-14853`, **all four targets live**. The other 8 stay `None` — their chains terminate on lists of 8–100 elements, so the unwrap never applies. **The patch fixes the bug and does not touch the by-design case.**
+- **(ii) Currently-resolving IDs whose answer changes: 0. Currently-resolving IDs that lose their answer: 0.** Strictly additive. **The structural reason, worth keeping:** anything that resolves today never encountered a list hop, because today a list hop returns `None` unconditionally; the patch only alters behaviour *at that hop*, so every working path is untouched **by construction — and the sweep confirms it rather than assuming it.** That is agreement 6 done properly: a structural argument *and* an independent per-entity measurement, neither leaning on the other.
+- **(iii) One published figure is invalidated — and it is not a data figure.** No corpus, deprecation, landmark or taxonomy number depends on `resolve_id`; the patch changes no data file, and the four successor targets are already live rows already inside the 13,361. **But the notes' Verification block publishes `python -m pytest -q # 459 passed, 1 xfailed` as a reproduction expectation.** Shipping the resolver fix with its regression test **makes that line stale the day it lands**, in a document whose entire credibility rests on every figure reproducing. **Promoted from advisory to a required edit in the notes-fix brief.**
+
 ### ⚖ D31 — USER RULING, 2026-09-20: **narrow code fix + disclose.** v2.11.0 carries a resolver fix, not notes alone.
 
 `resolve_id()` resolves an `into` list of **exactly one** element to that single live successor; **multi-successor records keep returning `None` as designed.** The four bugged IDs are repaired; the eight ambiguous ones keep today's behaviour but are **named in the notes** with a `resolve_id_group` migration line. Ships as **v2.11.0** with a regression test covering **all twelve**.
