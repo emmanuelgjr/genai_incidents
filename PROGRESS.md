@@ -2,6 +2,27 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🎉 D28 REMEDIATION MERGED 2026-09-20 (`8f74b035`) — **THE CORPUS IS UNFROZEN** · and ⚖ D30: cut **v2.11.0**
+
+**Published state on origin:** `incident_count` **13,361** · `landmark_count` **1,915** · `generated` **2026-09-18** · deprecations **1,060**. All four authorized IDs retired and confirmed absent from the live corpus. **The count had not moved since 2026-07-27.**
+
+**PASS (red-reviewer, 2026-09-20, on `a997ca57`) after four bounces — each with a different and progressively smaller cause, and none of the last three about the corpus.** Bounce 1: four inbound redirects landing wrong, three of them a fresh regression. Bounce 2: the committed regression test the user's ruling required was missing — proved by repointing a real record and watching `validate.py` exit 0 and 418 tests pass on a corpus carrying the defect. Bounce 3 (foreman-found): a comment asserting the very claim bounce 1 falsified, plus a duplicated chain-resolver. Bounce 4: **the merge itself produced a red `main`** — found only because the gate performed the merge rather than reading the diff.
+
+**Why the remediation existed, in the gate's own example:** with the over-merge fix alone, `INC-00311`'s military-targeting incident inherited a **Greek tax authority AI** story and `INC-00754`'s ChatGPT case inherited a **Jason Momoa deepfake scam** — the query-string bug had absorbed unrelated incidents, and the smallest-ID tie-break handed the published ID to whichever row won mechanically.
+
+**The `landmark_count` movement, decomposed per entity — this is what made it safe to publish:** **−2** retired landmark rows, **+12** new landmark rows among the 306 new IDs, **+0 / −0** existing rows flipped in either direction. **Zero existing rows changed tier.** Entirely a consequence of the authorized split, not a re-classification.
+
+**Two checks proved themselves at the moment they were built for:**
+- **WS6-T9's self-disarming tripwire fired on exactly this rebuild.** Its marker read *"Rebuilding populates `tier` and turns this XPASS → delete this marker then"*; its docstring, *"The gate disarms itself; nobody has to remember."* The remediation was that rebuild. The markers were deleted **with a dated note recording that it fired correctly**, rather than silently. The gate then broke the now-unmarked tests **six ways** and confirmed they discriminate: flipping every landmark→feed fails *only* the count test, and stripping `tier` from one variant fails *only* that variant's case.
+- **The deliberate barrier this project never had now exists:** a build-time guard aborting before any write when a previously-single published ID would newly resolve to more than one row unless authorized by a list carrying the D28 marker. **23 attack shapes, all abort**, including tamper-plus-recompute — closed by pinning the expected hash in code. **File presence authorizes nothing.**
+
+**⚖ D30 — USER RULING, 2026-09-20: cut `v2.11.0`.** A minor bump: `tier` newly ships in the distributed variants (a schema-field addition) and the corpus gained 301 rows with four permanent retirements. **Root cause the docs sweep identified: the cut checklist was never run for this merge** — `main` carried the new corpus while every version string still read 2.10.0, and the `v2.10.0` tag points at 13,060 rows with zero retirements. **Published data changed materially under an unchanged label — the E24 defect class, recurring.**
+
+**Docs sweep findings, routed:** README's "exactly one corpus row changed / refresh frozen" prose (Critical, live surface, correct in place) · no CHANGELOG entry for a 301-row change (Critical) · `DATA_DICTIONARY`'s "slim artifacts do not carry `tier` yet" (High, now false) · `v2.10.0.md` owed a **superseding dated note**, not an edit, since it is a dated record (Medium) · **`ID_POLICY.md`'s headroom table is stale input to the open WS3-T5 ruling** — measured 2026-07-27, states 992 deprecations against the actual **1,060**, and this remediation allocated ~306 new IDs (Medium, routed to schema-architect).
+
+**The sweep also recorded what it verified CLEAN, re-derived rather than re-read** — AIAAIC attribution counts exact at 1,422/1,517, six-taxonomy language consistent, no banned "TAXII endpoint" phrasing, HF card templated rather than hardcoded. Recording a clean result stops the next sweep re-checking it.
+
+
 ## 🔁 WS4-T17 — the skipped-URL sampling probe — **⛔ BOUNCE #1 (red-reviewer, 2026-09-18, on `1a0fa5a5`), fixes in flight**
 
 **Why the task exists:** WS4-T13's crawl budget skips ~1,773 legacy numeric-slug URLs per run. The rule rests on a premise — *every such page fails the body-shape check*, measured with zero exceptions — and **skipping those URLs makes the premise unobservable.** It was the one advisory that **gets worse by merging**.
