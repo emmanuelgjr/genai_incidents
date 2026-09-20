@@ -68,10 +68,16 @@ DETAIL_DIR = DOCS_DATA / "detail"
 # control (searching "reuters.com" against `main`): 3/13,060 matches on
 # `main`, 0 on the split-payload branch before this fix, 2 after
 # expanding one unrelated row. See WS6-T5 design-pass report (A2).
+#
+# `tier` is CORE, not DETAIL (WS6-T9): it is the selector for the landmark
+# subset README tells readers to cite, so it has to be in the payload that
+# the filter/stats path reads on first load -- the same reason
+# primary_reference is here. Putting it in a lazy per-year shard would
+# recreate the state-dependent-search bug above in a new place.
 CORE_FIELDS = [
     "id", "date", "year", "title", "severity", "attack_vector",
     "owasp_llm", "owasp_asi", "cve_ids", "affected", "corpus", "quality_tier",
-    "primary_reference",
+    "tier", "primary_reference",
 ]
 
 # Everything else: only read on row-expand or CSV export, so it is deferred

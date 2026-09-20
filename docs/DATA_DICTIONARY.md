@@ -9,7 +9,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 | `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json) and resolvable via the package's `resolve_id()`. |
 | `source_ids` | string[] | Upstream ids this entry was consolidated from (e.g. `AIID-1234`, `CVE-2026-…`, `ATLAS-AML.CS0001`, `AIAAIC2257`). |
 | `quality_tier` | enum | Vetting level: `curated` (hand-written/maintainer), `reviewed` (maintained catalogue, NVD-scored CVE, hand-picked, or human/assisted review), `auto` (bulk-ingested). Filter on this to control trust. |
-| `tier` | enum | **landmark** (curated, AIID-linked real-world, ai-harm, or real-world-category — the notable headline set) vs **feed** (the comprehensive CVE/GHSA/OSV stream). Cite the landmark count for headlines. |
+| `tier` | enum | **landmark** (the notable headline set) vs **feed** (the comprehensive CVE/GHSA/OSV stream). **Derived, recomputed every build** by `scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of record: `landmark` iff `quality_tier == "curated"` **OR** `aiid_id` is present **OR** `corpus == "ai-harm"`; everything else is `feed`. **Not a function of `quality_tier`** — they are different axes, and most landmark rows qualify only via `aiid_id`, so you cannot reconstruct this field from `quality_tier` (see [Reproducing the landmark count](#reproducing-the-landmark-count)). Cite the landmark count for headlines. *Corrected 2026-09-18 (WS6-T9): the previous wording also listed `category == "real-world"`, a criterion dropped from the code before #68 merged because it also tags exploited CVEs — read literally it described ~3.6x the rows the code marks. The old cross-reference to INCLUSION.md §5 was dropped for the same reason: §5 defines the split on `quality_tier`, a different and much larger set; reconciling §5 is an open maintainer item.* |
 | `confidence` | enum | Rule-derived, not opinion: **high** = `curated`/`reviewed`, OR 2+ sources with a CVE; **medium** = 2+ sources, OR has a CVE/CVSS; **low** = a single `auto` source, no CVE. |
 | `source_count` | int | Number of distinct upstream sources corroborating the entry. |
 | `source_status` | enum | **Emission status, not liveness status.** `active` (still emitted by a source this build) or `retained` (carried from a prior build after all its sources dropped it — see retain-on-drop). **`active` does not mean the upstream source is still alive or still refreshing successfully** — it means only that the entry appeared in this build's inputs, and a committed ingest snapshot re-emits its rows every build whether or not the source that produced them still exists. Freshness is a separate axis: see `source_freshness` and [Source freshness](#source-freshness) below. The two are independent — an entry can be active-and-fresh, active-and-stale, retained-and-fresh, or retained-and-stale. |
@@ -153,6 +153,48 @@ table above). Until
 the reconciliation check lands, an out-of-date registry is caught only when a
 human notices, not automatically. The counter itself is never the thing that
 ships.
+
+## Reproducing the landmark count
+
+README tells readers to cite the **landmark** count rather than the full
+corpus when they mean "notable incidents." A figure a consumer is told to
+cite must be selectable from the artifact they actually hold, so `tier` is
+carried by every variant this project distributes:
+
+| Variant | Where `tier` appears |
+|---|---|
+| `data/incidents.json` | `tier` |
+| `data/incidents.min.json` (+ the site and PyPI copies of it) | `tier` |
+| `docs/data/incidents.core.json` (site initial payload) | `tier` |
+| Hugging Face `incidents.jsonl` | `tier` |
+| `data/incidents.stix.json` / TAXII mirror | `x_tier` |
+| MISP feed | `genai-incidents:tier="…"` tag |
+| `data/stats.json` | `landmark_count` (the published total) |
+| Site CSV export (`docs/app.js`) | **not yet** — see the carry-in note below |
+
+Counting `tier == "landmark"` in any of those must give the same number as
+`data/stats.json`'s `landmark_count`. `tests/test_landmark_distribution.py`
+is the gate: it fails if a variant drops the field, and it fails if a new
+distribution producer appears without declaring what it does with `tier`.
+
+**Do not substitute `quality_tier`.** It is a vetting axis, not a notability
+axis, and it selects a different — much larger — set. Most landmark rows are
+landmark because they carry an `aiid_id`, which says nothing about
+`quality_tier`.
+
+**Carry-in status (2026-09-18).** The mechanism above is in the build code as
+of WS6-T9, but `data/` is frozen, so the *committed* slim artifacts do not
+carry `tier` yet — they gain it on the first rebuild after the freeze lifts.
+Until then the landmark count is reproducible from `data/incidents.json`,
+the Hugging Face export and the MISP feed only — measured against a full
+rebuild in a scratch tree, the rebuilt `incidents.min.json` yields
+`landmark` = the published `landmark_count` exactly, with `tier` as the only
+field the rebuild adds. The site's **CSV export** needs one further change
+(a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately sequenced
+after the rebuild so it does not ship a blank column in the meantime. The
+gate holds each remaining variant as strict-xfail, so the day one starts
+carrying the field is the day the test demands its marker be removed; see
+[`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
 ## Access
 - **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`.

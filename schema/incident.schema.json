@@ -179,8 +179,27 @@
     },
     "tier": {
       "type": "string",
-      "description": "Curated/notable `landmark` incidents vs the comprehensive vulnerability/advisory `feed` (INCLUSION.md §5). landmark = curated, AIID-linked real-world, ai-harm, or real-world-category; feed = the CVE/GHSA/OSV bulk. Cite the landmark count for headlines.",
-      "enum": ["landmark", "feed"]
+      "description": "Curated/notable `landmark` incidents vs the comprehensive vulnerability/advisory `feed`. DERIVED — recomputed from scratch on every build by `scripts/merge_and_dedupe.py::_derive_tier`, which is the only definition of record: `landmark` iff `quality_tier == \"curated\"` OR `aiid_id` is present OR `corpus == \"ai-harm\"`; everything else is `feed`. Two corrections landed here on 2026-09-18 (WS6-T9), both because this description is what README points readers to. (1) The clause `or real-world-category` was removed: the `category == \"real-world\"` criterion was dropped from the code before #68 merged, because it also tags exploited CVEs — read literally, the old wording described roughly 3.6x the rows the code actually marks, and it said so for three months. (2) The cross-reference to INCLUSION.md §5 was removed: §5 describes the split in terms of `quality_tier` (curated/reviewed vs auto), which is a DIFFERENT axis and a different set — reconciling §5's prose to this derivation is an open item for the maintainer, so until it closes this field's definition is the code, not §5. `tier` is NOT recoverable from `quality_tier`: the majority of landmark rows are landmark only by `aiid_id`, and `aiid_id` and `quality_tier` disagree by design. Because the published landmark count is the figure README tells consumers to cite, this field is carried by EVERY distributed variant — full JSON, `incidents.min.json` and its site/PyPI copies, the site core bundle, the Hugging Face export, STIX as `x_tier`, MISP as a `genai-incidents:tier` tag — so that count is reproducible from any artifact we ship, not just from the full file. `tests/test_landmark_distribution.py` is the gate on that. Cite the landmark count for headlines.",
+      "enum": ["landmark", "feed"],
+      "x-derivation": {
+        "$comment": "Machine-readable statement of the rule in the `description` above, so the published definition and `scripts/merge_and_dedupe.py::_derive_tier` can be compared by a test instead of by a reader. `tests/test_landmark_distribution.py` builds a predicate from THIS object and compares it to the real function over an exhaustive truth table, which is what makes the check bidirectional: a criterion added to the code but not here fails, and a criterion added here but not to the code fails too. Prose alone could only ever be checked for the presence of tokens, which catches a deletion and misses an addition — the direction that actually inflated this field's published definition for three months. An unknown keyword is ignored by JSON Schema validators; it annotates, it does not constrain.",
+        "producer": "scripts/merge_and_dedupe.py::_derive_tier",
+        "landmark_if_any": [
+          {"field": "quality_tier", "equals": "curated"},
+          {"field": "aiid_id", "present": true},
+          {"field": "corpus", "equals": "ai-harm"}
+        ],
+        "otherwise": "feed",
+        "retired_criteria": [
+          {
+            "field": "category",
+            "equals": "real-world",
+            "retired_in": "#68 (29273952), before merge",
+            "why": "the real-world category also tags exploited CVEs, which belong in the feed; applying it inflated landmark to 6,215 of ~11.7k rows at the time",
+            "note": "Listed so the retirement is testable rather than merely asserted: the test re-applies this criterion and requires that it would CHANGE the outcome (proving it is not vacuously retired) and that `_derive_tier` does not honour it. This clause survived in the published definition here and in DATA_DICTIONARY.md until 2026-09-18 (WS6-T9)."
+          }
+        ]
+      }
     },
     "source_count": {
       "type": "integer",
