@@ -1780,6 +1780,54 @@ def _check_split_authorization(
     raise SplitAuthorizationError("\n".join(lines))
 
 
+def resolve_live_targets(
+    node, into_map: dict, live_ids: set[str], _seen: set | None = None,
+) -> set[str]:
+    """Every LIVE id `node` (a `from` or an `into` value) transitively
+    resolves to, walking `into_map` and fanning out through list-valued
+    `into` hops (WS4-T15 `split`/`resplit` records, WS4-T21 step 8a's own
+    `resplit` corrections). Cycle-safe: a node revisited on the current
+    path contributes nothing further. Returns an empty set if `node`
+    dangles or terminates in a removal (`into: null`) without ever
+    reaching a live id.
+
+    WS4-T21 BOUNCE #3: this is the ONE canonical implementation of the
+    `from`/`into` chain walk, used by BOTH `scripts/validate.py` (which
+    imports it as `_resolve_live_targets`, e.g. `check_deprecation_coverage`
+    and `_resolves_to_live`) and step 8a below (the resplit-redirect
+    correction). Before this, the two files carried two SEPARATE, hand-kept-
+    in-sync copies of the same algorithm -- exactly the "two implementations
+    that currently agree, with nothing testing for divergence" shape the
+    WS4-T15 gate warned about for `_latest_by_from`, and precisely how the
+    `TypeError: unhashable type: 'list'` this algorithm already fixed once
+    (see the WS4-T15 spec) needed fixing in two places, not one.
+
+    Why the canonical copy lives HERE and not in validate.py: import
+    direction is fixed, not a style choice -- `validate.py` already does
+    `from merge_and_dedupe import is_out_of_scope_malware` (line ~26), so
+    `merge_and_dedupe.py` importing FROM `validate.py` would be circular.
+    The invariant both call sites must jointly preserve: **identical chain
+    resolution for identical `(node, into_map, live_ids)` inputs** --
+    validate.py's every-build integrity/coverage check and this build's
+    own resplit-redirect correction must never disagree about what a
+    deprecation chain currently resolves to. Regression-tested directly:
+    tests/test_shared_resolve_live_targets.py builds a real multi-hop,
+    list-fan-out chain and asserts `merge_and_dedupe.resolve_live_targets`
+    and `validate._resolve_live_targets` (the SAME object post-share, but
+    asserted independently so a future de-share is still caught) agree."""
+    seen = set(_seen or ())
+    if isinstance(node, list):
+        out: set[str] = set()
+        for t in node:
+            out |= resolve_live_targets(t, into_map, live_ids, seen)
+        return out
+    if node in live_ids:
+        return {node}
+    if node in seen or node not in into_map:
+        return set()
+    return resolve_live_targets(into_map[node], into_map, live_ids, seen | {node})
+
+
 def main():
     # 0) Load the previous output: timestamps, the id-by-key map (so stable
     #    INC-* IDs survive a rebuild), and the monotonic ID counter.
@@ -2065,17 +2113,35 @@ def main():
     #     id with an ARRAY-valued `into` naming every one of its actual
     #     successors (including the reassigned row) -- the shape
     #     `scripts/validate.py`'s chain-resolving guard (WS4-T15) already
-    #     supports. Deliberately does NOT touch the 8 pre-existing inbound
+    #     supports. Does NOT touch the 8 pre-existing inbound
     #     `resplit_redirect` corrections the same authorized list flags:
     #     this step's own successor list is fresh from THIS build (not the
     #     authorized list's precomputed `new_targets`, which were computed
     #     before any retirement executed and so, for 3 of the 8, still
     #     name the retiring id itself as a target -- stale the moment this
-    #     step runs). Those 8 existing `from`/`into` records are left
-    #     untouched and chain-resolve automatically through the new
-    #     records this step writes, via the same generic multi-hop
-    #     resolver (`_resolve_live_targets` in validate.py) -- verified,
-    #     not assumed; see the WS4-T21 board report.
+    #     step runs).
+    #
+    #     [WS4-T21 BOUNCE #1, dated correction] This comment used to claim
+    #     those 8 existing records "chain-resolve automatically ... via
+    #     the same generic multi-hop resolver -- verified, not assumed."
+    #     That was FALSE for four of the eight, and the verification that
+    #     produced the claim is exactly how it got through: it generalised
+    #     from `INC-08139`, one of the four that already worked, to all
+    #     eight, rather than checking each. What was actually true: the 8
+    #     records were left untouched here, THREE of them (`INC-07771`,
+    #     `INC-08109`, `INC-08133`) chained into a `keep_id` survivor that
+    #     kept its number but only PART of its old content, and a FOURTH
+    #     (`INC-08146`) chained through this step's own new records into a
+    #     retired id's FULL successor set when D28 approved it exactly one
+    #     specific successor -- all four resolved to a live id, just the
+    #     WRONG one, so `validate.py` and the full test suite both stayed
+    #     green while they were wrong (agreement 6). Step 8a, ~200 lines
+    #     below, was added in the same bounce specifically to correct
+    #     those four; the other four needed nothing. See
+    #     docs/audits/WS4-T21-delivered-delta-2026-09-18.md and
+    #     tests/test_validate.py::test_real_resplit_redirects_match_d28_approved_targets
+    #     (a committed test against the REAL corpus, not a fixture) for
+    #     what is actually verified now.
     retire_ids = _load_split_retirements(SPLIT_AUTHORIZATION_PATH)
     if retire_ids:
         retired = 0
@@ -2308,6 +2374,14 @@ def main():
     #     id through ITS chain too, exactly like the current-chain side) --
     #     write a corrective record only where the two sets actually differ.
     #     The four entries whose sets already agree get nothing appended.
+    #
+    #     Uses `resolve_live_targets` (module-level, above `main()`) -- the
+    #     SAME chain-walker `scripts/validate.py` imports as
+    #     `_resolve_live_targets` for its own every-build integrity/coverage
+    #     checks. One implementation, not two hand-kept-in-sync copies; see
+    #     that function's docstring for why the canonical copy lives in
+    #     this module (import direction) and what invariant the two call
+    #     sites must jointly preserve.
     _resplit_auth = _load_verified_split_authorization_data(SPLIT_AUTHORIZATION_PATH)
     if _resplit_auth:
         _live_ids_now = {e["id"] for e in deduped if e.get("id")}
@@ -2318,18 +2392,6 @@ def main():
                 _latest_deprec_map[_f] = _d
         _into_map = {f: r.get("into") for f, r in _latest_deprec_map.items()}
 
-        def _resolve_live(node, _seen: frozenset = frozenset()) -> set[str]:
-            if isinstance(node, list):
-                out: set[str] = set()
-                for t in node:
-                    out |= _resolve_live(t, _seen)
-                return out
-            if node in _live_ids_now:
-                return {node}
-            if node is None or node in _seen or node not in _into_map:
-                return set()
-            return _resolve_live(_into_map[node], _seen | {node})
-
         _resplit_corrected = 0
         for entry in _resplit_auth.get("entries", []):
             if entry.get("decision") != "resplit_redirect":
@@ -2338,10 +2400,11 @@ def main():
             approved = entry.get("new_targets") or []
             if not frm or not approved:
                 continue
-            approved_resolved = _resolve_live(approved)
+            approved_resolved = resolve_live_targets(approved, _into_map, _live_ids_now)
             current_rec = _latest_deprec_map.get(frm)
             current_resolved = (
-                _resolve_live(current_rec.get("into")) if current_rec else set()
+                resolve_live_targets(current_rec.get("into"), _into_map, _live_ids_now)
+                if current_rec else set()
             )
             if current_resolved == approved_resolved:
                 continue  # already correct -- nothing to append

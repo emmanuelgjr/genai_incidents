@@ -246,16 +246,29 @@ def test_real_resplit_redirects_match_d28_approved_targets():
 
     For every `resplit_redirect` entry, asserts what its CURRENT recorded
     `into` chain-resolves to EQUALS what its D28-approved `new_targets`
-    resolves to -- both sides via validate.py's own
-    `_resolve_live_targets`, exactly the function
-    scripts/merge_and_dedupe.py's step 8a uses (expanding any of
-    `new_targets`' own elements that are themselves a retired id through
-    ITS chain too, same as that step). Asserts the checked count is
-    exactly 8, not merely that no mismatch was found -- a loop over an
-    empty or mis-filtered list would otherwise report success vacuously.
-    Names the four chained-split cases explicitly, since that is the
-    regression shape: they regress precisely because they chain into a
-    `keep_id` survivor that only holds PART of what it used to."""
+    resolves to -- both sides via `v._resolve_live_targets`. Asserts the
+    checked count is exactly 8, not merely that no mismatch was found --
+    a loop over an empty or mis-filtered list would otherwise report
+    success vacuously. Names the four chained-split cases explicitly,
+    since that is the regression shape: they regress precisely because
+    they chain into a `keep_id` survivor that only holds PART of what it
+    used to.
+
+    [WS4-T21 BOUNCE #3, dated note on this test's own limit] `v._resolve_live_targets`
+    and step 8a's own resolver used to be TWO separate implementations of
+    the same algorithm, hand-kept in sync -- which meant this test asserted
+    a property of the committed DATA, but never exercised step 8a's LOGIC:
+    if the two resolvers had ever drifted apart, this test could pass
+    while the build that produced the data was wrong (the gate's own
+    observation). They are now ONE shared implementation
+    (`merge_and_dedupe.resolve_live_targets`, imported here as
+    `_resolve_live_targets` -- see that function's docstring), which
+    closes the gap for as long as they stay shared.
+    `tests/test_shared_resolve_live_targets.py` is what guards the
+    "stay shared" half: it asserts the two module attributes agree on
+    several real-shaped chains, independent of identity, so a future
+    de-share is caught there rather than silently reopening the gap this
+    note describes."""
     auth_path = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
     auth = json.loads(auth_path.read_text(encoding="utf-8"))
     assert m._verify_split_authorization_marker(auth, auth_path), (
