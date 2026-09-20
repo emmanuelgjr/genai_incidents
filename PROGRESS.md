@@ -43,6 +43,14 @@
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⚖ D31 — USER RULING, 2026-09-20: **narrow code fix + disclose.** v2.11.0 carries a resolver fix, not notes alone.
+
+`resolve_id()` resolves an `into` list of **exactly one** element to that single live successor; **multi-successor records keep returning `None` as designed.** The four bugged IDs are repaired; the eight ambiguous ones keep today's behaviour but are **named in the notes** with a `resolve_id_group` migration line. Ships as **v2.11.0** with a regression test covering **all twelve**.
+
+**Why this option and not the others.** Option "fix all 12" was rejected on the merits recorded above: choosing one of 100 successors **invents a canonical answer the data does not support** — the opposite of what the split was for. Notes-only was rejected because it knowingly ships a guard whose **own docstring justification is false** for four IDs. Holding the release was rejected because `main` already carries the new corpus under a 2.10.0 label, so the **E24 defect the cut exists to fix would stay live** while scope grew to include the nine Phase-2 ghosts.
+
+**Rider — the eight ambiguous IDs remain a known, disclosed deviation from `ID_POLICY.md` §3's "never to silence".** D31 does not resolve that; it scopes it. The honest position is that `None` for a 100-successor record is silence, and the policy sentence or the API owes a reconciliation. **Boarded as open, owner WS3** — do not let the disclosure line be read as closing it.
+
 ### ⚠ ADJUDICATION, 2026-09-20 — the foreman finding is UPHELD, the gate WITHDRAWS "zero new breaks", and the blast radius is **12 published IDs, not 4**
 
 **The gate chose a better route than the foreman's and said so.** The foreman ran today's code against old data. The gate **cloned the `v2.10.0` tag into a throwaway clone and ran the package exactly as it shipped — its own resolver against its own data** — making the comparison release-to-release rather than code-against-data. That difference is the whole finding: it surfaced four IDs the foreman's method could not have seen.
