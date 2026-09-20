@@ -43,7 +43,41 @@
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
-### 📝 `docs/ID_POLICY.md` stale-banner fix — schema-architect, `79101d81` on `ws3/headroom-remeasure` (parent `0babb2de`) — **ungated, unmerged, unpushed**
+### ⚠ ADJUDICATION, 2026-09-20 — the foreman finding is UPHELD, the gate WITHDRAWS "zero new breaks", and the blast radius is **12 published IDs, not 4**
+
+**The gate chose a better route than the foreman's and said so.** The foreman ran today's code against old data. The gate **cloned the `v2.10.0` tag into a throwaway clone and ran the package exactly as it shipped — its own resolver against its own data** — making the comparison release-to-release rather than code-against-data. That difference is the whole finding: it surfaced four IDs the foreman's method could not have seen.
+
+**The finding that decides the matter: `resolve_id_group` DID NOT EXIST at v2.10.0.** The import fails. Both it and the `isinstance(current, list)` bail were introduced together by `dcec1602` (WS4-T15), *after* the tag. **So a v2.10.0 consumer holds exactly one resolver, and it is the one that now returns `None` — "use `resolve_id_group`" is not advice they could have taken.**
+
+**v2.10.0 as shipped, all four returning a usable live single ID:** `INC-07771 → INC-01271` · `INC-08109 → INC-01412` · `INC-08133 → INC-07736` · `INC-08146 → INC-00554`. All four return `None` at `2f7bba1d`.
+
+**Sized properly rather than trusting the four already known** — all 1,051 tombstoned IDs swept through the v2.10.0 resolver, the same 1,051 through the `2f7bba1d` resolver, diffed **per-entity**:
+
+```
+REGRESSED (live single ID at v2.10.0 -> None now): 8
+  INC-00497  gave INC-00311  -> None   (group now: 12 successors)
+  INC-03128  gave INC-00754  -> None   (group now: 11)
+  INC-07771  gave INC-01271  -> None   (group now: 1 -> INC-14814)
+  INC-08109  gave INC-01412  -> None   (group now: 1 -> INC-14847)
+  INC-08133  gave INC-07736  -> None   (group now: 1 -> INC-14850)
+  INC-08139  gave INC-00554  -> None   (group now: 100)
+  INC-08146  gave INC-00554  -> None   (group now: 1 -> INC-14853)
+  INC-08185  gave INC-00554  -> None   (group now: 100)
+NEWLY-RESOLVING (None -> live): 0
+CHANGED TARGET (live -> different live): 0
+```
+
+`INC-00497`, `INC-03128`, `INC-08139`, `INC-08185` regress because they **chain through** a now-retired ID and land on a list. **Plus the four D28-retired IDs themselves**, live entries resolving to themselves at v2.10.0 and now `None` = **12 published IDs that went from a usable answer to silence.** The sweep is complete by construction: {live at v2.10.0} ∪ {tombstoned at v2.10.0} is that release's whole published universe, minus §1.4(a)'s nine ghosts, already broken.
+
+**The 12 split into two kinds and only one is a bug:**
+- **8 are ambiguous** (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897`, `INC-00497`, `INC-03128`, `INC-08139`, `INC-08185`) — 8 to 100 successors each. `None` is defensible and matches the docstring. **Still silence, which `ID_POLICY.md` forbids, and undisclosed.**
+- **4 are an outright bug** (`INC-07771`, `INC-08109`, `INC-08133`, `INC-08146`) — `resplit` `into` is a list of **exactly one live element**. `resolve_id` bails on `isinstance(current, list)` **before testing length**, so the docstring's justification — *"no single canonical successor to walk to"* — **is simply false for these four.** An unambiguous, live successor exists and is discarded. **An over-broad guard, not a design decision.**
+
+**The gate's withdrawal, in its own words:** *"So: no, you are not wrong, and I was. I told you 'this release introduces zero new breaks' and that the fix is 'purely editorial.' Both are too generous and I withdraw them."* The **data** is sound; the **shipped API** regressed, and v2.11.0 is the release that would carry it to consumers.
+
+**→ ESCALATED TO THE USER (protocol step 8): fixing `resolve_id` is a published-API behaviour change.** Notes-only vs notes-plus-code-fix is not the foreman's call. **DEFECT 2 and the advisories are still outstanding; the cut remains held.**
+
+### 📝 `docs/ID_POLICY.md` stale-banner fix — schema-architect, `79101d81` on `ws3/headroom-remeasure` (parent `0babb2de`) — **ungated, unmerged, PUSHED `0babb2de..79101d81`**
 
 Routed from today's correction 3. One file, `125 +/17 −`, tree clean, no strays, `data/`/`schema/`/code untouched. **Re-derived independently via §7.7 route A, with `data/` confirmed identical to `origin/main` @ `4861afd7`:** `live 13361 · records 1060 · distinct_dep 1056 · high_water 14910 · headroom 85089` — agrees with today's measurements and with §7.1.
 
