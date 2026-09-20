@@ -182,18 +182,21 @@ axis, and it selects a different — much larger — set. Most landmark rows are
 landmark because they carry an `aiid_id`, which says nothing about
 `quality_tier`.
 
-**Carry-in status (2026-09-18).** The mechanism above is in the build code as
-of WS6-T9, but `data/` is frozen, so the *committed* slim artifacts do not
-carry `tier` yet — they gain it on the first rebuild after the freeze lifts.
-Until then the landmark count is reproducible from `data/incidents.json`,
-the Hugging Face export and the MISP feed only — measured against a full
-rebuild in a scratch tree, the rebuilt `incidents.min.json` yields
-`landmark` = the published `landmark_count` exactly, with `tier` as the only
-field the rebuild adds. The site's **CSV export** needs one further change
-(a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately sequenced
-after the rebuild so it does not ship a blank column in the meantime. The
-gate holds each remaining variant as strict-xfail, so the day one starts
-carrying the field is the day the test demands its marker be removed; see
+**Carry-in status.** The mechanism above shipped in WS6-T9. It was held
+behind the `data/` freeze; the freeze lifted with the WS4-T21/D28 47-split
+remediation (2026-09-18), which was also the first rebuild after WS6-T9
+landed — so the *committed* slim artifacts carry `tier` now: `data/incidents.min.json`
+(and the site and PyPI copies of it), the Hugging Face export, the STIX
+bundle (as `x_tier`) and the MISP feed all carry it as of that rebuild. The
+landmark count is reproducible from any of them, not `data/incidents.json`
+alone. The site's **CSV export** is the one remaining gap — it needs one
+further change (a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately
+sequenced after the rebuild so it did not ship a blank column in the
+meantime; `tests/test_landmark_distribution.py` holds that one variant as
+strict-xfail until the change lands, so the day it starts carrying the field
+is the day the test demands its marker be removed. Every other variant's
+former strict-xfail marker was already removed when the freeze lifted, and
+the gate confirmed each fired correctly before its own deletion. See
 [`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
 ## Access

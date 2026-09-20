@@ -5,6 +5,71 @@ The dataset uses [SemVer](https://semver.org/) — major bumps for breaking
 schema or ID changes, minor bumps for additive schema fields or large
 ingest expansions, patch bumps for routine refreshes and bug fixes.
 
+## [2.11.0] — gated pre-cut; remediation merged to `main` 2026-09-18
+
+> **These notes describe a release gated but not yet cut** (board ruling
+> D30, 2026-09-20). Version strings still read `2.10.0` across the repo;
+> the data and code below are already on `main`. Full disclosure, the
+> consumer-impact section, and the re-derivation recipe for every figure:
+> [`docs/releases/v2.11.0.md`](docs/releases/v2.11.0.md).
+
+### Added
+- **`tier` now ships in every distributed variant** of the corpus, not only
+  the full `data/incidents.json`: `data/incidents.min.json` (and the site
+  and PyPI copies of it), the Hugging Face export, the STIX bundle
+  (as `x_tier`), and the MISP feed. Previously the README-cited landmark
+  count could not be reproduced from any distributed artifact except the
+  full file. A known gap remains, deliberately deferred: the site's CSV
+  export still lacks a `tier` column.
+- **A build-time authorization guard** aborts before writing whenever a
+  previously-single published ID would newly resolve to more than one row,
+  unless the write is authorized by a list carrying the D28 approval
+  marker. The board record reports 23 attack shapes tried at gate review,
+  all aborting, including tamper-plus-recompute (closed by pinning the
+  expected hash in code); the committed regression suite covers 9 of those
+  shapes directly (see the release notes for the count re-derived from
+  what's committed vs. the board's broader figure). File presence alone
+  authorizes nothing.
+
+### Fixed — the 47-split remediation (D28, 2026-09-18)
+- **Fixed a query-string URL over-merge in `normalize_url()`** that had been
+  silently collapsing unrelated incidents together under a single shared
+  published ID whenever their source URLs differed only by query string.
+  Concretely: `INC-00311`'s military-targeting incident had absorbed an
+  unrelated Greek tax-authority AI story, and `INC-00754`'s ChatGPT case had
+  absorbed an unrelated Jason Momoa deepfake-scam story.
+- **Executed the previously-deferred unmerge the fix enables**, authorized
+  by the user as D28 after review of per-split evidence
+  (`docs/audits/WS4-T19-authorized-splits-2026-09-18.json`, 55 entries):
+  - **13,060 → 13,361 entries (+301).**
+  - **43 published IDs keep their identity** (`keep_id` splits).
+  - **4 published IDs permanently retired** — `INC-00311`, `INC-00554`,
+    `INC-00754`, `INC-01897` — because the row that had been mechanically
+    inheriting the old ID was not its real successor.
+  - **8 existing inbound redirects corrected** so they resolve to the
+    D28-authorized successor set (4 needed new `id_deprecations.json`
+    records; 4 already chain-resolved correctly once the 4 retirements
+    above were in place).
+  - **Every retired ID still resolves** through
+    [`data/id_deprecations.json`](data/id_deprecations.json)
+    (1,051 → 1,060 records, **+9**, append-only under invariant 9). No
+    citation of any ID this project has ever published breaks.
+  - **`landmark_count` 1,905 → 1,915 (+10)**, entirely a consequence of the
+    split, not a re-classification: **−2** retired landmark rows, **+12**
+    new landmark rows among the 306 new IDs, **0** existing rows flipped
+    tier in either direction.
+  - **`generated` moves to 2026-09-18**; the weekly refresh is unblocked for
+    the first time since 2026-07-27, when a since-fixed CI persistence bug
+    and then the D25(a) freeze had kept it dead or blocked.
+- Full field-level delta:
+  [`docs/audits/WS4-T21-delivered-delta-2026-09-18.md`](docs/audits/WS4-T21-delivered-delta-2026-09-18.md).
+
+### Consumer impact
+Anyone holding v2.10.0 or earlier has a corpus where `INC-00311`,
+`INC-00554`, `INC-00754`, and `INC-01897` point at content that is not
+theirs. Anyone joining on incident IDs across versions must re-resolve
+through `data/id_deprecations.json`.
+
 ## [2.10.0] — 2026-09-18
 
 ### Changed (breaking for consumers of `owasp_llm`)
