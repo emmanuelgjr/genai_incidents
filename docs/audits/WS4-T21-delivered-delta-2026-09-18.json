@@ -1,0 +1,165 @@
+{
+  "measured_against": "origin/main (13,060 rows) vs this branch HEAD rebuild (13,361 rows)",
+  "entry_count": {
+    "pre": 13060,
+    "post": 13361,
+    "delta": 301
+  },
+  "id_set": {
+    "removed_from_active": [
+      "INC-00311",
+      "INC-00554",
+      "INC-00754",
+      "INC-01897",
+      "INC-07738"
+    ],
+    "added_count": 306,
+    "common_count": 13055
+  },
+  "deprecations": {
+    "pre": 1051,
+    "post": 1060,
+    "delta": 9
+  },
+  "field_change_counts_common_ids": {
+    "updated": 43,
+    "source_ids": 43,
+    "source_count": 43,
+    "last_seen": 43,
+    "references": 43,
+    "mitre_atlas": 28,
+    "nist_ai_rmf": 27,
+    "mitre_atlas_tactics": 26,
+    "owasp_asi": 26,
+    "owasp_llm": 25,
+    "severity": 22,
+    "cve_ids": 10,
+    "cwe_ids": 8,
+    "capec_ids": 8,
+    "tags": 8,
+    "cvss_vector": 2,
+    "confidence": 1,
+    "attack_vector": 1
+  },
+  "severity_changes": [
+    {
+      "id": "INC-00134",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-00774",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-00861",
+      "before": "Critical",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-00891",
+      "before": "Critical",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-01054",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-01221",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-01269",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-01271",
+      "before": "Critical",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-01412",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-01535",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-01791",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-05013",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-06264",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-06329",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-06527",
+      "before": "Critical",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-06558",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-06729",
+      "before": "Critical",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-06896",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-07688",
+      "before": "Medium",
+      "after": "Low"
+    },
+    {
+      "id": "INC-11452",
+      "before": "Critical",
+      "after": "High"
+    },
+    {
+      "id": "INC-12064",
+      "before": "High",
+      "after": "Medium"
+    },
+    {
+      "id": "INC-12120",
+      "before": "High",
+      "after": "Medium"
+    }
+  ],
+  "reference_urls_corpus_wide": {
+    "gained": 377,
+    "lost": 0
+  },
+  "landmark_count": {
+    "pre": 1905,
+    "post": 1915,
+    "delta": 10
+  }
+}

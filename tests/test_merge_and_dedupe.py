@@ -5,6 +5,8 @@ from __future__ import annotations
 import datetime
 import json as _json
 
+import pytest
+
 import merge_and_dedupe as m
 
 
@@ -420,6 +422,17 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # WS4-T10 build guard: this harness deliberately builds from a
+    # from-scratch tmp corpus with no legacy_consolidated.json, which is
+    # exactly the shape main() otherwise refuses to build from silently
+    # (see test_missing_legacy_consolidated_fails_loudly). Opt in via the
+    # same env var a real standalone run would need.
+    monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
+    # WS4-T19: point the split-authorization guard at a tmp, normally
+    # nonexistent file so tests never read the real, committed
+    # docs/audits/WS4-T19-authorized-splits-*.json -- a test that WANTS a
+    # populated allowlist writes to this path itself.
+    monkeypatch.setattr(m, "SPLIT_AUTHORIZATION_PATH", data / "split_authorization.json")
     return data, ingest
 
 
@@ -1850,3 +1863,503 @@ def test_oecd_attribution_removed_would_fail_the_stability_test(tmp_path, monkey
     requirement."""
     import inspect
     assert "_apply_oecd_attribution" in inspect.getsource(m._apply_history)
+
+
+# ---------------------------------------------------------------------------
+# WS4-T10 build guard: merge_and_dedupe.py must fail loudly, not silently
+# skip the legacy corpus, when data/legacy_consolidated.json is missing.
+# This is exactly the failure mode that produced the E21 tripwire audit's
+# first (wrong) rebuild delta -- run standalone without parse_existing.py
+# first, the corpus came out 5,675 rows short with fabricated severity
+# regressions (docs/audits/E21-tripwire-refresh-2026-09-14.md Finding 3).
+# ---------------------------------------------------------------------------
+
+def test_missing_legacy_consolidated_fails_loudly(tmp_path, monkeypatch):
+    data = tmp_path / "data"
+    ingest = tmp_path / "ingest"
+    data.mkdir()
+    ingest.mkdir()
+    monkeypatch.setattr(m, "DATA", data)
+    monkeypatch.setattr(m, "INGEST", ingest)
+    monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
+    monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
+    monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
+    # No legacy_consolidated.json written into `data` -- the real-world
+    # mistake of running merge_and_dedupe.py standalone (skipping
+    # `python scripts/parse_existing.py`, which regenerates that gitignored
+    # file -- see `make merge` / Makefile:11-13).
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    try:
+        m.main()
+    except SystemExit as exc:
+        assert "legacy_consolidated.json" in str(exc)
+        assert "parse_existing.py" in str(exc)
+    else:
+        raise AssertionError(
+            "main() must refuse to build silently when "
+            "data/legacy_consolidated.json is missing"
+        )
+    assert not (data / "incidents.json").exists(), \
+        "no output should be written on the guard's fatal path"
+
+
+def test_missing_legacy_consolidated_opt_out_still_builds(tmp_path, monkeypatch):
+    """The explicit opt-out (MERGE_ALLOW_MISSING_LEGACY=1) is what every
+    other test in this file relies on via _setup_tmp_repo -- confirm it
+    actually lets a legacy-free build proceed, rather than merely silencing
+    the guard's exception without exercising the accepted path."""
+    data = tmp_path / "data"
+    ingest = tmp_path / "ingest"
+    data.mkdir()
+    ingest.mkdir()
+    monkeypatch.setattr(m, "DATA", data)
+    monkeypatch.setattr(m, "INGEST", ingest)
+    monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
+    monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
+    monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    m.main()
+    assert (data / "incidents.json").exists()
+
+
+# --- WS4-T19: split pre-authorization guard --------------------------------
+
+def _entry_with_url(sid, title, url):
+    e = _oecd_entry(sid, title)
+    e["references"] = [{"url": url}]
+    return e
+
+
+def _seed_prior_merged_row(data, old_id, source_ids, title="Distinct Incident"):
+    """Hand-write data/incidents.json with ONE previously-published row
+    whose `source_ids` covers everything in `source_ids` -- i.e. the state
+    a buggy over-merge would have committed. Using a high, hand-picked
+    `old_id` (not one m.main() would allocate) keeps this independent of
+    the real, committed data/issue88_remediation.json exclude list, whose
+    low numeric ids (e.g. INC-00004) a freshly-counted id could otherwise
+    collide with."""
+    row = m.normalize_entry(_entry_with_url(
+        source_ids[0], title, "https://example.com/prior-merged"
+    ))
+    row["source_ids"] = list(source_ids)
+    row["id"] = old_id
+    row["added"] = row["updated"] = "2026-01-01"
+    data.mkdir(parents=True, exist_ok=True)
+    (data / "incidents.json").write_text(_json.dumps(
+        {"incidents": [row], "incident_count": 1}
+    ), encoding="utf-8")
+
+
+def _induce_a_split(tmp_path, monkeypatch):
+    """Seed a corpus where two source_ids already co-reside under ONE
+    published id (simulating a committed over-merge), then run a build
+    where those same two source_ids' reference URLs no longer bridge --
+    the exact shape of WS4-T10's fix: a previously-single id whose member
+    keys now resolve to >1 row. Returns (data_dir, old_id) with the ingest
+    already staged for the splitting build (not yet run)."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    old_id = "INC-90001"
+    _seed_prior_merged_row(data, old_id, ["OECD-AIM-X", "OECD-AIM-Y"])
+
+    # The splitting build: same two source_ids, but now their reference
+    # URLs are DISTINCT and don't bridge -- the dedupe key that used to
+    # unite them is gone, so they split into two rows this time.
+    (ingest / "src.json").write_text(_json.dumps([
+        _entry_with_url("OECD-AIM-X", "Distinct Incident X", "https://example.com/x-story"),
+        _entry_with_url("OECD-AIM-Y", "Distinct Incident Y", "https://example.com/y-story"),
+    ]), encoding="utf-8")
+    return data, old_id
+
+
+def test_split_guard_fires_with_empty_authorization_list(tmp_path, monkeypatch):
+    """Name the input that makes it fail (working agreement 6): a build
+    whose own dedupe would split a previously-single published id's member
+    keys across >1 new row, with NOTHING on the authorization list. Proves
+    the guard fires against a real (if small, fabricated) split -- not
+    merely that it exists."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    before = (data / "incidents.json").read_text(encoding="utf-8")
+
+    with pytest.raises(m.SplitAuthorizationError) as excinfo:
+        m.main()
+    assert old_id in str(excinfo.value)
+
+    # No output written: the file is byte-identical to build 1's output.
+    after = (data / "incidents.json").read_text(encoding="utf-8")
+    assert before == after, "guard must abort BEFORE any output write"
+
+
+def _write_authorized_split_file(path, entries, decision="D28", monkeypatch=None):
+    """Write a split_authorization.json with a VALID marker (WS4-T21/D28)
+    for the given entries, using the module's own hash function so tests
+    stay correct if the canonicalization ever changes. `decision` is a
+    parameter so tests can also write a deliberately WRONG marker.
+
+    WS4-T21 BOUNCE #1 (advisory A1): the guard also pins
+    `REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256` in code against the
+    REAL, committed 55-entry D28 list -- a synthetic test fixture's hash
+    never matches that constant. When `monkeypatch` is passed, this also
+    patches the pinned constant to match THIS fixture's own entries, so a
+    test can still exercise "marker is otherwise fully valid" without
+    depending on the real committed list's content. Tests that want the
+    pin itself to be the failure point simply omit `monkeypatch`."""
+    data = {"entries": entries}
+    data["authorization"] = {
+        "decision": decision,
+        "decided": "2026-09-18",
+        "decided_by": "test",
+        "entries_sha256": m._entries_sha256(entries),
+    }
+    path.write_text(_json.dumps(data), encoding="utf-8")
+    if monkeypatch is not None:
+        monkeypatch.setattr(
+            m, "REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256", m._entries_sha256(entries)
+        )
+
+
+def test_split_guard_fires_when_authorization_list_is_missing_this_pair(tmp_path, monkeypatch):
+    """A partially-correct authorization list (authorizing some OTHER id,
+    not the one that actually split) must still abort -- proves the guard
+    checks per-id, not just 'is the list non-empty'."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": "INC-99999", "reason": "unrelated"}],
+        monkeypatch=monkeypatch,
+    )
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_passes_once_the_pair_is_authorized(tmp_path, monkeypatch):
+    """The other half of 'name the input that makes it fail': add the
+    correct (from, reason) pair AND a valid D28 marker, and the SAME
+    transition proceeds and writes output."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    entries = [{"from": old_id, "reason": "test-authorized-split"}]
+    _write_authorized_split_file(data / "split_authorization.json", entries, monkeypatch=monkeypatch)
+
+    m.main()  # must NOT raise
+    second = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    assert second["incident_count"] == 2, "the authorized split must actually land"
+    srcs = {s for e in second["incidents"] for s in e["source_ids"]}
+    assert {"OECD-AIM-X", "OECD-AIM-Y"} <= srcs
+
+
+# --- WS4-T21 / D28: the authorization marker itself must be required,
+# not just the entries -- a guard satisfied by file-presence alone is not
+# a guard. Each test below names one input that must make the guard fail
+# even though the (from, reason) entry is entirely correct.
+
+def test_split_guard_fires_on_unmarked_list_even_with_correct_entry(tmp_path, monkeypatch):
+    """An authorization list with the right `from` entry but NO
+    `authorization` marker at all must still abort -- file presence is
+    not consent."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    (data / "split_authorization.json").write_text(_json.dumps({
+        "entries": [{"from": old_id, "reason": "test-authorized-split"}]
+        # deliberately no "authorization" key
+    }), encoding="utf-8")
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_fires_on_marker_naming_wrong_decision(tmp_path, monkeypatch):
+    """A marker naming a DIFFERENT board decision (not D28) must abort,
+    even with the right entry and a correct hash."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-authorized-split"}],
+        decision="D25",
+    )
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_fires_when_entries_diverge_from_the_marked_hash(tmp_path, monkeypatch):
+    """Entries edited (here: an extra entry appended) after the marker's
+    entries_sha256 was computed must abort -- the marker only vouches for
+    the exact entries it hashed."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    hashed_entries = [{"from": old_id, "reason": "test-authorized-split"}]
+    tampered_entries = hashed_entries + [{"from": "INC-99999", "reason": "snuck-in"}]
+    authorization = {
+        "decision": "D28",
+        "decided": "2026-09-18",
+        "decided_by": "test",
+        "entries_sha256": m._entries_sha256(hashed_entries),  # stale
+    }
+    (data / "split_authorization.json").write_text(_json.dumps({
+        "entries": tampered_entries,
+        "authorization": authorization,
+    }), encoding="utf-8")
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_fires_on_tamper_plus_recompute_the_hash(tmp_path, monkeypatch):
+    """WS4-T21 BOUNCE #1 advisory A1: the ONE attack shape the
+    self-consistency check alone (entries_sha256 vs its own entries)
+    could not catch -- tamper the entries AND rewrite entries_sha256 to
+    match the tampered entries. The marker is then internally
+    self-consistent (indistinguishable, from the file alone, from a
+    legitimate re-ruling), so this must abort via the PINNED code
+    constant, not the self-consistency check. Deliberately does NOT pass
+    `monkeypatch` to `_write_authorized_split_file` -- patching the pin
+    to match would defeat the very thing this test proves closed."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    entries = [{"from": old_id, "reason": "test-authorized-split"}]
+    # A fully self-consistent marker: entries_sha256 correctly hashes
+    # THESE entries. Still must fail, because it doesn't match the
+    # REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256 pinned in code.
+    _write_authorized_split_file(data / "split_authorization.json", entries)
+    assert m._entries_sha256(entries) != m.REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256, \
+        "test fixture collided with the real pinned hash -- pick different entries"
+
+    with pytest.raises(m.SplitAuthorizationError):
+        m.main()
+
+
+def test_split_guard_ignores_ordinary_merges_and_retention(tmp_path, monkeypatch):
+    """The guard must not fire on the ordinary, already-tested shapes
+    (a ordinary merge of two NEW entries, or a retained prior) -- only on a
+    previously-single id's own member keys landing on >1 row."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    (ingest / "src.json").write_text(_json.dumps([
+        _oecd_entry("OECD-AIM-A", "Incident A"),
+        _oecd_entry("OECD-AIM-B", "Incident B"),
+    ]), encoding="utf-8")
+    m.main()  # must not raise
+    (ingest / "src.json").write_text(_json.dumps([
+        _oecd_entry("OECD-AIM-A", "Incident A"),
+    ]), encoding="utf-8")
+    m.main()  # B retained, must not raise
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    assert out["incident_count"] == 2
+
+
+def test_split_guard_reports_every_unauthorized_id_not_just_the_first(tmp_path, monkeypatch):
+    """A guard that stops at the first unauthorized id could be satisfied
+    by authorizing only one of several real splits and silently missing
+    the rest. THREE independent splits, only one authorized: must still
+    abort, and must name BOTH remaining unauthorized ids in the message.
+
+    Regression-proven, not merely asserted (BOUNCE #1 defect 1): with only
+    two splits (one authorized, one not), the message necessarily contains
+    exactly one unauthorized id, so a mutant that truncates the report to
+    `unauthorized[:1]` (the exact defect this test is named for) still
+    passes -- there is nothing for `[:1]` to drop. With three splits and
+    only one authorized, TWO must be named; `[:1]` reporting only one of
+    them makes this test fail. Confirmed by hand: patching
+    `_check_split_authorization` to `for old_id in sorted(unauthorized)[:1]:`
+    fails this test (only one of old_id_2/old_id_3 present) while leaving
+    the OTHER four split-guard tests green."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    # THREE independent previously-merged rows (hand-seeded, high ids --
+    # see _seed_prior_merged_row for why real ids are avoided).
+    old_id_1, old_id_2, old_id_3 = "INC-90001", "INC-95001", "INC-97001"
+    row1 = m.normalize_entry(_entry_with_url(
+        "OECD-AIM-X", "Incident X", "https://example.com/prior-merged-1"
+    ))
+    row1["source_ids"] = ["OECD-AIM-X", "OECD-AIM-Y"]
+    row1["id"] = old_id_1
+    row1["added"] = row1["updated"] = "2026-01-01"
+    row2 = m.normalize_entry(_entry_with_url(
+        "OECD-AIM-P", "Incident P", "https://example.com/prior-merged-2"
+    ))
+    row2["source_ids"] = ["OECD-AIM-P", "OECD-AIM-Q"]
+    row2["id"] = old_id_2
+    row2["added"] = row2["updated"] = "2026-01-01"
+    row3 = m.normalize_entry(_entry_with_url(
+        "OECD-AIM-M", "Incident M", "https://example.com/prior-merged-3"
+    ))
+    row3["source_ids"] = ["OECD-AIM-M", "OECD-AIM-N"]
+    row3["id"] = old_id_3
+    row3["added"] = row3["updated"] = "2026-01-01"
+    data.mkdir(parents=True, exist_ok=True)
+    (data / "incidents.json").write_text(_json.dumps(
+        {"incidents": [row1, row2, row3], "incident_count": 3}
+    ), encoding="utf-8")
+
+    (ingest / "src.json").write_text(_json.dumps([
+        _entry_with_url("OECD-AIM-X", "Incident X", "https://example.com/x-story"),
+        _entry_with_url("OECD-AIM-Y", "Incident Y", "https://example.com/y-story"),
+        _entry_with_url("OECD-AIM-P", "Incident P", "https://example.com/p-story"),
+        _entry_with_url("OECD-AIM-Q", "Incident Q", "https://example.com/q-story"),
+        _entry_with_url("OECD-AIM-M", "Incident M", "https://example.com/m-story"),
+        _entry_with_url("OECD-AIM-N", "Incident N", "https://example.com/n-story"),
+    ]), encoding="utf-8")
+    # Only authorize the FIRST split, not the second or third. Uses a
+    # VALID D28 marker (pin patched to match, so marker verification
+    # itself succeeds) so the abort below is attributable to the missing
+    # entries, not to marker verification failing first.
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id_1, "reason": "test-authorized-split"}],
+        monkeypatch=monkeypatch,
+    )
+
+    with pytest.raises(m.SplitAuthorizationError) as excinfo:
+        m.main()
+    msg = str(excinfo.value)
+    detail = msg.split("Unauthorized split(s) detected", 1)[1]
+    assert old_id_2 in detail, "the unauthorized second split must be named"
+    assert old_id_3 in detail, "the unauthorized third split must be named"
+    assert old_id_1 not in detail, "the authorized first split must NOT be listed as unauthorized"
+
+
+# --- WS4-T21 / D28: retirement execution (decision: "retire") --------------
+# docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2: "no survivor keeps
+# the old id" for an authorized retirement -- the ordinary id-continuity
+# tie-break (smallest previous id wins) must be overridden, the old id
+# minted a fresh replacement, and a NEW `reason: "split"` deprecation
+# record written with an array-valued `into` naming every successor.
+
+def test_retirement_reassigns_the_old_id_and_writes_a_split_record(tmp_path, monkeypatch):
+    """Name the input that makes it fail (agreement 6): an authorized
+    "retire" decision whose old id the ordinary tie-break would otherwise
+    keep. Must end with the old id NOT live, a fresh id holding what the
+    tie-break originally gave the old id, and a `reason: "split"` record
+    naming both successors."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-retire", "decision": "retire"}],
+        monkeypatch=monkeypatch,
+    )
+
+    m.main()  # must NOT raise -- retirement is authorized, not unauthorized
+
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    live_ids = {e["id"] for e in out["incidents"]}
+    assert old_id not in live_ids, "no survivor may keep a retired id"
+    assert out["incident_count"] == 2, "both successors still land, just under fresh ids"
+
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    rec = next(d for d in deps if d["from"] == old_id)
+    assert rec["reason"] == "split"
+    assert isinstance(rec["into"], list) and len(rec["into"]) == 2
+    assert old_id not in rec["into"], "the retired id must not name itself as its own successor"
+    assert set(rec["into"]) <= live_ids, "every named successor must actually be live"
+
+
+def test_resplit_redirect_correction_fires_when_existing_record_is_wrong(tmp_path, monkeypatch):
+    """WS4-T21 BOUNCE #1 defect 1: name the input that makes it fail
+    (agreement 6) -- a pre-existing inbound redirect that already
+    resolves to a LIVE id, but not the one D28 actually approved for it.
+    Real shape: three of the eight inbound redirects chained into a
+    keep_id survivor holding only PART of what the inbound id used to
+    represent, and one fanned out through a retired id's FULL successor
+    set when D28 approved a single specific one. Two-phase: build once to
+    learn which fresh id the ordinary split mints for the second
+    successor (deterministic in this tiny fixture, but not assumed --
+    read back from the actual output), then authorize a resplit_redirect
+    entry naming THAT id as the correct target for a pre-existing inbound
+    redirect currently pointing at the OTHER (keep_id) successor, and
+    rebuild."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+    inbound_id = "INC-80001"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+
+    m.main()  # phase 1: ordinary split, old_id keeps X (keep_id)
+
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    fresh_id = next(e["id"] for e in out["incidents"] if e["source_ids"] == ["OECD-AIM-Y"])
+    assert fresh_id != old_id, "the second successor must have gotten a different id"
+
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [fresh_id]},
+        ],
+        monkeypatch=monkeypatch,
+    )
+
+    m.main()  # phase 2: must correct the inbound redirect
+
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    latest = {d["from"]: d for d in deps}
+    rec = latest[inbound_id]
+    assert rec["into"] == [fresh_id], f"expected corrected redirect to [{fresh_id}], got {rec}"
+    assert rec["reason"] == "resplit"
+    # The stale original record must still be present too (invariant 9 --
+    # append-only, never edited in place).
+    assert any(
+        d["from"] == inbound_id and d.get("into") == old_id and d.get("reason") == "merged"
+        for d in deps
+    ), "the original (now-superseded) record must remain, untouched"
+
+
+def test_resplit_redirect_correction_is_a_noop_when_already_correct(tmp_path, monkeypatch):
+    """Control: a pre-existing inbound redirect whose approved
+    new_targets ALREADY matches what it resolves to today must get NO new
+    record -- the mechanism only corrects real mismatches (four of the
+    eight real inbound redirects needed nothing; this proves the
+    mechanism doesn't append redundant records for those)."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    inbound_id = "INC-80002"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [old_id]},  # already correct today
+        ],
+        monkeypatch=monkeypatch,
+    )
+
+    m.main()
+
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    assert sum(1 for d in deps if d["from"] == inbound_id) == 1, \
+        "an already-correct resplit_redirect entry must not append a redundant record"
+
+
+def test_keep_id_decision_does_not_trigger_retirement(tmp_path, monkeypatch):
+    """Control: the SAME induced split, authorized as "keep_id" (the
+    default/ordinary decision), must NOT retire the old id -- the old id
+    stays live under the ordinary tie-break, exactly as the five
+    pre-existing split-guard tests already assume."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+
+    m.main()  # must NOT raise
+
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    live_ids = {e["id"] for e in out["incidents"]}
+    assert old_id in live_ids, "a keep_id decision must leave the old id live"
+
+    dep_path = data / "id_deprecations.json"
+    deps = (
+        _json.loads(dep_path.read_text(encoding="utf-8"))["deprecations"]
+        if dep_path.exists() else []
+    )
+    assert not any(d["from"] == old_id and d["reason"] == "split" for d in deps), \
+        "a keep_id decision must not write a retirement 'split' record"

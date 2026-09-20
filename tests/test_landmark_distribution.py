@@ -268,6 +268,14 @@ def _mixed_corpus():
 def rebuilt(tmp_path, monkeypatch):
     data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
     (ingest / "src.json").write_text(json.dumps(_mixed_corpus()), encoding="utf-8")
+    # WS4-T21 BOUNCE #4: this fixture builds a tmp corpus from ingest/
+    # alone -- exactly the shape WS4-T10's legacy_consolidated.json build
+    # guard (merge_and_dedupe.py) exists to catch, and it fires here on
+    # every run without this opt-in. The guard's own message prescribes
+    # the fix: "If this is deliberate (e.g. a test harness building its
+    # own tmp corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1."
+    # This fixture predates that guard; it is deliberate.
+    monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
     m.main()
     full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))["incidents"]
     slim = json.loads((data / "incidents.min.json").read_text(encoding="utf-8"))["incidents"]
@@ -594,16 +602,28 @@ def test_csv_columns_reference_no_field_the_payload_cannot_supply():
 
 
 # ---------------------------------------------------------------------------
-# 4. The committed artifacts -- strict-xfail until the D25(a) freeze lifts
+# 4. The committed artifacts -- WERE strict-xfail until the D25(a) freeze
+#    lifted; both markers are now deleted, per their own text.
 # ---------------------------------------------------------------------------
 #
 # These assert the property consumers actually experience: the files in this
-# repository, as shipped. They fail today because `data/` is frozen and the
-# slim artifacts predate the builder change above. They are NOT skipped -- a
+# repository, as shipped. They fail while `data/` is frozen and the slim
+# artifacts predate the builder change above. They were NOT skipped -- a
 # skipped test is a check that cannot fail, which is the failure shape this
-# project keeps producing. `strict=True` means that when the first post-freeze
-# rebuild lands and these start passing, pytest reports XPASS as a FAILURE and
-# forces the marker's removal. The gate re-arms itself.
+# project keeps producing. `strict=True` meant that when the first
+# post-freeze rebuild landed and these started passing, pytest would report
+# XPASS as a FAILURE and force the marker's removal. The gate rearmed itself.
+#
+# [WS4-T21 BOUNCE #4, dated 2026-09-19] It fired correctly, at the moment it
+# was built for. WS4-T21's own rebuild (the D28-authorized 47-split
+# remediation, merged with WS6-T9 while WS4-T21 was in review) is the first
+# post-freeze rebuild: `tier` is now populated on all 13,361 rows, both
+# markers below turned XPASS under `strict=True`, and per their own reason
+# text -- "Rebuilding populates `tier` and turns this XPASS -> delete this
+# marker then" -- both markers are deleted here, and the two tests they
+# guarded are now committed as ordinary passing assertions on the shipped
+# artifacts. Nobody had to remember to do this by prose alone; the tripwire
+# is what forced it.
 
 _SHIPPED_SLIM = [
     ROOT / "data" / "incidents.min.json",
@@ -613,24 +633,12 @@ _SHIPPED_SLIM = [
 
 
 @pytest.mark.parametrize("path", _SHIPPED_SLIM, ids=lambda p: p.parent.as_posix()[-24:])
-@pytest.mark.xfail(
-    strict=True,
-    reason="D25(a): data/ is frozen, so the committed slim artifacts predate "
-           "the WS6-T9 builder change. Rebuilding populates `tier` and turns "
-           "this XPASS -> delete this marker then (see "
-           "docs/specs/WS6-T9-landmark-distribution-2026-09-18.md).",
-)
 def test_shipped_slim_variants_carry_tier(path):
     rows = json.loads(path.read_text(encoding="utf-8"))["incidents"]
     assert rows
     assert all(r.get("tier") in ("landmark", "feed") for r in rows)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="D25(a): same freeze. The shipped landmark count becomes "
-           "reproducible from the slim file on the first rebuild.",
-)
 def test_shipped_landmark_count_reproducible_from_min_json():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.min.json").read_text(encoding="utf-8"))["incidents"]

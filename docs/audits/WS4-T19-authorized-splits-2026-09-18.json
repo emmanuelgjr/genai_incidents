@@ -1,0 +1,1036 @@
+{
+  "$schema_note": "PROPOSED list, not applied. D25(b): the user rules on this list; no code executes an unmerge from it in this task.",
+  "generated": "2026-09-18",
+  "transition": "WS4-T10 normalize_url query-string over-merge fix -- one-time 47-split + 8-inbound-redirect remediation",
+  "status": "PROPOSED",
+  "authorization": {
+    "$note": "WS4-T21 / dated 2026-09-18. Added AFTER the ruling below, as a distinct edit from this file's original PROPOSED commit -- the $schema_note and status fields above are preserved as-written (agreement 4: specs/audits are records, not rewritten) and describe this list's state before the ruling. This object is what scripts/merge_and_dedupe.py::_check_split_authorization actually requires (REQUIRED_SPLIT_AUTHORIZATION_DECISION): file presence alone does not authorize anything.",
+    "decision": "D28",
+    "decided": "2026-09-18",
+    "decided_by": "user",
+    "board_record": "PROGRESS.md, board decision D28 (\"USER APPROVES THE 47-SPLIT REMEDIATION, 2026-09-18\")",
+    "approved": "All 55 entries below exactly as committed: the 43 keep-id splits, the 4 retirements (INC-00311, INC-00554, INC-00754, INC-01897), and the 8 inbound redirect corrections. Three successor-pair questions (INC-14745/INC-14871, INC-14808/INC-14838, the Mythos pair) were explicitly NOT part of this authorization and remain routed to WS4-T5.",
+    "entries_sha256": "873c29a2b999335f9f1703510bbfec301028ae6ad6cb21a1d2a4e3db99654a4f"
+  },
+  "counts": {
+    "splits_total": 47,
+    "splits_keep_id": 43,
+    "splits_retire": 4,
+    "inbound_resplit_corrections": 8
+  },
+  "entries": [
+    {
+      "from": "INC-00128",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Google's FLoC AI Ad Tracking Raises Privacy and Discrimination Concerns, Prompting Industry Pushback",
+      "split_into": 5,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "solidot.org/story"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00134",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "City of Zhuzhou in Hunan Suspended Hellobike Robotaxi Service After Vehicle Struck Two Pedestrians",
+      "split_into": 22,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "app.myzaker.com/news/article.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00311",
+      "reason": "split_continuity_breaks_retire",
+      "decision": "retire",
+      "eventual_deprecation_reason": "split",
+      "old_title": "AI-Driven Military Targeting Causes Mass Casualties in Middle East Conflicts",
+      "split_into": 12,
+      "survivor_title_continuity": false,
+      "bridging_url_keys": [
+        "bankingnews.gr/index.php",
+        "ikypros.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00477",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Generated Images Used in Fraudulent 'Case Fixing' Scheme in Vietnam",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "xaluannews.com/modules.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00554",
+      "reason": "split_continuity_breaks_retire",
+      "decision": "retire",
+      "eventual_deprecation_reason": "split",
+      "old_title": "Tesla Driver Reportedly Said Driver-Assistance Mode Was Engaged During Fatal Texas Home Crash",
+      "split_into": 100,
+      "survivor_title_continuity": false,
+      "bridging_url_keys": [
+        "asiatoday.co.kr/kn/view.php",
+        "bikorea.net/news/articleview.html",
+        "bizwnews.com/news/articleview.html",
+        "busan.com/view/busan/view.php",
+        "businesspost.co.kr/bp",
+        "daily.hankooki.com/news/articleview.html",
+        "digitaltoday.co.kr/news/articleview.html",
+        "ebn.co.kr/news/articleview.html",
+        "econonews.co.kr/news/articleview.html",
+        "ekn.kr/web/view.php",
+        "enewstoday.co.kr/news/articleview.html",
+        "fortunekorea.co.kr/news/articleview.html",
+        "go.seoul.co.kr/news/newsview.php",
+        "goodkyung.com/news/articleview.html",
+        "gukjenews.com/news/articleview.html",
+        "hellot.net/news/article.html",
+        "ikld.kr/news/articleview.html",
+        "it.chosun.com/news/articleview.html",
+        "jeonpa.co.kr/news/articleview.html",
+        "kgnews.co.kr/news/article.html",
+        "kmib.co.kr/article/view.asp",
+        "knnews.co.kr/news/articleview.php",
+        "kookje.co.kr/news2011/asp/newsbody.asp",
+        "kr.acrofan.com/detail.php",
+        "m-i.kr/news/articleview.html",
+        "naewoeilbo.com/news/articleview.html",
+        "newsfreezone.co.kr/news/articleview.html",
+        "newstomato.com/readnews.aspx",
+        "pinpointnews.co.kr/news/articleview.html",
+        "pointdaily.co.kr/news/articleview.html",
+        "seoulfn.com/news/articleview.html",
+        "shinailbo.co.kr/news/articleview.html",
+        "sisajournal.com/news/articleview.html",
+        "smartbizn.com/news/articleview.html",
+        "widedaily.com/news/articleview.html",
+        "wowtv.co.kr/newscenter/news/read"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00620",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Anthropic's Mythos AI Model Sparks Global Cybersecurity and Financial System Fears",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "moneydj.com/kmdj/news/newsviewer.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00623",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "French Army Tests Boston Dynamics' Spot Robot in Combat Training, Revealing Operational Risks",
+      "split_into": 4,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "journaldugeek.com",
+        "presse-citron.net"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00679",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Generated Fake Crime Scene Image Causes Public Misinformation in Romania",
+      "split_into": 5,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "cotidianul.ro"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00754",
+      "reason": "split_continuity_breaks_retire",
+      "decision": "retire",
+      "eventual_deprecation_reason": "split",
+      "old_title": "ChatGPT Was Alleged to Have Aided Planning of Florida State University Mass Shooting",
+      "split_into": 11,
+      "survivor_title_continuity": false,
+      "bridging_url_keys": [
+        "index.hr/clanak.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00774",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "China Removes 39,000 Accounts for AI-Generated Harmful Content During Spring Festival",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "hkcna.hk/docdetail.jsp"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00861",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Purported AI-Generated Advertisements Reportedly Falsely Depicted Lee Ji-hye Endorsing Food and Clothing Products",
+      "split_into": 31,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "etnet.com.hk/www/tc/news/home_categorized_news_detail.php",
+        "ettvamerica.com/news",
+        "setn.com/news.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00891",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Cloned Image of Peter Obi Used in N230 Million Forex Scam in Lagos",
+      "split_into": 8,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "punchng.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00927",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Turkish Armed Drone Operation Neutralizes Six in Bitlis",
+      "split_into": 7,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "shorouknews.com/news/view.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00964",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "New York Lawmakers Propose Ban on Armed Police Robots Amid AI Safety Concerns",
+      "split_into": 4,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "tolerance.ca/articleext.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01054",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Frontier AI Models Exhibit Peer-Preservation, Defy Shutdown Orders",
+      "split_into": 4,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "propakistani.pk"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01192",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "In its design for automatic terminal command execution, AI Code offers two options: Execute safe commands and execute all commands.",
+      "split_into": 4,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "marketplace.visualstudio.com/items"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01221",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "India and Israel Advance AI-Enabled Missile Defense Collaboration",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "newsx.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01269",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Powered CT Diagnostics Aid COVID-19 Detection and Mitigate False Negatives in China",
+      "split_into": 5,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "baijiahao.baidu.com/s"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01271",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "EU Investigates X's Grok AI for Generating and Spreading Sexual Deepfake Images",
+      "split_into": 12,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "jiji.com/jc/article"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01412",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Meta Sued Over AI-Enhanced Fraudulent Ads on Facebook and Instagram",
+      "split_into": 6,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "01net.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01535",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI Hiring Tools Lead to Discriminatory Outcomes in US Recruitment",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "lexology.com/library/detail.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01664",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Chinese AI Startup Publishes Satellite Intelligence on US Military in Middle East",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "home.nzcity.co.nz/news/article.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01696",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Purported AI-Generated War Footage Reportedly Circulated Widely Online During the Opening Phase of the War in Iran",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "technosports.co.in"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01787",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "South Korean Authorities Crack Down on AI-Generated Fake News Ahead of Local Elections",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "obsnews.co.kr/news/articleview.html"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01791",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "SpaceX and xAI Pursue AI-Driven Military Drones and Lunar AI Satellite Factories",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "data.eastmoney.com/report/zw_industry.jshtml"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-01897",
+      "reason": "split_continuity_breaks_retire",
+      "decision": "retire",
+      "eventual_deprecation_reason": "split",
+      "old_title": "The Tag, Category, and Taxonomy Manager – AI Autotagger with OpenAI plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on ...",
+      "split_into": 8,
+      "survivor_title_continuity": false,
+      "bridging_url_keys": [
+        "plugins.trac.wordpress.org/changeset"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-02590",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "ForcedLeak — Salesforce Agentforce indirect prompt injection exfiltrates CRM data",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "help.salesforce.com/s/articleview"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-02671",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Grok Reportedly Generated and Distributed Nonconsensual Sexualized Images of Adults and Minors in X Replies",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "unternehmen-heute.de/news.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-05013",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Enabled TruDi Navigation System Was Alleged to Have Contributed to Patient's Stroke During June 2022 Sinus Procedure",
+      "split_into": 11,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "gizmodo.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-05663",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Google Ads AI Enabled Discrimination Against Nonbinary Users",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "brudirect.com/news.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06264",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI Uses Smartphone Data to Predict Schizophrenia Relapses",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "studyfinds.org"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06329",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "AI-Powered Workplace Harassment Detection Raises Privacy and Trust Concerns",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "assawsana.com/portal/pages.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06518",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Dutch Court Rules AI Welfare Fraud Detection System Violates Human Rights",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "ohchr.org/fr/newsevents/pages/displaynews.aspx"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06527",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Elon Musk's Neuralink Plans Human Brain Implant Within a Year",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "b92.net/tehnopolis/vesti.php",
+        "vesti-online.com"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06558",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Facebook Bans Israeli AI Firm for Subconscious Manipulation of Users",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "marebpress.net/news_details.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06729",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Israel Deploys AI-Driven Technology to Detect Hezbollah Tunnels on Lebanon Border",
+      "split_into": 5,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "alahednews.com.lb/article.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06778",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Mexican Government Plans Nationwide Biometric Data Collection Using AI Systems",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "xeu.mx/nota.cfm"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-06896",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Russian Railways Begin Testing AI-Equipped Trains to Reduce Human Error",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "sana.sy"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-07224",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "ProofPoint Evasion",
+      "split_into": 7,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "youtube.com/watch"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-07657",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Cobbler vulnerable to code injection via unsafe YAML loading",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "bugzilla.novell.com/show_bug.cgi"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-07688",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Unspecified vulnerability in the Resource Manager component in Oracle Database 10.1.0.5, 10.2.0.4, and 11.1.0.6, and Database Control in Enterprise Manager, has unknown impact a...",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "h20000.www2.hp.com/bizsupport/techsupport/document.jsp"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-07736",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Korean Chatbot Luda Reportedly Made Offensive Remarks Towards Minority Groups in South Korea",
+      "split_into": 17,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "bernama.com/en/news.php",
+        "koreaherald.com/view.php",
+        "nampa.org/index.php",
+        "world.kbs.co.kr/service/news_view.htm"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-11452",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Apache Ivy External Entity Reference vulnerability",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "gitbox.apache.org/repos/asf"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-11831",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Apache JSPWiki CSRF due to crafted invocation on the Image plugin",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "jspwiki-wiki.apache.org/wiki.jsp"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-12064",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "phpBB Cross-Site Request Forgery (CSRF)",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "phpbb.com/community/viewtopic.php"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-12120",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "phpMyAdmin Cross-site Scripting vulnerability",
+      "split_into": 3,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "phpmyadmin.git.sourceforge.net/git/gitweb.cgi"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-12180",
+      "reason": "split_continuity_holds_keep_id",
+      "decision": "keep_id",
+      "eventual_deprecation_reason": null,
+      "old_title": "Cross-site Scripting in Apache ActiveMQ",
+      "split_into": 2,
+      "survivor_title_continuity": true,
+      "bridging_url_keys": [
+        "issues.apache.org/jira/secure/releasenote.jspa"
+      ],
+      "judgement": "distinct",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-00497",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "Greek Tax Authority Plans AI System to Combat Tax Evasion",
+      "current_recorded_chain": [
+        "INC-00497",
+        "INC-00311"
+      ],
+      "current_recorded_final_target": "INC-00311",
+      "new_targets": [
+        "INC-00311",
+        "INC-14660",
+        "INC-14698",
+        "INC-14789",
+        "INC-14816",
+        "INC-14862",
+        "INC-14878",
+        "INC-14901"
+      ],
+      "new_targets_count": 8,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-03128",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "Purportedly AI-Generated Jason Momoa Deepfake Used in Romance Scam Reportedly Defrauding British Widow of $600,000",
+      "current_recorded_chain": [
+        "INC-03128",
+        "INC-00754"
+      ],
+      "current_recorded_final_target": "INC-00754",
+      "new_targets": [
+        "INC-00754",
+        "INC-14608",
+        "INC-14661",
+        "INC-14684",
+        "INC-14692",
+        "INC-14694",
+        "INC-14696",
+        "INC-14724",
+        "INC-14764"
+      ],
+      "new_targets_count": 9,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-07771",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "Japan Considers Financial System Shutdowns to Counter AI-Driven Cyberattack Risks",
+      "current_recorded_chain": [
+        "INC-07771",
+        "INC-01271"
+      ],
+      "current_recorded_final_target": "INC-01271",
+      "new_targets": [
+        "INC-14814"
+      ],
+      "new_targets_count": 1,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-08109",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "Meta Secretly Embeds Facial Recognition in Smart Glasses App, Raising Privacy Concerns",
+      "current_recorded_chain": [
+        "INC-08109",
+        "INC-01412"
+      ],
+      "current_recorded_final_target": "INC-01412",
+      "new_targets": [
+        "INC-14847"
+      ],
+      "new_targets_count": 1,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-08133",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "AI Robots Cause Harm and Raise Rights Concerns in China and Beyond",
+      "current_recorded_chain": [
+        "INC-08133",
+        "INC-07736"
+      ],
+      "current_recorded_final_target": "INC-07736",
+      "new_targets": [
+        "INC-14850"
+      ],
+      "new_targets_count": 1,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-08139",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "China Deploys Armed AI 'Wolf Robots' in Urban Combat Training",
+      "current_recorded_chain": [
+        "INC-08139",
+        "INC-00554"
+      ],
+      "current_recorded_final_target": "INC-00554",
+      "new_targets": [
+        "INC-00554",
+        "INC-14607",
+        "INC-14683",
+        "INC-14691",
+        "INC-14693",
+        "INC-14695",
+        "INC-14700",
+        "INC-14702",
+        "INC-14703",
+        "INC-14704",
+        "INC-14705",
+        "INC-14706",
+        "INC-14707",
+        "INC-14708",
+        "INC-14710",
+        "INC-14717",
+        "INC-14718",
+        "INC-14719",
+        "INC-14725",
+        "INC-14728",
+        "INC-14734",
+        "INC-14741",
+        "INC-14742",
+        "INC-14745",
+        "INC-14748",
+        "INC-14750",
+        "INC-14751",
+        "INC-14760",
+        "INC-14761",
+        "INC-14762",
+        "INC-14763",
+        "INC-14766",
+        "INC-14768",
+        "INC-14772",
+        "INC-14776",
+        "INC-14778",
+        "INC-14779",
+        "INC-14782",
+        "INC-14788",
+        "INC-14791",
+        "INC-14797",
+        "INC-14798",
+        "INC-14799",
+        "INC-14800",
+        "INC-14803",
+        "INC-14804",
+        "INC-14807",
+        "INC-14808",
+        "INC-14809",
+        "INC-14821",
+        "INC-14823",
+        "INC-14828",
+        "INC-14832",
+        "INC-14834",
+        "INC-14838",
+        "INC-14840",
+        "INC-14842",
+        "INC-14844",
+        "INC-14845",
+        "INC-14848",
+        "INC-14849",
+        "INC-14851",
+        "INC-14852",
+        "INC-14853",
+        "INC-14854",
+        "INC-14857",
+        "INC-14858",
+        "INC-14859",
+        "INC-14860",
+        "INC-14861",
+        "INC-14863",
+        "INC-14864",
+        "INC-14865",
+        "INC-14868",
+        "INC-14870",
+        "INC-14871",
+        "INC-14872",
+        "INC-14873",
+        "INC-14874",
+        "INC-14876",
+        "INC-14877",
+        "INC-14879",
+        "INC-14880",
+        "INC-14881",
+        "INC-14882",
+        "INC-14884",
+        "INC-14886",
+        "INC-14887",
+        "INC-14888",
+        "INC-14889"
+      ],
+      "new_targets_count": 90,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-08146",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "SWM.AI and Lenovo Collaborate on Advanced Robo-Taxi AI Platform in Seoul",
+      "current_recorded_chain": [
+        "INC-08146",
+        "INC-08139",
+        "INC-00554"
+      ],
+      "current_recorded_final_target": "INC-00554",
+      "new_targets": [
+        "INC-14853"
+      ],
+      "new_targets_count": 1,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    },
+    {
+      "from": "INC-08185",
+      "reason": "inbound_resplit_correction",
+      "decision": "resplit_redirect",
+      "eventual_deprecation_reason": "resplit",
+      "recovered_title": "China Deploys Armed AI 'Wolf Robots' in Urban Combat Training",
+      "current_recorded_chain": [
+        "INC-08185",
+        "INC-08139",
+        "INC-00554"
+      ],
+      "current_recorded_final_target": "INC-00554",
+      "new_targets": [
+        "INC-00554",
+        "INC-14607",
+        "INC-14683",
+        "INC-14691",
+        "INC-14693",
+        "INC-14695",
+        "INC-14700",
+        "INC-14702",
+        "INC-14703",
+        "INC-14704",
+        "INC-14705",
+        "INC-14706",
+        "INC-14707",
+        "INC-14708",
+        "INC-14710",
+        "INC-14717",
+        "INC-14718",
+        "INC-14719",
+        "INC-14725",
+        "INC-14728",
+        "INC-14734",
+        "INC-14741",
+        "INC-14742",
+        "INC-14745",
+        "INC-14748",
+        "INC-14750",
+        "INC-14751",
+        "INC-14760",
+        "INC-14761",
+        "INC-14762",
+        "INC-14763",
+        "INC-14766",
+        "INC-14768",
+        "INC-14772",
+        "INC-14776",
+        "INC-14778",
+        "INC-14779",
+        "INC-14782",
+        "INC-14788",
+        "INC-14791",
+        "INC-14797",
+        "INC-14798",
+        "INC-14799",
+        "INC-14800",
+        "INC-14803",
+        "INC-14804",
+        "INC-14807",
+        "INC-14808",
+        "INC-14809",
+        "INC-14821",
+        "INC-14823",
+        "INC-14828",
+        "INC-14832",
+        "INC-14834",
+        "INC-14838",
+        "INC-14840",
+        "INC-14842",
+        "INC-14844",
+        "INC-14845",
+        "INC-14848",
+        "INC-14849",
+        "INC-14851",
+        "INC-14854"
+      ],
+      "new_targets_count": 63,
+      "judgement": "wrong_after_fix",
+      "judgement_confidence": "confident"
+    }
+  ]
+}

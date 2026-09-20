@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import merge_and_dedupe as m
 import validate as v
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -172,24 +173,48 @@ def test_deprecation_coverage_resolves_a_chain_not_the_literal_into():
 def test_deprecation_coverage_resolves_a_real_committed_chain():
     # Prove it on a real committed chain, not only a synthetic one
     # (BOUNCE defect 2's explicit ask). `data/id_deprecations.json` has a
-    # genuine 3-hop chain today: INC-08146 -> INC-08139 -> INC-00554
-    # (live). Read-only: this test never writes to data/.
+    # genuine chain today: INC-08185 -> INC-08139 -> INC-00554 -> [100 live
+    # successors] -- INC-00554 was ITSELF retired (WS4-T21/D28: "no
+    # survivor keeps the old id" for a continuity-breaking split), so the
+    # chain is 4 hops deep, and the resolvable live end is any one of
+    # INC-00554's own successors, not INC-00554 itself.
+    #
+    # [WS4-T21 BOUNCE #1, dated note] The ORIGINAL fixture id here was
+    # INC-08146, which chained the SAME way before this bounce's defect-1
+    # fix: it turned out D28 approved INC-08146 a single, SPECIFIC
+    # successor (INC-14853), not the full 100-way fan-out this multi-hop
+    # chain produces -- exactly the bug the fix corrects, by giving
+    # INC-08146 its own direct, single-target record. Using INC-08146
+    # here after that fix would have locked the wrong resolution in as
+    # "expected" (the gate's advisory A2). INC-08185 is a DIFFERENT one of
+    # the same 8 inbound redirects, confirmed still genuinely multi-hop
+    # post-fix (D28 approved it the full fan-out, matching what this
+    # chain already produces -- see docs/audits/WS4-T19-authorized-splits-2026-09-18.json).
+    # Read-only: this test never writes to data/.
     data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
     real_deps = json.loads(
         (ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8")
     )["deprecations"]
-    live_end = next(e for e in data["incidents"] if e["id"] == "INC-00554")
-    a_real_source_the_chain_end_holds = live_end["source_ids"][0]
+    live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
+    latest = v._latest_by_from(real_deps)
+    into_map = {f: r.get("into") for f, r in latest.items()}
+    assert "INC-08185" in latest, "fixture assumption (INC-08185 is a recorded redirect) is stale -- update it"
+    resolved = v._resolve_live_targets(latest["INC-08185"].get("into"), into_map, live_ids)
+    assert len(resolved) > 1, "fixture assumption (INC-08185 chains to MULTIPLE live ids) is stale -- update it"
+    id_to_sources = {e["id"]: e.get("source_ids") or [] for e in data["incidents"]}
+    a_real_source_a_chain_end_holds = next(
+        s for t in sorted(resolved) for s in id_to_sources.get(t, []) if s
+    )
     deps = [dict(d) for d in real_deps]
     found = False
     for d in deps:
-        if d.get("from") == "INC-08146":
-            d["retired_source_ids"] = [a_real_source_the_chain_end_holds]
+        if d.get("from") == "INC-08185":
+            d["retired_source_ids"] = [a_real_source_a_chain_end_holds]
             found = True
-    assert found, "fixture assumption (INC-08146 chains to INC-00554) is stale -- update it"
+    assert found, "fixture assumption (INC-08185 chains to INC-08139) is stale -- update it"
     problems = v.check_deprecation_coverage(data, deps)
     assert problems == [], (
-        f"the real INC-08146 -> INC-08139 -> INC-00554 chain must resolve: {problems}"
+        f"the real INC-08185 -> INC-08139 -> INC-00554 -> [...] chain must resolve: {problems}"
     )
 
 
@@ -205,6 +230,97 @@ def test_deprecation_coverage_legacy_record_is_unverifiable_not_passing():
     # ...but check_integrity's own printed accounting (captured via capsys
     # in a real CI log) is what makes "0 checked" visible; see
     # scripts/validate.py's check_deprecation_coverage docstring.
+
+
+def test_real_resplit_redirects_match_d28_approved_targets():
+    """WS4-T21 BOUNCE #2 (the user's third requirement, quoted in the
+    ruling): "A committed test must assert this, so redirect-target
+    correctness survives the next refactor rather than resting on this
+    review." Reads the REAL, marker-verified D28 authorized list and the
+    REAL committed corpus + deprecations -- NOT a synthetic fixture (the
+    mechanism tests in tests/test_merge_and_dedupe.py cover the mechanism
+    on a 2-row fixture; this covers the DATA, which the gate proved a
+    passing fixture test does not: it repointed the real INC-08133
+    corrective record back to its pre-fix, still-live-but-wrong target
+    and got validate.py exit 0 and the full suite green).
+
+    For every `resplit_redirect` entry, asserts what its CURRENT recorded
+    `into` chain-resolves to EQUALS what its D28-approved `new_targets`
+    resolves to -- both sides via `v._resolve_live_targets`. Asserts the
+    checked count is exactly 8, not merely that no mismatch was found --
+    a loop over an empty or mis-filtered list would otherwise report
+    success vacuously. Names the four chained-split cases explicitly,
+    since that is the regression shape: they regress precisely because
+    they chain into a `keep_id` survivor that only holds PART of what it
+    used to.
+
+    [WS4-T21 BOUNCE #3, dated note on this test's own limit] `v._resolve_live_targets`
+    and step 8a's own resolver used to be TWO separate implementations of
+    the same algorithm, hand-kept in sync -- which meant this test asserted
+    a property of the committed DATA, but never exercised step 8a's LOGIC:
+    if the two resolvers had ever drifted apart, this test could pass
+    while the build that produced the data was wrong (the gate's own
+    observation). They are now ONE shared implementation
+    (`merge_and_dedupe.resolve_live_targets`, imported here as
+    `_resolve_live_targets` -- see that function's docstring), which
+    closes the gap for as long as they stay shared.
+    `tests/test_shared_resolve_live_targets.py` is what guards the
+    "stay shared" half: it asserts the two module attributes agree on
+    several real-shaped chains, independent of identity, so a future
+    de-share is caught there rather than silently reopening the gap this
+    note describes."""
+    auth_path = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
+    auth = json.loads(auth_path.read_text(encoding="utf-8"))
+    assert m._verify_split_authorization_marker(auth, auth_path), (
+        "the committed authorized list's D28 marker must verify -- if this "
+        "fails, nothing below is a claim about an authorized transition"
+    )
+
+    data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
+    deps = json.loads(
+        (ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8")
+    )["deprecations"]
+    live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
+    latest = v._latest_by_from(deps)
+    into_map = {f: r.get("into") for f, r in latest.items()}
+
+    def resolve(node):
+        return v._resolve_live_targets(node, into_map, live_ids)
+
+    resplit_entries = [e for e in auth["entries"] if e.get("decision") == "resplit_redirect"]
+    assert len(resplit_entries) == 8, (
+        f"expected exactly 8 resplit_redirect entries in the authorized "
+        f"list, found {len(resplit_entries)} -- fixture/list assumption is stale"
+    )
+
+    checked = 0
+    mismatches = []
+    for entry in resplit_entries:
+        frm = entry["from"]
+        approved = entry.get("new_targets") or []
+        assert frm in latest, f"{frm} has no recorded deprecation -- corpus assumption is stale"
+        current_resolved = resolve(latest[frm].get("into"))
+        approved_resolved = resolve(approved)
+        checked += 1
+        if current_resolved != approved_resolved:
+            mismatches.append((frm, sorted(current_resolved), sorted(approved_resolved)))
+
+    # Not vacuous: the loop must actually have visited all 8, not an
+    # accidentally-empty or mis-filtered subset.
+    assert checked == 8, f"must check all 8 real inbound redirects, checked {checked}"
+    assert mismatches == [], f"redirect(s) not matching D28-approved targets: {mismatches}"
+
+    # Named on the four chained-split (BOUNCE #1 defect-1) cases
+    # specifically: each must resolve to EXACTLY its one approved id.
+    for frm, expected_single in [
+        ("INC-07771", "INC-14814"),
+        ("INC-08109", "INC-14847"),
+        ("INC-08133", "INC-14850"),
+        ("INC-08146", "INC-14853"),
+    ]:
+        assert resolve(latest[frm].get("into")) == {expected_single}, (
+            f"{frm} must resolve to exactly {{'{expected_single}'}}"
+        )
 
 
 def test_integrity_reversibility_gate_allows_landmark():

@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 240" role="img" aria-label="Incidents per year, 1983–2026" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="11">
 <rect x="0" y="0" width="100%" height="100%" fill="white"/>
-<text x="44" y="18" font-weight="600">Incidents per year (13,060 total)</text>
+<text x="44" y="18" font-weight="600">Incidents per year (13,361 total)</text>
 <line x1="44" y1="30.0" x2="748" y2="30.0" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="33.0" text-anchor="end" fill="#666">5,401</text>
+<text x="38" y="33.0" text-anchor="end" fill="#666">5,630</text>
 <line x1="44" y1="64.8" x2="748" y2="64.8" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="67.8" text-anchor="end" fill="#666">4,320</text>
+<text x="38" y="67.8" text-anchor="end" fill="#666">4,504</text>
 <line x1="44" y1="99.6" x2="748" y2="99.6" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="102.6" text-anchor="end" fill="#666">3,240</text>
+<text x="38" y="102.6" text-anchor="end" fill="#666">3,378</text>
 <line x1="44" y1="134.4" x2="748" y2="134.4" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="137.4" text-anchor="end" fill="#666">2,160</text>
+<text x="38" y="137.4" text-anchor="end" fill="#666">2,252</text>
 <line x1="44" y1="169.2" x2="748" y2="169.2" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="172.2" text-anchor="end" fill="#666">1,080</text>
+<text x="38" y="172.2" text-anchor="end" fill="#666">1,126</text>
 <line x1="44" y1="204.0" x2="748" y2="204.0" stroke="#e5e5e5" stroke-width="1"/>
 <text x="38" y="207.0" text-anchor="end" fill="#666">0</text>
 <rect x="46.3" y="204.0" width="18.2" height="0.0" fill="#0a58ca" rx="1"><title>1983: 1</title></rect>
@@ -31,34 +31,34 @@
 <rect x="250.7" y="203.9" width="18.2" height="0.1" fill="#0a58ca" rx="1"><title>2005: 2</title></rect>
 <rect x="273.4" y="203.9" width="18.2" height="0.1" fill="#0a58ca" rx="1"><title>2006: 3</title></rect>
 <text x="282.5" y="218" text-anchor="middle" fill="#666">2006</text>
-<rect x="296.1" y="203.7" width="18.2" height="0.3" fill="#0a58ca" rx="1"><title>2007: 9</title></rect>
-<rect x="318.8" y="203.7" width="18.2" height="0.3" fill="#0a58ca" rx="1"><title>2008: 8</title></rect>
+<rect x="296.1" y="203.7" width="18.2" height="0.3" fill="#0a58ca" rx="1"><title>2007: 10</title></rect>
+<rect x="318.8" y="203.8" width="18.2" height="0.2" fill="#0a58ca" rx="1"><title>2008: 8</title></rect>
 <text x="327.9" y="218" text-anchor="middle" fill="#666">2008</text>
 <rect x="341.5" y="203.6" width="18.2" height="0.4" fill="#0a58ca" rx="1"><title>2009: 13</title></rect>
 <rect x="364.2" y="203.8" width="18.2" height="0.2" fill="#0a58ca" rx="1"><title>2010: 7</title></rect>
 <text x="373.3" y="218" text-anchor="middle" fill="#666">2010</text>
-<rect x="386.9" y="203.7" width="18.2" height="0.3" fill="#0a58ca" rx="1"><title>2011: 9</title></rect>
-<rect x="409.6" y="203.3" width="18.2" height="0.7" fill="#0a58ca" rx="1"><title>2012: 21</title></rect>
+<rect x="386.9" y="203.7" width="18.2" height="0.3" fill="#0a58ca" rx="1"><title>2011: 10</title></rect>
+<rect x="409.6" y="203.4" width="18.2" height="0.6" fill="#0a58ca" rx="1"><title>2012: 21</title></rect>
 <text x="418.7" y="218" text-anchor="middle" fill="#666">2012</text>
 <rect x="432.3" y="203.6" width="18.2" height="0.4" fill="#0a58ca" rx="1"><title>2013: 13</title></rect>
 <rect x="455.0" y="203.2" width="18.2" height="0.8" fill="#0a58ca" rx="1"><title>2014: 25</title></rect>
 <text x="464.1" y="218" text-anchor="middle" fill="#666">2014</text>
 <rect x="477.8" y="202.7" width="18.2" height="1.3" fill="#0a58ca" rx="1"><title>2015: 41</title></rect>
-<rect x="500.5" y="201.4" width="18.2" height="2.6" fill="#0a58ca" rx="1"><title>2016: 82</title></rect>
+<rect x="500.5" y="201.5" width="18.2" height="2.5" fill="#0a58ca" rx="1"><title>2016: 82</title></rect>
 <text x="509.5" y="218" text-anchor="middle" fill="#666">2016</text>
-<rect x="523.2" y="200.6" width="18.2" height="3.4" fill="#0a58ca" rx="1"><title>2017: 107</title></rect>
-<rect x="545.9" y="200.8" width="18.2" height="3.2" fill="#0a58ca" rx="1"><title>2018: 98</title></rect>
+<rect x="523.2" y="200.7" width="18.2" height="3.3" fill="#0a58ca" rx="1"><title>2017: 107</title></rect>
+<rect x="545.9" y="201.0" width="18.2" height="3.0" fill="#0a58ca" rx="1"><title>2018: 98</title></rect>
 <text x="555.0" y="218" text-anchor="middle" fill="#666">2018</text>
-<rect x="568.6" y="200.3" width="18.2" height="3.7" fill="#0a58ca" rx="1"><title>2019: 116</title></rect>
-<rect x="591.3" y="173.2" width="18.2" height="30.8" fill="#0a58ca" rx="1"><title>2020: 955</title></rect>
+<rect x="568.6" y="200.4" width="18.2" height="3.6" fill="#0a58ca" rx="1"><title>2019: 116</title></rect>
+<rect x="591.3" y="173.6" width="18.2" height="30.4" fill="#0a58ca" rx="1"><title>2020: 985</title></rect>
 <text x="600.4" y="218" text-anchor="middle" fill="#666">2020</text>
-<rect x="614.0" y="176.7" width="18.2" height="27.3" fill="#0a58ca" rx="1"><title>2021: 847</title></rect>
-<rect x="636.7" y="169.8" width="18.2" height="34.2" fill="#0a58ca" rx="1"><title>2022: 1,063</title></rect>
+<rect x="614.0" y="177.3" width="18.2" height="26.7" fill="#0a58ca" rx="1"><title>2021: 865</title></rect>
+<rect x="636.7" y="170.8" width="18.2" height="33.2" fill="#0a58ca" rx="1"><title>2022: 1,073</title></rect>
 <text x="645.8" y="218" text-anchor="middle" fill="#666">2022</text>
-<rect x="659.4" y="172.7" width="18.2" height="31.3" fill="#0a58ca" rx="1"><title>2023: 972</title></rect>
-<rect x="682.1" y="157.3" width="18.2" height="46.7" fill="#0a58ca" rx="1"><title>2024: 1,449</title></rect>
+<rect x="659.4" y="173.9" width="18.2" height="30.1" fill="#0a58ca" rx="1"><title>2023: 975</title></rect>
+<rect x="682.1" y="159.1" width="18.2" height="44.9" fill="#0a58ca" rx="1"><title>2024: 1,453</title></rect>
 <text x="691.2" y="218" text-anchor="middle" fill="#666">2024</text>
-<rect x="704.9" y="145.8" width="18.2" height="58.2" fill="#0a58ca" rx="1"><title>2025: 1,806</title></rect>
-<rect x="727.6" y="30.0" width="18.2" height="174.0" fill="#0a58ca" rx="1"><title>2026: 5,401</title></rect>
+<rect x="704.9" y="148.0" width="18.2" height="56.0" fill="#0a58ca" rx="1"><title>2025: 1,811</title></rect>
+<rect x="727.6" y="30.0" width="18.2" height="174.0" fill="#0a58ca" rx="1"><title>2026: 5,630</title></rect>
 <text x="736.6" y="218" text-anchor="middle" fill="#666">2026</text>
 </svg>

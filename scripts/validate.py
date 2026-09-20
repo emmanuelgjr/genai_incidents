@@ -27,6 +27,17 @@ try:
 except Exception:  # pragma: no cover - keep validate runnable in isolation
     is_out_of_scope_malware = None  # type: ignore
 
+# WS4-T21 BOUNCE #3: the `from`/`into` deprecation-chain walker is SHARED
+# with scripts/merge_and_dedupe.py (its step 8a resplit-redirect
+# correction), not duplicated -- see `resolve_live_targets`'s docstring
+# there for why the canonical implementation lives in that module (import
+# direction: this file already imports FROM merge_and_dedupe above, so the
+# reverse would be circular) and for the invariant the two call sites must
+# jointly preserve. Unlike `is_out_of_scope_malware` above, there is no
+# safe no-op fallback for this one -- every integrity/coverage check below
+# depends on it -- so a failed import is fatal here, not swallowed.
+from merge_and_dedupe import resolve_live_targets as _resolve_live_targets
+
 _RESOLVABLE_URL = re.compile(r"^(https?://|mailto:)", re.I)
 
 
@@ -145,37 +156,13 @@ def _latest_by_from(deprecations: list[dict]) -> dict[str, dict]:
     return latest
 
 
-def _resolve_live_targets(
-    node, into_map: dict, live_ids: set[str], _seen: set | None = None,
-) -> set[str]:
-    """Every LIVE id `node` (a `from` or an `into` value) transitively
-    resolves to, walking `into_map` and fanning out through list-valued
-    `into` hops (WS4-T15 `split`/`resplit` records). Cycle-safe: a node
-    revisited on the current path contributes nothing further. Returns an
-    empty set if `node` dangles or terminates in a removal (`into: null`)
-    without ever reaching a live id -- callers that need to treat a
-    recorded removal as a valid resolution (referential-integrity
-    checking) handle that separately; callers measuring what a redirect
-    ACTUALLY points at today (the coverage guard) want exactly this: the
-    live id(s), or nothing.
-
-    This is the ONE place that walks a `from`/`into` chain with
-    list-fan-out — `_resolves_to_live` (does a chain resolve) and
-    `check_deprecation_coverage` (what does a chain resolve TO) both call
-    it rather than each re-implementing the walk; a second independent
-    walk is exactly how the `TypeError: unhashable type: 'list'` this
-    module already fixed once ended up needing fixing in two places."""
-    seen = set(_seen or ())
-    if isinstance(node, list):
-        out: set[str] = set()
-        for t in node:
-            out |= _resolve_live_targets(t, into_map, live_ids, seen)
-        return out
-    if node in live_ids:
-        return {node}
-    if node in seen or node not in into_map:
-        return set()
-    return _resolve_live_targets(into_map[node], into_map, live_ids, seen | {node})
+# `_resolve_live_targets` -- the `from`/`into` chain-walker used below by
+# `_resolves_to_live` and `check_deprecation_coverage` -- is imported from
+# `merge_and_dedupe.resolve_live_targets` at module load (see the import
+# block near the top of this file for why the shared copy lives there, not
+# here). Kept as a module-level name via that import so every existing
+# call site in this file (and `tests/test_validate.py`, via `v._resolve_live_targets`)
+# is unchanged.
 
 
 def _resolves_to_live(

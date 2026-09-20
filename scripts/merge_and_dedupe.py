@@ -11,7 +11,9 @@ Run after the per-source aggregators have written into ingest/.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import re
 from pathlib import Path
 from datetime import date, datetime, timezone
@@ -316,14 +318,127 @@ def seed_frameworks_from_vector(entry: dict) -> None:
         entry["mitre_atlas"] = sorted(set((entry.get("mitre_atlas") or []) + list(atlas)))
 
 
+# WS4-T10: params that carry no identifying information — campaign/referrer
+# tracking cruft appended by CMSes, email clients and ad platforms. Anything
+# NOT in this set is assumed to identify the resource (e.g. CMS query-string
+# article IDs like `idxno=`, `id=`, `p=`, `itemName=`, `page=`) and is KEPT
+# in the dedup key. Approach (i) from the WS4-T10 brief: keep the query
+# string, normalized (sorted, tracking params dropped), rather than an
+# allowlist of identifying params (ii, brittle — a param an ingest source
+# doesn't yet know about would silently collapse again) or refusing
+# ambiguous keys outright (iii, would also refuse true duplicates that
+# differ only by a tracking param). The false-merge risk this leaves is the
+# SAME kind of query param appearing on both a tracking blocklist miss and
+# an identifying role, which WS4-T5's later dedupe-error-rate audit
+# measures — not over-engineered here.
+#
+# WS4-T10 BOUNCE #1 (red-reviewer, 2026-09-15) named 9 real-data blocklist
+# misses. Classified against ingest/*.json evidence, each on whether the
+# param disambiguates the RESOURCE or is presentational/session noise —
+# not by name pattern alone, since a param name that is tracking cruft on
+# one host (`category=` on a Shopware advisory-listing page, `research=`
+# on an NCC Group search page — both a fixed/generic value, not a per-page
+# id) could in principle be an identifying id on another. Kept where a
+# clean counter-example wasn't found, per the same "assume identifying
+# unless clearly not" default the blocklist itself embodies — dropping a
+# borderline param is a false-merge risk (the harm this fix exists to
+# close), keeping one is at worst a missed-dedup, which is the safe
+# direction:
+#   - `iref` (Asahi Shimbun, e.g. `?iref=ogimage_rek`) — BLOCKLIST. Constant
+#     literal value across every sampled URL; the article slug in the path
+#     already fully identifies the page.
+#   - `edtsign`, `edtcode`, `scm` (Sohu CMS, e.g.
+#     `?edtsign=...&edtcode=...&scm=10001...`) — BLOCKLIST. CMS
+#     analytics/signature cruft; the numeric article id is in the path
+#     (`/a/<id>_<n>`), so these add nothing identifying.
+#   - `web_view` (e.g. a blog URL with `?&web_view=true`) — BLOCKLIST.
+#     Presentational rendering flag. THIS is the WS4-T10 BOUNCE #1 fix:
+#     its absence let a bare URL and its `?&web_view=true` twin key apart,
+#     producing a false split on INC-08183 (see
+#     tests/test_normalize_url_overmerge.py and the committed Phase B
+#     delta) even though both reference the identical resource.
+#   - Liferay portlet plumbing (e.g.
+#     `p_r_p_assetEntryId=...&_com_liferay_asset_publisher_..._redirect=
+#     https%3A%2F%2F...`) — the `_com_liferay_*` family is BLOCKLISTED,
+#     matched by prefix since the portlet-instance id varies (57 real
+#     occurrences in ingest/cve_nvd_expanded.json, e.g.
+#     `_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_
+#     INSTANCE_jekt_redirect`): framework session/navigation state, and the
+#     `..._redirect` value is itself a huge percent-encoded return-to URL
+#     that would make near-identical page fetches key apart, a
+#     missed-dedup risk in the OTHER direction. `p_r_p_assetEntryId` is
+#     KEPT (genuinely identifying, a per-CVE numeric id) even though it's
+#     redundant with the path's own CVE slug.
+#     WS4-T10 ATTEMPT 3 (advisory A2) removed the earlier `p_p_id`/
+#     `p_p_lifecycle`/`p_p_state`/`p_p_mode`/`p_r_p_resetcur` entries: **0
+#     occurrences anywhere in `ingest/*.json`**, so they were speculative,
+#     not evidenced — this blocklist only adds params with a real sample
+#     backing the call, per this comment's opening paragraph. Any of them
+#     reappearing with the classic Liferay portlet-parameter shape would
+#     already be covered by `_com_liferay_.*`'s prefix match if it starts
+#     that way; a genuinely new, differently-named Liferay framework param
+#     would need its own justified addition, not a speculative one.
+#   - `category` (e.g. a Shopware docs URL) and `research` (e.g. an NCC
+#     Group search URL) — KEPT. Both sampled uses are coarse/generic
+#     values on index-style pages, not per-article ids, so blocklisting
+#     wouldn't help disambiguate the sampled cases — but neither name is
+#     implausible as a genuine per-article category id on some other CMS,
+#     and no counter-example forces the call either way, so the
+#     conservative default (keep, i.e. treat as potentially identifying)
+#     applies per this comment's opening paragraph.
+_URL_TRACKING_PARAMS = re.compile(
+    r"^(utm(_[a-z]+)?|fbclid|gclid|msclkid|dclid|mc_[a-z]+|igshid|"
+    r"ref_src|referrer|spm|cmpid|icid|yclid|_ga|_gl|s_cid|cmp|"
+    r"iref|edtsign|edtcode|scm|web_view|"
+    r"_com_liferay_.*)$",
+    re.IGNORECASE,
+)
+# `ref` (bare) is deliberately NOT in the blocklist above (WS4-T10 BOUNCE #1
+# advisory A4): on some hosts `ref=` is pure referrer tracking, but on
+# others (e.g. a GitHub raw/blob URL's `?ref=<branch>`) it identifies which
+# branch/tag the content came from — collapsing it would re-introduce a
+# false-merge risk for the sake of deduping an ambiguous tracking param.
+# Measured 0 collisions from keeping `ref` today; if that changes, prefer
+# host-scoping `ref` (block it only on hosts confirmed tracking-only) over
+# a blanket drop.
+
+
 def normalize_url(url: str) -> str:
+    """Canonicalize a reference URL into a dedup key.
+
+    Strips scheme/``www.``/fragment/trailing-slash and lowercases the
+    scheme+host+path as before, but — unlike the pre-WS4-T10 version —
+    keeps the query string (sorted, with tracking params dropped) instead
+    of discarding it outright. Dropping the query string entirely
+    collapsed distinct CMS articles that share a path and differ only by
+    an `?idxno=`/`?id=` query param onto one dedup key (E21 tripwire
+    investigation, docs/audits/E21-tripwire-refresh-2026-09-14.md Finding
+    8/9) — e.g. INC-00554 accreted ~100 unrelated source rows this way.
+
+    WS4-T10 BOUNCE #1 (advisory A4): query-parameter VALUES are no longer
+    lowercased (only the scheme/host/path and the parameter KEYS are) —
+    some identifying values are case-significant (e.g. a mixed-case CMS
+    slug or token), and folding their case was a latent false-merge risk
+    of the same shape this task exists to close, just not yet observed in
+    the committed corpus. See tests/test_normalize_url_overmerge.py.
+    """
     if not url:
         return ""
-    u = url.strip().lower()
-    u = re.sub(r"^https?://(www\.)?", "", u)
-    u = u.split("?")[0].split("#")[0]
-    u = u.rstrip("/")
-    return u
+    u = url.strip()
+    u = re.sub(r"^https?://(www\.)?", "", u, flags=re.IGNORECASE)
+    u = u.split("#", 1)[0]
+    path, _, query = u.partition("?")
+    path = path.lower().rstrip("/")
+    if query:
+        kept = sorted(
+            (k.lower(), v) for k, v in
+            (pair.split("=", 1) if "=" in pair else (pair, "")
+             for pair in query.split("&") if pair)
+            if not _URL_TRACKING_PARAMS.match(k)
+        )
+        if kept:
+            return path + "?" + "&".join(f"{k}={v}" if v else k for k, v in kept)
+    return path
 
 
 def title_key(t: str) -> str:
@@ -934,6 +1049,42 @@ CURATION_OVERRIDES_PATH = DATA / "curation_overrides.json"
 CISA_KEV_PATH = INGEST / "cisa_kev.json"
 CWE_VECTOR_PATH = MAPPINGS / "cwe_attack_vector.json"
 SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
+# WS4-T19: the pre-authorization guard's input. A committed, docs/-only
+# list (never data/, never schema/) of which previously-single published
+# ids are authorized to newly resolve to more than one row on the
+# transition that lands WS4-T10's normalize_url fix. See
+# docs/audits/WS4-T19-split-evidence-2026-09-18.md and
+# docs/audits/WS4-T19-authorized-splits-2026-09-18.json (the file this
+# constant points at).
+SPLIT_AUTHORIZATION_PATH = ROOT / "docs" / "audits" / "WS4-T19-authorized-splits-2026-09-18.json"
+# WS4-T21 / board decision D28: the ONLY board decision this guard accepts
+# as authorization. A guard that treats the authorized list's mere
+# presence-on-main as consent is not a guard -- the list was committed
+# BEFORE the ruling and is read by filename, so once both the list and
+# the WS4-T10 fix are on main, a filename-only check is already satisfied
+# for the very transition it exists to gate (red-reviewer's finding on
+# WS4-T19, carried into D28's board record). The list must therefore
+# carry an explicit `authorization` marker naming this exact decision id,
+# and the entries it approved must hash-match the entries actually
+# present -- see `_verify_split_authorization_marker`.
+REQUIRED_SPLIT_AUTHORIZATION_DECISION = "D28"
+# WS4-T21 BOUNCE #1 advisory A1: pinning the marker's OWN declared
+# `entries_sha256` against a freshly-computed hash of its OWN `entries`
+# closes 16 of 17 attempted attack shapes, but leaves exactly one open --
+# tamper the entries AND recompute+rewrite the marker's declared hash to
+# match, which is indistinguishable in the file alone from a legitimate
+# re-ruling (see `_verify_split_authorization_marker`'s own docstring,
+# unchanged, which says this honestly). Pinning the EXPECTED hash here,
+# in code, closes it: a tampered file now has to match something outside
+# itself. Re-deriving this constant is exactly the recipe in
+# `_entries_sha256`'s own use, run against the currently-committed file:
+#   python -c "import json,hashlib; d=json.load(open('docs/audits/WS4-T19-authorized-splits-2026-09-18.json')); print(hashlib.sha256(json.dumps(d['entries'],sort_keys=True,separators=(',',':')).encode()).hexdigest())"
+# Changing this constant is itself the kind of code change that needs its
+# own dated board decision naming a NEW ruling -- it is not something a
+# routine PR should ever need to touch.
+REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256 = (
+    "873c29a2b999335f9f1703510bbfec301028ae6ad6cb21a1d2a4e3db99654a4f"
+)
 
 
 def load_cwe_vector_map() -> dict[str, str]:
@@ -1413,6 +1564,283 @@ def dedupe_entries(
     return surviving, tombstones
 
 
+class SplitAuthorizationError(SystemExit):
+    """Raised by :func:`_check_split_authorization` to abort the build
+    BEFORE any output file is written. Subclasses SystemExit so a plain
+    ``make build`` run stops with a nonzero exit and the message below,
+    without a Python traceback obscuring it."""
+
+
+def _entries_sha256(entries: list[dict]) -> str:
+    """Canonical (sort_keys, no whitespace) sha256 of an `entries` array,
+    so the hash is stable regardless of formatting and detects ANY change
+    to the approved content -- added, removed, or edited entries alike."""
+    canonical = json.dumps(entries, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _verify_split_authorization_marker(data: dict, path: Path) -> bool:
+    """WS4-T21 / D28: a guard that authorizes on file-presence alone is
+    not a guard (see REQUIRED_SPLIT_AUTHORIZATION_DECISION's comment).
+    Requires an `authorization` object naming EXACTLY the board decision
+    that ruled on this list, plus a content hash proving the `entries`
+    array is byte-for-byte what that decision approved. Fails closed
+    (returns False, never raises) on every deviation:
+      - no `authorization` key at all (an unmarked list),
+      - `authorization.decision` missing or naming a different decision,
+      - `authorization.entries_sha256` missing or not matching a fresh
+        hash of this file's own `entries` array (entries edited, added,
+        or removed after the marker was written),
+      - that fresh hash not matching REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256,
+        the value pinned in CODE at the time D28 was ruled on (WS4-T21
+        BOUNCE #1, advisory A1). The previous check alone left exactly
+        one attack shape open: tamper the entries AND rewrite the
+        marker's OWN declared `entries_sha256` to match the tampered
+        entries -- indistinguishable, from the file alone, from a
+        legitimate re-ruling. Pinning the expected value outside the
+        file closes it: a tampered file now has to match something it
+        cannot itself rewrite.
+    Prints a specific reason to stderr in every failure case so a bad
+    marker is diagnosable, not just silently empty."""
+    auth = data.get("authorization")
+    if not isinstance(auth, dict):
+        print(
+            f"[split-guard] {path.name} carries no `authorization` marker "
+            "-- file presence alone does not authorize any split.",
+        )
+        return False
+    decision = auth.get("decision")
+    if decision != REQUIRED_SPLIT_AUTHORIZATION_DECISION:
+        print(
+            f"[split-guard] {path.name}'s authorization marker names "
+            f"decision {decision!r}, not the required "
+            f"{REQUIRED_SPLIT_AUTHORIZATION_DECISION!r} -- refusing to "
+            "authorize any split.",
+        )
+        return False
+    expected_hash = auth.get("entries_sha256")
+    actual_hash = _entries_sha256(data.get("entries", []))
+    if not expected_hash or expected_hash != actual_hash:
+        print(
+            f"[split-guard] {path.name}'s authorization marker's "
+            f"entries_sha256 ({expected_hash!r}) does not match a fresh "
+            f"hash of its own `entries` array ({actual_hash!r}) -- the "
+            "approved entries and the entries on disk have diverged; "
+            "refusing to authorize any split.",
+        )
+        return False
+    if actual_hash != REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256:
+        print(
+            f"[split-guard] {path.name}'s entries hash ({actual_hash!r}) "
+            f"does not match the value pinned in code at D28's ruling "
+            f"({REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256!r}) -- even "
+            "though the marker's own declared entries_sha256 matches its "
+            "own entries, refusing to authorize any split. A legitimate "
+            "re-ruling updates this constant with its own dated board "
+            "decision; a self-consistent-but-unpinned file does not.",
+        )
+        return False
+    return True
+
+
+def _load_verified_split_authorization_data(path: Path) -> dict | None:
+    """Parse `path` and verify its D28 marker (`_verify_split_authorization_marker`).
+    Returns the parsed dict only if the file exists, parses, AND the
+    marker verifies; returns None on every other outcome (fail closed).
+    Both `_load_split_authorization` (the guard's input) and
+    `_load_split_retirements` (the WS4-T21/D28 retirement-execution
+    step's input) share this single verification path, so a marker
+    failure blocks BOTH consumers identically -- there is no route to
+    "guard passes but retirement executes anyway" or vice versa."""
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    if not _verify_split_authorization_marker(data, path):
+        return None
+    return data
+
+
+def _load_split_authorization(path: Path) -> set[str]:
+    """Read the WS4-T19 pre-authorization list's `from` ids, gated on the
+    D28 authorization marker. Missing file, unparseable JSON, or a marker
+    that fails verification all mean "nothing is authorized" (the safe
+    default: a guard that treats a missing/corrupt/unmarked allowlist as
+    authorizing everything is not a guard) -- returns an empty set, not
+    an exception, so a build with zero detected splits (today's normal
+    case, pre-WS4-T10-merge) never even looks at this file's presence."""
+    data = _load_verified_split_authorization_data(path)
+    if data is None:
+        return set()
+    return {
+        e.get("from") for e in data.get("entries", []) if e.get("from")
+    }
+
+
+def _load_split_retirements(path: Path) -> set[str]:
+    """`from` ids whose D28-authorized decision is "retire" -- WS4-T21:
+    docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2 requires that
+    "no survivor keeps the old id" for these; see the retirement-
+    execution step in `main()`. Same fail-closed verification as
+    `_load_split_authorization` (returns empty set on any marker
+    failure) -- a retirement never executes on an unverified list any
+    more than a split is ever authorized on one."""
+    data = _load_verified_split_authorization_data(path)
+    if data is None:
+        return set()
+    return {
+        e.get("from") for e in data.get("entries", [])
+        if e.get("from") and e.get("decision") == "retire"
+    }
+
+
+def _check_split_authorization(
+    prev_id_by_key: dict[str, str],
+    deduped: list[dict],
+    authorized_path: Path = SPLIT_AUTHORIZATION_PATH,
+) -> None:
+    """WS4-T19 build-time pre-authorization guard.
+
+    Aborts LOUDLY, before any output file is written (call this before
+    step 8's `id_deprecations.json` write and step 9's `incidents.json`
+    write), if this build's own dedupe logic would cause a previously
+    single PUBLISHED id's member keys (the union of `source_ids` +
+    `cve_ids` it held in the last committed build) to newly resolve onto
+    MORE THAN ONE row of `deduped` -- i.e. would silently produce a
+    `split`/`resplit`-shaped change -- unless that id is present in the
+    authorized list at `authorized_path` (the `from` field of a
+    docs/-committed, human-reviewed, PROPOSED list; see
+    docs/audits/WS4-T19-split-evidence-2026-09-18.md and D25(b): the user
+    rules on the list, not this function).
+
+    This is the mechanical form of D25(a) condition (2) and the
+    "deliberate guard" named in board entry `8d1b241f` / WS4-T15 spec §7(b)
+    -- until now the project had three ACCIDENTAL barriers (a mis-keyed
+    curation override that made `validate.py` fail closed, CI running
+    `make build` before `validate.py`, and nothing else) and no
+    DELIBERATE one. Name the input that makes this fail: any build whose
+    dedupe output would split a previously-single published id's own
+    historical member keys across >1 new row, where that id is NOT on the
+    authorized list -- including the empty-list case (nothing is
+    authorized) and the case where exactly one of several detected splits
+    is missing from an otherwise-complete list (this function reports
+    every unauthorized id, not just the first, so a partially-correct list
+    cannot hide behind an early return).
+    """
+    new_key_to_id: dict[str, str] = {}
+    for e in deduped:
+        eid = e.get("id")
+        if not eid:
+            continue
+        for k in list(e.get("source_ids") or []) + list(e.get("cve_ids") or []):
+            new_key_to_id[k] = eid
+
+    split_map: dict[str, set[str]] = {}
+    for key, old_id in prev_id_by_key.items():
+        new_id = new_key_to_id.get(key)
+        if new_id is None:
+            continue
+        split_map.setdefault(old_id, set()).add(new_id)
+    detected_splits = {
+        old_id: ids for old_id, ids in split_map.items() if len(ids) > 1
+    }
+    if not detected_splits:
+        return
+
+    authorized = _load_split_authorization(authorized_path)
+    unauthorized = {
+        old_id: ids for old_id, ids in detected_splits.items()
+        if old_id not in authorized
+    }
+    if not unauthorized:
+        print(
+            f"[split-guard] {len(detected_splits)} previously-single "
+            f"published id(s) resolve to >1 row this build; all are on "
+            f"the authorized list ({authorized_path.name}) -- proceeding."
+        )
+        return
+
+    lines = [
+        "[split-guard] ABORT: this build would silently split "
+        f"{len(unauthorized)} previously-single PUBLISHED id(s) into "
+        "more than one row, and no authorization for them was found at "
+        f"{authorized_path}.",
+        "No output file was written.",
+        "",
+        "Unauthorized split(s) detected (old id -> new row ids):",
+    ]
+    for old_id in sorted(unauthorized):
+        new_ids = sorted(unauthorized[old_id])
+        shown = new_ids[:8]
+        suffix = f" ... (+{len(new_ids) - 8} more)" if len(new_ids) > 8 else ""
+        lines.append(f"  - {old_id} -> {shown}{suffix}  ({len(new_ids)} rows)")
+    lines.append("")
+    lines.append(
+        "This is the WS4-T19 pre-authorization guard (D25(b): the user "
+        "rules on which splits are authorized for a one-time transition; "
+        "the build never decides this for itself). Authorizing a split "
+        "requires BOTH an entry ({\"from\": \"<old-id>\", \"reason\": "
+        "\"<...>\"} in " + str(authorized_path) + ") AND a valid "
+        f"`authorization` marker naming decision "
+        f"{REQUIRED_SPLIT_AUTHORIZATION_DECISION!r} whose entries_sha256 "
+        "matches the file's own entries -- file presence alone does not "
+        "authorize anything (see _verify_split_authorization_marker). "
+        "See docs/audits/WS4-T19-split-evidence-2026-09-18.md and D28 "
+        "in PROGRESS.md."
+    )
+    raise SplitAuthorizationError("\n".join(lines))
+
+
+def resolve_live_targets(
+    node, into_map: dict, live_ids: set[str], _seen: set | None = None,
+) -> set[str]:
+    """Every LIVE id `node` (a `from` or an `into` value) transitively
+    resolves to, walking `into_map` and fanning out through list-valued
+    `into` hops (WS4-T15 `split`/`resplit` records, WS4-T21 step 8a's own
+    `resplit` corrections). Cycle-safe: a node revisited on the current
+    path contributes nothing further. Returns an empty set if `node`
+    dangles or terminates in a removal (`into: null`) without ever
+    reaching a live id.
+
+    WS4-T21 BOUNCE #3: this is the ONE canonical implementation of the
+    `from`/`into` chain walk, used by BOTH `scripts/validate.py` (which
+    imports it as `_resolve_live_targets`, e.g. `check_deprecation_coverage`
+    and `_resolves_to_live`) and step 8a below (the resplit-redirect
+    correction). Before this, the two files carried two SEPARATE, hand-kept-
+    in-sync copies of the same algorithm -- exactly the "two implementations
+    that currently agree, with nothing testing for divergence" shape the
+    WS4-T15 gate warned about for `_latest_by_from`, and precisely how the
+    `TypeError: unhashable type: 'list'` this algorithm already fixed once
+    (see the WS4-T15 spec) needed fixing in two places, not one.
+
+    Why the canonical copy lives HERE and not in validate.py: import
+    direction is fixed, not a style choice -- `validate.py` already does
+    `from merge_and_dedupe import is_out_of_scope_malware` (line ~26), so
+    `merge_and_dedupe.py` importing FROM `validate.py` would be circular.
+    The invariant both call sites must jointly preserve: **identical chain
+    resolution for identical `(node, into_map, live_ids)` inputs** --
+    validate.py's every-build integrity/coverage check and this build's
+    own resplit-redirect correction must never disagree about what a
+    deprecation chain currently resolves to. Regression-tested directly:
+    tests/test_shared_resolve_live_targets.py builds a real multi-hop,
+    list-fan-out chain and asserts `merge_and_dedupe.resolve_live_targets`
+    and `validate._resolve_live_targets` (the SAME object post-share, but
+    asserted independently so a future de-share is still caught) agree."""
+    seen = set(_seen or ())
+    if isinstance(node, list):
+        out: set[str] = set()
+        for t in node:
+            out |= resolve_live_targets(t, into_map, live_ids, seen)
+        return out
+    if node in live_ids:
+        return {node}
+    if node in seen or node not in into_map:
+        return set()
+    return resolve_live_targets(into_map[node], into_map, live_ids, seen | {node})
+
+
 def main():
     # 0) Load the previous output: timestamps, the id-by-key map (so stable
     #    INC-* IDs survive a rebuild), and the monotonic ID counter.
@@ -1422,6 +1850,25 @@ def main():
 
     # 1) Legacy consolidated first (highest priority — already curated)
     legacy_path = DATA / "legacy_consolidated.json"
+    if not legacy_path.exists() and os.environ.get("MERGE_ALLOW_MISSING_LEGACY") != "1":
+        # WS4-T10 build guard. This used to silently proceed without the
+        # legacy corpus, which is exactly how the E21 tripwire audit's first
+        # rebuild delta went wrong: run standalone (skipping
+        # parse_existing.py, which regenerates this gitignored file — see
+        # `make merge`), it produced a corpus 5,675 rows short with
+        # fabricated severity regressions that were reported as real
+        # (docs/audits/E21-tripwire-refresh-2026-09-14.md Finding 3). Fail
+        # loudly instead of yielding a materially wrong corpus with no
+        # indication anything is missing.
+        raise SystemExit(
+            f"[FATAL] {legacy_path} not found.\n"
+            "merge_and_dedupe.py must run after `python scripts/parse_existing.py`\n"
+            "(which regenerates this gitignored file), not standalone — see\n"
+            "`make merge` / Makefile:11-13. Running it alone silently drops the\n"
+            "legacy corpus and yields a materially wrong build.\n"
+            "If this is deliberate (e.g. a test harness building its own tmp\n"
+            "corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1."
+        )
     if legacy_path.exists():
         legacy = json.loads(legacy_path.read_text(encoding="utf-8")).get("incidents", [])
         # Legacy already in unified shape — backfill taxonomy and stamp a
@@ -1668,6 +2115,83 @@ def main():
         used_ids.add(pid)
         carried += 1
 
+    # 6e-bis) WS4-T21 / D28: execute the authorized RETIREMENT decisions.
+    #     docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2 ("Where
+    #     continuity breaks") is explicit: for these ids the ordinary
+    #     smallest-previous-id tie-break in step 6 above picks CONFIRMED
+    #     WRONG content (measured, not hypothetical -- see the same doc's
+    #     #2.1/#2.2). "No survivor keeps the old id for these four": mint a
+    #     fresh id for whichever row the tie-break gave the old number to,
+    #     and write a NEW `reason: "split"` deprecation record for the old
+    #     id with an ARRAY-valued `into` naming every one of its actual
+    #     successors (including the reassigned row) -- the shape
+    #     `scripts/validate.py`'s chain-resolving guard (WS4-T15) already
+    #     supports. Does NOT touch the 8 pre-existing inbound
+    #     `resplit_redirect` corrections the same authorized list flags:
+    #     this step's own successor list is fresh from THIS build (not the
+    #     authorized list's precomputed `new_targets`, which were computed
+    #     before any retirement executed and so, for 3 of the 8, still
+    #     name the retiring id itself as a target -- stale the moment this
+    #     step runs).
+    #
+    #     [WS4-T21 BOUNCE #1, dated correction] This comment used to claim
+    #     those 8 existing records "chain-resolve automatically ... via
+    #     the same generic multi-hop resolver -- verified, not assumed."
+    #     That was FALSE for four of the eight, and the verification that
+    #     produced the claim is exactly how it got through: it generalised
+    #     from `INC-08139`, one of the four that already worked, to all
+    #     eight, rather than checking each. What was actually true: the 8
+    #     records were left untouched here, THREE of them (`INC-07771`,
+    #     `INC-08109`, `INC-08133`) chained into a `keep_id` survivor that
+    #     kept its number but only PART of its old content, and a FOURTH
+    #     (`INC-08146`) chained through this step's own new records into a
+    #     retired id's FULL successor set when D28 approved it exactly one
+    #     specific successor -- all four resolved to a live id, just the
+    #     WRONG one, so `validate.py` and the full test suite both stayed
+    #     green while they were wrong (agreement 6). Step 8a, ~200 lines
+    #     below, was added in the same bounce specifically to correct
+    #     those four; the other four needed nothing. See
+    #     docs/audits/WS4-T21-delivered-delta-2026-09-18.md and
+    #     tests/test_validate.py::test_real_resplit_redirects_match_d28_approved_targets
+    #     (a committed test against the REAL corpus, not a fixture) for
+    #     what is actually verified now.
+    retire_ids = _load_split_retirements(SPLIT_AUTHORIZATION_PATH)
+    if retire_ids:
+        retired = 0
+        for old_id in sorted(retire_ids):
+            holder = next((e for e in surviving if e.get("id") == old_id), None)
+            if holder is None:
+                # Nothing in this build mechanically inherited the old id
+                # -- nothing to retire.
+                continue
+            # Every row in `surviving` whose id-continuity key set (its
+            # OWN historical member keys, via prev_id_by_key) traces back
+            # to old_id, recomputed fresh -- not read from the authorized
+            # list's precomputed (and, post-retirement, stale) figures.
+            successors: set[str] = set()
+            for e in surviving:
+                eid = e.get("id")
+                if not eid:
+                    continue
+                keys = list(e.get("source_ids") or []) + list(e.get("cve_ids") or [])
+                if any(prev_id_by_key.get(k) == old_id for k in keys):
+                    successors.add(eid)
+            new_id = slug_to_id(next_id)
+            used_ids.add(new_id)
+            next_id += 1
+            holder["id"] = new_id
+            successors.discard(old_id)
+            successors.add(new_id)
+            deprecations_new.append({
+                "from": old_id, "into": sorted(successors), "reason": "split",
+                "date": today_str, **_retired_fields(old_id),
+            })
+            retired += 1
+        if retired:
+            print(f"[retire] executed {retired} WS4-T19/D28-authorized "
+                  f"retirement(s): old id(s) fully deprecated, no survivor "
+                  f"keeps them (docs/specs/WS4-T10-unmerge-design-2026-09-15.md #7.2)")
+
     # 6f) Stable out-of-scope removal deprecations. Derived only from the
     #     PREVIOUSLY-PUBLISHED data and the final live id set — no dependence on
     #     ephemeral build IDs — so the deprecation list is deterministic and
@@ -1773,6 +2297,14 @@ def main():
         prev_generated = ""
     generated = today if any_change or not prev_generated else prev_generated
 
+    # 7b) WS4-T19 pre-authorization guard. Must run AFTER id assignment
+    #     (deduped rows already carry their final `id`) and BEFORE any
+    #     output write below -- both the id_deprecations.json write in
+    #     step 8 and the incidents.json write in step 9. Raises
+    #     SplitAuthorizationError (a SystemExit subclass) and writes
+    #     nothing if an unauthorized split is detected.
+    _check_split_authorization(prev_id_by_key, deduped, SPLIT_AUTHORIZATION_PATH)
+
     # 8) Merge deprecations with the on-disk history and persist.
     prev_deprec: list[dict] = []
     if DEPRECATIONS_PATH.exists():
@@ -1828,6 +2360,82 @@ def main():
             seen_fresh_from.add(f)
             fresh.append(d)
     deprecations_all = list(prev_deprec) + fresh
+
+    # 8a) WS4-T21 BOUNCE #1 defect 1: correct the pre-existing inbound
+    #     `resplit_redirect` entries the D28-authorized list flags,
+    #     whenever their EXISTING on-disk record no longer chain-resolves
+    #     to what D28 approved. Four of the eight regressed or were
+    #     already wrong: three chain into a `keep_id` survivor that only
+    #     holds PART of what it used to (the old inbound id's own content
+    #     moved to a DIFFERENT successor when its group split -- the
+    #     survivor keeping its number does not mean it kept everything);
+    #     the fourth already fanned out through a retired id's FULL
+    #     successor set when D28 approved a single, specific one. These
+    #     ids already carry a prior record on disk, so a plain append to
+    #     `deprecations_new` above would be silently dropped by the
+    #     `already_deprecated` guard (by design -- see the comment on
+    #     that guard, which names this exact id, INC-07771, as the
+    #     original motivating case for allowing a deliberate supersede).
+    #     This mirrors the ISSUE88_EXCLUDE fixpoint immediately below:
+    #     append a NEW record directly to `deprecations_all`, never edit
+    #     the old one (invariant 9).
+    #
+    #     Mechanical, not a new judgement call: for each `resplit_redirect`
+    #     entry, compare what its CURRENT recorded chain resolves to
+    #     against what its D28-approved `new_targets` resolves to (expanding
+    #     any of new_targets' own elements that are themselves a NOW-RETIRED
+    #     id through ITS chain too, exactly like the current-chain side) --
+    #     write a corrective record only where the two sets actually differ.
+    #     The four entries whose sets already agree get nothing appended.
+    #
+    #     Uses `resolve_live_targets` (module-level, above `main()`) -- the
+    #     SAME chain-walker `scripts/validate.py` imports as
+    #     `_resolve_live_targets` for its own every-build integrity/coverage
+    #     checks. One implementation, not two hand-kept-in-sync copies; see
+    #     that function's docstring for why the canonical copy lives in
+    #     this module (import direction) and what invariant the two call
+    #     sites must jointly preserve.
+    _resplit_auth = _load_verified_split_authorization_data(SPLIT_AUTHORIZATION_PATH)
+    if _resplit_auth:
+        _live_ids_now = {e["id"] for e in deduped if e.get("id")}
+        _latest_deprec_map: dict[str, dict] = {}
+        for _d in deprecations_all:
+            _f = _d.get("from")
+            if _f:
+                _latest_deprec_map[_f] = _d
+        _into_map = {f: r.get("into") for f, r in _latest_deprec_map.items()}
+
+        _resplit_corrected = 0
+        for entry in _resplit_auth.get("entries", []):
+            if entry.get("decision") != "resplit_redirect":
+                continue
+            frm = entry.get("from")
+            approved = entry.get("new_targets") or []
+            if not frm or not approved:
+                continue
+            approved_resolved = resolve_live_targets(approved, _into_map, _live_ids_now)
+            current_rec = _latest_deprec_map.get(frm)
+            current_resolved = (
+                resolve_live_targets(current_rec.get("into"), _into_map, _live_ids_now)
+                if current_rec else set()
+            )
+            if current_resolved == approved_resolved:
+                continue  # already correct -- nothing to append
+            new_rec = {
+                "from": frm,
+                "into": sorted(approved_resolved),
+                "reason": entry.get("eventual_deprecation_reason") or "resplit",
+                "date": today_str,
+            }
+            deprecations_all.append(new_rec)
+            _latest_deprec_map[frm] = new_rec
+            _into_map[frm] = new_rec["into"]
+            _resplit_corrected += 1
+        if _resplit_corrected:
+            print(f"[resplit-redirect] corrected {_resplit_corrected} pre-existing "
+                  f"inbound redirect(s) to match D28's approved new_targets "
+                  f"(docs/audits/WS4-T19-authorized-splits-2026-09-18.json)")
+
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
     # deprecation whose CURRENTLY AUTHORITATIVE `into` was that bucket (or
     # transitively resolves to it) now dangles. Redirect it to a terminal
@@ -2023,7 +2631,12 @@ def merge_into(target: dict, src: dict):
     for key in ("cvss_vector", "aiid_id", "disclosure_date", "impact"):
         if not target.get(key) and src.get(key):
             target[key] = src[key]
-    # References — dedupe by url
+    # References — dedupe by url. WS4-T10: deliberately reuses the SAME
+    # normalize_url as the dedup-key indexes above, not a stricter variant —
+    # a reference is a genuine duplicate under exactly the same identity
+    # rule that says two rows are the same incident, so splitting the
+    # definitions would only let two references for the very row being
+    # merged disagree with each other about whether they're duplicates.
     seen = {normalize_url(r["url"]): r for r in target.get("references", [])}
     for r in src.get("references", []):
         u = normalize_url(r.get("url", ""))

@@ -694,9 +694,10 @@
       "discovery_method": "security-researcher",
       "_note": "Batch-2 labeling (2026-07-04). Discovery: Microsoft's own research team tested and disclosed the Skeleton Key jailbreak to affected vendors before publication (https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/)."
     },
-    "CVE-2025-10875": {
+    "INC-088": {
       "discovery_method": "security-researcher",
-      "_note": "Batch-2 labeling (2026-07-04). Discovery: \"July 28, 2025 – Noma Labs discovers and reports the vulnerability to Salesforce.\" (https://noma.security/blog/forcedleak-agent-risks-exposed-in-salesforce-agentforce)"
+      "_note": "Batch-2 labeling (2026-07-04). Discovery: \"July 28, 2025 – Noma Labs discovers and reports the vulnerability to Salesforce.\" (https://noma.security/blog/forcedleak-agent-risks-exposed-in-salesforce-agentforce)",
+      "_rekeyed": "WS4-T21 (2026-09-18), per docs/specs/WS4-T10-unmerge-design-2026-09-15.md #2.3b. Was keyed \"CVE-2025-10875\": under WS4-T10's normalize_url fix, that CVE id (and its three siblings CVE-2025-64318/64320/64321) split off onto a new, unrelated row (INC-14614, Mulesoft Anypoint Code Builder), while this override's actual subject -- ForcedLeak / Salesforce Agentforce, INC-02590 -- keeps only INC-088 and LEGACY-INC-00137 as source_ids. Re-keyed to INC-088 (confirmed: data/legacy_consolidated.json's INC-00088 carries this exact title and reference URL) so the override follows its intended content through the split instead of landing on Mulesoft Anypoint. validate.py's discovery_method landmark-tier check was failing on INC-14614 before this fix; see PROGRESS.md D28."
     },
     "INC-090": {
       "discovery_method": "security-researcher",
