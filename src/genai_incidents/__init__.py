@@ -59,10 +59,26 @@ def _load_deprecations() -> dict[str, str]:
         return {}
     data = json.loads(text)
     out: dict[str, str] = {}
+    # A `from` ID can carry more than one tombstone record — e.g. an
+    # older `merged` entry later superseded by a `resplit` (WS4-T15/
+    # WS4-T22: INC-07771, INC-08109, INC-08133, INC-08146 each have
+    # both). The most recent `date` wins, selected explicitly rather
+    # than by "whichever the JSON array lists last" — the latter is an
+    # accident of file order, not a decision, and this codebase has
+    # already shipped that exact accident once (merge_and_dedupe.py's
+    # `seen_from` kept the LAST record under a comment claiming
+    # "earliest"). Ties (same date) fall back to file order for
+    # determinism, matching the append-only convention that later
+    # entries are written after earlier ones.
+    latest_date: dict[str, str] = {}
     for entry in data.get("deprecations", []):
-        f, t = entry.get("from"), entry.get("into")
-        if f and t:
-            out[f] = t
+        f, t, date = entry.get("from"), entry.get("into"), entry.get("date") or ""
+        if not f or not t:
+            continue
+        if f in out and date < latest_date[f]:
+            continue
+        out[f] = t
+        latest_date[f] = date
     return out
 
 
@@ -181,17 +197,33 @@ def resolve_id(inc_id: str) -> str | None:
     """Map a (possibly deprecated) ``INC-NNNNN`` ID to its current
     canonical ID. Returns the input unchanged if it's still active,
     follows the deprecation chain otherwise, and returns ``None`` if
-    the chain doesn't terminate in an existing entry.
+    the chain doesn't terminate in a single, unambiguous existing entry.
 
-    A record whose ``into`` is a LIST (a multi-successor ``split``/
-    ``resplit`` record — WS4-T15) has no single canonical successor to
-    walk to, so this function treats it the same as a dangling/unknown
-    ID and returns ``None`` rather than raising. Before this fix, the
-    next chain hop did ``current in deprec`` with ``current`` bound to a
+    A record whose ``into`` is a list (a multi-successor ``split``/
+    ``resplit`` record — WS4-T15) is walked like any other hop *when it
+    has exactly one element*: a one-element list is an unambiguous,
+    live successor, and there is nothing to disambiguate. It is only a
+    list of TWO OR MORE elements that has no single canonical successor
+    to walk to — for that case (and only that case) this function
+    treats the record the same as a dangling/unknown ID and returns
+    ``None`` rather than inventing an answer the data doesn't support
+    (WS4-T22 / user ruling D31: picking one of N successors, even
+    "the first", would fabricate a canonical answer). Before WS4-T22,
+    this function discarded ALL list-valued hops uniformly — including
+    the one-element case — on the false premise that any list means "no
+    single successor"; that premise only holds for length >= 2, and the
+    length == 1 case was a live, resolvable successor being silently
+    dropped (12 published IDs affected across the corpus at the time of
+    the fix, 4 of which had a single-element resplit target).
+
+    Before the WS4-T15 fix that added the list check at all, the next
+    chain hop did ``current in deprec`` with ``current`` bound to a
     list, which raises ``TypeError: unhashable type: 'list'`` — verified
     against WS4-T10's own array-valued ``split``/``resplit`` proposal.
-    Callers that need every successor of a multi-target record should use
-    :func:`resolve_id_group`, not this function."""
+
+    Callers that need every successor of a multi-target (two-or-more)
+    record — i.e. the case this function still returns ``None`` for —
+    should use :func:`resolve_id_group`, not this function."""
     if by_id(inc_id) is not None:
         return inc_id
     deprec = _load_deprecations()
@@ -201,7 +233,9 @@ def resolve_id(inc_id: str) -> str | None:
         seen.add(current)
         current = deprec[current]
         if isinstance(current, list):
-            return None
+            if len(current) != 1:
+                return None
+            current = current[0]
         if by_id(current) is not None:
             return current
     return None
