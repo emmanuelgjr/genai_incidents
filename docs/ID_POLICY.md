@@ -1,23 +1,131 @@
 # Incident ID policy — headroom and stability
 
-> **STATUS: DRAFT — decision pending (E4).** This document presents two
-> options for the ID-width question with a recommendation. The human lead
-> decides in Phase 1 (`MASTER_IMPROVEMENT_PLAN.md` §WS3-T5); implementation
-> lands in Phase 2 with the other breaking changes. The **Stability policy**
-> section (§4) is not part of the decision — it restates rules the project
-> already follows and is published as policy either way.
+> **STATUS: DECIDED AND IN FORCE — D13, 2026-07-27.** The ID-width question
+> (E4) was decided by the human lead on **2026-07-27** as board decision
+> **D13**: *"E4 DECIDED: Option B — padding-agnostic parsing commitment.
+> Publish the commitment; widen the schema pattern to `^INC-[0-9]{5,}$` in the
+> v3.0 break; never re-pad a published ID."* Two riders bind the implementation
+> task (§0.3). This file is the project's **binding ID policy**, not a
+> proposal; the policy in force is §0 and §4.
+>
+> **§§1–6 are the decision memo as submitted on 2026-07-27** — the *input* to
+> D13, preserved as the record of why Option B was chosen. They are a closed
+> question, not an open one. See the record marker above §1.
 >
 > Owner: schema-architect (WS3). Related: WS6-T8 (v3.0 migration guide),
 > WS1-T2 (corpus split), WS6-T3 (STIX).
 >
-> **SUPERSEDED IN PART — see §7 (addendum, 2026-09-19).** Sections 1–6 below
-> are preserved verbatim as the record of what was measured on 2026-07-27.
-> The headroom figures in §1 and §1.3 are stale; §7 re-measures them and says
-> what changed. §7 also records that the E4 decision this banner calls
-> "pending" **was subsequently made** (D13, 2026-07-27, Option B). Do not edit
-> §§1–6 to make them current.
+> **Headroom figures — see §7 (addendum, 2026-09-19).** The counts in §1 and
+> §1.3 are the 2026-07-27 measurement and are stale; §7 re-measures them and
+> says what changed. Do not edit §§1–6 to make them current.
+>
+> **Banner history (so §7.4's cross-reference stays legible).** From
+> 2026-07-27 until **2026-09-20** this file carried a
+> `STATUS: DRAFT — decision pending (E4)` banner. It was true the day it was
+> written and stale the day after; §7.4 (2026-09-19) is the record of finding
+> it stale, and the board's dated correction of 2026-09-20 is the record of
+> routing the fix. Replaced here in place, because working agreement 4 treats
+> a live surface that way: a policy which hedges its own currency is not a
+> policy.
 
 ---
+
+## 0. The policy in force
+
+This section and §4 state what the policy **is**. They are corrected in place
+when they stop being true; everything between them (§§1–3, §5, §6) is a dated
+record and is not.
+
+### 0.1 The commitment (adopted verbatim by D13)
+
+> **Incident IDs are `INC-` followed by a decimal number with no upper bound
+> on digit count.** IDs issued to date are zero-padded to a minimum of five
+> digits; that padding is presentational and is not part of the identifier's
+> meaning. Consumers MUST treat an ID as an opaque string for equality and
+> lookup, and MUST NOT assume a fixed length, a five-digit width, or that
+> lexicographic order equals issue order. Consumers that need numeric order
+> MUST parse the digit run as an integer. The project will not re-pad,
+> re-number, or otherwise rewrite an ID that has been published.
+
+This is §3's block, adopted by D13 without amendment. §3 retains it as
+submitted; **this copy is the one in force** — if the commitment is ever
+amended, it is amended here.
+
+What consumers must do about it is §3's "What consumers must do" list, which
+D13 adopted along with the commitment: compare full strings, replace
+`INC-\d{5}` regexes with `INC-\d+`, sort by parsed integer rather than by
+string, and store IDs in variable-width columns.
+
+### 0.2 What is implemented today, and what is still owed
+
+D13's ruling is settled; parts of its **implementation** are not. Re-derived
+2026-09-20 at `data/` identical to `origin/main` @ `4861afd7`:
+
+| Item | State today | Owed to |
+|---|---|---|
+| Never re-pad / never renumber a published ID | **in force** — no ID has been re-padded | D13 |
+| Schema pattern `^INC-[0-9]{5}$` → `^INC-[0-9]{5,}$` | **not yet** — both schema copies still read `{5}` at line 12 | D13, v3.0/Phase 2 |
+| Allocator emits >5 digits past 99,999 | **already true** — `f"INC-{n:05d}"` pads, never truncates | — |
+| `high_water_id` in `data/stats.json` | **absent** — keys are `generated`, `incident_count`, `landmark_count`, `version`, `year_max`, `year_min` | D13 rider (a) |
+
+The schema gap is scheduled, not overlooked: the current high-water number is
+**14,910**, so `{5}` will not be tested for years (§7.2). It remains a written
+promise the validator does not yet enforce, which §3's risk 4 calls out.
+
+### 0.3 D13's two riders — open work, *not* an open decision
+
+The decision is closed. These two riders travel with the Phase-2
+implementation task and are the only parts of D13 still unfinished. **A rider
+being open does not reopen the ruling.**
+
+- **Rider (a) — a written reopen trigger.** If a single onboarding event would
+  consume more than a threshold of IDs, or total headroom falls below 20%, the
+  widening decision reopens automatically as an escalation to the human lead
+  ("never discover the ceiling by hitting it"). D13 asked schema-architect to
+  propose the threshold; **the proposal is §7.5** (four conditions, calibrated
+  against the three bulk events on record). It is prose until the
+  `high_water_id` key exists to compute it, and that key still has no owner.
+- **Rider (b) — repair the nine dangling v2.0.0 IDs.** `INC-00522`, `00609`,
+  `00951`, `00952`, `00955`, `00956`, `00957`, `01355`, `01660` were published
+  in v2.0.0 and today appear in neither `data/incidents.json` nor
+  `data/id_deprecations.json`, so `resolve_id()` returns `None` for each — a
+  standing violation of §4 rule 3. Each must be tombstoned or redirected, with
+  a test that **every** historical ID resolves. Still unimplemented as of
+  2026-09-20; the diagnosis is §1.4(a) and the re-confirmation is §7.1.
+
+### 0.4 Current figures
+
+This file is a point-in-time decision record and is **not** on the
+`stats_docs_lib.DOC_SURFACES` list, so counts here carry their measurement
+date rather than being templated. Measured **2026-09-20**, `data/` identical
+to `origin/main` @ `4861afd7`: **13,361** live entries, **1,060** deprecation
+records over **1,056** distinct `from` IDs (four IDs carry two tombstones
+each — see §7.1), high-water **14,910**, headroom **85,089**. The command is
+Route A in §7.7.
+
+---
+
+> **RECORD — §§1 THROUGH 6. DO NOT REGENERATE. DO NOT READ AS A LIVE CHOICE.**
+> Everything from here to §6 is the WS3-T5 decision memo exactly as submitted
+> on 2026-07-27. It was the input to D13 and is preserved as the record of the
+> reasoning, which is worth keeping: §2 sets out **Option A, which D13
+> REJECTED**; §3 sets out **Option B, which D13 ADOPTED**; §5 is the
+> recommendation the lead accepted. **§4 is the exception — it is live
+> policy**, was never part of the E4 choice, and is corrected in place.
+>
+> Nothing here is still being chosen. Its counts are the 2026-07-27
+> measurement and are superseded by §7. Its future-tense phrasing —
+> "whichever option wins" (§1.4), "Until it is decided, WS6-T8 cannot be
+> drafted to completion" (§5), "If the lead prefers Option A anyway" (§5) — is
+> the tense of the day it was written and is **not** evidence that anything is
+> pending. §0 is the current state.
+>
+> **Changed 2026-09-20:** the headings of §2, §3, §4 and §5 gained
+> `REJECTED` / `ADOPTED` / `LIVE POLICY` / `accepted` labels, and §3's
+> "(proposed policy text)" became "(as submitted…)". Those are labels on a
+> closed question, not corrections of any claim. **No body text in §§1–6 was
+> altered** — verify with `git diff 0babb2de -- docs/ID_POLICY.md` and confirm
+> that every hunk falling inside §§1–6 is a heading line.
 
 ## 1. Current state (measured 2026-07-27, at `main` @ 66b973ca)
 
@@ -131,7 +239,7 @@ rows that were dropped later in the same build. Harmless, but it means issued
 
 ---
 
-## 2. Option A — widen to 7 digits in the v3.0 break
+## 2. Option A — widen to 7 digits in the v3.0 break *(REJECTED by D13, 2026-07-27 — historical rationale)*
 
 `INC-04853` becomes `INC-0004853`. Numbers are preserved; only padding changes.
 (The alternative — renumbering — is not on the table: it would destroy every
@@ -195,13 +303,13 @@ at the cost of growing `id_deprecations.json` roughly fifteen-fold (992 →
 
 ---
 
-## 3. Option B — a written padding-agnostic-parsing commitment
+## 3. Option B — a written padding-agnostic-parsing commitment *(ADOPTED by D13, 2026-07-27 — in force; see §0.1)*
 
 Keep `INC-` + five-digit minimum padding. Publish a commitment that the digit
 run is a **variable-width decimal number**, and that when the counter passes
 99,999 IDs organically become six digits (`INC-100000`), then seven, and so on.
 
-### Exact wording of the commitment (proposed policy text)
+### Exact wording of the commitment (as submitted 2026-07-27 — adopted verbatim by D13; the copy in force is §0.1)
 
 > **Incident IDs are `INC-` followed by a decimal number with no upper bound
 > on digit count.** IDs issued to date are zero-padded to a minimum of five
@@ -252,7 +360,7 @@ rewrites, no UUID rotation.
 
 ---
 
-## 4. Stability policy (not part of the decision — published either way)
+## 4. Stability policy *(LIVE POLICY — it was outside the E4 choice and is unaffected by D13)*
 
 These three rules hold under both options and are stated here as project
 policy. They align with the always-active board invariants in `CLAUDE.md`
@@ -282,7 +390,7 @@ append-only") and with plan invariants 3 and 4.
 
 ---
 
-## 5. Recommendation
+## 5. Recommendation *(as submitted 2026-07-27 — accepted in full by D13, with two riders added; see §0.3)*
 
 **Adopt Option B: publish the padding-agnostic-parsing commitment, widen the
 schema pattern to `^INC-[0-9]{5,}$`, and do not re-pad any published ID.**
