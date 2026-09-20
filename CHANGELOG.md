@@ -24,12 +24,11 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - **A build-time authorization guard** aborts before writing whenever a
   previously-single published ID would newly resolve to more than one row,
   unless the write is authorized by a list carrying the D28 approval
-  marker. The board record reports 23 attack shapes tried at gate review,
-  all aborting, including tamper-plus-recompute (closed by pinning the
-  expected hash in code); the committed regression suite covers 9 of those
-  shapes directly (see the release notes for the count re-derived from
-  what's committed vs. the board's broader figure). File presence alone
-  authorizes nothing.
+  marker, closed against tamper-plus-recompute by pinning the expected
+  hash in code. Covered by 13 dedicated tests in
+  `tests/test_merge_and_dedupe.py` (9 exercising the authorization check
+  directly, 4 covering the retirement/resplit-correction paths it gates).
+  File presence alone authorizes nothing.
 
 ### Fixed — the 47-split remediation (D28, 2026-09-18)
 - **Fixed a query-string URL over-merge in `normalize_url()`** that had been
@@ -41,11 +40,18 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - **Executed the previously-deferred unmerge the fix enables**, authorized
   by the user as D28 after review of per-split evidence
   (`docs/audits/WS4-T19-authorized-splits-2026-09-18.json`, 55 entries):
-  - **13,060 → 13,361 entries (+301).**
+  - **13,060 → 13,361 entries (+301)** — 306 new IDs, 5 removed from the
+    live set.
   - **43 published IDs keep their identity** (`keep_id` splits).
-  - **4 published IDs permanently retired** — `INC-00311`, `INC-00554`,
-    `INC-00754`, `INC-01897` — because the row that had been mechanically
-    inheriting the old ID was not its real successor.
+  - **D28 authorized and executed 4 permanent retirements** —
+    `INC-00311`, `INC-00554`, `INC-00754`, `INC-01897` — because the row
+    that had been mechanically inheriting the old ID was not its real
+    successor.
+  - **A 5th ID, `INC-07738`, also stops resolving to itself in this
+    release**, via a separate, ordinary `reason: "merged"` tombstone into
+    `INC-14757` — pre-existing dedupe behaviour, not part of the D28
+    authorization, named here because it is just as real a
+    stop-resolving-to-itself event for a consumer citing that ID.
   - **8 existing inbound redirects corrected** so they resolve to the
     D28-authorized successor set (4 needed new `id_deprecations.json`
     records; 4 already chain-resolved correctly once the 4 retirements
@@ -53,7 +59,14 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   - **Every retired ID still resolves** through
     [`data/id_deprecations.json`](data/id_deprecations.json)
     (1,051 → 1,060 records, **+9**, append-only under invariant 9). No
-    citation of any ID this project has ever published breaks.
+    citation of any ID this project has ever published breaks. **Two
+    counts over that file now diverge for the first time**: 1,060
+    records but only **1,056 distinct `from` IDs** — `INC-07771`,
+    `INC-08109`, `INC-08133`, `INC-08146` each carry an original
+    `merged` tombstone (2026-06-28) plus the `resplit` record (2026-09-18)
+    that corrects it; neither is deleted, per invariant 9. Reason
+    breakdown across all 1,060: `out-of-scope` 704, `merged` 289,
+    `orphaned-ingest-source-retired` 59, `split` 4, `resplit` 4.
   - **`landmark_count` 1,905 → 1,915 (+10)**, entirely a consequence of the
     split, not a re-classification: **−2** retired landmark rows, **+12**
     new landmark rows among the 306 new IDs, **0** existing rows flipped
@@ -67,8 +80,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 ### Consumer impact
 Anyone holding v2.10.0 or earlier has a corpus where `INC-00311`,
 `INC-00554`, `INC-00754`, and `INC-01897` point at content that is not
-theirs. Anyone joining on incident IDs across versions must re-resolve
-through `data/id_deprecations.json`.
+theirs, and where `INC-07738` (a separate, ordinary merge, not part of the
+D28 remediation) has also stopped resolving to itself. Anyone joining on
+incident IDs across versions must re-resolve through
+`data/id_deprecations.json`.
 
 ## [2.10.0] — 2026-09-18
 
