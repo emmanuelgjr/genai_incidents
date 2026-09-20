@@ -9,6 +9,13 @@
 >
 > Owner: schema-architect (WS3). Related: WS6-T8 (v3.0 migration guide),
 > WS1-T2 (corpus split), WS6-T3 (STIX).
+>
+> **SUPERSEDED IN PART — see §7 (addendum, 2026-09-19).** Sections 1–6 below
+> are preserved verbatim as the record of what was measured on 2026-07-27.
+> The headroom figures in §1 and §1.3 are stale; §7 re-measures them and says
+> what changed. §7 also records that the E4 decision this banner calls
+> "pending" **was subsequently made** (D13, 2026-07-27, Option B). Do not edit
+> §§1–6 to make them current.
 
 ---
 
@@ -352,3 +359,273 @@ Corpus totals quoted in this document are as of 2026-07-27 and are stated with
 their measurement date rather than templated, because this file is a
 point-in-time decision record and is not on the `stats_docs_lib.DOC_SURFACES`
 list.
+
+---
+
+## 7. Addendum — headroom re-measured 2026-09-19
+
+> **DATED RECORD — DO NOT REGENERATE, DO NOT MERGE INTO §§1–6.**
+> Measured 2026-09-19 at `main` @ `0fb0d969`. This section supersedes the
+> **numbers** in §1 and §1.3 and nothing else: §2, §3, §4 and §5 are
+> unaffected in substance, and §§1–6 stay as written because they are the
+> record of what the runway looked like when it was last assessed. Written by
+> schema-architect (WS3). A later re-measurement appends §8; it does not edit
+> this section.
+>
+> **Why this was run:** `docs/ID_POLICY.md` exists to inform the ID-width
+> question, and the D28 remediation (WS4-T21, the 47-split unmerge, merged
+> 2026-09-18) minted roughly three hundred IDs in a single transaction. A
+> runway table dated eight weeks earlier is stale input to that question.
+
+### 7.1 What moved, and what did not
+
+| Quantity | §1 (2026-07-27) | Now (2026-09-19) | Δ |
+|---|---:|---:|---:|
+| Live entries | 13,115 | **13,361** | +246 |
+| High-water number issued | 14,600 | **14,910** | +310 |
+| Deprecation **records** | 992 | **1,060** | +68 |
+| Deprecation **distinct IDs** | 992 | **1,056** | +64 |
+| Silent burn (issued, recorded nowhere) | 493 | **493** | 0 |
+| Numbers remaining below `[0-9]{5}` | 85,399 | **85,089** | −310 |
+| Issued ÷ live | 1.113 | **1.116** | +0.003 |
+| Distinct ID patterns / ID length | 1 / 9 chars | **1 / 9 chars** | unchanged |
+| Duplicate IDs | 0 | **0** | 0 |
+
+**Records ≠ distinct IDs, for the first time in this file's history.** Four IDs
+(`INC-07771`, `INC-08109`, `INC-08133`, `INC-08146`) now carry **two**
+tombstones each: a `merged` record from 2026-06-28 and a `resplit` record from
+2026-09-18 that un-does it. Every runway figure below is computed against
+*distinct* IDs, because that is what the allocator's high-water scan consumes.
+A reader reconciling 1,060 against 1,056 is not looking at an error.
+
+Two vocabulary items postdate §1 entirely: the `reason` values `split` (4
+records) and `resplit` (4 records), and an `into` field that may hold a **list**
+of successors rather than a string. §1's reason breakdown (704 `out-of-scope` /
+288 `merged`) is now 704 `out-of-scope` / 289 `merged` / 59
+`orphaned-ingest-source-retired` / 4 `split` / 4 `resplit`, and 763 records are
+terminal (`into: null`) rather than 704.
+
+**§1.4(a) is still open.** All nine IDs — 522, 609, 951, 952, 955, 956, 957,
+1355, 1660 — remain in neither `data/incidents.json` nor
+`data/id_deprecations.json` as of this measurement. D13's rider (b) is
+unimplemented.
+
+### 7.2 The runway, stated the way §1.3 states it
+
+Extending §1.3's series with every revision of `data/incidents.json` since:
+
+| Date | Live entries | High-water | Note |
+|---|---:|---:|---|
+| 2026-07-27 | 13,115 | 14,600 | §1.3's last row (weekly auto-refresh #97) |
+| 2026-07-28 | 13,119 | 14,604 | WS0-T3 Phase B rebuild (+4) |
+| 2026-07-30 | 13,060 | 14,604 | E21 OECD reduction — **live −59, no numbers issued** |
+| 2026-08-17 | 13,060 | 14,604 | OWASP 2026 migration — **no numbers issued** |
+| 2026-09-18 | 13,060 | 14,604 | v2.10.0 cut — **no numbers issued** |
+| 2026-09-18 | 13,361 | 14,910 | **D28 remediation: +306 in one transaction** |
+
+85,089 numbers remain below the `[0-9]{5}` ceiling. The same four regimes §1.3
+uses, recomputed to today:
+
+| Regime | §1.3 rate | Now | §1.3 runway | Now | Ceiling hit |
+|---|---:|---:|---:|---:|---|
+| Project-lifetime average (2026-05-12 →) | 192/day | **115/day** | 445 days | **742 days** | late 2028 |
+| Bulk-inclusive (2026-06-10 →) | 106/day | **52/day** | 2.2 years | **4.5 years** | early 2031 |
+| Post-backfill mixed (2026-06-11 →) | 44/day | **23/day** | 5.3 years | **10.0 years** | 2036 |
+| Recent drip only (2026-07-02 →) | 15/day | **8.8/day** | 15.2 years | **26.5 years** | 2053 |
+
+Every regime got **slower**, and every runway got **longer**. The reason is in
+the series above: between refresh #97 and the D28 merge the corpus issued
+**zero** new numbers for 52 days — an unusually long idle stretch (the corpus
+was frozen for the WS4-T21 remediation), which dilutes every rate whose window
+overlaps it. Strip the D28 event out of the newest window and the organic drip
+since 2026-07-02 is 389 numbers over 79 days = **4.9/day**, a ~47-year runway.
+
+Read the widening with suspicion, not relief: it is a measurement of a period
+in which the project was deliberately not ingesting. It is evidence that the
+drip is slow; it is not evidence that the project got safer.
+
+### 7.3 What D28 did to the runway specifically
+
+Field-level, from the tombstones and the corpus (not from prose):
+
+- **306 numbers minted**, `INC-14605` … `INC-14910`, one contiguous block, in
+  one merge.
+- **5 IDs left live service**: four `split` parents (`INC-00311`, `INC-00554`,
+  `INC-00754`, `INC-01897`) plus `INC-07738`, merged into `INC-14757`. All five
+  carry tombstones. Four already-tombstoned IDs gained `resplit` records.
+  (The routing brief's "four retirements" undercounts by one: `INC-07738` is a
+  retirement too, just a `merged` one rather than a `split` one.)
+- **Net live 13,060 → 13,361** = +306 − 5. The arithmetic closes exactly.
+- **Zero burn inside the block.** All 306 numbers are live entries today;
+  135 of them are named as `into` targets of a D28 tombstone, the other 171
+  are rows unmerged from parents that were never tombstoned.
+
+That last point is the interesting one for the model. Ordinary ingestion runs
+at issued ≈ live × 1.11 — roughly one number in ten is consumed by a row that
+never survives the build. **D28 consumed 306 numbers and produced 306 live
+entries: 100% efficiency, the cleanest allocation event in the project's
+history.** A remediation knows exactly how many rows it is creating; an ingest
+does not.
+
+**Does it change the shape of the projection, or only its position?** Position
+only, and by −310 numbers out of 85,399 — 0.36% of the remaining space. The
+shape argument is addressed in §7.5.
+
+### 7.4 Has the answer changed? No.
+
+Stated plainly, because "no change" is the result and should not have to be
+inferred:
+
+1. **The ID width question was already decided.** E4 was resolved on
+   2026-07-27 by **D13** — Option B, the padding-agnostic-parsing commitment,
+   with two riders. The DRAFT banner at the top of this file, which says
+   "decision pending", was true when written and has been stale since the day
+   after. What remains open is the *implementation* task and the two riders,
+   not the ruling. (This addendum does not edit the banner's original wording;
+   see the supersession note beside it.)
+2. **Nothing measured here disturbs that ruling.** Option B's case never
+   rested on the runway being long — it rested on Option A being Option B plus
+   a rewrite of every published identifier (§5). That argument is unaffected by
+   any count in §7.1, and the cost side of it got *larger*: Option A would now
+   rewrite 13,361 IDs rather than 13,115, and the "complete old→new map" would
+   cover 14,910 numbers rather than 14,107.
+3. **Neither of D13's own revisit triggers is near firing.** Issued numbers are
+   14,910 — **29.8%** of the way to the 50,000 revisit trigger, and headroom is
+   **85.1%** of the space against a 20% floor.
+4. **The runway is comfortable and got more so**, on every regime §1.3 defined.
+
+If the lead is re-reading this file to make a ruling: the ruling was made, and
+the fresh numbers support it more strongly than the stale ones did.
+
+### 7.5 The bulk-consumption question — judgement
+
+**The model does not need a rate term for bulk events. It needs the reopen
+trigger D13 already ordered, and D28 is the event that lets us set its
+threshold honestly.**
+
+Averaging bulk events into a per-day rate is the wrong instrument and always
+was. §1.3's four regimes differ by a factor of thirteen purely in how much bulk
+they average in, which is another way of saying the average is not measuring
+anything stable. Adding a fifth "bulk term" fitted to one 306-number event
+would be over-fitting with extra steps — and it would over-fit to the *smallest*
+bulk event on record, which is worse than useless. The three bulk events this
+project has actually had were 2,941 (v2.3.0 backfill), 788 (v2.6.0 CVE
+expansion) and 306 (D28). The space absorbs 28, 107 or 278 more of them
+respectively. The honest statement is the one §1.3 already makes: the drip will
+never exhaust the space, bulk events might, and the number of bulk events per
+year is not a measured quantity — it is a planning decision the project makes
+one remediation at a time.
+
+The right instrument for a variable nobody can forecast is a **threshold that
+escalates before the fact**, which is exactly what D13's rider (a) asked
+schema-architect to propose. D28 gives it a calibration point. Proposed:
+
+> **ID-headroom reopen trigger.** The Option-B ruling (D13) reopens
+> automatically as an escalation to the human lead when **any one** of these
+> holds:
+> **(a)** a single planned operation would mint **more than 2,000 numbers**
+> — roughly 2.5% of remaining headroom at the time of writing, and about
+> two-thirds of the largest event on record;
+> **(b)** **more than 5,000 numbers** are issued across any rolling 90-day
+> window, whatever the mix of drip and bulk;
+> **(c)** cumulative numbers issued pass **50,000** (D13's own figure); or
+> **(d)** remaining headroom below the current width falls under **20%**
+> (D13's own figure — 20,000 numbers).
+> Condition (a) is checked by the operation's own design review, before it
+> runs. Conditions (b)–(d) are checked in CI against a `high_water_id` key
+> published in `data/stats.json`.
+
+Why those two new numbers. **(a) 2,000** is set so that the *largest event this
+project has ever run* would have tripped it and D28 would not — a threshold
+that no historical event trips is form (a) of working agreement 6, a check that
+cannot fail; a threshold that every event trips is noise. 2,000 sits between
+306 and 2,941 and closer to the top, which is the correct asymmetry: we want to
+hear about the rare large one, not the routine remediation. **(b) 5,000 per 90
+days** exists because the failure mode the drip regimes hide is not one large
+event, it is several medium ones in quick succession — WS4-T5's successor-pair
+merges and the three flagged pairs are exactly that population, and each is
+individually far under (a). Condition (b) is the term that catches what a
+per-event threshold cannot, without pretending to forecast a rate. At today's
+organic rate a 90-day window carries ~440 numbers, so (b) has roughly 11×
+slack against the drip alone — it fires on accumulation, not on business as
+usual.
+
+**Blocking prerequisite.** Conditions (b)–(d) are unenforceable today:
+`data/stats.json` has keys `incident_count`, `landmark_count`, `generated`,
+`version`, `year_min`, `year_max` — **no `high_water_id`**. §5's second
+condition asked for that key on 2026-07-27, D13 folded it into rider (a), and
+the board still carries it as a follow-up with no owner. Until it exists, every
+number in this addendum is something a human re-derives by hand, which is how
+the table in §1 went stale in the first place. **This addendum recommends the
+`high_water_id` key be given an owner as the first piece of rider (a)'s
+machinery**; the threshold above is prose until something computes it.
+
+### 7.6 No schema change is required by this addendum
+
+The `pattern` on the `id` property in both `schema/incident.schema.json` and
+`src/genai_incidents/schema/incident.schema.json` is still `^INC-[0-9]{5}$`,
+and at a high-water of 14,910 it will not be tested for a long time. Widening
+it to `^INC-[0-9]{5,}$` remains D13's v3.0/Phase-2 implementation work, not
+something this re-measurement triggers. **This is a documentation-only change.**
+
+### 7.7 Verification recipe for §7
+
+Every figure above is reproducible from the repository at `main` @ `0fb0d969`.
+Two independent derivation paths are given, because a re-run of a single method
+is not a check (working agreement 6).
+
+```bash
+# ROUTE A - current state, straight from the two data files
+python -c "import json; \
+inc=json.load(open('data/incidents.json',encoding='utf-8'))['incidents']; \
+dep=json.load(open('data/id_deprecations.json',encoding='utf-8'))['deprecations']; \
+live={int(e['id'][4:]) for e in inc}; d={int(x['from'][4:]) for x in dep}; \
+print('live',len(live),'records',len(dep),'distinct_dep',len(d), \
+'high_water',max(live|d),'burn',max(live|d)-len(live)-len(d-live), \
+'headroom',99999-max(live|d))"
+# -> live 13361 records 1060 distinct_dep 1056 high_water 14910 burn 493 headroom 85089
+
+# ROUTE B - the same three totals derived WITHOUT reading git history, from
+# each entry's own `added` stamp and each tombstone's own `date`. Agrees with A
+# on all three. It confirms the TOTALS only: D28's split children inherit their
+# parents' `added` date, so `added` is not an issuance date and Route B cannot
+# reconstruct the curve. That limitation is itself a finding - any future
+# consumption model built on `added` would be blind to bulk remediations.
+python -c "import json,collections; \
+inc=json.load(open('data/incidents.json',encoding='utf-8'))['incidents']; \
+dep=json.load(open('data/id_deprecations.json',encoding='utf-8'))['deprecations']; \
+p=[(e['added'][:10],int(e['id'][4:])) for e in inc]+[(x['date'][:10],int(x['from'][4:])) for x in dep]; \
+print('high_water',max(n for _,n in p),'live',len(inc),'distinct_dep',len({x['from'] for x in dep}))"
+# -> high_water 14910 live 13361 distinct_dep 1056
+
+# The D28 delta, per-ID rather than per-aggregate (form (d) of agreement 6 is
+# exactly what an aggregate hides). 0c778ced is the v2.10.0 cut, pre-D28:
+git show 0c778ced:data/incidents.json > pre.json
+python -c "import json; \
+pre={e['id'] for e in json.load(open('pre.json',encoding='utf-8'))['incidents']}; \
+now={e['id'] for e in json.load(open('data/incidents.json',encoding='utf-8'))['incidents']}; \
+print('added',len(now-pre),'removed',sorted(pre-now))"
+# -> added 306 removed ['INC-00311','INC-00554','INC-00754','INC-01897','INC-07738']
+
+# The high-water series in 7.2 - one row per revision of the data file:
+git log --format='%H %ad' --date=short -- data/incidents.json
+
+# 1.4(a): the nine are still dangling
+python -c "import json; \
+inc={e['id'] for e in json.load(open('data/incidents.json',encoding='utf-8'))['incidents']}; \
+dep={x['from'] for x in json.load(open('data/id_deprecations.json',encoding='utf-8'))['deprecations']}; \
+print([i for i in ['INC-00522','INC-00609','INC-00951','INC-00952','INC-00955', \
+'INC-00956','INC-00957','INC-01355','INC-01660'] if i not in inc and i not in dep])"
+# -> all nine
+```
+
+**Proof the Route-B check can fail** (a gate nobody has seen fail is a gate
+nobody should cite): deleting the single highest-numbered entry from a *copy*
+of `data/incidents.json` moves Route B's output from `high_water 14910 live
+13361` to `high_water 14909 live 13360`. Run against a scratch copy; nothing
+under `data/` was modified by this measurement.
+
+Corpus totals quoted in this section are as of **2026-09-19** and are stated
+with their measurement date rather than templated, for the same reason §6 gives:
+this file is a point-in-time decision record and is not on the
+`stats_docs_lib.DOC_SURFACES` list.
