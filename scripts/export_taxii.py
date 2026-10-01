@@ -143,6 +143,15 @@ This directory is a **read-only, static** TAXII 2.1 mirror of the
 | Objects | `{api_root}collections/{COLLECTION_ID}/objects.json` |
 | Manifest | `{api_root}collections/{COLLECTION_ID}/manifest.json` |
 
+## OWASP edition label
+
+OWASP LLM `external_references` in these objects carry an edition-qualified
+`source_name`, currently `owasp-llm-top10-2026` (before 2026-10-01 it read
+`owasp-llm-top10-2025`, which was the wrong edition for these codes). The
+edition is derived from the crosswalk `mappings/owasp_llm_2025_to_2026.json`.
+Object `id` and `modified` did not change, so consumers that dedupe on
+(`id`, `modified`) must re-import to pick up the corrected label.
+
 ## Caveat: media type & pagination
 
 GitHub Pages serves these files as `application/json`, **not** the

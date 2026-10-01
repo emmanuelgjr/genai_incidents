@@ -5,6 +5,35 @@ The dataset uses [SemVer](https://semver.org/) — major bumps for breaking
 schema or ID changes, minor bumps for additive schema fields or large
 ingest expansions, patch bumps for routine refreshes and bug fixes.
 
+## [Unreleased]
+
+### Changed — STIX/TAXII OWASP LLM `source_name` relabel (live since 2026-10-01, after the v2.11.0 cut)
+
+- **Every OWASP LLM `external_reference` in the STIX bundle
+  (`data/incidents.stix.json`) and the TAXII collection `05bbe2e9…` now has
+  `source_name: "owasp-llm-top10-2026"`; it was
+  `"owasp-llm-top10-2025"`.** 17,750 references changed, equal to the sum of
+  `len(owasp_llm)` over the corpus. Commit `7dc80602`, merged 2026-10-01
+  after the v2.11.0 cut (board ruling D32), so it is **not** in the v2.11.0
+  release notes; it is live on Pages now.
+- **Why:** the `owasp_llm` codes have been the 2026 edition since v2.10.0
+  (migration applied 2026-08-17), so the 2025 label was wrong. Under the
+  2025 edition `LLM03` reads as *Supply Chain*; in this data it means
+  *Excessive Agency*. The edition is now derived from the crosswalk
+  (`mappings/owasp_llm_2025_to_2026.json`, `to_version`), so a future
+  migration cannot leave the label stale.
+- **Consumers keying on the old string must change.** Query for
+  `owasp-llm-top10-2025` (old) and `owasp-llm-top10-2026` (new).
+- **Re-import the STIX bundle.** SDO `id` and `modified` are **unchanged**
+  (`modified` derives from entry dates), so consumers that dedupe on
+  (`id`, `modified`), OpenCTI for example, will not pick up the corrected
+  label from a normal re-sync. Delete and re-import the affected objects,
+  or re-import the bundle into a clean instance.
+- **Did not change:** SDO `id` and `modified`, the object count (54,485),
+  the MISP feed, PyPI, the Hugging Face dataset, and every `data/*.json`
+  file. Only the STIX bundle, the TAXII `objects.json` and the STIX line of
+  `docs/data/SHA256SUMS` changed.
+
 ## [2.11.0] — 2026-10-01
 
 > **These notes were gated before the cut** (board ruling D30, 2026-09-20)
