@@ -124,6 +124,25 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ⚖ D35 — USER RULINGS, 2026-10-01, on WS4-T23's escalation: **no data change in v2.11.0; disclose per ID**
+
+1. **INC-03128 and INC-08185: NO authorization change for v2.11.0.**
+   - D28's data ships exactly as authorized and gated.
+   - The notes name the stable-key successors, **INC-14909** and **INC-14742**.
+   - Narrowing D28's authorized fan-out for these two, which means editing the audit entries and re-pinning `REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256`, becomes a **separate gated task after the cut**, owned by WS4.
+2. **INC-00497 and INC-08139: no single answer.**
+   - The fan-out stays, so `resolve_id` returns None.
+   - The notes carry a **per-release successor table**:
+     - 00497: 14789 for v2.0–2.1, 14907 for v2.2–2.8;
+     - 08139: 14852 for v2.2–2.5, 14742 for v2.6–2.7.
+
+**Consequence: "8 ambiguous by design" is replaced by an exact per-ID disclosure** of the 8 IDs that return None:
+- 4 retirements, split into real groups;
+- 2 with an identified successor not yet written as a record;
+- 2 whose meaning changed between releases.
+
+**Branch movement.** `release/v2.11.0-notes` was fast-forwarded `1977515e..c7b5fe8f` (WS4-T23's `src/`+tests commit). **That commit is UNGATED.** It is covered explicitly by the final gate rather than by its own gate, which is a foreman decision recorded here. WS6 notes pass dispatched next.
+
 ### 🔎 WS4-T23 — D33 investigation delivered `c7b5fe8f` (pushed) — **NO DATA WRITTEN: an authorization change is needed → ESCALATED TO USER**
 
 **Phase A.** Content checked per tag from v2.0.0 to v2.10.0, with the successor matched by **stable keys** (source IDs plus reference-URL overlap), not titles:
