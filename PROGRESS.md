@@ -124,6 +124,22 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ⚖ D36 — USER RULING, 2026-10-01, on BOUNCE #3: **narrow fix + narrow gate, then cut**
+
+**One WS6 specialist pass.** Under this ruling it is authorized to make **the docstring-only** `src/` edit. It edits exactly these:
+- README:33 (drop "by design" for all 8 and point to the per-ID breakdown);
+- the false `query()` docstring sentence, plus the hardcoded 1,915 (A1);
+- the dated-note marker label (A3);
+- `docs/paper/genai-incidents-methods.md:74`, the unscoped "citations always resolve" (A4).
+
+**Then a gate limited to that diff:**
+- re-run the suite;
+- the behaviour hash `c322f3fa…` (proves no behaviour change);
+- the drift check;
+- a surface sweep for "by design" / "would match nothing" / unscoped resolution claims.
+
+**On PASS → the cut** (VERSIONING.md steps 2–9). A2, the DATA_DICTIONARY:9 lead-in and ID_POLICY §3 stay as follow-ups.
+
 ### ⛔⛔⛔ v2.11.0 RELEASE NOTES — **BOUNCE #3 (red-reviewer, 2026-10-01, on `d27bcae2`) — ESCALATED TO USER** · two wording defects, about 2 lines, no data or behaviour change
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Both defects are wording only, about 2 lines in total. No data change and no behaviour change is needed. Everything else re-derives exactly."*
