@@ -124,6 +124,48 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⛔ WS4-T22 — **BOUNCE #1 (red-reviewer, 2026-09-30, on `af9601fa`)** — the first RECORDED verdict; the gate a prior session dispatched never filed one (agreement 3), so this gate was re-dispatched from scratch. **Status: in-progress; re-dispatched to a fresh pipeline-engineer.** The user ordered "cut v2.11.0" on 2026-09-30, and this is the first blocker on that path.
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … The D31 core is correct … It bounces because the loader-rule change introduces a split-brain between the package and the build/validator. Two of the 11 new tests also cannot fail."*
+
+**Evidence measured [R]:**
+- **The core passes.** The real pre-fix module and the real branch module were each run in its own subprocess over INC-00000..19999, comparing per-ID results:
+  - `resolve_id` changes for **exactly 4**, all from None to an answer (07771→14814, 08109→14847, 08133→14850, 08146→14853);
+  - `resolve_id_group` changes for 0;
+  - the deprecations map is identical.
+- **The 8 stay None**, with group sizes of 11–100.
+- The suite runs `470 passed, 1 xfailed` on the branch and 459 on the base.
+- The branch merges clean into `release/v2.11.0-notes`; a fast-forward is possible.
+- **"Output-identical today" is TRUE.** For all 4 duplicated `from`s, the merged record (2026-06-28, at index ~436) and the resplit record (2026-09-18, at index 1056–1059) agree under both rules. The file has 57 adjacent date inversions.
+
+**DEFECTS:**
+1. **Split-brain between the loader and the validator.**
+   - **What changed:** `_load_deprecations()` now picks max-`date`.
+   - **The repo's existing contract is last-in-file:**
+     - `scripts/validate.py` `_latest_by_from` says "every consumer … must go through this function";
+     - `merge_and_dedupe.py:2346-2353, 2460-2468` must stay "behaviourally identical";
+     - `tests/test_merge_and_dedupe.py:552` asserts the last record stays authoritative even with an earlier date.
+   - **How the rules disagree:**
+     - (A) the inversion test's own seed: the package returns INC-00002, the validator INC-00001;
+     - (B) a dateless second record also gives INC-00002 vs INC-00001.
+     - Both answers are live, believable IDs.
+   - **Remedy:** restore last-in-file wins and state it explicitly. Date precedence would be a separate policy question that moves three files in lockstep. **The foreman does NOT escalate it now**, because the repo's recorded decision is last-in-file and the D31 scope was the list hop only.
+2. **The A1-required supersession test is missing.**
+   - **Required:** a fixture with both targets live, run in both file orders, with proof that it fires.
+   - **What exists instead:** the duplicate test uses only real data, where the two rules agree. Mutation M3 (reverting to last-in-file) still gives 470 passed.
+3. **Two proof-of-fire tests cannot fail (agreement 6 form a).**
+   - **The tests:** `test_resolve_id_ws4t22_proof_the_regression_test_fires` and `test_resolve_id_no_collateral_change_proof_it_fires` never call `gi.resolve_id`.
+   - **The evidence:** both still PASS under M1 (bug restored) and M2 (over-broad fix).
+   - **Also:** the no-collateral oracle shares the new loader (form b).
+   - **Remedy:** remove these two tests or make them exercise `gi.resolve_id` against fixtures, and point the oracle at the raw file with last-in-file semantics.
+
+**Keep:**
+- the `len(current) != 1` unwrap;
+- the docstring rewrite;
+- the 0/1/2-element, dangling, chain and cycle unit tests.
+
+**Re-derive the pytest figure** after the rework; it will not be 470. **A second bounce goes to the user.**
+
 ### 🔧 WS4-T22 — `resolve_id` single-successor fix (D31) — delivered `af9601fa`, **pushed**, gate dispatched
 
 Branch `ws4/t22-resolve-id-single-successor` off `release/v2.11.0-notes` @ `2f7bba1d`. Two files: `src/genai_incidents/__init__.py`, `tests/test_package.py`. No `data/`, no version strings, `resolve_id_group()` byte-identical. Suite **459 → 470 passed, 1 xfailed** (+11), baseline confirmed at `2f7bba1d` first.
