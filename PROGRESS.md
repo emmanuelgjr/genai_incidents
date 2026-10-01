@@ -2,6 +2,22 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🖼 2026-09-30 — README refresh (PR #100, DRAFT, held for v2.11.0) · three defects found while building it, routed to WS6
+
+**User request, ad hoc (not a plan task):** make the README more appealing, then add images. The foreman implemented it directly on `docs/readme-refresh` (`8e23d6e6`). It is presentation only: licensing, citation, caveat and release prose is carried verbatim, counts stay inside `stats:` markers, and **no image carries a corpus count**. The site screenshot was cropped to keep the total out, and the image generators are in `scripts/readme_assets/`. `check_stats_drift` is clean and was shown to fire on a corrupted marker. docs-warden ran one pass with 12 findings; the 8 actionable ones were fixed in `426ed817`.
+
+**⛔ PR #100 is HELD until after the v2.11.0 cut.** `git merge-tree` shows a `README.md` conflict with `release/v2.11.0-notes` (`2f7bba1d`): both rewrite "Latest release". The D30/D31 sequencing must not be reordered.
+- **Docs-warden miss, form (b) of agreement 6.** It called the "exactly one corpus row changed / refresh frozen" paragraph "accurate today". It verified the paragraph against the v2.10.0 notes, the same source the paragraph came from. That paragraph is the Critical stale claim the D30 sweep already found.
+- **After the cut:** rebase #100 and take the corrected paragraph into its callout.
+
+**Defects found (foreman, 2026-09-30), dispatched to distribution-engineer, worktree branch `ws6/stix-owasp-edition-and-site-fixes`, NO MERGE until the user rules on timing:**
+1. **HIGH, live.** `scripts/export_stix.py:128` labels every `owasp_llm` external_reference `owasp-llm-top10-2025`, but codes are the 2026 edition since v2.10.0. The live bundle has 17,750 such refs. A STIX/TAXII consumer reads `LLM03` as *Supply Chain*, not *Excessive Agency*. This is the **E24 class surviving in one exporter**: the v2.10.0 migration relabelled the data but not this export's edition string, and no check covered it.
+   - **Merge-timing question for the user:** Pages rebuilds STIX on exporter pushes. Merging before the cut changes a published surface under an unchanged version label (the D30 root-cause class) unless the v2.11.0 notes disclose it.
+2. **MEDIUM, false site claim.** `docs/app.js:293` shows "31 YEARS — unbroken since 1983". That is 31 distinct years over a 44-year span, so it is not unbroken.
+3. **LOW.** The site table's ASI column overflows on long code lists (INC-00924 renders "ASI0" cut off).
+
+Acceptance given to WS6: a test that fails on the old code, run first; a field-level STIX before/after delta where only that `source_name` moves; a full pytest count; branch confirmed on origin. **red-reviewer gates on return.**
+
 ## 🎉 D28 REMEDIATION MERGED 2026-09-20 (`8f74b035`) — **THE CORPUS IS UNFROZEN** · and ⚖ D30: cut **v2.11.0**
 
 **Published state on origin:** `incident_count` **13,361** · `landmark_count` **1,915** · `generated` **2026-09-18** · deprecations **1,060 records over 1,056 distinct `from` IDs**. **Four** IDs were retired under D28's authorization (`reason: "split"`); **five** IDs in total stopped resolving to themselves, the fifth being `INC-07738` via an ordinary `merged` tombstone into `INC-14757`. Both figures are true and they answer different questions — see the dated correction below. **The count had not moved since 2026-07-27.**
