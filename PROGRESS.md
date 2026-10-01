@@ -2,6 +2,35 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+### ⛔ D38 disclosure — **BOUNCE #1 (red-reviewer, 2026-10-01, on `476c9f5d`)** — four false or overclaimed sentences; re-dispatched to WS6 with the gate's own scoped wording
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … first gate on this task."*
+
+**DEFECTS:**
+1. **HIGH.** The CHANGELOG says "the STIX line of `docs/data/SHA256SUMS` changed". That is **false**: SHA256SUMS has **no STIX line**, because `pages.yml` runs `gen_data_integrity.py` **before** `export_stix.py`. The live file has 33 lines and 0 stix; a v2.11.0-tag reproduction of the deploy order equals the live file. **The claim originated in an earlier gate's "Published surfaces on merge" list on this board, which is testimony refuted by a different route (agreement 5/6).**
+2. **MED.** "Before 2026-10-01" (DATA_DICTIONARY:205 and the TAXII template) is misleading. The deploy of `7dc80602` completed at **13:43:57Z** (Last-Modified 13:43:53 GMT); `-2025` was live during the v2.11.0 publication at 06:17Z.
+3. **MED.** OpenCTI is overclaimed. The earlier advisory said consumers "may" miss the change; the text says "will not", stated as fact about a third party, and is untested. **Scope it** to consumers that treat an unchanged (`id`, `modified`) as an already-seen version, as STIX 2.1 versioning permits, and say they **may not** pick up the change. Drop "OpenCTI for example" unless it is verified.
+4. **LOW.** "Every `data/*.json` unchanged" includes the gitignored STIX bundle at `data/incidents.stix.json`. Make it "every **committed** `data/*.json`".
+
+**Evidence [R]:**
+- Live STIX and TAXII: 54,485 objects with 17,750 `-2026`. The **v2.11.0-tag build has 17,750 `-2025`**. An independent Σ len(owasp_llm) gives 17,750.
+- **Per-object delta, tag against live:** the id sets are equal, `modified` is equal on every object, and the ONLY differing path is `.external_references[].source_name`, with 17,750 changes on **11,753 `x-genai-incident` SDOs**. The TAXII manifest is byte-identical.
+- The branch build is byte-identical to the live files.
+- **MISP:** 34 live files, `diff -r` against the tag build is empty.
+- PyPI and HF last changed at 06:18Z, before the deploy.
+- Migration applied 2026-08-17. LLM03 is Supply Chain under 2025 and Excessive Agency under 2026.
+- `export_taxii.py`: the AST with str constants blanked is equal, **proven to fire** with a mutated control.
+- 476/1; the drift check is clean; merge-tree is clean.
+
+**Advisories:**
+- A1: the template hardcodes "currently -2026" (WS6 follow-up: interpolate the derived label).
+- A2: **the STIX bundle has no published checksum**, because of the step order (WS6 follow-up; a change would need its own disclosure).
+- A3: the relabel changed content without bumping `modified`, which breaks STIX 2.1 versioning; the policy is still open.
+- A4: "query for old and new" is ambiguous.
+- **A5: re-syncing the Release body with the addendum is consistent with agreement 4 and step 8b** after the fixes. Note that the tag's copy of the notes, and so the Zenodo archive, will NOT carry the addendum.
+
+> **Dated correction, 2026-10-01 (gate A6):** the "🛰 WS6 STIX OWASP-edition + site fixes — PASS" entry's advisory A3 says "The 17,750 SDOs change content". **The measured figure is 11,753 SDOs carrying 17,750 references.** *Dated record; the entry above is not rewritten.*
+
 ## ⚖ D38 — USER RULING, 2026-10-01: **disclose the live STIX relabel now**, not at the next release (amends D32's timing)
 
 **One WS6 pass, then a gate:**
