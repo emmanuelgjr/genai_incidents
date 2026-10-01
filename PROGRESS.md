@@ -2,6 +2,25 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+### 📋 docs-warden sweep after the STIX merge (origin/main `f6398c75`, 2026-10-01) — findings ROUTED (protocol step 7)
+
+The warden confirmed the diff matches the foreman's description (4 files).
+- **Clean [R]:**
+  - no live surface asserts `-2025` or "unbroken";
+  - all OWASP prose says 2026;
+  - all 2.11.0 version strings agree;
+  - the concept DOI is consistent;
+  - the drift check is clean (run against a `git archive` extract).
+
+| # | Sev | Where | Finding | Owner |
+|---|---|---|---|---|
+| 1 | HIGH | `CHANGELOG.md` (no `[Unreleased]`) | **Nothing discloses the live STIX/TAXII `source_name` relabel, or the re-import instruction.** This is the D32 notice that is owed. | WS6 (the timing is the user's call) |
+| 2 | MED | `docs/releases/v2.11.0.md` 197-215 | "Consumer impact, stated without hedging" is now incomplete for STIX consumers. It is a dated record, so it needs a **dated addendum** with a do-not-regenerate marker, not a rewrite (agreement 4). | WS6 |
+| 3 | MED | README:18, DATASHEET:115, DATA_DICTIONARY:205; the `export_taxii.py` README template | No surface documents that the STIX OWASP `source_name` is edition-qualified (`owasp-llm-top10-2026`). | WS6 docs + WS4 `export_taxii.py` |
+| 4 | LOW | `docs/taxii2/README.md` | Generated at deploy and not in git, so it cannot be audited from the repo. Its text makes no edition claim. | — |
+| 5 | LOW | README:88-95 file tree | Lists only `owasp_llm_top10_2025.json`. **Already fixed in README PR #100** (`426ed817`/`3be697c4` add the 2026 file and the crosswalk). | — via PR #100 |
+| 6 | INFO | `export_stix.py:39-47` | The docstring calls the crosswalk "the single source of truth" for the edition. It is scoped to one field, so acceptable; reword if zero tolerance is wanted. | WS4 |
+
 ## 🛰 STIX OWASP-edition fix — **MERGED to main `7dc80602` and LIVE (2026-10-01)** · D32 post-cut step 1 done
 
 **Merge.** `ws6/stix-owasp-edition-and-site-fixes` (`a2be3364`, gate PASS, board `70e72155`) was merged `--no-ff` onto post-cut main.
