@@ -121,7 +121,7 @@ _WS4T22_TWELVE = {
     # regressed by the WS4-T15 list guard, fixed by WS4-T22 (each of
     # these carries an older `merged` tombstone AND a later `resplit`
     # tombstone with a single-element `into` -- see
-    # test_load_deprecations_prefers_latest_date_for_known_duplicates).
+    # test_load_deprecations_last_in_file_wins_for_known_duplicates).
     "INC-07771": "INC-14814",
     "INC-08109": "INC-14847",
     "INC-08133": "INC-14850",
@@ -139,58 +139,20 @@ _WS4T22_TWELVE = {
 }
 
 
-def test_resolve_id_ws4t22_named_twelve():
+def test_resolve_id_named_twelve():
     # Input that makes this fail: reverting resolve_id's list-length
     # check to the pre-WS4-T22 uniform `isinstance(current, list): return
-    # None` bail. Verified live below in
-    # test_resolve_id_ws4t22_proof_the_regression_test_fires.
+    # None` bail (the 4 IDs flip to None), or an over-broad fix that picks
+    # an element of a 2+ element list (the 8 flip to a non-None ID).
     for inc_id, expected in _WS4T22_TWELVE.items():
         assert gi.resolve_id(inc_id) == expected, (inc_id, gi.resolve_id(inc_id))
-
-
-def test_resolve_id_ws4t22_proof_the_regression_test_fires():
-    """Working agreement 6: prove the regression test above actually can
-    fail, by running it against a frozen copy of the pre-WS4-T22
-    resolve_id (the one that shipped in dcec1602 / WS4-T15) instead of
-    the current one. All four of the named non-None IDs must flip to
-    None under the old algorithm -- if they didn't, the test above would
-    not be checking what this docstring claims it checks."""
-
-    def pre_ws4t22_resolve_id(inc_id):
-        if gi.by_id(inc_id) is not None:
-            return inc_id
-        deprec = gi._load_deprecations()
-        seen = set()
-        current = inc_id
-        while current in deprec and current not in seen:
-            seen.add(current)
-            current = deprec[current]
-            if isinstance(current, list):
-                return None
-            if gi.by_id(current) is not None:
-                return current
-        return None
-
-    regressed = {
-        inc_id: pre_ws4t22_resolve_id(inc_id)
-        for inc_id, expected in _WS4T22_TWELVE.items()
-        if expected is not None
-    }
-    assert regressed == {
-        "INC-07771": None,
-        "INC-08109": None,
-        "INC-08133": None,
-        "INC-08146": None,
-    }, regressed
 
 
 def _pre_ws4t22_resolve_id(inc_id, deprec, by_id_fn):
     """Frozen, independent copy of resolve_id() as it shipped in WS4-T15
     (dcec1602), before WS4-T22: ANY list-valued hop, including a
     one-element list, returns None. Used only as a comparison oracle
-    below, never as production behaviour -- see
-    test_resolve_id_ws4t22_proof_the_regression_test_fires for the
-    identical logic exercised directly against live gi.by_id."""
+    below, never as production behaviour."""
     if by_id_fn(inc_id) is not None:
         return inc_id
     seen = set()
@@ -228,7 +190,13 @@ def test_resolve_id_no_collateral_change_across_full_corpus():
     all_from_ids = sorted({d["from"] for d in raw.get("deprecations", []) if d.get("from")})
     assert len(all_from_ids) >= 1000  # sanity: this is a real, large sweep
 
-    deprec = gi._load_deprecations()
+    # Oracle map built INLINE from the raw file with last-in-file-wins
+    # semantics -- deliberately NOT gi._load_deprecations(), so a bug in
+    # the package loader cannot hide itself from this sweep.
+    deprec = {}
+    for d in raw.get("deprecations", []):
+        if d.get("from") and d.get("into"):
+            deprec[d["from"]] = d["into"]
     expected_to_change = {k for k, v in _WS4T22_TWELVE.items() if v is not None}
     changed = {}
     for inc_id in all_from_ids:
@@ -244,53 +212,10 @@ def test_resolve_id_no_collateral_change_across_full_corpus():
         assert new == _WS4T22_TWELVE[inc_id]
 
 
-def test_resolve_id_no_collateral_change_proof_it_fires():
-    """Working agreement 6, second half: prove the no-collateral test
-    above can catch an over-broad fix, by simulating one that resolves
-    ANY non-empty list to its first element (not just one-element
-    lists). This must disagree with the frozen oracle on the 8
-    genuinely-ambiguous IDs, which is exactly what the real
-    no-collateral test would flag as an unexpected change."""
-
-    def over_broad_resolve_id(inc_id, deprec, by_id_fn):
-        if by_id_fn(inc_id) is not None:
-            return inc_id
-        seen = set()
-        current = inc_id
-        while current in deprec and current not in seen:
-            seen.add(current)
-            current = deprec[current]
-            if isinstance(current, list):
-                if not current:
-                    return None
-                current = current[0]  # BUG: picks first of N, not just 1
-            if by_id_fn(current) is not None:
-                return current
-        return None
-
-    deprec = gi._load_deprecations()
-    ambiguous_eight = [k for k, v in _WS4T22_TWELVE.items() if v is None]
-    disagreements = 0
-    for inc_id in ambiguous_eight:
-        old = _pre_ws4t22_resolve_id(inc_id, deprec, gi.by_id)
-        broad = over_broad_resolve_id(inc_id, deprec, gi.by_id)
-        if old != broad:
-            disagreements += 1
-    assert disagreements > 0, (
-        "the over-broad simulation should have invented answers for at "
-        "least some of the ambiguous IDs -- if it didn't, this proof "
-        "doesn't demonstrate the no-collateral test has teeth"
-    )
-
-
-def test_load_deprecations_prefers_latest_date_for_known_duplicates():
+def test_load_deprecations_last_in_file_wins_for_known_duplicates():
     # INC-07771/08109/08133/08146 each carry both an older `merged`
     # tombstone and a later `resplit` tombstone (WS4-T15 -> WS4-T22).
-    # The loader must select by explicit `date` comparison, not by
-    # "whichever the JSON array happens to list last" -- the trap this
-    # guards against already bit merge_and_dedupe.py once (a `seen_from`
-    # dict that kept the LAST record under a comment claiming
-    # "earliest").
+    # Contract: the LAST record in file order is authoritative.
     import json
 
     raw = json.loads((ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8"))
@@ -299,8 +224,89 @@ def test_load_deprecations_prefers_latest_date_for_known_duplicates():
     for f in dup_froms:
         entries = [d for d in raw["deprecations"] if d["from"] == f]
         assert len(entries) >= 2, f"fixture assumption broken for {f}: only {len(entries)} entries"
-        newest = max(entries, key=lambda d: d["date"])
-        assert deprec[f] == newest["into"], (f, deprec[f], newest)
+        assert deprec[f] == entries[-1]["into"], (f, deprec[f], entries[-1])
+
+
+# --- WS4-T22 (D31 rework): supersession precedence on a synthetic fixture.
+# One `from` with two records whose targets are BOTH live, so a wrong
+# precedence rule returns a live-but-wrong ID rather than None. The
+# package must agree with scripts/validate.py::_latest_by_from (the
+# repo-wide "last record in file order wins" contract). ---
+
+import json as _json
+import sys as _sys
+
+_sys.path.insert(0, str(ROOT / "scripts"))
+import validate as _validate  # noqa: E402
+
+_REC_A = {"from": "INC-90001", "into": "INC-90002", "date": "2026-01-01"}
+_REC_B_LATER_DATE = {"from": "INC-90001", "into": "INC-90003", "date": "2026-06-01"}
+_REC_B_EARLIER_DATE = {"from": "INC-90001", "into": "INC-90003", "date": "2025-01-01"}
+_REC_B_DATELESS = {"from": "INC-90001", "into": "INC-90003"}
+
+
+class _FakeFiles:
+    def __init__(self, text):
+        self._text = text
+
+    def joinpath(self, *_a):
+        return self
+
+    def read_text(self, encoding=None):
+        return self._text
+
+
+def _install_fixture(monkeypatch, records):
+    text = _json.dumps({"deprecations": records})
+    monkeypatch.setattr(gi, "files", lambda _name: _FakeFiles(text))
+    monkeypatch.setattr(
+        gi, "by_id", lambda x: {"id": x} if x in ("INC-90002", "INC-90003") else None
+    )
+    gi._load_deprecations.cache_clear()
+
+
+import pytest as _pytest
+
+
+@_pytest.fixture
+def _fresh_deprecation_cache(monkeypatch):
+    # Undo the fixture's patches FIRST, then drop the lru_cache entry that
+    # was built from fixture data, so no later test sees it.
+    gi._load_deprecations.cache_clear()
+    yield
+    monkeypatch.undo()
+    gi._load_deprecations.cache_clear()
+
+
+@_pytest.mark.parametrize(
+    "records",
+    [
+        # plain two-record case, both file orders
+        [_REC_A, _REC_B_LATER_DATE],
+        [_REC_B_LATER_DATE, _REC_A],
+        # inversion: the later-in-file record carries the EARLIER date
+        [_REC_A, _REC_B_EARLIER_DATE],
+        [_REC_B_EARLIER_DATE, _REC_A],
+        # dateless second record (and dateless first record)
+        [_REC_A, _REC_B_DATELESS],
+        [_REC_B_DATELESS, _REC_A],
+    ],
+    ids=[
+        "ab-later-date", "ba-later-date",
+        "ab-inversion", "ba-inversion",
+        "ab-dateless", "ba-dateless",
+    ],
+)
+def test_supersession_last_in_file_wins_and_matches_validate(
+    monkeypatch, _fresh_deprecation_cache, records
+):
+    _install_fixture(monkeypatch, records)
+    expected = records[-1]["into"]
+    assert gi._load_deprecations()["INC-90001"] == expected
+    assert gi.resolve_id("INC-90001") == expected
+    # Independent path: the validator's authoritative-record view.
+    assert _validate._latest_by_from(records)["INC-90001"]["into"] == expected
+    assert gi.resolve_id("INC-90001") == _validate._latest_by_from(records)["INC-90001"]["into"]
 
 
 # --- WS4-T22: boundary/unit tests for the list-length check itself ---

@@ -59,26 +59,20 @@ def _load_deprecations() -> dict[str, str]:
         return {}
     data = json.loads(text)
     out: dict[str, str] = {}
-    # A `from` ID can carry more than one tombstone record — e.g. an
-    # older `merged` entry later superseded by a `resplit` (WS4-T15/
-    # WS4-T22: INC-07771, INC-08109, INC-08133, INC-08146 each have
-    # both). The most recent `date` wins, selected explicitly rather
-    # than by "whichever the JSON array lists last" — the latter is an
-    # accident of file order, not a decision, and this codebase has
-    # already shipped that exact accident once (merge_and_dedupe.py's
-    # `seen_from` kept the LAST record under a comment claiming
-    # "earliest"). Ties (same date) fall back to file order for
-    # determinism, matching the append-only convention that later
-    # entries are written after earlier ones.
-    latest_date: dict[str, str] = {}
+    # A `from` ID can carry more than one tombstone record (e.g. an older
+    # `merged` entry later superseded by a `resplit`: INC-07771, INC-08109,
+    # INC-08133, INC-08146). RULE: the LAST record in file order wins.
+    # Why: the deprecations file is append-only, so file order is decision
+    # order; this is the repo-wide contract and it must stay identical to
+    # `scripts/validate.py::_latest_by_from` (and the fixpoint in
+    # `scripts/merge_and_dedupe.py`). Do NOT select by `date` here: dates
+    # can be absent or out of order, and a package that disagrees with the
+    # validator returns a live-but-wrong ID. tests/test_package.py
+    # cross-checks this loader against `_latest_by_from`.
     for entry in data.get("deprecations", []):
-        f, t, date = entry.get("from"), entry.get("into"), entry.get("date") or ""
-        if not f or not t:
-            continue
-        if f in out and date < latest_date[f]:
-            continue
-        out[f] = t
-        latest_date[f] = date
+        f, t = entry.get("from"), entry.get("into")
+        if f and t:
+            out[f] = t
     return out
 
 
