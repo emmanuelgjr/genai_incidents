@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/readme/banner-dark.svg">
-  <img src="docs/assets/readme/banner-light.svg" alt="GenAI & Agentic AI Security Incidents" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/banner-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/banner-light.svg" alt="GenAI & Agentic AI Security Incidents" width="100%">
 </picture>
 
 **One queryable index of AI security incidents, vulnerabilities, and red-team findings,<br>normalized onto OWASP LLM/ASI Top 10, NIST AI RMF, and MITRE ATLAS.**
@@ -32,8 +32,8 @@
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/readme/how-it-works-dark.svg">
-  <img src="docs/assets/readme/how-it-works-light.svg" alt="How it works: public sources are collected, normalized onto one schema, deduplicated, mapped to OWASP, NIST and MITRE ATLAS, validated, and shipped as a website, JSON, PyPI, Hugging Face, STIX/TAXII and MISP" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/how-it-works-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/how-it-works-light.svg" alt="How it works: public sources are collected, normalized onto one schema, deduplicated, mapped to OWASP, NIST and MITRE ATLAS, validated, and shipped as a website, JSON, PyPI, Hugging Face, STIX/TAXII and MISP" width="100%">
 </picture>
 </p>
 
@@ -67,7 +67,7 @@ The landmark tier is the curated, headline-worthy subset (see `docs/DATA_DICTION
 ### 👀 Explore it
 
 <p align="center">
-  <a href="https://emmanuelgjr.github.io/genai_incidents/#q=EchoLeak"><img src="docs/assets/readme/site-search.png" alt="The searchable website: a search for EchoLeak with one entry expanded, showing its description, attack vector, quality tier, OWASP LLM and ASI codes, tags, and cite link" width="100%"></a>
+  <a href="https://emmanuelgjr.github.io/genai_incidents/#q=EchoLeak"><img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/site-search.png" alt="The searchable website: a search for EchoLeak with one entry expanded, showing its description, attack vector, quality tier, OWASP LLM and ASI codes, tags, and cite link" width="100%"></a>
 </p>
 <p align="center"><sub>The <a href="https://emmanuelgjr.github.io/genai_incidents/">website</a>: search, filter by year, severity, OWASP code, vector, corpus or quality tier, expand any entry, and deep-link the result. Screenshot taken 2026-09-30.</sub></p>
 
@@ -118,7 +118,7 @@ curl -sL https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/data
 | 🪪 **DOI** | [`10.5281/zenodo.20248675`](https://doi.org/10.5281/zenodo.20248675) (concept DOI — always the latest release; see [How to cite](#how-to-cite)) | per release |
 
 <p align="center">
-  <img src="docs/assets/readme/stix-excerpt.png" alt="An excerpt of the STIX 2.1 bundle: the x-genai-incident object for INC-00924 (EchoLeak) with its JSON fields, and a graph linking it by 'uses' relationships to four MITRE ATLAS attack-patterns and by 'exploits' to CVE-2025-32711" width="100%">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/stix-excerpt.png" alt="An excerpt of the STIX 2.1 bundle: the x-genai-incident object for INC-00924 (EchoLeak) with its JSON fields, and a graph linking it by 'uses' relationships to four MITRE ATLAS attack-patterns and by 'exploits' to CVE-2025-32711" width="100%">
 </p>
 <p align="center"><sub>A real excerpt from the published STIX 2.1 bundle (INC-00924, captured 2026-09-30; elided fields shown as <code>…</code>). Each incident is an <code>x-genai-incident</code> SDO linked to MITRE ATLAS <code>attack-pattern</code>s and CVE <code>vulnerability</code> objects.</sub></p>
 
@@ -174,8 +174,8 @@ Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/readme/taxonomy-map-dark.svg">
-  <img src="docs/assets/readme/taxonomy-map-light.svg" alt="One entry, six taxonomies: INC-00924 (EchoLeak) with its OWASP LLM 2026, OWASP ASI, NIST AI RMF and MITRE ATLAS codes (core), MAESTRO layers (companion) and VERIS crosswalk (experimental)" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/taxonomy-map-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/taxonomy-map-light.svg" alt="One entry, six taxonomies: INC-00924 (EchoLeak) with its OWASP LLM 2026, OWASP ASI, NIST AI RMF and MITRE ATLAS codes (core), MAESTRO layers (companion) and VERIS crosswalk (experimental)" width="100%">
 </picture>
 </p>
 
