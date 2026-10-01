@@ -124,6 +124,27 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ⚖ D33 + D34 — USER RULINGS, 2026-10-01, on the v2.11.0 notes BOUNCE #2 escalation
+
+**Foreman finding behind D33, measured [R] by a route the gate did not take.**
+- `docs/audits/WS4-T19-authorized-splits-2026-09-18.json` records `decision: resplit_redirect` (`eventual_deprecation_reason: resplit`) for **8** IDs.
+- `data/id_deprecations.json` carries resplit records for only **4** of them (07771, 08109, 08133, 08146).
+- **INC-00497, INC-03128, INC-08139 and INC-08185 have only their original `merged` records.** This is a **delivery gap against D28's own audit decision**, not a new policy question.
+- **The history check disagrees with the audit on one ID.** Titles in tagged releases:
+  - INC-08139 was a *robotic endoscope* story in v2.5.0, but the audit recovers "Wolf Robots" for it. (INC-08185 *was* Wolf Robots in v2.5.0.)
+  - INC-00497 changed content between v2.0.0 (Saint Paisios scam) and v2.5.0 (Greek tax AI).
+  - INC-03128 is consistent (Momoa).
+- So the fix needs investigation, not just four appended records.
+
+**D33 — fix the data first; the cut stays HELD.** WS4 investigates all 4 IDs and states a per-ID determination with evidence **before writing anything**. It appends records under invariant 9, through the pipeline and never by hand-editing, only for IDs whose determination is unambiguous, with a field-level delta (agreement 2). Any ID where the audit and history disagree and cannot be reconciled **stops and comes back** to the foreman and user. Then the notes are corrected and gated, then the cut.
+
+**D34 — disclose the `load_deprecations()` type change; no API change in v2.11.0.** Document `str | list[str]` in the docstring, the notes and the CHANGELOG as a consumer-impact item, including that v2.10.0's `resolve_id` raises `TypeError` on v2.11.0 data. A stable accessor is a follow-up.
+
+**Routing for the rest of BOUNCE #2:**
+- Defect 5 (the false `query()` `tier=` docstring) and the D34 docstring go with the WS4 task, because they touch `src/`.
+- Defects 2 and 4, the D34 notes and CHANGELOG text, and the corrected 12-ID figures go to a WS6 notes pass after WS4 lands.
+- A final gate follows.
+
 ### ⛔⛔ v2.11.0 RELEASE NOTES — **BOUNCE #2 (red-reviewer, exhaustive pre-cut gate, 2026-09-30, on `1977515e`) — ESCALATED TO USER** (protocol: two bounces; defect 1 also needs a data ruling). **The cut stays held.**
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Both BOUNCE #1 defects are fixed in the notes body itself, and every figure in docs/releases/v2.11.0.md re-derives exactly. The bounce is for five problems."*
