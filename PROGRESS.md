@@ -124,6 +124,40 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ✅ WS4-T22 — **PASS (red-reviewer, second gate, 2026-09-30, on `934a6348`) — NO DEFECTS — MERGED (fast-forward) into `release/v2.11.0-notes`, `2f7bba1d..934a6348`, origin verified**
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … All three BOUNCE #1 defects are closed, and I confirmed that with my own mutation runs. The null-`into` divergence … was already in the package at 2f7bba1d … not a defect of this branch and does not block the release."*
+
+The rework came from a fresh pipeline-engineer (agreement 3: replace, don't re-prompt). Before it ran, an orphaned uncommitted 2026-09-20 follow-up in the T22 worktree, which went the max-date way, was rescued to `ws4/t22-abandoned-wip-2026-09-20` (`f764d2d2`) and marked not for merge.
+
+**Evidence [R]:**
+- **Loader.** The loader is back to last-in-file wins.
+  - On real data, `gi._load_deprecations()` against `validate._latest_by_from` shows 0 mismatches.
+  - A subprocess sweep of the real 2f7bba1d module against the branch module over INC-00000..19999 shows:
+    - an identical deprecations map (293 keys);
+    - `resolve_id` changed for **exactly 4**, each from None (07771→14814, 08109→14847, 08133→14850, 08146→14853);
+    - `resolve_id_group` changed for 0;
+    - **8 stay None**.
+  - **A second route, through the build code** (`merge_and_dedupe.resolve_live_targets`) over all 1,056 `from`s, gives 0 disagreements.
+- **Fire-proofs reproduced by the gate:**
+  - max-date loader: 3 failed;
+  - first-wins loader: 9 failed;
+  - fix reverted: 4 failed;
+  - over-broad fix: 3 failed.
+- **Cannot-fail tests.** Both are deleted.
+- **Fixture leak.** Forward and reverse file order both pass. Adversarial adjacency passes, and the gate **proved that adjacency check can fire** by removing the teardown, which gave 2 failures. A plain file-order run cannot catch a broken teardown.
+- **Suite: `474 passed, 1 xfailed`** (base 459; +15 = 1+1+1+6+6, accounted for). **This is the figure the notes publish**, and the notes specialist is to re-derive it, not copy it.
+
+**Advisories, routed:**
+- **A1 (→ new follow-up, WS4 + WS3, not a release blocker).** Package/validator parity on null-`into` supersession.
+  - The shape `[F→live, F→null]` gives package = live and validator = None, identically at 2f7bba1d, so it is pre-existing.
+  - It is unreachable through automated paths: step 6f is fresh-filtered, and the #88 fixpoint only nulls removed targets. No such record exists in the data.
+  - Fix later: either the loader honours a later null, or `validate.py` rejects a removal appended over a live target. Add a null case to the fixture.
+- **A2.** `named_twelve` and `no_collateral` are pinned to the current corpus and act as tripwires. The next legitimate `data/` rebuild that touches these IDs should expect to update them.
+- **A3.** Cosmetic: a duplicate assert, and mid-module imports.
+
+**→ Next on the v2.11.0 path:** the WS6 notes pass on BOUNCE #1 (`2f7bba1d`) defects 1 and 2, run against `934a6348`.
+
 ### ⛔ WS4-T22 — **BOUNCE #1 (red-reviewer, 2026-09-30, on `af9601fa`)** — the first RECORDED verdict; the gate a prior session dispatched never filed one (agreement 3), so this gate was re-dispatched from scratch. **Status: in-progress; re-dispatched to a fresh pipeline-engineer.** The user ordered "cut v2.11.0" on 2026-09-30, and this is the first blocker on that path.
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … The D31 core is correct … It bounces because the loader-rule change introduces a split-brain between the package and the build/validator. Two of the 11 new tests also cannot fail."*
