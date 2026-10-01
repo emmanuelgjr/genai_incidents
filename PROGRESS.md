@@ -124,6 +124,28 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⛔ v2.11.0 — **D36 narrow gate: BOUNCE #4 (red-reviewer, 2026-10-01, on `59dd995b`) — ESCALATED TO USER** · one clause on one line
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Only one wording defect is left: one clause on one line. Nothing else is wrong."*
+
+**DEFECT 1.** The new README:33 says `resolve_id()` returns None for "8 IDs whose record lists more than one successor".
+- Only the 4 retirements have such a record.
+- 00497, 03128, 08139 and 08185 each have a single-successor `merged` record whose **chain ends** in a retired split. `load_deprecations()` gives `str` for them.
+- This is the same 4 IDs as BOUNCE #3. **The foreman's D36 brief supplied the wrong wording, and the specialist used it.**
+- The line ships as the PyPI page (`pyproject.toml:9`).
+- **Gate-verified replacement [R]:** "`resolve_id()` returns `None` for 8 IDs whose redirect chain ends in more than one live successor, for three different reasons — see the v2.11.0 release notes". All 8 have group sizes of 8–100, and they are exactly the 8 deprecated IDs that return None.
+
+**Evidence that the rest is clean [R]:**
+- The docstring sentence is TRUE: all 12 tags' `query()` lack `tier`, and `git tag --contains 4c09dcb1` is empty.
+- The paper is correctly classified as a live document.
+- The marker is relabelled.
+- The docstring-stripped AST is equal, so there is no code change.
+- The behaviour hash is **`c322f3fa…` on both trees, and it was proved to fire** (one monkeypatched answer gives `b7bda274…`).
+- `475 passed, 1 xfailed`; the drift check is clean; the dated note is 41/0.
+- merge-tree is clean, and the version strings are still 2.10.0.
+
+**Advisory A1.** The marker's "revised … before publication; added post-publication" uses "publication" for two different events. The gate suggests "added 2026-09-18 after v2.10.0's publication; revised 2026-10-01 before this note was published".
+
 ## ⚖ D36 — USER RULING, 2026-10-01, on BOUNCE #3: **narrow fix + narrow gate, then cut**
 
 **One WS6 specialist pass.** Under this ruling it is authorized to make **the docstring-only** `src/` edit. It edits exactly these:
