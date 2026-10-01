@@ -2,6 +2,35 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## ✅ D38 disclosure — **PASS (red-reviewer, second gate, 2026-10-01, on `802ab95c`) — MERGED `43591dcd` — v2.11.0 Release body re-synced and byte-verified**
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … All four BOUNCE #1 defects and advisory A4 are closed in all four files. I re-measured every timestamp myself … The new 11,753 figure holds on the LIVE bundle."*
+
+**Evidence [R]:**
+- **Timestamps, re-measured:** deploy-pages completed 13:43:56Z; live Last-Modified is 13:43:53 GMT; the Release was published 06:17:47Z.
+- **11,753, by two routes:** on the live bundle and TAXII, every relabelled object is an `x-genai-incident`; from the corpus, Σ len(owasp_llm) = 17,750 and 11,753 entries have a non-empty `owasp_llm`.
+- **Tag build against live:** the ids, order and `modified` are equal. Reversing the relabel leaves a residual of 0, and a **fire control** gives 1.
+- **MISP:** 34/34 files byte-identical.
+- **`export_taxii.py`:** the AST with str constants blanked is equal, and **both fire controls trip**.
+- The generated README differs from live only by the new section.
+- 476/1; the drift check is clean; merge-tree is clean.
+
+**Merge:** `43591dcd` on origin, with the merged tree re-tested (476/1, drift clean).
+
+**Release re-sync:** `gh release edit v2.11.0`, then byte-verify via the API with an explicit UTF-8 decode (the gate's recipe; jq appends a newline, and cp1252 decoding gives a false mismatch). Result: **`True 35324 35324`**. The addendum and the DOI are both present, and the Release is not a draft.
+- **The tag's copy of the notes (34,137 B) and the Zenodo record do not carry the addendum.** That is expected (A5).
+
+**Follow-ups:**
+- The CHANGELOG `[Unreleased]` does not mention the site UI fixes (Years tile, ASI wrap) shipped in the same deploy.
+- "(the corpus)" is a loose gloss.
+- The `export_taxii.py:9` docstring mentions OpenCTI.
+- Template "currently -2026" is hardcoded.
+- The STIX bundle has no published checksum.
+- The `modified`-bump policy is undecided (user).
+- README:18 / DATASHEET:115 `source_name` docs (warden finding 3, partly open).
+
+**D32 post-cut queue: step 1 (STIX) and step 2 (docs-warden) are DONE, and D38 disclosure is DONE. Remaining: step 3, the README PR #100 rebase.**
+
 ### ⛔ D38 disclosure — **BOUNCE #1 (red-reviewer, 2026-10-01, on `476c9f5d`)** — four false or overclaimed sentences; re-dispatched to WS6 with the gate's own scoped wording
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … first gate on this task."*
