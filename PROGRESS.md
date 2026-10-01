@@ -124,6 +124,27 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ✅ v2.11.0 CUT — **PASS (red-reviewer, narrow re-gate, 2026-10-01, on `50e42bbe`) — GO for steps 6–9 — MERGED to main**
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … All three BOUNCE #1 defects are closed, and every sentence I checked is true. GO for steps 6–9."*
+
+**Evidence [R]:**
+- `data`/`src`/`scripts` are unchanged from the cleared `be559587` (0 bytes of diff).
+- Every figure and ID in README:71's v2.11.0 part matches the gated notes, item by item.
+- The v2.10.0 part matches `docs/releases/v2.10.0.md`. "Roughly eight times" was **re-derived on v2.11.0 data: 6,162 / 783 = 7.87**.
+- There are no orphaned referents. Dropping the OECD-freeze sentence loses nothing, because the notes and CHANGELOG still record that state.
+- The drift check is clean and **was shown to fire** (exit 1 on the 2.10.0 marker).
+- pytest 475/1.
+- The release body has 0 anchors and 0 relative links, with the grep validated against README's 44 relative links.
+- The step-5 sweep is clean on live surfaces.
+- merge-tree is clean, and main moved only through board commits.
+
+**Advisory 1 (README on PyPI): already settled by D32.** README PR #100 is queued after the cut, so v2.11.0's PyPI long_description is the gated cut-branch README. **When #100 merges, hand-resolve README:71 so it keeps the `50e42bbe` text**, or the BOUNCE #1 defect-2 wording can come back through the conflict.
+
+Advisories 2–3: README:71 "still resolves" can be read two ways but is accurate; "eight weeks" versus "eight consecutive runs" is consistent.
+
+**Merged:** `release/v2.11.0-cut` → `main` as `632f227b`. **The merge commit is the v2.11.0 tag target.** Step 6 (tag) follows.
+
 ### ⛔ v2.11.0 CUT — **BOUNCE #1 (red-reviewer, pre-publish gate, 2026-10-01, on `be559587`)** — step-5 prose only; the data is fully clean; re-dispatched to WS6
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … The data, the version strings, the resolver, the tests and the secret scan are all clean … The bounce is about step-5 prose only."*
