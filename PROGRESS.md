@@ -124,6 +124,31 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⛔ v2.11.0 CUT — **BOUNCE #1 (red-reviewer, pre-publish gate, 2026-10-01, on `be559587`)** — step-5 prose only; the data is fully clean; re-dispatched to WS6
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … The data, the version strings, the resolver, the tests and the secret scan are all clean … The bounce is about step-5 prose only."*
+
+**DEFECTS:**
+1. **HIGH: `CHANGELOG.md:8-11`.** The header still reads "gated pre-cut", and the body says "a release gated but not yet cut … Version strings still read 2.10.0". The cut did not touch CHANGELOG. Precedent: v2.10.0's cut `0c778ced` set its header to `## [2.10.0] — 2026-09-18`.
+2. **HIGH: `README.md:71`.** "2.11.0 — released 2026-10-01" now heads v2.10.0's paragraph, crediting v2.11.0 with the OWASP migration and the refresh fixes; "The v2.10.0 notes above" points nowhere. **This is the third cut in a row with this exact step-5 failure shape** (v2.9.0, v2.10.0, v2.11.0).
+3. **LOW: `docs/releases/v2.11.0.md:392-393`.** "every version string … still reads 2.10.0 as of this writing" is inconsistent with the re-tensed banner.
+
+**Evidence that the data is clean [R]:**
+- **Two routes:** per-ID canonical-JSON sha256 shows 0 differences across all 4 incident files (fire-tested), and each file differs by **exactly one byte** ("0" becoming "1").
+- `id_deprecations` is byte-identical (both copies).
+- **A rebuild reproduces the committed outputs byte for byte, and is deterministic over 2 runs.**
+- The built **wheel** reports `metadata.version` 2.11.0, and the resolver gives 13/13. The behaviour hash `87cd5547…` is identical for the wheel and for base src, and was fire-tested.
+- pytest 475/1. The drift check is clean and was fire-tested.
+- merge-tree is clean.
+- **Secret scan: 0 hits in data**; the only hits are prose mentions already on main.
+
+**Advisories:**
+- **A1.** PR #100's branch is based on stale `528d5936` and conflicts in README. Rebase after the cut, per D32. Local `main` is also behind.
+- **A2.** `docs/releases/v2.10.0.md:222` "gated as v2.11.0" is a dated record; consider a dated one-line update after the cut.
+- **A3.** Cosmetic line wrap at `v2.11.0.md:9`.
+
+**Route:** a prose-only WS6 pass on `release/v2.11.0-cut`. README:71 rewords gated text, so it goes through the D36/D37 narrow-gate path, and the lesson applies: the specialist DERIVES the wording from the gated notes; the foreman does not dictate it. Then a narrow gate, then steps 6–9.
+
 ## 🚀 v2.11.0 CUT — VERSIONING.md steps 2–5 delivered on `release/v2.11.0-cut` @ `be559587` (pushed) — **pre-publish gate in flight**
 
 - **Step 2a, WS4 (`f341ecd5`).** `USER_AGENT` is now `genai_incidents/2.11.0`, and the current-UA literal plus the version cross-reference in INGESTION_CONDUCT.md were updated to match. The historical 2.8.0 quotes are untouched.
