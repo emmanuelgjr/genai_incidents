@@ -2,6 +2,20 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## ⚖ D32 — USER RULING, 2026-09-30: the STIX OWASP-edition fix ships AFTER the v2.11.0 cut, not in it
+
+**Ruling:** `ws6/stix-owasp-edition-and-site-fixes` (`a2be3364`) does **not** fold into v2.11.0. The v2.11.0 scope and sequencing (D30/D31) are unchanged.
+
+**Why it mattered:** Pages rebuilds STIX/TAXII and the site on any `main` push that touches `scripts/export_stix.py` or `docs/**`. Merging before the cut would change 17,750 published `source_name` values under an unchanged version label, which is the D30 root-cause class.
+
+**Consequences:**
+- Merge after the cut, and only on a gate PASS. The red-reviewer gate was dispatched 2026-09-30 and its verdict is pending.
+- The next release's notes must disclose the corrective relabel: STIX `source_name` `owasp-llm-top10-2025` becomes `-2026` on every OWASP-LLM reference. That is a corrective break for any consumer keying on the old string.
+- PR #100 (README) is also queued after the cut.
+- **Post-cut merge order: v2.11.0 cut → this fix branch → rebase PR #100** onto the corrected "Latest release" paragraph.
+
+**Also found by the specialist (unrouted, pre-existing):** axe reports 1 serious `aria-prohibited-attr` at 1280px and 380px on **unmodified main**. The site's a11y gate may be red on `main` today. It is outside this task's scope, and the owner is WS6. It is pending the gate's own confirmation.
+
 ## 🖼 2026-09-30 — README refresh (PR #100, DRAFT, held for v2.11.0) · three defects found while building it, routed to WS6
 
 **User request, ad hoc (not a plan task):** make the README more appealing, then add images. The foreman implemented it directly on `docs/readme-refresh` (`8e23d6e6`). It is presentation only: licensing, citation, caveat and release prose is carried verbatim, counts stay inside `stats:` markers, and **no image carries a corpus count**. The site screenshot was cropped to keep the total out, and the image generators are in `scripts/readme_assets/`. `check_stats_drift` is clean and was shown to fire on a corrupted marker. docs-warden ran one pass with 12 findings; the 8 actionable ones were fixed in `426ed817`.
