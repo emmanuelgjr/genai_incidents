@@ -124,6 +124,32 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### 🔎 WS4-T23 — D33 investigation delivered `c7b5fe8f` (pushed) — **NO DATA WRITTEN: an authorization change is needed → ESCALATED TO USER**
+
+**Phase A.** Content checked per tag from v2.0.0 to v2.10.0, with the successor matched by **stable keys** (source IDs plus reference-URL overlap), not titles:
+
+| ID | Content by release | Stable-key successor | Determination |
+|---|---|---|---|
+| INC-03128 | Momoa deepfake (v2.0–2.1), tombstoned v2.2 | **INC-14909** (AIID-1285 + OECD 1cd0 unique to it; 6/6 refs) | UNAMBIGUOUS |
+| INC-08185 | Wolf Robots (v2.2–2.5), tombstoned v2.6 | **INC-14742** (OECD 2510 unique; 7/7 refs) | UNAMBIGUOUS (headline of a ~65-source over-merge) |
+| INC-00497 | Saint Paisios scam (v2.0–2.1) → Greek tax AI (v2.2–2.8) | 14789 *or* 14907 | **CONFLICTED** |
+| INC-08139 | Robotic endoscope (v2.2–2.5) → Wolf Robots (v2.6–2.7) | 14852 *or* 14742 | **CONFLICTED** |
+
+**Phase B: nothing written, correctly.**
+- The only pipeline route to single-element records is step 8a, driven by audit `new_targets` pinned by `REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256` (873c29a2…).
+- Narrowing any ID means editing D28's authorized entries and re-pinning that SHA, which is a **user authorization change**.
+- The data delta is empty.
+
+**Committed (`src/` + tests only):**
+- BOUNCE #2 defect 5: the `query()` `tier=` caveat is corrected as a dated correction in the docstring.
+- D34: `load_deprecations()` is typed `dict[str, str | list[str]]` with a docstring disclosure, and a new test pins the type against the real bundled data. It was shown failing on the old annotation (8 violations).
+- Suite: `475 passed, 1 xfailed`. Drift check clean. `validate.py` passes.
+- Not yet gated.
+
+**Open for the user:**
+1. Authorize single-target records for 03128→14909 and 08185→14742?
+2. Choose a successor, or none, for the two contested IDs.
+
 ## ⚖ D33 + D34 — USER RULINGS, 2026-10-01, on the v2.11.0 notes BOUNCE #2 escalation
 
 **Foreman finding behind D33, measured [R] by a route the gate did not take.**
@@ -144,6 +170,11 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - Defect 5 (the false `query()` `tier=` docstring) and the D34 docstring go with the WS4 task, because they touch `src/`.
 - Defects 2 and 4, the D34 notes and CHANGELOG text, and the corrected 12-ID figures go to a WS6 notes pass after WS4 lands.
 - A final gate follows.
+
+> **Update 2026-10-01, WS4-T23 Phase A (the "delivery gap" half of the finding is WRONG; the "fix needs investigation" half stands).**
+> - D28's audit `new_targets` for INC-00497, 03128, 08139 and 08185 are the **full fan-outs** (8/9/~90/63), and step 8a (`merge_and_dedupe.py` ~2397-2437) correctly appended nothing. It was **neither a bug nor a narrowing**: D28 authorized the fan-out, and the data matches it.
+> - The "single successor" idea came from `recovered_title` (`scripts/audit/ws4t10_inbound_deprecations.py` `LOOKUPS`), which reads a title at **one hand-picked commit per ID**. That is a title-match route, so it was not the independent evidence BOUNCE #2 defect 1 took it for.
+> - The foreman's history check **was** right about INC-08139. *Dated record; do not regenerate the paragraph above.*
 
 ### ⛔⛔ v2.11.0 RELEASE NOTES — **BOUNCE #2 (red-reviewer, exhaustive pre-cut gate, 2026-09-30, on `1977515e`) — ESCALATED TO USER** (protocol: two bounces; defect 1 also needs a data ruling). **The cut stays held.**
 
