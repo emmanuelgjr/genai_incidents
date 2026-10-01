@@ -58,8 +58,11 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
     above were in place).
   - **Every retired ID still resolves** through
     [`data/id_deprecations.json`](data/id_deprecations.json)
-    (1,051 → 1,060 records, **+9**, append-only under invariant 9). No
-    citation of any ID this project has ever published breaks. **Two
+    (1,051 → 1,060 records, **+9**, append-only under invariant 9). No citation of any ID that carries a tombstone breaks; the nine IDs
+    that predate the tombstone machinery (`INC-00522`, `INC-00609`,
+    `INC-00951`, `INC-00952`, `INC-00955`, `INC-00956`, `INC-00957`,
+    `INC-01355`, `INC-01660`) are a known, documented exception recorded
+    in `docs/ID_POLICY.md` section 1.4(a), unchanged by this release. **Two
     counts over that file now diverge for the first time**: 1,060
     records but only **1,056 distinct `from` IDs** — `INC-07771`,
     `INC-08109`, `INC-08133`, `INC-08146` each carry an original
@@ -84,6 +87,26 @@ theirs, and where `INC-07738` (a separate, ordinary merge, not part of the
 D28 remediation) has also stopped resolving to itself. Anyone joining on
 incident IDs across versions must re-resolve through
 `data/id_deprecations.json`.
+
+**Twelve IDs resolved to a single ID under the v2.10.0 package and return
+`None` from `resolve_id()` on the way to this release** (re-derived by
+sweeping the v2.10.0 tag's own package against this tree):
+- **Fixed in this release (D31; `resolve_id()` now follows a one-element
+  successor list):** `INC-07771` -> `INC-14814`, `INC-08109` ->
+  `INC-14847`, `INC-08133` -> `INC-14850`, `INC-08146` -> `INC-14853`.
+- **`None` by design, 8 to 100 real successors each:** the four
+  retirements `INC-00311` (12), `INC-00554` (100), `INC-00754` (11),
+  `INC-01897` (8), **and four older tombstones that were resolving and
+  went silent: `INC-00497` (12), `INC-03128` (11), `INC-08139` (100),
+  `INC-08185` (100).**
+- **`None` here means ambiguity, not loss:** every successor is live.
+  Two ways to act: (1) read `data/id_deprecations.json` directly - `into`
+  is the full successor array, last record per `from` wins, works without
+  upgrading; (2) upgrade and call the new `resolve_id_group()`, which does
+  not exist in the v2.10.0 package.
+- The eight by-design cases remain an **open, disclosed deviation** from
+  `docs/ID_POLICY.md` section 3 ("never to silence"), owned by the
+  ID-policy workstream; this release does not resolve it.
 
 ## [2.10.0] — 2026-09-18
 
