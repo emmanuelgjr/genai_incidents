@@ -2,6 +2,38 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🎉 v2.11.0 PUBLISHED 2026-10-01 — all nine VERSIONING.md steps done and independently verified
+
+| Step | Result | Evidence [R] |
+|---|---|---|
+| Merge | `release/v2.11.0-cut` → main as **`632f227b`** | The tree equals the gated `50e42bbe` except PROGRESS.md (`git diff --quiet`) |
+| 6 Tag | **`v2.11.0` → `632f227b`** (annotated) | `git ls-remote --tags origin` shows `^{}` = `632f227b`. **No secret-scanning block** |
+| 7 Release | [published](https://github.com/emmanuelgjr/genai_incidents/releases/tag/v2.11.0) 06:17:47Z, isDraft=false, not a prerelease | Body byte-identical to `docs/releases/v2.11.0.md` (normalized for gh's trailing newline) |
+| 8 Zenodo | **Version DOI `10.5281/zenodo.23076162`** | doi.org returns 302. The API record shows version 2.11.0, 2026-10-01, under concept `10.5281/zenodo.20248675`, linked to the repo |
+| 8b DOI sync | Notes paragraph filled (WS6, `7af549db`, fast-forwarded to main); Release body re-synced | Re-verified byte-identical; the DOI is present in the published body |
+| 9 PyPI | `publish.yml`, event=release, headBranch=v2.11.0: **success** | **pypi.org JSON: latest 2.11.0**, with wheel and sdist |
+| 9 HF | `huggingface.yml`, event=release, headBranch=v2.11.0: **success** | The dataset card reads "Dataset version `2.11.0`"; lastModified 06:18:08Z |
+
+**Gate trail for this release:**
+- notes: B#1 → B#2 (D33/D34) → D35 → B#3 (D36) → B#4 (D37) → PASS `c9ff5b49`;
+- WS4-T22: B#1 → PASS `934a6348`;
+- cut: B#1 → PASS `50e42bbe`.
+**The foreman's premises were refuted 5 times** (D33 "delivery gap", "old targets still live", "audit title = independent", the D36 dictated wording, "8 ambiguous by design"). Each was caught by a specialist or a gate.
+
+**Post-cut queue (D32 order):**
+1. Merge `ws6/stix-owasp-edition-and-site-fixes` (`a2be3364`, PASS). Its notes must tell STIX consumers to **re-import** ((id, modified) unchanged).
+2. docs-warden, because the site's Years-tile text changes.
+3. Rebase README PR #100. **Hand-resolve README:71 so it keeps the `50e42bbe` v2.11.0 text.**
+
+**Follow-ups:**
+- D35: narrow D28 for 03128→14909 and 08185→14742 (WS4, gated).
+- Package/validator null-`into` parity (WS4+WS3).
+- STIX edition test independence (WS6 A1).
+- VERSIONING.md: step-2 UA scope is stale, and the step-3 script should use `tier`.
+- **A mechanical check for the step-5 failure shape.** Three cuts in a row shipped a stale "Latest release" paragraph next to a correct marker.
+- ID_POLICY §3 / D31 rider (WS3).
+- 2 high Dependabot alerts.
+
 ## 🛰 WS6 STIX OWASP-edition + site fixes — **✅ PASS (red-reviewer, 2026-09-30, on `a2be3364`) — NO DEFECTS — merge QUEUED behind the v2.11.0 cut per D32**
 
 **Branch** `ws6/stix-owasp-edition-and-site-fixes` @ `a2be3364` (base `528d5936`). 4 files, +34/−3, all in scope. Foreman stray check: `git status --porcelain` is empty, and the SHA is confirmed on origin.
