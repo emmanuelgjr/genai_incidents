@@ -2,6 +2,32 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🛰 WS6 STIX OWASP-edition + site fixes — **✅ PASS (red-reviewer, 2026-09-30, on `a2be3364`) — NO DEFECTS — merge QUEUED behind the v2.11.0 cut per D32**
+
+**Branch** `ws6/stix-owasp-edition-and-site-fixes` @ `a2be3364` (base `528d5936`). 4 files, +34/−3, all in scope. Foreman stray check: `git status --porcelain` is empty, and the SHA is confirmed on origin.
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … No defects against the acceptance criteria."* The gate worked in two throwaway clones and confirmed the main-tree HEAD unchanged before and after.
+
+**Evidence the gate measured, all [R]:**
+- **Failing-first.** The branch test on the base code gives `1 failed, 7 passed`. On the branch, the full suite gives `460 passed, 1 xfailed`. `check_stats_drift` is clean.
+- **Delta, by a different route from the specialist's.** One `sed` substitution of `-2025`→`-2026` on the base bundle makes it **byte-identical** to the branch bundle (`cmp`; both 61,215,761 B, 54,485 objects). The `--numstat` diff is 17,750/17,750. **An independent count of Σ len(owasp_llm) over 13,361 incidents gives 17,750.**
+- **Other surfaces.** In TAXII only `objects.json` changes (the same 17,750 lines); manifest and discovery are unchanged. **MISP is byte-identical** (86,784 attributes). Two runs give the same sha256, so the build is deterministic.
+- **Edition anchored on sources the fix does not read.** These all say 2026: the corpus metadata description, `owasp_llm_top10_2025.json` `superseded_by`, `data/.owasp_llm_migration.json` (applied 2026-08-17), and CHANGELOG [2.10.0].
+- **Years tile.** The rendered text reads "31 / YEARS WITH ENTRIES / of 44 in 1983–2026" (13 empty years confirmed), with no hardcoded number.
+- **Table.** `.table-wrap` scroll/client at 1440, 1280 and 1024 now fits exactly, against base overflow of 1316. At 900 there is a 6 px residual. At 640 px and below the columns are hidden by the existing rule, so mobile is unaffected.
+- **a11y.** axe gives **0 violations on base and branch** (two URLs, two viewports, both themes). The 380 px check passes. Lighthouse accessibility is 100.
+
+**Advisories, routed:**
+- **A1 (→ WS6, new follow-up).** The test checks the fix against its own source (agreement 6 form (b)). Both the exporter and the test read the fixed filename `owasp_llm_2025_to_2026.json`, so a 2027 migration would leave both saying 2026 and the test green. Fix: anchor on the newest applied entry in `data/.owasp_llm_migration.json` or the end of the `superseded_by` chain, and have the exporter resolve the current catalog the same way.
+- **A2.** The specialist's axe claim was **not reproduced**: 0 violations on both trees. See the dated correction under D32.
+- **A3 (→ user/WS3+WS6, schema/versioning call).** The 17,750 SDOs change content with the same `id` and `modified`, because `modified` derives from entry dates. STIX consumers that dedupe on (id, modified), such as OpenCTI, may never pick up the corrected label. **The post-cut release notes must tell STIX consumers to re-import**, or a `modified`-bump policy must be decided.
+- **A4.** A 6 px residual horizontal scroll remains at 641–900 px. This is polish, not a regression.
+- **A5.** `x_owasp_llm_edition` is a schema decision and was correctly not added.
+
+**Published surfaces on merge (for the post-cut notes):**
+- These change: STIX bundle, TAXII `objects.json`, `docs/data/SHA256SUMS` (STIX line), the Years tile, and the LLM/ASI CSS.
+- These do not: MISP, PyPI, HF, and every `data/*.json`.
+
 ## ⚖ D32 — USER RULING, 2026-09-30: the STIX OWASP-edition fix ships AFTER the v2.11.0 cut, not in it
 
 **Ruling:** `ws6/stix-owasp-edition-and-site-fixes` (`a2be3364`) does **not** fold into v2.11.0. The v2.11.0 scope and sequencing (D30/D31) are unchanged.
@@ -15,6 +41,8 @@
 - **Post-cut merge order: v2.11.0 cut → this fix branch → rebase PR #100** onto the corrected "Latest release" paragraph.
 
 **Also found by the specialist (unrouted, pre-existing):** axe reports 1 serious `aria-prohibited-attr` at 1280px and 380px on **unmodified main**. The site's a11y gate may be red on `main` today. It is outside this task's scope, and the owner is WS6. It is pending the gate's own confirmation.
+
+> **Update 2026-09-30, red-reviewer (the "found by the specialist" half is superseded; the ruling half stands):** the gate re-ran axe on base `528d5936` and branch `a2be3364` across both URLs, both viewports and both themes, and measured **0 violations on both**. The specialist's `aria-prohibited-attr` was **testimony that a re-run contradicts**. It is **not** a known violation on `main`, and nothing is routed. *Dated record; do not regenerate the paragraph above.*
 
 ## 🖼 2026-09-30 — README refresh (PR #100, DRAFT, held for v2.11.0) · three defects found while building it, routed to WS6
 
