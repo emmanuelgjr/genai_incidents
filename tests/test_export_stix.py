@@ -113,3 +113,18 @@ def test_source_ids_or_tags_alone_no_longer_trigger_marker():
     inc = next(o for o in b["objects"]
                if o["type"] == "x-genai-incident" and o["x_incident_id"] == "INC-00006")
     assert "x_content_license" not in inc
+
+
+def test_owasp_llm_source_name_matches_corpus_edition():
+    """Every owasp_llm code in the corpus is the edition named by the crosswalk's
+    to_version (E24 / D26(c)); the STIX source_name must say so. Expected value
+    is derived from mappings/owasp_llm_2025_to_2026.json, not hardcoded."""
+    import json
+    xwalk = json.loads((s.MAPPINGS / "owasp_llm_2025_to_2026.json").read_text(encoding="utf-8"))
+    expected = f"owasp-llm-top10-{xwalk['to_version']}"
+    assert expected != f"owasp-llm-top10-{xwalk['from_version']}"
+    sdo = next(o for o in _bundle()["objects"] if o.get("x_incident_id") == "INC-00001")
+    names = [r["source_name"] for r in sdo["external_references"] if r.get("external_id") == "LLM10"]
+    assert names == [expected]
+    assert not any(r["source_name"] == f"owasp-llm-top10-{xwalk['from_version']}"
+                   for o in _bundle()["objects"] for r in o.get("external_references", []))
