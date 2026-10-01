@@ -303,6 +303,93 @@ def test_load_deprecations_prefers_latest_date_for_known_duplicates():
         assert deprec[f] == newest["into"], (f, deprec[f], newest)
 
 
+class _FakeIdDeprecationsFile:
+    """Minimal stand-in for the `importlib.resources` Traversable
+    `_load_deprecations()` reads through, so tests below can feed it a
+    synthetic `deprecations` array without touching the real package
+    data file."""
+
+    def __init__(self, text: str) -> None:
+        self._text = text
+
+    def joinpath(self, *_args: object) -> "_FakeIdDeprecationsFile":
+        return self
+
+    def read_text(self, encoding: str = "utf-8") -> str:  # noqa: ARG002
+        return self._text
+
+
+def test_supersession_is_selected_by_date_not_file_order_both_targets_live(monkeypatch):
+    """Gate follow-up to WS4-T22: the real data happens to list every
+    duplicate-`from` record's superseding entry LAST, so a loader that
+    silently did "last entry wins" (no `date` comparison at all) would
+    look correct against today's file. It would go quietly wrong the
+    moment a record were appended out of date order -- and BOTH the
+    superseded and superseding targets can be live simultaneously (real
+    example: INC-07771's old `merged` target INC-01271 is still a live
+    incident distinct from its `resplit` target INC-14814), so getting
+    it wrong wouldn't crash or return None -- it would return a
+    believable, live, WRONG incident id.
+
+    This constructs a `from` ID with two tombstone records whose
+    targets are BOTH live, in both file orders (superseding record
+    listed first, and listed last), and asserts `_load_deprecations()`
+    -- and `resolve_id()` built on top of it -- picks the later-`date`
+    record either way. If the loader is flipped to first-wins, this
+    must fail on the "superseding record listed first" case; see
+    test_supersession_by_date_proof_it_fires below.
+    """
+    import json
+
+    def _entries(order: str) -> list[dict[str, str]]:
+        pair = [
+            {"from": "DUP-1", "into": "LIVE-OLD", "reason": "merged", "date": "2026-01-01"},
+            {"from": "DUP-1", "into": "LIVE-NEW", "reason": "resplit", "date": "2026-06-01"},
+        ]
+        return list(reversed(pair)) if order == "superseding-first" else pair
+
+    live = {"LIVE-OLD", "LIVE-NEW"}
+    monkeypatch.setattr(gi, "by_id", lambda x: {"id": x} if x in live else None)
+
+    try:
+        for order in ("superseding-first", "superseding-last"):
+            text = json.dumps({"deprecations": _entries(order)})
+            monkeypatch.setattr(gi, "files", lambda _name, _t=text: _FakeIdDeprecationsFile(_t))
+            gi._load_deprecations.cache_clear()
+            assert gi._load_deprecations()["DUP-1"] == "LIVE-NEW", order
+            assert gi.resolve_id("DUP-1") == "LIVE-NEW", order
+    finally:
+        gi._load_deprecations.cache_clear()  # force real data back in on next call
+
+
+def test_supersession_by_date_proof_it_fires(monkeypatch):
+    """Working agreement 6: prove the test above actually can fail, by
+    running its "superseding record listed first" case against a
+    first-wins loader (the pre-WS4-T22 `out[f] = t` overwrite, with no
+    `date` comparison at all) instead of the real one. Must return the
+    OLD (superseded, but still live) target, not the new one -- the
+    exact silent-wrong-answer failure mode this test guards against.
+    """
+    import json
+
+    def first_wins_load(text: str) -> dict[str, object]:
+        data = json.loads(text)
+        out: dict[str, object] = {}
+        for entry in data.get("deprecations", []):
+            f, t = entry.get("from"), entry.get("into")
+            if f and t:
+                out.setdefault(f, t)  # first entry seen wins, no date check
+        return out
+
+    entries_superseding_first = [
+        {"from": "DUP-1", "into": "LIVE-NEW", "reason": "resplit", "date": "2026-06-01"},
+        {"from": "DUP-1", "into": "LIVE-OLD", "reason": "merged", "date": "2026-01-01"},
+    ]
+    text = json.dumps({"deprecations": entries_superseding_first})
+    result = first_wins_load(text)
+    assert result["DUP-1"] == "LIVE-NEW", "fixture sanity: this order should trip up first-wins"
+
+
 # --- WS4-T22: boundary/unit tests for the list-length check itself ---
 
 

@@ -59,17 +59,30 @@ def _load_deprecations() -> dict[str, str]:
         return {}
     data = json.loads(text)
     out: dict[str, str] = {}
-    # A `from` ID can carry more than one tombstone record — e.g. an
-    # older `merged` entry later superseded by a `resplit` (WS4-T15/
-    # WS4-T22: INC-07771, INC-08109, INC-08133, INC-08146 each have
-    # both). The most recent `date` wins, selected explicitly rather
-    # than by "whichever the JSON array lists last" — the latter is an
-    # accident of file order, not a decision, and this codebase has
-    # already shipped that exact accident once (merge_and_dedupe.py's
-    # `seen_from` kept the LAST record under a comment claiming
-    # "earliest"). Ties (same date) fall back to file order for
-    # determinism, matching the append-only convention that later
-    # entries are written after earlier ones.
+    # SUPERSESSION RULE (WS4-T22, gate follow-up): a `from` ID can carry
+    # more than one tombstone record — e.g. an older `merged` entry
+    # later superseded by a `resplit` (INC-07771, INC-08109, INC-08133,
+    # INC-08146 each have both, in this shipped data). When that
+    # happens, THE RECORD WITH THE LATEST `date` WINS, full stop — that
+    # comparison is the rule, not an accident of which entry the JSON
+    # array happens to list last (append-only means later-dated records
+    # are normally appended later too, but nothing enforces that, and
+    # this loop must not silently depend on it holding). Ties (equal
+    # `date`) fall back to file order for determinism.
+    #
+    # This is not cosmetic: BOTH a superseded and a superseding target
+    # can be live simultaneously. INC-07771's superseded `merged` target
+    # INC-01271 is itself a live, real incident, distinct from its
+    # `resplit` target INC-14814 — so picking the wrong record here
+    # doesn't crash and doesn't return None, it returns a believable,
+    # live, WRONG incident with nothing downstream to flag it (working
+    # agreement 6, form (d): the resolver "succeeds", the value is
+    # simply wrong). merge_and_dedupe.py shipped exactly this shape of
+    # bug once already — a `seen_from` dict that kept the LAST record
+    # under a comment claiming "earliest" — which is why this selection
+    # is spelled out by comparing `date` values explicitly below rather
+    # than left as an emergent property of `out[f] = t` overwriting in
+    # loop order.
     latest_date: dict[str, str] = {}
     for entry in data.get("deprecations", []):
         f, t, date = entry.get("from"), entry.get("into"), entry.get("date") or ""
