@@ -6,7 +6,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 ## Identity & provenance
 | Field | Type | Notes |
 |---|---|---|
-| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json) and resolvable via the package's `resolve_id()`. |
+| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away and retired ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json), with two scoped exceptions: **9 ids are unrecorded** (published in v2.0.0, no tombstone; [`ID_POLICY.md`](ID_POLICY.md) §1.4(a)), and **8 recorded ids return `None` from `resolve_id()`** because they have no single successor (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897` are retirements split into groups of 12/100/11/8; `INC-03128` and `INC-08185` have an identified successor, `INC-14909` and `INC-14742`, not written as a record; `INC-00497` and `INC-08139` named different incidents in different releases). For those eight use `resolve_id_group()` or read the file; see the [v2.11.0 notes](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/releases/v2.11.0.md). |
 | `source_ids` | string[] | Upstream ids this entry was consolidated from (e.g. `AIID-1234`, `CVE-2026-…`, `ATLAS-AML.CS0001`, `AIAAIC2257`). |
 | `quality_tier` | enum | Vetting level: `curated` (hand-written/maintainer), `reviewed` (maintained catalogue, NVD-scored CVE, hand-picked, or human/assisted review), `auto` (bulk-ingested). Filter on this to control trust. |
 | `tier` | enum | **landmark** (the notable headline set) vs **feed** (the comprehensive CVE/GHSA/OSV stream). **Derived, recomputed every build** by `scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of record: `landmark` iff `quality_tier == "curated"` **OR** `aiid_id` is present **OR** `corpus == "ai-harm"`; everything else is `feed`. **Not a function of `quality_tier`** — they are different axes, and most landmark rows qualify only via `aiid_id`, so you cannot reconstruct this field from `quality_tier` (see [Reproducing the landmark count](#reproducing-the-landmark-count)). Cite the landmark count for headlines. *Corrected 2026-09-18 (WS6-T9): the previous wording also listed `category == "real-world"`, a criterion dropped from the code before #68 merged because it also tags exploited CVEs — read literally it described ~3.6x the rows the code marks. The old cross-reference to INCLUSION.md §5 was dropped for the same reason: §5 defines the split on `quality_tier`, a different and much larger set; reconciling §5 is an open maintainer item.* |
@@ -182,22 +182,25 @@ axis, and it selects a different — much larger — set. Most landmark rows are
 landmark because they carry an `aiid_id`, which says nothing about
 `quality_tier`.
 
-**Carry-in status (2026-09-18).** The mechanism above is in the build code as
-of WS6-T9, but `data/` is frozen, so the *committed* slim artifacts do not
-carry `tier` yet — they gain it on the first rebuild after the freeze lifts.
-Until then the landmark count is reproducible from `data/incidents.json`,
-the Hugging Face export and the MISP feed only — measured against a full
-rebuild in a scratch tree, the rebuilt `incidents.min.json` yields
-`landmark` = the published `landmark_count` exactly, with `tier` as the only
-field the rebuild adds. The site's **CSV export** needs one further change
-(a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately sequenced
-after the rebuild so it does not ship a blank column in the meantime. The
-gate holds each remaining variant as strict-xfail, so the day one starts
-carrying the field is the day the test demands its marker be removed; see
+**Carry-in status.** The mechanism above shipped in WS6-T9. It was held
+behind the `data/` freeze; the freeze lifted with the WS4-T21/D28 47-split
+remediation (2026-09-18), which was also the first rebuild after WS6-T9
+landed — so the *committed* slim artifacts carry `tier` now: `data/incidents.min.json`
+(and the site and PyPI copies of it), the Hugging Face export, the STIX
+bundle (as `x_tier`) and the MISP feed all carry it as of that rebuild. The
+landmark count is reproducible from any of them, not `data/incidents.json`
+alone. The site's **CSV export** is the one remaining gap — it needs one
+further change (a `tier` row in `docs/app.js`'s `CSV_COLUMNS`), deliberately
+sequenced after the rebuild so it did not ship a blank column in the
+meantime; `tests/test_landmark_distribution.py` holds that one variant as
+strict-xfail until the change lands, so the day it starts carrying the field
+is the day the test demands its marker be removed. Every other variant's
+former strict-xfail marker was already removed when the freeze lifted, and
+the gate confirmed each fired correctly before its own deletion. See
 [`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
 ## Access
-- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`.
+- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`).
 - **Hugging Face:** `load_dataset("emmanuelgjr/genai-incidents")` (JSONL projection).
 - **STIX 2.1:** `…github.io/genai_incidents/data/incidents.stix.json`.
 - **CSV / min JSON / per-year markdown:** see the [site](https://emmanuelgjr.github.io/genai_incidents/) and [`docs/`](.).

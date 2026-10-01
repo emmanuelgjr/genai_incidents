@@ -48,7 +48,7 @@ def _load_raw() -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _load_deprecations() -> dict[str, str]:
+def _load_deprecations() -> dict[str, str | list[str]]:
     import json
 
     try:
@@ -59,6 +59,16 @@ def _load_deprecations() -> dict[str, str]:
         return {}
     data = json.loads(text)
     out: dict[str, str] = {}
+    # A `from` ID can carry more than one tombstone record (e.g. an older
+    # `merged` entry later superseded by a `resplit`: INC-07771, INC-08109,
+    # INC-08133, INC-08146). RULE: the LAST record in file order wins.
+    # Why: the deprecations file is append-only, so file order is decision
+    # order; this is the repo-wide contract and it must stay identical to
+    # `scripts/validate.py::_latest_by_from` (and the fixpoint in
+    # `scripts/merge_and_dedupe.py`). Do NOT select by `date` here: dates
+    # can be absent or out of order, and a package that disagrees with the
+    # validator returns a live-but-wrong ID. tests/test_package.py
+    # cross-checks this loader against `_latest_by_from`.
     for entry in data.get("deprecations", []):
         f, t = entry.get("from"), entry.get("into")
         if f and t:
@@ -81,8 +91,17 @@ def load_schema() -> dict[str, Any]:
     return json.loads(text)
 
 
-def load_deprecations() -> dict[str, str]:
-    """Return ``{deprecated_id: canonical_id}`` mappings for retired IDs."""
+def load_deprecations() -> dict[str, str | list[str]]:
+    """Return ``{deprecated_id: into}`` mappings for retired IDs.
+
+    The value is ``str | list[str]``: a single canonical id for a merge or
+    rename, or a LIST of successor ids for a ``split``/``resplit`` record.
+    v2.11.0 is the first release whose bundled data carries list values (8 of
+    293 records); every earlier release shipped strings only, so a consumer
+    written against ``dict[str, str]`` (including v2.10.0's own
+    ``resolve_id``) can raise ``TypeError`` on v2.11.0 data. Use
+    ``resolve_id`` / ``resolve_id_group`` rather than indexing the mapping.
+    """
     return dict(_load_deprecations())
 
 
@@ -124,12 +143,11 @@ def query(
     project's README asks consumers to cite, and is a different axis from
     ``quality_tier`` (vetting level) — neither substitutes for the other.
 
-    **Carry-in caveat (WS6-T9, 2026-09-18):** the packaged
-    ``incidents.min.json`` gained ``tier`` in the build code but the
-    committed copy predates that change, so ``tier=`` matches nothing until
-    the dataset is rebuilt and re-shipped. This filter is wired now, with the
-    field, rather than after — a kwarg that silently ignores an argument is
-    worse than one that is explicitly not yet populated.
+    **Carry-in caveat (WS6-T9, 2026-09-18; corrected 2026-10-01):** this
+    note originally said ``tier=`` matched nothing until the dataset was
+    rebuilt. That is no longer true: the packaged ``incidents.min.json`` now
+    carries ``tier``, and ``query(tier="landmark")`` returns the landmark
+    set. Releases before v2.11.0 do not accept ``tier=``.
     """
     filters = {
         "year": year,
@@ -181,17 +199,33 @@ def resolve_id(inc_id: str) -> str | None:
     """Map a (possibly deprecated) ``INC-NNNNN`` ID to its current
     canonical ID. Returns the input unchanged if it's still active,
     follows the deprecation chain otherwise, and returns ``None`` if
-    the chain doesn't terminate in an existing entry.
+    the chain doesn't terminate in a single, unambiguous existing entry.
 
-    A record whose ``into`` is a LIST (a multi-successor ``split``/
-    ``resplit`` record — WS4-T15) has no single canonical successor to
-    walk to, so this function treats it the same as a dangling/unknown
-    ID and returns ``None`` rather than raising. Before this fix, the
-    next chain hop did ``current in deprec`` with ``current`` bound to a
+    A record whose ``into`` is a list (a multi-successor ``split``/
+    ``resplit`` record — WS4-T15) is walked like any other hop *when it
+    has exactly one element*: a one-element list is an unambiguous,
+    live successor, and there is nothing to disambiguate. It is only a
+    list of TWO OR MORE elements that has no single canonical successor
+    to walk to — for that case (and only that case) this function
+    treats the record the same as a dangling/unknown ID and returns
+    ``None`` rather than inventing an answer the data doesn't support
+    (WS4-T22 / user ruling D31: picking one of N successors, even
+    "the first", would fabricate a canonical answer). Before WS4-T22,
+    this function discarded ALL list-valued hops uniformly — including
+    the one-element case — on the false premise that any list means "no
+    single successor"; that premise only holds for length >= 2, and the
+    length == 1 case was a live, resolvable successor being silently
+    dropped (12 published IDs affected across the corpus at the time of
+    the fix, 4 of which had a single-element resplit target).
+
+    Before the WS4-T15 fix that added the list check at all, the next
+    chain hop did ``current in deprec`` with ``current`` bound to a
     list, which raises ``TypeError: unhashable type: 'list'`` — verified
     against WS4-T10's own array-valued ``split``/``resplit`` proposal.
-    Callers that need every successor of a multi-target record should use
-    :func:`resolve_id_group`, not this function."""
+
+    Callers that need every successor of a multi-target (two-or-more)
+    record — i.e. the case this function still returns ``None`` for —
+    should use :func:`resolve_id_group`, not this function."""
     if by_id(inc_id) is not None:
         return inc_id
     deprec = _load_deprecations()
@@ -201,7 +235,9 @@ def resolve_id(inc_id: str) -> str | None:
         seen.add(current)
         current = deprec[current]
         if isinstance(current, list):
-            return None
+            if len(current) != 1:
+                return None
+            current = current[0]
         if by_id(current) is not None:
             return current
     return None
