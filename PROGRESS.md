@@ -2,6 +2,22 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🛰 STIX OWASP-edition fix — **MERGED to main `7dc80602` and LIVE (2026-10-01)** · D32 post-cut step 1 done
+
+**Merge.** `ws6/stix-owasp-edition-and-site-fixes` (`a2be3364`, gate PASS, board `70e72155`) was merged `--no-ff` onto post-cut main.
+- **The merged tree was re-verified [R], not inherited from the gate:**
+  - merge-tree is clean, and no branch file changed on main since the branch base `528d5936`;
+  - pytest is **476 passed, 1 xfailed** (v2.11.0's 475 plus the new STIX test);
+  - a bundle rebuilt from the merged tree has **17,750 `-2026` labels and 0 `-2025`**, equal to an independent Σ len(owasp_llm) = 17,750; 54,485 objects, unchanged.
+- **Live verification [R], after the Pages run `36870624095` succeeded:**
+  - the live STIX bundle has 17,750/17,750 `owasp-llm-top10-2026`, with 54,485 objects;
+  - the live TAXII collection `05bbe2e9…/objects.json` is the same, 17,750/17,750;
+  - the live `app.js` serves the "Years with entries" tile.
+
+**⚠ The disclosure is owed in the next release notes (D32).** The corrective relabel is now public with no notice until the next release. The notes must state the `source_name` change and tell **STIX consumers to re-import**: SDO `id` and `modified` are unchanged, so (id, modified) dedupe such as OpenCTI's will not pick it up (gate advisory A3). The foreman offered the user an immediate CHANGELOG `[Unreleased]` entry; that is pending the user's answer.
+
+**Next (D32):** docs-warden on the site text change, then the README PR #100 rebase (keep the `50e42bbe` README:71 text).
+
 ## 🎉 v2.11.0 PUBLISHED 2026-10-01 — all nine VERSIONING.md steps done and independently verified
 
 | Step | Result | Evidence [R] |
