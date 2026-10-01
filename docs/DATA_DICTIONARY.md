@@ -202,5 +202,5 @@ the gate confirmed each fired correctly before its own deletion. See
 ## Access
 - **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`).
 - **Hugging Face:** `load_dataset("emmanuelgjr/genai-incidents")` (JSONL projection).
-- **STIX 2.1:** `…github.io/genai_incidents/data/incidents.stix.json`.
+- **STIX 2.1:** `…github.io/genai_incidents/data/incidents.stix.json`. The OWASP LLM `external_references` `source_name` is edition-qualified and currently `owasp-llm-top10-2026` (it was `owasp-llm-top10-2025` until 2026-10-01 13:43 UTC, the Pages deploy of `7dc80602`); the edition is derived from the crosswalk `mappings/owasp_llm_2025_to_2026.json` (`to_version`).
 - **CSV / min JSON / per-year markdown:** see the [site](https://emmanuelgjr.github.io/genai_incidents/) and [`docs/`](.).
