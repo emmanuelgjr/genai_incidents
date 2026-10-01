@@ -147,8 +147,7 @@ def query(
     note originally said ``tier=`` matched nothing until the dataset was
     rebuilt. That is no longer true: the packaged ``incidents.min.json`` now
     carries ``tier``, and ``query(tier="landmark")`` returns the landmark
-    set (1,915 entries at this writing). Releases built before the field
-    existed would match nothing; this one does not.
+    set. Releases before v2.11.0 do not accept ``tier=``.
     """
     filters = {
         "year": year,

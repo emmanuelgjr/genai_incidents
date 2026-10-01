@@ -71,7 +71,10 @@ The build is a deterministic, idempotent pipeline
    reference URL › fuzzy title within ±1 year), resolving every match to the
    *live* absorbing record to avoid silent content loss on transitive merges.
 3. **Assign stable `INC-#####` ids**; merged-away ids are recorded in
-   `id_deprecations.json` so citations always resolve.
+   `id_deprecations.json`, so citations of any ID that carries a tombstone
+   resolve. This is scoped: the 9 IDs in `docs/ID_POLICY.md` §1.4(a) are
+   unrecorded (no tombstone), and 8 IDs return `None` from `resolve_id()` (see
+   the v2.11.0 release notes).
 4. **Finalise content fields** (attack vector, framework mappings, curation
    overrides) *before* history stamping, so the content snapshot is stable.
 5. **Enrich**: CWE/CVSS from NVD/GHSA; CISA KEV exploited-in-the-wild flags;
