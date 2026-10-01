@@ -5,11 +5,12 @@ The dataset uses [SemVer](https://semver.org/) — major bumps for breaking
 schema or ID changes, minor bumps for additive schema fields or large
 ingest expansions, patch bumps for routine refreshes and bug fixes.
 
-## [2.11.0] — gated pre-cut; remediation merged to `main` 2026-09-18
+## [2.11.0] — 2026-10-01
 
-> **These notes describe a release gated but not yet cut** (board ruling
-> D30, 2026-09-20). Version strings still read `2.10.0` across the repo;
-> the data and code below are already on `main`. Full disclosure, the
+> **These notes were gated before the cut** (board ruling D30, 2026-09-20)
+> and the release was cut on 2026-10-01. Version strings read `2.10.0`
+> across the repo before the cut; the data and code below were already on
+> `main` from 2026-09-18. Full disclosure, the
 > consumer-impact section, and the re-derivation recipe for every figure:
 > [`docs/releases/v2.11.0.md`](docs/releases/v2.11.0.md).
 
