@@ -124,6 +124,12 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ⚖ D37 — USER RULING, 2026-10-01, on BOUNCE #4: **apply the gate-verified text verbatim, then a string-check gate**
+
+- A specialist inserts the gate's exact README:33 sentence and its A1 marker wording, **verbatim, with no new wording**.
+- A short gate confirms only that the two strings match exactly, that nothing else in the diff moved, and that pytest and the drift check still pass.
+- **On PASS, the cut starts.**
+
 ### ⛔ v2.11.0 — **D36 narrow gate: BOUNCE #4 (red-reviewer, 2026-10-01, on `59dd995b`) — ESCALATED TO USER** · one clause on one line
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Only one wording defect is left: one clause on one line. Nothing else is wrong."*
