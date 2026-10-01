@@ -1,4 +1,11 @@
-# GenAI & Agentic AI Security Incidents
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/banner-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/banner-light.svg" alt="GenAI & Agentic AI Security Incidents" width="100%">
+</picture>
+
+**One queryable index of AI security incidents, vulnerabilities, and red-team findings,<br>normalized onto OWASP LLM/ASI Top 10, NIST AI RMF, and MITRE ATLAS.**
 
 [![Incidents](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Femmanuelgjr%2Fgenai_incidents%2Fmain%2Fdata%2Fstats.json&query=%24.incident_count&label=incidents&color=9a3412&logo=databricks&logoColor=white)](https://emmanuelgjr.github.io/genai_incidents/)
 [![Validate dataset](https://github.com/emmanuelgjr/genai_incidents/actions/workflows/validate.yml/badge.svg)](https://github.com/emmanuelgjr/genai_incidents/actions/workflows/validate.yml)
@@ -9,126 +16,213 @@
 [![License: MIT (code)](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![License: CC-BY-4.0 (data)](https://img.shields.io/badge/data-CC--BY--4.0-lightgrey.svg)](LICENSE-DATA)
 
-**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems, normalized onto OWASP LLM/ASI Top 10, NIST AI RMF, and MITRE ATLAS so you can query and pivot across sources that don't share a schema. It's built for AppSec/threat-intel teams doing CVE and vendor-advisory triage, red-teamers scoping attack classes, and researchers tracking incident trends — pull it as a Python package, a Hugging Face dataset, raw JSON, or a STIX/TAXII/MISP feed. It is **not** a complete census of every AI incident, and most taxonomy/severity labels are heuristic-assigned rather than human-reviewed — see [Limitations & biases](docs/DATASHEET.md#limitations--biases) before citing a mapping count as a measured real-world rate.
+[**🔎 Browse the site**](https://emmanuelgjr.github.io/genai_incidents/) · [**⚡ Quick start**](#-quick-start) · [**📚 Docs**](#-documentation--policies) · [**📝 Cite**](#how-to-cite) · [**🤝 Contribute**](#-contributing)
 
-- 🔎 **Searchable site:** <https://emmanuelgjr.github.io/genai_incidents/>
-- 📦 **Python:** `pip install genai-incidents`
-- 🤗 **Hugging Face:** [`emmanuelgjr/genai-incidents`](https://huggingface.co/datasets/emmanuelgjr/genai-incidents) — `load_dataset("emmanuelgjr/genai-incidents")`
-- 🛰️ **STIX 2.1 bundle** (for OpenCTI / MISP / TAXII): <https://emmanuelgjr.github.io/genai_incidents/data/incidents.stix.json> — incidents as `x-genai-incident` SDOs linked to MITRE ATLAS `attack-pattern`s and CVE `vulnerability`s
-- 📡 **TAXII 2.1 (static):** discovery at <https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json> — a read-only static mirror of the STIX collection ([usage + caveats](https://emmanuelgjr.github.io/genai_incidents/taxii2/README.md))
-- 🛡️ **MISP feed:** subscribe a MISP instance to <https://emmanuelgjr.github.io/genai_incidents/misp/> (Format: *MISP Feed*) — incidents grouped into year-events with `genai-incidents:*` / `mitre-atlas:*` / VERIS 1.4.1 `veris:*` tags
-- 🪪 **DOI:** [`10.5281/zenodo.20248675`](https://doi.org/10.5281/zenodo.20248675) (Zenodo concept DOI — always the latest release; see [How to cite](#how-to-cite))
+</div>
 
 ---
 
-## What's in the data
+**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems. It pulls together AIID, OECD AIM, AIAAIC, MITRE ATLAS, NVD/GHSA/OSV, and researcher and vendor write-ups and maps them onto the same security taxonomies, so you can query and pivot across sources that don't share a schema.
 
-<!-- stats:incident_count -->13,361<!-- /stats:incident_count --> entries as of the <!-- stats:generated -->2026-09-18<!-- /stats:generated --> build, <!-- stats:landmark_count -->1,915<!-- /stats:landmark_count --> of them `tier: landmark` — the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition); cite the landmark count, not the full corpus, when you mean "notable incidents." Coverage spans <!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max -->. Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
-
-Beyond the obvious title/description/severity fields, a few worth knowing about before you build on this data:
-
-- **`content_license`** — a row-level marker on entries whose upstream source imposes its own attribution/share-alike obligation on that specific row, carried through the full JSON, the Hugging Face export, and the STIX bundle (as `x_content_license`). Its absence means no *known* obligation, not a guarantee the row is unencumbered.
-- **`source_status` / `source_freshness`** — whether a row is still *emitted* by a build and whether the upstream source that fed it is still *refreshing* are tracked as two separate, independent facts. A committed ingest snapshot keeps re-emitting its rows every build even after the source that produced them goes dark, so a row being present is never itself a freshness claim — `source_freshness` is the field that actually says so, and it's published at [`data/source_freshness.json`](data/source_freshness.json).
-- **`quality_tier` / `confidence`** — vetting level (`curated` / `reviewed` / `auto`) and a rule-derived confidence tier, so you can filter to only human/assisted-reviewed entries instead of the full heuristic-labeled corpus.
-- **Tombstones, never deletions** — merged or withdrawn IDs are never dropped; they redirect (or terminate) via [`data/id_deprecations.json`](data/id_deprecations.json), so a citation of any ID that carries a tombstone resolves to something, never to silence (9 pre-tombstone IDs are a known exception, and `resolve_id()` returns `None` for 8 IDs whose redirect chain ends in more than one live successor, for three different reasons — see the [v2.11.0 release notes](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/releases/v2.11.0.md)). See [`docs/ID_POLICY.md`](docs/ID_POLICY.md) for the ID-stability commitment.
-
-**Heuristic labels, stated plainly:** most taxonomy and severity labels are assigned by deterministic heuristics, not human review. A count like "N incidents tagged LLM01" is a labeling artifact of what the heuristics matched across whichever sources happened to be aggregated — it is not a measured rate of how often that failure mode occurs in the real world. This is the datasheet's own warning, not a paraphrase of it: see [Limitations & biases](docs/DATASHEET.md#limitations--biases) for the full statement and known gaps.
-
-### Taxonomies mapped
-
-- **OWASP Top 10 for LLM Applications (2026)** — `LLM01`–`LLM10` — _core_
-- **OWASP Agentic Top 10 (ASI)** — `ASI01`–`ASI10` — _core_
-- **NIST AI Risk Management Framework (AI 100-1)** — `GOVERN` / `MAP` / `MEASURE` / `MANAGE` subcategories — _core_
-- **MITRE ATLAS** — tactics (`AML.TA00xx`) and techniques (`AML.T00xx`) — _core_
-- **MAESTRO** architectural layers (`L1`–`L7`) — _companion_ (carried on entries whose upstream source already provides a MAESTRO mapping; not populated on every entry)
-- **VERIS 1.4.1 crosswalk** (`veris:*` tags in the MISP export) — _experimental_ (a hand-curated crosswalk from `attack_vector`, emitted at export time only — not a stored per-incident schema field)
-
-That's six taxonomies total, not four — see [`docs/TAXONOMIES.md`](docs/TAXONOMIES.md) for a chooser table and the full code lists.
-
-**How this differs from AIID / MIT AI Risk Repository / AVID:** those projects are themselves primary or aggregated incident trackers, and this dataset draws on several of them as upstream sources (see [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md)) rather than replacing them. What this project adds is normalization onto security-oriented taxonomies (OWASP LLM/ASI, NIST AI RMF, MITRE ATLAS) across sources that don't share a common schema. A full side-by-side positioning comparison is planned but not yet written.
-
-## Documentation & policies
-
-| | |
+| If you are… | …use it to |
 |---|---|
-| Provenance, composition, limitations (Datasheets for Datasets) | [`docs/DATASHEET.md`](docs/DATASHEET.md) |
-| Per-source license/ToS audit — every upstream, its terms, this project's remediation | [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md) |
-| How the CC-BY-4.0 data grant applies, and where it doesn't | [`NOTICE-DATA`](NOTICE-DATA) |
-| Incident ID stability policy (tombstones, redirects always honored; ID-width decision still pending) | [`docs/ID_POLICY.md`](docs/ID_POLICY.md) |
-| Ingestion conduct — rate limits, robots.txt, identification | [`docs/INGESTION_CONDUCT.md`](docs/INGESTION_CONDUCT.md) |
-| Field reference | [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) |
-| Taxonomy detail and chooser table | [`docs/TAXONOMIES.md`](docs/TAXONOMIES.md) |
-| Scope contract — what's in/out, and why | [`INCLUSION.md`](INCLUSION.md) |
-| Methodology paper | [`docs/paper/genai-incidents-methods.md`](docs/paper/genai-incidents-methods.md) |
-| **Public evidence trail** — dated audits, delta reports, and rulings behind licensing/data/conduct decisions | [`docs/audits/`](docs/audits/) |
-| Corrections & scope disputes — open a [data correction](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=data_correction.yml) or [scope dispute](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=scope_dispute.yml); accepted changes logged in | [`CORRECTIONS.md`](CORRECTIONS.md) |
-| Changelog | [`CHANGELOG.md`](CHANGELOG.md) |
+| 🧯 **AppSec / threat-intel** | triage AI-related CVEs and vendor advisories, and pull the corpus into OpenCTI or MISP |
+| 🎯 **A red-teamer** | scope attack classes against OWASP LLM/ASI and MITRE ATLAS |
+| 🔬 **A researcher** | track incident trends with stable IDs, a DOI, and a published evidence trail |
 
-`docs/audits/` is unusual for a dataset repo, and deliberately so: rather than folding a licensing ruling or a data-migration rationale into a doc that then has to be kept perpetually current, each is a dated, standalone record of what was true and why a decision was made — worth a look if you want the reasoning behind a change, not just its result.
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/how-it-works-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/how-it-works-light.svg" alt="How it works: public sources are collected, normalized onto one schema, deduplicated, mapped to OWASP, NIST and MITRE ATLAS, validated, and shipped as a website, JSON, PyPI, Hugging Face, STIX/TAXII and MISP" width="100%">
+</picture>
+</p>
 
-## Latest release
+> ⚠️ **Important — read this before citing a number.** genai_incidents is **not** a complete census of every AI incident. Most taxonomy and severity labels are assigned by deterministic heuristics, not human review. A count like "N incidents tagged LLM01" is a labeling artifact of what the heuristics matched across whichever sources happened to be aggregated — it is not a measured rate of how often that failure mode occurs in the real world. This is the datasheet's own warning, not a paraphrase of it: see [Limitations & biases](docs/DATASHEET.md#limitations--biases) for the full statement and known gaps.
+
+---
+
+## 📊 At a glance
+
+<table>
+<tr>
+<td align="center"><b><!-- stats:incident_count -->13,361<!-- /stats:incident_count --></b><br><sub>entries</sub></td>
+<td align="center"><b><!-- stats:landmark_count -->1,915<!-- /stats:landmark_count --></b><br><sub><code>tier: landmark</code></sub></td>
+<td align="center"><b><!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max --></b><br><sub>coverage</sub></td>
+<td align="center"><b>6</b><br><sub>taxonomies (4 core)</sub></td>
+<td align="center"><b>v<!-- stats:version -->2.11.0<!-- /stats:version --></b><br><sub>built <!-- stats:generated -->2026-09-18<!-- /stats:generated --></sub></td>
+</tr>
+</table>
+
+The landmark tier is the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition) — cite the landmark count, not the full corpus, when you mean "notable incidents."
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/charts/year_bar.svg" alt="Entries per year" width="760">
+</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/charts/owasp_llm.svg" alt="Entries by OWASP LLM Top 10 (2026) code" width="49%">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/charts/severity_stack.svg" alt="Severity composition, last 12 years" width="49%">
+</p>
+<p align="center"><sub>Charts are regenerated on every build. They show what the aggregated sources contain and what the heuristics matched — <b>not</b> real-world rates (see the note above).</sub></p>
+
+### 👀 Explore it
+
+<p align="center">
+  <a href="https://emmanuelgjr.github.io/genai_incidents/#q=EchoLeak"><img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/site-search.png" alt="The searchable website: a search for EchoLeak with one entry expanded, showing its description, attack vector, quality tier, OWASP LLM and ASI codes, tags, and cite link" width="100%"></a>
+</p>
+<p align="center"><sub>The <a href="https://emmanuelgjr.github.io/genai_incidents/">website</a>: search, filter by year, severity, OWASP code, vector, corpus or quality tier, expand any entry, and deep-link the result. Screenshot taken 2026-09-30.</sub></p>
+
+---
+
+## ⚡ Quick start
+
+**Python**
+
+```bash
+pip install genai-incidents
+```
+
+```python
+from genai_incidents import query, by_cve, resolve_id
+
+for inc in query(severity="Critical", attack_vector="prompt-injection", year=2026):
+    print(inc["id"], "-", inc["title"])
+
+print(by_cve("CVE-2026-21520"))   # all incidents that list this CVE
+print(resolve_id("INC-00139"))    # follow merge history to the current canonical INC
+```
+
+**Hugging Face**
+
+```python
+from datasets import load_dataset
+ds = load_dataset("emmanuelgjr/genai-incidents")
+```
+
+**Raw JSON**
+
+```bash
+curl -sL https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/data/incidents.json -o incidents.json
+```
+
+### Every way to get it
+
+| Channel | Where | Freshness |
+|---|---|---|
+| 🔎 **Website** | <https://emmanuelgjr.github.io/genai_incidents/> — filterable, searchable, deep-linkable | rebuilt when a push to `main` touches the corpus or an exporter |
+| 📄 **Raw JSON** | [`data/incidents.json`](data/incidents.json) (full) · [`data/incidents.min.json`](data/incidents.min.json) (slim) · [`schema/incident.schema.json`](schema/incident.schema.json) | **always current** — the authoritative copy |
+| 🛰️ **STIX 2.1** | <https://emmanuelgjr.github.io/genai_incidents/data/incidents.stix.json> — `x-genai-incident` SDOs linked to MITRE ATLAS `attack-pattern`s and CVE `vulnerability`s | rebuilt when a push to `main` touches the corpus or an exporter |
+| 📡 **TAXII 2.1 (static)** | <https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json> — a read-only static mirror of the STIX collection ([usage + caveats](https://emmanuelgjr.github.io/genai_incidents/taxii2/README.md)) | rebuilt when a push to `main` touches the corpus or an exporter |
+| 🛡️ **MISP feed** | <https://emmanuelgjr.github.io/genai_incidents/misp/> (Format: *MISP Feed*) — year-events with `genai-incidents:*` / `mitre-atlas:*` / VERIS 1.4.1 `veris:*` tags | rebuilt when a push to `main` touches the corpus or an exporter |
+| 📦 **PyPI** | `pip install genai-incidents` | snapshot per release |
+| 🤗 **Hugging Face** | [`emmanuelgjr/genai-incidents`](https://huggingface.co/datasets/emmanuelgjr/genai-incidents) | snapshot per release |
+| 🪪 **DOI** | [`10.5281/zenodo.20248675`](https://doi.org/10.5281/zenodo.20248675) (concept DOI — always the latest release; see [How to cite](#how-to-cite)) | per release |
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/stix-excerpt.png" alt="An excerpt of the STIX 2.1 bundle: the x-genai-incident object for INC-00924 (EchoLeak) with its JSON fields, and a graph linking it by 'uses' relationships to four MITRE ATLAS attack-patterns and by 'exploits' to CVE-2025-32711" width="100%">
+</p>
+<p align="center"><sub>A real excerpt from the published STIX 2.1 bundle (INC-00924, captured 2026-09-30; elided fields shown as <code>…</code>). Each incident is an <code>x-genai-incident</code> SDO linked to MITRE ATLAS <code>attack-pattern</code>s and CVE <code>vulnerability</code> objects.</sub></p>
+
+<details>
+<summary><b>Staleness details per channel</b> — know which build you're getting before you rely on freshness</summary>
+
+Every distribution channel ships from the same corpus, but not necessarily the same **build** of it.
+
+**PyPI.** The package bundles a snapshot of the slim dataset (`incidents.min.json` + `id_deprecations.json`) taken at that release's build time and publishes on a tagged GitHub release (or a maintainer-triggered manual run) — `pip install` gives you the corpus as of the version you installed, not a live feed. The package's own release version and the dataset's content-vintage are not yet decoupled (that split — `data_version` distinct from code `__version__`, with a `fetch_latest()` to pull current data on demand — is planned but not shipped); today they're the same string. If you need current data, don't assume a `pip install` a week ago is still current — re-pull, or use one of the other channels.
+
+**Hugging Face.** Published by `make huggingface` on each GitHub release (or manually via `workflow_dispatch`) — refreshed on releases, not continuously. Same vintage characteristics as the PyPI package.
+
+**STIX / TAXII / MISP.** All rebuilt automatically by the Pages deploy workflow on every push to `main` that touches the corpus or an exporter script — the closest thing to "live" this project offers, though it is a rebuild-on-push, not a continuous feed. Build any of them locally with `make stix` / `make taxii` / `make misp`.
+
+**Raw JSON.** [`data/incidents.json`](data/incidents.json) is the authoritative, always-current copy; the site and the STIX/TAXII/MISP exports all build from this file. [`data/id_deprecations.json`](data/id_deprecations.json) resolves citations of merged-away IDs. If you need the current corpus rather than a point-in-time snapshot, pull from `data/incidents.json` on `main` (or the site/STIX/TAXII/MISP exports, which build from it), not from PyPI or Hugging Face.
+
+</details>
+
+---
+
+## 🚨 Latest release
 
 **<!-- stats:version -->2.11.0<!-- /stats:version --> — released 2026-10-01.** A 47-split remediation (board ruling D28, 2026-09-18) executed the previously-deferred unmerge: a query-string over-merge bug in `normalize_url()` had been silently collapsing unrelated incidents under shared published IDs, and the fix split them back out — growing the corpus by 301 entries to the <!-- stats:incident_count -->13,361<!-- /stats:incident_count --> above. D28 authorized and executed four permanent retirements (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897`) whose content had been inherited by a row that was not its real successor; a fifth ID, `INC-07738`, also stops resolving to itself in this release via a separate, ordinary merge unrelated to D28. Every retired ID still resolves through [`data/id_deprecations.json`](data/id_deprecations.json) — no citation of any ID that carries a tombstone breaks (nine pre-tombstone IDs are a known exception, [`docs/ID_POLICY.md`](docs/ID_POLICY.md) §1.4(a)). **Twelve IDs change their `resolve_id()` answer in this release.** Four were **wrong under v2.10.0** and are corrected: `INC-07771`, `INC-08109`, `INC-08133` and `INC-08146` resolved to the wrong targets `INC-01271`, `INC-01412`, `INC-07736` and `INC-00554` (the first three are still live rows about unrelated incidents), and now resolve to `INC-14814`, `INC-14847`, `INC-14850` and `INC-14853` — **if you cached the old mappings, re-resolve them.** **Eight return `None`, for three different reasons, and in every case the content still exists:** the four retirements (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897`) were split into real groups of 12, 100, 11 and 8, so there is no single successor (ambiguity); `INC-03128` and `INC-08185` have an identified successor, `INC-14909` and `INC-14742`, that this release does not write as a record (a known answer the package does not yet give; narrowing them is a follow-up); and `INC-00497` and `INC-08139` named different incidents in different releases, so resolve them by the release you cited (the release notes carry the per-release table). Read `data/id_deprecations.json` directly or call `resolve_id_group()`; this deviation from the ID policy is still open. **`load_deprecations()` values are now `str | list[str]`** (8 of 293 are lists), and v2.10.0's own `resolve_id()` raises `TypeError` on this data, so upgrade the package and data together. This remediation was cut as **v2.11.0** on 2026-10-01; see [`docs/releases/v2.11.0.md`](docs/releases/v2.11.0.md) for the full disclosure, the consumer-impact section, and the re-derivation recipe for every figure. **Previous release, v2.10.0 (2026-09-18):** A **silent breaking change for anyone matching on `owasp_llm` code strings**: every code was migrated from the OWASP Top 10 for LLM Applications 2025 edition to the 2026 edition. The code space is identical before and after, so `LLM03` is still valid and now means *Excessive Agency* instead of *Supply Chain* — nothing errors, nothing fails validation. Concretely: a filter on `LLM03` matched roughly eight times as many rows at v2.9.0 as it matches today — the release notes give both exact counts and the command to re-derive them. Data at or before v2.9.0, including its Zenodo deposits, carries 2025 codes; the crosswalk is [`mappings/owasp_llm_2025_to_2026.json`](mappings/owasp_llm_2025_to_2026.json). Also fixed eight weeks of silently-dead weekly refreshes, an 800 KB page truncation that dropped ~38 incidents per run, and the OECD crawl budget. **Exactly one corpus row changed, at the time of that cut** — `INC-11516`'s description had the query string of an expired pre-signed URL removed. The v2.10.0 release notes are at [`docs/releases/v2.10.0.md`](docs/releases/v2.10.0.md); [`CHANGELOG.md`](CHANGELOG.md) carries both entries.
 
 ---
 
-## Layout
+## ✨ How it differs from AIID / MIT AI Risk Repository / AVID
 
-```
-.
-├── data/
-│   ├── incidents.json          ← the full, authoritative dataset (use this)
-│   ├── incidents.min.json      ← slim variant: id, title, taxonomy mappings, primary reference
-│   ├── stats.json              ← the single source of every published count (invariant 6)
-│   ├── id_deprecations.json    ← merged/withdrawn ID redirects and tombstones
-│   ├── source_freshness.json   ← reviewed registry of which sources have stopped refreshing
-│   └── legacy_consolidated.json ← intermediate output from the legacy parser
-├── schema/
-│   └── incident.schema.json    ← JSON Schema for one incident
-├── mappings/
-│   ├── owasp_llm_top10_2025.json
-│   ├── owasp_asi_top10.json
-│   ├── nist_ai_rmf.json
-│   ├── mitre_atlas.json
-│   ├── cwe_capec.json
-│   ├── veris.json
-│   └── maestro_layers.json
-├── legacy/                     ← original source files (preserved verbatim)
-├── ingest/                     ← per-source aggregator outputs (CVE, AIID, ATLAS, etc.)
-├── scripts/
-│   ├── parse_existing.py             ← parse legacy/ → data/legacy_consolidated.json
-│   ├── ingest_external.py            ← parse cloned source repos under ../_external/ → ingest/*.json
-│   ├── ingest_aiid_snapshot.py       ← AIID official weekly snapshot (sanctioned bulk channel) → ingest/aiid_full.json
-│   ├── scrape_aiid.py                ← RETIRED per-page scrape (kept only as a reused parsing-logic library; disabled in Makefile)
-│   ├── ingest_airi_navigator.py      ← MIT FutureTech AI Risk Navigator CSV → ingest/airi_navigator_incidents.json
-│   ├── ingest_aiaaic_sheet.py        ← AIAAIC Repository public Google Sheet → ingest/aiaaic_sheet_incidents.json
-│   ├── ingest_oecd_aim.py            ← OECD AI Incidents Monitor (large page crawl) → ingest/oecd_aim_full_incidents.json
-│   ├── ingest_cve_nvd_expanded.py    ← pull AI-relevant CVEs from NVD/GHSA/OSV → ingest/cve_nvd_expanded.json
-│   ├── ingest_cisa_kev.py            ← CISA Known Exploited Vulnerabilities catalog (enrichment only)
-│   ├── merge_and_dedupe.py           ← merge legacy + ingest/* → data/incidents.json
-│   ├── render_markdown.py            ← data/incidents.json → INCIDENTS.md + data/stats.json
-│   ├── render_docs_stats.py          ← templates data/stats.json's counts into README/DATASHEET/site/CITATION.cff (invariant 6)
-│   ├── check_stats_drift.py          ← CI gate: fails on any doc surface out of sync with data/stats.json, or a hardcoded total
-│   ├── export_stix.py / export_taxii.py / export_misp.py / export_huggingface.py  ← format exporters
-│   └── validate.py                   ← validate JSON against schema
-├── INCIDENTS.md                ← rendered index: unified table, newest-first
-├── docs/incidents/<year>.md    ← per-year detail shards linked from INCIDENTS.md
-├── docs/audits/                ← dated project decision records (licensing, data, conduct) — see Documentation & policies below
-├── tests/                      ← pytest suite for merge/render/export/ingest-conduct helpers
-├── LICENSE                     ← MIT (covers code in scripts/, schema/, src/)
-├── LICENSE-DATA                ← CC-BY-4.0 (covers the dataset under data/) — see Licensing below for exceptions
-└── README.md
-```
+AIID, the MIT AI Risk Repository, and AVID are themselves primary or aggregated incident trackers, and this dataset draws on several of them as upstream sources (see [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md)) rather than replacing them. What this project adds is normalization onto security-oriented taxonomies (OWASP LLM/ASI, NIST AI RMF, MITRE ATLAS) across sources that don't share a common schema. A full side-by-side positioning comparison is planned but not yet written.
+
+Beyond the obvious title/description/severity fields, a few worth knowing about before you build on this data:
+
+- 🔗 **Tombstones, never deletions** — merged or withdrawn IDs are never dropped; they redirect (or terminate) via [`data/id_deprecations.json`](data/id_deprecations.json), so a citation of any ID that carries a tombstone resolves to something, never to silence (9 pre-tombstone IDs are a known exception, and `resolve_id()` returns `None` for 8 IDs whose redirect chain ends in more than one live successor, for three different reasons — see the [v2.11.0 release notes](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/releases/v2.11.0.md)). See [`docs/ID_POLICY.md`](docs/ID_POLICY.md) for the ID-stability commitment.
+- 🏷️ **`content_license`** — a row-level marker on entries whose upstream source imposes its own attribution/share-alike obligation on that specific row, carried through the full JSON, the Hugging Face export, and the STIX bundle (as `x_content_license`). Its absence means no *known* obligation, not a guarantee the row is unencumbered.
+- 🕰️ **`source_status` / `source_freshness`** — whether a row is still *emitted* by a build and whether the upstream source that fed it is still *refreshing* are tracked as two separate, independent facts. A committed ingest snapshot keeps re-emitting its rows every build even after the source that produced them goes dark, so a row being present is never itself a freshness claim — `source_freshness` is the field that actually says so, and it's published at [`data/source_freshness.json`](data/source_freshness.json).
+- ✅ **`quality_tier` / `confidence`** — vetting level (`curated` / `reviewed` / `auto`) and a rule-derived confidence tier, so you can filter to only human/assisted-reviewed entries instead of the full heuristic-labeled corpus.
+- 🧾 **A public evidence trail** — [`docs/audits/`](docs/audits/) is unusual for a dataset repo, and deliberately so: rather than folding a licensing ruling or a data-migration rationale into a doc that then has to be kept perpetually current, each is a dated, standalone record of what was true and why a decision was made — worth a look if you want the reasoning behind a change, not just its result.
+
+Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
+
+### 🧭 Taxonomies mapped
+
+| Taxonomy | Codes | Status |
+|---|---|---|
+| **OWASP Top 10 for LLM Applications (2026)** | `LLM01`–`LLM10` | core |
+| **OWASP Agentic Top 10 (ASI)** | `ASI01`–`ASI10` | core |
+| **NIST AI Risk Management Framework (AI 100-1)** | `GOVERN` / `MAP` / `MEASURE` / `MANAGE` subcategories | core |
+| **MITRE ATLAS** | tactics (`AML.TA00xx`) and techniques (`AML.T00xx`) | core |
+| **MAESTRO** architectural layers | `L1`–`L7` | companion — carried on entries whose upstream source already provides a MAESTRO mapping; not populated on every entry |
+| **VERIS 1.4.1 crosswalk** | `veris:*` tags in the MISP export | experimental — a hand-curated crosswalk from `attack_vector`, emitted at export time only, not a stored per-incident schema field |
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/taxonomy-map-dark.svg">
+  <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/taxonomy-map-light.svg" alt="One entry, six taxonomies: INC-00924 (EchoLeak) with its OWASP LLM 2026, OWASP ASI, NIST AI RMF and MITRE ATLAS codes (core), MAESTRO layers (companion) and VERIS crosswalk (experimental)" width="100%">
+</picture>
+</p>
+
+See [`docs/TAXONOMIES.md`](docs/TAXONOMIES.md) for a chooser table and the full code lists.
+
+### 🎯 What counts as an incident?
+
+Every entry must satisfy three gates, defined precisely in [`INCLUSION.md`](INCLUSION.md) — the authoritative scope contract this project's own ingesters and reviewers decide against, not a keyword list. In gist (not a substitute for the real thing):
+
+1. a real **AI-nexus** — the AI/ML system is the target, the vector, or a material enabler of harm, not an incidental mention;
+2. **security or safety relevance** — a vulnerability, exploit, attack, misuse, or real-world harm, not a feature or benchmark;
+3. **at least one citable primary source**.
+
+Broad fairness/bias-only harms with no security primitive are out of scope; see `INCLUSION.md` for the full definition and worked examples.
 
 ---
 
-## What counts as an incident?
+## 🌐 Sources aggregated
 
-Every entry must satisfy three gates, defined precisely in [`INCLUSION.md`](INCLUSION.md) — the authoritative scope contract this project's own ingesters and reviewers decide against, not a keyword list. In gist (not a substitute for the real thing): a real **AI-nexus** (the AI/ML system is the target, the vector, or a material enabler of harm — not an incidental mention), **security or safety relevance** (a vulnerability, exploit, attack, misuse, or real-world harm, not a feature or benchmark), and **at least one citable primary source**. Broad fairness/bias-only harms with no security primitive are out of scope; see `INCLUSION.md` for the full definition and worked examples.
+Each entry retains links back to the originating advisory, post, or paper. Headline sources: **AIID**, **OECD AIM**, **AIAAIC**, **MITRE ATLAS**, **AVID**, **NVD / GHSA / OSV / CISA KEV**, **garak**, **promptfoo**, plus dozens of researcher blogs, vendor threat reports, and academic papers.
+
+<details>
+<summary><b>Full source list, with per-source handling</b></summary>
+
+- **OWASP GenAI Security Project** — incident roundups + Top 10 references
+- **AI Incident Database (AIID)** ([incidentdatabase.ai](https://incidentdatabase.ai/), [github.com/responsible-ai-collaborative/aiid](https://github.com/responsible-ai-collaborative/aiid)) — ingested via AIID's official weekly snapshot archive (not per-page scraping); title + structured facts only, no verbatim narrative retained
+- **OECD AI Incidents Monitor (AIM)** ([oecd.ai/en/incidents](https://oecd.ai/en/incidents)) — cross-listed against AIID via the official AIID-OECD bridge file; `title`/`summary` are LLM-generated (OpenAI o3-mini) from third-party news of unresolved copyright status, so `description` is reduced to structural facts + link and carries a per-entry OECD attribution (decision E21); `title` itself remains an open question — see [`NOTICE-DATA`](NOTICE-DATA) and `docs/SOURCE_LICENSES.md` §1.5
+- **AIAAIC** ([aiaaic.org](https://www.aiaaic.org/aiaaic-repository)) — AI, Algorithmic, and Automation Incidents and Controversies; a CC BY-SA 4.0 source reduced to title/headline + categorical facts + link (decision D2), with row-level attribution/share-alike honored via a per-entry marker and an open database-right question — see [`NOTICE-DATA`](NOTICE-DATA) and `docs/SOURCE_LICENSES.md` §1.1
+- **MITRE ATLAS** ([atlas.mitre.org](https://atlas.mitre.org/), [github.com/mitre-atlas/atlas-data](https://github.com/mitre-atlas/atlas-data)) — all case studies parsed from the YAML corpus
+- **AVID** — AI Vulnerability Database ([avidml.org](https://avidml.org/))
+- **CSET-AIID Harm Taxonomy** ([github.com/georgetown-cset/CSET-AIID-harm-taxonomy](https://github.com/georgetown-cset/CSET-AIID-harm-taxonomy)) — controlled vocabulary reference
+- **NVD / CVE.org / GitHub Security Advisories / OSV.dev / CISA KEV** — AI/ML/LLM/agent CVEs pulled via REST API across a broad, actively-maintained keyword list
+- **NVIDIA garak** ([github.com/NVIDIA/garak](https://github.com/NVIDIA/garak)) — one entry per LLM vulnerability scanner probe (canonical attack classes)
+- **promptfoo** ([github.com/promptfoo/promptfoo](https://github.com/promptfoo/promptfoo)) — one entry per red-team plugin/strategy
+- **ModelOriented/CVE-AI** ([github.com/ModelOriented/CVE-AI](https://github.com/ModelOriented/CVE-AI)) — XAI-based AI model validation findings
+- **Researcher and vendor blogs** — Embrace The Red, Tenable, Palo Alto Unit 42, Trail of Bits, Aim Security, Noma Security, Wiz Research, Lakera, Invariant Labs, PromptArmor, Pillar Security, Token Security, HiddenLayer, Robust Intelligence, Protect AI, Cato Networks CTRL, Endor Labs, Sysdig, Zenity Labs, JFrog, Datadog Security Labs, Reco, AppOmni, BeyondTrust, Oasis Security, Mindgard, Koi Security, Imperva, Sonar, Oligo Security, OX Security, SentinelOne, Check Point Research, Trend Micro, Tinfoil Security, ZeroPath, Cymulate, MaccariTA, and others.
+- **Vendor threat reports** — Anthropic, OpenAI, Google Threat Intelligence (GTIG/TAG/Mandiant), Microsoft Threat Intelligence (MTAC/MSRC), AWS Security Bulletins, CrowdStrike, Recorded Future.
+- **Academic papers** — selected USENIX Security / NDSS / S&P / CCS / arXiv entries with concrete adversarial PoCs.
+
+</details>
+
+If a source is missing or mis-attributed, open an issue or PR. **One tracked source is currently stale** (MIT AIRI Navigator's public bulk download was withdrawn; the corpus keeps re-emitting its last-fetched snapshot, unshrunk, under a dated hold) — see [`data/source_freshness.json`](data/source_freshness.json) for the reviewed, published status of every source this project actively monitors.
 
 ---
 
-## Schema (summary)
+## 🧱 Reference
+
+<details>
+<summary><b>Schema (summary)</b></summary>
 
 See [`schema/incident.schema.json`](schema/incident.schema.json) for the canonical version, and [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) for the complete field-by-field reference (identity/provenance, quality/freshness, licensing, and evidence fields are not shown below to keep this summary short).
 
@@ -169,58 +263,64 @@ See [`schema/incident.schema.json`](schema/incident.schema.json) for the canonic
 }
 ```
 
----
+</details>
 
-## Using the dataset
+<details>
+<summary><b>Repository layout</b></summary>
 
-Every distribution channel below ships from the same corpus, but not necessarily the same **build** of it — know which one you're getting before you rely on freshness.
-
-### As a Python library
-
-```bash
-pip install genai-incidents
+```
+.
+├── data/
+│   ├── incidents.json          ← the full, authoritative dataset (use this)
+│   ├── incidents.min.json      ← slim variant: id, title, taxonomy mappings, primary reference
+│   ├── stats.json              ← the single source of every published count (invariant 6)
+│   ├── id_deprecations.json    ← merged/withdrawn ID redirects and tombstones
+│   ├── source_freshness.json   ← reviewed registry of which sources have stopped refreshing
+│   └── legacy_consolidated.json ← intermediate output from the legacy parser
+├── schema/
+│   └── incident.schema.json    ← JSON Schema for one incident
+├── mappings/
+│   ├── owasp_llm_top10_2026.json
+│   ├── owasp_llm_top10_2025.json
+│   ├── owasp_llm_2025_to_2026.json ← crosswalk for the v2.10.0 code migration
+│   ├── owasp_asi_top10.json
+│   ├── nist_ai_rmf.json
+│   ├── mitre_atlas.json
+│   ├── cwe_capec.json
+│   ├── cwe_attack_vector.json
+│   ├── veris.json
+│   └── maestro_layers.json
+├── legacy/                     ← original source files (preserved verbatim)
+├── ingest/                     ← per-source aggregator outputs (CVE, AIID, ATLAS, etc.)
+├── scripts/
+│   ├── parse_existing.py             ← parse legacy/ → data/legacy_consolidated.json
+│   ├── ingest_external.py            ← parse cloned source repos under ../_external/ → ingest/*.json
+│   ├── ingest_aiid_snapshot.py       ← AIID official weekly snapshot (sanctioned bulk channel) → ingest/aiid_full.json
+│   ├── scrape_aiid.py                ← RETIRED per-page scrape (kept only as a reused parsing-logic library; disabled in Makefile)
+│   ├── ingest_airi_navigator.py      ← MIT FutureTech AI Risk Navigator CSV → ingest/airi_navigator_incidents.json
+│   ├── ingest_aiaaic_sheet.py        ← AIAAIC Repository public Google Sheet → ingest/aiaaic_sheet_incidents.json
+│   ├── ingest_oecd_aim.py            ← OECD AI Incidents Monitor (large page crawl) → ingest/oecd_aim_full_incidents.json
+│   ├── ingest_cve_nvd_expanded.py    ← pull AI-relevant CVEs from NVD/GHSA/OSV → ingest/cve_nvd_expanded.json
+│   ├── ingest_cisa_kev.py            ← CISA Known Exploited Vulnerabilities catalog (enrichment only)
+│   ├── merge_and_dedupe.py           ← merge legacy + ingest/* → data/incidents.json
+│   ├── render_markdown.py            ← data/incidents.json → INCIDENTS.md + data/stats.json + docs/charts/*.svg
+│   ├── render_docs_stats.py          ← templates data/stats.json's counts into README/DATASHEET/site/CITATION.cff (invariant 6)
+│   ├── check_stats_drift.py          ← CI gate: fails on any doc surface out of sync with data/stats.json, or a hardcoded total
+│   ├── export_stix.py / export_taxii.py / export_misp.py / export_huggingface.py  ← format exporters
+│   └── validate.py                   ← validate JSON against schema
+├── INCIDENTS.md                ← rendered index: unified table, newest-first
+├── docs/incidents/<year>.md    ← per-year detail shards linked from INCIDENTS.md
+├── docs/audits/                ← dated project decision records (licensing, data, conduct)
+├── tests/                      ← pytest suite for merge/render/export/ingest-conduct helpers
+├── LICENSE                     ← MIT (covers code in scripts/, schema/, src/)
+├── LICENSE-DATA                ← CC-BY-4.0 (covers the dataset under data/) — see Licensing below for exceptions
+└── README.md
 ```
 
-```python
-from genai_incidents import query, by_cve, resolve_id
+</details>
 
-for inc in query(severity="Critical", attack_vector="prompt-injection", year=2026):
-    print(inc["id"], "-", inc["title"])
-
-print(by_cve("CVE-2026-21520"))   # all incidents that list this CVE
-print(resolve_id("INC-00139"))    # follow merge history to the current canonical INC
-```
-
-**Staleness:** the PyPI package bundles a snapshot of the slim dataset (`incidents.min.json` + `id_deprecations.json`) taken at that release's build time and publishes on a tagged GitHub release (or a maintainer-triggered manual run) — `pip install` gives you the corpus as of the version you installed, not a live feed. The package's own release version and the dataset's content-vintage are not yet decoupled (that split — `data_version` distinct from code `__version__`, with a `fetch_latest()` to pull current data on demand — is planned but not shipped); today they're the same string. If you need current data, don't assume a `pip install` a week ago is still current — re-pull, or use one of the channels below.
-
-### As a Hugging Face dataset
-
-```python
-from datasets import load_dataset
-ds = load_dataset("emmanuelgjr/genai-incidents")
-```
-
-**Staleness:** published by `make huggingface` on each GitHub release (or manually via `workflow_dispatch`) — refreshed on releases, not continuously. Same vintage characteristics as the PyPI package.
-
-### As the STIX 2.1 / TAXII / MISP feeds
-
-<https://emmanuelgjr.github.io/genai_incidents/data/incidents.stix.json>, the [TAXII-compatible discovery document](https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json), and the [MISP feed](https://emmanuelgjr.github.io/genai_incidents/misp/) are all rebuilt automatically by the Pages deploy workflow on every push to `main` that touches the corpus or an exporter script — the closest thing to "live" this project offers, though it is a rebuild-on-push, not a continuous feed. Build any of them locally with `make stix` / `make taxii` / `make misp`.
-
-### As raw JSON
-
-- Full: [`data/incidents.json`](data/incidents.json) — the authoritative, always-current copy; the site and the STIX/TAXII/MISP exports all build from this file.
-- Slim: [`data/incidents.min.json`](data/incidents.min.json) — id/title/taxonomy mappings/primary reference only.
-- Schema: [`schema/incident.schema.json`](schema/incident.schema.json)
-- ID deprecations: [`data/id_deprecations.json`](data/id_deprecations.json) — for resolving citations of merged-away IDs
-
-If you need the current corpus rather than a point-in-time snapshot, pull from `data/incidents.json` on `main` (or the site/STIX/TAXII/MISP exports, which build from it), not from PyPI or Hugging Face.
-
-### As a website
-
-Filterable, searchable, deep-linkable table at
-<https://emmanuelgjr.github.io/genai_incidents/>.
-
-## Regenerating the dataset
+<details>
+<summary><b>Regenerating the dataset</b></summary>
 
 ```bash
 pip install -r requirements.txt
@@ -244,9 +344,10 @@ Dedupe keys (first hit wins): (a) matching `cve_ids`, (b) matching `source_ids` 
 
 `added` and `updated` are preserved from the previous output; `updated` only bumps when an entry's content actually changes. That keeps `make build` deterministic for CI drift checks.
 
----
+</details>
 
-## Adding entries
+<details>
+<summary><b>Adding entries</b></summary>
 
 Two paths:
 
@@ -255,9 +356,10 @@ Two paths:
 
 Always run `scripts/validate.py` before committing.
 
----
+</details>
 
-## Taxonomy mappings
+<details>
+<summary><b>Taxonomy mapping sources</b></summary>
 
 The mapping files in `mappings/` document the controlled vocabulary used in this dataset. They are derived from the original sources:
 
@@ -270,43 +372,43 @@ The mapping files in `mappings/` document the controlled vocabulary used in this
 
 When a framework releases a new version, update the mapping JSON in `mappings/` and re-run merge + validate.
 
----
-
-## Sources aggregated
-
-The current dataset draws from the following public sources. Each entry retains links back to the originating advisory, post, or paper:
-
-- **OWASP GenAI Security Project** — incident roundups + Top 10 references
-- **AI Incident Database (AIID)** ([incidentdatabase.ai](https://incidentdatabase.ai/), [github.com/responsible-ai-collaborative/aiid](https://github.com/responsible-ai-collaborative/aiid)) — ingested via AIID's official weekly snapshot archive (not per-page scraping); title + structured facts only, no verbatim narrative retained
-- **OECD AI Incidents Monitor (AIM)** ([oecd.ai/en/incidents](https://oecd.ai/en/incidents)) — cross-listed against AIID via the official AIID-OECD bridge file; `title`/`summary` are LLM-generated (OpenAI o3-mini) from third-party news of unresolved copyright status, so `description` is reduced to structural facts + link and carries a per-entry OECD attribution (decision E21); `title` itself remains an open question — see [`NOTICE-DATA`](NOTICE-DATA) and `docs/SOURCE_LICENSES.md` §1.5
-- **AIAAIC** ([aiaaic.org](https://www.aiaaic.org/aiaaic-repository)) — AI, Algorithmic, and Automation Incidents and Controversies; a CC BY-SA 4.0 source reduced to title/headline + categorical facts + link (decision D2), with row-level attribution/share-alike honored via a per-entry marker and an open database-right question — see [`NOTICE-DATA`](NOTICE-DATA) and `docs/SOURCE_LICENSES.md` §1.1
-- **MITRE ATLAS** ([atlas.mitre.org](https://atlas.mitre.org/), [github.com/mitre-atlas/atlas-data](https://github.com/mitre-atlas/atlas-data)) — all case studies parsed from the YAML corpus
-- **AVID** — AI Vulnerability Database ([avidml.org](https://avidml.org/))
-- **CSET-AIID Harm Taxonomy** ([github.com/georgetown-cset/CSET-AIID-harm-taxonomy](https://github.com/georgetown-cset/CSET-AIID-harm-taxonomy)) — controlled vocabulary reference
-- **NVD / CVE.org / GitHub Security Advisories / OSV.dev / CISA KEV** — AI/ML/LLM/agent CVEs pulled via REST API across a broad, actively-maintained keyword list
-- **NVIDIA garak** ([github.com/NVIDIA/garak](https://github.com/NVIDIA/garak)) — one entry per LLM vulnerability scanner probe (canonical attack classes)
-- **promptfoo** ([github.com/promptfoo/promptfoo](https://github.com/promptfoo/promptfoo)) — one entry per red-team plugin/strategy
-- **ModelOriented/CVE-AI** ([github.com/ModelOriented/CVE-AI](https://github.com/ModelOriented/CVE-AI)) — XAI-based AI model validation findings
-- **Researcher and vendor blogs** — Embrace The Red, Tenable, Palo Alto Unit 42, Trail of Bits, Aim Security, Noma Security, Wiz Research, Lakera, Invariant Labs, PromptArmor, Pillar Security, Token Security, HiddenLayer, Robust Intelligence, Protect AI, Cato Networks CTRL, Endor Labs, Sysdig, Zenity Labs, JFrog, Datadog Security Labs, Reco, AppOmni, BeyondTrust, Oasis Security, Mindgard, Koi Security, Imperva, Sonar, Oligo Security, OX Security, SentinelOne, Check Point Research, Trend Micro, Tinfoil Security, ZeroPath, Cymulate, MaccariTA, and others.
-- **Vendor threat reports** — Anthropic, OpenAI, Google Threat Intelligence (GTIG/TAG/Mandiant), Microsoft Threat Intelligence (MTAC/MSRC), AWS Security Bulletins, CrowdStrike, Recorded Future.
-- **Academic papers** — selected USENIX Security / NDSS / S&P / CCS / arXiv entries with concrete adversarial PoCs.
-
-If a source is missing or mis-attributed, open an issue or PR. **One tracked source is currently stale** (MIT AIRI Navigator's public bulk download was withdrawn; the corpus keeps re-emitting its last-fetched snapshot, unshrunk, under a dated hold) — see [`data/source_freshness.json`](data/source_freshness.json) for the reviewed, published status of every source this project actively monitors.
+</details>
 
 ---
 
-## Contributing
+## 📚 Documentation & policies
 
-PRs welcome. Please:
+| | |
+|---|---|
+| Provenance, composition, limitations (Datasheets for Datasets) | [`docs/DATASHEET.md`](docs/DATASHEET.md) |
+| Per-source license/ToS audit — every upstream, its terms, this project's remediation | [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md) |
+| How the CC-BY-4.0 data grant applies, and where it doesn't | [`NOTICE-DATA`](NOTICE-DATA) |
+| Incident ID stability policy (tombstones, redirects always honored; ID-width decision still pending) | [`docs/ID_POLICY.md`](docs/ID_POLICY.md) |
+| Ingestion conduct — rate limits, robots.txt, identification | [`docs/INGESTION_CONDUCT.md`](docs/INGESTION_CONDUCT.md) |
+| Field reference | [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) |
+| Taxonomy detail and chooser table | [`docs/TAXONOMIES.md`](docs/TAXONOMIES.md) |
+| Scope contract — what's in/out, and why | [`INCLUSION.md`](INCLUSION.md) |
+| Methodology paper | [`docs/paper/genai-incidents-methods.md`](docs/paper/genai-incidents-methods.md) |
+| **Public evidence trail** — dated audits, delta reports, and rulings behind licensing/data/conduct decisions | [`docs/audits/`](docs/audits/) |
+| Corrections & scope disputes — open a [data correction](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=data_correction.yml) or [scope dispute](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=scope_dispute.yml); accepted changes logged in | [`CORRECTIONS.md`](CORRECTIONS.md) |
+| Changelog | [`CHANGELOG.md`](CHANGELOG.md) |
+
+---
+
+## 🤝 Contributing
+
+PRs welcome — corrections, missing incidents, and new sources especially. Please:
 
 - Add at least one verifiable URL per entry.
 - Map to the four core taxonomies where applicable (MAESTRO and VERIS are not contributor-set — see CONTRIBUTING.md). If unsure, leave the field empty rather than guess.
 - Run `scripts/validate.py` and `scripts/render_markdown.py` before opening a PR.
 - For incidents you authored or first reported, that's totally fine — but please link the canonical writeup.
 
+Found something wrong in an existing entry? Open a [data correction](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=data_correction.yml) or a [scope dispute](https://github.com/emmanuelgjr/genai_incidents/issues/new?template=scope_dispute.yml).
+
 ---
 
-## Licensing
+## ⚖️ Licensing
 
 **MIT** for code (`scripts/`, `schema/`, `src/genai_incidents/`) — [`LICENSE`](LICENSE). **CC-BY-4.0** for the dataset and documentation (`data/`, `INCIDENTS.md`, `mappings/`, `docs/`) — [`LICENSE-DATA`](LICENSE-DATA). Neither of those is the whole story:
 
@@ -316,6 +418,8 @@ PRs welcome. Please:
 - **AIID, despite also being a CC BY-SA source, is a resolved question, not an open one** for the population this project ships — the legal analysis concludes no row-level marker is owed there. The two sources reach different outcomes under the same kind of license grant for reasons specific to each maker's legal situs, not because one was treated more carefully than the other.
 
 None of the above is exhaustive, and stating exact per-source row counts here would only drift out of sync with the audit that actually tracks them. [`NOTICE-DATA`](NOTICE-DATA) and [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md) are the authoritative, currently-maintained accounts of every source's terms, this project's remediation for each, and the current per-source figures — read those, not this summary, before making a decision that depends on the details.
+
+---
 
 ## How to cite
 
