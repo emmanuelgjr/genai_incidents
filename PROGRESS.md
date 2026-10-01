@@ -124,6 +124,30 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## ✅ v2.11.0 NOTES — **PASS (red-reviewer, D37 string-check gate, 2026-10-01, on `c9ff5b49`) — NO DEFECTS — MERGED to `main`** · the cut proceeds (VERSIONING.md steps 2–9)
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … all 4 checks met on `release/v2.11.0-notes` @ c9ff5b49."*
+
+**Evidence [R]:**
+- The diff is exactly 2 lines in 2 files, checked byte-level (U+2014).
+- README:33 matches verbatim.
+- **The claim is true by the gate's own redirect walker over the raw JSON, not the package's:**
+  - exactly 8 deprecated IDs have more than one live leaf, with sizes 12/12/100/11/8/11/100/100;
+  - the package's `resolve_id` returns None for 771, of which 763 are terminations with empty groups, leaving the 8;
+  - "three reasons" matches README:71 and the notes' A/B/C sections.
+- The v2.10.0.md:188 marker matches, and the file is still 41/0.
+- `475 passed, 1 xfailed`; the drift check is clean; merge-tree is clean.
+
+**Release-branch gate history:**
+- notes BOUNCE #1 (`2f7bba1d`);
+- WS4-T22 BOUNCE #1 (`af9601fa`), then PASS (`934a6348`);
+- notes BOUNCE #2 (`1977515e`), which produced D33/D34; WS4-T23 refuted D33's premise, which produced D35;
+- BOUNCE #3 (`d27bcae2`), which produced D36;
+- BOUNCE #4 (`59dd995b`), caused by wording the foreman supplied in the brief, which produced D37;
+- **PASS (`c9ff5b49`)**.
+
+**Merged** into `main` as a `--no-ff` merge commit (this push). **Next is VERSIONING.md step 2:** WS4 bumps `USER_AGENT` plus its INGESTION_CONDUCT literal, then WS6 bumps the other four strings and builds. The step-3 field-level expectations are recorded under BOUNCE #3.
+
 ## ⚖ D37 — USER RULING, 2026-10-01, on BOUNCE #4: **apply the gate-verified text verbatim, then a string-check gate**
 
 - A specialist inserts the gate's exact README:33 sentence and its A1 marker wording, **verbatim, with no new wording**.
