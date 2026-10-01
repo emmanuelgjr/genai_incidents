@@ -79,6 +79,39 @@ def test_load_deprecations_dict_shape():
         assert v.startswith("INC-")
 
 
+def _conforms(value, tp) -> bool:
+    """True if `value` is an instance of the (possibly union/list) type `tp`."""
+    import types
+    import typing
+
+    origin = typing.get_origin(tp)
+    if origin in (typing.Union, types.UnionType):
+        return any(_conforms(value, a) for a in typing.get_args(tp))
+    if origin is list:
+        (item,) = typing.get_args(tp)
+        return isinstance(value, list) and all(_conforms(v, item) for v in value)
+    return isinstance(value, tp)
+
+
+def test_load_deprecations_documented_type_matches_real_bundled_data():
+    """D34 / BOUNCE #2 defect 3: the annotation is the documented contract and
+    must describe the real bundled data. v2.11.0 is the first release with
+    list-valued `into` (8 records); an annotation of dict[str, str] was false.
+    """
+    import typing
+
+    ret = typing.get_type_hints(gi.load_deprecations)["return"]
+    assert typing.get_origin(ret) is dict
+    key_tp, val_tp = typing.get_args(ret)
+    data = gi.load_deprecations()
+    bad = [(k, v) for k, v in data.items()
+           if not (_conforms(k, key_tp) and _conforms(v, val_tp))]
+    assert not bad, f"{len(bad)} real values violate the declared {ret}: {bad[:3]}"
+    # The union is not decorative: list values really are present.
+    assert any(isinstance(v, list) for v in data.values())
+    assert "str | list[str]" in (gi.load_deprecations.__doc__ or "")
+
+
 # --- WS4-T15: resolve_id must degrade, not crash, on a list-valued `into` --
 
 def test_resolve_id_list_into_returns_none_not_typeerror(monkeypatch):

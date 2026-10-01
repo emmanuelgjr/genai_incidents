@@ -48,7 +48,7 @@ def _load_raw() -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def _load_deprecations() -> dict[str, str]:
+def _load_deprecations() -> dict[str, str | list[str]]:
     import json
 
     try:
@@ -91,8 +91,17 @@ def load_schema() -> dict[str, Any]:
     return json.loads(text)
 
 
-def load_deprecations() -> dict[str, str]:
-    """Return ``{deprecated_id: canonical_id}`` mappings for retired IDs."""
+def load_deprecations() -> dict[str, str | list[str]]:
+    """Return ``{deprecated_id: into}`` mappings for retired IDs.
+
+    The value is ``str | list[str]``: a single canonical id for a merge or
+    rename, or a LIST of successor ids for a ``split``/``resplit`` record.
+    v2.11.0 is the first release whose bundled data carries list values (8 of
+    293 records); every earlier release shipped strings only, so a consumer
+    written against ``dict[str, str]`` (including v2.10.0's own
+    ``resolve_id``) can raise ``TypeError`` on v2.11.0 data. Use
+    ``resolve_id`` / ``resolve_id_group`` rather than indexing the mapping.
+    """
     return dict(_load_deprecations())
 
 
@@ -134,12 +143,12 @@ def query(
     project's README asks consumers to cite, and is a different axis from
     ``quality_tier`` (vetting level) — neither substitutes for the other.
 
-    **Carry-in caveat (WS6-T9, 2026-09-18):** the packaged
-    ``incidents.min.json`` gained ``tier`` in the build code but the
-    committed copy predates that change, so ``tier=`` matches nothing until
-    the dataset is rebuilt and re-shipped. This filter is wired now, with the
-    field, rather than after — a kwarg that silently ignores an argument is
-    worse than one that is explicitly not yet populated.
+    **Carry-in caveat (WS6-T9, 2026-09-18; corrected 2026-10-01):** this
+    note originally said ``tier=`` matched nothing until the dataset was
+    rebuilt. That is no longer true: the packaged ``incidents.min.json`` now
+    carries ``tier``, and ``query(tier="landmark")`` returns the landmark
+    set (1,915 entries at this writing). Releases built before the field
+    existed would match nothing; this one does not.
     """
     filters = {
         "year": year,
