@@ -290,7 +290,7 @@ function renderStats(allRows) {
     <div class="stat"><span class="num sev-Critical" style="color: var(--critical)">${fmtNum(crit)}</span><span class="label">Critical</span><span class="sub">${(100*crit/total).toFixed(1)}% of total</span></div>
     <div class="stat"><span class="num">${fmtNum(withCve)}</span><span class="label">With CVE</span><span class="sub">${(100*withCve/total).toFixed(1)}% of total</span></div>
     <div class="stat"><span class="num">${fmtNum(curated + reviewed)}</span><span class="label">Curated + Reviewed</span><span class="sub">${fmtNum(curated)} curated</span></div>
-    <div class="stat"><span class="num">${fmtNum(years.length)}</span><span class="label">Years</span><span class="sub">unbroken since ${earliest}</span></div>
+    <div class="stat"><span class="num">${fmtNum(years.length)}</span><span class="label">Years with entries</span><span class="sub">of ${latest - earliest + 1} in ${earliest}–${latest}</span></div>
   `;
 }
 

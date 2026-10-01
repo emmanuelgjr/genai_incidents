@@ -801,7 +801,11 @@ tr.expanded .row-toggle { color: var(--accent); border-color: var(--accent-line)
 td.id { font-family: var(--mono); font-size: 0.8rem; white-space: nowrap; }
 td.id a { color: var(--accent); }
 td.title-cell { min-width: 22ch; line-height: 1.45; font-family: var(--serif); }
-td.llm, td.asi { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
+/* LLM/ASI cells can hold up to ~10 codes (e.g. INC-00924 has seven ASI codes);
+   nowrap pushed the row past .table-wrap's right edge and clipped the last
+   code ("ASI0"). Wrap at the ", " separators instead, with a floor wide
+   enough for two codes per line. */
+td.llm, td.asi { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); white-space: normal; min-width: 14ch; }
 td.cves { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
 
 /* severity badge: glyph + left tick + pill. Background tokens are the

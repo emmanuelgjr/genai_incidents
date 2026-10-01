@@ -36,6 +36,17 @@ ATLAS_URL = "https://atlas.mitre.org/techniques/"
 OWASP_LLM_URL = "https://genai.owasp.org/llmrisk/"
 
 
+def _owasp_llm_source_name() -> str:
+    """Edition-qualified external_reference source_name for owasp_llm codes.
+
+    The edition is read from the crosswalk's ``to_version`` (the single source
+    of truth for which edition the corpus codes belong to, E24 / D26(c)), so a
+    future edition migration cannot leave this label stale.
+    """
+    xwalk = json.loads((MAPPINGS / "owasp_llm_2025_to_2026.json").read_text(encoding="utf-8"))
+    return f"owasp-llm-top10-{xwalk['to_version']}"
+
+
 def _content_license(i: dict) -> dict | None:
     """Row-level license-obligation marker for `x_content_license` (D14,
     retired to this form by D15). Emits the entry's own `content_license`
@@ -114,6 +125,7 @@ def build_bundle(incidents: list[dict]) -> dict:
         })
 
     # 2) Incident SDOs + relationships.
+    owasp_llm_src = _owasp_llm_source_name()
     for i in incidents:
         iid = i["id"]
         oid = _sid("x-genai-incident", iid)
@@ -125,7 +137,7 @@ def build_bundle(incidents: list[dict]) -> dict:
                 ext.append({"source_name": r.get("type") or "reference",
                             "description": r.get("title") or "", "url": r["url"]})
         for code in i.get("owasp_llm") or []:
-            ext.append({"source_name": "owasp-llm-top10-2025", "external_id": code})
+            ext.append({"source_name": owasp_llm_src, "external_id": code})
         for code in i.get("owasp_asi") or []:
             ext.append({"source_name": "owasp-asi-top10", "external_id": code})
         sdo = {
