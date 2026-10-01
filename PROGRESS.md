@@ -2,6 +2,31 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
+
+**Rebase.** A squash-rebase of `docs/readme-refresh` (5 commits, base `528d5936`) onto post-v2.11.0 main produced `0c4b51cc`. main had changed only README:33 and README:71 since the branch point; **both were carried byte-identical from main** (D37-verified :33, emoji prefix kept; gated `50e42bbe` :71, now a plain paragraph under "Latest release" instead of the old callout). `render_docs_stats` moved the At-a-glance tile to 2.11.0. Pushed with `--force-with-lease` pinned to `8e23d6e6`. The first attempt used a wrong SHA and was **correctly rejected (stale info)**, so nothing was overwritten.
+
+**CodeQL caught my own code: 2 new alerts on `scripts/readme_assets/shot.mjs`.**
+- HIGH `js/unvalidated-dynamic-method-call`: CDP reply ids indexed a plain object.
+- MED `js/bad-code-sanitization`: the selector was spliced into an evaluated expression.
+
+**Fixed, not dismissed** (`67de4f3f`): a Map plus a function-type check, and `Runtime.callFunctionOn` with the selector passed as an argument. Functionally re-tested: both screenshots re-capture with the same element bounds. **CodeQL then passed, with 0 open alerts on the PR.**
+
+**Checks:**
+- CI: all 7 passed (CodeQL ×4, a11y, validate 3.12 and 3.13).
+- pytest 476/1; no link from main's README dropped; all relative links resolve.
+
+**Post-merge [R], with the working tree now on `main`:**
+- README:71 and :33 verbatim on main;
+- the drift check is clean;
+- all 11 README image URLs (raw `main`) return 200.
+
+**Process note:** this PR did not get its own red-reviewer gate, because the user directed "rebase, push and merge". The controls were byte-equality of the two gated lines against main, CI including CodeQL (which found real defects), and the drift check. **Advisory:** a docs-warden pass on the new README is cheap if wanted.
+
+**Housekeeping:** a stale worktree from the 2026-09-20 session held `main` and blocked switching. It was inspected first: 283 deletions, 0 files present (temp cleanup), HEAD on origin/main, no stash. It was removed. **The main tree is now on `main`**, which ends the branch-confusion condition behind D29.
+
+**D32 queue: STIX fix ✅ · docs-warden ✅ · D38 disclosure ✅ · README PR #100 ✅.**
+
 ## ✅ D38 disclosure — **PASS (red-reviewer, second gate, 2026-10-01, on `802ab95c`) — MERGED `43591dcd` — v2.11.0 Release body re-synced and byte-verified**
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … All four BOUNCE #1 defects and advisory A4 are closed in all four files. I re-measured every timestamp myself … The new 11,753 figure holds on the LIVE bundle."*
