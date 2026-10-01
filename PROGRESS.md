@@ -2,6 +2,15 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## ⚖ D38 — USER RULING, 2026-10-01: **disclose the live STIX relabel now**, not at the next release (amends D32's timing)
+
+**One WS6 pass, then a gate:**
+- a CHANGELOG `[Unreleased]` entry with the re-import instruction (warden finding 1);
+- a **dated, do-not-regenerate addendum** to `docs/releases/v2.11.0.md`'s consumer-impact section (finding 2; agreement 4);
+- one sentence in DATA_DICTIONARY, plus the `scripts/export_taxii.py` README template, saying the STIX OWASP `source_name` is edition-qualified (finding 3).
+
+**Under D38, WS6 is authorized for the template-text edit in `export_taxii.py`, and that edit only.** The next release notes still repeat the disclosure.
+
 ### 📋 docs-warden sweep after the STIX merge (origin/main `f6398c75`, 2026-10-01) — findings ROUTED (protocol step 7)
 
 The warden confirmed the diff matches the foreman's description (4 files).
