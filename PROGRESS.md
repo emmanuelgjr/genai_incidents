@@ -124,6 +124,23 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+## 🚀 v2.11.0 CUT — VERSIONING.md steps 2–5 delivered on `release/v2.11.0-cut` @ `be559587` (pushed) — **pre-publish gate in flight**
+
+- **Step 2a, WS4 (`f341ecd5`).** `USER_AGENT` is now `genai_incidents/2.11.0`, and the current-UA literal plus the version cross-reference in INGESTION_CONDUCT.md were updated to match. The historical 2.8.0 quotes are untouched.
+- **Step 2b, WS6 (`be559587`).** `merge_and_dedupe` `out["version"]`, pyproject, CITATION.cff (version, preferred-citation.version, `date-released` 2026-10-01) and .zenodo.json are all at 2.11.0.
+- **Step 3, specialist-reported.** The full build ran (parse, merge, render, render-docs-stats, validate: 13361/13361 valid). `top_diff` = {version}. The ID set is equal at 13,361, 0 entries changed, landmark (`tier`) is 1,915, `generated` did not move, and `id_deprecations.json` is byte-identical. The 3 min.json copies read 2.11.0. The resolver spot-check gives 13/13 as expected.
+- **Step 4.** The drift check is clean, and INCIDENTS.md reads Version 2.11.0.
+- **Step 5.** Four prose edits:
+  - README "released 2026-10-01";
+  - README "was cut as v2.11.0 on 2026-10-01";
+  - two tense edits in the notes banner.
+- pytest `475 passed, 1 xfailed`.
+- **Foreman pre-checks:**
+  - The release body is 34,147 B, with 0 in-body anchors and 0 relative links.
+  - No `v2.11.0` tag or Release exists on origin.
+  - The PyPI metadata-2.5 failure from the v2.10.0 cut is fixed on main (`71c8ad6c`).
+- **Follow-ups (post-cut, WS6):** VERSIONING.md step 2's UA-scope text is stale and quotes 2.9.0, and its step-3 script should use `tier == "landmark"`. `genai_incidents.VERSION` = 2.0.0 is the schema version, not a release string (WS6-T1).
+
 ## ✅ v2.11.0 NOTES — **PASS (red-reviewer, D37 string-check gate, 2026-10-01, on `c9ff5b49`) — NO DEFECTS — MERGED to `main`** · the cut proceeds (VERSIONING.md steps 2–9)
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … all 4 checks met on `release/v2.11.0-notes` @ c9ff5b49."*
