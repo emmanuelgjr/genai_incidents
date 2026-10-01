@@ -22,7 +22,7 @@
 
 ---
 
-**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems. It pulls together sources that don't share a schema — AIID, OECD AIM, AIAAIC, MITRE ATLAS, NVD/GHSA/OSV, researcher and vendor write-ups — and maps them onto the same security taxonomies so you can query and pivot across sources that don't share a schema.
+**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems. It pulls together AIID, OECD AIM, AIAAIC, MITRE ATLAS, NVD/GHSA/OSV, and researcher and vendor write-ups and maps them onto the same security taxonomies, so you can query and pivot across sources that don't share a schema.
 
 | If you are… | …use it to |
 |---|---|
