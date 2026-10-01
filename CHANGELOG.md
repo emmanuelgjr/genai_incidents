@@ -22,17 +22,22 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   *Excessive Agency*. The edition is now derived from the crosswalk
   (`mappings/owasp_llm_2025_to_2026.json`, `to_version`), so a future
   migration cannot leave the label stale.
-- **Consumers keying on the old string must change.** Query for
-  `owasp-llm-top10-2025` (old) and `owasp-llm-top10-2026` (new).
-- **Re-import the STIX bundle.** SDO `id` and `modified` are **unchanged**
-  (`modified` derives from entry dates), so consumers that dedupe on
-  (`id`, `modified`), OpenCTI for example, will not pick up the corrected
-  label from a normal re-sync. Delete and re-import the affected objects,
-  or re-import the bundle into a clean instance.
+- **Consumers keying on the old string must change.** Replace
+  `owasp-llm-top10-2025` with `owasp-llm-top10-2026` in your queries, or
+  match both strings during the transition.
+- **Re-import the STIX bundle.** The relabel changed object content
+  (**11,753 `x-genai-incident` objects** carrying the 17,750 references)
+  without changing `modified`; SDO `id` and `modified` are unchanged
+  (`modified` derives from entry dates). Consumers that treat an unchanged
+  (`id`, `modified`) as an already-seen object version, as STIX 2.1
+  versioning permits, **may not** pick up the corrected label from a normal
+  re-sync. Prefer **delete-then-import** of the affected objects, or import
+  the bundle into a clean instance.
 - **Did not change:** SDO `id` and `modified`, the object count (54,485),
-  the MISP feed, PyPI, the Hugging Face dataset, and every `data/*.json`
-  file. Only the STIX bundle, the TAXII `objects.json` and the STIX line of
-  `docs/data/SHA256SUMS` changed.
+  the MISP feed, PyPI, the Hugging Face dataset, and every **committed**
+  `data/*.json` file (the corpus). Only the STIX bundle and the TAXII
+  `objects.json` changed. `docs/data/SHA256SUMS` does not cover the STIX
+  bundle.
 
 ## [2.11.0] — 2026-10-01
 

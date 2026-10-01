@@ -146,11 +146,13 @@ This directory is a **read-only, static** TAXII 2.1 mirror of the
 ## OWASP edition label
 
 OWASP LLM `external_references` in these objects carry an edition-qualified
-`source_name`, currently `owasp-llm-top10-2026` (before 2026-10-01 it read
-`owasp-llm-top10-2025`, which was the wrong edition for these codes). The
-edition is derived from the crosswalk `mappings/owasp_llm_2025_to_2026.json`.
-Object `id` and `modified` did not change, so consumers that dedupe on
-(`id`, `modified`) must re-import to pick up the corrected label.
+`source_name`, currently `owasp-llm-top10-2026` (until 2026-10-01 13:43 UTC,
+the Pages deploy of `7dc80602`, it read `owasp-llm-top10-2025`, which was the
+wrong edition for these codes). The edition is derived from the crosswalk
+`mappings/owasp_llm_2025_to_2026.json`. The relabel changed object content
+without changing `id` or `modified`, so consumers that treat an unchanged
+(`id`, `modified`) as an already-seen object version, as STIX 2.1 versioning
+permits, may not pick up the corrected label; prefer delete-then-import.
 
 ## Caveat: media type & pagination
 
