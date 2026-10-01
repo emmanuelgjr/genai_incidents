@@ -88,25 +88,49 @@ D28 remediation) has also stopped resolving to itself. Anyone joining on
 incident IDs across versions must re-resolve through
 `data/id_deprecations.json`.
 
-**Twelve IDs resolved to a single ID under the v2.10.0 package and return
-`None` from `resolve_id()` on the way to this release** (re-derived by
-sweeping the v2.10.0 tag's own package against this tree):
-- **Fixed in this release (D31; `resolve_id()` now follows a one-element
-  successor list):** `INC-07771` -> `INC-14814`, `INC-08109` ->
-  `INC-14847`, `INC-08133` -> `INC-14850`, `INC-08146` -> `INC-14853`.
-- **`None` by design, 8 to 100 real successors each:** the four
-  retirements `INC-00311` (12), `INC-00554` (100), `INC-00754` (11),
-  `INC-01897` (8), **and four older tombstones that were resolving and
-  went silent: `INC-00497` (12), `INC-03128` (11), `INC-08139` (100),
-  `INC-08185` (100).**
-- **`None` here means ambiguity, not loss:** every successor is live.
-  Two ways to act: (1) read `data/id_deprecations.json` directly - `into`
-  is the full successor array, last record per `from` wins, works without
-  upgrading; (2) upgrade and call the new `resolve_id_group()`, which does
-  not exist in the v2.10.0 package.
-- The eight by-design cases remain an **open, disclosed deviation** from
+**Twelve IDs whose `resolve_id()` answer changes in this release** (re-derived
+by sweeping the v2.10.0 tag's own package against this tree). Under v2.10.0
+all twelve resolved to a single ID, and **four of those answers were wrong**.
+- **Four were wrong under v2.10.0 and are corrected in this release (D31;
+  `resolve_id()` now follows a one-element successor list):** `INC-07771`
+  (was `INC-01271`) -> `INC-14814`, `INC-08109` (was `INC-01412`) ->
+  `INC-14847`, `INC-08133` (was `INC-07736`) -> `INC-14850`, `INC-08146`
+  (was `INC-00554`) -> `INC-14853`. They never returned `None` in a published
+  package. `INC-01271`, `INC-01412` and `INC-07736` are still live rows about
+  unrelated incidents; `INC-00554` is one of the retirements. **If you cached
+  `resolve_id()` output from v2.10.0 or earlier for these four, re-resolve.**
+- **Eight return `None`, for three different reasons. In every case the
+  content still exists; what `None` means differs:**
+  - **Four retirements - ambiguity:** `INC-00311` (12 successors),
+    `INC-00554` (100), `INC-00754` (11), `INC-01897` (8). The over-merged row
+    was split into real groups; no single successor exists.
+  - **Two with an identified successor this release does not write as a
+    record - a known answer the package does not yet give:** `INC-03128` ->
+    **`INC-14909`** (Momoa deepfake), `INC-08185` -> **`INC-14742`** (Wolf
+    Robots), identified by source IDs and reference URLs. v2.11.0 does not
+    resolve them to it (D28's authorized fan-out ships as authorized);
+    narrowing the records is a follow-up.
+  - **Two whose meaning changed between releases - depends on the release
+    cited; resolve by the release you cited:** `INC-00497` was the Saint
+    Paisios scam in v2.0.0-v2.1.0 (-> `INC-14789`) and the Greek tax AI story
+    in v2.2.0-v2.8.0 (-> `INC-14907`); `INC-08139` was the South Korea robotic
+    endoscope project in v2.2.0-v2.5.0 (-> `INC-14852`) and Wolf Robots in
+    v2.6.0-v2.7.0 (-> `INC-14742`).
+- Two ways to act: (1) read `data/id_deprecations.json` directly - `into`
+  is the full successor array, last record per `from` wins; (2) upgrade and
+  call the new `resolve_id_group()`, which does not exist in the v2.10.0
+  package.
+- These eight remain an **open, disclosed deviation** from
   `docs/ID_POLICY.md` section 3 ("never to silence"), owned by the
   ID-policy workstream; this release does not resolve it.
+
+**`load_deprecations()` return type change (D34).** It returned
+`dict[str, str]` through v2.10.0; its values are now `str | list[str]`. **8 of
+its 293 values are lists** (the four corrected IDs and the four retirements);
+v2.11.0 is the first release with any list value. **v2.10.0's own
+`resolve_id()`, run on v2.11.0 data, raises `TypeError: unhashable type:
+'list'`** for each of the twelve IDs above. Upgrade the package and the data
+together. A stable always-list accessor is a follow-up.
 
 ## [2.10.0] — 2026-09-18
 

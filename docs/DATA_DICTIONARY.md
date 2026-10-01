@@ -6,7 +6,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 ## Identity & provenance
 | Field | Type | Notes |
 |---|---|---|
-| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json) and resolvable via the package's `resolve_id()`. |
+| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away and retired ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json), with two scoped exceptions: **9 ids are unrecorded** (published in v2.0.0, no tombstone; [`ID_POLICY.md`](ID_POLICY.md) §1.4(a)), and **8 recorded ids return `None` from `resolve_id()`** because they have no single successor (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897` are retirements split into groups of 12/100/11/8; `INC-03128` and `INC-08185` have an identified successor, `INC-14909` and `INC-14742`, not written as a record; `INC-00497` and `INC-08139` named different incidents in different releases). For those eight use `resolve_id_group()` or read the file; see the [v2.11.0 notes](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/releases/v2.11.0.md). |
 | `source_ids` | string[] | Upstream ids this entry was consolidated from (e.g. `AIID-1234`, `CVE-2026-…`, `ATLAS-AML.CS0001`, `AIAAIC2257`). |
 | `quality_tier` | enum | Vetting level: `curated` (hand-written/maintainer), `reviewed` (maintained catalogue, NVD-scored CVE, hand-picked, or human/assisted review), `auto` (bulk-ingested). Filter on this to control trust. |
 | `tier` | enum | **landmark** (the notable headline set) vs **feed** (the comprehensive CVE/GHSA/OSV stream). **Derived, recomputed every build** by `scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of record: `landmark` iff `quality_tier == "curated"` **OR** `aiid_id` is present **OR** `corpus == "ai-harm"`; everything else is `feed`. **Not a function of `quality_tier`** — they are different axes, and most landmark rows qualify only via `aiid_id`, so you cannot reconstruct this field from `quality_tier` (see [Reproducing the landmark count](#reproducing-the-landmark-count)). Cite the landmark count for headlines. *Corrected 2026-09-18 (WS6-T9): the previous wording also listed `category == "real-world"`, a criterion dropped from the code before #68 merged because it also tags exploited CVEs — read literally it described ~3.6x the rows the code marks. The old cross-reference to INCLUSION.md §5 was dropped for the same reason: §5 defines the split on `quality_tier`, a different and much larger set; reconciling §5 is an open maintainer item.* |
@@ -200,7 +200,7 @@ the gate confirmed each fired correctly before its own deletion. See
 [`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
 ## Access
-- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`.
+- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`).
 - **Hugging Face:** `load_dataset("emmanuelgjr/genai-incidents")` (JSONL projection).
 - **STIX 2.1:** `…github.io/genai_incidents/data/incidents.stix.json`.
 - **CSV / min JSON / per-year markdown:** see the [site](https://emmanuelgjr.github.io/genai_incidents/) and [`docs/`](.).
