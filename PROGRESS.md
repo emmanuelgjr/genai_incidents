@@ -124,6 +124,37 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⛔⛔⛔ v2.11.0 RELEASE NOTES — **BOUNCE #3 (red-reviewer, 2026-10-01, on `d27bcae2`) — ESCALATED TO USER** · two wording defects, about 2 lines, no data or behaviour change
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Both defects are wording only, about 2 lines in total. No data change and no behaviour change is needed. Everything else re-derives exactly."*
+
+**DEFECTS:**
+1. **README.md:33** still applies "by design" to all 8 None IDs. The line came in with `1977515e`. It was missed by d27bcae2, by BOUNCE #2, and by the foreman. It contradicts D35, notes:313-314, and README:71.
+2. **The `query()` docstring** ends with "Releases built before the field existed would match nothing; this one does not." That is false: v2.10.0's `query()` has no `tier` kwarg and **raises TypeError** (the kwarg arrived in 4c09dcb1). The sentence ships on PyPI and cannot be corrected after the cut.
+
+**Evidence [R], all clean apart from the two defects:**
+- The surface sweep found only these two plus allowed quotes.
+- **Per-ID successors were confirmed by a THIRD route**: per-tag tombstone state, incident `date` matched within each group, and upstream `ingest/` snapshot titles for each successor's source ID. 14909, 14742, 14907, 14789 and 14852 are all correct. The per-release boundaries are exact, including v2.3.1.
+- T23's type test fails on the `1977515e` annotation (8 violations).
+- A **behaviour sweep, old module against new, gives the identical hash `c322f3fa…`**, so there is no behaviour change.
+- pytest `475 passed, 1 xfailed`.
+- **The drift check was proven to fire**: a planted "13,060 incidents" gave exit 1, and it was clean after restore.
+- The whole notes verification block (413–574) runs on this host with every value matching.
+- Exactly 12 IDs raise TypeError under v2.10.0's package on v2.11.0 data.
+- The `data` tree hash is 540a66ba, unchanged. merge-tree is clean. D32 is respected. All 5 version strings still read 2.10.0.
+
+**Advisories:**
+- A1: drop the hardcoded "1,915" from the docstring.
+- A2: the "stable keys, not titles" wording does not single out 14742 (three group members' keys are fully inside the old row). The pick is decided by headline/`date`, and the answers are correct.
+- A3: the dated-note marker should read "2026-09-18, revised 2026-10-01 pre-publication".
+- A4: DATA_DICTIONARY:9 lead-in; ID_POLICY §3 (WS3); **`docs/paper/genai-incidents-methods.md:74` "so citations always resolve" (unscoped)**.
+- A5: STIX `x_tier` still [A].
+
+**Cut-time expectations, recorded:**
+- top_diff `{version}`; ID set unchanged at 13,361; 0 entries changed; landmark 1,915; deprecations byte-identical.
+- Resolver spot-check: 07771/08109/08133/08146 → 14814/14847/14850/14853 (group 1). The 8 give None with groups 12/100/11/8/12/11/100/100. 07738→14757.
+- Behaviour hash `c322f3fa…` if `src/` is unchanged apart from the docstring.
+
 ## ⚖ D35 — USER RULINGS, 2026-10-01, on WS4-T23's escalation: **no data change in v2.11.0; disclose per ID**
 
 1. **INC-03128 and INC-08185: NO authorization change for v2.11.0.**
