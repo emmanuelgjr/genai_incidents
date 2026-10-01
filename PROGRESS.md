@@ -124,6 +124,51 @@ Remedy (three sentences, no code changes beyond D31's): name `resolve_id_group()
 - **(a) The four split IDs look like design** — 100 successors has no single canonical answer, and the docstring redirects callers to `resolve_id_group`. If so the gap is a **missing migration instruction** in the notes, likely part of defect 1's remedy.
 - **(b) The four dual-tombstone IDs look like a genuine behavioural regression in code.** Their `resplit` record's `into` is a list of **exactly one element** — an unambiguous successor exists — but `resolve_id` bails on `isinstance(current, list)` **before testing length** and returns `None`, where v2.10.0 returned a usable single ID. If confirmed, **defect 1's "this release introduces zero new breaks" is too generous** and the remedy is not purely editorial. **Open — the gate was asked to take its own route and to say plainly if the foreman has this wrong.**
 
+### ⛔⛔ v2.11.0 RELEASE NOTES — **BOUNCE #2 (red-reviewer, exhaustive pre-cut gate, 2026-09-30, on `1977515e`) — ESCALATED TO USER** (protocol: two bounces; defect 1 also needs a data ruling). **The cut stays held.**
+
+**─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: BOUNCE … Both BOUNCE #1 defects are fixed in the notes body itself, and every figure in docs/releases/v2.11.0.md re-derives exactly. The bounce is for five problems."*
+
+**What passed [R]:**
+- The promise is scoped on every surface except DATA_DICTIONARY:9.
+- The 12-ID table matches a v2.10.0-package-on-v2.10.0-data run exactly.
+- A release-to-release sweep over INC-00000..19999 shows an answer becoming None for 8 IDs and changing for 5 (07738 plus the 4 fixed). 306 IDs are new, and nothing else moves.
+- The pytest count is `474 passed, 1 xfailed`, and the drift check is clean.
+- Both verification blocks run as written.
+- The v2.10.0 note is pure-insert (29/0) and carries the marker.
+- The release body has absolute links and no anchors.
+- The `data/` tree hash is unchanged (540a66ba), and version strings are not yet bumped.
+- merge-tree with main is clean.
+
+**DEFECTS:**
+1. **Four of the "8 ambiguous" IDs are not ambiguous, according to the project's own D28 audit.**
+   - `docs/audits/WS4-T19-authorized-splits-2026-09-18.json` `recovered_title` gives exactly one matching row inside each group:
+     - INC-00497 → INC-14907 (Greek tax AI; group of 12);
+     - INC-03128 → INC-14909 (Momoa deepfake; group of 11);
+     - INC-08139 and INC-08185 → INC-14742 ("Wolf Robots"; groups of 100).
+   - This is the same title-match proof the delta audit uses to call the 4 fixed targets right. So "None means ambiguity" is false for them, and `resolve_id_group` hands consumers 11–99 unrelated rows (agreement 6 form (d)).
+   - The data matches what D28 authorized. **DATA QUESTION → user:** should these 4 get single-element resplit records, like the other 4?
+2. **README:71 and the dated v2.10.0 note say "twelve … return None in this release — four fixed".** That is false for 4: no published package ever returned None for them. v2.10.0 returned the wrong over-merged targets 01271, 01412, 07736 and 00554. Consumers who cached those mappings need to be told to re-resolve, not told the IDs are "fixed".
+3. **Undisclosed public API change.**
+   - `load_deprecations()` is still typed `dict[str,str]`, but 8 of 293 values are now lists. v2.10.0 had 0.
+   - v2.10.0's own `resolve_id`, run on v2.11.0 data, raises `TypeError: unhashable type: 'list'` for all 12 IDs.
+   - Neither the notes nor the CHANGELOG mentions it.
+4. **DATA_DICTIONARY:9** carries an unscoped "recorded … and resolvable via resolve_id()", and line 203 omits `resolve_id_group`.
+5. **A false docstring ships in the PyPI package.** `query()` (src `__init__.py:137-142`) says `tier=` "matches nothing until the dataset is rebuilt", but `query(tier='landmark')` returns 1,915. Fixing it touches `src/`, so it needs a small re-gate.
+
+**Advisories:**
+- **A1.** `ID_POLICY.md:3` still says "DRAFT — decision pending (E4)". The fix is on the ungated `ws3/headroom-remeasure` (`79101d81`). §3 still claims resolve_id terminates on any chain and omits the 8 None cases (the D31 rider, WS3).
+- **A2.** The notes' hash-grep needs `-A1`, and its `/tmp` steps break on Windows.
+- **A3.** README:71 still conflicts with PR #100 (known).
+- **A4.** STIX `x_tier` is still [A].
+
+**Cut-time expectations, recorded for step 3:**
+- top-level diff `{version}` (± `generated`);
+- the ID set is unchanged at 13,361, with 0 changed entries;
+- landmark 1,915;
+- deprecations byte-identical (1,060 / 1,056; reasons 704/289/59/4/4);
+- the five version strings at 2.11.0;
+- the resolver spot-check as in the table (unless defect 1's data ruling changes it).
+
 ### ✅ WS4-T22 — **PASS (red-reviewer, second gate, 2026-09-30, on `934a6348`) — NO DEFECTS — MERGED (fast-forward) into `release/v2.11.0-notes`, `2f7bba1d..934a6348`, origin verified**
 
 **─── GATE VERDICT TEXT (agreement 5) ───** *"VERDICT: PASS … All three BOUNCE #1 defects are closed, and I confirmed that with my own mutation runs. The null-`into` divergence … was already in the package at 2f7bba1d … not a defect of this branch and does not block the release."*
