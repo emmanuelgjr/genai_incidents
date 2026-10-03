@@ -28,7 +28,19 @@
   - None of the four is named in `docs/SOURCE_LICENSES.md`. §4's arXiv text covers only the ten red-team benchmarks.
   - license-auditor has been told to note this in the AVID and arXiv rows. Whether these four files need rows of their own (WS0-T1 accept criterion wording: "every source in `scripts/ingest_*.py`") is **open, and not yet routed**.
 - **In flight:** license-auditor is writing tranche-2 pre-rows, rejections (CNNVD/CNVD, Snyk/VulDB, news aggregators) and watch items (EU AI Act Art. 73 register, EUVD API maturation). Its absence findings route to red-reviewer for a curl check.
-- **Next:** foreman commits the auditor's file → pipeline-engineer estimates → red-reviewer gate → ranked waves to the user.
+- **2026-10-03: license-auditor DELIVERED. Verified by reading the tree; all of it is committed and pushed on `eval/source-expansion`.**
+  - `62890512`: 27 pre-row tables, 4 rejections, 2 dated watch items.
+  - `8ddb7702`: the AVID and arXiv existing-subset lines, plus section 6, which lists 30 checks for "not found" results, each with its curl/grep.
+  - **14 of the 27 rows rest partly on search extracts or on sites that blocked the fetch.**
+  - **Auditor's preliminary scores, not yet verified:**
+    - NCSC 3, ANSSI 3, ICO 3, arXiv metadata 3.
+    - ACSC 2 (search extract only), cvelistV5 2 (MITRE notice required), AVID 2.
+    - **CCCS 1: non-commercial only, which breaks the user's "permissive trio" prior.**
+    - **EUVD 1 (d):** no terms found, and the docs page is a JS app the fetch tool could not render.
+    - VulnCheck KEV 0, BAILII 0, CanLII 0, Bugcrowd 0.
+  - **Auditor error, caught by the foreman:** its chat report said `ingest/README.md` does not name the curated files. It does, at lines 37 and 41; the grep's escaped `\|` probably failed. The file's wording was correct, so no edit was needed.
+- **red-reviewer DISPATCHED 2026-10-03** to run the 30 checks against raw HTML. Its brief requires a different route for NCSC, ACSC, ANSSI, EUVD and cvelistV5, plus a re-check of the VulnCheck and Bugcrowd prohibitions.
+- **Next:** red-reviewer verdict → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
