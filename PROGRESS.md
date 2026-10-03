@@ -40,7 +40,23 @@
     - VulnCheck KEV 0, BAILII 0, CanLII 0, Bugcrowd 0.
   - **Auditor error, caught by the foreman:** its chat report said `ingest/README.md` does not name the curated files. It does, at lines 37 and 41; the grep's escaped `\|` probably failed. The file's wording was correct, so no edit was needed.
 - **red-reviewer DISPATCHED 2026-10-03** to run the 30 checks against raw HTML. Its brief requires a different route for NCSC, ACSC, ANSSI, EUVD and cvelistV5, plus a re-check of the VulnCheck and Bugcrowd prohibitions.
-- **Next:** red-reviewer verdict → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+- **⛔ BOUNCE #1 (red-reviewer, 2026-10-03, on `8ddb7702`). The full verdict text is in `docs/audits/source-expansion-tranche2-gate1-verdict-2026-10-03.md`.**
+  - **Seven defects:**
+    - D1, JVN: the quoted FAQ text is not on the page. The page actually says "no particular restrictions… please notify by email".
+    - D2, CSA: the row missed a clause prohibiting links without permission, so its score reads as 0, not 1.
+    - D3, JPCERT: "no ToS" is refuted. `jpcert.or.jp/guide.html` allows quotation freely and requires notification for redistribution.
+    - D4, ENISA: "ToS not located" is refuted. The legal notice authorises reproduction with acknowledgement.
+    - D5, EUVD: "none located" is refuted. The ENISA legal notice applies, and the official docs repo's LICENSE bars reuse of the docs. Watch item W2 is refuted too.
+    - D6, ICO: "terms page not found" is refuted. OGL v3.0 is confirmed, so score 3 stands but the citation is owed.
+    - D7, cvelistV5: check 13 false-fires on the MITRE ATLAS notice. The CVE ToU notice gap itself is confirmed by a targeted grep.
+  - **Measured by the gate [R]:**
+    - Results on the 30 checks: 19 confirmed, 7 refuted, 4 still unverifiable (ACSC behind Akamai, CanLII behind DataDome, DEF CON/Black Hat, CNVD/CNNVD/VulDB).
+    - VulnCheck's open-licence prohibition is verbatim on the April 2026 Service Terms, so 0/(d) stands. Bugcrowd's prohibition is verbatim.
+    - The gate took a different route on all five high-weight rows.
+    - Invariants hold: only the two specs files changed (895 insertions); `SOURCE_LICENSES.md` and `data/` diffs are 0.
+  - **Foreman stray check:** main tree porcelain was clean.
+- **Redispatched to license-auditor with D1–D7 and the gate's smaller corrections.** The brief also adds pre-rows for the two tranche-1 names the user did give: huntr and CISA beyond KEV.
+- **Next:** red-reviewer re-gate → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
