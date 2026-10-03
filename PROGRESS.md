@@ -56,7 +56,13 @@
     - Invariants hold: only the two specs files changed (895 insertions); `SOURCE_LICENSES.md` and `data/` diffs are 0.
   - **Foreman stray check:** main tree porcelain was clean.
 - **Redispatched to license-auditor with D1–D7 and the gate's smaller corrections.** The brief also adds pre-rows for the two tranche-1 names the user did give: huntr and CISA beyond KEV.
-- **Next:** red-reviewer re-gate → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+- **2026-10-03: rework DELIVERED, verified in the tree and committed as `6d77a194` (pushed).**
+  - Each fix was confirmed by grep for its distinguishing content: JVN 引用、転載、再配布, CSA "caching and links to", `guide.html`, the ENISA reproduction clause, `euvd-docs-public`, ICO copyright-and-re-use, the CVE ToU grep, AVID-2026-R1714, fr-lo, Crawl-delay 10, §1E, and section-6 items 31–33. The withdrawn JVN phrases survive only inside the withdrawal notes.
+  - **Score changes:** CSA 1→0; ACSC 2→1 provisional; ENISA split 2 for PDFs and 1 for web text.
+  - **New rows:** huntr 1 (c); CISA beyond KEV 2 (CISA-authored text) and 1 (co-sealed material).
+  - The huntr terms quotes came through a converter and are unverified.
+- **red-reviewer RE-GATE (attempt 2) DISPATCHED. A second bounce goes to the user.**
+- **Next:** re-gate verdict → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
