@@ -15,6 +15,18 @@
   - The only names known are the user's priors, CISA and huntr. CISA KEV is already ingested (`SOURCE_LICENSES.md` §2.1), so tranche-1 "CISA" presumably means a CISA surface beyond KEV. That is an unconfirmed inference.
   - This has the working-agreement-1 shape: a chat-only deliverable lost at a session boundary.
   - **Consequence:** the cross-tranche first-wave decision the user asked for cannot be ranked until the user supplies the ten names and they are re-evaluated under the same discipline. **Escalated to the user 2026-10-02.**
+- **Second search for the first ten (user asked, 2026-10-02), run by different routes. Still not found.**
+  - **Git:** every local and origin ref, all file types. `huntr` appears only in `ingest/README.md:40` and in NVD reference URLs.
+  - **Commit messages:** nothing relevant.
+  - **Transcripts:** all 11 Claude Code session transcripts for this project, subagent transcripts included. Only the current session mentions huntr or "tranche".
+  - **Memory directory:** nothing.
+  - **Published artifacts:** the only one is unrelated.
+  The record is gone or was never written.
+- **Foreman correction, found during that search: two tranche-2 "new" candidates are already corpus inputs.**
+  - `ingest/avid_owasp_incidents.json` (130 rows) and `ingest/arxiv_incidents.json` (123 rows) are hand-curated files with no ingest script.
+  - `research_incidents.json` (135) and `threat_reports_incidents.json` (82) are in the same position.
+  - None of the four is named in `docs/SOURCE_LICENSES.md`. §4's arXiv text covers only the ten red-team benchmarks.
+  - license-auditor has been told to note this in the AVID and arXiv rows. Whether these four files need rows of their own (WS0-T1 accept criterion wording: "every source in `scripts/ingest_*.py`") is **open, and not yet routed**.
 - **In flight:** license-auditor is writing tranche-2 pre-rows, rejections (CNNVD/CNVD, Snyk/VulDB, news aggregators) and watch items (EU AI Act Art. 73 register, EUVD API maturation). Its absence findings route to red-reviewer for a curl check.
 - **Next:** foreman commits the auditor's file → pipeline-engineer estimates → red-reviewer gate → ranked waves to the user.
 
