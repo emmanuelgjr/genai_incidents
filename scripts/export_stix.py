@@ -202,6 +202,9 @@ def build_bundle(incidents: list[dict]) -> dict:
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
+    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
+    # their IDs resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if e.get("status") != "retracted"]
     bundle = build_bundle(incidents)
     out = json.dumps(bundle, indent=2, ensure_ascii=False) + "\n"
     (DATA / "incidents.stix.json").write_text(out, encoding="utf-8", newline="\n")

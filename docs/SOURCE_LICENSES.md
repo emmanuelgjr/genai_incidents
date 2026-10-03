@@ -201,6 +201,22 @@ against the `OSV_TARGETS` list of PyPI, npm, and Go-ecosystem packages).
 | Action | **(a) compatible.** Ensure per-entry attribution names the originating DB (e.g. "PyPI Advisory Database via OSV.dev"), not just "OSV," since that's whose license actually applies. |
 | Date-checked | 2026-07-15 |
 
+### 2.5 CVE Program record state (CVEProject/cvelistV5) — added 2026-10-03 (WS4-T2 / N1)
+*Ingested by:* `scripts/ingest_cve_rejections.py` (per-CVE
+`raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/...`, via
+`ingest/common.py`; each REJECTED hit is cross-checked against the NVD API's
+`vulnStatus`, covered by §2.2). Output `ingest/cve_rejections.json`.
+
+| Field | Value |
+|---|---|
+| What is taken | One lifecycle fact per CVE already in the corpus: `cveMetadata.state` (PUBLISHED / REJECTED / ...) and, for REJECTED, `dateRejected`. No CVE description, reference or other record text is stored or republished; the fact is used to mark entries `retracted` / flag them. |
+| License | The repository README (fetched 2026-10-03) states: *"You may search, download, and use the content hosted in this repository, per the [CVE Program Terms of Use](https://www.cve.org/Legal/TermsOfUse)."* The repo has no LICENSE file (404). The Terms of Use page itself is a JavaScript application and could not be read through `ingest/common.py`, so **its operative clauses are not quoted here and have not been verified.** |
+| Scrape-permitted | robots.txt for `raw.githubusercontent.com` allows the path (checked by `robots_allowed()` on every fetch); one small file per CVE at the 1 s default spacing. The README invites download of the repository content. |
+| Redistribute-verbatim | Not applicable: no record text is redistributed, only a derived status marker. |
+| Relicense-compatible | **Not assessed** beyond the above; a status marker is a fact about the identifier. |
+| Action | **(a) compatible for the use made, PENDING license-auditor confirmation of the Terms of Use text.** If the Terms are found to restrict this use, the snapshot can be dropped and rejections sourced from NVD alone (§2.2); the `retracted` markers already in the corpus would stand on the NVD cross-check recorded alongside. |
+| Date-checked | 2026-10-03 |
+
 ---
 
 ## 3. Attack-capability / taxonomy sources

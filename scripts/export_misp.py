@@ -250,6 +250,9 @@ public disclosures, not active-campaign IOCs (threat level: low).
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
+    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
+    # their IDs resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if e.get("status") != "retracted"]
     n_events, n_attr = build(incidents)
     print(f"[misp] wrote MISP feed: {n_events} year-events, {n_attr} attributes "
           f"-> docs/misp/")

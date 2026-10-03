@@ -1,4 +1,4 @@
-.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
+.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -97,6 +97,13 @@ ingest-cve:
 ingest-kev:
 	python scripts/ingest_cisa_kev.py
 
+# Record CVE Program state (PUBLISHED/REJECTED) for every corpus CVE so the merge
+# can retract entries whose CVEs were REJECTED (WS4-T2). Full sweep is ~2 h at
+# the 1 s/host default; routine runs pass --max-requests / --nvd-modified-days.
+# Output: ingest/cve_rejections.json
+ingest-cve-rejections:
+	python scripts/ingest_cve_rejections.py
+
 # Pull the MIT FutureTech AI Risk Navigator dataset (wraps AIID with extra
 # taxonomy and authoritative incident dates).
 # Output: ingest/airi_navigator_incidents.json
@@ -127,7 +134,7 @@ ingest-aiid:
 	python scripts/ingest_aiid_snapshot.py
 
 # Refresh every external source. Heavy: NVD/GHSA, AIRI, AIAAIC, AIID, OECD AIM.
-ingest-all: ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim
+ingest-all: ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim
 # D1/E1/WS0-T4 (2026-07-16): AIID's Terms of Use prohibit high-volume/bot
 # access; scrape_aiid.py ran ThreadPoolExecutor(max_workers=12) against
 # per-incident pages, an active ToS violation. Disabled here (stop-half of

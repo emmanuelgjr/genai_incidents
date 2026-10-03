@@ -346,6 +346,21 @@ def render_incident_block(e: dict) -> list[str]:
         f"Severity: {e.get('severity','')}",
     ]
     lines.append("_" + " · ".join(b for b in meta_bits if b) + "_")
+    if e.get("status") == "retracted":
+        reason = e.get("status_reason") or {}
+        lines.append("")
+        lines.append(
+            "**RETRACTED** -- every CVE id on this entry is REJECTED by the CVE "
+            f"Program (checked {reason.get('as_of', 'n/a')}). Kept so this ID keeps "
+            "resolving; not counted as an incident."
+        )
+    elif e.get("rejected_cve_ids"):
+        lines.append("")
+        lines.append(
+            "**Note:** the CVE Program marks "
+            + ", ".join(f"`{c}`" for c in e["rejected_cve_ids"])
+            + " as REJECTED; this entry stands on its other sources."
+        )
     if e.get("exploited_in_wild"):
         kev = "**🚨 Exploited in the wild** (CISA KEV"
         if e.get("kev_date_added"):
@@ -504,13 +519,21 @@ def render():
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     entries = list(raw["incidents"])
     entries.sort(key=sort_key)
+    # WS4-T2: retracted entries (e.g. every CVE REJECTED) are never deleted, so
+    # their IDs keep resolving and they keep a (bannered) card in the year
+    # shards -- but they are not incidents that stand, so they are excluded
+    # from every count, chart and table. `all_entries` feeds only the shards.
+    all_entries = entries
+    entries = [e for e in all_entries if e.get("status") != "retracted"]
+    n_retracted = len(all_entries) - len(entries)
 
     # Tiny stats file for the README's live incident-count badge (shields.io
     # dynamic JSON reads it). Kept small so the badge endpoint is fast, and
     # regenerated every build so it never drifts from the dataset.
     years = sorted({e.get("year") for e in entries if e.get("year")})
     stats = {
-        "incident_count": raw.get("incident_count", len(entries)),
+        "incident_count": len(entries),
+        "retracted_count": n_retracted,
         "landmark_count": sum(1 for e in entries if e.get("tier") == "landmark"),
         "version": raw.get("version", ""),
         "generated": raw.get("generated", ""),
@@ -527,6 +550,10 @@ def render():
     by_year_sev: dict[int, Counter] = defaultdict(Counter)
     cve_count = 0
     by_year: dict[int, list[dict]] = defaultdict(list)
+    shard_by_year: dict[int, list[dict]] = defaultdict(list)
+    for e in all_entries:
+        if e.get("year"):
+            shard_by_year[e["year"]].append(e)
     for e in entries:
         for c in e.get("owasp_llm", []):
             llm_counts[c] += 1
@@ -725,19 +752,19 @@ def render():
     SHARD_DIR.mkdir(parents=True, exist_ok=True)
     # Wipe any stale shards from previous renders (years that vanished
     # after a dedupe pass) so the directory mirrors the current dataset.
-    expected = {shard_path(y).name for y in by_year}
+    expected = {shard_path(y).name for y in shard_by_year}
     for existing in SHARD_DIR.glob("*.md"):
         if existing.name not in expected:
             existing.unlink()
-    for year, rows in by_year.items():
+    for year, rows in shard_by_year.items():
         body = render_details_shard(year, rows)
         _write_lf(shard_path(year), body)
     total_shard_chars = sum(
         len((SHARD_DIR / f"{y}.md").read_text(encoding="utf-8"))
-        for y in by_year
+        for y in shard_by_year
     )
     print(
-        f"wrote {len(by_year)} year shards under docs/incidents/ "
+        f"wrote {len(shard_by_year)} year shards under docs/incidents/ "
         f"({total_shard_chars:,} chars total)"
     )
 

@@ -112,6 +112,13 @@ jobs:
         run: python scripts/ingest_cisa_kev.py
         continue-on-error: true
 
+      # WS4-T2: a CVE rejected after it was ingested must be retracted, not
+      # left live. Feeder = NVD CVEs modified in the last 10 days (a rejection
+      # is a modification); the rotation budget re-checks the stalest ids.
+      - name: Refresh CVE rejection snapshot
+        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 600
+        continue-on-error: true
+
       # The ingest steps are continue-on-error so one flaky source doesn't
       # block the others — but if ALL of them failed, the "refreshed" data is
       # just last week's cache and the PR would ship silent staleness. Surface

@@ -203,6 +203,9 @@ def build(out_dir: Path) -> tuple[int, Path]:
     # Rationale in docs/specs/WS6-T9-landmark-distribution-2026-09-18.md sec 4.
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
+    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
+    # their IDs resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if e.get("status") != "retracted"]
     out_dir.mkdir(parents=True, exist_ok=True)
     jsonl = out_dir / "incidents.jsonl"
     with jsonl.open("w", encoding="utf-8", newline="\n") as fh:
