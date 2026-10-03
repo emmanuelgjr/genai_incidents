@@ -286,11 +286,355 @@ exist as described.
 
 ## Estimates (pipeline-engineer)
 
-*Placeholder. Filled by pipeline-engineer in the next step.*
+**Author:** pipeline-engineer, 2026-10-03. Evidence (commands, raw counts, name
+lists): `docs/specs/source-expansion-tranche1-estimates-evidence-2026-10-03.md` and
+`.json` (same directory, dated records). Nothing here changes sections 1 to 6 above.
+No ingest code exists or is proposed before a user ruling. Method, factor scales and
+labels are those of `docs/specs/source-expansion-evaluation.md` sections 4 and 5.
+
+**Labels.** **[M]** = measured on 2026-10-03 (command in the evidence file). **[E]** =
+estimated (reasoning given). A "proxy" is a regex over names or titles, spot-read,
+not a label. The corpus is `data/incidents.json` in this worktree: 13,361 entries,
+`generated` 2026-09-18.
+
+**This is a reconstruction.** Tranche 1 is reconstructed: 8 of its 10 names (T1.3 to
+T1.10) were inferred by the foreman from the tranche-2 brief, and only T1.1 and T1.2
+were named by the user
+(`docs/specs/source-expansion-tranche1-reconstruction-2026-10-03.md`). T1.9 is dropped
+(section "Brief vs. found", item 1), so **9 of the 10 names remain**. Of those, this
+section estimates 4 (T1.4, T1.5, T1.6, T1.8), carries 2 by citation (T1.1, T1.2), and
+lists 3 by name (T1.3, T1.7, T1.10). Any name the user supplies replaces a
+reconstructed one and needs its own estimate.
+
+**Not re-measured, carried by citation.** T1.1 CISA beyond KEV and T1.2 huntr: factor
+rows are those of tranche-2 sections 4.2 and 5.2, cited, not recomputed. Licence facts
+for every row are the gated pre-rows above (PASS at `d1a6774b`); nothing from them is
+re-derived here.
+
+**Conduct.** Every request went through `ingest/common.py::fetch_once` (identifying
+User-Agent, robots check, per-host spacing; one deviation: the 136-file AVID scan ran at
+2.0 s, below tranche 2's 3.0 s). `www.courtlistener.com` was never contacted. No
+`ftc.gov` content path was requested (robots.txt could not be verified, below). `0din.ai`
+was not contacted (Hugging Face mirror only). Prompt, response and signature fields of
+the 0din corpus were never written to disk.
+
+### E.0 Findings that cut across the four estimated sources
+
+1. **`www.ftc.gov` cannot be reached through `ingest/common.py` as it stands.** [M]
+   robots.txt returns HTTP 403 to the project User-Agent: 3 separate runs, 2 attempts
+   each, plus one explicit fetch; `common.py` fails closed. The tranche-1 gate read the
+   same file with curl and a default UA (pre-row T1.5), so not every client is refused
+   and the host does **not** meet the evidence standard for
+   `ROBOTS_UNVERIFIABLE_ALLOWLIST`. I did not try another User-Agent: `common.py` strips
+   caller UAs by design and trying one would be identity evasion. Same shape as
+   `www.cisa.gov` in tranche-2 section 4.1.
+2. **66 of the 80 records in the 0din Hugging Face corpus are already in the AVID
+   repository that wave 1 ingests.** [M] AVID-2026-R0059 to R0124 each cite one
+   `https://0din.ai/disclosures/<uuid>`, and all 66 uuids are in the HF corpus. The
+   corpus holds 2 of the 66 today (INC-02924, INC-02923). A title comparison found only 1
+   of 73, so it badly under-counts; the AVID link was found by reading AVID records.
+3. **The corpus already carries a GHSA-sourced malicious-package stream.** [M] 79
+   entries titled `Malware in <package>`, all GHSA-keyed, 62 of them AI-named by the
+   strict token list. OpenSSF is a second route to the same kind of record, and the
+   dedupe key has to be (ecosystem, package name), because the sampled OpenSSF records
+   have `aliases: null` (14 of 14).
+4. **The headline AI litigation and the 2019-2024 FTC AI actions are already in the
+   corpus** [M, name probes], through AIAAIC, AIID and OECD sources: 9 of 12 named US
+   AI suits and 6 named FTC actions found by title (lists in the evidence file). Both
+   sources add the tail and docket-level facts, not the headline cases.
+5. **`common.py` reads a whole response into memory** (`resp.read()`), so the 5.14 GB
+   CourtListener dockets file cannot be fetched in one call. [M] Chunked `Range`
+   requests work through `fetch_once` (an 8,000,000-byte read returned
+   exactly the requested bytes and a 300 KB head read decoded). `common.py` also never parses `Crawl-delay` (0 matches
+   for the string in the module), so FTC's 5 s must be passed as `min_interval=`.
+
+### E.1 Candidate rows
+
+Each row: **Volume** · **Overlap** (dedupe key stated; not CVE alone) · **Shape** ·
+**Fit** · **Reconciliation** (WS4-T2) · **Maint.** (structure 0-3, as tranche-2 section
+4.2) · **Non-English**.
+
+#### T1.4 CourtListener / RECAP, bulk S3 route only (licence 2; the site crawl is 0)
+- **Volume.** [M] The bulk bucket `com-courtlistener-storage` lists current files
+  (newest key 2026-09-30): `dockets` 5.14 GB, `opinion-clusters` 2.47 GB, `opinions`
+  55.25 GB (not needed), all bz2 CSV. [M] One 8 MB `Range` read of the dockets file
+  parsed to 98,837 dockets (ids 70.7M to 72.05M, created 2025-07 to 2025-12); **1** has a
+  core AI-company defendant (Dalal v. Clearview AI, S.D.N.Y., filed 2025-09-19) and 99
+  are copyright suits (nature of suit 820). A broader name regex gave 9 hits, of which 2
+  to 3 are AI-related and the rest surnames or company names. So **a keyword filter on
+  `case_name` is not a method**: it has both false positives and misses captions that
+  name no AI company. The workable filter is a curated docket-id list (the corpus's own
+  litigation entries plus a hand-curated seed, as WS4-T4 does for packages).
+  [E] backlog 100-300 AI-litigation dockets, 10-40 new per year. No measurement supports
+  these beyond the 1-in-98,837 density and the name probes; treat V as plus or minus one
+  step.
+- **Overlap.** [M] 0 corpus entries carry a courtlistener URL. [M] 9 of 12 named US AI
+  suits are already in the corpus by title (NYT v. OpenAI, Authors Guild, Getty v.
+  Stability, GitHub Copilot, Character.AI, Workday, Clearview); 3 not found by name
+  (Kadrey v. Meta, Thomson Reuters v. Ross, Andersen v. Stability; title variants not all
+  tried). **Dedupe key: (court_id, docket_number) and the CourtListener docket id.**
+  Corpus titles are narrative ("Getty Images sues Stability AI for copyright abuse"), so
+  the reference-URL and fuzzy-title tiers of `scripts/merge_and_dedupe.py` will mostly
+  miss; matching to existing entries needs a curated crosswalk from docket id to INC id
+  [E]. Merging into AIAAIC-derived rows touches the CC-BY-SA `content_license` marker
+  (1,517 rows today).
+- **Shape.** Bulk CSV on S3, `bz2`, no auth, robots check passes on the bucket host
+  [M]. Chunked `Range` reads through `fetch_once` (E.0-5). Per refresh: dockets 5.14 GB
+  plus clusters 2.47 GB [M] to download; bz2 blocks are independent, so a partial read
+  is possible [M, used for the sample]. Site pages and `/api/` are not used.
+- **Fit.** Litigation as a real-world event. Partial mapping: no attack vector, no
+  severity, no OWASP code. Enrichment of existing litigation entries (docket number,
+  court, filing and termination dates, status) is as valuable as new entries [E].
+- **Reconciliation.** Medium. Dockets are mutable (status, termination date, caption).
+  Bulk files are snapshots, not deltas (pre-row), so a refresh diffs a curated row set,
+  not the file. The table has `blocked` and `date_blocked` columns [M, header]; a blocked
+  docket must become `status` plus tombstone, never a silent drop. Privacy review of
+  party names is a pre-row condition.
+- **Maint.** Structure 2 (fixed CSV schema, 54 columns [M], but 5 GB per refresh and a
+  curated seed to keep current).
+- **Non-English.** English.
+
+#### T1.5 FTC enforcement actions (licence 2)
+- **Volume.** Not measurable: **the host is unreachable through `common.py` (E.0-1).**
+  [E] 5-15 AI-related actions per year, from the author's knowledge of the 2023-2025
+  pace; no fetch backs it. The corpus signal is [M] 6 entries mention FTC or the Federal
+  Trade Commission and 2 carry an `ftc.gov` URL (INC-07386, INC-04395).
+- **Overlap.** [M] By title, Rite Aid, Everalbum, DoNotPay, IntelliVision, Kurbo and Alexa
+  COPPA are in the corpus (AIAAIC, AIID); not found: Rytr, Operation AI Comply, Workado,
+  Air AI, Ascend Ecom, Click Profit, FBA Machine (names from the author's memory, not
+  verified as FTC actions). So the tail is 2024-2026 actions. **Dedupe key: FTC case or
+  docket number and the case-page URL**, then party name; not CVE. As with CourtListener,
+  existing titles are narrative, so a crosswalk is needed [E].
+- **Shape.** HTML under `/legal-library/` reached via browse pages (pre-row), Crawl-delay
+  5 passed as `min_interval=5.0`. **Cannot start**: robots unverifiable, fail-closed.
+- **Fit.** Enforcement action; partial mapping (as ICO in tranche 2).
+- **Reconciliation.** Medium [E]: orders are amended and cases settle; case pages carry
+  dates but no machine status.
+- **Maint.** Structure 1 if reachable (scraped HTML, a `common.py` argument); **0 as
+  things stand**.
+- **Non-English.** English; Spanish mirrors under `/es/` are skipped (pre-row).
+
+#### T1.6 0din, Hugging Face CC BY corpus only (licence 2)
+- **Volume.** [M] `0dinai/public-disclosures` at revision `9c75d830`: 80 records, last
+  modified 2026-05-15, i.e. **4.5 months stale** against the dataset card's "weekly".
+  Published: 2025: 53, 2026 to April: 27 (months in the evidence file); 79 of 80 severity
+  `low`. All 80 are `guardrail_jailbreak`. **Net-new against the corpus today: 78 of 80**
+  [M]; **after wave 1 imports AVID: at most 14** [M], those published 2026-02 to 2026-04.
+  [E] Further new records only if the mirror is refreshed; the site lists 82 (pre-row).
+- **Overlap.** **Dedupe key: the 0din `uuid`** (the URL form `https://0din.ai/disclosures/<uuid>`
+  is what AVID cites [M]). The HF `reference_urls` field is empty in all 80 [M], so the
+  link has to be built from the uuid; whether that page resolves was not fetched. The
+  reference-URL tier of `merge_and_dedupe.py` matches if the entry carries the same URL
+  [E]; fuzzy title would miss (INC-02924 is retitled by curation). No CVE in any record.
+- **Shape.** Pinned HF revision, one JSONL (596,614 bytes) plus `manifest.json`, through
+  `huggingface.co` (robots allowed [M]); drop `messages`, `variant_prompts` and
+  `detection_signature` (present in 6 of 80 records [M]); `researcher_credit` is a
+  name or handle in 66 records, a privacy decision for the row [E]. Keep summary, title,
+  models, dates, severity, taxonomy and the uuid link.
+- **Fit.** Jailbreak and guardrail disclosures: the corpus has `research-demonstrated`
+  (41) and AVID-derived entries of this kind. Partial mapping, no CVE or CWE.
+- **Reconciliation.** Low. Key is the uuid; the pinned revision diffs cleanly; no
+  rejection concept in the schema (1.1.0). A record vanishing between revisions (80 vs
+  the site's 82 suggests lag, not removal) becomes `status` plus tombstone.
+- **Maint.** Structure 3 (fixed JSONL schema). The risk is staleness, not format.
+- **Non-English.** English.
+
+#### T1.8 OpenSSF malicious-packages, AI/ML subset (licence 2, Apache-2.0)
+- **Volume.** [M] The repo is large: pypi 11,780 packages (one record each; ids by year
+  2023: 6,467, 2024: 2,476, 2025: 1,419, 2026 to 3 Oct: 1,398), rubygems 4,238, nuget
+  782, npm **more than 100,000 top-level directories** (the listing truncates at 100,000,
+  last name `lintang-tea65`). The AI/ML subset is a **filter problem on package names**,
+  and the proxy is poor: strict-token names are pypi 73, npm 91 (first 100,000 only),
+  nuget 1, rubygems 1 after removing 100 npm names where `gemini` is a constellation word
+  in a tea.xyz token-farming campaign (that removal is itself a heuristic; the 4 npm
+  records read were all that campaign). [M, n=10] by summary, 5 of 10 strict pypi names
+  target an AI library (instructor-mcp, scikit-leran, mlc-llm-nightly,
+  strands-agents-anthropic, ant-mcp-proxy-for-test) and 5 only carry an AI token in the
+  name. [E] about 80 AI-library-targeting records in the backlog (166 candidates times
+  about one half), range 40-120, and 15-40 new per year (pypi strict names: 2023: 23,
+  2024: 9, 2025: 12, 2026 to date: 30). Wide: n=10.
+- **Overlap.** [M] 0 of 73 pypi and 17 of 91 npm candidates already have a corpus entry
+  `Malware in <name>` (GHSA-keyed); by package name about 90% are net-new (147 of 164).
+  [M] 1 corpus entry cites a `MAL-` id (INC-08450). **Dedupe key: (ecosystem, package
+  name)**, then GHSA alias; `aliases` is null in 14 of 14 sampled records, so a CVE or
+  GHSA key does not exist. The existing 79 GHSA malware entries are CC BY 4.0 and would
+  win any text conflict.
+- **Shape.** OSV JSON, one file per record, id `MAL-YYYY-N`, in
+  `osv/malicious/<ecosystem>/<package>/`. Reachable through `common.py`: the trees API
+  (one call per ecosystem; **npm truncates, so it needs per-prefix sharding or a `git`
+  route that must be registered in `docs/INGESTION_CONDUCT.md`**) and `raw.githubusercontent.com`.
+  Unauthenticated `api.github.com` is limited (documented 60 calls per hour; [M] the
+  `X-RateLimit-Remaining` header read 33 down to 30 after about 27 calls). The OSV `all.zip` route was not tried.
+- **Fit.** Supply-chain malware. The corpus already holds it as `threat-report` (79
+  entries). Records have no severity, CVSS, CWE or CVE [M, 14 of 14]; the mapping is
+  partial and the OWASP LLM03 code would come from the filter, not the record.
+- **Reconciliation.** Medium. [M] 8 of 14 sampled records have `modified` later than
+  `published` (a batch re-import on 2026-03-19 touched several) and the `schema_version`
+  is mixed (1.5.0 and 1.7.4). No `withdrawn` field in 14 of 14; the OSV schema defines
+  one [E], so a false-positive withdrawal is possible and must become `status` plus
+  tombstone. Ids are append-only.
+- **Maint.** Structure 2: fixed OSV schema, but a name filter that needs upkeep against
+  campaign spam, a truncating npm listing, a rate-limited API, and mixed record
+  provenance (`database_specific.malicious-packages-origins` names kam193,
+  reversing-labs, amazon-inspector, checkmarx and ossf-package-analysis, none with a
+  licence statement of its own, pre-row).
+- **Non-English.** English.
+
+**What per-record Apache-2.0 attribution costs here.** The brief notes the project is
+excluding `MAL-` records from the OSV ingest because of Apache-2.0 (board note N6). I
+could not confirm an exclusion: the board text I read (`PROGRESS.md` on `origin/main`,
+`77e04846`) says the fix is to "either filter `MAL-` in the OSV ingest or attribute those
+records per record as Apache-2.0", with no decision recorded. Costs of the attribute
+route, for the roughly 80 rows above:
+1. **Schema.** `content_license` in `schema/incident.schema.json` is **one object per
+   row** and its `obligations` enum is only `attribution` or `share-alike` [M]. Apache-2.0
+   needs the licence text to travel and changes to be stated (Apache-2.0 section 4;
+   [E], not re-fetched here), so the enum needs new values and the schema's own
+   `$comment` says each new source extends the conditional. A row that merges an AIAAIC
+   source (CC-BY-SA, 1,517 rows today) with an OpenSSF source cannot carry two licences
+   in one object. Both are WS3 changes.
+2. **Surfaces.** The marker is mirrored into the HF export, `incidents.min.json` (marked
+   rows only) and STIX `x_content_license` (schema description), so each gains Apache
+   rows.
+3. **Notice.** One-time: the Apache-2.0 text in the licence bundle and a NOTICE-DATA
+   entry stating that records were normalised to the INC schema. Pre-row: no NOTICE file
+   in the upstream repo.
+4. **Merge discipline.** The marker is sticky and excluded from merge union; if a `MAL-`
+   record merges into a GHSA entry, the survivor needs the Apache marker only if OpenSSF
+   text is kept.
+5. **The cheaper shape.** Taking facts plus link plus our own summary (ecosystem, package,
+   dates, `MAL-` id as a link) would avoid items 1 to 4; whether that shape escapes the
+   Apache terms is license-auditor's call, not mine.
+6. **Already incurred.** The 2 `MAL-` records in `ingest/cve_nvd_expanded.json` carry
+   verbatim OpenSSF text today (pre-row T1.8); that is N6, not a tranche-1 cost.
+
+### E.2 Carried by citation (not re-measured)
+
+- **T1.1 CISA beyond KEV.** L2 V1 F1 M1 = **2** (tranche-2 section 5.2, rank 14). `cisa.gov`
+  feeds return 403; the structured route is the ICS-heavy CSAF repository.
+- **T1.2 huntr.** L2 V2 F3 M3 = **36**, "a filter inside cvelistV5, not additive"
+  (tranche-2 sections 4.2 and 5.2). huntr.com serves no report fields; 228 AI-relevant
+  CVEs missing from the corpus in the 2024-01 to 2026-06 window.
+
+### E.3 Listed by name only (licence 1; not estimated)
+
+Facts and links only. Corpus counts are **entries** whose JSON contains the string [M],
+not the line counts in the summary above (28, 40, 0 lines).
+
+- **T1.3 CERT/CC Vulnerability Notes** (kb.cert.org). 19 corpus entries contain
+  `kb.cert.org`; 1 contains a `VU#` id. Licence-clean route to the same facts: CVE
+  records and NVD (pre-row T1.3). Links: <https://www.kb.cert.org/vuls/>,
+  <https://certcc.github.io/VINCE-docs/copyright/>.
+- **T1.7 FIRST EPSS** (enrichment). 0 corpus entries mention EPSS. Links:
+  <https://www.first.org/epss/>, <https://www.first.org/about/policies/terms>. Tranche-2
+  section 4.2 found EPSS present on 3,873 of 3,873 EUVD items, which is the other route.
+- **T1.10 GitHub Security Lab** (securitylab.github.com). 18 corpus entries contain the
+  host and 27 a `GHSL-` id. Links: <https://securitylab.github.com/advisories/>. The
+  licence-clean twin is the GHSA record (pre-row T1.10).
+
+With L=1 the product ceiling is 27 (V=F=M=3), below huntr's 36 and cvelistV5's 36, so a
+later estimate of these three cannot move them above waves 1 or 2.
+
+### E.4 Dropped
+
+**T1.9 Hugging Face security advisories** (section "Brief vs. found", item 1): no such
+source exists; not estimated.
+
+### E.5 Non-English
+
+All four estimated sources are English. FTC Spanish mirrors (`/es/`) are skipped. No
+translated summary is needed, so the WS0-T3 rule (translations are original prose,
+generated offline, never a model call in `make build`) is not engaged.
 
 ## Ranking
 
-*Placeholder. Filled in the next step.*
+### R.1 Method
+
+Same as tranche-2 section 5.1: product of L (licence cleanliness of the subset actually
+ingested), V (new-entry volume after dedupe against the current corpus), F (corpus fit),
+M (inverse maintenance cost), each 0-3; a 0 zeroes the candidate. Scales are copied
+unchanged from `docs/specs/source-expansion-evaluation.md` section 5.1. Tranche-2 products
+below are **cited, not recomputed**.
+
+### R.2 Tranche-1 factor table
+
+| Candidate | L | V | F | M | Product | Basis |
+|---|---|---|---|---|---|---|
+| T1.4 CourtListener (bulk S3) | 2 | 2 | 2 | 2 | **16** | V is [E] (100-300 curated dockets); at V=1 the product is 8 |
+| T1.6 0din (HF corpus) | 2 | 1 | 2 | 3 | **12** | V=1 because 66 of 80 arrive via AVID in wave 1 (14 left) [M]; at V=2 (AVID skipped or mirror refreshed) it is 24 |
+| T1.8 OpenSSF AI/ML subset | 2 | 1 | 2 | 2 | **8** | V=1: about 80 records, 15-40 per year [E], straddles the V=2 line; at V=2 it is 16; at L=1 (Apache not accepted) 4; zero if excluded |
+| T1.5 FTC | 2 | 1 | 2 | 0 | **0** | M=0: robots.txt 403 through `common.py` (E.0-1); if reachable M=1 and the product is 4 |
+| T1.1 CISA beyond KEV | 2 | 1 | 1 | 1 | 2 | cited, tranche-2 section 5.2 |
+| T1.2 huntr (CVE route) | 2 | 2 | 3 | 3 | 36 | cited; a filter inside cvelistV5 |
+| T1.3 CERT/CC, T1.7 EPSS, T1.10 GHSL | 1 | | | | not estimated | listed by name; ceiling 27 |
+| T1.9 HF advisories | | | | | dropped | no such source |
+
+### R.3 Cross-tranche ordering
+
+Rank is competition ranking by product, as in tranche-2 section 5.2. Tranche-2 rows are
+copied from that table (factors and product as published there); tranche-1 rows are new.
+Rows with product 0 are collapsed.
+
+| Rank | Candidate | Tranche | L V F M | Product | Proposed wave | Why |
+|---|---|---|---|---|---|---|
+| 1 | AVID | 2 | 2 3 3 3 | 54 | 1 (approved, in flight) | cited |
+| 2 | cvelistV5 | 2 | 2 2 3 3 | 36 | 1 (approved, in flight) | cited |
+| 2 | huntr (CVE route) | 1 (T1.2) | 2 2 3 3 | 36 | 1, as a filter inside cvelistV5 | cited |
+| 4 | arXiv cs.CR metadata | 2 | 3 2 2 2 | 24 | 2 (approved; pending outreach) | cited |
+| 5 | **CourtListener (bulk)** | 1 (T1.4) | 2 2 2 2 | **16** | **3** | only legal-process source; needs a curated docket seed, privacy review and chunked 5 GB reads; V is [E] |
+| 6 | EUVD | 2 | 1 2 3 2 | 12 | 2, enrichment (pending outreach) | cited |
+| 6 | ANSSI / CERT-FR | 2 | 3 1 2 2 | 12 | hold | cited |
+| 6 | **0din (HF corpus)** | 1 (T1.6) | 2 1 2 3 | **12** | **3, after AVID merges** | 66 of 80 already arrive through AVID; adds at most 14, depends on the mirror being refreshed |
+| 9 | BSI / WID | 2 | 1 1 3 3 | 9 | hold | cited |
+| 10 | **OpenSSF AI/ML subset** | 1 (T1.8) | 2 1 2 2 | **8** | **4, gated on N6 and WS3** | about 80 records; duplicates part of the GHSA malware stream; Apache needs a schema change |
+| 11 | NCSC, JVN, ICO | 2 | | 6 | hold / 3 (ICO) | cited |
+| 14 | ENISA reports, EDPB register | 2 | | 4 | hold / 3 (EDPB) | cited |
+| 16 | CCCS | 2 | | 3 | hold | cited |
+| 17 | Garante, CISA beyond KEV (T1.1), Black Hat / DEF CON | 2 / 1 | | 2 | hold (Garante: tranche-2 optional wave 3) | cited |
+| 20 | **FTC** and the tranche-2 zero rows (ACSC, JPCERT/CC, CERT-EU, Dutch AP, CNIL, ANPD, OPC, HackerOne, huntr.com direct) | 1 / 2 | | 0 | hold | FTC: unreachable through `common.py` today |
+| n/a | CERT/CC, EPSS, GHSL | 1 | 1 | not estimated | hold | listed by name |
+
+**Sensitivity.** None of the tranche-1 estimates exceeds 24, and 24 is reached only by
+0din at its optimistic V. So **no estimated tranche-1 source outranks AVID, cvelistV5 or
+huntr, and none outranks arXiv except by a tie.** That answers the tranche-2 caveat
+(section 5.5) for the names estimated here: of the 8 reconstructed names, none that was
+estimated lands above wave 2, and the 3 listed by name have a ceiling of 27. Ordering
+among ranks 5 to 10 is within estimation error: one step on V reorders CourtListener,
+0din and OpenSSF.
+
+### R.4 Proposed waves
+
+Waves 1 (AVID + cvelistV5 with huntr as a filter) and 2 (arXiv + EUVD as enrichment) are
+user-approved and in flight (AVID and cvelistV5/huntr; arXiv and EUVD pending outreach).
+Nothing below changes them. These are proposals for a user ruling.
+
+- **Wave 3: legal-process and gap-fill.** (a) **0din**, once AVID's reports are merged:
+  one pinned JSONL fetch, dedupe on the uuid URL, expected yield at most 14 entries until
+  the mirror refreshes, so it may be deferred without loss. (b) **CourtListener bulk**:
+  worth doing only as a curated docket list that enriches existing litigation entries and
+  adds the tail. Needs before ingest: the curated seed, a privacy decision on party
+  names, a `common.py`-compatible chunked `Range` reader, and handling of `blocked`
+  dockets. This sits with tranche-2's optional wave 3 (ICO, EDPB, Garante), which is
+  also a regulatory and legal axis; the user's call whether that axis is wanted.
+- **Wave 4: OpenSSF AI/ML subset**, after the N6 ruling (exclude, or attribute per
+  record) and the WS3 decisions (one licence object per row, the obligations enum). If the
+  ruling is to exclude `MAL-`, the product is 0 and this row closes.
+- **Hold:** FTC (unreachable; a route needs either FTC's operator to accept the project
+  User-Agent or reviewed evidence that fits the allowlist standard, neither of which
+  exists), CISA beyond KEV (cited), CERT/CC, EPSS and GHSL (licence 1, listed by name).
+
+### R.5 What in the brief was not supported or not verified
+
+1. The brief says the project is excluding `MAL-` records from the OSV ingest. The board
+   text I read records the choice as open (E.1, T1.8). I treated it as undecided.
+2. The brief describes FTC as reachable "via browse pages, Crawl-delay 5". The browse
+   pages are not reachable through `common.py` (E.0-1); Crawl-delay is correct per the
+   pre-row but could not be exercised.
+3. The pre-row corpus-overlap figures were line counts (28, 40, 0 lines); the entry
+   counts are 19, 18 and 0 (E.3).
+4. Not measured: the full npm package list (listing truncates), any FTC page content, any
+   CourtListener volume beyond one 8 MB window, whether `https://0din.ai/disclosures/<uuid>`
+   resolves, and OSV `all.zip` as an alternative OpenSSF route.
 
 ## Absence findings for shell verification
 
