@@ -22,6 +22,14 @@
   - pipeline-engineer: refresh-tripwire diagnosis, measurement only (`ws4/refresh-tripwire-42`).
   - pipeline-engineer: N1, the 17 entries still active for rejected CVEs, reconciled under invariant 3 with a field-level delta (`ws4/rejected-cve-reconcile`).
   - pipeline-engineer: wave 1–2 ingest (AVID, cvelistV5 + huntr CNA + the post-2026-06 CVE catch-up, arXiv OAI-PMH), with a field-level delta (`ws4/wave12-ingest`).
+- **Delivered so far:**
+  - **Wave 1–2 licence rows:** `ad8ddfb5` on `ws0/wave12-licence-rows`, pushed. Not gated alone; they gate together with the ingest PR (invariant 10). The AVID MIT text was foreman-verified word-identical to upstream.
+  - **Foreman correction to the auditor's draft:** the MITRE copyright line was written from memory with "All rights reserved". Per cve.org's own `FooterModule.vue` it is "Copyright © 1999-{currentYear}, The MITRE Corporation.", and it has been fixed.
+  - **Tranche-1 pre-rows:** `06c7d561` on `ws0/tranche1-reconstructed`, pushed.
+    - **Foreman refuted:** T1.9 (Hugging Face advisories) does not exist as a source and is to be dropped.
+    - T1.8 and T1.10 largely duplicate ingested OSV and GHSA.
+    - red-reviewer has been dispatched to run the 24 absence checks.
+- **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
   1. Merge the licence rows into the ingest branch (invariant 10).
   2. red-reviewer gates each data branch.
