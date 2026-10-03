@@ -128,7 +128,30 @@
     - (e) **The corpus CVE refresh is stale.** The newest CVE entry is from 2026-07, and about 515 proxy-AI CVEs are missing. That is a refresh gap, not a new-source gain.
     - (f) **17 corpus entries (18 CVE ids) are `active` although NVD marks those CVEs Rejected.** This is a measured WS4-T2 case.
     - (e) and (f) are data-integrity findings on the shipped corpus and need routing to pipeline-engineer as board notes after this task merges.
-- **Next:** ANSSI tidy → final red-reviewer gate on sections 4–5 → merge to main. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+- **Next:** ANSSI tidy → final red-reviewer gate on sections 4–5 → merge to main.
+- **ANSSI tidy committed `fb64ea10`** (a 1-line diff, verified).
+- **⛔ Final gate on sections 4–5: BOUNCE #1 on 4–5 (fresh red-reviewer, 2026-10-03, on `fb64ea10`). 9 defects.** The verdict is in `docs/audits/source-expansion-tranche2-gate5-final-sections45-2026-10-03.md`; its defect sections were shell-concatenated from files saved as received, not retyped.
+  - **Defects:**
+    - D1: the "not in corpus" lists are refuted. 9 of 302 EUVD ids and 5 of 233 huntr ids are already present as AVID-keyed entries. Corrected to 293 and 228, union 416.
+    - D2: the wave-1 yield floor rises to 416 (about 165/yr).
+    - D3: CVE ids vs entries (5,293 entries).
+    - D4: the AP robots cause. stdlib robotparser has no wildcard support.
+    - D5: the non-English rule is missing on 5 rows and partial on 1.
+    - D6: `source_status`.
+    - D7: the evidence JSON has one Latin-1 byte.
+    - D8: a stale placeholder line.
+    - D9: CCCS extrapolation unlabelled; Garante contradiction.
+  - **Confirmed by a different route [R]:**
+    - AVID 1,790 / 109 / V025;
+    - huntr 2,496 / 111;
+    - **(e) max CVE month is 2026-07, with an independent NVD lower bound of 334 missing;**
+    - **(f) 18/18 REJECTED via cve.org, 17 entries active;**
+    - Crawl-delay never parsed; the arXiv and data.gouv robots facts;
+    - arithmetic, sort and licence factors;
+    - scope, and a clean merge-tree.
+  - **Not re-derivable:** arXiv 2/535 (no ID list).
+  - **Foreman stray check:** clean.
+- **Next:** pipeline-engineer applies D1–D9 verbatim → string re-check → merge to main. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
