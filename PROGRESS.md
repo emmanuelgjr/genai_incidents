@@ -106,7 +106,29 @@
   - The verdict is in `docs/audits/source-expansion-tranche2-gate4-recheck-PASS-2026-10-03.md`, pasted rather than retyped.
   - **Gate evidence [R]:** item-33 commands re-run, 284 / 277; stale-string sweep 0 hits; diff 7/7 with every hunk declared; invariants PASS.
   - **Advisory, routed to the final merge pass:** the ANSSI Retrieval-method cell (line 238) still says "method-suspect" although gate 1 confirmed it. Change it to "gate-confirmed (curl, 2026-10-03)".
-  - **Remaining:** pipeline-engineer sections 4–5 → merge into `eval/source-expansion` → final red-reviewer gate on 4–5 → merge to main. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **Remaining:** pipeline-engineer sections 4–5 → merge into `eval/source-expansion` → final red-reviewer gate on 4–5 → merge to main.
+- **2026-10-03: pipeline-engineer DELIVERED sections 4–5.**
+  - **Verification and merge:** confirmed by foreman diff. There are exactly two hunks, at the section-4 and section-5 placeholders, plus two evidence files: `docs/specs/source-expansion-estimates-evidence-2026-10-03.{md,json}`. It was merged into `eval/source-expansion` as `6d9e0038` (`--no-ff`, pushed). The ANSSI advisory went to license-auditor.
+  - **Proposed waves:**
+    - **Wave 1:** AVID + cvelistV5, with huntr as a CNA filter inside cvelistV5. About 1,200–1,600 net-new entries, estimated.
+    - **Wave 2:** arXiv cs.CR via OAI-PMH, plus EUVD as enrichment only. EUVD needs ENISA outreach, which the user sends.
+    - **Wave 3, optional:** hand-curated ICO/EDPB.
+  - **On the user's prior: "mostly not supported."**
+    - CISA beyond KEV scores product 2, and `cisa.gov` feeds return 403 to our UA.
+    - huntr pages are client-rendered shells, so huntr is reached through the CVE route instead.
+    - EUVD: 3,873 of 3,873 items carry a CVE alias.
+    - NCSC publishes guidance, not incidents.
+    - CCCS is non-commercial, with 0 AI items in a sample of 50.
+    - ACSC is unreachable through `common.py`.
+  - **Cross-cutting findings, NOT yet routed:**
+    - (a) `ingest/common.py` never parses Crawl-delay.
+    - (b) Stdlib robotparser uses first-match order, so it wrongly refuses the AP's `/documenten/*`. Fixing this needs an RFC 9309 parser.
+    - (c) `export.arxiv.org` robots says `Disallow: /`, so the route must be OAI-PMH.
+    - (d) The CNIL open-data host disallows `/resources`.
+    - (e) **The corpus CVE refresh is stale.** The newest CVE entry is from 2026-07, and about 515 proxy-AI CVEs are missing. That is a refresh gap, not a new-source gain.
+    - (f) **17 corpus entries (18 CVE ids) are `active` although NVD marks those CVEs Rejected.** This is a measured WS4-T2 case.
+    - (e) and (f) are data-integrity findings on the shipped corpus and need routing to pipeline-engineer as board notes after this task merges.
+- **Next:** ANSSI tidy → final red-reviewer gate on sections 4–5 → merge to main. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
