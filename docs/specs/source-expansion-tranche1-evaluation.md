@@ -40,7 +40,7 @@ here). Project data licence for "relicense-compatible": **CC BY 4.0**.
 
 ## Summary
 
-Scores are the specialist's first pass as corrected by red-reviewer gate 1 (BOUNCE #1, 2026-10-03, corrections applied verbatim); no gate has passed them yet.
+Scores are the specialist's first pass as corrected by red-reviewer gate 1 (BOUNCE #1, 2026-10-03, corrections applied verbatim) and passed at gate 3 (docs/audits/source-expansion-tranche1-gate3-PASS-2026-10-03.md).
 
 | # | Source | Score | Action | Blocking issue |
 |---|---|---|---|---|
@@ -288,7 +288,7 @@ exist as described.
 
 **Author:** pipeline-engineer, 2026-10-03. Evidence (commands, raw counts, name
 lists): `docs/specs/source-expansion-tranche1-estimates-evidence-2026-10-03.md` and
-`.json` (same directory, dated records). Nothing here changes sections 1 to 6 above.
+`.json` (same directory, dated records). Nothing here changes the sections above.
 No ingest code exists or is proposed before a user ruling. Method, factor scales and
 labels are those of `docs/specs/source-expansion-evaluation.md` sections 4 and 5.
 
@@ -322,10 +322,7 @@ the 0din corpus were never written to disk.
 
 1. **`www.ftc.gov` cannot be reached through `ingest/common.py` as it stands.** [M]
    robots.txt returns HTTP 403 to the project User-Agent: 3 separate runs, 2 attempts
-   each, plus one explicit fetch; `common.py` fails closed. The tranche-1 gate read the
-   same file with curl and a default UA (pre-row T1.5), so not every client is refused
-   and the host does **not** meet the evidence standard for
-   `ROBOTS_UNVERIFIABLE_ALLOWLIST`. I did not try another User-Agent: `common.py` strips
+   each, plus one explicit fetch; `common.py` fails closed. The estimates gate (`docs/audits/source-expansion-tranche1-estimates-gate1-verdict-2026-10-03.md`, Part 2) found: "The project UA gets 403 (454 B). \"genai_incidents/2.11.0\" alone, a browser UA, and the bare contact string each get 200 (3,056 B). The UA with \"+https://github.com/emmanuelgjr\" alone gets 403, and so do curl/8.0 and curl/8.4.0. So the 403 is UA-pattern-specific: an edge rule that apparently rejects UAs containing a URL, and curl. It is not a robots rule.\" The pre-row's earlier reading (that the gate read the file with curl and a default UA) no longer holds for curl/8.x. Not every client is refused, so the host does **not** meet the evidence standard for `ROBOTS_UNVERIFIABLE_ALLOWLIST`. I did not try another User-Agent: `common.py` strips
    caller UAs by design and trying one would be identity evasion. Same shape as
    `www.cisa.gov` in tranche-2 section 4.1.
 2. **66 of the 80 records in the 0din Hugging Face corpus are already in the AVID
