@@ -70,6 +70,11 @@
     - The OpenSSF `MAL-` text is purged by `scripts/audit/purge_openssf_mal.py` (verified: "Per source details" now has 0 hits).
   - **⚠ Deviation the foreman flagged for the gate:** cvelistV5's 2,240 is about 5× the gated estimate (≥416 + ~165/yr). **Filter precision is the crux.**
   - **red-reviewer dispatched** with a precision sample of ≥60 + 20 + 15, delta re-derivation, invariants and licensing.
+- **N6 handling, recorded as a decision (it was implemented before it was recorded; a specialist caught the gap):** `MAL-` (OpenSSF, Apache-2.0) records are **EXCLUDED** from the OSV route, via `is_openssf_malicious` in `scripts/ingest_cve_nvd_expanded.py`. `SOURCE_LICENSES` row 2.4 now states this.
+  - **Open, for the gate and possibly the user:** MAL-2026-3607 is kept as a bare identifier plus links, so that INC-08450 does not split.
+- **Tranche-1 estimates DELIVERED** (`85deb30d`, pushed).
+  - **Proposed waves:** CourtListener (bulk) and 0din → wave 3; OpenSSF → wave 4; FTC on hold (robots 403 to the project UA); CERT/CC, EPSS and GHSL held.
+  - **Gate dispatched** to the tranche-2 §4–5 reviewer.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
