@@ -75,7 +75,11 @@
   - **Smaller items:** D7 (AP Dutch verbatim), D8 (JPCERT quotation notice).
   - **D9: ACSC score 1 contradicts the scale's own score-2 definition.** This needs a choice.
   - **Every defect comes with replacement wording to apply verbatim** (D37 precedent).
-  - **Foreman stray check:** main porcelain clean. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **Foreman stray check:** main porcelain clean.
+- **⚖ D39, USER RULING 2026-10-03, on BOUNCE #2:**
+  - **(a) Apply the gate's replacement text verbatim, then a narrow string-check gate** (D37 precedent). The specialist applies each replacement with an occurs-once replace (Edit's unique-match), without re-deriving. The narrow gate then confirms the strings landed and that nothing else moved.
+  - **(b) ACSC stays at 1, and the scale is amended.** The score-1 definition gains "or a grant known only from a search extract whose primary page could not be reached (provisional)". ACSC returns to 2 once its primary page is read.
+  - **Then:** pipeline-engineer estimates → final gate → merge. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
