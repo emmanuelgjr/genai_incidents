@@ -55,6 +55,7 @@ WEAK_TOKENS = {
     "embedding", "transformer", "neural", "triton", "cursor", "copilot",
     "cody", "sourcegraph", "mistral", "haystack", "rasa", "mcp ",
     "fine-tuning", "model serving", "inference server", "ray.io", "claude",
+    "gpt-",   # bare "GPT-" also names routers (MitraStar GPT-2742GX); see the bounded gpt-N form in _EXTRA_DESC_RE
 }
 # The weak words stay available to the PRODUCT-field test below, which
 # matches them as whole segments of a vendor/product name rather than as
@@ -91,6 +92,10 @@ ECOSYSTEM_SEED = [
     "cohere-terrarium", "qwen-agent", "autogpt", "mindsdb", "ray-project",
     "aimhubio", "applio", "embedai", "apache-submarine", "odh-dashboard",
     "openshift-data-science", "cvat", "watson-studio",
+    # Added with the description-only second-signal rule (BOUNCE #1, D6): AI-native
+    # products that were being admitted only by their self-description.
+    "nanobot", "weknora", "tensorzero", "llava", "desktopcommandermcp", "pyspur",
+    "docling", "lumiverse", "aliasrobotics", "aix-db", "firecrawl", "crawl4ai",
 ]
 
 # Red Hat container-image names (``rhoai/odh-...-rhel9``, ``rhaiis/vllm-...``)
@@ -114,7 +119,7 @@ _DESC_RE = re.compile(
 # A few unambiguous standalone words the token list spells with a trailing
 # space or hyphen ("llm", "gpt-"), handled explicitly.
 _EXTRA_DESC_RE = re.compile(
-    r"(?<![A-Za-z0-9])(?:llms?|gpt-\d\w*|mcp servers?|ai agents?|ai models?|ml models?|"
+    r"(?<![A-Za-z0-9])(?:llms?|gpt-\d(?:\.\d+)?(?:o|-turbo|-mini|-oss)?|mcp servers?|ai agents?|ai models?|ml models?|"
     r"machine-learning|vector stores?|prompt injection|"
     # "Claude" alone also names a person / appears in patch trailers and
     # discovery credits; only the product forms count.
@@ -144,17 +149,82 @@ def product_match(product_strings: list[str]) -> str | None:
     return None
 
 
+# Credit / trailer clauses name tools that FOUND or HELPED WRITE a record, not
+# the product it is about ("reported by ... Claude", "Assisted-by: Claude").
+_CREDIT_RE = re.compile(
+    r"\b(?:found|reported|discovered|triaged|identified|credited|disclosed|reviewed|tested|"
+    r"assisted|suggested|co-developed|analy[sz]ed)[- ]by\b[^.\n]*|^[A-Za-z][A-Za-z-]*-by:.*$",
+    re.I | re.M,
+)
+# INCLUSION.md section 6: a description-only match is a borderline AI-nexus and
+# needs a SECOND signal: another distinct AI phrase, or an AI-specific vector.
+_AI_VECTOR_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:prompt injection|jailbreak\w*|system prompts?|tool[- ]calls?|"
+    r"model (?:files?|loading|poison\w*|extraction|serving|weights)|chat (?:completions?|templates?)|"
+    r"inference (?:server|engine|endpoint)s?|training data|large language models?|"
+    r"llm[- ](?:output|response|agent|app|application)s?)(?![A-Za-z0-9])", re.I)
+
+# Switches exist so the recall cost of each rule can be measured (audit doc).
+RULES = {"credits": True, "linux_cna": True, "second_signal": True}
+
+
+def strip_credits(text: str) -> str:
+    return _CREDIT_RE.sub(" ", text or "") if RULES["credits"] else (text or "")
+
+
+def description_matches(description: str) -> set[str]:
+    text = strip_credits(description)
+    found = {m.group(0).lower().rstrip("s") for m in _DESC_RE.finditer(text)}
+    found |= {m.group(0).lower().rstrip("s") for m in _EXTRA_DESC_RE.finditer(text)}
+    return found
+
+
 def description_match(description: str) -> str | None:
-    m = _DESC_RE.search(description or "") or _EXTRA_DESC_RE.search(description or "")
-    return m.group(0).lower() if m else None
+    found = sorted(description_matches(description))
+    return found[0] if found else None
 
 
-def assess(description: str, product_strings: list[str]) -> tuple[bool, dict]:
+# Phrases that already name AI infrastructure by themselves (an MCP server is
+# an AI tool server whatever else the record says).
+_SELF_SUFFICIENT = {"mcp server", "model context protocol", "prompt injection", "openclaw", "claude code",
+                    "claude desktop"}
+
+
+def second_signal(description: str, matches: set[str], product_strings: list[str]) -> bool:
+    """INCLUSION.md section 6 second signal for a description-only match:
+    another distinct AI phrase; an AI-specific vector phrase; a phrase that
+    names AI infrastructure by itself; or the matched phrase also being a
+    delimited segment of a vendor/product/package/repo name (the record's own
+    product corroborates the mention). A product's self-description alone
+    ("X is an AI chatbot ... CSRF in the settings page") is NOT a second
+    signal: that is the measured false-positive shape."""
+    text = strip_credits(description)
+    if len(matches) >= 2 or _AI_VECTOR_RE.search(text) or matches & _SELF_SUFFICIENT:
+        return True
+    segs = {x for p in product_strings for x in re.split(r"[^a-z0-9]+", (p or "").lower()) if x}
+    # single-word phrases only (a multi-word phrase such as "ai chatbot" found
+    # in the product NAME is the self-description, not corroboration), and not
+    # "llama", which is also an ordinary product-name word (Quotes llama).
+    return any(" " not in tok and tok != "llama" and tok in segs for tok in matches)
+
+
+def assess(description: str, product_strings: list[str], assigner: str | None = None
+           ) -> tuple[bool, dict]:
     """-> (is_ai_relevant, why). Accepts when a product field strongly matches
-    an AI identifier, OR the description carries a strong (non-weak) AI
-    phrase. *why* names the matching evidence, for the audit trail."""
+    an AI identifier; otherwise (description-only, a borderline AI-nexus,
+    INCLUSION.md section 6) when the description carries a strong phrase AND a
+    second signal, never on a Linux-kernel-CNA record (those carry code
+    identifiers and patch trailers; measured false positives). *why* names the
+    evidence for the audit trail."""
     p = product_match(product_strings)
-    d = description_match(description)
-    if p or d:
+    ms = description_matches(description)
+    d = sorted(ms)[0] if ms else None
+    if p:
         return True, {"product": p, "description": d}
-    return False, {}
+    if not d:
+        return False, {}
+    if RULES["linux_cna"] and (assigner or "").lower() == "linux":
+        return False, {}
+    if RULES["second_signal"] and not second_signal(description, ms, product_strings):
+        return False, {}
+    return True, {"product": None, "description": d}

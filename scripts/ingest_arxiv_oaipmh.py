@@ -388,8 +388,23 @@ def _named_systems(text: str) -> list[str]:
     return seen[:5]
 
 
+_NEW_ID_RE = re.compile(r"^(\d{2})(\d{2})\.\d{4,5}$")
+
+
+def v1_month(rec: dict) -> str:
+    """YYYY-MM of the FIRST submission (v1). The OAI ``arXiv`` format's
+    ``<created>`` is the latest version's date (measured: 2411.16769 is v1
+    2024-11-25 but ``created`` 2026-09-26), so it must not date a paper. A
+    new-style id (YYMM.NNNNN) is assigned at v1 submission and carries the
+    month exactly; the fallback is ``created``."""
+    m = _NEW_ID_RE.match(rec.get("id") or "")
+    if m and 1 <= int(m.group(2)) <= 12:
+        return f"20{m.group(1)}-{m.group(2)}"
+    return (rec.get("created") or "")[:7]
+
+
 def _describe(rec: dict, reasons: dict, cite: str) -> str:
-    month = (rec.get("created") or "")[:7]
+    month = v1_month(rec)
     cats = ", ".join(rec.get("categories") or [])
     targets = ", ".join(reasons.get("target_terms") or [])
     return (
@@ -402,7 +417,7 @@ def _describe(rec: dict, reasons: dict, cite: str) -> str:
 
 
 def to_row(rec: dict, reasons: dict) -> dict:
-    created = rec["created"]
+    created = v1_month(rec)
     arxiv_id = rec["id"]
     systems = _named_systems(f"{rec['title']} {rec['abstract']}")
     authors = rec.get("authors") or []
@@ -410,7 +425,7 @@ def to_row(rec: dict, reasons: dict) -> dict:
     return {
         "source_id": f"{SOURCE_PREFIX}{arxiv_id}",
         "title": rec["title"],
-        "date": created[:7],
+        "date": created,
         "year": int(created[:4]),
         "category": "research",
         # NOT the abstract: arXiv's CC0 covers arXiv's metadata dedication, and
@@ -434,7 +449,7 @@ def build(records: list[dict], *, since: date, known: set[str], idx: CorpusIndex
           ) -> tuple[list[dict], dict, list[dict]]:
     rows: list[dict] = []
     selected_log: list[dict] = []
-    stats = {"harvested": len(records), "deleted": 0, "created_before_window": 0,
+    stats = {"harvested": len(records), "deleted": 0, "v1_before_window": 0,
              "not_selected": 0, "already_in_corpus": 0, "would_merge_into_existing": 0,
              "selected_new": 0}
     merges: dict[str, dict] = {}
@@ -442,8 +457,8 @@ def build(records: list[dict], *, since: date, known: set[str], idx: CorpusIndex
         if rec.get("deleted"):
             stats["deleted"] += 1
             continue
-        if not rec.get("created") or rec["created"] < since.isoformat():
-            stats["created_before_window"] += 1
+        if not v1_month(rec) or v1_month(rec) < since.isoformat()[:7]:
+            stats["v1_before_window"] += 1
             continue
         ok, reasons = select(rec)
         if not ok:
@@ -460,7 +475,7 @@ def build(records: list[dict], *, since: date, known: set[str], idx: CorpusIndex
             continue
         stats["selected_new"] += 1
         rows.append(row)
-        selected_log.append({"id": rec["id"], "created": rec["created"], "title": rec["title"],
+        selected_log.append({"id": rec["id"], "v1_month": v1_month(rec), "latest_version_date": rec["created"], "title": rec["title"],
                              "reasons": reasons})
     stats["_merges"] = merges
     return rows, stats, selected_log
@@ -503,7 +518,7 @@ def main() -> int:
     PROVENANCE_FILE.write_text(json.dumps({
         "source": "arXiv OAI-PMH (oaipmh.arxiv.org), set cs:cs:CR, metadataPrefix=arXiv",
         "licence_of_metadata": "CC0 1.0 (info.arxiv.org/help/api/tou.html, footnote 1)",
-        "window": {"created_since": since.isoformat(), "datestamp_until": until.isoformat()},
+        "window": {"v1_month_since": since.isoformat()[:7], "note": "dated by v1 (id YYMM), not by the OAI created field", "datestamp_until": until.isoformat()},
         "min_interval_seconds": MIN_INTERVAL,
         "stats": stats,
         "would_merge_into_existing": merges,

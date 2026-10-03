@@ -1,0 +1,203 @@
+{
+ "CVE-2022-49590": {
+  "assigner": "Linux",
+  "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nigmp: Fix data-races around sysctl_igmp_llm_reports.\n\nWhile reading sysctl_igmp_llm_reports, it can be changed concurrently.\nThus, we need to add READ_ONCE() to its readers.\n\nThis test can be packed into a helper, so such changes will be in the\nfollow-up series after net is merged into net-next.\n\n  if (ipv4_is_local_multicast(pmc->multiaddr) &&\n      !READ_ONCE(net->ipv4.sysctl_igmp_llm_reports))",
+  "products": [
+   "Linux",
+   "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-53378": {
+  "assigner": "Linux",
+  "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ndrm/colorop: Fix blob property reference tracking in state lifecycle\n\nThe colorop state blob property handling had memory leaks during state\nduplication, destruction, and reset operations. The implementation\nfailed to follow the established pattern from drm_crtc's handling of\nDEGAMMA/GAMMA blob properties.\n\nIssues fixed:\n- drm_colorop_atomic_destroy_state() was freeing state memory without\n  releasing the blob reference, causing a leak\n- drm_colorop_reset() was directly freeing old state with kfree()\n  instead of properly destroying it, leaking blob references\n- drm_colorop_cleanup() had duplicate blob cleanup code\n\nChanges:\n- Add __drm_atomic_helper_colorop_destroy_state() helper to properly\n  release blob references before freeing state memory\n- Update drm_colorop_atomic_destroy_state() to call the helper\n- Fix drm_colorop_reset() to use drm_colorop_atomic_destroy_state()\n  for proper cleanup of old state\n- Simplify drm_colorop_cleanup() to use the common destruction path\n\nThis matches the well-tested pattern used by drm_crtc since 2016 and\nensures proper reference counting throughout the state lifecycle.\n\nCo-developed by Claude Sonnet 4.5.",
+  "products": [
+   "Linux",
+   "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-74630": {
+  "assigner": "Linux",
+  "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nipv6: prevent in6_dev_get() from resurrecting inet6_dev\n\nin6_dev_get() reads dev->ip6_ptr under RCU and then unconditionally\nincrements its refcount. Device teardown can clear the pointer and drop\nthe last reference between these operations. The increment then\nresurrects an object whose RCU free has already been queued, so callers\ncan use it after it is freed.\n\nUse refcount_inc_not_zero() and return NULL when the object has already\nreached zero. RCU keeps the memory accessible through the attempted\nreference acquisition, and a successful increment pins the object for\nthe caller.\n\nAn independent run on the exact unpatched 6f5156d7a31a (v7.2-rc3)\nkernel reproduced the invalid reference acquisition as UID 1000:\n\n  refcount_t: addition on 0; use-after-free.\n  ip6_mc_source+0xef4/0x17e0\n\nIt was followed by the corresponding reference underflow in\nip6_mc_source(). The supplied trace from the same unpatched revision\nadditionally shows the access after the RCU read-side section ends:\n\n  BUG: KASAN: slab-use-after-free in mutex_lock+0x76/0xe0\n  Write of size 8 at addr ffff888015b50240 by task poc/1219\n\nBug found and triaged by OpenAI Security Research and\nvalidated by Trail of Bits.",
+  "products": [
+   "Linux",
+   "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-89519": {
+  "assigner": "Linux",
+  "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nsched_ext: Replace SCX_RQ_BAL_KEEP with a dispatch verdict return\n\nSCX_RQ_BAL_KEEP tells the pick to keep running the previous task, a leftover\nfrom when balancing and picking were separate operations. An rq-level flag\nonly works while dispatches and picks pair up one to one, which core\nscheduling breaks: selections interleave through dispatch's lock drops and a\npick can consume a stale flag, keeping a task that has since been dequeued.\nFixing core scheduling support requires the decision to travel with the\ndispatch that made it. Make scx_dispatch_sched() and balance_one() return an\nexplicit verdict instead and drop the flag's plumbing from the tools autogen\nenum headers.\n\nAlso factor the pick-side invocation, its follow-up queueing and the\npost-dispatch checks out of do_pick_task_scx() into dispatch_pick(). No\nfunctional changes intended.\n\nv2: Drop the SCX_RQ_BAL_KEEP plumbing from the tools autogen enum headers\n    as well (Andrea).",
+  "products": [
+   "Linux",
+   "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-97620": {
+  "assigner": "Linux",
+  "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ndrm/xe: Flush LSC untyped L1 dataport cache after rcs/ccs batches\n\nemit_render_cache_flush() sets PIPE_CONTROL0_HDC_PIPELINE_FLUSH to\nflush the L2/HDC data cache before fence signalling, but it never\nrequests a flush of the LSC untyped L1 data cache via the 'Untyped\nData-Port Cache Flush Enable' bit in PIPE_CONTROL DWord0[11].\n\nPer the Bspec, in 3D pipeline mode HDC Pipeline Flush is documented to\nalso flush/invalidate the untyped L1 cache, but only depending on how\nHDC_CHICKEN0[13:11] is programmed. Starting with MTL, this coupling\nbetween HDC Pipeline Flush and the untyped L1 cache flush no longer\nholds in practice, regardless of how HDC_CHICKEN0 is programmed, so\nrelying on it is not safe on newer platforms such as BMG. Mesa's Vulkan\ndriver (anv) has been assuming the kernel flushes both caches between\nsubmissions, and hit user-visible corruption in apps such as Llama.cpp\nbecause of this gap; it now works around it by flushing both caches\nagain from userspace at the end of every command buffer.\n\nCorrectness between submissions on the same queue is userspace's\nresponsibility and belongs in Mesa, not the kernel. However, for\nsecurity we must ensure stale data can't leak through the untyped L1\ndataport cache once memory is reclaimed or evicted, which requires the\nKMD to flush it before releasing memory for reuse.\n\nPrior to MTL, HDC_CHICKEN0 could be programmed (as already done for\nDG2 via Wa_22010960976/Wa_14013347512) to reliably keep HDC Pipeline\nFlush coupled to the untyped L1 cache flush, so those platforms are\nunaffected. Mesa's own anv driver found that on MTL the HW\ndisconnected the two independently of how HDC_CHICKEN0 is programmed,\nand could not bring the old behavior back even by writing the register\nby hand; see Mesa commit 7c2ff46a4fc3 (\"anv: don't prevent L1 untyped\ncache flush in 3D mode\"). The kernel can't reliably request the flush\nfrom the CS on MTL either, so restrict the new PIPE_CONTROL bit to\nGRAPHICS_VERx100 >= 2000 (Xe2 and later), where it can be relied on.\n\nExplicitly set PIPE_CONTROL0_UNTYPED_DATAPORT_CACHE_FLUSH together\nwith PIPE_CONTROL0_HDC_PIPELINE_FLUSH in emit_render_cache_flush() on\nXe2 and later, so the L1 data cache is known clean before memory is\nreleased for reuse, without depending on undocumented\nplatform-specific HDC_CHICKEN0 behavior.\n\nBspec: 56551\n(cherry picked from commit 434514b6fe731e873808297c268fc52cdf4a1ce6)",
+  "products": [
+   "Linux",
+   "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+  ],
+  "expect": "out"
+ },
+ "CVE-2024-9977": {
+  "assigner": "VulDB",
+  "description": "A vulnerability, which was classified as critical, was found in MitraStar GPT-2541GNAC BR_g5.6_1.11(WVK.0)b26. Affected is an unknown function of the file /cgi-bin/settings-firewall.cgi of the component Firewall Settings Page. The manipulation of the argument SrcInterface leads to os command injection. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used. We tried to contact the vendor early about the disclosure but the official mail address was not working properly.",
+  "products": [
+   "MitraStar",
+   "GPT-2541GNAC",
+   "peritocibernetico/VivoCodeExecutionFirewall"
+  ],
+  "expect": "out"
+ },
+ "CVE-2025-50753": {
+  "assigner": "mitre",
+  "description": "Mitrastar GPT-2741GNAC-N2 devices are provided with access through ssh into a restricted default shell.The command \"deviceinfo show file\" is supposed to be used from restricted shell to show files and directories. By providing \" /bin/sh\" (quotes included) to the argument of this command will drop a root shell.",
+  "products": [
+   "n/a"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-52483": {
+  "assigner": "mitre",
+  "description": "The ping diagnostics and other similar functions of the MitraStar GPT-2741GNAC-N2-SV router with firmware BR_g8.10_1.11(WVK.0)b46 allow authenticated users execute arbitrary OS command via concatenated params on a crafted POST request for the endpoint /cgi-bin/device-management-utilities-internet.cgi.",
+  "products": [
+   "n/a",
+   "FelpM/MitraStar_GPT-2741GNAC-N2-SV_BR_g8.10_1.11-WVK.0-b46"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-52484": {
+  "assigner": "mitre",
+  "description": "An issue in MitraStar GPT-2742GX4X5v6-SV GL_g2.5_100XNT0b23_3 allows an authenticated attacker to execute arbitrary code via the /cgi-bin/device-management-utilities-internet.cgi component",
+  "products": [
+   "n/a",
+   "FelpM/Mitrastar_GPT-2742GX4X5v6-SV_GL_g2.5_100XNT0b23_3"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-12512": {
+  "assigner": "WPScan",
+  "description": "The Quotes llama WordPress plugin before 3.1.6 does not properly sanitize and escape a user-supplied parameter before using it in a SQL query, allowing unauthenticated attackers to perform UNION-based SQL injection and read arbitrary data from the database, including password hashes.",
+  "products": [
+   "Unknown",
+   "Quotes llama"
+  ],
+  "expect": "out"
+ },
+ "CVE-2025-27496": {
+  "assigner": "GitHub_M",
+  "description": "Snowflake, a platform for using artificial intelligence in the context of cloud computing, has a vulnerability in the Snowflake JDBC driver (\"Driver\") in versions 3.0.13 through 3.23.0 of the driver. When the logging level was set to DEBUG, the Driver would log locally the client-side encryption master key of the target stage during the execution of GET/PUT commands. This key by itself does not grant access to any sensitive data without additional access authorizations,  and is not logged server-side by Snowflake. Snowflake fixed the issue in version 3.23.1.",
+  "products": [
+   "snowflakedb",
+   "snowflake-jdbc",
+   "snowflakedb/snowflake-jdbc"
+  ],
+  "expect": "out"
+ },
+ "CVE-2024-12596": {
+  "assigner": "Wordfence",
+  "description": "The LifterLMS – WP LMS for eLearning, Online Courses, & Quizzes plugin for WordPress is vulnerable to arbitrary post deletion due to a missing capability check on the 'llms_delete_cert' action in all versions up to, and including, 7.8.5. This makes it possible for authenticated attackers, with Subscriber-level access and above, to delete arbitrary posts.",
+  "products": [
+   "chrisbadgett",
+   "LifterLMS – WP LMS for eLearning, Online Courses, & Quizzes"
+  ],
+  "expect": "out"
+ },
+ "CVE-2025-13921": {
+  "assigner": "Wordfence",
+  "description": "The weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot plugin for WordPress is vulnerable to unauthorized modification or loss of data due to a missing capability check on the 'wedocs_user_documentation_handling_capabilities' function in all versions up to, and including, 2.1.16. This makes it possible for authenticated attackers, with Subscriber-level access and above, to edit any documentation post. The vulnerability was partially patched in version 2.1.16.",
+  "products": [
+   "wedevs",
+   "weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-12729": {
+  "assigner": "Wordfence",
+  "description": "The weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot plugin for WordPress is vulnerable to Missing Authorization in versions up to and including 2.3.0. This is due to a missing capability check on the do_migration() function registered as the wedocs_migrate_betterdocs_to_wedocs AJAX action, which performs no nonce verification via check_ajax_referer() and no capability check via current_user_can() before executing sensitive operations. This makes it possible for authenticated attackers, with Subscriber-level access and above, to trigger a full BetterDocs-to-weDocs data migration, creating and modifying 'docs' custom post type entries with attacker-controlled titles, updating site options, and deactivating the BetterDocs and BetterDocs Pro plugins via deactivate_plugins().",
+  "products": [
+   "wedevs",
+   "weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-12731": {
+  "assigner": "Wordfence",
+  "description": "The weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot plugin for WordPress is vulnerable to Stored Cross-Site Scripting via 'sectionTitleTag' and 'articleTitleTag' Block Attributes in all versions up to, and including, 2.3.0 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "products": [
+   "wedevs",
+   "weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-12734": {
+  "assigner": "Wordfence",
+  "description": "The weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot plugin for WordPress is vulnerable to Stored Cross-Site Scripting via 'connectorWidth' Block Attribute in all versions up to, and including, 2.3.0 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "products": [
+   "wedevs",
+   "weDocs: AI Powered Knowledge Base, Docs, Documentation, Wiki & AI Chatbot"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-19806": {
+  "assigner": "Wordfence",
+  "description": "The Support Genix – Helpdesk, AI Chatbot, Knowledge Base & Customer Support Ticketing System plugin for WordPress is vulnerable to Authentication Bypass leading to Administrator Account Takeover in all versions up to, and including, 1.4.52 via the `guest_ticket_login()` function and its `p` parameter. This is due to the site-wide AES-256-CBC encryption key being derived from only three two-digit `wp_rand(10, 99)` values and a Unix timestamp via `md5()` — yielding approximately 19.5 bits of entropy — combined with a deterministic IV derived from the password, no authentication tag on the ciphertext, and no capability check, nonce, or session validation on the publicly reachable `/sgnix/?p=<token>` endpoint. This makes it possible for authenticated attackers, with subscriber-level access and above, who can obtain a single legitimate guest ticket token as a known-plaintext oracle and bound the plugin activation timestamp, to exhaust the ~729,000-candidate keyspace entirely offline, recover the site-wide encryption key, and forge a self-consistent `{ticket_id, ticket_user}` token targeting any administrator-owned ticket. Submitting the forged token to the unprotected endpoint causes `wp_set_auth_cookie()` to be called for that administrator, granting the attacker full administrative access to the WordPress site.",
+  "products": [
+   "devitemsllc",
+   "Support Genix – Helpdesk, AI Chatbot, Knowledge Base & Customer Support Ticketing System"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-73655": {
+  "assigner": "GitHub_M",
+  "description": "Trigger.dev is a platform for building and deploying fully managed AI agents and workflows. Prior to 4.5.2, addGoogleStrategy() in apps/webapp/app/services/googleAuth.server.ts passes a Google profile email to findOrCreateGoogleUser() in apps/webapp/app/models/user.server.ts without requiring Google's email_verified assertion. When existingEmailUser && !existingUser is true, the flow writes the new Google authIdentifier into the existing email-matched account and returns that user object, allowing an attacker-controlled Google profile with an unverified matching email to take over the account. This issue is fixed in version 4.5.2.",
+  "products": [
+   "triggerdotdev",
+   "trigger.dev",
+   "triggerdotdev/trigger.dev"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-73657": {
+  "assigner": "GitHub_M",
+  "description": "Trigger.dev is a platform for building and deploying fully managed AI agents and workflows. From 4.4.2 until 4.5.0-rc.4, `POST /api/v1/runs/:runParam/replay` in apps/webapp/app/routes/api.v1.runs.$runParam.replay.ts uses `prisma.taskRun.findUnique({ where: { friendlyId: runParam } })` without a runtimeEnvironmentId filter, then ReplayTaskRunService in apps/webapp/app/v3/services/replayTaskRun.server.ts replays the selected run in the victim environment. Any valid environment API key can therefore replay another tenant's run by friendlyId, consuming victim resources and repeating side effects; when `payloadType: \"application/store\"` is used, overrideExistingPayloadPacket() calls conditionallyImportPacket() on existingTaskRun.payload without an integrity check, so payload bytes overwritten through a separate object-store path-traversal vulnerability become attacker-controlled input to the victim task. This issue is fixed in version 4.5.0-rc.4.",
+  "products": [
+   "triggerdotdev",
+   "trigger.dev",
+   "triggerdotdev/trigger.dev"
+  ],
+  "expect": "out"
+ },
+ "CVE-2026-67989": {
+  "assigner": "mitre",
+  "description": "crmne/ruby_llm at commit fa6f279847d6d7027814539d9c0dfc3bbdfd2a83 contains a polynomial-time regular expression denial-of-service condition in Mistral model capability matching on Ruby 3.1.x",
+  "products": [
+   "n/a",
+   "crmne/ruby_llm"
+  ],
+  "expect": "in"
+ },
+ "CVE-2026-67991": {
+  "assigner": "mitre",
+  "description": "crmne/ruby_llm at commit fa6f279847d6d7027814539d9c0dfc3bbdfd2a83 contains a polynomial-time regular expression denial-of-service condition in RubyLLM::Utils.underscore on Ruby 3.1.x. A very long crafted class, agent, or tool name can cause excessive CPU consumption and a denial of service.",
+  "products": [
+   "n/a",
+   "crmne/ruby_llm"
+  ],
+  "expect": "in"
+ },
+ "CVE-2026-67987": {
+  "assigner": "mitre",
+  "description": "crmne/ruby_llm at commit fa6f279847d6d7027814539d9c0dfc3bbdfd2a83 contains polynomial-time regular expression denial-of-service conditions in think-tag response parsing on Ruby 3.1.x. A malicious or anomalous model response containing many unterminated <think> tags can cause excessive CPU consumption in two consecutive regular expressions and delay chat-completion processing",
+  "products": [
+   "n/a",
+   "crmne/ruby_llm"
+  ],
+  "expect": "in"
+ }
+}

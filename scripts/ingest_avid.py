@@ -35,8 +35,8 @@ What is emitted, and what is deliberately not (INCLUSION.md):
     which the fold would split). Each skipped row is recorded in the
     provenance file with the colliding INC id.
   * ``Third-party Report`` reports (0DIN / Mindgard-style disclosures): kept;
-    the description is cut to its first sentence(s) (the third-party prose is
-    not AVID's to license, evaluation section 1B.5 caveat iii).
+    the description is ORIGINAL deterministic prose from facts, never a sentence
+    of the report (not AVID's to license, evaluation section 1B.5 caveat iii).
   * ``LLM Evaluation`` reports: NOT emitted. In the 2026 import these are
     automated per-(model, probe) garak scan results ("The model X was
     evaluated by the Garak LLM Vulnerability scanner using the probe Y"),
@@ -46,7 +46,8 @@ What is emitted, and what is deliberately not (INCLUSION.md):
   * ``reports/review`` (drafts) are never read.
 
 Every emitted row carries the MIT provenance per record
-(``content_license`` + ``description_source`` + ``description_provenance``).
+(``content_license`` + ``description_source`` + ``description_provenance``): CVE-class rows
+carry the CVE ToU marker (the text is CNA text), the others the MIT marker with original prose.
 """
 
 from __future__ import annotations
@@ -67,6 +68,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from ingest.common import fetch_once  # noqa: E402
 from ai_relevance import assess  # noqa: E402
 from corpus_overlap import CorpusIndex  # noqa: E402
+from ingest_cvelistv5 import CVE_TOU_MARKER  # noqa: E402
 from merge_and_dedupe import normalize_url  # noqa: E402  (the merger's own URL key)
 from ingest_cve_nvd_expanded import infer_attack_vector, map_owasp_and_atlas  # noqa: E402
 
@@ -230,7 +232,7 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
         category = "vulnerability-disclosure"
     else:
         title = ptitle or desc_full[:120]
-        description = first_sentences(desc_full)
+        description = "-"   # replaced below by original prose (needs the date)
         category = "vulnerability-disclosure" if cls == CLASS_THIRD_PARTY else "research"
     if not title or not description:
         return None
@@ -238,6 +240,22 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
     published = rec.get("reported_date") or rec.get("published_date") or ""
     year = int(published[:4]) if published[:4].isdigit() else int(rel_path.split("/")[1])
     date_str = published[:7] if len(published) >= 7 else str(year)
+    if cls != CLASS_CVE:
+        # Third-party report text is not AVID's to license and not ours to
+        # copy (docs/SOURCE_LICENSES.md 6.1: facts + link + ORIGINAL summary):
+        # deterministic prose from facts only, no sentence of the report.
+        host = ""
+        for r in rec.get("references") or []:
+            m = re.match(r"https?://(?:www\.)?([^/]+)/", (r.get("url") or "") + "/")
+            if m:
+                host = m.group(1)
+                break
+        description = (
+            f"AVID record {aid} ({cls or 'report'}), reported {date_str}, concerning "
+            f"{affected_string(rec) or 'AI systems'}. The disclosure"
+            + (f" is published at {host}" if host else " is linked below")
+            + "; its text is not reproduced here. The title is the disclosure's own."
+        )
 
     imp = rec.get("impact") or {}
     cvss = imp.get("cvss") or {}
@@ -278,10 +296,14 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
         "references": refs,
         "tags": sorted(set(tags)),
         "avid_categories": sep_codes(rec),
-        "description_provenance": "verbatim",
-        "description_source": "avid",
-        "content_license": dict(MIT_LICENSE_MARKER),
     }
+    if cls == CLASS_CVE:
+        # CNA text, governed by the CVE ToU (SOURCE_LICENSES 6.1/6.2), only
+        # delivered via AVID: marker and source say so.
+        row.update({"description_provenance": "verbatim", "description_source": "cve-cna-via-avid",
+                    "content_license": dict(CVE_TOU_MARKER)})
+    else:
+        row.update({"description_provenance": "original", "content_license": dict(MIT_LICENSE_MARKER)})
     if cves:
         row["cve_ids"] = cves
     if cvss.get("baseSeverity"):

@@ -350,7 +350,7 @@ def build(records, idx: CorpusIndex, *, since: str, backlog_end: str):
         cna = (rec.get("containers") or {}).get("cna") or {}
         desc = _en(cna.get("descriptions"))
         prods = product_strings(rec)
-        ok, why = assess(desc, prods)
+        ok, why = assess(desc, prods, meta.get("assignerShortName"))
         if state != "PUBLISHED":
             stats["not_published"] += 1
             if ok:

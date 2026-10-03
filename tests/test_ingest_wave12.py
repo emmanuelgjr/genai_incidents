@@ -94,35 +94,30 @@ def test_avid_cve_entry_extraction():
         "title": "AVID-2026-R0045", "url": "https://avidml.org/database/avid-2026-r0045/",
         "type": "advisory"}
     # MIT provenance travels on the row
-    assert row["content_license"]["license"] == "MIT"
-    assert row["content_license"]["source"] == "avid"
-    assert row["content_license"]["obligations"] == ["attribution"]
-    assert row["description_source"] == "avid" and row["description_provenance"] == "verbatim"
+    # CNA text delivered via AVID: the CVE ToU marker, not MIT (SOURCE_LICENSES 6.1)
+    assert row["content_license"] == CV.CVE_TOU_MARKER
+    assert row["description_source"] == "cve-cna-via-avid" and row["description_provenance"] == "verbatim"
 
 
-def test_avid_third_party_report_description_is_cut_to_a_sentence():
+def test_avid_third_party_report_description_is_original_prose_not_report_text():
     rec = _load("avid", "AVID-2026-R0420.json")
     row = AV.to_row(rec, "reports/2026/AVID-2026-R0420.json")
     assert row["title"] == "Google Gemini CLI Tool Discovery Code Execution"
-    assert row["description"].startswith("The gemini-cli is vulnerable")
-    long = "First sentence here. " + "Another sentence that keeps going on and on. " * 20
-    cut = AV.first_sentences(long, 300)
-    assert cut.startswith("First sentence here.") and len(cut) <= 300
-    assert row["description"] == AV.first_sentences(AV._clean(rec["description"]["value"]))
+    assert row["description_provenance"] == "original" and "description_source" not in row
+    assert row["content_license"]["license"] == "MIT"
+    body = AV._clean(rec["description"]["value"])
+    assert not any(sent in row["description"] for sent in body.split(". ") if len(sent) > 25)
+    assert "AVID-2026-R0420" in row["description"] and "mindgard.ai" in row["description"]
+    assert row["description"] == AV.to_row(rec, "reports/2026/AVID-2026-R0420.json")["description"]
     assert "cve_ids" not in row
 
 
-def test_avid_rationale_suffix_is_stripped_and_does_not_decide_relevance():
-    text = ("Spring Framework allows RCE via data binding. Reason for inclusion in AVID: "
-            "CVE-2022-22965 affects a stack that can host an AI model.")
-    assert AV.strip_avid_rationale(text) == "Spring Framework allows RCE via data binding."
-    rec = {"metadata": {"report_id": "AVID-2026-R9999"},
-           "problemtype": {"classof": "CVE Entry", "description": {"value": "Vulnerability CVE-2022-22965"}},
-           "affects": {"developer": ["VMware"], "artifacts": [{"name": "Spring Framework"}]},
-           "references": [{"url": "https://www.cve.org/CVERecord?id=CVE-2022-22965"}],
-           "description": {"value": text}, "reported_date": "2022-04-01"}
-    rows, stats, _ = AV.build({"reports/2026/AVID-2026-R9999.json": rec}, corpus=[])
-    assert rows == [] and stats["skipped_not_ai_relevant"] == 1
+def test_avid_third_party_text_fires_if_verbatim_leaks(monkeypatch):
+    """Prove the check can fail: re-introducing the verbatim first sentence breaks it."""
+    rec = _load("avid", "AVID-2026-R0420.json")
+    body = AV._clean(rec["description"]["value"])
+    leaked = dict(AV.to_row(rec, "reports/2026/AVID-2026-R0420.json"), description=AV.first_sentences(body))
+    assert any(sent in leaked["description"] for sent in body.split(". ") if len(sent) > 25)
 
 
 def _tar(records: dict[str, dict]) -> bytes:
@@ -390,7 +385,9 @@ def test_arxiv_row_is_metadata_only_with_cc0_provenance():
     row = AX.to_row(r, AX.select(r)[1])
     assert row["source_id"] == "ARXIV-2510.10271"
     assert row["category"] == "research"
-    assert row["date"] == "2026-06" and row["year"] == 2026
+    # OAI created is the LATEST version date (2026-06); v1 month comes from the id
+    assert r["created"] == "2026-06-26" and AX.v1_month(r) == "2025-10"
+    assert row["date"] == "2025-10" and row["year"] == 2025
     assert row["references"][0]["url"] == "https://arxiv.org/abs/2510.10271"
     assert row["references"][0]["type"] == "paper"
     # description is original, deterministic prose and never the abstract
@@ -462,3 +459,63 @@ def test_committed_nvd_expanded_file_carries_no_openssf_report_text():
     for r in mal:
         assert r["description"].startswith("Bare identifier for OpenSSF") and r["description_provenance"] == "original"
         assert "Per source details" not in r["description"] and "google-open-source-security" not in r["description"]
+
+
+# ----------------------------------------------------------------------------
+# Gate BOUNCE #1 (D6): named description-only false positives must stay out
+# ----------------------------------------------------------------------------
+_GATE_FPS = json.loads((FIX / "cvelistv5" / "gate1_false_positives.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("cve", sorted(_GATE_FPS))
+def test_gate_named_false_positives_are_out_and_ruby_llm_stays_in(cve):
+    f = _GATE_FPS[cve]
+    ok, _ = R.assess(f["description"], f["products"], f["assigner"])
+    assert ok is (f["expect"] == "in"), cve
+
+
+def test_gpt_regex_is_bounded_to_model_names():
+    assert not R.assess("The MitraStar GPT-2742GX router has a flaw", [], "twcert")[0]
+    assert R.assess("Prompt handling in GPT-4o and gpt-4-turbo deployments is unsafe. The LLM leaks", [], "x")[0]
+
+
+def test_credit_and_trailer_clauses_are_stripped_before_matching():
+    assert not R.assess("Bug in the scheduler. Reported by Claude Code.", [], "x")[0]
+    assert not R.assess("Bug in the scheduler.\nAssisted-by: Claude Sonnet 4", [], "x")[0]
+
+
+def test_linux_cna_description_only_matches_are_rejected():
+    assert not R.assess("sysctl_igmp_llm_reports is read without a lock", [], "Linux")[0]
+
+
+def test_description_only_match_needs_a_second_signal():
+    assert not R.assess("Foo is an AI chatbot builder. CSRF in the settings page.", [], "x")[0]
+    assert R.assess("Foo is an AI chatbot builder. Prompt injection reaches the model.", [], "x")[0]
+    assert R.assess("Bar MCP server allows path traversal.", [], "x")[0]
+
+
+@pytest.mark.parametrize("rule", ["credits", "linux_cna", "second_signal"])
+def test_each_rule_fires_when_enabled_and_not_when_disabled(rule, monkeypatch):
+    cases = {
+        "credits": ("Bug in the scheduler. Reported by Claude Code.", [], "x"),
+        "linux_cna": ("sysctl_igmp_llm_reports is read without a lock. The LLM and language model.", [], "Linux"),
+        "second_signal": ("Foo is an AI chatbot builder. CSRF in the settings page.", [], "x"),
+    }
+    for other in R.RULES:                       # isolate the rule under test
+        monkeypatch.setitem(R.RULES, other, other == rule)
+    assert not R.assess(*cases[rule])[0]      # enabled: it is caught
+    monkeypatch.setitem(R.RULES, rule, False)
+    assert R.assess(*cases[rule])[0]          # disabled: the false positive gets through
+
+
+def test_arxiv_window_applies_to_v1_month_not_latest_version_date():
+    """2411.16769 was first submitted 2024-11 but its OAI created is 2026-09:
+    it must be dropped from a 2025-10 window and must not be dated 2026-09."""
+    rec = {"id": "2411.16769", "created": "2026-09-26", "title":
+           "Jailbreaking ChatGPT via X", "abstract": "We demonstrate on commercial models.",
+           "authors": ["A B"], "categories": ["cs.CR"]}
+    assert AX.select(rec)[0]
+    rows, stats, _ = AX.build([rec], since=__import__("datetime").date(2025, 10, 1), known=set())
+    assert rows == [] and stats["v1_before_window"] == 1
+    rows, _, _ = AX.build([dict(rec, id="2510.00001")], since=__import__("datetime").date(2025, 10, 1), known=set())
+    assert rows[0]["date"] == "2025-10"

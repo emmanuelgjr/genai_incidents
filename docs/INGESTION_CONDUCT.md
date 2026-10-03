@@ -470,11 +470,9 @@ kind of pacing/identification discipline as `ingest/common.py`) is a
 design decision for a future task, flagged here, not decided or
 implemented in this one.
 
-### 3. `git clone` of `avidml/avid-db` and `CVEProject/cvelistV5` (PENDING, conditional; added 2026-10-03)
+### 3. git clone of avidml/avid-db and CVEProject/cvelistV5 (NOT USED, HTTP route taken; added 2026-10-03, status updated 2026-10-03)
 
-**Status: PENDING and conditional.** Source-expansion waves 1 (AVID,
-cvelistV5; `docs/SOURCE_LICENSES.md` sections 6.1 and 6.2) are not yet
-implemented. The evaluation (`docs/specs/source-expansion-evaluation.md`,
+**Status: not used, HTTP route taken.** The wave 1/2 ingest (branch ws4/wave12-ingest) fetches AVID as the GitHub tarball (api.github.com/repos/avidml/avid-db/tarball/main, ingest/common.py fetch_once) and cvelistV5 as the daily baseline release asset (ingest/common.py fetch_to_file: fail-closed robots check, per-host rate limit, project User-Agent). scripts/ingest_avid.py, scripts/ingest_cvelistv5.py and scripts/ingest_arxiv_oaipmh.py contain no git clone, subprocess or other non-HTTP egress (red-reviewer grep, 2026-10-03). The text below is kept as the record of the conditional decision. The evaluation (`docs/specs/source-expansion-evaluation.md`,
 AVID Shape) recommends the `git` route or the repo tarball for the AVID
 backlog (about 1,790 files; one raw fetch per file at the 3 s floor is
 about 85 minutes). A tarball or release-asset download is HTTP and goes
