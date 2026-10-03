@@ -71,3 +71,71 @@ The score stays 2; inbound licensing is a listed condition.
 REPLACE the quote with: *"If you decide to set your Repository public, you grant each User a perpetual, irrevocable, worldwide, royalty-free, non-exclusive license to use, display, publish, reproduce, distribute, and make derivative works of your Content through our Services and functionalities"*. REPLACE the bold caveat with: **the licence runs only "through our Services and functionalities", so it gives a downstream dataset nothing.**
 
 The foreman's framing was right on T1.9 (drop it; the gate confirmed across all 469 HF org repos) and on the OSV side question. It was not wrong anywhere I could test.
+
+
+## Part 2: A1–A24 results, routes, OSV advisory
+
+Part 2 of 2 (tranche-1 gate, BOUNCE #1): the A1-A24 results, different-route notes, the OSV advisory and the evidence. Everything below was fetched raw by curl on 2026-10-03, one request at a time per host, with FTC spaced at least 5 s apart. No robots-disallowed path was fetched; on www.courtlistener.com I fetched only robots.txt.
+
+A1-A24 RESULTS
+A1 CONFIRMED: kb.cert.org robots.txt is 404 HTML on both www and bare host. Note that kb.cert.org gzips even without Accept-Encoding, so an uncompressed grep sees binary.
+A2 CONFIRMED: the footer anchor "Legal" points to vuls.cert.org/.../VINCE+Code+of+Conduct, which 301s to certcc.github.io and then 404s.
+A3 CONFIRMED: the note's only rights text is "(c)2022 Carnegie Mellon University"; tag-stripped grep finds no licence wording.
+A4 RESOLVED (defect 5): "SEI websites, including SEI Weblogs and Wikis (collectively, the Service)". The "June 20, 2018" date is confirmed.
+A5 CONFIRMED: archive LICENSE.md read in full; external use is limited to unmodified reproduction, and anything else needs permission.
+A6 CONFIRMED absent: "complete and unmodified" gets 0 hits on kb.cert.org/vuls/ and VINCE-docs/copyright (both 200). VINCE docs are CC BY-NC 4.0; the MIT text there belongs to the mkdocs theme.
+A7 REFUTED (defect 1): User-agent * Disallow /.
+A8 CONFIRMED: no scraping, bulk or commercial ban. The page body has the "Do not use multiple accounts" control phrase, and both ToS quotes are verbatim.
+A9 CONFIRMED: "Our bulk data files are free of known copyright restrictions.", followed by the Public Domain Mark linking to creativecommons.org/publicdomain/mark/1.0/.
+A10 CONFIRMED: 0 hits (status 200, "public domain" present).
+A11 RESOLVED (defect 4): exact paths given there; legal-library is not disallowed.
+A12 REFUTED: /services_agreement exists (MSA PDF dated 2026-04-02); /legal_archive also lists MSA versions from 2026-01-08 and 2025-06-30.
+A13 CONFIRMED: /policy has no copyright, licence, reuse or scrape clause ("Last Updated: 2026-10-02"). All four quotes are verbatim.
+A14 REFUTED in substance (defect 2): the Intel docs say "for licensed users only"; the sitemap has 267 URLs, 82 of them under /disclosures; the CC BY 4.0 HF corpus was found from the sitemap.
+A15 REFUTED (defect 3): /about/policies/terms and /copyright exist.
+A16 CONFIRMED: api.first.org robots.txt is 404; the JSON has no licence key.
+A17 CONFIRMED: 0 licence, DCO or CLA hits in the three files. New finding from the same files: automated S3/GCS ingestion (defect 7).
+A18 CONFIRMED: API spdx_id Apache-2.0; no NOTICE in the root; osv/ holds only malicious/, unmergable/ and withdrawn/, with no LICENSE file.
+A19 see the OSV advisory below.
+A20 CONFIRMED: all 469 huggingface org repos (pages 1-5) searched. Only security-workflows (CI tooling) and atif-scan (no description) match "secur|scan". The docs index has no advisory links; huggingface_hub /security-advisories returns []. The GHSA API does return transformers advisories, e.g. GHSA-x9r9-c232-4q39.
+A21 CONFIRMED: no scrape or crawl clause; the "You own the Content you create" control phrase is present.
+A22 CONFIRMED: the footer reads "GitHub Inc. (c) 2024" and links the GitHub ToS and Privacy pages.
+A23 REFUTED as "not obtained": the complete file is a single Sitemap line (defect 6).
+A24 RESOLVED: the GitHub ToS "Website" includes GitHub-owned subdomains. GHSA twin GHSA-rggg-jp6v-h52j exists. The three AUP quotes are verbatim.
+Tally: 13 confirmed, 6 refuted or refuted-in-substance (A7, A12, A14, A15, A23, plus A17's new finding), 4 resolved, 0 still unverifiable.
+
+QUOTE SPOT-CHECK: every quoted clause in T1.3, T1.4, T1.6, T1.8 and T1.10 is verbatim on its cited page, as are T1.7's FAQ and home quotes (one differs only by sentence-initial capital). The misses are T1.5's first quote (defect 4) and T1.9's truncation (defect 8). I proved the matcher fires: the row's FTC form gets 0 hits and the cited form gets 1.
+
+SCORES AGAINST THE SCALE (after the fixes)
+- T1.3: 1, with action (c)/(d). Fits the scale.
+- T1.4: 2 bulk / 0 crawl (split per the 1D.1 arXiv precedent).
+- T1.5: 2. Holds: §105(a) is verbatim at law.cornell.edu, and the FTC page cites §105 itself.
+- T1.6: 2 (a filter separates the covered fields).
+- T1.7: 1, no longer provisional.
+- T1.8: 2.
+- T1.9: n/a.
+- T1.10: 1.
+The D39 provisional clause no longer applies to any row: every grant was read from a primary page or an API.
+
+DIFFERENT ROUTES (agreement 6)
+- T1.4: found the CourtListener ToS and bulk-data pages through wiki.free.law/llms.txt and its robots file rather than the auditor's URLs. Re-confirmed the bulk route on S3; the robots result was a material finding.
+- T1.5: read the FTC robots file in full and found the policy links from the page's own hrefs. FTC has no /sitemap.xml (404). Verified §105 from Cornell LII, a different host from the earlier gate.
+- T1.8: used the GitHub API for the licence and the raw LICENSE, README and CONTRIBUTING files, then followed CONTRIBUTING into the bulk and automated ingestion paths. The OSV data page independently lists "OpenSSF Malicious Packages (Apache 2.0)".
+- T1.6 and T1.7 were not in the brief, but following footer hrefs refuted both rows. The auditor's 404s were guessed URLs, the same failure shape tranche 2 found.
+
+OSV ADVISORY (shipped data; not a defect of this branch)
+- Half 1 CONFIRMED: google.github.io/osv.dev/data/ lists "OpenSSF Malicious Packages (Apache 2.0)" next to "GitHub Advisory Database (CC-BY 4.0)". The ossf repo licence is Apache-2.0 (API). Row 2.4's sentence "every source database actually reachable by this script is CC-BY 4.0" is FALSE. Proof that it is reachable: the tracked file ingest/cve_nvd_expanded.json holds 2 OSV records sourced from MAL-: MAL-2026-3607 (guardrails-ai) and MAL-2026-2144 (litellm). Their descriptions are verbatim OpenSSF report text ("Per source details. Do not edit below this line ... ## Source: google-open-source-security ..."). That file is committed (git ls-files), so the repo itself redistributes Apache-2.0 text under a CC BY claim.
+- Half 2, the published layer: in data/incidents.json, grep -c '"MAL-' gives 1 line, and MAL-2026-3607 appears twice (control MAL-2099- gives 0). Both occurrences are in INC-08450, as a source_id and an OSV reference URL. Its description is the GHSA-6xwp-cp5h-q856 beproduct text (CC BY 4.0). The MAL text markers "Per source details" and "compromised through trivy" both get 0 hits. MAL-2026-2144 is absent from incidents.json; it appears only in an id list in data/issue88_remediation.json. So the published records carry no Apache text today, but the row's sentence is untrue, and the next MAL record without a GHSA twin would ship Apache-2.0 text.
+- Proposed follow-up task (WS0): correct row 2.4 in place (a live surface, agreement 4). Then either filter MAL- records out of OSV_TARGETS results, or carry them as Apache-2.0 per record with attribution "OpenSSF Malicious Packages via OSV.dev". Also check whether ingest/*.json ships in any release artifact.
+- Side observation for WS1: INC-08450 merges beproduct (GHSA-6xwp), mistralai (GHSA-wx9m, CVE-2026-46412) and guardrails-ai (MAL-2026-3607) under one id, with tags for all three. That may be an over-merge; I did not investigate further.
+
+ADVISORY
+- The "Absence findings" table should gain a result column taken from the list above. The working file says "routed to shell verification" with no outcome.
+- T1.6 at score 2 raises a payload question for the user: the CC BY corpus includes jailbreak prompts, which the project does not carry. The field filter is the condition.
+
+EVIDENCE / STATE
+- Worktree HEAD: `git symbolic-ref -q HEAD` gives refs/heads/ws0/tranche1-reconstructed, at 06c7d561.
+- `git diff --stat origin/main...HEAD` shows only the 2 docs/specs files (405 insertions); `git diff origin/main HEAD -- data docs/SOURCE_LICENSES.md` is empty.
+- The scale table diff against main is empty.
+- `git status --porcelain` is empty in both the worktree and the main tree; main is at refs/heads/main. That covers the working tree only, not refs.
+- I wrote no repo files. Curl outputs are in my scratchpad only.

@@ -29,6 +29,21 @@
     - **Foreman refuted:** T1.9 (Hugging Face advisories) does not exist as a source and is to be dropped.
     - T1.8 and T1.10 largely duplicate ingested OSV and GHSA.
     - red-reviewer has been dispatched to run the 24 absence checks.
+- **⛔ Tranche-1 pre-rows: BOUNCE #1 (red-reviewer, 2026-10-03, on `06c7d561`). 8 defects.** The verdict is in `docs/audits/source-expansion-tranche1-gate1-verdict-2026-10-03.md`, both parts saved as received and concatenated by shell.
+  - **Refuted by shell:**
+    - T1.6 0din: a CC BY 4.0 HF corpus exists, so 1 → 2.
+    - T1.7 EPSS: FIRST's terms exist and are purpose-limited; it stays 1, no longer provisional.
+  - **T1.4 CourtListener splits:** 2 for bulk S3, 0 for crawling, because robots.txt says `Disallow: /`.
+  - **Text corrections:** T1.3, T1.5, T1.8, T1.9 and T1.10.
+  - **Gate measurements [R]:** of the 24 checks, 13 confirmed, 6 refuted, 4 resolved.
+  - **The foreman's framing was confirmed** on T1.9 (drop it) and on the OSV question.
+  - Fixes have gone to license-auditor for verbatim application.
+- **N6 CONFIRMED by gate [R], and now RELEASE-BLOCKING.**
+  - `SOURCE_LICENSES.md` row 2.4's "every reachable OSV database is CC-BY 4.0" is FALSE. OSV lists "OpenSSF Malicious Packages (Apache 2.0)".
+  - **The committed `ingest/cve_nvd_expanded.json` carries 2 `MAL-` records with verbatim Apache-2.0 OpenSSF text under a CC BY claim**: MAL-2026-3607 and MAL-2026-2144. The repo itself is a distribution channel.
+  - The published `data/incidents.json` carries no MAL text today. INC-08450's description comes from GHSA.
+  - **The fix rides the wave-1/2 licence PR:** correct row 2.4 in place, as a live surface, and either filter `MAL-` in the OSV ingest or attribute those records per record as Apache-2.0.
+- **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
   1. Merge the licence rows into the ingest branch (invariant 10).
