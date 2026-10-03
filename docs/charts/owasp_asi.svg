@@ -2,33 +2,33 @@
 <rect x="0" y="0" width="100%" height="100%" fill="white"/>
 <text x="12" y="18" font-weight="600">OWASP Agentic Top 10 (ASI) — incident coverage</text>
 <text x="212" y="47" text-anchor="end" fill="#333">ASI01 · Agent Goal Hijack</text>
-<rect x="220" y="36" width="26.4" height="14" fill="#0a58ca" rx="2"><title>Agent Goal Hijack: 458</title></rect>
-<text x="252.4" y="47" fill="#666">458</text>
+<rect x="220" y="36" width="27.0" height="14" fill="#0a58ca" rx="2"><title>Agent Goal Hijack: 458</title></rect>
+<text x="253.0" y="47" fill="#666">458</text>
 <text x="212" y="69" text-anchor="end" fill="#333">ASI02 · Tool Misuse &amp; Exploitation</text>
-<rect x="220" y="58" width="42.4" height="14" fill="#0a58ca" rx="2"><title>Tool Misuse &amp; Exploitation: 736</title></rect>
-<text x="268.4" y="69" fill="#666">736</text>
+<rect x="220" y="58" width="43.1" height="14" fill="#0a58ca" rx="2"><title>Tool Misuse &amp; Exploitation: 730</title></rect>
+<text x="269.1" y="69" fill="#666">730</text>
 <text x="212" y="91" text-anchor="end" fill="#333">ASI03 · Identity &amp; Privilege Abuse</text>
-<rect x="220" y="80" width="141.2" height="14" fill="#0a58ca" rx="2"><title>Identity &amp; Privilege Abuse: 2,450</title></rect>
-<text x="367.2" y="91" fill="#666">2,450</text>
+<rect x="220" y="80" width="142.2" height="14" fill="#0a58ca" rx="2"><title>Identity &amp; Privilege Abuse: 2,409</title></rect>
+<text x="368.2" y="91" fill="#666">2,409</text>
 <text x="212" y="113" text-anchor="end" fill="#333">ASI04 · Agentic Supply Chain Vulnerabilities</text>
-<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Agentic Supply Chain Vulnerabilities: 8,331</title></rect>
-<text x="706.0" y="113" fill="#666">8,331</text>
+<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Agentic Supply Chain Vulnerabilities: 8,133</title></rect>
+<text x="706.0" y="113" fill="#666">8,133</text>
 <text x="212" y="135" text-anchor="end" fill="#333">ASI05 · Unexpected Code Execution (RCE)</text>
-<rect x="220" y="124" width="340.3" height="14" fill="#0a58ca" rx="2"><title>Unexpected Code Execution (RCE): 5,906</title></rect>
-<text x="566.3" y="135" fill="#666">5,906</text>
+<rect x="220" y="124" width="344.8" height="14" fill="#0a58ca" rx="2"><title>Unexpected Code Execution (RCE): 5,843</title></rect>
+<text x="570.8" y="135" fill="#666">5,843</text>
 <text x="212" y="157" text-anchor="end" fill="#333">ASI06 · Memory &amp; Context Poisoning</text>
-<rect x="220" y="146" width="8.0" height="14" fill="#0a58ca" rx="2"><title>Memory &amp; Context Poisoning: 139</title></rect>
-<text x="234.0" y="157" fill="#666">139</text>
+<rect x="220" y="146" width="8.2" height="14" fill="#0a58ca" rx="2"><title>Memory &amp; Context Poisoning: 139</title></rect>
+<text x="234.2" y="157" fill="#666">139</text>
 <text x="212" y="179" text-anchor="end" fill="#333">ASI07 · Insecure Inter-Agent Communication</text>
 <rect x="220" y="168" width="1.6" height="14" fill="#0a58ca" rx="2"><title>Insecure Inter-Agent Communication: 27</title></rect>
 <text x="227.6" y="179" fill="#666">27</text>
 <text x="212" y="201" text-anchor="end" fill="#333">ASI08 · Cascading Failures</text>
-<rect x="220" y="190" width="45.1" height="14" fill="#0a58ca" rx="2"><title>Cascading Failures: 783</title></rect>
-<text x="271.1" y="201" fill="#666">783</text>
+<rect x="220" y="190" width="46.2" height="14" fill="#0a58ca" rx="2"><title>Cascading Failures: 783</title></rect>
+<text x="272.2" y="201" fill="#666">783</text>
 <text x="212" y="223" text-anchor="end" fill="#333">ASI09 · Human-Agent Trust Exploitation</text>
-<rect x="220" y="212" width="157.0" height="14" fill="#0a58ca" rx="2"><title>Human-Agent Trust Exploitation: 2,725</title></rect>
-<text x="383.0" y="223" fill="#666">2,725</text>
+<rect x="220" y="212" width="160.8" height="14" fill="#0a58ca" rx="2"><title>Human-Agent Trust Exploitation: 2,725</title></rect>
+<text x="386.8" y="223" fill="#666">2,725</text>
 <text x="212" y="245" text-anchor="end" fill="#333">ASI10 · Rogue Agents</text>
-<rect x="220" y="234" width="26.4" height="14" fill="#0a58ca" rx="2"><title>Rogue Agents: 459</title></rect>
-<text x="252.4" y="245" fill="#666">459</text>
+<rect x="220" y="234" width="27.1" height="14" fill="#0a58ca" rx="2"><title>Rogue Agents: 459</title></rect>
+<text x="253.1" y="245" fill="#666">459</text>
 </svg>

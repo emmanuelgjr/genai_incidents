@@ -8,36 +8,36 @@
  "window": {
   "backlog": {
    "in_window": 121318,
-   "ai_relevant": 3468,
-   "emitted": 1181,
-   "already_in_corpus": 2276,
+   "ai_relevant": 3231,
+   "already_in_corpus": 2095,
+   "emitted": 1125,
    "would_merge_into_existing": 11
   },
   "post_backlog": {
    "in_window": 37835,
-   "ai_relevant": 1628,
-   "emitted": 1524,
-   "already_in_corpus": 48,
-   "would_merge_into_existing": 56
+   "ai_relevant": 1475,
+   "emitted": 1377,
+   "already_in_corpus": 44,
+   "would_merge_into_existing": 54
   }
  },
  "stats": {
   "outside_window": 51560,
   "in_window": 159153,
   "not_published": 891,
-  "ai_relevant_published": 5096,
-  "emitted": 2705,
-  "already_in_corpus": 2324,
-  "would_merge_into_existing": 67
+  "ai_relevant_published": 4706,
+  "emitted": 2502,
+  "already_in_corpus": 2139,
+  "would_merge_into_existing": 65
  },
  "huntr": {
   "backlog_in_window": 771,
-  "backlog_ai_relevant": 618,
-  "backlog_emitted": 427,
+  "backlog_ai_relevant": 622,
+  "backlog_emitted": 433,
   "post_backlog_in_window": 17,
   "post_backlog_ai_relevant": 14,
   "post_backlog_emitted": 14,
-  "backlog_already_in_corpus": 191
+  "backlog_already_in_corpus": 189
  },
  "rejected_ai_matching": [],
  "would_merge_into_existing": {
@@ -185,10 +185,6 @@
    "key": "url",
    "corpus_entry": "INC-13855"
   },
-  "CVE-2026-57583": {
-   "key": "url",
-   "corpus_entry": "INC-13799"
-  },
   "CVE-2026-57127": {
    "key": "url",
    "corpus_entry": "INC-13849"
@@ -232,10 +228,6 @@
   "CVE-2026-57126": {
    "key": "url",
    "corpus_entry": "INC-13850"
-  },
-  "CVE-2026-57494": {
-   "key": "url",
-   "corpus_entry": "INC-13815"
   },
   "CVE-2026-57132": {
    "key": "url",
@@ -313,19 +305,19 @@
  "candidates_for_curation": [
   [
    "linux",
-   181
+   184
   ],
   [
    "microsoft",
-   70
+   79
   ],
   [
    "unknown",
-   60
+   66
   ],
   [
    "(no product)",
-   43
+   44
   ],
   [
    "trend micro, inc.",
@@ -336,6 +328,10 @@
    34
   ],
   [
+   "elastic",
+   32
+  ],
+  [
    "acronis",
    31
   ],
@@ -344,15 +340,11 @@
    30
   ],
   [
-   "elastic",
-   28
+   "red hat",
+   29
   ],
   [
    "ibm",
-   27
-  ],
-  [
-   "red hat",
    27
   ],
   [
@@ -372,15 +364,27 @@
    21
   ],
   [
+   "gitlab",
+   19
+  ],
+  [
+   "spring",
+   19
+  ],
+  [
    "jenkins project",
    18
   ],
   [
-   "gitlab",
+   "oracle corporation",
    16
   ],
   [
-   "spring",
+   "tigroumeow",
+   16
+  ],
+  [
+   "jetbrains",
    16
   ],
   [
@@ -392,23 +396,11 @@
    15
   ],
   [
-   "oracle corporation",
-   15
-  ],
-  [
-   "jetbrains",
-   15
-  ],
-  [
-   "hkuds",
-   14
-  ],
-  [
-   "tigroumeow",
-   14
-  ],
-  [
    "arista networks",
+   13
+  ],
+  [
+   "drupal",
    13
   ],
   [
@@ -416,8 +408,24 @@
    13
   ],
   [
+   "wedevs",
+   12
+  ],
+  [
+   "aws",
+   12
+  ],
+  [
    "gitroomhq",
    12
+  ],
+  [
+   "eclipse foundation",
+   11
+  ],
+  [
+   "discourse",
+   11
   ],
   [
    "arraytics",
@@ -440,8 +448,12 @@
    11
   ],
   [
-   "aws",
+   "zammad",
    11
+  ],
+  [
+   "blinkospace",
+   10
   ],
   [
    "wwbn",
@@ -460,23 +472,27 @@
    10
   ],
   [
+   "mozilla",
+   10
+  ],
+  [
    "bmc",
    10
+  ],
+  [
+   "quantumcloud",
+   9
   ],
   [
    "tenable",
    9
   ],
   [
-   "discourse",
+   "hkuds",
    9
   ],
   [
-   "eclipse foundation",
-   9
-  ],
-  [
-   "blinkospace",
+   "wpdevteam",
    9
   ],
   [
@@ -492,19 +508,19 @@
    9
   ],
   [
+   "splunk",
+   9
+  ],
+  [
+   "cursor",
+   9
+  ],
+  [
    "rankmath",
    9
   ],
   [
-   "mozilla",
-   9
-  ],
-  [
    "cosmicstack-labs",
-   8
-  ],
-  [
-   "wedevs",
    8
   ],
   [
@@ -520,10 +536,6 @@
    8
   ],
   [
-   "zammad",
-   8
-  ],
-  [
    "1panel-dev",
    8
   ],
@@ -533,10 +545,6 @@
   ],
   [
    "mattermost",
-   8
-  ],
-  [
-   "cursor",
    8
   ],
   [
@@ -568,15 +576,19 @@
    7
   ],
   [
-   "wpdevteam",
-   7
-  ],
-  [
    "google",
    7
   ],
   [
    "activepieces",
+   7
+  ],
+  [
+   "pinchtab",
+   7
+  ],
+  [
+   "hatchet-dev",
    7
   ],
   [
@@ -586,6 +598,18 @@
   [
    "synology",
    7
+  ],
+  [
+   "wordplus",
+   6
+  ],
+  [
+   "wupsales",
+   6
+  ],
+  [
+   "vercel",
+   6
   ],
   [
    "mongodb",
@@ -598,45 +622,9 @@
   [
    "hashicorp",
    6
-  ],
-  [
-   "google cloud",
-   6
-  ],
-  [
-   "cozmoslabs",
-   6
-  ],
-  [
-   "broadcom",
-   6
-  ],
-  [
-   "open-telemetry",
-   6
-  ],
-  [
-   "budibase",
-   6
-  ],
-  [
-   "mage-ai",
-   6
-  ],
-  [
-   "daytonaio",
-   6
-  ],
-  [
-   "netdata",
-   6
   ]
  ],
  "match_evidence": {
-  "CVE-2022-49590": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-16074": {
    "product": "AstrBot",
    "description": null
@@ -660,10 +648,6 @@
   "CVE-2026-16077": {
    "product": "AstrBot",
    "description": null
-  },
-  "CVE-2026-16056": {
-   "product": null,
-   "description": "openai"
   },
   "CVE-2026-16497": {
    "product": "Triton Inference Server",
@@ -693,21 +677,9 @@
    "product": "https://github.com/hashicorp/terraform-mcp-server",
    "description": null
   },
-  "CVE-2026-16585": {
-   "product": null,
-   "description": "ai chat"
-  },
-  "CVE-2026-16773": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-68771": {
    "product": "ComfyUI",
    "description": "comfyui"
-  },
-  "CVE-2026-68791": {
-   "product": null,
-   "description": "machine learning"
   },
   "CVE-2026-68770": {
    "product": "Hugging Face",
@@ -741,6 +713,10 @@
    "product": "Flowise",
    "description": "flowise"
   },
+  "CVE-2026-90808": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-90533": {
    "product": "Flowise",
    "description": "flowise"
@@ -753,9 +729,9 @@
    "product": "vllm-project",
    "description": "vllm"
   },
-  "CVE-2026-90938": {
-   "product": null,
-   "description": "llm"
+  "CVE-2026-90809": {
+   "product": "nanobot",
+   "description": null
   },
   "CVE-2026-90553": {
    "product": "vllm-project",
@@ -779,7 +755,7 @@
   },
   "CVE-2026-2611": {
    "product": "mlflow",
-   "description": "mlflow"
+   "description": "claude code"
   },
   "CVE-2026-2734": {
    "product": "mlflow",
@@ -797,25 +773,9 @@
    "product": "Vertex AI SDK for Python",
    "description": "genai"
   },
-  "CVE-2026-2993": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-2473": {
    "product": "Vertex AI Experiments",
    "description": null
-  },
-  "CVE-2026-2711": {
-   "product": null,
-   "description": "dify"
-  },
-  "CVE-2026-2955": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-2111": {
-   "product": null,
-   "description": "retrieval-augmented"
   },
   "CVE-2026-2531": {
    "product": "MindsDB",
@@ -837,6 +797,10 @@
    "product": "TensorFlow",
    "description": "tensorflow"
   },
+  "CVE-2026-2577": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-2008": {
    "product": "fermat-mcp",
    "description": null
@@ -847,10 +811,10 @@
   },
   "CVE-2026-44223": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-44444": {
-   "product": null,
+   "product": "Lumiverse",
    "description": "ai chat"
   },
   "CVE-2026-44345": {
@@ -859,11 +823,7 @@
   },
   "CVE-2026-44222": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-44209": {
-   "product": null,
-   "description": "llm"
+   "description": "language model"
   },
   "CVE-2026-44346": {
    "product": "bentoml",
@@ -871,34 +831,38 @@
   },
   "CVE-2026-44192": {
    "product": null,
-   "description": "model context protocol"
+   "description": "ai agent"
   },
   "CVE-2026-44484": {
    "product": "pytorch-lightning",
-   "description": "pytorch"
+   "description": "ai model"
+  },
+  "CVE-2026-44520": {
+   "product": "docling-project",
+   "description": null
   },
   "CVE-2026-44022": {
-   "product": null,
+   "product": "docling-project",
    "description": "generative ai"
   },
   "CVE-2026-44512": {
    "product": "onnx",
-   "description": "onnx"
+   "description": "machine learning"
   },
   "CVE-2026-44934": {
    "product": null,
-   "description": "llm"
+   "description": "ai agent"
   },
   "CVE-2026-44847": {
    "product": "MaxKB",
    "description": "ai assistant"
   },
   "CVE-2026-44451": {
-   "product": null,
+   "product": "Lumiverse",
    "description": "ai chat"
   },
   "CVE-2026-44449": {
-   "product": null,
+   "product": "Lumiverse",
    "description": "ai chat"
   },
   "CVE-2026-44369": {
@@ -906,20 +870,24 @@
    "description": null
   },
   "CVE-2026-44443": {
-   "product": null,
+   "product": "Lumiverse",
    "description": "ai chat"
+  },
+  "CVE-2026-44019": {
+   "product": "docling-project",
+   "description": null
   },
   "CVE-2026-44342": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
+  },
+  "CVE-2026-44023": {
+   "product": "docling-project",
+   "description": null
   },
   "CVE-2026-13745": {
    "product": "Gemini CLI",
    "description": null
-  },
-  "CVE-2026-13731": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-13448": {
    "product": "Langflow OSS",
@@ -929,33 +897,13 @@
    "product": "MLflow",
    "description": "mlflow"
   },
-  "CVE-2026-13236": {
-   "product": null,
-   "description": "ai agents"
-  },
-  "CVE-2026-13237": {
-   "product": null,
-   "description": "ai agents"
-  },
   "CVE-2026-13444": {
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-13234": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
   "CVE-2026-13435": {
    "product": "Langflow OSS",
    "description": "langflow"
-  },
-  "CVE-2026-13235": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
-  "CVE-2026-13005": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-13445": {
    "product": "Langflow OSS",
@@ -963,7 +911,7 @@
   },
   "CVE-2026-13442": {
    "product": "Langflow OSS",
-   "description": "langflow"
+   "description": "fai"
   },
   "CVE-2026-13446": {
    "product": "Langflow OSS",
@@ -989,14 +937,6 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-12729": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-12734": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-12940": {
    "product": "Langflow OSS",
    "description": "langflow"
@@ -1011,7 +951,7 @@
   },
   "CVE-2026-12491": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-12112": {
    "product": null,
@@ -1028,10 +968,6 @@
   "CVE-2026-12770": {
    "product": "litellm",
    "description": "litellm"
-  },
-  "CVE-2026-12731": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-12482": {
    "product": "keras-team",
@@ -1061,14 +997,6 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-12512": {
-   "product": null,
-   "description": "llama"
-  },
-  "CVE-2026-12697": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-12570": {
    "product": "keras-team",
    "description": "machine learning"
@@ -1077,13 +1005,9 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-46711": {
-   "product": null,
-   "description": "agentic"
-  },
   "CVE-2026-46555": {
    "product": "whatsapp-mcp",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-46678": {
    "product": "pydantic-ai",
@@ -1095,11 +1019,11 @@
   },
   "CVE-2026-24271": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24234": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24239": {
    "product": "NeMo Speech",
@@ -1119,7 +1043,7 @@
   },
   "CVE-2026-24220": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24157": {
    "product": "NeMo Framework",
@@ -1131,7 +1055,7 @@
   },
   "CVE-2026-24779": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-24163": {
    "product": "TensorRT-LLM",
@@ -1147,11 +1071,11 @@
   },
   "CVE-2026-24229": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24233": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24147": {
    "product": "Triton Inference Server",
@@ -1179,11 +1103,7 @@
   },
   "CVE-2026-24226": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
-  },
-  "CVE-2026-24141": {
-   "product": null,
-   "description": "onnx"
+   "description": "llm"
   },
   "CVE-2026-24123": {
    "product": "bentoml",
@@ -1247,7 +1167,7 @@
   },
   "CVE-2026-24763": {
    "product": "openclaw/openclaw",
-   "description": "openclaw"
+   "description": "ai assistant"
   },
   "CVE-2026-24160": {
    "product": "TensorRT-LLM",
@@ -1275,7 +1195,7 @@
   },
   "CVE-2026-24259": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-24206": {
    "product": "Triton Inference Server",
@@ -1305,10 +1225,6 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-10813": {
-   "product": null,
-   "description": "vllm"
-  },
   "CVE-2026-10548": {
    "product": "hermes-agent",
    "description": "anthropic"
@@ -1323,6 +1239,10 @@
   },
   "CVE-2026-10661": {
    "product": "blender-mcp",
+   "description": null
+  },
+  "CVE-2026-10691": {
+   "product": "DesktopCommanderMCP",
    "description": null
   },
   "CVE-2026-10212": {
@@ -1413,9 +1333,9 @@
    "product": "modelscope",
    "description": null
   },
-  "CVE-2026-10510": {
-   "product": null,
-   "description": "ai assistant"
+  "CVE-2026-10690": {
+   "product": "DesktopCommanderMCP",
+   "description": null
   },
   "CVE-2026-10800": {
    "product": "PaddlePaddle",
@@ -1433,21 +1353,17 @@
    "product": "picklescan",
    "description": null
   },
-  "CVE-2026-53656": {
-   "product": null,
-   "description": "ai models"
-  },
   "CVE-2026-53556": {
    "product": null,
-   "description": "language models"
+   "description": "language model"
   },
   "CVE-2026-53923": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-53555": {
    "product": null,
-   "description": "language models"
+   "description": "language model"
   },
   "CVE-2026-53509": {
    "product": "ckan-mcp-server",
@@ -1459,39 +1375,27 @@
   },
   "CVE-2026-53937": {
    "product": "modelcontextprotocol",
-   "description": "model context protocol"
-  },
-  "CVE-2026-53598": {
-   "product": null,
-   "description": "llm"
-  },
-  "CVE-2026-53597": {
-   "product": null,
-   "description": "llm"
+   "description": "mcp server"
   },
   "CVE-2026-53872": {
    "product": "picklescan",
    "description": null
   },
-  "CVE-2026-53378": {
-   "product": null,
-   "description": "claude sonnet"
-  },
   "CVE-2026-53965": {
    "product": "modelcontextprotocol",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-53957": {
    "product": "contentful-mcp-server",
-   "description": "model context protocol"
+   "description": "llm"
   },
   "CVE-2026-53557": {
    "product": null,
-   "description": "language models"
+   "description": "language model"
   },
   "CVE-2026-53554": {
    "product": null,
-   "description": "language models"
+   "description": "language model"
   },
   "CVE-2026-53871": {
    "product": "hermes-webui",
@@ -1504,10 +1408,6 @@
   "CVE-2026-71539": {
    "product": "n8n-io",
    "description": "n8n"
-  },
-  "CVE-2026-71492": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-71962": {
    "product": "Flowise",
@@ -1523,11 +1423,11 @@
   },
   "CVE-2026-71486": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-71479": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-71416": {
    "product": null,
@@ -1589,6 +1489,10 @@
    "product": "obsidian-mcp-server",
    "description": null
   },
+  "CVE-2026-19244": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-19306": {
    "product": "Langflow OSS",
    "description": "langflow"
@@ -1623,7 +1527,7 @@
   },
   "CVE-2026-19645": {
    "product": null,
-   "description": "llm"
+   "description": "ai agent"
   },
   "CVE-2026-19288": {
    "product": "rive-mcp-server-core",
@@ -1697,10 +1601,6 @@
    "product": "swagger-testcase-mcp",
    "description": null
   },
-  "CVE-2026-19806": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-19263": {
    "product": "mcp-bridge-api",
    "description": null
@@ -1724,10 +1624,6 @@
   "CVE-2026-19006": {
    "product": "openclaw-cn",
    "description": "openclaw"
-  },
-  "CVE-2026-19136": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-19370": {
    "product": "new-mcp",
@@ -1761,6 +1657,10 @@
    "product": "handwriting-ocr-mcp-server",
    "description": null
   },
+  "CVE-2026-19246": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-19298": {
    "product": "Langflow OSS",
    "description": "langflow"
@@ -1783,7 +1683,7 @@
   },
   "CVE-2026-19591": {
    "product": "OpenAI",
-   "description": "openai"
+   "description": "mcp server"
   },
   "CVE-2026-19304": {
    "product": "Langflow OSS",
@@ -1791,6 +1691,10 @@
   },
   "CVE-2026-19040": {
    "product": "mcp-api",
+   "description": null
+  },
+  "CVE-2026-19245": {
+   "product": "nanobot",
    "description": null
   },
   "CVE-2026-19593": {
@@ -1815,7 +1719,7 @@
   },
   "CVE-2026-19753": {
    "product": "mcp-rdf-explorer",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-19336": {
    "product": "spec-workflow-mcp",
@@ -1832,6 +1736,10 @@
   "CVE-2026-19592": {
    "product": "OpenAI",
    "description": "openai"
+  },
+  "CVE-2026-19243": {
+   "product": "nanobot",
+   "description": null
   },
   "CVE-2026-19294": {
    "product": "Langflow OSS",
@@ -1877,6 +1785,10 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
+  "CVE-2026-8786": {
+   "product": "WeKnora",
+   "description": null
+  },
   "CVE-2026-8505": {
    "product": "Langflow OSS",
    "description": "langflow"
@@ -1902,7 +1814,7 @@
    "description": "mlflow"
   },
   "CVE-2026-8335": {
-   "product": null,
+   "product": "Aix-DB",
    "description": "llm"
   },
   "CVE-2026-8752": {
@@ -1963,11 +1875,7 @@
   },
   "CVE-2026-58197": {
    "product": "toolhive",
-   "description": "model context protocol"
-  },
-  "CVE-2026-58474": {
-   "product": null,
-   "description": "huggingface"
+   "description": "mcp server"
   },
   "CVE-2026-58373": {
    "product": "cvat-ai",
@@ -1976,10 +1884,6 @@
   "CVE-2026-58617": {
    "product": "Microsoft 365 Copilot for iOS",
    "description": null
-  },
-  "CVE-2026-58198": {
-   "product": null,
-   "description": "machine learning"
   },
   "CVE-2026-58659": {
    "product": "pytorch-lightning",
@@ -2003,15 +1907,11 @@
   },
   "CVE-2026-58196": {
    "product": "toolhive",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-58201": {
    "product": null,
    "description": "model context protocol"
-  },
-  "CVE-2026-58473": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-58578": {
    "product": "lobehub",
@@ -2023,11 +1923,7 @@
   },
   "CVE-2026-33625": {
    "product": "lmdeploy",
-   "description": "lmdeploy"
-  },
-  "CVE-2026-33990": {
-   "product": null,
-   "description": "ai models"
+   "description": "huggingface"
   },
   "CVE-2026-33340": {
    "product": "lollms-webui",
@@ -2035,15 +1931,15 @@
   },
   "CVE-2026-33655": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-33744": {
    "product": "bentoml",
    "description": "bentoml"
   },
-  "CVE-2026-33879": {
-   "product": null,
-   "description": "ai models"
+  "CVE-2026-92576": {
+   "product": "nanobot",
+   "description": null
   },
   "CVE-2026-92365": {
    "product": "vllm-project",
@@ -2077,10 +1973,6 @@
    "product": "vllm-project",
    "description": "vllm"
   },
-  "CVE-2026-92992": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2026-92588": {
    "product": "n8n-io",
    "description": "n8n"
@@ -2089,17 +1981,9 @@
    "product": "fetcher-mcp",
    "description": null
   },
-  "CVE-2026-74630": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2026-75913": {
    "product": null,
    "description": "prompt injection"
-  },
-  "CVE-2026-75857": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-75845": {
    "product": null,
@@ -2108,10 +1992,6 @@
   "CVE-2026-75104": {
    "product": "huggingface",
    "description": "hugging face"
-  },
-  "CVE-2026-75911": {
-   "product": null,
-   "description": "ai model"
   },
   "CVE-2026-75149": {
    "product": null,
@@ -2127,23 +2007,15 @@
   },
   "CVE-2026-75130": {
    "product": null,
-   "description": "prompt injection"
-  },
-  "CVE-2026-75093": {
-   "product": null,
-   "description": "onnx"
+   "description": "mcp server"
   },
   "CVE-2026-75110": {
    "product": null,
-   "description": "llms"
+   "description": "ai agent"
   },
   "CVE-2026-88005": {
    "product": "open-webui",
    "description": "open webui"
-  },
-  "CVE-2026-88978": {
-   "product": null,
-   "description": "ai agents"
   },
   "CVE-2026-88001": {
    "product": "open-webui",
@@ -2152,10 +2024,6 @@
   "CVE-2026-88006": {
    "product": "open-webui",
    "description": "open webui"
-  },
-  "CVE-2026-88938": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-88000": {
    "product": "open-webui",
@@ -2231,7 +2099,7 @@
   },
   "CVE-2026-56340": {
    "product": "vLLM",
-   "description": "vllm"
+   "description": "pytorch"
   },
   "CVE-2026-56682": {
    "product": "9router",
@@ -2255,7 +2123,7 @@
   },
   "CVE-2026-56273": {
    "product": "Flowise",
-   "description": "flowise"
+   "description": "fai"
   },
   "CVE-2026-56402": {
    "product": "nanoclaw",
@@ -2285,14 +2153,6 @@
    "product": "ComfyUI",
    "description": "comfyui"
   },
-  "CVE-2026-85668": {
-   "product": null,
-   "description": "llm"
-  },
-  "CVE-2026-85674": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-85885": {
    "product": "Microsoft 365 Copilot",
    "description": null
@@ -2311,7 +2171,7 @@
   },
   "CVE-2026-85178": {
    "product": null,
-   "description": "openai"
+   "description": "anthropic"
   },
   "CVE-2026-85686": {
    "product": "modelscope",
@@ -2322,7 +2182,7 @@
    "description": "language model"
   },
   "CVE-2026-85606": {
-   "product": "firecrawl-mcp-server",
+   "product": "firecrawl",
    "description": null
   },
   "CVE-2026-85666": {
@@ -2399,7 +2259,7 @@
   },
   "CVE-2026-85709": {
    "product": "LightRAG",
-   "description": "retrieval-augmented"
+   "description": "language-model"
   },
   "CVE-2026-85107": {
    "product": "hermes-agent",
@@ -2445,10 +2305,6 @@
    "product": "ollama",
    "description": "ollama"
   },
-  "CVE-2026-85607": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-85654": {
    "product": "awslabs.dynamodb-mcp-server",
    "description": null
@@ -2481,10 +2337,6 @@
    "product": "openclaw-cn",
    "description": "openclaw"
   },
-  "CVE-2026-17153": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-17627": {
    "product": "Langflow OSS",
    "description": "langflow"
@@ -2499,7 +2351,7 @@
   },
   "CVE-2026-17351": {
    "product": null,
-   "description": "llm"
+   "description": "ai assistant"
   },
   "CVE-2026-17632": {
    "product": "Langflow OSS",
@@ -2536,10 +2388,6 @@
   "CVE-2026-17513": {
    "product": "whisper.cpp",
    "description": null
-  },
-  "CVE-2026-17496": {
-   "product": null,
-   "description": "ai chat"
   },
   "CVE-2026-17432": {
    "product": "hermes-agent",
@@ -2609,10 +2457,6 @@
    "product": "ACE-MCP",
    "description": null
   },
-  "CVE-2026-94376": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-94031": {
    "product": "nexus-mcp",
    "description": null
@@ -2627,7 +2471,7 @@
   },
   "CVE-2026-94093": {
    "product": null,
-   "description": "pytorch"
+   "description": "hugging face"
   },
   "CVE-2026-94622": {
    "product": "vllm-project",
@@ -2635,7 +2479,7 @@
   },
   "CVE-2026-94626": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "openai"
   },
   "CVE-2026-94623": {
    "product": "vllm-project",
@@ -2648,10 +2492,6 @@
   "CVE-2026-94094": {
    "product": "OpenClaw",
    "description": "openclaw"
-  },
-  "CVE-2026-94111": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-94037": {
    "product": "mcp-file-analyzer",
@@ -2668,10 +2508,6 @@
   "CVE-2026-60087": {
    "product": "PraisonAI",
    "description": null
-  },
-  "CVE-2026-60758": {
-   "product": null,
-   "description": "artificial intelligence"
   },
   "CVE-2026-60090": {
    "product": "PraisonAI",
@@ -2693,17 +2529,9 @@
    "product": "parisneo/lollms",
    "description": null
   },
-  "CVE-2026-1724": {
-   "product": null,
-   "description": "ai models"
-  },
   "CVE-2026-1116": {
    "product": "parisneo/lollms",
    "description": null
-  },
-  "CVE-2026-1832": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-1977": {
    "product": "mcp-vegalite-server",
@@ -2773,17 +2601,9 @@
    "product": null,
    "description": "mcp server"
   },
-  "CVE-2026-47361": {
-   "product": null,
-   "description": "ai chat"
-  },
-  "CVE-2026-47835": {
-   "product": null,
-   "description": "vector stores"
-  },
   "CVE-2026-47470": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-47627": {
    "product": "Triton Inference Server",
@@ -2795,7 +2615,7 @@
   },
   "CVE-2026-47472": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-47413": {
    "product": "praisonai-platform",
@@ -2807,7 +2627,7 @@
   },
   "CVE-2026-47155": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-47477": {
    "product": "Triton Inference Server",
@@ -2823,7 +2643,7 @@
   },
   "CVE-2026-47471": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-47852": {
    "product": null,
@@ -2863,7 +2683,7 @@
   },
   "CVE-2026-47475": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-47102": {
    "product": "litellm",
@@ -2871,7 +2691,7 @@
   },
   "CVE-2026-47473": {
    "product": "TensorRT-LLM",
-   "description": "tensorrt"
+   "description": "llm"
   },
   "CVE-2026-47481": {
    "product": "Triton Inference Server",
@@ -2895,7 +2715,7 @@
   },
   "CVE-2026-57441": {
    "product": null,
-   "description": "model context protocol"
+   "description": "ai agent"
   },
   "CVE-2026-57148": {
    "product": "PraisonAI",
@@ -2903,15 +2723,11 @@
   },
   "CVE-2026-57860": {
    "product": null,
-   "description": "mcp servers"
-  },
-  "CVE-2026-57476": {
-   "product": null,
-   "description": "retrieval-augmented"
+   "description": "mcp server"
   },
   "CVE-2026-57173": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-57573": {
    "product": "crawl4ai",
@@ -2920,10 +2736,6 @@
   "CVE-2026-97662": {
    "product": "security-agent-mcp-server",
    "description": null
-  },
-  "CVE-2026-97620": {
-   "product": null,
-   "description": "llama"
   },
   "CVE-2026-97228": {
    "product": "http://github.com/rapid7/rapid7-bulk-export-mcp",
@@ -2951,11 +2763,11 @@
   },
   "CVE-2026-32879": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
-  "CVE-2026-32232": {
-   "product": null,
-   "description": "ai assistant"
+  "CVE-2026-32857": {
+   "product": "Firecrawl",
+   "description": null
   },
   "CVE-2026-63764": {
    "product": "lmdeploy",
@@ -2963,11 +2775,7 @@
   },
   "CVE-2026-63127": {
    "product": "modelcontextprotocol",
-   "description": "model context protocol"
-  },
-  "CVE-2026-63342": {
-   "product": null,
-   "description": "ai agents"
+   "description": "mcp server"
   },
   "CVE-2026-63732": {
    "product": "9router",
@@ -2977,28 +2785,12 @@
    "product": "modelcontextprotocol",
    "description": "model context protocol"
   },
-  "CVE-2026-63766": {
-   "product": null,
-   "description": "gradio"
-  },
   "CVE-2026-63118": {
    "product": "modelcontextprotocol",
-   "description": "model context protocol"
-  },
-  "CVE-2026-63261": {
-   "product": null,
-   "description": "machine learning"
+   "description": "mcp server"
   },
   "CVE-2026-63632": {
    "product": "onnx",
-   "description": "onnx"
-  },
-  "CVE-2026-63216": {
-   "product": null,
-   "description": "ai agents"
-  },
-  "CVE-2026-63145": {
-   "product": null,
    "description": "machine learning"
   },
   "CVE-2026-63128": {
@@ -3099,15 +2891,11 @@
   },
   "CVE-2026-103758": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-103249": {
    "product": "n8n-io",
    "description": "n8n"
-  },
-  "CVE-2026-51871": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-51866": {
    "product": "eosphoros-ai/DB-GPT",
@@ -3135,7 +2923,7 @@
   },
   "CVE-2026-51882": {
    "product": "chatchat-space/Langchain-Chatchat",
-   "description": "openai"
+   "description": "langchain"
   },
   "CVE-2026-51996": {
    "product": "geelen/mcp-remote",
@@ -3176,10 +2964,6 @@
   "CVE-2026-51899": {
    "product": "TransformerOptimus/SuperAGI",
    "description": null
-  },
-  "CVE-2026-51888": {
-   "product": null,
-   "description": "langflow"
   },
   "CVE-2026-51883": {
    "product": "chatchat-space/Langchain-Chatchat",
@@ -3223,7 +3007,7 @@
   },
   "CVE-2026-91771": {
    "product": "wandb",
-   "description": "weights & biases"
+   "description": "wandb"
   },
   "CVE-2026-91942": {
    "product": "crawl4ai",
@@ -3235,6 +3019,10 @@
   },
   "CVE-2026-91940": {
    "product": "crawl4ai",
+   "description": null
+  },
+  "CVE-2026-91750": {
+   "product": "WeKnora",
    "description": null
   },
   "CVE-2026-91934": {
@@ -3257,10 +3045,6 @@
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-91921": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-91932": {
    "product": "Flowise",
    "description": "flowise"
@@ -3279,7 +3063,7 @@
   },
   "CVE-2026-69146": {
    "product": "mlflow",
-   "description": "mlflow"
+   "description": "language model"
   },
   "CVE-2026-69257": {
    "product": "Flowise",
@@ -3301,10 +3085,6 @@
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-69116": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-69252": {
    "product": "Flowise",
    "description": "flowise"
@@ -3319,15 +3099,15 @@
   },
   "CVE-2026-69111": {
    "product": "milvus-io",
-   "description": "milvus"
+   "description": "milvu"
   },
   "CVE-2026-69147": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-69148": {
    "product": "mlflow",
-   "description": "mlflow"
+   "description": "language model"
   },
   "CVE-2026-69258": {
    "product": "Flowise",
@@ -3363,7 +3143,7 @@
   },
   "CVE-2026-55574": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "llm"
   },
   "CVE-2026-55418": {
    "product": "FastGPT",
@@ -3379,7 +3159,7 @@
   },
   "CVE-2026-55640": {
    "product": "nextcloud-mcp-server",
-   "description": "ai assistants"
+   "description": "ai assistant"
   },
   "CVE-2026-55236": {
    "product": "langchain-ai",
@@ -3391,7 +3171,7 @@
   },
   "CVE-2026-55514": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "llm"
   },
   "CVE-2026-55529": {
    "product": "PraisonAI",
@@ -3399,7 +3179,7 @@
   },
   "CVE-2026-55093": {
    "product": null,
-   "description": "tensorflow"
+   "description": "onnx"
   },
   "CVE-2026-55605": {
    "product": "deepseek-mcp-server",
@@ -3408,10 +3188,6 @@
   "CVE-2026-55615": {
    "product": "langroid",
    "description": "language-model"
-  },
-  "CVE-2026-55176": {
-   "product": null,
-   "description": "agentic"
   },
   "CVE-2026-55530": {
    "product": "PraisonAI",
@@ -3469,10 +3245,6 @@
    "product": "hermes-webui",
    "description": null
   },
-  "CVE-2026-55563": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-55534": {
    "product": "PraisonAI",
    "description": null
@@ -3491,7 +3263,7 @@
   },
   "CVE-2026-55646": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-55526": {
    "product": "PraisonAI",
@@ -3555,11 +3327,7 @@
   },
   "CVE-2026-55608": {
    "product": "n8n-mcp",
-   "description": "n8n"
-  },
-  "CVE-2026-55107": {
-   "product": null,
-   "description": "llm"
+   "description": "ai assistant"
   },
   "CVE-2026-6612": {
    "product": "SuperAGI",
@@ -3569,10 +3337,6 @@
    "product": "SuperAGI",
    "description": null
   },
-  "CVE-2026-6859": {
-   "product": null,
-   "description": "huggingface"
-  },
   "CVE-2026-6977": {
    "product": "vanna-ai",
    "description": null
@@ -3581,10 +3345,6 @@
    "product": "SuperAGI",
    "description": null
   },
-  "CVE-2026-6804": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-6106": {
    "product": "MaxKB",
    "description": null
@@ -3592,10 +3352,6 @@
   "CVE-2026-6613": {
    "product": "SuperAGI",
    "description": null
-  },
-  "CVE-2026-6803": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-6616": {
    "product": "SuperAGI",
@@ -3677,6 +3433,10 @@
    "product": "PraisonAI",
    "description": null
   },
+  "CVE-2026-40047": {
+   "product": "org.apache.camel:camel-docling",
+   "description": null
+  },
   "CVE-2026-40217": {
    "product": "LiteLLM",
    "description": "litellm"
@@ -3688,10 +3448,6 @@
   "CVE-2026-40775": {
    "product": "royal-mcp",
    "description": null
-  },
-  "CVE-2026-45499": {
-   "product": null,
-   "description": "openai"
   },
   "CVE-2026-45412": {
    "product": "MaxKB",
@@ -3721,10 +3477,6 @@
    "product": "ChromaDB",
    "description": "chromadb"
   },
-  "CVE-2026-52484": {
-   "product": null,
-   "description": "gpt-2742gx4x5v6"
-  },
   "CVE-2026-52131": {
    "product": "ggml-org/llama.cpp",
    "description": "llama"
@@ -3745,10 +3497,6 @@
    "product": "fast-mcp-telegram",
    "description": "mcp server"
   },
-  "CVE-2026-52483": {
-   "product": null,
-   "description": "gpt-2741gnac"
-  },
   "CVE-2026-52870": {
    "product": "modelcontextprotocol",
    "description": "model context protocol"
@@ -3761,28 +3509,16 @@
    "product": "ggml-org/llama.cpp",
    "description": "llama"
   },
-  "CVE-2026-48766": {
-   "product": null,
-   "description": "openai"
-  },
-  "CVE-2026-48762": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2026-48746": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-48774": {
-   "product": null,
-   "description": "genai"
+   "description": "language model"
   },
   "CVE-2026-48168": {
    "product": "PraisonAI",
    "description": null
   },
   "CVE-2026-48716": {
-   "product": null,
+   "product": "nanobot",
    "description": "ai assistant"
   },
   "CVE-2026-48545": {
@@ -3792,10 +3528,6 @@
   "CVE-2026-5241": {
    "product": "huggingface",
    "description": "huggingface"
-  },
-  "CVE-2026-5616": {
-   "product": null,
-   "description": "ai chat"
   },
   "CVE-2026-5026": {
    "product": "langflow-ai",
@@ -3859,7 +3591,7 @@
   },
   "CVE-2026-5497": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "openai"
   },
   "CVE-2026-5022": {
    "product": "langflow-ai",
@@ -4055,15 +3787,11 @@
   },
   "CVE-2026-100528": {
    "product": "OpenClaw",
-   "description": "openclaw"
+   "description": "openai"
   },
   "CVE-2026-100550": {
    "product": "OpenClaw",
    "description": "openclaw"
-  },
-  "CVE-2026-100863": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-100578": {
    "product": "OpenClaw",
@@ -4147,7 +3875,7 @@
   },
   "CVE-2026-100647": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "anthropic"
   },
   "CVE-2026-100603": {
    "product": "openclaw",
@@ -4159,7 +3887,7 @@
   },
   "CVE-2026-100585": {
    "product": "OpenClaw",
-   "description": "openclaw"
+   "description": "claude code"
   },
   "CVE-2026-100577": {
    "product": "OpenClaw",
@@ -4189,10 +3917,6 @@
    "product": "OpenClaw",
    "description": "openclaw"
   },
-  "CVE-2026-100265": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2026-100557": {
    "product": "OpenClaw",
    "description": "openclaw"
@@ -4203,7 +3927,7 @@
   },
   "CVE-2026-100653": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "hugging face"
   },
   "CVE-2026-100551": {
    "product": "OpenClaw",
@@ -4239,7 +3963,7 @@
   },
   "CVE-2026-100654": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "openai"
   },
   "CVE-2026-100526": {
    "product": "openclaw",
@@ -4321,17 +4045,13 @@
    "product": "pgvector",
    "description": "pgvector"
   },
-  "CVE-2026-18555": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-18904": {
    "product": "Langflow OSS",
    "description": "langflow"
   },
   "CVE-2026-18482": {
    "product": null,
-   "description": "mcp server"
+   "description": "ai agent"
   },
   "CVE-2026-18976": {
    "product": "hermes-agent",
@@ -4345,10 +4065,6 @@
    "product": "documentdb-mcp-server",
    "description": "mcp server"
   },
-  "CVE-2026-18394": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-18774": {
    "product": "hermes-agent",
    "description": null
@@ -4359,7 +4075,7 @@
   },
   "CVE-2026-18875": {
    "product": null,
-   "description": "vector database"
+   "description": "ai agent"
   },
   "CVE-2026-18992": {
    "product": "CowAgent",
@@ -4372,10 +4088,6 @@
   "CVE-2026-18899": {
    "product": "Langflow OSS",
    "description": "langflow"
-  },
-  "CVE-2026-18252": {
-   "product": null,
-   "description": "claude agent"
   },
   "CVE-2026-18733": {
    "product": null,
@@ -4427,7 +4139,7 @@
   },
   "CVE-2026-81096": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-81091": {
    "product": "mcp-use",
@@ -4623,7 +4335,7 @@
   },
   "CVE-2026-65015": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "ai agent"
   },
   "CVE-2026-65698": {
    "product": null,
@@ -4651,11 +4363,11 @@
   },
   "CVE-2026-65594": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "mcp server"
   },
   "CVE-2026-65589": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "llm"
   },
   "CVE-2026-65084": {
    "product": "NemoClaw",
@@ -4663,11 +4375,7 @@
   },
   "CVE-2026-65920": {
    "product": "huggingface",
-   "description": "diffusers"
-  },
-  "CVE-2026-65699": {
-   "product": null,
-   "description": "llm"
+   "description": "diffuser"
   },
   "CVE-2026-65056": {
    "product": "mcp-webresearch",
@@ -4697,10 +4405,6 @@
    "product": "n8n-io",
    "description": "n8n"
   },
-  "CVE-2026-96455": {
-   "product": null,
-   "description": "hugging face"
-  },
   "CVE-2026-96524": {
    "product": null,
    "description": "mcp server"
@@ -4729,10 +4433,6 @@
    "product": "hermes-agent",
    "description": null
   },
-  "CVE-2026-84886": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-84427": {
    "product": "CowAgent",
    "description": null
@@ -4744,10 +4444,6 @@
   "CVE-2026-84288": {
    "product": "hermes-agent",
    "description": null
-  },
-  "CVE-2026-84452": {
-   "product": null,
-   "description": "ai models"
   },
   "CVE-2026-84201": {
    "product": "appium-mcp-server",
@@ -4761,33 +4457,21 @@
    "product": "claude-world",
    "description": null
   },
-  "CVE-2026-84298": {
-   "product": null,
-   "description": "ai agents"
-  },
   "CVE-2026-84809": {
    "product": "AI-Infra-Guard",
    "description": null
   },
   "CVE-2026-84779": {
    "product": null,
-   "description": "llms"
+   "description": "ai agent"
   },
   "CVE-2026-84289": {
    "product": "hermes-agent",
    "description": null
   },
-  "CVE-2026-84885": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-84377": {
    "product": "litellm",
    "description": "litellm"
-  },
-  "CVE-2026-84887": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-84889": {
    "product": "Langflow OSS",
@@ -4797,13 +4481,9 @@
    "product": "FastGPT",
    "description": "llm"
   },
-  "CVE-2026-84462": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-62186": {
    "product": "OpenClaw",
-   "description": "openclaw"
+   "description": "openai"
   },
   "CVE-2026-62215": {
    "product": "OpenClaw",
@@ -4881,17 +4561,9 @@
    "product": "OpenClaw",
    "description": "openclaw"
   },
-  "CVE-2026-62677": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-62190": {
    "product": "OpenClaw",
    "description": "openclaw"
-  },
-  "CVE-2026-62663": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-62212": {
    "product": "OpenClaw",
@@ -4981,10 +4653,6 @@
    "product": "OpenClaw",
    "description": "openclaw"
   },
-  "CVE-2026-62676": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-62327": {
    "product": "9Router",
    "description": null
@@ -5000,10 +4668,6 @@
   "CVE-2026-62312": {
    "product": "9router",
    "description": null
-  },
-  "CVE-2026-62675": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-62207": {
    "product": "OpenClaw",
@@ -5023,7 +4687,7 @@
   },
   "CVE-2026-72922": {
    "product": "AutoGPT",
-   "description": "autogpt"
+   "description": "artificial intelligence"
   },
   "CVE-2026-72768": {
    "product": "n8n-io",
@@ -5032,10 +4696,6 @@
   "CVE-2026-72560": {
    "product": "Label Studio",
    "description": "label studio"
-  },
-  "CVE-2026-72644": {
-   "product": null,
-   "description": "ai assistant"
   },
   "CVE-2026-72766": {
    "product": "n8n-io",
@@ -5049,25 +4709,13 @@
    "product": "n8n-io",
    "description": "n8n"
   },
-  "CVE-2026-72649": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-72769": {
    "product": "n8n-io",
    "description": "n8n"
   },
-  "CVE-2026-72642": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-72762": {
    "product": "n8n-io",
    "description": "n8n"
-  },
-  "CVE-2026-72671": {
-   "product": null,
-   "description": "machine learning"
   },
   "CVE-2026-72770": {
    "product": "n8n-io",
@@ -5081,25 +4729,17 @@
    "product": "n8n-io",
    "description": "n8n"
   },
-  "CVE-2026-72675": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-72764": {
    "product": "n8n-io",
    "description": "n8n"
   },
   "CVE-2026-72771": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "llm"
   },
   "CVE-2026-72763": {
    "product": "n8n-io",
    "description": "n8n"
-  },
-  "CVE-2026-72654": {
-   "product": null,
-   "description": "machine learning"
   },
   "CVE-2026-72917": {
    "product": null,
@@ -5110,12 +4750,8 @@
    "description": null
   },
   "CVE-2026-72904": {
-   "product": null,
+   "product": "firecrawl",
    "description": "llm"
-  },
-  "CVE-2026-72718": {
-   "product": null,
-   "description": "ai agent"
   },
   "CVE-2026-72846": {
    "product": null,
@@ -5147,7 +4783,7 @@
   },
   "CVE-2026-64859": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-64650": {
    "product": null,
@@ -5155,19 +4791,19 @@
   },
   "CVE-2026-64866": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-64849": {
    "product": "mlflow",
-   "description": "mlflow"
+   "description": "language model"
   },
   "CVE-2026-64868": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-64865": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-64684": {
    "product": "modelcontextprotocol",
@@ -5179,19 +4815,11 @@
   },
   "CVE-2026-27489": {
    "product": "onnx",
-   "description": "onnx"
-  },
-  "CVE-2026-27170": {
-   "product": null,
-   "description": "generative ai"
+   "description": "machine learning"
   },
   "CVE-2026-27893": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-27169": {
-   "product": null,
-   "description": "generative ai"
+   "description": "language model"
   },
   "CVE-2026-27577": {
    "product": "n8n-io",
@@ -5201,10 +4829,6 @@
    "product": "vLLM Hardware Plugin for Intel(R) Gaudi(R) software",
    "description": "vllm"
   },
-  "CVE-2026-27941": {
-   "product": null,
-   "description": "vector store"
-  },
   "CVE-2026-27578": {
    "product": "n8n-io",
    "description": "n8n"
@@ -5212,10 +4836,6 @@
   "CVE-2026-27167": {
    "product": null,
    "description": "gradio"
-  },
-  "CVE-2026-27189": {
-   "product": null,
-   "description": "generative ai"
   },
   "CVE-2026-25640": {
    "product": "pydantic-ai",
@@ -5231,11 +4851,11 @@
   },
   "CVE-2026-25960": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-25591": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2026-25580": {
    "product": "pydantic-ai",
@@ -5243,11 +4863,7 @@
   },
   "CVE-2026-41523": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-41512": {
-   "product": null,
-   "description": "ai model"
+   "description": "huggingface"
   },
   "CVE-2026-41106": {
    "product": "Microsoft 365 Copilot",
@@ -5275,7 +4891,7 @@
   },
   "CVE-2026-59971": {
    "product": "mysql_mcp_server",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-59819": {
    "product": "litellm",
@@ -5284,10 +4900,6 @@
   "CVE-2026-59098": {
    "product": "lobehub",
    "description": "retrieval-augmented"
-  },
-  "CVE-2026-59163": {
-   "product": null,
-   "description": "artificial intelligence"
   },
   "CVE-2026-59208": {
    "product": "n8n-io",
@@ -5335,7 +4947,7 @@
   },
   "CVE-2026-59820": {
    "product": "litellm",
-   "description": "litellm"
+   "description": "anthropic"
   },
   "CVE-2026-59206": {
    "product": "n8n-io",
@@ -5447,11 +5059,11 @@
   },
   "CVE-2026-59207": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "ai agent"
   },
   "CVE-2026-59213": {
    "product": "open-webui",
-   "description": "open webui"
+   "description": "ollama"
   },
   "CVE-2026-59224": {
    "product": "open-webui",
@@ -5459,7 +5071,7 @@
   },
   "CVE-2026-15643": {
    "product": "awslabs.healthlake-mcp-server",
-   "description": "model context protocol"
+   "description": "ai assistant"
   },
   "CVE-2026-15521": {
    "product": "n8n-workflow-builder",
@@ -5549,14 +5161,6 @@
    "product": "memory-bank-mcp",
    "description": null
   },
-  "CVE-2026-15106": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-15154": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-15610": {
    "product": null,
    "description": "ai chatbot"
@@ -5575,7 +5179,7 @@
   },
   "CVE-2026-15746": {
    "product": null,
-   "description": "language model"
+   "description": "ai agent"
   },
   "CVE-2026-15531": {
    "product": "HashNeRF-pytorch",
@@ -5601,17 +5205,9 @@
    "product": "aerostack-mcp",
    "description": null
   },
-  "CVE-2026-15044": {
-   "product": null,
-   "description": "ai models"
-  },
   "CVE-2026-15628": {
    "product": "chatgpt-on-wechat CowAgent",
    "description": "chatgpt"
-  },
-  "CVE-2026-15737": {
-   "product": null,
-   "description": "ai agents"
   },
   "CVE-2026-15685": {
    "product": "Ollama",
@@ -5621,17 +5217,9 @@
    "product": "CowAgent",
    "description": null
   },
-  "CVE-2026-15241": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-15535": {
-   "product": null,
-   "description": "faiss"
-  },
   "CVE-2026-15976": {
    "product": "SGLang",
-   "description": "sglang"
+   "description": "huggingface"
   },
   "CVE-2026-15749": {
    "product": "mastergo-magic-mcp",
@@ -5691,7 +5279,7 @@
   },
   "CVE-2026-61647": {
    "product": "notebooklm-mcp",
-   "description": "llms"
+   "description": "llm"
   },
   "CVE-2026-61462": {
    "product": "mcp-gitlab",
@@ -5715,7 +5303,7 @@
   },
   "CVE-2026-61808": {
    "product": "LightRAG",
-   "description": "retrieval-augmented"
+   "description": "llm"
   },
   "CVE-2026-61445": {
    "product": "PraisonAI",
@@ -5748,10 +5336,6 @@
   "CVE-2026-61436": {
    "product": "PraisonAI",
    "description": null
-  },
-  "CVE-2026-61687": {
-   "product": null,
-   "description": "ai agents"
   },
   "CVE-2026-61446": {
    "product": "PraisonAI",
@@ -5817,10 +5401,6 @@
    "product": "PraisonAI",
    "description": null
   },
-  "CVE-2026-61681": {
-   "product": null,
-   "description": "ai agents"
-  },
   "CVE-2026-61443": {
    "product": "PraisonAI",
    "description": null
@@ -5849,33 +5429,21 @@
    "product": null,
    "description": "llm"
   },
-  "CVE-2026-67618": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2026-67991": {
    "product": null,
    "description": "llm"
   },
   "CVE-2026-67425": {
    "product": null,
-   "description": "llm"
+   "description": "anthropic"
   },
   "CVE-2026-67987": {
-   "product": null,
-   "description": "llm"
-  },
-  "CVE-2026-67428": {
    "product": null,
    "description": "llm"
   },
   "CVE-2026-67623": {
    "product": "mistralai",
    "description": null
-  },
-  "CVE-2026-67926": {
-   "product": null,
-   "description": "ai chat"
   },
   "CVE-2026-67621": {
    "product": "Flowise",
@@ -5909,6 +5477,10 @@
    "product": null,
    "description": "model context protocol"
   },
+  "CVE-2026-49138": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-49959": {
    "product": "hermes-webui",
    "description": null
@@ -5917,13 +5489,17 @@
    "product": "9router",
    "description": null
   },
+  "CVE-2026-49140": {
+   "product": "nanobot",
+   "description": null
+  },
+  "CVE-2026-49139": {
+   "product": "nanobot",
+   "description": null
+  },
   "CVE-2026-49468": {
    "product": "litellm",
    "description": "litellm"
-  },
-  "CVE-2026-49082": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-49973": {
    "product": "hermes-webui",
@@ -5961,17 +5537,9 @@
    "product": "parisneo/lollms",
    "description": null
   },
-  "CVE-2026-0847": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-0764": {
    "product": "GPT Academic",
    "description": null
-  },
-  "CVE-2026-0598": {
-   "product": null,
-   "description": "ai chat"
   },
   "CVE-2026-0762": {
    "product": "GPT Academic",
@@ -6003,11 +5571,11 @@
   },
   "CVE-2026-9196": {
    "product": "Langflow OSS",
-   "description": "langflow"
+   "description": "agentic"
   },
   "CVE-2026-9135": {
    "product": "Langflow OSS",
-   "description": "langflow"
+   "description": "agentic"
   },
   "CVE-2026-9202": {
    "product": "Langflow OSS",
@@ -6039,7 +5607,7 @@
   },
   "CVE-2026-9856": {
    "product": "huggingface",
-   "description": "huggingface"
+   "description": "hugging face"
   },
   "CVE-2026-9225": {
    "product": "Langflow OSS",
@@ -6099,11 +5667,11 @@
   },
   "CVE-2026-9540": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "openai"
   },
   "CVE-2026-22778": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-22677": {
    "product": "hermes-webui",
@@ -6111,11 +5679,7 @@
   },
   "CVE-2026-22807": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-36728": {
-   "product": null,
-   "description": "ai assistant"
+   "description": "hugging face"
   },
   "CVE-2026-70476": {
    "product": "Flowise",
@@ -6128,10 +5692,6 @@
   "CVE-2026-70480": {
    "product": "open-webui",
    "description": "open webui"
-  },
-  "CVE-2026-70331": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-70638": {
    "product": "llama.cpp",
@@ -6243,7 +5803,7 @@
   },
   "CVE-2026-101861": {
    "product": "langflow-ai",
-   "description": "langflow"
+   "description": "langchain"
   },
   "CVE-2026-101065": {
    "product": null,
@@ -6303,27 +5863,27 @@
   },
   "CVE-2026-34446": {
    "product": "onnx",
-   "description": "onnx"
+   "description": "machine learning"
   },
   "CVE-2026-34756": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-34445": {
    "product": "onnx",
-   "description": "onnx"
+   "description": "machine learning"
   },
   "CVE-2026-34447": {
    "product": "onnx",
-   "description": "onnx"
+   "description": "machine learning"
   },
   "CVE-2026-34755": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-34753": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-78205": {
    "product": "bentoml",
@@ -6341,14 +5901,6 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-78268": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-78581": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2026-78684": {
    "product": "vllm-project",
    "description": "vllm"
@@ -6357,21 +5909,9 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-78598": {
-   "product": null,
-   "description": "machine learning"
-  },
-  "CVE-2026-78379": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-78501": {
    "product": "Microsoft 365 Copilot's Business Chat",
    "description": null
-  },
-  "CVE-2026-78606": {
-   "product": null,
-   "description": "ai assistant"
   },
   "CVE-2026-78430": {
    "product": "mcp-ffmpeg-helper",
@@ -6403,11 +5943,11 @@
   },
   "CVE-2026-79744": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79749": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79917": {
    "product": "MaxKB",
@@ -6431,7 +5971,7 @@
   },
   "CVE-2026-79746": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79723": {
    "product": "Langflow OSS",
@@ -6447,7 +5987,7 @@
   },
   "CVE-2026-79743": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79407": {
    "product": "REYu6/Metagpt-vul",
@@ -6459,19 +5999,15 @@
   },
   "CVE-2026-79750": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79745": {
    "product": null,
    "description": "llm"
   },
-  "CVE-2026-79623": {
-   "product": null,
-   "description": ".claude/"
-  },
   "CVE-2026-79747": {
    "product": null,
-   "description": "mcp servers"
+   "description": "mcp server"
   },
   "CVE-2026-79408": {
    "product": "REYu6/Metagpt-vul",
@@ -6481,25 +6017,9 @@
    "product": "Langflow OSS",
    "description": "langflow"
   },
-  "CVE-2026-80464": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-80047": {
    "product": "Hugging Face",
    "description": "hugging face"
-  },
-  "CVE-2026-80443": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-80298": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2026-80337": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2026-80098": {
    "product": "Microsoft Copilot Studio",
@@ -6540,10 +6060,6 @@
   "CVE-2026-87014": {
    "product": "open-webui",
    "description": "open webui"
-  },
-  "CVE-2026-87959": {
-   "product": null,
-   "description": "claude ai"
   },
   "CVE-2026-87986": {
    "product": "mistralai",
@@ -6615,11 +6131,7 @@
   },
   "CVE-2026-54236": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2026-54520": {
-   "product": null,
-   "description": "ai agent"
+   "description": "anthropic"
   },
   "CVE-2026-54771": {
    "product": "langroid",
@@ -6627,11 +6139,7 @@
   },
   "CVE-2026-54547": {
    "product": "meta-ads-mcp",
-   "description": "model context protocol"
-  },
-  "CVE-2026-54746": {
-   "product": null,
-   "description": "ai agents"
+   "description": "ai assistant"
   },
   "CVE-2026-54450": {
    "product": "toolhive",
@@ -6643,11 +6151,11 @@
   },
   "CVE-2026-54233": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-54235": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-54601": {
    "product": "FastGPT",
@@ -6659,14 +6167,10 @@
   },
   "CVE-2026-54052": {
    "product": "n8n-mcp",
-   "description": "n8n"
+   "description": "ai assistant"
   },
   "CVE-2026-54688": {
    "product": "mcp-searxng",
-   "description": "model context protocol"
-  },
-  "CVE-2026-54519": {
-   "product": null,
    "description": "ai agent"
   },
   "CVE-2026-54769": {
@@ -6683,7 +6187,7 @@
   },
   "CVE-2026-54549": {
    "product": "meta-ads-mcp",
-   "description": "model context protocol"
+   "description": "ai assistant"
   },
   "CVE-2026-54618": {
    "product": "obsidian-web-mcp",
@@ -6691,11 +6195,11 @@
   },
   "CVE-2026-54449": {
    "product": null,
-   "description": "llms"
+   "description": "llm"
   },
   "CVE-2026-54785": {
    "product": null,
-   "description": "mcp server"
+   "description": "ai agent"
   },
   "CVE-2026-54760": {
    "product": "langroid",
@@ -6706,12 +6210,12 @@
    "description": "open webui"
   },
   "CVE-2026-54457": {
-   "product": null,
+   "product": "tensorzero",
    "description": "llm"
   },
   "CVE-2026-54234": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "llm"
   },
   "CVE-2026-54446": {
    "product": "NetLicensing-MCP",
@@ -6723,7 +6227,7 @@
   },
   "CVE-2026-54689": {
    "product": "mcp-searxng",
-   "description": "model context protocol"
+   "description": "ai assistant"
   },
   "CVE-2026-54607": {
    "product": "FastGPT",
@@ -6739,7 +6243,7 @@
   },
   "CVE-2026-93529": {
    "product": "wsp-mcp-ai-agents-connector",
-   "description": "ai agents"
+   "description": "ai agent"
   },
   "CVE-2026-93013": {
    "product": "ragflow",
@@ -6781,17 +6285,13 @@
    "product": "SGLang",
    "description": "sglang"
   },
-  "CVE-2026-93899": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2026-93982": {
    "product": null,
    "description": "model context protocol"
   },
   "CVE-2026-93595": {
    "product": null,
-   "description": "ai chat"
+   "description": "ai assistant"
   },
   "CVE-2026-93841": {
    "product": "vllm-project",
@@ -6817,10 +6317,6 @@
    "product": "mcp-atlassian",
    "description": "model context protocol"
   },
-  "CVE-2026-77814": {
-   "product": null,
-   "description": "stable diffusion"
-  },
   "CVE-2026-77079": {
    "product": "n8n-io",
    "description": "n8n"
@@ -6843,7 +6339,7 @@
   },
   "CVE-2026-77255": {
    "product": "mcp-atlassian",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-77269": {
    "product": "mcp-atlassian",
@@ -6867,7 +6363,7 @@
   },
   "CVE-2026-77247": {
    "product": "mcp-atlassian",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-77075": {
    "product": "n8n-io",
@@ -6907,7 +6403,7 @@
   },
   "CVE-2026-77294": {
    "product": null,
-   "description": "llm"
+   "description": "anthropic"
   },
   "CVE-2026-77272": {
    "product": "mcp-atlassian",
@@ -6980,10 +6476,6 @@
   "CVE-2026-77822": {
    "product": "contextforge-mcp-gateway",
    "description": null
-  },
-  "CVE-2026-77815": {
-   "product": null,
-   "description": "stable diffusion"
   },
   "CVE-2026-77254": {
    "product": "mcp-atlassian",
@@ -7073,10 +6565,6 @@
    "product": "CrewAI",
    "description": "crewai"
   },
-  "CVE-2026-37009": {
-   "product": null,
-   "description": "crewai"
-  },
   "CVE-2026-43627": {
    "product": "llama.cpp",
    "description": "llama"
@@ -7093,10 +6581,6 @@
    "product": "llama.cpp",
    "description": "llama"
   },
-  "CVE-2026-43752": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-43631": {
    "product": "llama.cpp",
    "description": "llama"
@@ -7105,13 +6589,9 @@
    "product": "llama.cpp",
    "description": "llama"
   },
-  "CVE-2026-43900": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
   "CVE-2026-43632": {
    "product": "llama.cpp",
-   "description": "llama"
+   "description": "anthropic"
   },
   "CVE-2026-104873": {
    "product": "langchain-ai",
@@ -7145,21 +6625,9 @@
    "product": "ragflow",
    "description": "retrieval-augmented"
   },
-  "CVE-2026-28676": {
-   "product": null,
-   "description": "generative ai"
-  },
   "CVE-2026-28400": {
    "product": null,
-   "description": "llama"
-  },
-  "CVE-2026-28444": {
-   "product": null,
    "description": "ai model"
-  },
-  "CVE-2026-28677": {
-   "product": null,
-   "description": "generative ai"
   },
   "CVE-2026-28414": {
    "product": null,
@@ -7167,11 +6635,7 @@
   },
   "CVE-2026-28500": {
    "product": "onnx",
-   "description": "onnx"
-  },
-  "CVE-2026-28675": {
-   "product": null,
-   "description": "generative ai"
+   "description": "machine learning"
   },
   "CVE-2026-30623": {
    "product": "BerriAI/litellm",
@@ -7196,10 +6660,6 @@
   "CVE-2026-7113": {
    "product": "hermes-agent",
    "description": null
-  },
-  "CVE-2026-7021": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-7875": {
    "product": "NanoClaw",
@@ -7284,10 +6744,6 @@
   "CVE-2026-7599": {
    "product": "hwpx-mcp",
    "description": null
-  },
-  "CVE-2026-7595": {
-   "product": null,
-   "description": ".claude/"
   },
   "CVE-2026-7316": {
    "product": "aider-mcp",
@@ -7385,10 +6841,6 @@
    "product": "code-mcp",
    "description": null
   },
-  "CVE-2026-7596": {
-   "product": null,
-   "description": ".claude/"
-  },
   "CVE-2026-7157": {
    "product": "aider-mcp-server",
    "description": null
@@ -7445,14 +6897,6 @@
    "product": "gmx-vmd-mcp",
    "description": null
   },
-  "CVE-2026-83071": {
-   "product": null,
-   "description": "machine learning"
-  },
-  "CVE-2026-83593": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2026-83551": {
    "product": "sagemaker-python-sdk",
    "description": null
@@ -7504,10 +6948,6 @@
   "CVE-2026-102911": {
    "product": null,
    "description": "llm"
-  },
-  "CVE-2026-102583": {
-   "product": null,
-   "description": "artificial intelligence"
   },
   "CVE-2026-102878": {
    "product": "mcp-chrome-bridge",
@@ -7568,14 +7008,6 @@
   "CVE-2026-3680": {
    "product": "biome-mcp-server",
    "description": null
-  },
-  "CVE-2026-3573": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
-  "CVE-2026-3962": {
-   "product": null,
-   "description": "machine-learning"
   },
   "CVE-2026-3960": {
    "product": "h2oai",
@@ -7647,10 +7079,14 @@
   },
   "CVE-2026-4993": {
    "product": "wandb",
-   "description": "wandb"
+   "description": "litellm"
   },
   "CVE-2026-4230": {
    "product": "vanna-ai",
+   "description": null
+  },
+  "CVE-2026-4530": {
+   "product": "Aix-DB",
    "description": null
   },
   "CVE-2026-4231": {
@@ -7725,10 +7161,6 @@
    "product": "agentic-community/mcp-gateway-registry",
    "description": null
   },
-  "CVE-2026-14185": {
-   "product": null,
-   "description": "retrieval-augmented"
-  },
   "CVE-2026-14537": {
    "product": "mcp-toolbox",
    "description": null
@@ -7752,10 +7184,6 @@
   "CVE-2026-14630": {
    "product": null,
    "description": "agentic"
-  },
-  "CVE-2026-14501": {
-   "product": null,
-   "description": "agentics"
   },
   "CVE-2026-14647": {
    "product": "onnx",
@@ -7814,24 +7242,12 @@
    "description": "bentoml"
   },
   "CVE-2026-35589": {
-   "product": null,
+   "product": "nanobot",
    "description": "ai assistant"
-  },
-  "CVE-2026-35219": {
-   "product": null,
-   "description": "n8n"
-  },
-  "CVE-2026-73658": {
-   "product": null,
-   "description": "ai agents"
-  },
-  "CVE-2026-73657": {
-   "product": null,
-   "description": "ai agents"
   },
   "CVE-2026-73560": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73219": {
    "product": "cvat-ai",
@@ -7841,21 +7257,13 @@
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-73299": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-73555": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73079": {
    "product": null,
    "description": "chatgpt"
-  },
-  "CVE-2026-73298": {
-   "product": null,
-   "description": "ai-driven"
   },
   "CVE-2026-73844": {
    "product": "ckan-mcp-server",
@@ -7877,10 +7285,6 @@
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-73847": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2026-73486": {
    "product": "Flowise",
    "description": "flowise"
@@ -7895,7 +7299,7 @@
   },
   "CVE-2026-73557": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73846": {
    "product": "ckan-mcp-server",
@@ -7907,23 +7311,19 @@
   },
   "CVE-2026-73558": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73483": {
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-73264": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2026-73496": {
    "product": "mcp-atlassian",
-   "description": "model context protocol"
+   "description": "mcp server"
   },
   "CVE-2026-73556": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73220": {
    "product": "cvat-ai",
@@ -7932,10 +7332,6 @@
   "CVE-2026-73602": {
    "product": "Flowise",
    "description": "flowise"
-  },
-  "CVE-2026-73655": {
-   "product": null,
-   "description": "ai agents"
   },
   "CVE-2026-73221": {
    "product": "cvat-ai",
@@ -7951,7 +7347,7 @@
   },
   "CVE-2026-73559": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2026-73222": {
    "product": "claude-code-templates",
@@ -7963,11 +7359,7 @@
   },
   "CVE-2026-73498": {
    "product": "mcp-atlassian",
-   "description": "model context protocol"
-  },
-  "CVE-2026-73656": {
-   "product": null,
-   "description": "ai agents"
+   "description": "ai agent"
   },
   "CVE-2026-73845": {
    "product": "ckan-mcp-server",
@@ -7977,37 +7369,21 @@
    "product": "Flowise",
    "description": "flowise"
   },
-  "CVE-2026-73068": {
-   "product": null,
-   "description": "ai agents"
-  },
-  "CVE-2026-73654": {
-   "product": null,
-   "description": "ai agents"
-  },
   "CVE-2026-82268": {
    "product": "Qwen-Agent",
-   "description": "qwen"
+   "description": "gradio"
   },
   "CVE-2026-82456": {
    "product": "argocd-mcp",
    "description": null
   },
-  "CVE-2026-82293": {
-   "product": null,
-   "description": "machine learning"
-  },
-  "CVE-2026-82833": {
-   "product": null,
-   "description": "machine learning"
-  },
-  "CVE-2026-82404": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-82217": {
    "product": null,
    "description": "prompt injection"
+  },
+  "CVE-2026-82881": {
+   "product": "Aix-DB",
+   "description": null
   },
   "CVE-2026-82021": {
    "product": "hermes-agent",
@@ -8029,29 +7405,17 @@
    "product": "hermes-agent",
    "description": null
   },
-  "CVE-2026-82834": {
-   "product": null,
-   "description": "machine learning"
-  },
   "CVE-2026-82233": {
    "product": null,
    "description": "ai agent"
   },
-  "CVE-2026-82640": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2026-82275": {
    "product": "Qwen-Agent",
-   "description": "qwen"
+   "description": "gradio"
   },
   "CVE-2026-82533": {
    "product": "DeepSeek",
    "description": "deepseek"
-  },
-  "CVE-2026-82637": {
-   "product": null,
-   "description": "gradio"
   },
   "CVE-2026-82639": {
    "product": "NextChat",
@@ -8059,7 +7423,7 @@
   },
   "CVE-2026-82288": {
    "product": "AUTOMATIC1111",
-   "description": "stable diffusion"
+   "description": "gradio"
   },
   "CVE-2026-86994": {
    "product": "n8n-io",
@@ -8127,15 +7491,11 @@
   },
   "CVE-2026-86082": {
    "product": "n8n-io",
-   "description": "n8n"
+   "description": "langchain"
   },
   "CVE-2026-86080": {
    "product": "n8n-io",
    "description": "n8n"
-  },
-  "CVE-2026-86169": {
-   "product": null,
-   "description": "hugging face"
   },
   "CVE-2026-86079": {
    "product": "n8n-io",
@@ -8156,10 +7516,6 @@
   "CVE-2026-86793": {
    "product": "SGLang",
    "description": "sglang"
-  },
-  "CVE-2026-86228": {
-   "product": null,
-   "description": "llm"
   },
   "CVE-2026-39421": {
    "product": "MaxKB",
@@ -8197,10 +7553,6 @@
    "product": "MaxKB",
    "description": "ai assistant"
   },
-  "CVE-2026-39107": {
-   "product": null,
-   "description": "ai model"
-  },
   "CVE-2026-76395": {
    "product": null,
    "description": "machine learning"
@@ -8233,22 +7585,6 @@
    "product": "Agno AGI",
    "description": "prompt injection"
   },
-  "CVE-2026-76397": {
-   "product": null,
-   "description": "machine-learning"
-  },
-  "CVE-2026-76392": {
-   "product": null,
-   "description": "machine-learning"
-  },
-  "CVE-2026-76391": {
-   "product": null,
-   "description": "machine-learning"
-  },
-  "CVE-2026-76398": {
-   "product": null,
-   "description": "machine-learning"
-  },
   "CVE-2026-76404": {
    "product": null,
    "description": "mcp server"
@@ -8265,10 +7601,6 @@
    "product": "openclaw-dashboard",
    "description": "openclaw"
   },
-  "CVE-2026-66027": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2026-66004": {
    "product": "blender-mcp",
    "description": "prompt injection"
@@ -8281,33 +7613,13 @@
    "product": "huggingface",
    "description": null
   },
-  "CVE-2026-66005": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2026-89278": {
    "product": null,
-   "description": "openai"
-  },
-  "CVE-2026-89093": {
-   "product": null,
-   "description": "ai chat"
-  },
-  "CVE-2026-89519": {
-   "product": null,
-   "description": "autogen"
-  },
-  "CVE-2026-89334": {
-   "product": null,
-   "description": "ai chat"
+   "description": "deepseek"
   },
   "CVE-2026-89032": {
    "product": "litellm",
-   "description": "litellm"
-  },
-  "CVE-2023-6985": {
-   "product": null,
-   "description": "ai assistant"
+   "description": "agentic"
   },
   "CVE-2023-52304": {
    "product": "PaddlePaddle",
@@ -8509,9 +7821,9 @@
    "product": "aimhubio",
    "description": null
   },
-  "CVE-2024-12596": {
-   "product": null,
-   "description": "llms"
+  "CVE-2024-12068": {
+   "product": "haotian-liu/llava",
+   "description": null
   },
   "CVE-2024-12063": {
    "product": "imartinez/privategpt",
@@ -8587,6 +7899,10 @@
   },
   "CVE-2024-12871": {
    "product": "infiniflow/ragflow",
+   "description": null
+  },
+  "CVE-2024-12070": {
+   "product": "haotian-liu/llava",
    "description": null
   },
   "CVE-2024-12044": {
@@ -8707,6 +8023,10 @@
   },
   "CVE-2024-10110": {
    "product": "aimhubio",
+   "description": null
+  },
+  "CVE-2024-10225": {
+   "product": "haotian-liu/llava",
    "description": null
   },
   "CVE-2024-10131": {
@@ -8851,7 +8171,7 @@
   },
   "CVE-2024-8939": {
    "product": "vllm",
-   "description": "vllm"
+   "description": "llm"
   },
   "CVE-2024-8057": {
    "product": "danswer-ai",
@@ -9109,6 +8429,10 @@
    "product": "danny-avila/librechat",
    "description": "librechat"
   },
+  "CVE-2024-11449": {
+   "product": "haotian-liu/llava",
+   "description": null
+  },
   "CVE-2024-11169": {
    "product": "danny-avila/librechat",
    "description": "librechat"
@@ -9293,10 +8617,6 @@
    "product": "mudler/localai",
    "description": "localai"
   },
-  "CVE-2024-6669": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2024-6862": {
    "product": "lunary-ai",
    "description": null
@@ -9349,10 +8669,6 @@
    "product": "mindsdb",
    "description": null
   },
-  "CVE-2024-52269": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2024-52787": {
    "product": "librechat",
    "description": null
@@ -9364,10 +8680,6 @@
   "CVE-2024-48052": {
    "product": null,
    "description": "gradio"
-  },
-  "CVE-2024-48918": {
-   "product": null,
-   "description": "ai-driven"
   },
   "CVE-2024-5208": {
    "product": "anythingllm",
@@ -9465,10 +8777,6 @@
    "product": "berriai/litellm",
    "description": "litellm"
   },
-  "CVE-2024-5858": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2024-5124": {
    "product": "gaizhenbiao/chuanhuchatgpt",
    "description": null
@@ -9491,7 +8799,7 @@
   },
   "CVE-2024-5616": {
    "product": "mudler/localai",
-   "description": "localai"
+   "description": "gpt-4"
   },
   "CVE-2024-5823": {
    "product": "gaizhenbiao/chuanhuchatgpt",
@@ -9511,7 +8819,7 @@
   },
   "CVE-2024-5211": {
    "product": "anythingllm",
-   "description": "llm"
+   "description": "anythingllm"
   },
   "CVE-2024-5127": {
    "product": "lunary-ai",
@@ -9579,7 +8887,7 @@
   },
   "CVE-2024-0549": {
    "product": "anythingllm",
-   "description": "llm"
+   "description": "anythingllm"
   },
   "CVE-2024-0521": {
    "product": "paddlepaddle",
@@ -9625,12 +8933,12 @@
    "product": "anythingllm",
    "description": "llm"
   },
-  "CVE-2024-0378": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2024-0440": {
    "product": "anythingllm",
+   "description": null
+  },
+  "CVE-2024-9308": {
+   "product": "haotian-liu/llava",
    "description": null
   },
   "CVE-2024-9418": {
@@ -9685,10 +8993,6 @@
    "product": "vllm-project",
    "description": "vllm"
   },
-  "CVE-2024-9977": {
-   "product": null,
-   "description": "gpt-2541gnac"
-  },
   "CVE-2024-9612": {
    "product": "danswer-ai",
    "description": null
@@ -9721,8 +9025,16 @@
    "product": "gaizhenbiao/chuanhuchatgpt",
    "description": null
   },
+  "CVE-2024-9309": {
+   "product": "haotian-liu/llava",
+   "description": null
+  },
   "CVE-2024-9919": {
    "product": "parisneo/lollms-webui",
+   "description": null
+  },
+  "CVE-2024-9311": {
+   "product": "haotian-liu/llava",
    "description": null
   },
   "CVE-2024-9447": {
@@ -9803,7 +9115,7 @@
   },
   "CVE-2024-37058": {
    "product": "MLflow",
-   "description": "mlflow"
+   "description": "langchain"
   },
   "CVE-2024-43598": {
    "product": "LightGBM",
@@ -9811,7 +9123,7 @@
   },
   "CVE-2024-28224": {
    "product": "ollama/ollama",
-   "description": "ollama"
+   "description": "language model"
   },
   "CVE-2024-7010": {
    "product": "mudler/localai",
@@ -9875,7 +9187,7 @@
   },
   "CVE-2024-7557": {
    "product": "odh-dashboard",
-   "description": "ai models"
+   "description": "ai model"
   },
   "CVE-2024-7776": {
    "product": "onnx",
@@ -9919,7 +9231,7 @@
   },
   "CVE-2024-3279": {
    "product": "anythingllm",
-   "description": "llm"
+   "description": "anythingllm"
   },
   "CVE-2024-3504": {
    "product": "lunary-ai",
@@ -10073,10 +9385,6 @@
    "product": "parisneo/lollms-webui",
    "description": null
   },
-  "CVE-2024-4560": {
-   "product": null,
-   "description": "chatgpt"
-  },
   "CVE-2024-4841": {
    "product": "parisneo/lollms-webui",
    "description": null
@@ -10195,11 +9503,11 @@
   },
   "CVE-2025-2322": {
    "product": "springboot-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-2323": {
    "product": "springboot-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-2148": {
    "product": "PyTorch",
@@ -10207,7 +9515,7 @@
   },
   "CVE-2025-2321": {
    "product": "springboot-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-2953": {
    "product": "PyTorch",
@@ -10215,11 +9523,11 @@
   },
   "CVE-2025-2320": {
    "product": "springboot-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-2334": {
    "product": "springboot-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-2149": {
    "product": "PyTorch",
@@ -10228,34 +9536,6 @@
   "CVE-2025-44779": {
    "product": "ollama/ollama",
    "description": "ollama"
-  },
-  "CVE-2025-13887": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2025-13772": {
-   "product": null,
-   "description": "ai model"
-  },
-  "CVE-2025-13981": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
-  "CVE-2025-13921": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2025-12805": {
-   "product": null,
-   "description": "llama"
-  },
-  "CVE-2025-12585": {
-   "product": null,
-   "description": "ai chatbot"
-  },
-  "CVE-2025-12343": {
-   "product": null,
-   "description": "tensorflow"
   },
   "CVE-2025-12058": {
    "product": "Keras",
@@ -10271,19 +9551,11 @@
   },
   "CVE-2025-46560": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2025-24923": {
-   "product": null,
-   "description": "retrieval-augmented"
+   "description": "llm"
   },
   "CVE-2025-24357": {
    "product": "vllm-project",
-   "description": "vllm"
-  },
-  "CVE-2025-24666": {
-   "product": null,
-   "description": "ai chatbot"
+   "description": "huggingface"
   },
   "CVE-2025-10769": {
    "product": "h2oai",
@@ -10308,10 +9580,6 @@
   "CVE-2025-10236": {
    "product": "gpt_academic",
    "description": null
-  },
-  "CVE-2025-10705": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2025-10279": {
    "product": "mlflow",
@@ -10387,7 +9655,7 @@
   },
   "CVE-2025-71379": {
    "product": "vllm",
-   "description": "vllm"
+   "description": "openai"
   },
   "CVE-2025-71357": {
    "product": "picklescan",
@@ -10487,7 +9755,7 @@
   },
   "CVE-2025-23968": {
    "product": "aibuddy-openai-chatgpt",
-   "description": "openai"
+   "description": "chatgpt"
   },
   "CVE-2025-23315": {
    "product": "NeMo Framework",
@@ -10569,17 +9837,9 @@
    "product": "RooCodeInc",
    "description": "prompt injection"
   },
-  "CVE-2025-58768": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
   "CVE-2025-58373": {
    "product": "RooCodeInc",
    "description": null
-  },
-  "CVE-2025-58055": {
-   "product": null,
-   "description": "ai model"
   },
   "CVE-2025-58374": {
    "product": "RooCodeInc",
@@ -10649,10 +9909,6 @@
    "product": "NeMo Framework",
    "description": null
   },
-  "CVE-2025-33244": {
-   "product": null,
-   "description": "pytorch"
-  },
   "CVE-2025-33205": {
    "product": "NeMo Framework",
    "description": null
@@ -10691,7 +9947,7 @@
   },
   "CVE-2025-29770": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "llm"
   },
   "CVE-2025-1750": {
    "product": "run-llama",
@@ -10730,16 +9986,16 @@
    "description": null
   },
   "CVE-2025-11489": {
-   "product": null,
-   "description": "llms"
+   "product": "DesktopCommanderMCP",
+   "description": "llm"
   },
   "CVE-2025-11202": {
    "product": "win-cli-mcp-server",
    "description": null
   },
-  "CVE-2025-11576": {
-   "product": null,
-   "description": "ai chatbot"
+  "CVE-2025-11491": {
+   "product": "DesktopCommanderMCP",
+   "description": null
   },
   "CVE-2025-11750": {
    "product": "langgenius/dify",
@@ -10748,6 +10004,14 @@
   "CVE-2025-11201": {
    "product": "MLflow",
    "description": "mlflow"
+  },
+  "CVE-2025-11046": {
+   "product": "WeKnora",
+   "description": null
+  },
+  "CVE-2025-11490": {
+   "product": "DesktopCommanderMCP",
+   "description": null
   },
   "CVE-2025-32434": {
    "product": "pytorch",
@@ -10760,10 +10024,6 @@
   "CVE-2025-63604": {
    "product": "baryhuang/mcp-server-aws-resources-python",
    "description": null
-  },
-  "CVE-2025-63639": {
-   "product": null,
-   "description": "ai assistant"
   },
   "CVE-2025-63389": {
    "product": "ollama/ollama",
@@ -10837,10 +10097,6 @@
    "product": "AstrBotDevs/AstrBot",
    "description": null
   },
-  "CVE-2025-55012": {
-   "product": null,
-   "description": "ai agent"
-  },
   "CVE-2025-55345": {
    "product": "@openai/codex",
    "description": null
@@ -10866,7 +10122,7 @@
    "description": null
   },
   "CVE-2025-6518": {
-   "product": null,
+   "product": "PySpur-Dev",
    "description": "llm"
   },
   "CVE-2025-6507": {
@@ -10878,7 +10134,7 @@
    "description": "comfyui"
   },
   "CVE-2025-6242": {
-   "product": null,
+   "product": "rhelai1/modelcar-docling-layout",
    "description": "vllm"
   },
   "CVE-2025-6544": {
@@ -10905,10 +10161,6 @@
    "product": "honysyang/Xinference",
    "description": null
   },
-  "CVE-2025-45146": {
-   "product": null,
-   "description": "llm"
-  },
   "CVE-2025-52967": {
    "product": "MLflow",
    "description": "mlflow"
@@ -10919,11 +10171,11 @@
   },
   "CVE-2025-48944": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-48943": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-48187": {
    "product": "RAGFlow",
@@ -10935,15 +10187,15 @@
   },
   "CVE-2025-48956": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-48887": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-48942": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-48381": {
    "product": "cvat-ai",
@@ -10956,10 +10208,6 @@
   "CVE-2025-5352": {
    "product": "lunary-ai",
    "description": null
-  },
-  "CVE-2025-5019": {
-   "product": null,
-   "description": "ai chat"
   },
   "CVE-2025-5320": {
    "product": null,
@@ -10983,19 +10231,19 @@
   },
   "CVE-2025-62164": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-62155": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2025-62426": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-62372": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-64485": {
    "product": "cvat-ai",
@@ -11017,10 +10265,6 @@
    "product": "Applio",
    "description": null
   },
-  "CVE-2025-27518": {
-   "product": null,
-   "description": "retrieval augmented"
-  },
   "CVE-2025-27787": {
    "product": "Applio",
    "description": null
@@ -11037,21 +10281,9 @@
    "product": "Applio",
    "description": null
   },
-  "CVE-2025-27772": {
-   "product": null,
-   "description": "generative ai"
-  },
   "CVE-2025-27782": {
    "product": "Applio",
    "description": null
-  },
-  "CVE-2025-27496": {
-   "product": null,
-   "description": "artificial intelligence"
-  },
-  "CVE-2025-27770": {
-   "product": null,
-   "description": "generative ai"
   },
   "CVE-2025-27785": {
    "product": "Applio",
@@ -11060,10 +10292,6 @@
   "CVE-2025-27777": {
    "product": "Applio",
    "description": null
-  },
-  "CVE-2025-27519": {
-   "product": null,
-   "description": "retrieval augmented"
   },
   "CVE-2025-27776": {
    "product": "Applio",
@@ -11081,17 +10309,9 @@
    "product": "Applio",
    "description": null
   },
-  "CVE-2025-27621": {
-   "product": null,
-   "description": "generative ai"
-  },
   "CVE-2025-27135": {
    "product": "ragflow",
    "description": "retrieval-augmented"
-  },
-  "CVE-2025-27771": {
-   "product": null,
-   "description": "generative ai"
   },
   "CVE-2025-27786": {
    "product": "Applio",
@@ -11111,15 +10331,11 @@
   },
   "CVE-2025-59146": {
    "product": null,
-   "description": "llm"
+   "description": "artificial intelligence"
   },
   "CVE-2025-59376": {
    "product": "mcp-kubernetes-server",
    "description": null
-  },
-  "CVE-2025-59053": {
-   "product": null,
-   "description": "artificial intelligence"
   },
   "CVE-2025-59426": {
    "product": "lobehub",
@@ -11127,11 +10343,11 @@
   },
   "CVE-2025-59425": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-59953": {
    "product": "lmdeploy",
-   "description": "lmdeploy"
+   "description": "language model"
   },
   "CVE-2025-15381": {
    "product": "mlflow",
@@ -11155,15 +10371,11 @@
   },
   "CVE-2025-15453": {
    "product": "milvus",
-   "description": "milvus"
+   "description": "milvu"
   },
   "CVE-2025-50735": {
    "product": "ChatGPTNextWeb/NextChat",
    "description": null
-  },
-  "CVE-2025-50753": {
-   "product": null,
-   "description": "gpt-2741gnac"
   },
   "CVE-2025-50472": {
    "product": "modelscope/ms-swift",
@@ -11173,21 +10385,13 @@
    "product": "pytorch/pytorch",
    "description": null
   },
-  "CVE-2025-50733": {
-   "product": null,
-   "description": "ai chat"
-  },
   "CVE-2025-61260": {
    "product": null,
-   "description": "openai"
+   "description": "model context protocol"
   },
   "CVE-2025-61489": {
    "product": "sonirico/mcp-shell",
    "description": null
-  },
-  "CVE-2025-67744": {
-   "product": null,
-   "description": "artificial intelligence"
   },
   "CVE-2025-49655": {
    "product": "Keras",
@@ -11208,10 +10412,6 @@
   "CVE-2025-0744": {
    "product": "EmbedAI",
    "description": null
-  },
-  "CVE-2025-0329": {
-   "product": null,
-   "description": "ai chatbot"
   },
   "CVE-2025-0330": {
    "product": "berriai/litellm",
@@ -11309,10 +10509,6 @@
    "product": "significant-gravitas/autogpt",
    "description": "autogpt"
   },
-  "CVE-2025-9111": {
-   "product": null,
-   "description": "ai chatbot"
-  },
   "CVE-2025-9262": {
    "product": "mcp-cli",
    "description": null
@@ -11349,13 +10545,9 @@
    "product": "cvat-ai",
    "description": null
   },
-  "CVE-2025-37734": {
-   "product": null,
-   "description": "ai assistant"
-  },
   "CVE-2025-30165": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-7105": {
    "product": "danny-avila/librechat",
@@ -11364,10 +10556,6 @@
   "CVE-2025-7104": {
    "product": "danny-avila/librechat",
    "description": "librechat"
-  },
-  "CVE-2025-7499": {
-   "product": null,
-   "description": "ai-driven"
   },
   "CVE-2025-7106": {
    "product": "danny-avila/librechat",
@@ -11388,10 +10576,6 @@
   "CVE-2025-3467": {
    "product": "langgenius/dify",
    "description": "dify"
-  },
-  "CVE-2025-3812": {
-   "product": null,
-   "description": "openai"
   },
   "CVE-2025-3163": {
    "product": "LMDeploy",
@@ -11433,21 +10617,17 @@
    "product": "whisper.cpp",
    "description": null
   },
-  "CVE-2025-14486": {
-   "product": null,
-   "description": "openai"
-  },
   "CVE-2025-66419": {
    "product": "MaxKB",
    "description": "ai assistant"
   },
   "CVE-2025-66448": {
    "product": "vllm-project",
-   "description": "vllm"
+   "description": "language model"
   },
   "CVE-2025-66455": {
    "product": "lmdeploy",
-   "description": "lmdeploy"
+   "description": "language model"
   },
   "CVE-2025-66446": {
    "product": "MaxKB",

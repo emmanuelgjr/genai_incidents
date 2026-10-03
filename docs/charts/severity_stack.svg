@@ -3,60 +3,60 @@
 <text x="44" y="18" font-weight="600">Severity composition, last 12 years</text>
 <rect x="48.9" y="203.7" width="39.1" height="0.3" fill="#b40000"><title>2015 Critical: 13</title></rect>
 <rect x="48.9" y="203.6" width="39.1" height="0.1" fill="#cc4400"><title>2015 High: 6</title></rect>
-<rect x="48.9" y="203.1" width="39.1" height="0.5" fill="#8a6d00"><title>2015 Medium: 22</title></rect>
+<rect x="48.9" y="203.0" width="39.1" height="0.5" fill="#8a6d00"><title>2015 Medium: 22</title></rect>
 <text x="68.4" y="218" text-anchor="middle" fill="#666">2015</text>
 <rect x="97.7" y="203.6" width="39.1" height="0.4" fill="#b40000"><title>2016 Critical: 16</title></rect>
 <rect x="97.7" y="203.1" width="39.1" height="0.6" fill="#cc4400"><title>2016 High: 24</title></rect>
 <rect x="97.7" y="202.1" width="39.1" height="1.0" fill="#8a6d00"><title>2016 Medium: 42</title></rect>
 <text x="117.3" y="218" text-anchor="middle" fill="#666">2016</text>
 <rect x="146.6" y="203.7" width="39.1" height="0.3" fill="#b40000"><title>2017 Critical: 14</title></rect>
-<rect x="146.6" y="203.0" width="39.1" height="0.7" fill="#cc4400"><title>2017 High: 31</title></rect>
-<rect x="146.6" y="201.6" width="39.1" height="1.4" fill="#8a6d00"><title>2017 Medium: 61</title></rect>
+<rect x="146.6" y="202.9" width="39.1" height="0.7" fill="#cc4400"><title>2017 High: 31</title></rect>
+<rect x="146.6" y="201.5" width="39.1" height="1.4" fill="#8a6d00"><title>2017 Medium: 61</title></rect>
 <rect x="146.6" y="201.5" width="39.1" height="0.0" fill="#2a7f2a"><title>2017 Low: 1</title></rect>
 <text x="166.1" y="218" text-anchor="middle" fill="#666">2017</text>
 <rect x="195.4" y="203.5" width="39.1" height="0.5" fill="#b40000"><title>2018 Critical: 23</title></rect>
-<rect x="195.4" y="203.0" width="39.1" height="0.5" fill="#cc4400"><title>2018 High: 22</title></rect>
-<rect x="195.4" y="201.8" width="39.1" height="1.2" fill="#8a6d00"><title>2018 Medium: 53</title></rect>
+<rect x="195.4" y="202.9" width="39.1" height="0.5" fill="#cc4400"><title>2018 High: 22</title></rect>
+<rect x="195.4" y="201.7" width="39.1" height="1.2" fill="#8a6d00"><title>2018 Medium: 53</title></rect>
 <text x="214.9" y="218" text-anchor="middle" fill="#666">2018</text>
 <rect x="244.2" y="203.4" width="39.1" height="0.6" fill="#b40000"><title>2019 Critical: 25</title></rect>
 <rect x="244.2" y="202.8" width="39.1" height="0.6" fill="#cc4400"><title>2019 High: 26</title></rect>
-<rect x="244.2" y="201.4" width="39.1" height="1.4" fill="#8a6d00"><title>2019 Medium: 63</title></rect>
+<rect x="244.2" y="201.3" width="39.1" height="1.5" fill="#8a6d00"><title>2019 Medium: 63</title></rect>
 <rect x="244.2" y="201.3" width="39.1" height="0.0" fill="#2a7f2a"><title>2019 Low: 2</title></rect>
 <text x="263.8" y="218" text-anchor="middle" fill="#666">2019</text>
-<rect x="293.1" y="199.3" width="39.1" height="4.7" fill="#b40000"><title>2020 Critical: 205</title></rect>
-<rect x="293.1" y="189.5" width="39.1" height="9.8" fill="#cc4400"><title>2020 High: 426</title></rect>
-<rect x="293.1" y="181.4" width="39.1" height="8.1" fill="#8a6d00"><title>2020 Medium: 353</title></rect>
-<rect x="293.1" y="181.4" width="39.1" height="0.0" fill="#2a7f2a"><title>2020 Low: 1</title></rect>
+<rect x="293.1" y="199.2" width="39.1" height="4.8" fill="#b40000"><title>2020 Critical: 205</title></rect>
+<rect x="293.1" y="189.2" width="39.1" height="10.0" fill="#cc4400"><title>2020 High: 426</title></rect>
+<rect x="293.1" y="180.9" width="39.1" height="8.3" fill="#8a6d00"><title>2020 Medium: 353</title></rect>
+<rect x="293.1" y="180.8" width="39.1" height="0.0" fill="#2a7f2a"><title>2020 Low: 1</title></rect>
 <text x="312.6" y="218" text-anchor="middle" fill="#666">2020</text>
-<rect x="341.9" y="200.6" width="39.1" height="3.4" fill="#b40000"><title>2021 Critical: 148</title></rect>
-<rect x="341.9" y="194.2" width="39.1" height="6.4" fill="#cc4400"><title>2021 High: 280</title></rect>
-<rect x="341.9" y="186.2" width="39.1" height="8.0" fill="#8a6d00"><title>2021 Medium: 347</title></rect>
-<rect x="341.9" y="184.1" width="39.1" height="2.1" fill="#2a7f2a"><title>2021 Low: 92</title></rect>
+<rect x="341.9" y="200.5" width="39.1" height="3.5" fill="#b40000"><title>2021 Critical: 147</title></rect>
+<rect x="341.9" y="194.0" width="39.1" height="6.6" fill="#cc4400"><title>2021 High: 280</title></rect>
+<rect x="341.9" y="185.8" width="39.1" height="8.1" fill="#8a6d00"><title>2021 Medium: 346</title></rect>
+<rect x="341.9" y="183.7" width="39.1" height="2.2" fill="#2a7f2a"><title>2021 Low: 92</title></rect>
 <text x="361.4" y="218" text-anchor="middle" fill="#666">2021</text>
-<rect x="390.7" y="201.0" width="39.1" height="3.0" fill="#b40000"><title>2022 Critical: 131</title></rect>
-<rect x="390.7" y="193.9" width="39.1" height="7.1" fill="#cc4400"><title>2022 High: 311</title></rect>
-<rect x="390.7" y="180.4" width="39.1" height="13.4" fill="#8a6d00"><title>2022 Medium: 585</title></rect>
-<rect x="390.7" y="179.3" width="39.1" height="1.1" fill="#2a7f2a"><title>2022 Low: 49</title></rect>
+<rect x="390.7" y="200.9" width="39.1" height="3.1" fill="#b40000"><title>2022 Critical: 131</title></rect>
+<rect x="390.7" y="193.6" width="39.1" height="7.3" fill="#cc4400"><title>2022 High: 311</title></rect>
+<rect x="390.7" y="179.9" width="39.1" height="13.8" fill="#8a6d00"><title>2022 Medium: 585</title></rect>
+<rect x="390.7" y="178.7" width="39.1" height="1.2" fill="#2a7f2a"><title>2022 Low: 49</title></rect>
 <text x="410.3" y="218" text-anchor="middle" fill="#666">2022</text>
-<rect x="439.6" y="200.7" width="39.1" height="3.3" fill="#b40000"><title>2023 Critical: 146</title></rect>
-<rect x="439.6" y="193.2" width="39.1" height="7.4" fill="#cc4400"><title>2023 High: 323</title></rect>
-<rect x="439.6" y="181.8" width="39.1" height="11.5" fill="#8a6d00"><title>2023 Medium: 500</title></rect>
-<rect x="439.6" y="181.2" width="39.1" height="0.5" fill="#2a7f2a"><title>2023 Low: 23</title></rect>
+<rect x="439.6" y="200.6" width="39.1" height="3.4" fill="#b40000"><title>2023 Critical: 146</title></rect>
+<rect x="439.6" y="193.0" width="39.1" height="7.6" fill="#cc4400"><title>2023 High: 323</title></rect>
+<rect x="439.6" y="181.2" width="39.1" height="11.7" fill="#8a6d00"><title>2023 Medium: 499</title></rect>
+<rect x="439.6" y="180.7" width="39.1" height="0.5" fill="#2a7f2a"><title>2023 Low: 23</title></rect>
 <text x="459.1" y="218" text-anchor="middle" fill="#666">2023</text>
-<rect x="488.4" y="196.9" width="39.1" height="7.1" fill="#b40000"><title>2024 Critical: 310</title></rect>
-<rect x="488.4" y="183.5" width="39.1" height="13.4" fill="#cc4400"><title>2024 High: 582</title></rect>
-<rect x="488.4" y="166.5" width="39.1" height="17.0" fill="#8a6d00"><title>2024 Medium: 742</title></rect>
-<rect x="488.4" y="165.5" width="39.1" height="1.1" fill="#2a7f2a"><title>2024 Low: 46</title></rect>
+<rect x="488.4" y="196.7" width="39.1" height="7.3" fill="#b40000"><title>2024 Critical: 309</title></rect>
+<rect x="488.4" y="183.1" width="39.1" height="13.6" fill="#cc4400"><title>2024 High: 580</title></rect>
+<rect x="488.4" y="165.8" width="39.1" height="17.3" fill="#8a6d00"><title>2024 Medium: 736</title></rect>
+<rect x="488.4" y="164.7" width="39.1" height="1.1" fill="#2a7f2a"><title>2024 Low: 46</title></rect>
 <text x="507.9" y="218" text-anchor="middle" fill="#666">2024</text>
-<rect x="537.2" y="195.2" width="39.1" height="8.8" fill="#b40000"><title>2025 Critical: 383</title></rect>
-<rect x="537.2" y="177.5" width="39.1" height="17.7" fill="#cc4400"><title>2025 High: 773</title></rect>
-<rect x="537.2" y="157.1" width="39.1" height="20.4" fill="#8a6d00"><title>2025 Medium: 890</title></rect>
-<rect x="537.2" y="155.4" width="39.1" height="1.7" fill="#2a7f2a"><title>2025 Low: 72</title></rect>
+<rect x="537.2" y="195.1" width="39.1" height="8.9" fill="#b40000"><title>2025 Critical: 380</title></rect>
+<rect x="537.2" y="176.8" width="39.1" height="18.2" fill="#cc4400"><title>2025 High: 775</title></rect>
+<rect x="537.2" y="156.1" width="39.1" height="20.8" fill="#8a6d00"><title>2025 Medium: 883</title></rect>
+<rect x="537.2" y="154.4" width="39.1" height="1.6" fill="#2a7f2a"><title>2025 Low: 70</title></rect>
 <text x="556.8" y="218" text-anchor="middle" fill="#666">2025</text>
-<rect x="586.1" y="174.2" width="39.1" height="29.8" fill="#b40000"><title>2026 Critical: 1,298</title></rect>
-<rect x="586.1" y="100.2" width="39.1" height="74.1" fill="#cc4400"><title>2026 High: 3,229</title></rect>
-<rect x="586.1" y="34.5" width="39.1" height="65.7" fill="#8a6d00"><title>2026 Medium: 2,862</title></rect>
-<rect x="586.1" y="30.0" width="39.1" height="4.5" fill="#2a7f2a"><title>2026 Low: 196</title></rect>
+<rect x="586.1" y="173.7" width="39.1" height="30.3" fill="#b40000"><title>2026 Critical: 1,287</title></rect>
+<rect x="586.1" y="99.5" width="39.1" height="74.2" fill="#cc4400"><title>2026 High: 3,158</title></rect>
+<rect x="586.1" y="34.5" width="39.1" height="65.0" fill="#8a6d00"><title>2026 Medium: 2,766</title></rect>
+<rect x="586.1" y="30.0" width="39.1" height="4.5" fill="#2a7f2a"><title>2026 Low: 190</title></rect>
 <text x="605.6" y="218" text-anchor="middle" fill="#666">2026</text>
 <rect x="638" y="30" width="12" height="12" fill="#b40000"/>
 <text x="656" y="40" fill="#333">Critical</text>

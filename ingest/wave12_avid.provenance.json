@@ -17,12 +17,12 @@
     },
     "skipped_evaluation": 556,
     "skipped_already_in_corpus": 87,
-    "skipped_not_ai_relevant": 336,
+    "skipped_not_ai_relevant": 367,
     "skipped_unparseable": 0,
-    "skipped_cve_already_in_corpus": 519,
+    "skipped_cve_already_in_corpus": 498,
     "skipped_would_merge_into_existing": 7,
-    "emitted": 280,
-    "emitted_new_cve": 193,
+    "emitted": 270,
+    "emitted_new_cve": 183,
     "emitted_no_cve": 87
   },
   "review": {
@@ -246,6 +246,16 @@
         "id": "AVID-2026-R0924",
         "title": "Inefficient Regular Expression Complexity in nltk (CVE-2021-43854)",
         "affected": "nltk"
+      },
+      {
+        "id": "AVID-2026-R0925",
+        "title": "Chain Sea Information Integration Co., Ltd ai chatbot system - Reflected XSS (CVE-2021-44163)",
+        "affected": "ai chatbot system"
+      },
+      {
+        "id": "AVID-2026-R0926",
+        "title": "Chain Sea Information Integration Co., Ltd ai chatbot system - Arbitrary File Upload (CVE-2021-44164)",
+        "affected": "ai chatbot system"
       },
       {
         "id": "AVID-2026-R0927",
@@ -663,6 +673,11 @@
         "affected": ""
       },
       {
+        "id": "AVID-2026-R1166",
+        "title": "In PyTorch before trunk/89695, torch.jit.annotations.parse_type_line can cause arbitrary code execution because eval is ",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1167",
         "title": "In PaddlePaddle before 2.4, paddle.audio.functional.get_window is vulnerable to code injection because it calls eval on ",
         "affected": ""
@@ -711,6 +726,11 @@
         "id": "AVID-2026-R1180",
         "title": "Apache Airflow JDBC Provider: RCE Vulnerability (CVE-2023-22886)",
         "affected": "Apache Airflow JDBC Provider"
+      },
+      {
+        "id": "AVID-2026-R1181",
+        "title": "Azure Machine Learning Compute Instance Information Disclosure Vulnerability (CVE-2023-23382)",
+        "affected": "Azure Machine Learning"
       },
       {
         "id": "AVID-2026-R1183",
@@ -853,6 +873,16 @@
         "affected": "MindSpore"
       },
       {
+        "id": "AVID-2026-R1235",
+        "title": "A directory traversal vulnerability in the /get-artifact API method of the mlflow platform up to v2.0.1 allows attackers",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1236",
+        "title": "IBM Watson Machine Learning on Cloud Pak for Data server-side request forgery (CVE-2023-30444)",
+        "affected": "Watson Machine Learning on Cloud Pak for Data"
+      },
+      {
         "id": "AVID-2026-R1240",
         "title": "in-toto vulnerable to Configuration Read From Local Directory (CVE-2023-32076)",
         "affected": "in-toto"
@@ -903,6 +933,16 @@
         "affected": "Jupyter Extension for Visual Studio Code"
       },
       {
+        "id": "AVID-2026-R1252",
+        "title": "SQL injection vulnerability in langchain before v0.0.247 allows a remote attacker to obtain sensitive information via th",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1253",
+        "title": "An issue in langchain v.0.0.171 allows a remote attacker to execute arbitrary code via a JSON file to load_prompt.",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1254",
         "title": "Azure Identity SDK Remote Code Execution Vulnerability (CVE-2023-36414)",
         "affected": "Azure Identity SDK for .NET"
@@ -923,13 +963,28 @@
         "affected": "Apache Pulsar Function Worker"
       },
       {
+        "id": "AVID-2026-R1267",
+        "title": "An issue in weaviate v.1.20.0 allows a remote attacker to cause a denial of service via the handleUnbatchedGraphQLReques",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1268",
         "title": "Apache Avro Java SDK: Memory when deserializing untrusted data in Avro Java SDK (CVE-2023-39410)",
         "affected": "Apache Avro Java SDK"
       },
       {
+        "id": "AVID-2026-R1269",
+        "title": "An issue in langchain langchain-ai v.0.0.232 and before allows a remote attacker to execute arbitrary code via a crafted",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1270",
         "title": "An issue in Gaberiele Venturi pandasai v.0.8.0 and before allows a remote attacker to execute arbitrary code via a craft",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1271",
+        "title": "An issue in llama_index v.0.7.13 and before allows a remote attacker to execute arbitrary code via the `exec` parameter ",
         "affected": ""
       },
       {
@@ -958,6 +1013,11 @@
         "affected": "fides"
       },
       {
+        "id": "AVID-2026-R1278",
+        "title": "Gradio v3.27.0 was discovered to contain an arbitrary file upload vulnerability via the /upload interface.",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1279",
         "title": "Apache Airflow: Improper access control to DAG resources (CVE-2023-42792)",
         "affected": "Apache Airflow"
@@ -971,6 +1031,11 @@
         "id": "AVID-2026-R1282",
         "title": "D-Tale vulnerable to Remote Code Execution through the Custom Filter Input (CVE-2023-46134)",
         "affected": "dtale"
+      },
+      {
+        "id": "AVID-2026-R1283",
+        "title": "LangChain before 0.0.317 allows SSRF via document_loaders/recursive_url_loader.py because crawling can proceed from an e",
+        "affected": ""
       },
       {
         "id": "AVID-2026-R1285",
@@ -1028,6 +1093,16 @@
         "affected": "Apache Pulsar"
       },
       {
+        "id": "AVID-2026-R1319",
+        "title": "Using MLeap for loading a saved model (zip archive) can lead to path traversal/arbitrary file creation and possibly remo",
+        "affected": "Unknown System"
+      },
+      {
+        "id": "AVID-2026-R1320",
+        "title": "The AI ChatBot plugin for WordPress is vulnerable to Cross-Site Request Forgery in versions up to, and including, 4.8.9 ",
+        "affected": "AI ChatBot"
+      },
+      {
         "id": "AVID-2026-R1326",
         "title": "Cross-Site Request Forgery (CSRF) in prefecthq/prefect (CVE-2023-6022)",
         "affected": "prefecthq/prefect"
@@ -1073,6 +1148,11 @@
         "affected": "RAPIDS cuDF and cuML"
       },
       {
+        "id": "AVID-2026-R1352",
+        "title": "The AI Engine: Chatbots, Generators, Assistants, GPT 4 and more!",
+        "affected": "AI Engine"
+      },
+      {
         "id": "AVID-2026-R1356",
         "title": "Download and export of file via default user role (CVE-2024-0551)",
         "affected": "mintplex-labs/anything-llm"
@@ -1106,11 +1186,6 @@
         "id": "AVID-2026-R1379",
         "title": "CORS Vulnerability in feast-dev/feast (CVE-2024-11602)",
         "affected": "feast-dev/feast"
-      },
-      {
-        "id": "AVID-2026-R1382",
-        "title": "Server-Side Request Forgery in haotian-liu/llava (CVE-2024-12068)",
-        "affected": "haotian-liu/llava"
       },
       {
         "id": "AVID-2026-R1383",
@@ -1213,6 +1288,11 @@
         "affected": "python-ecdsa"
       },
       {
+        "id": "AVID-2026-R1432",
+        "title": "MetaGPT through 0.6.4 allows the QaEngineer role to execute arbitrary code because RunCode.run_script() passes shell met",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1434",
         "title": "CORS settings overly permissive in vantage6 (CVE-2024-23823)",
         "affected": "vantage6"
@@ -1226,6 +1306,16 @@
         "id": "AVID-2026-R1440",
         "title": "RedisBloom heap buffer overflow in CF.LOADCHUNK command (CVE-2024-25115)",
         "affected": "RedisBloom"
+      },
+      {
+        "id": "AVID-2026-R1442",
+        "title": "Insufficient sanitization in MLflow leads to XSS when running a recipe that uses an untrusted dataset. (CVE-2024-27133)",
+        "affected": "Unknown System"
+      },
+      {
+        "id": "AVID-2026-R1443",
+        "title": "Excessive directory permissions in MLflow leads to local privilege escalation when using spark_udf (CVE-2024-27134)",
+        "affected": "Unknown System"
       },
       {
         "id": "AVID-2026-R1444",
@@ -1271,6 +1361,16 @@
         "id": "AVID-2026-R1464",
         "title": "WordPress Copymatic plugin <= 1.6 - Unauthenticated Arbitrary File Upload vulnerability (CVE-2024-31351)",
         "affected": "Copymatic – AI Content Writer & Generator"
+      },
+      {
+        "id": "AVID-2026-R1466",
+        "title": "PyTorch before v2.2.0 was discovered to contain a heap buffer overflow vulnerability in the component /runtime/vararg_fu",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1467",
+        "title": "Pytorch before version v2.2.0 was discovered to contain a use-after-free vulnerability in torch/csrc/jit/mobile/interpre",
+        "affected": ""
       },
       {
         "id": "AVID-2026-R1468",
@@ -1333,6 +1433,11 @@
         "affected": ""
       },
       {
+        "id": "AVID-2026-R1495",
+        "title": "Langflow through 0.6.19 allows remote code execution if untrusted users are able to reach the \"POST /api/v1/custom_compo",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1497",
         "title": "Deserialization of untrusted data can occur in versions 3.7.0 or newer of Ydata's ydata-profiling open-source library, e",
         "affected": "ydata-profiling"
@@ -1383,6 +1488,16 @@
         "affected": "Apache Airflow"
       },
       {
+        "id": "AVID-2026-R1510",
+        "title": "An issue in Doccano Open source annotation tools for machine learning practitioners v.1.8.4 and Doccano Auto Labeling Pi",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1511",
+        "title": "An issue in Doccano Open source annotation tools for machine learning practitioners v.1.8.4 and Doccano Auto Labeling Pi",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1512",
         "title": "Remote code execution in streamlit geospatial in pages/1_📷_Timelapse.py MODIS Ocean Color SMI option palette (CVE-2024-4",
         "affected": "streamlit-geospatial"
@@ -1408,9 +1523,19 @@
         "affected": "streamlit"
       },
       {
+        "id": "AVID-2026-R1524",
+        "title": "langflow v1.0.12 was discovered to contain a remote code execution (RCE) vulnerability via the PythonCodeTool component.",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1531",
         "title": "Apache Airflow: Authenticated DAG authors could execute code on scheduler nodes (CVE-2024-45034)",
         "affected": "Apache Airflow"
+      },
+      {
+        "id": "AVID-2026-R1532",
+        "title": "An issue was discovered in llama_index before 0.10.38.",
+        "affected": ""
       },
       {
         "id": "AVID-2026-R1533",
@@ -1436,6 +1561,21 @@
         "id": "AVID-2026-R1546",
         "title": "Dell Data Lakehouse, version(s) 1.0.0.0 and 1.1.0.0, contain(s) an Improper Neutralization of Special Elements used in a",
         "affected": "Data Lakehouse"
+      },
+      {
+        "id": "AVID-2026-R1549",
+        "title": "In gradio <=4.42.0, the gr.DownloadButton function has a hidden server-side request forgery (SSRF) vulnerability.",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1550",
+        "title": "localai <=2.20.1 is vulnerable to Cross Site Scripting (XSS).",
+        "affected": ""
+      },
+      {
+        "id": "AVID-2026-R1551",
+        "title": "In PyTorch <=2.4.1, the RemoteModule has Deserialization RCE.",
+        "affected": ""
       },
       {
         "id": "AVID-2026-R1552",
@@ -1613,6 +1753,16 @@
         "affected": "graphql-ruby"
       },
       {
+        "id": "AVID-2026-R1671",
+        "title": "Snowflake JDBC Driver client-side encryption key in DEBUG logs (CVE-2025-27496)",
+        "affected": "snowflake-jdbc"
+      },
+      {
+        "id": "AVID-2026-R1677",
+        "title": "Flowise <= 2.2.3 is vulnerable to SQL Injection.",
+        "affected": ""
+      },
+      {
         "id": "AVID-2026-R1679",
         "title": "Apache Parquet Java: Arbitrary code execution in the parquet-avro module when reading an Avro schema from a Parquet file",
         "affected": "Apache Parquet Java"
@@ -1646,6 +1796,11 @@
         "id": "AVID-2026-R1686",
         "title": "MindSpore mindspore.numpy.fft.rfft2 memory corruption (CVE-2025-3145)",
         "affected": "MindSpore"
+      },
+      {
+        "id": "AVID-2026-R1693",
+        "title": "labsai/eddi Vulnerable to Path Traversal (Zip Slip) in ZIP Import Function (CVE-2025-32779)",
+        "affected": "EDDI"
       },
       {
         "id": "AVID-2026-R1694",
@@ -3902,23 +4057,11 @@
         ],
         "corpus_entry": "INC-04260"
       },
-      "AVID-2026-R1166": {
-        "cves": [
-          "CVE-2022-45907"
-        ],
-        "corpus_entry": "INC-05136"
-      },
       "AVID-2026-R1177": {
         "cves": [
           "CVE-2023-1651"
         ],
         "corpus_entry": "INC-04943"
-      },
-      "AVID-2026-R1181": {
-        "cves": [
-          "CVE-2023-23382"
-        ],
-        "corpus_entry": "INC-04479"
       },
       "AVID-2026-R1192": {
         "cves": [
@@ -4052,18 +4195,6 @@
         ],
         "corpus_entry": "INC-11437"
       },
-      "AVID-2026-R1235": {
-        "cves": [
-          "CVE-2023-30172"
-        ],
-        "corpus_entry": "INC-04376"
-      },
-      "AVID-2026-R1236": {
-        "cves": [
-          "CVE-2023-30444"
-        ],
-        "corpus_entry": "INC-04683"
-      },
       "AVID-2026-R1237": {
         "cves": [
           "CVE-2023-30620"
@@ -4088,53 +4219,17 @@
         ],
         "corpus_entry": "INC-04260"
       },
-      "AVID-2026-R1252": {
-        "cves": [
-          "CVE-2023-36189"
-        ],
-        "corpus_entry": "INC-01291"
-      },
-      "AVID-2026-R1253": {
-        "cves": [
-          "CVE-2023-36281"
-        ],
-        "corpus_entry": "INC-04718"
-      },
       "AVID-2026-R1266": {
         "cves": [
           "CVE-2023-38699"
         ],
         "corpus_entry": "INC-11471"
       },
-      "AVID-2026-R1267": {
-        "cves": [
-          "CVE-2023-38976"
-        ],
-        "corpus_entry": "INC-04453"
-      },
-      "AVID-2026-R1269": {
-        "cves": [
-          "CVE-2023-39659"
-        ],
-        "corpus_entry": "INC-04449"
-      },
-      "AVID-2026-R1271": {
-        "cves": [
-          "CVE-2023-39662"
-        ],
-        "corpus_entry": "INC-04451"
-      },
       "AVID-2026-R1280": {
         "cves": [
           "CVE-2023-43654"
         ],
         "corpus_entry": "INC-04959"
-      },
-      "AVID-2026-R1283": {
-        "cves": [
-          "CVE-2023-46229"
-        ],
-        "corpus_entry": "INC-01291"
       },
       "AVID-2026-R1284": {
         "cves": [
@@ -4160,12 +4255,6 @@
           "CVE-2023-51409"
         ],
         "corpus_entry": "INC-04324"
-      },
-      "AVID-2026-R1319": {
-        "cves": [
-          "CVE-2023-5245"
-        ],
-        "corpus_entry": "INC-04640"
       },
       "AVID-2026-R1324": {
         "cves": [
@@ -4335,12 +4424,6 @@
         ],
         "corpus_entry": "INC-03413"
       },
-      "AVID-2026-R1432": {
-        "cves": [
-          "CVE-2024-23750"
-        ],
-        "corpus_entry": "INC-11266"
-      },
       "AVID-2026-R1433": {
         "cves": [
           "CVE-2024-23751"
@@ -4473,12 +4556,6 @@
         ],
         "corpus_entry": "INC-04139"
       },
-      "AVID-2026-R1495": {
-        "cves": [
-          "CVE-2024-37014"
-        ],
-        "corpus_entry": "INC-10973"
-      },
       "AVID-2026-R1500": {
         "cves": [
           "CVE-2024-37902"
@@ -4490,18 +4567,6 @@
           "CVE-2024-38791"
         ],
         "corpus_entry": "INC-04202"
-      },
-      "AVID-2026-R1510": {
-        "cves": [
-          "CVE-2024-40441"
-        ],
-        "corpus_entry": "INC-03562"
-      },
-      "AVID-2026-R1511": {
-        "cves": [
-          "CVE-2024-40442"
-        ],
-        "corpus_entry": "INC-03562"
       },
       "AVID-2026-R1515": {
         "cves": [
@@ -4539,12 +4604,6 @@
         ],
         "corpus_entry": "INC-04269"
       },
-      "AVID-2026-R1524": {
-        "cves": [
-          "CVE-2024-42835"
-        ],
-        "corpus_entry": "INC-10786"
-      },
       "AVID-2026-R1525": {
         "cves": [
           "CVE-2024-4311"
@@ -4557,29 +4616,11 @@
         ],
         "corpus_entry": "INC-04002"
       },
-      "AVID-2026-R1532": {
-        "cves": [
-          "CVE-2024-45201"
-        ],
-        "corpus_entry": "INC-01348"
-      },
       "AVID-2026-R1534": {
         "cves": [
           "CVE-2024-45846"
         ],
         "corpus_entry": "INC-03558"
-      },
-      "AVID-2026-R1550": {
-        "cves": [
-          "CVE-2024-48057"
-        ],
-        "corpus_entry": "INC-10549"
-      },
-      "AVID-2026-R1551": {
-        "cves": [
-          "CVE-2024-48063"
-        ],
-        "corpus_entry": "INC-03895"
       },
       "AVID-2026-R1557": {
         "cves": [
@@ -4797,12 +4838,6 @@
         ],
         "corpus_entry": "INC-10626"
       },
-      "AVID-2026-R1677": {
-        "cves": [
-          "CVE-2025-29189"
-        ],
-        "corpus_entry": "INC-02579"
-      },
       "AVID-2026-R1678": {
         "cves": [
           "CVE-2025-29783"
@@ -4826,12 +4861,6 @@
           "CVE-2025-32444"
         ],
         "corpus_entry": "INC-03336"
-      },
-      "AVID-2026-R1693": {
-        "cves": [
-          "CVE-2025-32779"
-        ],
-        "corpus_entry": "INC-02538"
       },
       "AVID-2026-R1705": {
         "cves": [

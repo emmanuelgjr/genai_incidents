@@ -2,134 +2,26 @@
   "source": "arXiv OAI-PMH (oaipmh.arxiv.org), set cs:cs:CR, metadataPrefix=arXiv",
   "licence_of_metadata": "CC0 1.0 (info.arxiv.org/help/api/tou.html, footnote 1)",
   "window": {
-    "created_since": "2025-10-03",
+    "v1_month_since": "2025-10",
+    "note": "dated by v1 (id YYMM), not by the OAI created field",
     "datestamp_until": "2026-10-03"
   },
   "min_interval_seconds": 3.0,
   "stats": {
-    "harvested": 12551,
+    "harvested": 12616,
     "deleted": 0,
-    "created_before_window": 617,
-    "not_selected": 11871,
+    "v1_before_window": 2352,
+    "not_selected": 10209,
     "already_in_corpus": 0,
     "would_merge_into_existing": 0,
-    "selected_new": 63
+    "selected_new": 55
   },
   "would_merge_into_existing": {},
   "selected": [
     {
-      "id": "2411.16769",
-      "created": "2026-09-26",
-      "title": "Red-Teaming Text-to-Image Models via In-Context Experience Replay and Semantic-Preserving Prompt Rewriting",
-      "reasons": {
-        "headline": "red-teaming",
-        "target_terms": [
-          "text-to-image"
-        ],
-        "concrete": "commercial systems"
-      }
-    },
-    {
-      "id": "2504.19373",
-      "created": "2026-03-03",
-      "title": "Doxing via the Lens: Revealing Location-related Privacy Leakage on Multi-modal Large Reasoning Models",
-      "reasons": {
-        "headline": "leakage",
-        "target_terms": [
-          "mllms",
-          "multi-modal"
-        ],
-        "concrete": "real-world attack"
-      }
-    },
-    {
-      "id": "2507.16329",
-      "created": "2025-12-07",
-      "title": "DREAM: Scalable Red Teaming for Text-to-Image Generative Systems via Distribution Modeling",
-      "reasons": {
-        "headline": "red teaming",
-        "target_terms": [
-          "generative",
-          "text-to-image"
-        ],
-        "concrete": "real-world deployment"
-      }
-    },
-    {
-      "id": "2508.14070",
-      "created": "2025-11-25",
-      "title": "Special-Character Adversarial Attacks on Open-Source Language Model",
-      "reasons": {
-        "headline": "attacks",
-        "target_terms": [
-          "language model",
-          "large language models",
-          "llms"
-        ],
-        "concrete": "real-world deployments"
-      }
-    },
-    {
-      "id": "2508.20083",
-      "created": "2026-07-19",
-      "title": "DisarmRAG: Stealthy Retriever-Centric Poisoning to Disable Self-Correction in Retrieval-Augmented Generation (Extended Version)",
-      "reasons": {
-        "headline": "stealthy",
-        "target_terms": [
-          "large language models",
-          "llms",
-          "rag",
-          "retrieval-augmented"
-        ],
-        "concrete": "real-world deployment"
-      }
-    },
-    {
-      "id": "2508.20863",
-      "created": "2026-03-30",
-      "title": "Misleading Large Language Models used (or misused) in Scientific Peer-Reviewing via Hidden Prompt-Injection Attacks",
-      "reasons": {
-        "headline": "prompt-injection",
-        "target_terms": [
-          "large language models",
-          "llm",
-          "llms"
-        ],
-        "concrete": "commercial llm"
-      }
-    },
-    {
-      "id": "2508.21669",
-      "created": "2025-11-15",
-      "title": "Cybersecurity AI: Hacking the AI Hackers via Prompt Injection",
-      "reasons": {
-        "headline": "prompt injection",
-        "target_terms": [
-          "ai agents"
-        ],
-        "concrete": "proof-of-concept"
-      }
-    },
-    {
-      "id": "2509.05755",
-      "created": "2026-06-28",
-      "title": "Red-Teaming Coding Agents from a Tool-Invocation Perspective: An Empirical Security Assessment",
-      "reasons": {
-        "headline": "red-teaming",
-        "target_terms": [
-          "claude",
-          "coding agents",
-          "copilot",
-          "cursor",
-          "gpt-5",
-          "large language models"
-        ],
-        "concrete": "remote code execution"
-      }
-    },
-    {
       "id": "2510.01342",
-      "created": "2025-10-09",
+      "v1_month": "2025-10",
+      "latest_version_date": "2025-10-09",
       "title": "Fine-Tuning Jailbreaks under Highly Constrained Black-Box Settings: A Three-Pronged Approach",
       "reasons": {
         "headline": "jailbreaks",
@@ -144,7 +36,8 @@
     },
     {
       "id": "2510.04261",
-      "created": "2025-10-05",
+      "v1_month": "2025-10",
+      "latest_version_date": "2025-10-05",
       "title": "VortexPIA: Indirect Prompt Injection Attack against LLMs for Efficient Extraction of User Privacy",
       "reasons": {
         "headline": "prompt injection",
@@ -157,7 +50,8 @@
     },
     {
       "id": "2510.10271",
-      "created": "2026-06-26",
+      "v1_month": "2025-10",
+      "latest_version_date": "2026-06-26",
       "title": "MetaBreak: Jailbreaking Online LLM Services via Special Token Manipulation",
       "reasons": {
         "headline": "jailbreaking",
@@ -171,7 +65,8 @@
     },
     {
       "id": "2510.10281",
-      "created": "2025-10-11",
+      "v1_month": "2025-10",
+      "latest_version_date": "2025-10-11",
       "title": "ArtPerception: ASCII Art-based Jailbreak on LLMs with Recognition Pre-test",
       "reasons": {
         "headline": "jailbreak",
@@ -188,7 +83,8 @@
     },
     {
       "id": "2510.17277",
-      "created": "2026-03-07",
+      "v1_month": "2025-10",
+      "latest_version_date": "2026-03-07",
       "title": "PolyJailbreak: Cross-Modal Jailbreaking Attacks on Black-Box Multimodal LLMs",
       "reasons": {
         "headline": "jailbreaking",
@@ -205,7 +101,8 @@
     },
     {
       "id": "2510.17904",
-      "created": "2026-09-18",
+      "v1_month": "2025-10",
+      "latest_version_date": "2026-09-18",
       "title": "BreakFun: Jailbreaking LLMs via Object Instantiation under Simulated Code Execution",
       "reasons": {
         "headline": "jailbreaking",
@@ -219,7 +116,8 @@
     },
     {
       "id": "2510.21190",
-      "created": "2026-02-18",
+      "v1_month": "2025-10",
+      "latest_version_date": "2026-02-18",
       "title": "The Trojan Example: Jailbreaking LLMs through Template Filling and Unsafety Reasoning",
       "reasons": {
         "headline": "jailbreaking",
@@ -233,7 +131,8 @@
     },
     {
       "id": "2510.22963",
-      "created": "2026-06-19",
+      "v1_month": "2025-10",
+      "latest_version_date": "2026-06-19",
       "title": "When Compression Becomes an Attack Surface: Black-Box Attacks on Prompt-Compressed LLM Agents",
       "reasons": {
         "headline": "attack",
@@ -247,7 +146,8 @@
     },
     {
       "id": "2511.02376",
-      "created": "2025-12-21",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-12-21",
       "title": "AutoAdv: Automated Adversarial Prompting for Multi-Turn Jailbreaking of Large Language Models",
       "reasons": {
         "headline": "jailbreaking",
@@ -261,7 +161,8 @@
     },
     {
       "id": "2511.05797",
-      "created": "2025-11-08",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-11-08",
       "title": "When AI Meets the Web: Prompt Injection Risks in Third-Party AI Chatbot Plugins",
       "reasons": {
         "headline": "prompt injection",
@@ -277,7 +178,8 @@
     },
     {
       "id": "2511.07876",
-      "created": "2025-11-11",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-11-11",
       "title": "LoopLLM: Transferable Energy-Latency Attacks in LLMs via Repetitive Generation",
       "reasons": {
         "headline": "attacks",
@@ -291,7 +193,8 @@
     },
     {
       "id": "2511.16110",
-      "created": "2025-11-20",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-11-20",
       "title": "Multi-Faceted Attack: Exposing Cross-Model Vulnerabilities in Defense-Equipped Vision-Language Models",
       "reasons": {
         "headline": "attack",
@@ -305,7 +208,8 @@
     },
     {
       "id": "2511.16709",
-      "created": "2025-11-20",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-11-20",
       "title": "AutoBackdoor: Automating Backdoor Attacks via LLM Agents",
       "reasons": {
         "headline": "backdoor",
@@ -322,7 +226,8 @@
     },
     {
       "id": "2511.21180",
-      "created": "2025-11-26",
+      "v1_month": "2025-11",
+      "latest_version_date": "2025-11-26",
       "title": "CAHS-Attack: CLIP-Aware Heuristic Search Attack Method for Stable Diffusion",
       "reasons": {
         "headline": "attack",
@@ -336,7 +241,8 @@
     },
     {
       "id": "2601.09625",
-      "created": "2026-02-10",
+      "v1_month": "2026-01",
+      "latest_version_date": "2026-02-10",
       "title": "The Promptware Kill Chain: How Prompt Injections Gradually Evolved Into a Multistep Malware Delivery Mechanism",
       "reasons": {
         "headline": "prompt injections",
@@ -349,7 +255,8 @@
     },
     {
       "id": "2601.12460",
-      "created": "2026-01-18",
+      "v1_month": "2026-01",
+      "latest_version_date": "2026-01-18",
       "title": "TrojanPraise: Jailbreak LLMs via Benign Fine-Tuning",
       "reasons": {
         "headline": "jailbreak",
@@ -363,7 +270,8 @@
     },
     {
       "id": "2602.04653",
-      "created": "2026-05-24",
+      "v1_month": "2026-02",
+      "latest_version_date": "2026-05-24",
       "title": "Inference-Time Backdoors via Chat Templates: From LLM Supply Chains to Agentic System Compromise",
       "reasons": {
         "headline": "backdoors",
@@ -377,7 +285,8 @@
     },
     {
       "id": "2602.05401",
-      "created": "2026-02-05",
+      "v1_month": "2026-02",
+      "latest_version_date": "2026-02-05",
       "title": "BadTemplate: A Training-Free Backdoor Attack via Chat Template Against Large Language Models",
       "reasons": {
         "headline": "backdoor",
@@ -391,7 +300,8 @@
     },
     {
       "id": "2602.19450",
-      "created": "2026-05-26",
+      "v1_month": "2026-02",
+      "latest_version_date": "2026-05-26",
       "title": "Red-Teaming Claude Opus and ChatGPT-based Security Advisors for Trusted Execution Environments",
       "reasons": {
         "headline": "red-teaming",
@@ -407,7 +317,8 @@
     },
     {
       "id": "2602.22242",
-      "created": "2026-02-24",
+      "v1_month": "2026-02",
+      "latest_version_date": "2026-02-24",
       "title": "Analysis of LLMs Against Prompt Injection and Jailbreak Attacks",
       "reasons": {
         "headline": "prompt injection",
@@ -420,7 +331,8 @@
     },
     {
       "id": "2603.09246",
-      "created": "2026-03-10",
+      "v1_month": "2026-03",
+      "latest_version_date": "2026-03-10",
       "title": "Reasoning-Oriented Programming: Chaining Semantic Gadgets to Jailbreak Large Vision Language Models",
       "reasons": {
         "headline": "jailbreak",
@@ -436,7 +348,8 @@
     },
     {
       "id": "2603.13420",
-      "created": "2026-05-12",
+      "v1_month": "2026-03",
+      "latest_version_date": "2026-05-12",
       "title": "Accelerating Suffix Jailbreak attacks with Prefix-Shared KV-cache",
       "reasons": {
         "headline": "jailbreak",
@@ -449,7 +362,8 @@
     },
     {
       "id": "2603.13847",
-      "created": "2026-03-14",
+      "v1_month": "2026-03",
+      "latest_version_date": "2026-03-14",
       "title": "Sirens' Whisper: Inaudible Near-Ultrasonic Jailbreaks of Speech-Driven LLMs",
       "reasons": {
         "headline": "jailbreaks",
@@ -462,7 +376,8 @@
     },
     {
       "id": "2603.27522",
-      "created": "2026-03-29",
+      "v1_month": "2026-03",
+      "latest_version_date": "2026-03-29",
       "title": "Hidden Ads: Behavior Triggered Semantic Backdoors for Advertisement Injection in Vision Language Models",
       "reasons": {
         "headline": "backdoors",
@@ -477,7 +392,8 @@
     },
     {
       "id": "2603.28013",
-      "created": "2026-09-30",
+      "v1_month": "2026-03",
+      "latest_version_date": "2026-09-30",
       "title": "Kill-Chain Canaries: Stage-Level Tracking of Prompt Injection Across Attack Surfaces and Five Production LLMs",
       "reasons": {
         "headline": "prompt injection",
@@ -491,7 +407,8 @@
     },
     {
       "id": "2604.05809",
-      "created": "2026-08-13",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-08-13",
       "title": "Adjustable Text-Guided Backdoor Attacks with Natural-Word Triggers on Multimodal Pretrained Models",
       "reasons": {
         "headline": "backdoor",
@@ -503,7 +420,8 @@
     },
     {
       "id": "2604.12232",
-      "created": "2026-04-14",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-04-14",
       "title": "TEMPLATEFUZZ: Fine-Grained Chat Template Fuzzing for Jailbreaking and Red Teaming LLMs",
       "reasons": {
         "headline": "jailbreaking",
@@ -516,7 +434,8 @@
     },
     {
       "id": "2604.15368",
-      "created": "2026-04-15",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-04-15",
       "title": "LogJack: Indirect Prompt Injection Through Cloud Logs Against LLM Debugging Agents",
       "reasons": {
         "headline": "prompt injection",
@@ -529,7 +448,8 @@
     },
     {
       "id": "2604.21829",
-      "created": "2026-04-27",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-04-27",
       "title": "Black-Box Skill Stealing Attack from Proprietary LLM Agents: An Empirical Study",
       "reasons": {
         "headline": "stealing",
@@ -543,7 +463,8 @@
     },
     {
       "id": "2604.23711",
-      "created": "2026-04-26",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-04-26",
       "title": "Spore: Efficient and Training-Free Privacy Extraction Attack on LLMs via Inference-Time Hybrid Probing",
       "reasons": {
         "headline": "privacy extraction",
@@ -559,7 +480,8 @@
     },
     {
       "id": "2604.28157",
-      "created": "2026-04-30",
+      "v1_month": "2026-04",
+      "latest_version_date": "2026-04-30",
       "title": "FlashRT: Towards Computationally and Memory Efficient Red-Teaming for Prompt Injection and Knowledge Corruption",
       "reasons": {
         "headline": "prompt injection",
@@ -576,7 +498,8 @@
     },
     {
       "id": "2605.11229",
-      "created": "2026-05-11",
+      "v1_month": "2026-05",
+      "latest_version_date": "2026-05-11",
       "title": "Comment and Control: Hijacking Agentic Workflows via Context-Grounded Evolution",
       "reasons": {
         "headline": "hijacking",
@@ -593,7 +516,8 @@
     },
     {
       "id": "2605.14460",
-      "created": "2026-05-14",
+      "v1_month": "2026-05",
+      "latest_version_date": "2026-05-14",
       "title": "Exploiting LLM Agent Supply Chains via Payload-less Skills",
       "reasons": {
         "headline": "exploiting",
@@ -610,7 +534,8 @@
     },
     {
       "id": "2605.17971",
-      "created": "2026-05-18",
+      "v1_month": "2026-05",
+      "latest_version_date": "2026-05-18",
       "title": "Babel: Jailbreaking Safety Attention via Obfuscation Distribution Optimized Sampling",
       "reasons": {
         "headline": "jailbreaking",
@@ -624,7 +549,8 @@
     },
     {
       "id": "2605.18133",
-      "created": "2026-05-18",
+      "v1_month": "2026-05",
+      "latest_version_date": "2026-05-18",
       "title": "An Empirical Study of Privacy Leakage Chains via Prompt Injection in Black-Box Chatbot Environments",
       "reasons": {
         "headline": "prompt injection",
@@ -636,7 +562,8 @@
     },
     {
       "id": "2605.30667",
-      "created": "2026-05-28",
+      "v1_month": "2026-05",
+      "latest_version_date": "2026-05-28",
       "title": "Automatically Attacking Software Reverse Engineering AI Agents",
       "reasons": {
         "headline": "attacking",
@@ -652,7 +579,8 @@
     },
     {
       "id": "2606.06244",
-      "created": "2026-06-04",
+      "v1_month": "2026-06",
+      "latest_version_date": "2026-06-04",
       "title": "Steering LLM Viewpoints through Fabricated Evidence Injection",
       "reasons": {
         "headline": "injection",
@@ -667,7 +595,8 @@
     },
     {
       "id": "2606.10742",
-      "created": "2026-06-09",
+      "v1_month": "2026-06",
+      "latest_version_date": "2026-06-09",
       "title": "MemVenom: Triggered Poisoning of Multimodal Memories in Web Agents",
       "reasons": {
         "headline": "poisoning",
@@ -682,7 +611,8 @@
     },
     {
       "id": "2606.15788",
-      "created": "2026-06-14",
+      "v1_month": "2026-06",
+      "latest_version_date": "2026-06-14",
       "title": "GAS-Leak-LLM: Genetic Algorithm-Based Suffix Optimization for Black-Box LLM Jailbreaking",
       "reasons": {
         "headline": "jailbreaking",
@@ -696,7 +626,8 @@
     },
     {
       "id": "2606.21077",
-      "created": "2026-06-19",
+      "v1_month": "2026-06",
+      "latest_version_date": "2026-06-19",
       "title": "OTTER: A Red-Teaming System for Toxicity-Evading Jailbreak Prompt Optimization",
       "reasons": {
         "headline": "jailbreak",
@@ -708,7 +639,8 @@
     },
     {
       "id": "2607.00481",
-      "created": "2026-07-01",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-01",
       "title": "Beyond the Prompt: Jailbreaking Function-Calling LLMs via Simulated Moderation Traces",
       "reasons": {
         "headline": "jailbreaking",
@@ -722,7 +654,8 @@
     },
     {
       "id": "2607.02961",
-      "created": "2026-07-03",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-03",
       "title": "Overloading Large Vision-Language Models for Jailbreaking",
       "reasons": {
         "headline": "jailbreaking",
@@ -739,7 +672,8 @@
     },
     {
       "id": "2607.05120",
-      "created": "2026-07-06",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-06",
       "title": "Agent Data Injection Attacks are Realistic Threats to AI Agents",
       "reasons": {
         "headline": "injection attacks",
@@ -756,7 +690,8 @@
     },
     {
       "id": "2607.07433",
-      "created": "2026-07-08",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-08",
       "title": "Beware of Agentic Botnets: Scalable Untargeted Promptware Attacks via Universal and Transferable Adversarial HalluSquatting",
       "reasons": {
         "headline": "attacks",
@@ -770,7 +705,8 @@
     },
     {
       "id": "2607.15657",
-      "created": "2026-07-17",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-17",
       "title": "Do Agents Dream of False Memories? Black-box Visual Attacks on Long-term Memory in Multimodal AI Agents",
       "reasons": {
         "headline": "attacks",
@@ -784,7 +720,8 @@
     },
     {
       "id": "2607.19267",
-      "created": "2026-07-21",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-21",
       "title": "They'll Verify. They Just Won't Act. How Authority Framing and Laundered Code Turn a Trusted Agentic CI/CD Pipeline Into an Attack Surface",
       "reasons": {
         "headline": "attack",
@@ -798,7 +735,8 @@
     },
     {
       "id": "2607.23444",
-      "created": "2026-07-26",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-26",
       "title": "Isolated but Exposed: Persistence-Based Memory Extraction Attack on LLM Agents",
       "reasons": {
         "headline": "attack",
@@ -811,7 +749,8 @@
     },
     {
       "id": "2607.25936",
-      "created": "2026-07-28",
+      "v1_month": "2026-07",
+      "latest_version_date": "2026-07-28",
       "title": "From Role Prompt to Infinite Thinking: Exploiting Persona Conditioning for Inference Cost Attacks in LLMs",
       "reasons": {
         "headline": "exploiting",
@@ -824,7 +763,8 @@
     },
     {
       "id": "2608.04741",
-      "created": "2026-08-05",
+      "v1_month": "2026-08",
+      "latest_version_date": "2026-08-05",
       "title": "LoginTrap: Uncovering Task-Agnostic Phishing-Style Indirect Prompt Injection Attacks against LLM-based Web Agents",
       "reasons": {
         "headline": "prompt injection",
@@ -838,7 +778,8 @@
     },
     {
       "id": "2608.23471",
-      "created": "2026-08-24",
+      "v1_month": "2026-08",
+      "latest_version_date": "2026-08-24",
       "title": "InjecMEM: Memory Injection Attack on LLM Agent Memory Systems",
       "reasons": {
         "headline": "memory injection",
@@ -850,7 +791,8 @@
     },
     {
       "id": "2609.01222",
-      "created": "2026-09-02",
+      "v1_month": "2026-09",
+      "latest_version_date": "2026-09-02",
       "title": "What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness",
       "reasons": {
         "headline": "attacks",
@@ -864,7 +806,8 @@
     },
     {
       "id": "2609.04533",
-      "created": "2026-09-15",
+      "v1_month": "2026-09",
+      "latest_version_date": "2026-09-15",
       "title": "Repeat-After-Me: Black-Box Adaptive Visual Prompt Injection",
       "reasons": {
         "headline": "prompt injection",
@@ -879,7 +822,8 @@
     },
     {
       "id": "2609.09553",
-      "created": "2026-09-09",
+      "v1_month": "2026-09",
+      "latest_version_date": "2026-09-09",
       "title": "Arbitrary Cipher Attacks Against Large Language Models Do Not Require Fine-Tuning",
       "reasons": {
         "headline": "attacks",
@@ -892,7 +836,8 @@
     },
     {
       "id": "2609.32635",
-      "created": "2026-09-26",
+      "v1_month": "2026-09",
+      "latest_version_date": "2026-09-26",
       "title": "Trust the Brand, Lose Control: How Identity Hijacks LLM Agent Orchestration",
       "reasons": {
         "headline": "hijacks",
@@ -905,7 +850,8 @@
     },
     {
       "id": "2609.39902",
-      "created": "2026-09-30",
+      "v1_month": "2026-09",
+      "latest_version_date": "2026-09-30",
       "title": "CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code Completion",
       "reasons": {
         "headline": "exploiting",
