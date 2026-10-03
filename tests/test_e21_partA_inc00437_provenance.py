@@ -19,7 +19,7 @@ generated data/incidents.json directly:
 
 1. The override actually lands the right values when run through the real
    pipeline (not just that the JSON parses).
-2. The population this fix addresses is still exactly one row -- if a future
+2. (Superseded 2026-10-03, see the note at the foot of this file.) The population this fix addresses is still exactly one row -- if a future
    OECD refresh, an AIID snapshot update, or a merge-order change ever makes
    a second OECD-tracked row's claimed AIID cross-reference go unmatched by
    aiid_full.json, this test fails loudly instead of a second unlabeled row
@@ -90,24 +90,13 @@ def test_inc00437_row_exists_and_is_absent_from_aiid_full_snapshot():
         "cross-reference via aiid_ids -- the fact pattern this fix addresses"
     )
 
-    aiid_rows = _load("aiid_full.json")
-    aiid_ids_present = set()
-    for r in aiid_rows:
-        sid = r.get("source_id") or ""
-        if sid.startswith("AIID-"):
-            try:
-                aiid_ids_present.add(int(sid.split("-", 1)[1]))
-            except ValueError:
-                pass
-    assert _INC_00437_AIID_ID not in aiid_ids_present, (
-        f"aiid_id {_INC_00437_AIID_ID} now exists in ingest/aiid_full.json -- "
-        "AIID's own snapshot may have caught up with OECD's cross-reference. "
-        "If so, this row's content will start winning the merge from AIID "
-        "instead of OECD, and the description_provenance/description_source "
-        "override in data/curation_overrides.json's OECD-AIM-2026-04-03-c16a "
-        "entry needs re-examination (it would be actively wrong, not just "
-        "unnecessary, once AIID content actually ships here)."
-    )
+    # SUPERSEDED 2026-10-03 (board D42): this test used to also assert that
+    # aiid_id 1574 is ABSENT from ingest/aiid_full.json. Once WS4-T14 keeps the
+    # AIID snapshot current that stops being true (the 2026-09-28 snapshot
+    # contains 1574), and the weekly job would fail for a reason that is no
+    # longer a defect: merge_and_dedupe.apply_curation_overrides() now applies
+    # a provenance label only while the description is still the text the
+    # keyed source authored (tests/test_d42_refresh_merge_gate.py).
 
 
 def test_curation_override_labels_inc00437s_description_as_oecd_aim_original():
@@ -140,83 +129,14 @@ def test_curation_override_labels_inc00437s_description_as_oecd_aim_original():
     assert entry["description_source"] == "oecd-aim"
 
 
-def test_oecd_aiid_content_disagreement_is_unique_to_inc00437():
-    """Tripwire: among rows built from ONLY aiid_full.json +
-    oecd_aim_full_incidents.json (the two files that can jointly produce an
-    aiid_id-bearing row whose description is NOT AIID's own template), exactly
-    one such row exists today -- aiid_id 1574 / INC-00437. Measured
-    2026-07-30 via docs/audits/E21-part-A-measurement-2026-07-30.md, which
-    also confirms 3 other OECD rows claiming a not-yet-in-aiid_full.json AIID
-    cross-reference exist at the raw-ingest level, but each merges into a
-    corpus row that ALSO carries a different, real AIID-<n> id, so none of
-    those three produces a corpus-level disagreement -- only a raw per-row
-    join (not run through dedup) would over-count to 4. This test runs the
-    real dedup, not a raw join, precisely to avoid that over-count.
-
-    **WS4-T10 update (2026-09-15), dated -- this population is expected to
-    change again and is not itself a defect.** The WS4-T10 `normalize_url`
-    fix (docs/audits/E21-tripwire-refresh-2026-09-14.md Findings 8/9) stopped
-    a query-string URL collapse that was silently weak-merging one of the
-    three "other" raw-ingest rows above -- aiid_id 1575 / source_ids
-    `AIID-1575` + `OECD-AIM-2026-01-21-eb71` ("Eightfold AI Sued for Secretly
-    Profiling Job Applicants with AI") -- into an unrelated corpus row that
-    happened to carry a real `AIID-<n>` id, masking its own OECD-vs-AIID
-    disagreement the same way INC-00437's was masked before its fix. Splitting
-    it back out is the fix working as intended (WS4-T10 Phase B measures
-    exactly this kind of population change), not a regression the code
-    introduced. The other two "other" rows are unaffected -- confirming the
-    fix is precise, not a blanket un-merge.
-
-    **Correction (BOUNCE #1, red-reviewer [R], 2026-09-15): the paragraph
-    below originally, and wrongly, said 1575 "still ships the disagreement
-    in the committed corpus today."** It does not. In the COMMITTED corpus,
-    `AIID-1575` and `OECD-AIM-2026-01-21-eb71` sit MERGED INSIDE `INC-05013`
-    (the TruDi navigation-system row, whose surviving description is
-    AIID's own template for `AIID-1436`) -- so today's committed data ships
-    ZERO visible disagreement for 1575; it is masked exactly the way
-    INC-00437's was before ITS fix, which is the point this docstring's
-    prior paragraph was making about the MECHANISM, not (correctly) about
-    what's currently published. 1575 only becomes a standalone,
-    template-disagreeing row -- and only then would need a
-    `curation_overrides.json` entry the way 1574 has one -- once a rebuild
-    actually runs under the WS4-T10 fix (confirmed independently by
-    red-reviewer's own rebuild, which produced 1575 as a fresh row).
-
-    **This is code-only, per WS4-T10's scope** (`git diff main -- data/
-    schema/ ingest/` stays empty for that task) -- no `curation_overrides.json`
-    entry for 1575 exists yet, and none should be added by this task; that
-    decision belongs to whoever executes the WS4-T10 Phase C unmerge design
-    (docs/specs/WS4-T10-unmerge-design-2026-09-15.md), which the user rules
-    on separately. This test should not encode the eventual fixed-rebuild
-    state as a fait accompli by silently widening its assertion beyond what
-    the CODE change (not a data change) actually does. So the assertion
-    below is intentionally an explicit two-item list, not `>=`: a THIRD row
-    appearing here (from either an OECD refresh or a further merge-heuristic
-    change) must still fail loudly, exactly as the original tripwire
-    intended."""
-    surviving = _build_surviving()
-    aiid_rows = [e for e in surviving if e.get("aiid_id")]
-
-    # Positive control: the checked population must actually contain
-    # aiid_id-bearing rows, or the uniqueness assertion below would pass
-    # vacuously.
-    assert len(aiid_rows) > 1000, (
-        f"expected >1000 aiid_id-bearing rows from the two-file repro, found "
-        f"{len(aiid_rows)} -- ingest/aiid_full.json may be empty/broken"
-    )
-
-    _WS4_T10_KNOWN_SPLIT_AIID_ID = 1575  # see the docstring's dated note
-
-    exceptions = [e for e in aiid_rows if not _AIID_TEMPLATE.match(e.get("description", ""))]
-    exception_aiid_ids = sorted(e["aiid_id"] for e in exceptions)
-    expected = sorted([_INC_00437_AIID_ID, _WS4_T10_KNOWN_SPLIT_AIID_ID])
-    assert exception_aiid_ids == expected, (
-        f"expected exactly the two known aiid_id-bearing rows whose "
-        f"description doesn't match AIID's own template ({expected} -- "
-        f"1574/INC-00437 plus the WS4-T10-split 1575, see this test's "
-        f"docstring), found {len(exceptions)}: {exception_aiid_ids} -- a "
-        "NEW AIID-signal-vs-OECD-content disagreement has appeared and "
-        "needs its own curation_overrides.json entry, the same way "
-        "INC-00437 got one (1575 is a known, not-yet-overridden split -- "
-        "see this test's docstring)"
-    )
+# REMOVED 2026-10-03 (board D42; docs/audits/refresh-tripwire-2026-10-03.md):
+# `test_oecd_aiid_content_disagreement_is_unique_to_inc00437` asserted an
+# exact two-row population ([1574, 1575]) built from two ingest files and
+# matched by an AIID-prefix regex. It failed the weekly refresh on 2026-09-14,
+# 09-20 and 09-27 as the population grew 2 -> 42, and had three blind spots
+# (prefix-spoofed descriptions, rows outside the two files such as aiid_id 898,
+# the `title` field). Superseded by tests/test_aiid_signal_provenance.py, which
+# explains every aiid_id row by independent derivation, plus the build-time
+# merge gate tests/test_d42_refresh_merge_gate.py. The original function and
+# its long WS4-T10 docstring remain in git history (commit 9ef355f5 and
+# earlier); do not restore it as a source.

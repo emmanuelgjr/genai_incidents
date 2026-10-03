@@ -594,6 +594,21 @@ def test_deprecations_file_order_is_never_resorted_even_with_date_inversions(
     )
 
 
+def _approve_merge(tmp_path, monkeypatch, frm, into):
+    """D42: these tests exercise deprecation persistence with OECD-AIM-* fixture
+    ids, which the refresh-merge gate (correctly) refuses without a user
+    approval. Supply one, through the real approval-file path."""
+    entries = [{"kind": "merge", "from": frm, "into": into}]
+    p = tmp_path / "approved-refresh-merges.json"
+    p.write_text(_json.dumps({
+        "entries": entries,
+        "authorization": {"decision": "TEST", "ruled_by": "user",
+                          "entries_sha256": m._refresh_merge_entries_sha256(entries)},
+    }), encoding="utf-8")
+    monkeypatch.setattr(m, "REFRESH_MERGE_APPROVAL_PATH", p)
+
+
+
 def test_ordinary_rebuild_still_refuses_second_record_for_new_from(tmp_path, monkeypatch):
     """The persistence fix must not turn off the EXISTING guard against an
     ordinary rebuild silently double-writing a record for an id its own
@@ -601,6 +616,7 @@ def test_ordinary_rebuild_still_refuses_second_record_for_new_from(tmp_path, mon
     deliberately-appended on-disk record (see the previous test) may create
     a second entry for one `from`."""
     data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    _approve_merge(tmp_path, monkeypatch, "INC-00002", "INC-00001")
     prev_a = {
         **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-A", "Old incident A")),
         "id": "INC-00001", "added": "2026-01-01", "updated": "2026-01-01",
@@ -635,6 +651,7 @@ def test_merged_deprecation_persists_retired_source_ids(tmp_path, monkeypatch):
     retired id's own `source_ids` from the last committed build, so a
     guard can check it later without manual git archaeology."""
     data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    _approve_merge(tmp_path, monkeypatch, "INC-00002", "INC-00001")
     # Prior build: two entries that are about to merge under a shared CVE.
     prev_a = {
         **m.normalize_entry(_oecd_entry("OECD-AIM-OLD-A", "Old incident A")),
