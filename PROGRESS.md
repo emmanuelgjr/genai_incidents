@@ -2,6 +2,22 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🌍 Source-expansion evaluation, tranche 2 (worldwide): **license-auditor DISPATCHED 2026-10-02** on `eval/source-expansion` (pushed, `83da7445`) · ⚠ **the tranche-1 record does not exist**
+
+- **User brief, 2026-10-02.** Evaluate about 30 worldwide candidates under the same discipline as tranche 1:
+  - license-auditor writes a pre-row for each candidate first (invariant 10 applied at evaluation time; absence findings follow the standing rule);
+  - pipeline-engineer then estimates volume, overlap and dedupe load, ingest shape, corpus fit, reconciliation cost (WS4-T2) and non-English handling;
+  - the output is one committed ranked file, with waves of 2–3 sources for the user's approval;
+  - **no ingest code is written before a ruling.**
+  The scope record is `docs/specs/source-expansion-tranche2-scope-2026-10-02.md`. The deliverable will be `docs/specs/source-expansion-evaluation.md`.
+- **⚠ Foreman finding: the "first ten" evaluation exists nowhere.**
+  - `git grep -i huntr` across every local and origin ref, all 21 worktrees, and this board found no evaluation file.
+  - The only names known are the user's priors, CISA and huntr. CISA KEV is already ingested (`SOURCE_LICENSES.md` §2.1), so tranche-1 "CISA" presumably means a CISA surface beyond KEV. That is an unconfirmed inference.
+  - This has the working-agreement-1 shape: a chat-only deliverable lost at a session boundary.
+  - **Consequence:** the cross-tranche first-wave decision the user asked for cannot be ranked until the user supplies the ten names and they are re-evaluated under the same discipline. **Escalated to the user 2026-10-02.**
+- **In flight:** license-auditor is writing tranche-2 pre-rows, rejections (CNNVD/CNVD, Snyk/VulDB, news aggregators) and watch items (EU AI Act Art. 73 register, EUVD API maturation). Its absence findings route to red-reviewer for a curl check.
+- **Next:** foreman commits the auditor's file → pipeline-engineer estimates → red-reviewer gate → ranked waves to the user.
+
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
 **Rebase.** A squash-rebase of `docs/readme-refresh` (5 commits, base `528d5936`) onto post-v2.11.0 main produced `0c4b51cc`. main had changed only README:33 and README:71 since the branch point; **both were carried byte-identical from main** (D37-verified :33, emoji prefix kept; gated `50e42bbe` :71, now a plain paragraph under "Latest release" instead of the old callout). `render_docs_stats` moved the At-a-glance tile to 2.11.0. Pushed with `--force-with-lease` pinned to `8e23d6e6`. The first attempt used a wrong SHA and was **correctly rejected (stale info)**, so nothing was overwritten.
