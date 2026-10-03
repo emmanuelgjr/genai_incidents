@@ -61,6 +61,15 @@
   - **Build WS4-T12** (OECD description provenance) and **WS4-T14** (an AIID snapshot step in the refresh) next.
   - The 7 merges come back to the user as a reviewed list (D28 pattern) before any refresh merges.
 - **NEW BOARD NOTE N8 → WS0 + WS4.** The AIRI Navigator ingest is dead since 2026-05-31: the site was relaunched, the data zip is gone, and `/api/` is disallowed. It needs a redesign: find whether the bulk data is published elsewhere, and get a licence re-read.
+- **Wave 1–2 ingest DELIVERED** (pipeline-engineer, `ws4/wave12-ingest`, pushed). The licence rows were merged in under invariant 10 → `d49d9647`.
+  - **Claimed:** 13,361 → **15,872 (+2,511)**, 0 changes to existing entries, IDs INC-14911..17421. By source: cvelistV5-only 2,240, AVID 103 + 105, arXiv 63. Tests 520 pass.
+  - **Design choices the engineer made:**
+    - AVID enrichment of existing CVE entries was dropped on purpose: it would have tripped the split guard, and it rewrote 79 fields.
+    - `scripts/corpus_overlap.py` skips any row that would fold into an existing entry.
+    - The cvelistV5 bulk asset comes in via the new `fetch_to_file`, not `git clone`.
+    - The OpenSSF `MAL-` text is purged by `scripts/audit/purge_openssf_mal.py` (verified: "Per source details" now has 0 hits).
+  - **⚠ Deviation the foreman flagged for the gate:** cvelistV5's 2,240 is about 5× the gated estimate (≥416 + ~165/yr). **Filter precision is the crux.**
+  - **red-reviewer dispatched** with a precision sample of ≥60 + 20 + 15, delta re-derivation, invariants and licensing.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
