@@ -388,6 +388,19 @@ def _named_systems(text: str) -> list[str]:
     return seen[:5]
 
 
+def _describe(rec: dict, reasons: dict, cite: str) -> str:
+    month = (rec.get("created") or "")[:7]
+    cats = ", ".join(rec.get("categories") or [])
+    targets = ", ".join(reasons.get("target_terms") or [])
+    return (
+        f"arXiv:{rec['id']} ({cite or 'authors n/a'}, {month}; {cats}). "
+        f"Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: "
+        f"the title carries the attack term \"{reasons.get('headline', '')}\", the paper concerns "
+        f"{targets or 'a generative-AI system'}, and its abstract makes a real-world claim "
+        f"(\"{reasons.get('concrete', '')}\"). Read the abstract and paper at the arXiv link before relying on it."
+    )
+
+
 def to_row(rec: dict, reasons: dict) -> dict:
     created = rec["created"]
     arxiv_id = rec["id"]
@@ -400,7 +413,12 @@ def to_row(rec: dict, reasons: dict) -> dict:
         "date": created[:7],
         "year": int(created[:4]),
         "category": "research",
-        "description": rec["abstract"],
+        # NOT the abstract: arXiv's CC0 covers arXiv's metadata dedication, and
+        # nothing shows the authors waived rights in the abstract prose
+        # (docs/SOURCE_LICENSES.md, arXiv row). The description is original,
+        # deterministic text composed from facts (authors, id, date, categories,
+        # the filter's own reasons); the abstract stays at the arXiv link.
+        "description": _describe(rec, reasons, cite),
         "affected": ", ".join(systems),
         "references": [{
             "title": rec["title"] + (f" ({cite})" if cite else ""),
@@ -408,9 +426,7 @@ def to_row(rec: dict, reasons: dict) -> dict:
             "type": "paper",
         }],
         "tags": ["arxiv", "auto-selected", "paper"],
-        # abstract = arXiv descriptive metadata, CC0 1.0 (API ToU fn. 1)
-        "description_provenance": "verbatim",
-        "description_source": "arxiv",
+        "description_provenance": "original",
     }
 
 

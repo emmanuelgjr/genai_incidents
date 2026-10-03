@@ -962,7 +962,7 @@ def fetch_osv() -> list[dict]:
         vulns = data.get("vulns", []) or []
         for v in vulns:
             vid = v.get("id")
-            if not vid or vid in seen:
+            if not vid or vid in seen or is_openssf_malicious(v):
                 continue
             seen.add(vid)
             v["_pkg"] = {"name": name, "ecosystem": eco}
@@ -978,7 +978,28 @@ def fetch_osv() -> list[dict]:
     return all_vulns
 
 
+def is_openssf_malicious(v: dict) -> bool:
+    """True for OpenSSF Malicious Packages records (``MAL-`` ids, Apache-2.0,
+    not the CC BY 4.0 OSV applies to its own records). Their report text may
+    not be carried verbatim under this repo's licence posture
+    (docs/SOURCE_LICENSES.md row 2.4), so the OSV path never admits them.
+    Deterministic: id / alias prefix, or the record's own source marker."""
+    ids = [v.get("id") or ""] + list(v.get("aliases") or [])
+    if any(str(i).startswith("MAL-") for i in ids):
+        return True
+    src = str((v.get("database_specific") or {}).get("source") or "")
+    return "ossf/malicious-packages" in src
+
+
+def is_openssf_malicious_row(row: dict) -> bool:
+    """Same test on an already-converted ingest row (for the one-off purge of
+    the committed file, scripts/audit/purge_openssf_mal.py)."""
+    return any(str(row.get(k) or "").startswith("MAL-") for k in ("source_id", "osv_id"))
+
+
 def osv_to_record(v: dict) -> dict | None:
+    if is_openssf_malicious(v):
+        return None
     osv_id = v.get("id") or ""
     aliases = v.get("aliases") or []
     cve_id = next((a for a in aliases if a.startswith("CVE-")), None)

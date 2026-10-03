@@ -393,8 +393,12 @@ def test_arxiv_row_is_metadata_only_with_cc0_provenance():
     assert row["date"] == "2026-06" and row["year"] == 2026
     assert row["references"][0]["url"] == "https://arxiv.org/abs/2510.10271"
     assert row["references"][0]["type"] == "paper"
-    assert row["description"] == r["abstract"]
-    assert row["description_source"] == "arxiv" and row["description_provenance"] == "verbatim"
+    # description is original, deterministic prose and never the abstract
+    assert row["description"] != r["abstract"]
+    assert r["abstract"][:80] not in row["description"]
+    assert "arXiv:2510.10271" in row["description"] and "jailbreak" in row["description"].lower()
+    assert row["description_provenance"] == "original" and "description_source" not in row
+    assert row == AX.to_row(r, AX.select(r)[1])      # deterministic
     assert not any("/pdf/" in x["url"] or "e-print" in x["url"] for x in row["references"])
 
 
@@ -417,3 +421,44 @@ def test_arxiv_build_skips_a_paper_the_merger_would_fold_into_an_existing_entry(
                               idx=CorpusIndex(corpus))
     assert rows == [] and stats["would_merge_into_existing"] == 1
     assert stats["_merges"]["2510.10271"] == {"key": "title", "corpus_entry": "INC-00009"}
+
+
+# ----------------------------------------------------------------------------
+# OSV path: OpenSSF Malicious Packages (MAL-, Apache-2.0) are never admitted
+# ----------------------------------------------------------------------------
+import ingest_cve_nvd_expanded as NVD  # noqa: E402
+
+
+def test_osv_path_excludes_openssf_malicious_packages_records():
+    mal = _load("osv", "MAL-2026-2144.json")
+    ok = _load("osv", "GHSA-ordinary.json")
+    assert NVD.is_openssf_malicious(mal) and NVD.osv_to_record(mal) is None
+    assert not NVD.is_openssf_malicious(ok)
+    rec = NVD.osv_to_record(ok)
+    assert rec and rec["source_id"] == "CVE-2025-00001"
+
+
+def test_openssf_filter_catches_alias_and_source_marker():
+    assert NVD.is_openssf_malicious({"id": "GHSA-x", "aliases": ["MAL-2026-1"]})
+    assert NVD.is_openssf_malicious({"id": "X", "database_specific": {
+        "source": "https://github.com/ossf/malicious-packages/x.json"}})
+
+
+def test_openssf_filter_fires_without_the_guard(monkeypatch):
+    """Prove the test can fail: with the predicate neutered the MAL record is
+    converted and its verbatim text would be carried."""
+    mal = _load("osv", "MAL-2026-2144.json")
+    monkeypatch.setattr(NVD, "is_openssf_malicious", lambda v: False)
+    rec = NVD.osv_to_record(mal)
+    assert rec is not None and "exfiltrate credentials" in rec["description"]
+
+
+def test_committed_nvd_expanded_file_carries_no_openssf_report_text():
+    """MAL rows survive only as bare identifiers (facts + links); no row may
+    carry the Apache-2.0 report text."""
+    rows = json.loads((Path(__file__).parents[1] / "ingest" / "cve_nvd_expanded.json").read_text(encoding="utf-8"))
+    mal = [r for r in rows if NVD.is_openssf_malicious_row(r)]
+    assert [r["source_id"] for r in mal] == ["MAL-2026-3607"]
+    for r in mal:
+        assert r["description"].startswith("Bare identifier for OpenSSF") and r["description_provenance"] == "original"
+        assert "Per source details" not in r["description"] and "google-open-source-security" not in r["description"]

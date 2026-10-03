@@ -1,6 +1,6 @@
 # Wave 1 + wave 2 ingest: field-level delta (2026-10-03)
 
-Branch `ws4/wave12-ingest`, code commit `f9ce8d06` (the data commit follows it).
+Branch `ws4/wave12-ingest`, code commit `48065e66` (the data commit follows it).
 Machine-readable twin: `wave12-ingest-delta-2026-10-03.json`. Produced by
 `scripts/audit/wave12_delta.py` from the corpus at `9604752f` (before) and the
 rebuilt corpus (after). Working agreement 2: unintended deltas are defects.
@@ -323,8 +323,11 @@ segment also matches unrelated products named "MCP ..."; none surfaced in the sa
 
 Channel: `oaipmh.arxiv.org` (no robots.txt there, 404 == no restriction), set `cs:cs:CR`,
 `metadataPrefix=arXiv`, 3.0 s between requests passed explicitly (`common.py` has no
-Crawl-delay parser), single connection. Metadata only (title, authors, id, abstract,
-categories; CC0); no full text, no e-print URL. `export.arxiv.org` is not touched.
+Crawl-delay parser), single connection. Metadata only (title, authors, id, dates,
+categories); no full text, no e-print URL. **The abstract is used by the filter and then discarded: the
+row's `description` is original, deterministic prose composed from facts (id, authors, month,
+categories, the filter's own reasons), `description_provenance: original`** - the CC0 dedication is
+arXiv's and nothing shows authors waived rights in abstract prose (licence rows, foreman note). `export.arxiv.org` is not touched.
 Window: papers created 2025-10-03 .. 2026-10-03 (the last 12 months); 12,551
 records harvested, 617 created before the window (re-datestamped).
 
@@ -391,7 +394,42 @@ paper whose target is a GenAI/agentic system": **28 yes, 2 borderline, 0 no.**
 | 2609.32635 | Trust the Brand, Lose Control: How Identity Hijacks LLM Agent Orchestration | hijacks / production agent | TP |
 | 2609.39902 | CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code  | exploiting / commercial llms | TP |
 
-## 7. Reproduce
+## 7. OpenSSF Malicious Packages (MAL-, Apache-2.0) removed from the OSV path
+
+OSV aggregates OpenSSF Malicious Packages records, which are Apache-2.0, not OSV's CC BY 4.0
+(board note N6). Changes:
+- `scripts/ingest_cve_nvd_expanded.py::is_openssf_malicious(v)` (id or alias `MAL-`, or an
+  `ossf/malicious-packages` source marker) is applied in `fetch_osv` and in `osv_to_record`, so the
+  OSV path never admits such a record. Row-level twin: `is_openssf_malicious_row`. Tests with
+  recorded fixtures (`tests/fixtures/wave12/osv/`): the MAL fixture is excluded, an ordinary GHSA
+  record passes, and with the predicate neutered the MAL text is converted (the test fails
+  without the filter).
+- The committed `ingest/cve_nvd_expanded.json` held 2 MAL rows. `scripts/audit/purge_openssf_mal.py`
+  applies the same predicate (no hand edit; second run is a no-op). MAL-2026-2144 (litellm) is
+  dropped; it was not cited by any corpus entry. **MAL-2026-3607 is kept as a bare identifier**:
+  id, title label, affected package, tags and reference links, with the description replaced by an
+  original sentence and the Apache text gone. The reason is structural, not sentimental: the corpus
+  entry INC-08450 is held together by that row (its links bridge a nestjs-auth CVE and a mistralai
+  GHSA, so it is already an over-merge), and dropping the row entirely makes the merger split
+  INC-08450, which the WS4-T19 guard refuses without a user ruling (reproduced). Facts and links
+  are not Apache-protected text; INC-08450's own title and description come from GHSA/CVE and do not
+  change. Delta of this step on existing entries: none (no field, tag or `updated` moves).
+- `data/incidents.json` is otherwise unaffected; `docs/SOURCE_LICENSES.md` row 2.4 should name
+  `is_openssf_malicious` as the exclusion.
+
+## 8. Notes for the licence rows
+
+- No `git clone` anywhere: AVID is the GitHub tarball API, cvelistV5 the release asset, arXiv
+  OAI-PMH, all through `ingest/common.py` (`fetch_once` / `fetch_to_file`). The pending
+  non-HTTP-egress register entry is "not used".
+- `AVID-2023-V025` is in the corpus (static `avid_owasp_incidents.json`) and no longer upstream.
+  Nothing in this ingest or the build deletes it; it is listed in
+  `wave12_avid.provenance.json` (`corpus_avid_ids_absent_from_repo`). Marking it with a status
+  needs the WS4-T2 reconciliation mechanism (`status` + conflicts), which is the sibling task, not
+  an ingest side effect. OAI-PMH deletion headers are parsed (`deleted: true`), counted, and only ever
+  skip a candidate row; no corpus entry is touched.
+
+## 9. Reproduce
 
 ```
 git checkout ws4/wave12-ingest

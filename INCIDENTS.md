@@ -76,16 +76,16 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 
 | Code | Name | Count |
 |---|---|---:|
-| LLM01 | Prompt Injection | 559 |
-| LLM02 | Sensitive Information Disclosure | 1,082 |
+| LLM01 | Prompt Injection | 548 |
+| LLM02 | Sensitive Information Disclosure | 1,080 |
 | LLM03 | Excessive Agency | 783 |
 | LLM04 | Supply Chain | 8,516 |
 | LLM05 | Data and Model Poisoning | 201 |
 | LLM06 | Unbounded Consumption | 44 |
-| LLM07 | Misinformation | 2,499 |
+| LLM07 | Misinformation | 2,498 |
 | LLM08 | Hidden Context Exposure | 730 |
 | LLM09 | Vector and Embedding Weaknesses | 24 |
-| LLM10 | Improper Output Handling | 6,919 |
+| LLM10 | Improper Output Handling | 6,918 |
 
 ### OWASP Agentic Top 10 (ASI)
 
@@ -107,15 +107,15 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 | Technique | Count |
 |---|---:|
 | `AML.T0010` | 8,556 |
-| `AML.T0050` | 7,018 |
+| `AML.T0050` | 7,017 |
 | `AML.T0048.003` | 2,725 |
-| `AML.T0058` | 2,499 |
+| `AML.T0058` | 2,498 |
 | `AML.T0012` | 2,450 |
 | `AML.T0048` | 1,896 |
 | `AML.T0053` | 1,400 |
-| `AML.T0057` | 1,086 |
+| `AML.T0057` | 1,084 |
 | `AML.T0056` | 730 |
-| `AML.T0051` | 648 |
+| `AML.T0051` | 637 |
 | `AML.T0049` | 578 |
 | `AML.T0024` | 368 |
 | `AML.T0010.001` | 325 |
@@ -208,7 +208,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 78 | 2026-09 | [`INC-16325`](docs/incidents/2026.md#inc-16325) | An issue in MitraStar GPT-2742GX4X5v6-SV GL_g2.5_100XNT0b23_3 allows an authenticated attacker to execute arb… | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-52484` |
 | 79 | 2026-09 | [`INC-17302`](docs/incidents/2026.md#inc-17302) | AnythingLLM: Stored XSS Due to Unescaped Server-Side HTML Concatenation in MetaGenerator | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-88055` |
 | 80 | 2026-09 | [`INC-17169`](docs/incidents/2026.md#inc-17169) | appium-mcp-server through 0.1.61 Path Traversal in write_file and write_files_batch | Medium | LLM04 | ASI04 | `CVE-2026-84201` |
-| 81 | 2026-09 | [`INC-14971`](docs/incidents/2026.md#inc-14971) | Arbitrary Cipher Attacks Against Large Language Models Do Not Require Fine-Tuning | Medium | LLM01 |  |  |
+| 81 | 2026-09 | [`INC-14971`](docs/incidents/2026.md#inc-14971) | Arbitrary Cipher Attacks Against Large Language Models Do Not Require Fine-Tuning | Medium |  |  |  |
 | 82 | 2026-09 | [`INC-15873`](docs/incidents/2026.md#inc-15873) | Arbitrary Code Execution in Gemini CLI via Untrusted Local .env Files Overriding GEMINI_CLI_HOME | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-13745` |
 | 83 | 2026-09 | [`INC-17376`](docs/incidents/2026.md#inc-17376) | ArcadeDB before 26.9.1 ACL Bypass via query_database Tool | High | LLM04 | ASI03, ASI04 | `CVE-2026-93595` |
 | 84 | 2026-09 | [`INC-17062`](docs/incidents/2026.md#inc-17062) | AshAi aggregate tool can read field-policy-protected fields | Medium | LLM04 | ASI04 | `CVE-2026-78230` |
@@ -234,7 +234,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 104 | 2026-09 | [`INC-17222`](docs/incidents/2026.md#inc-17222) | cli-mcp-server 0.2.5 Command Allowlist Bypass via Shell Substitution | Critical | LLM04 | ASI04 | `CVE-2026-85660` |
 | 105 | 2026-09 | [`INC-17083`](docs/incidents/2026.md#inc-17083) | Code execution can occur in versions of the MLflow platform running version 0.0.1 or newer, enabling a malici… | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-79721` |
 | 106 | 2026-09 | [`INC-17221`](docs/incidents/2026.md#inc-17221) | Code injection in the CDK generator in Amazon awslabs.dynamodb-mcp-server | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-85654` |
-| 107 | 2026-09 | [`INC-14973`](docs/incidents/2026.md#inc-14973) | CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code Completion | Medium | LLM01 |  |  |
+| 107 | 2026-09 | [`INC-14973`](docs/incidents/2026.md#inc-14973) | CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code Completion | Medium |  |  |  |
 | 108 | 2026-09 | [`INC-17360`](docs/incidents/2026.md#inc-17360) | ComfyUI before 0.30.0 Path Traversal via dataset save nodes | High | LLM04, LLM05, LLM10 | ASI04, ASI05 | `CVE-2026-92816` |
 | 109 | 2026-09 | [`INC-16350`](docs/incidents/2026.md#inc-16350) | Contentful MCP Server: export_space/import_space tools pass LLM-controlled `host`/`proxy` args to CMA client,… | High | LLM01, LLM10 | ASI01, ASI05 | `CVE-2026-53957` |
 | 110 | 2026-09 | [`INC-16343`](docs/incidents/2026.md#inc-16343) | ContextForge: DNS TOCTOU race condition causes SSRF protection bypass (`/admin/gateways/test`) | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-53708` |
@@ -645,7 +645,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 515 | 2026-09 | [`INC-17415`](docs/incidents/2026.md#inc-17415) | Rapid7 Bulk Export MCP — GraphQL Query Injection in Export Status Lookup | Low | LLM01, LLM10 | ASI01, ASI03, ASI05 | `CVE-2026-97228` |
 | 516 | 2026-09 | [`INC-17407`](docs/incidents/2026.md#inc-17407) | Reachy Mini daemon allows unauthenticated remote code execution through the app installation endpoint | High | LLM04 | ASI03, ASI04 | `CVE-2026-96455` |
 | 517 | 2026-09 | [`INC-17282`](docs/incidents/2026.md#inc-17282) | Read-only enforcement bypass enabling operating system command execution in the SQL validation component of A… | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-87911` |
-| 518 | 2026-09 | [`INC-14911`](docs/incidents/2026.md#inc-14911) | Red-Teaming Text-to-Image Models via In-Context Experience Replay and Semantic-Preserving Prompt Rewriting | Medium | LLM01 |  |  |
+| 518 | 2026-09 | [`INC-14911`](docs/incidents/2026.md#inc-14911) | Red-Teaming Text-to-Image Models via In-Context Experience Replay and Semantic-Preserving Prompt Rewriting | Medium |  |  |  |
 | 519 | 2026-09 | [`INC-14970`](docs/incidents/2026.md#inc-14970) | Repeat-After-Me: Black-Box Adaptive Visual Prompt Injection | Medium | LLM01 |  |  |
 | 520 | 2026-09 | [`INC-16676`](docs/incidents/2026.md#inc-16676) | RMCP: Custom HTTP headers leak to cross-origin redirect targets | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-64684` |
 | 521 | 2026-09 | [`INC-16664`](docs/incidents/2026.md#inc-16664) | RMCP: Missing Resource Field Validation in OAuth Protected Resource Metadata Discovery | High | LLM04 | ASI04 | `CVE-2026-63127` |
@@ -719,7 +719,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 589 | 2026-09 | [`INC-15648`](docs/incidents/2026.md#inc-15648) | Vulnerability in discord | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-100526` |
 | 590 | 2026-09 | [`INC-17164`](docs/incidents/2026.md#inc-17164) | Vulnerability in the Oracle Business Intelligence Enterprise Edition product of Oracle Analytics (component:… | High | LLM04 | ASI04 | `CVE-2026-83071` |
 | 591 | 2026-09 | [`INC-17328`](docs/incidents/2026.md#inc-17328) | Weights & Biases wandb before 0.29.0 Path Traversal via File Download | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-91771` |
-| 592 | 2026-09 | [`INC-14969`](docs/incidents/2026.md#inc-14969) | What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness | Medium | LLM10 |  |  |
+| 592 | 2026-09 | [`INC-14969`](docs/incidents/2026.md#inc-14969) | What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness | Medium |  |  |  |
 | 593 | 2026-09 | [`INC-17179`](docs/incidents/2026.md#inc-17179) | Windows ML CLI: CORS misconfig enables localhost RCE | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-84452` |
 | 594 | 2026-09 | [`INC-17185`](docs/incidents/2026.md#inc-17185) | WordPress Agentimus – AI SEO, llms.txt & MCP for AI Agents plugin <= 1.51.0 - Broken Access Control vulnerabi… | High | LLM04 | ASI03, ASI04 | `CVE-2026-84779` |
 | 595 | 2026-09 | [`INC-17416`](docs/incidents/2026.md#inc-17416) | WordPress MCP Content Manager Lite plugin <= 1.1.0 - Broken Access Control vulnerability | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-97239` |
@@ -1497,7 +1497,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 1,367 | 2026-07 | [`INC-16431`](docs/incidents/2026.md#inc-16431) | @arikusi/deepseek-mcp-server Missing Authentication on Self-Hosted HTTP MCP Endpoint | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-55605` |
 | 1,368 | 2026-07 | [`INC-13449`](docs/incidents/2026.md#inc-13449) | @jshookmcp/jshook: ICMP probe and traceroute skip local-network SSRF authorization | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-49856` |
 | 1,369 | 2026-07 | [`INC-15905`](docs/incidents/2026.md#inc-15905) | aerostackdev aerostack-mcp mcp-whatsapp upload_media server-side request forgery | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-15189` |
-| 1,370 | 2026-07 | [`INC-14961`](docs/incidents/2026.md#inc-14961) | Agent Data Injection Attacks are Realistic Threats to AI Agents | Medium | LLM01 |  |  |
+| 1,370 | 2026-07 | [`INC-14961`](docs/incidents/2026.md#inc-14961) | Agent Data Injection Attacks are Realistic Threats to AI Agents | Medium |  |  |  |
 | 1,371 | 2026-07 | [`INC-16721`](docs/incidents/2026.md#inc-16721) | AgentGPT 1.0.0 Authorization Bypass via Agent Task Creation | Low | LLM04 | ASI04 | `CVE-2026-65699` |
 | 1,372 | 2026-07 | [`INC-15862`](docs/incidents/2026.md#inc-15862) | AI (Artificial Intelligence) - Moderately critical - Access bypass - SA-CONTRIB-2026-055 | Low | LLM04 | ASI04 | `CVE-2026-13235` |
 | 1,373 | 2026-07 | [`INC-15861`](docs/incidents/2026.md#inc-15861) | AI (Artificial Intelligence) - Moderately critical - Information Disclosure / Cross-site Scripting - SA-CONTR… | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-13234` |
@@ -1544,7 +1544,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 1,414 | 2026-07 | [`INC-15900`](docs/incidents/2026.md#inc-15900) | bentoml OpenLLM Model Repository Directory Name common.py async_run_command command injection | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-15035` |
 | 1,415 | 2026-07 | [`INC-15959`](docs/incidents/2026.md#inc-15959) | Better Messages <= 2.15.19 - Authenticated (Administrator+) Arbitrary File Deletion via Path Traversal via 'f… | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-16585` |
 | 1,416 | 2026-07 | [`INC-15828`](docs/incidents/2026.md#inc-15828) | BetterDocs < 4.5.5 - Unauthenticated Stored XSS via AI Doc Summarizer Prompt Injection | Medium | LLM01, LLM10 | ASI01, ASI05 | `CVE-2026-11371` |
-| 1,417 | 2026-07 | [`INC-14962`](docs/incidents/2026.md#inc-14962) | Beware of Agentic Botnets: Scalable Untargeted Promptware Attacks via Universal and Transferable Adversarial… | Medium | LLM01 |  |  |
+| 1,417 | 2026-07 | [`INC-14962`](docs/incidents/2026.md#inc-14962) | Beware of Agentic Botnets: Scalable Untargeted Promptware Attacks via Universal and Transferable Adversarial… | Medium |  |  |  |
 | 1,418 | 2026-07 | [`INC-14959`](docs/incidents/2026.md#inc-14959) | Beyond the Prompt: Jailbreaking Function-Calling LLMs via Simulated Moderation Traces | Medium | LLM01 |  |  |
 | 1,419 | 2026-07 | [`INC-15880`](docs/incidents/2026.md#inc-15880) | BigQuery Dataset Allowlist Bypass via Metadata Dry-Run in MCP Toolbox | Medium | LLM04, LLM05 | ASI03, ASI04 | `CVE-2026-14538` |
 | 1,420 | 2026-07 | [`INC-16732`](docs/incidents/2026.md#inc-16732) | BlenderMCP Path Traversal via download_polyhaven_asset API | Medium | LLM01, LLM10 | ASI01, ASI05 | `CVE-2026-66004` |
@@ -1584,7 +1584,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 1,454 | 2026-07 | [`INC-15991`](docs/incidents/2026.md#inc-15991) | Dify AI Workflow oauth_redirect_url Open Redirect Vulnerability | Medium | LLM02, LLM04 | ASI02, ASI04 | `CVE-2026-18266` |
 | 1,455 | 2026-07 | [`INC-14915`](docs/incidents/2026.md#inc-14915) | DisarmRAG: Stealthy Retriever-Centric Poisoning to Disable Self-Correction in Retrieval-Augmented Generation… | Medium |  |  |  |
 | 1,456 | 2026-07 | [`INC-17184`](docs/incidents/2026.md#inc-17184) | Disk Cache Deserialization Remote Code Execution Vulnerability | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-8476` |
-| 1,457 | 2026-07 | [`INC-14963`](docs/incidents/2026.md#inc-14963) | Do Agents Dream of False Memories? Black-box Visual Attacks on Long-term Memory in Multimodal AI Agents | Medium | LLM05 |  |  |
+| 1,457 | 2026-07 | [`INC-14963`](docs/incidents/2026.md#inc-14963) | Do Agents Dream of False Memories? Black-box Visual Attacks on Long-term Memory in Multimodal AI Agents | Medium |  |  |  |
 | 1,458 | 2026-07 | [`INC-16334`](docs/incidents/2026.md#inc-16334) | drm/colorop: Fix blob property reference tracking in state lifecycle | Medium | LLM04 | ASI04 | `CVE-2026-53378` |
 | 1,459 | 2026-07 | [`INC-13447`](docs/incidents/2026.md#inc-13447) | EasyAdminBundle has path traversal and reflected XSS in Flag and Icon Twig components | Medium | LLM04, LLM10 | ASI04, ASI05 |  |
 | 1,460 | 2026-07 | [`INC-16223`](docs/incidents/2026.md#inc-16223) | Exposed tokens in SUSE Rancher AI Agent logs | High | LLM02, LLM04 | ASI02, ASI03, ASI04 | `CVE-2026-44934` |
@@ -1626,7 +1626,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 1,496 | 2026-07 | [`INC-16666`](docs/incidents/2026.md#inc-16666) | Incorrect Authorization in Kibana Leading to Machine Learning Audit Log Integrity Compromise | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-63145` |
 | 1,497 | 2026-07 | [`INC-15993`](docs/incidents/2026.md#inc-15993) | Incorrect authorization in Strands Agents Tools http_request proxy credential exfiltration | High | LLM04 | ASI03, ASI04 | `CVE-2026-18394` |
 | 1,498 | 2026-07 | [`INC-16684`](docs/incidents/2026.md#inc-16684) | InvokeAI < 6.13.7 Unauthenticated Directory Enumeration via scan_folder | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-65012` |
-| 1,499 | 2026-07 | [`INC-14965`](docs/incidents/2026.md#inc-14965) | Isolated but Exposed: Persistence-Based Memory Extraction Attack on LLM Agents | Medium | LLM02 |  |  |
+| 1,499 | 2026-07 | [`INC-14965`](docs/incidents/2026.md#inc-14965) | Isolated but Exposed: Persistence-Based Memory Extraction Attack on LLM Agents | Medium |  |  |  |
 | 1,500 | 2026-07 | [`INC-16733`](docs/incidents/2026.md#inc-16733) | Jan Local API Server CORS Origin Reflection via 0.0.0.0 Binding | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-66005` |
 | 1,501 | 2026-07 | [`INC-13443`](docs/incidents/2026.md#inc-13443) | Kimai Password Reset Link Remains Valid After Password Change | Low | LLM04 | ASI03, ASI04 |  |
 | 1,502 | 2026-07 | [`INC-15976`](docs/incidents/2026.md#inc-15976) | Kimi Code FetchURL SSRF protection bypass via DNS-resolving hostnames and redirects | Medium | LLM01, LLM10 | ASI01, ASI05 | `CVE-2026-17534` |
@@ -1915,7 +1915,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 1,785 | 2026-07 | [`INC-15897`](docs/incidents/2026.md#inc-15897) | terraform-mcp-server vulnerable to server side request forgery leading to token exposure | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-14869` |
 | 1,786 | 2026-07 | [`INC-16660`](docs/incidents/2026.md#inc-16660) | text-generation-inference 3.3.7 SSRF via fetch_image in multimodal chat completions | Medium | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-63086` |
 | 1,787 | 2026-07 | [`INC-15899`](docs/incidents/2026.md#inc-15899) | The OpenAI Codex desktop app for macOS rendered remote images from Markdown in model responses. | Medium | LLM01, LLM10 | ASI01, ASI03, ASI05 | `CVE-2026-14898` |
-| 1,788 | 2026-07 | [`INC-14964`](docs/incidents/2026.md#inc-14964) | They'll Verify. They Just Won't Act. How Authority Framing and Laundered Code Turn a Trusted Agentic CI/CD Pi… | Medium | LLM02 |  |  |
+| 1,788 | 2026-07 | [`INC-14964`](docs/incidents/2026.md#inc-14964) | They'll Verify. They Just Won't Act. How Authority Framing and Laundered Code Turn a Trusted Agentic CI/CD Pi… | Medium |  |  |  |
 | 1,789 | 2026-07 | [`INC-15992`](docs/incidents/2026.md#inc-15992) | ThriveDesk <= 2.1.7 - Missing Authorization to Authenticated (Subscriber+) Cache Deletion | Medium | LLM04 | ASI04 | `CVE-2026-1832` |
 | 1,790 | 2026-07 | [`INC-15901`](docs/incidents/2026.md#inc-15901) | Trustyai-service-operator: trustyai service operator: unauthenticated access to ai guardrails and orchestrato… | Medium | LLM02, LLM04 | ASI02, ASI04 | `CVE-2026-15044` |
 | 1,791 | 2026-07 | [`INC-15918`](docs/incidents/2026.md#inc-15918) | tugcantopaloglu godot-mcp run_project index.js validatePath path traversal | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-15522` |
@@ -2936,7 +2936,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 2,806 | 2026-06 | [`INC-08235`](docs/incidents/2026.md#inc-08235) | mcp-server-kubernetes — Vulnerability (CVE-2026-47250) | Medium | LLM04 | ASI03, ASI04 | `CVE-2026-47250` |
 | 2,807 | 2026-06 | [`INC-13766`](docs/incidents/2026.md#inc-13766) | MCPVault: PathFilter restricted directories (.git/.obsidian/node_modules) only denied at vault root, not nest… | Medium | LLM04 | ASI04 |  |
 | 2,808 | 2026-06 | [`INC-08196`](docs/incidents/2026.md#inc-08196) | Mem0 versions through 0.2.8, fixed in commit ae7f406, contain a missing authorization vulnerability in the se… | High | LLM04 | ASI03, ASI04 | `CVE-2026-49948` |
-| 2,809 | 2026-06 | [`INC-14956`](docs/incidents/2026.md#inc-14956) | MemVenom: Triggered Poisoning of Multimodal Memories in Web Agents | Medium | LLM05 |  |  |
+| 2,809 | 2026-06 | [`INC-14956`](docs/incidents/2026.md#inc-14956) | MemVenom: Triggered Poisoning of Multimodal Memories in Web Agents | Medium |  |  |  |
 | 2,810 | 2026-06 | [`INC-13959`](docs/incidents/2026.md#inc-13959) | Meta Ads MCP: Unauthenticated HTTP MCP Tool Execution Leaks Operator Meta Access Token | Critical | LLM04 | ASI03, ASI04 | `CVE-2026-48039` |
 | 2,811 | 2026-06 | [`INC-14921`](docs/incidents/2026.md#inc-14921) | MetaBreak: Jailbreaking Online LLM Services via Special Token Manipulation | Medium | LLM01 |  |  |
 | 2,812 | 2026-06 | [`INC-13907`](docs/incidents/2026.md#inc-13907) | Microsoft Security Advisory CVE-2026-45491 – .NET Tampering Vulnerability | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-45491` |
@@ -3229,7 +3229,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 3,099 | 2026-06 | [`INC-13941`](docs/incidents/2026.md#inc-13941) | Radius Controller May Delete a Container Resource via an Injected Deployment Annotation (Multi-Tenant Install… | High | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-53999` |
 | 3,100 | 2026-06 | [`INC-08254`](docs/incidents/2026.md#inc-08254) | React Router has stored XSS via unescaped Location header in prerendered redirect HTML | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-33244` |
 | 3,101 | 2026-06 | [`INC-13451`](docs/incidents/2026.md#inc-13451) | Read-only transaction bypass in the pgAdmin 4 AI Assistant allows an attacker who can influence database cont… | Critical | LLM01, LLM10 | ASI01, ASI05 | `CVE-2026-12045` |
-| 3,102 | 2026-06 | [`INC-14918`](docs/incidents/2026.md#inc-14918) | Red-Teaming Coding Agents from a Tool-Invocation Perspective: An Empirical Security Assessment | Medium | LLM01 |  |  |
+| 3,102 | 2026-06 | [`INC-14918`](docs/incidents/2026.md#inc-14918) | Red-Teaming Coding Agents from a Tool-Invocation Perspective: An Empirical Security Assessment | Medium | LLM10 |  |  |
 | 3,103 | 2026-06 | [`INC-13701`](docs/incidents/2026.md#inc-13701) | Relyra SAML SignatureValue not cryptographically verified -> authentication bypass | Critical | LLM04 | ASI04 | `CVE-2026-49454` |
 | 3,104 | 2026-06 | [`INC-13711`](docs/incidents/2026.md#inc-13711) | Remark42: Cross-Site Scripting (XSS) on /api/v1/img via content-type spoofing | High | LLM04 | ASI03, ASI04 | `CVE-2026-48788` |
 | 3,105 | 2026-06 | [`INC-13966`](docs/incidents/2026.md#inc-13966) | Routinator crashes when encountering maliciously crafted RRDP XML files | High | LLM04 | ASI04 | `CVE-2026-49235` |
@@ -3300,7 +3300,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 3,170 | 2026-06 | [`INC-13499`](docs/incidents/2026.md#inc-13499) | Warp — Vulnerability (CVE-2026-48725) | High | LLM04 | ASI04 | `CVE-2026-48725` |
 | 3,171 | 2026-06 | [`INC-13502`](docs/incidents/2026.md#inc-13502) | Warp — Vulnerability (CVE-2026-54686) | Medium | LLM04 | ASI04 | `CVE-2026-54686` |
 | 3,172 | 2026-06 | [`INC-08234`](docs/incidents/2026.md#inc-08234) | wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction | High | LLM04 | ASI03, ASI04 | `CVE-2026-47261` |
-| 3,173 | 2026-06 | [`INC-14926`](docs/incidents/2026.md#inc-14926) | When Compression Becomes an Attack Surface: Black-Box Attacks on Prompt-Compressed LLM Agents | Medium | LLM01 |  |  |
+| 3,173 | 2026-06 | [`INC-14926`](docs/incidents/2026.md#inc-14926) | When Compression Becomes an Attack Surface: Black-Box Attacks on Prompt-Compressed LLM Agents | Medium |  |  |  |
 | 3,174 | 2026-06 | [`INC-08440`](docs/incidents/2026.md#inc-08440) | Windows-MCP — Vulnerability (CVE-2026-48989) | Medium | LLM04 | ASI04 | `CVE-2026-48989` |
 | 3,175 | 2026-06 | [`INC-13940`](docs/incidents/2026.md#inc-13940) | Withdrawn Advisory: esbuild: Missing binary integrity verification in Deno module enables remote code executi… | High | LLM04, LLM10 | ASI04, ASI05 |  |
 | 3,176 | 2026-06 | [`INC-16268`](docs/incidents/2026.md#inc-16268) | WordPress Chatway Live Chat – AI Chatbot, Customer Support, FAQ & Helpdesk Customer Service & Chat Buttons pl… | High | LLM04 | ASI04 | `CVE-2026-49082` |
@@ -3977,7 +3977,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 3,847 | 2026-05 | [`INC-09725`](docs/incidents/2026.md#inc-09725) | AutoGPT — Dos (CVE-2025-32425) | Medium | LLM04 | ASI04 | `CVE-2025-32393` (+2) |
 | 3,848 | 2026-05 | [`INC-09726`](docs/incidents/2026.md#inc-09726) | AutoGPT — Vulnerability (CVE-2026-30950) | High | LLM04 | ASI04 | `CVE-2026-30950` |
 | 3,849 | 2026-05 | [`INC-09728`](docs/incidents/2026.md#inc-09728) | AutoGPT — Vulnerability (CVE-2026-45023) | Medium | LLM04 | ASI04 | `CVE-2026-45023` |
-| 3,850 | 2026-05 | [`INC-14954`](docs/incidents/2026.md#inc-14954) | Automatically Attacking Software Reverse Engineering AI Agents | Medium | LLM01 |  |  |
+| 3,850 | 2026-05 | [`INC-14954`](docs/incidents/2026.md#inc-14954) | Automatically Attacking Software Reverse Engineering AI Agents | Medium |  |  |  |
 | 3,851 | 2026-05 | [`INC-08680`](docs/incidents/2026.md#inc-08680) | AVideo has an Incomplete Fix for YPTSocket autoEvalCodeOnHTML Strip: Unauthenticated Cross-User JavaScript Ex… | Critical | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-40911`, `CVE-2026-43874` |
 | 3,852 | 2026-05 | [`INC-08663`](docs/incidents/2026.md#inc-08663) | AVideo has Blind SSRF in YPTWallet Donation Webhook via Missing isSSRFSafeURL() Check and CURLOPT_FOLLOWLOCAT… | Medium | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-43879` |
 | 3,853 | 2026-05 | [`INC-08657`](docs/incidents/2026.md#inc-08657) | AVideo has SSRF Protection Bypass via HTTP Redirect and DNS Rebinding in isSSRFSafeURL() | High | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-43884` |
@@ -4029,7 +4029,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 3,899 | 2026-05 | [`INC-08516`](docs/incidents/2026.md#inc-08516) | CodeWhale — Ssrf (CVE-2026-45310) | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-45310` |
 | 3,900 | 2026-05 | [`INC-08514`](docs/incidents/2026.md#inc-08514) | CodeWhale — Ssrf (CVE-2026-45373) | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-45373`, `CVE-2026-45374` |
 | 3,901 | 2026-05 | [`INC-00847`](docs/incidents/2026.md#inc-00847) | Command injection vulnerability in automagik-genie 2.5.27 MCP Server allows attackers to execute arbitrary co… | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-30635` |
-| 3,902 | 2026-05 | [`INC-14950`](docs/incidents/2026.md#inc-14950) | Comment and Control: Hijacking Agentic Workflows via Context-Grounded Evolution | Medium | LLM10 |  |  |
+| 3,902 | 2026-05 | [`INC-14950`](docs/incidents/2026.md#inc-14950) | Comment and Control: Hijacking Agentic Workflows via Context-Grounded Evolution | Medium |  |  |  |
 | 3,903 | 2026-05 | [`INC-08382`](docs/incidents/2026.md#inc-08382) | compliance-trestle Profile Import has an Arbitrary File Read via trestle:// URI and Relative Path Traversal | Medium | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-45774` |
 | 3,904 | 2026-05 | [`INC-08385`](docs/incidents/2026.md#inc-08385) | compliance-trestle Remote Fetching Mechanism has an Arbitrary File Write via Cache Path Traversal | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-45725` |
 | 3,905 | 2026-05 | [`INC-08381`](docs/incidents/2026.md#inc-08381) | compliance-trestle Vulnerable to Remote Code Execution via Recursive Server-Side Template Injection (SSTI) | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-46345`, `CVE-2026-46439` |
@@ -4175,7 +4175,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 4,045 | 2026-05 | [`INC-08716`](docs/incidents/2026.md#inc-08716) | Incus has Blind SSRF via Image Import Preflight HEAD | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-35527` |
 | 4,046 | 2026-05 | [`INC-08708`](docs/incidents/2026.md#inc-08708) | Incus has Nil Dereferences on Restore via Malformed YAML | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-41647` (+2) |
 | 4,047 | 2026-05 | [`INC-08711`](docs/incidents/2026.md#inc-08711) | Incus Vulnerable to Panic via Snapshot Bounds Check | High | LLM04 | ASI04 | `CVE-2026-40251` |
-| 4,048 | 2026-05 | [`INC-14935`](docs/incidents/2026.md#inc-14935) | Inference-Time Backdoors via Chat Templates: From LLM Supply Chains to Agentic System Compromise | Medium | LLM01 |  |  |
+| 4,048 | 2026-05 | [`INC-14935`](docs/incidents/2026.md#inc-14935) | Inference-Time Backdoors via Chat Templates: From LLM Supply Chains to Agentic System Compromise | Medium | LLM05 |  |  |
 | 4,049 | 2026-05 | [`INC-08662`](docs/incidents/2026.md#inc-08662) | ip-address has XSS in Address6 HTML-emitting methods | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-42338` |
 | 4,050 | 2026-05 | [`INC-08373`](docs/incidents/2026.md#inc-08373) | IPAM controller service account granted unnecessary full access to Secrets | Medium | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-47190` |
 | 4,051 | 2026-05 | [`INC-08374`](docs/incidents/2026.md#inc-08374) | Ironic Standalone Operator's controller modifies user-owned resources without consent | Medium | LLM04 | ASI03, ASI04 |  |
@@ -4503,7 +4503,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 4,373 | 2026-05 | [`INC-08188`](docs/incidents/2026.md#inc-08188) | RAGFlow — Command Injection (CVE-2026-45312) | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-45312` |
 | 4,374 | 2026-05 | [`INC-17003`](docs/incidents/2026.md#inc-17003) | ravenwits mcp-server-arangodb MCP tools.ts arango_backup path traversal | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-7715` |
 | 4,375 | 2026-05 | [`INC-01722`](docs/incidents/2026.md#inc-01722) | Ray — Deserialization (CVE-2026-41486) | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-41486` |
-| 4,376 | 2026-05 | [`INC-14937`](docs/incidents/2026.md#inc-14937) | Red-Teaming Claude Opus and ChatGPT-based Security Advisors for Trusted Execution Environments | Medium | LLM07 |  |  |
+| 4,376 | 2026-05 | [`INC-14937`](docs/incidents/2026.md#inc-14937) | Red-Teaming Claude Opus and ChatGPT-based Security Advisors for Trusted Execution Environments | Medium |  |  |  |
 | 4,377 | 2026-05 | [`INC-08454`](docs/incidents/2026.md#inc-08454) | Regression in pymdownx.snippets reintroduces sibling-prefix path traversal bypass despite restrict_base_path | Medium | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2026-46338` |
 | 4,378 | 2026-05 | [`INC-16195`](docs/incidents/2026.md#inc-16195) | Remote code execution via JavaScript injection in `BrowserAutomation::PlaywrightService` | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-41512` |
 | 4,379 | 2026-05 | [`INC-02870`](docs/incidents/2026.md#inc-02870) | RMCP — Vulnerability (CVE-2026-42559) | Critical | LLM04 | ASI04 | `CVE-2025-64443`, `CVE-2026-42559` |
@@ -6396,7 +6396,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 6,266 | 2026-03 | [`INC-09044`](docs/incidents/2026.md#inc-09044) | HAPI FHIR Core has Authentication Credential Leakage via Improper URL Prefix Matching on HTTP Redirect | High | LLM04 | ASI03, ASI04 | `CVE-2026-34359` |
 | 6,267 | 2026-03 | [`INC-09071`](docs/incidents/2026.md#inc-09071) | Happy DOM ECMAScriptModuleCompiler: unsanitized export names are interpolated as executable code | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-33943` |
 | 6,268 | 2026-03 | [`INC-09176`](docs/incidents/2026.md#inc-09176) | Heimdall: Path received via Envoy gRPC corrupted when containing query string | High | LLM04 | ASI04 | `CVE-2026-32811` |
-| 6,269 | 2026-03 | [`INC-14942`](docs/incidents/2026.md#inc-14942) | Hidden Ads: Behavior Triggered Semantic Backdoors for Advertisement Injection in Vision Language Models | Medium | LLM01 |  |  |
+| 6,269 | 2026-03 | [`INC-14942`](docs/incidents/2026.md#inc-14942) | Hidden Ads: Behavior Triggered Semantic Backdoors for Advertisement Injection in Vision Language Models | Medium | LLM05 |  |  |
 | 6,270 | 2026-03 | [`INC-09228`](docs/incidents/2026.md#inc-09228) | Hono vulnerable to Prototype Pollution possible through __proto__ key allowed in parseBody({ dot: true }) | Medium | LLM04 | ASI04 |  |
 | 6,271 | 2026-03 | [`INC-16197`](docs/incidents/2026.md#inc-16197) | hypermodel-labs mcp-server-auto-commit index.ts getGitChanges command injection | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-4198` |
 | 6,272 | 2026-03 | [`INC-01172`](docs/incidents/2026.md#inc-01172) | Hyperterse — Vulnerability (CVE-2026-31841) | Medium | LLM04 | ASI04 | `CVE-2026-31841` |
@@ -8032,7 +8032,7 @@ All **15,872** incidents in a single table, newest-first. Each `INC-*****` link 
 | 7,902 | 2025-11 | [`INC-10077`](docs/incidents/2025.md#inc-10077) | runc container escape with malicious config due to /dev/console mount and related races | High | LLM04 | ASI04 | `CVE-2025-52565` |
 | 7,903 | 2025-11 | [`INC-03211`](docs/incidents/2025.md#inc-03211) | ShadowMQ — critical RCE in Meta/NVIDIA/vLLM inference servers via pickle deserialization | Critical | LLM02, LLM04, LLM10 | ASI04, ASI05 | `CVE-2024-50050` |
 | 7,904 | 2025-11 | [`INC-10046`](docs/incidents/2025.md#inc-10046) | Snipe-IT has Cross-site Scripting vulnerability in CSV import workflow | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2025-64027` |
-| 7,905 | 2025-11 | [`INC-14914`](docs/incidents/2025.md#inc-14914) | Special-Character Adversarial Attacks on Open-Source Language Model | Medium | LLM01 |  |  |
+| 7,905 | 2025-11 | [`INC-14914`](docs/incidents/2025.md#inc-14914) | Special-Character Adversarial Attacks on Open-Source Language Model | Medium |  |  |  |
 | 7,906 | 2025-11 | [`INC-10065`](docs/incidents/2025.md#inc-10065) | sudo-rs: Partial password reveal is possible after timeout | Low | LLM04 | ASI04 | `CVE-2025-64170` |
 | 7,907 | 2025-11 | [`INC-03248`](docs/incidents/2025.md#inc-03248) | Sysdig AI-Accelerated Cloud Attack: Admin Privileges in 10 Minutes | Critical | LLM06 | ASI02 |  |
 | 7,908 | 2025-11 | [`INC-03265`](docs/incidents/2025.md#inc-03265) | The Ai Auto Tool Content Writing Assistant (Gemini Writer, ChatGPT ) All in One plugin for WordPress is vulne… | Medium | LLM04 | ASI04 | `CVE-2025-12156` |
