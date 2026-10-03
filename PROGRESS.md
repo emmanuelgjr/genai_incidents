@@ -2,6 +2,32 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🚚 2026-10-03 — USER GOAL: waves 1+2 APPROVED · count update · release if it bumps · tranche-1 names · push and merge
+
+- **⚖ D40, USER RULING 2026-10-03: waves 1 and 2 are APPROVED.**
+  - **Wave 1:** AVID + cvelistV5, with huntr as a CNA filter inside cvelistV5.
+  - **Wave 2:** arXiv cs.CR via OAI-PMH, metadata only, with EUVD as enrichment.
+  - **EUVD is NOT ingested until outreach settles its licence (d).** Its outreach email is drafted for the user to send (protocol step 8).
+  - **Release:** the user directed checking the count, updating it, and cutting a release if it bumps.
+- **Tranche-1 names, searched again by new routes:** Gmail (the only "huntr" hits are the unrelated huntr.co job newsletter), Google Drive (OWASP documents only), and every earlier route. **Not found.**
+  - **Solution, at the user's direction:** a reconstruction from the tranche-2 brief's own phrasing, which is the US and industry counterpart of each worldwide category. It is recorded with each name's basis in `docs/specs/source-expansion-tranche1-reconstruction-2026-10-03.md` (`8699cc35` on `ws0/tranche1-reconstructed`, pushed).
+  - The 8 reconstructed names: CERT/CC VU, CourtListener, FTC, 0din, EPSS, OpenSSF malicious-packages, HF security, GHSL. **The user may amend them.**
+- **Count-update finding: the weekly auto-refresh has FAILED on every run since the unfreeze.**
+  - The failing runs are 09-20 and 09-27. Both fail on the E21 tripwire `test_oecd_aiid_content_disagreement_is_unique_to_inc00437`, which found 42 rows against an expected 2.
+  - As a result no refresh PR has opened, and `incident_count` has been 13,361 since 2026-09-18.
+  - The AIRI download URL also returns 404.
+- **Dispatched in parallel, one worktree each.** The deviation from serial execution is deliberate: the tasks are independent, and integration happens by rebuild.
+  - license-auditor: wave 1–2 `SOURCE_LICENSES` rows, the CVE ToU and AVID MIT notices, and the EUVD outreach draft (`ws0/wave12-licence-rows`).
+  - license-auditor: reconstructed tranche-1 pre-rows (`ws0/tranche1-reconstructed`).
+  - pipeline-engineer: refresh-tripwire diagnosis, measurement only (`ws4/refresh-tripwire-42`).
+  - pipeline-engineer: N1, the 17 entries still active for rejected CVEs, reconciled under invariant 3 with a field-level delta (`ws4/rejected-cve-reconcile`).
+  - pipeline-engineer: wave 1–2 ingest (AVID, cvelistV5 + huntr CNA + the post-2026-06 CVE catch-up, arXiv OAI-PMH), with a field-level delta (`ws4/wave12-ingest`).
+- **Integration plan:**
+  1. Merge the licence rows into the ingest branch (invariant 10).
+  2. red-reviewer gates each data branch.
+  3. Integrate on a release branch and rebuild.
+  4. Run the VERSIONING.md cut if the count bumps.
+
 ## ✅ Source-expansion evaluation (tranche 2 + partial tranche 1): **DONE and MERGED to main `2504fb89` (2026-10-03)**
 
 - **Final gate: PASS (fresh red-reviewer, gate 6, 2026-10-03, on `946a7e55`), no defects.** Verdict text in `docs/audits/source-expansion-tranche2-gate6-final-PASS-2026-10-03.md`.
