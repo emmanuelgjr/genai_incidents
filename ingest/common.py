@@ -172,6 +172,15 @@ _last_request_at: dict[str, float] = {}
 _robots_cache: dict[str, urllib.robotparser.RobotFileParser] = {}
 
 
+def url_with_query(base: str, params: dict[str, str], *, safe: str = "") -> str:
+    """``base?k=v&...`` with percent-encoding. A pure string helper (no
+    network); lives here so ingest scripts need no ``urllib`` import of their
+    own (tests/test_network_chokepoint.py pins which scripts mention it)."""
+    from urllib.parse import urlencode
+
+    return base + "?" + urlencode(params, safe=safe)
+
+
 def _reset_state_for_tests() -> None:
     """Test-only: clear the rate-limit and robots caches between test cases,
     so state (and, more importantly, an accidental real time.sleep or a real

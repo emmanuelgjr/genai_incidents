@@ -1,4 +1,4 @@
-.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
+.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -125,6 +125,30 @@ ingest-oecd-aim:
 # Output: ingest/aiid_full.json (+ ingest/aiid_full.provenance.json).
 ingest-aiid:
 	python scripts/ingest_aiid_snapshot.py
+
+# Source-expansion wave 1 / wave 2 (docs/specs/source-expansion-evaluation.md
+# section 5.3). Each target is one rate-limited fetch through ingest/common.py
+# and writes a committed ingest/*.json; `make build` only ever reads those
+# committed files. Deliberately NOT part of ingest-all or the weekly
+# auto-refresh: adding them there is a separate decision. The wave12_ file
+# prefix is load-bearing: merge_and_dedupe reads ingest/*.json in sorted name
+# order and URL keys go to the first row that claims them, so new-source files
+# must sort AFTER every existing source (see ingest/README.md).
+#
+# AVID (MIT): GitHub tarball of avidml/avid-db -> ingest/wave12_avid.json
+ingest-avid:
+	python scripts/ingest_avid.py
+
+# CVE Program record dump (CVE-TOU), AI-relevance filtered, huntr CNA tagged
+# inside it. Streams the ~620 MB baseline asset to ingest/_cache/ (gitignored).
+# Output: ingest/wave12_cvelistv5.json (+ .provenance.json)
+ingest-cvelistv5:
+	python scripts/ingest_cvelistv5.py
+
+# arXiv cs.CR descriptive metadata via OAI-PMH (CC0), deterministic
+# attack-on-GenAI filter. Output: ingest/wave12_arxiv.json (+ .provenance.json)
+ingest-arxiv:
+	python scripts/ingest_arxiv_oaipmh.py
 
 # Refresh every external source. Heavy: NVD/GHSA, AIRI, AIAAIC, AIID, OECD AIM.
 ingest-all: ingest-cve ingest-kev ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim

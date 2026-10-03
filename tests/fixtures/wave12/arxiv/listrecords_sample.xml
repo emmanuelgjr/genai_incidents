@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <responseDate>2026-10-03T14:57:13Z</responseDate>
+    <request verb="ListRecords" metadataPrefix="arXiv" from="2025-10-03" until="2025-11-01" set="cs:cs:CR">http://oaipmh.arxiv.org/oai</request>
+    <ListRecords>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:2510.10271</identifier>
+        <datestamp>2026-06-29</datestamp>
+            <setSpec>cs:cs:CR</setSpec>
+            <setSpec>cs:cs:AI</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2510.10271</id>
+        <created>2026-06-26</created>
+            <updated>2026-06-29</updated>
+        <authors>
+                <author>
+                    <keyname>Zhu</keyname>
+                        <forenames>Wentian</forenames>
+                </author>
+                <author>
+                    <keyname>Xiang</keyname>
+                        <forenames>Zhen</forenames>
+                </author>
+                <author>
+                    <keyname>Niu</keyname>
+                        <forenames>Wei</forenames>
+                </author>
+                <author>
+                    <keyname>Guan</keyname>
+                        <forenames>Le</forenames>
+                </author>
+        </authors>
+        <title>MetaBreak: Jailbreaking Online LLM Services via Special Token Manipulation</title>
+            <categories>cs.CR cs.AI</categories>
+            <comments>Accepted version. Revised to match the version accepted to the 2026 IEEE Symposium on Security and Privacy (SP); added publication information and DOI</comments>
+            <journal-ref>Proceedings of the 2026 IEEE Symposium on Security and Privacy (SP), pp. 98-117, IEEE Computer Society, 2026</journal-ref>
+            <doi>10.1109/SP63933.2026.00095</doi>
+            <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+            <abstract>Unlike regular tokens derived from existing text corpora, special tokens are artificially created to annotate structured conversations during the fine-tuning process of Large Language Models (LLMs). Serving as metadata of training data, these tokens play a crucial role in instructing LLMs to generate coherent and context-aware responses. We demonstrate that special tokens can be exploited to construct four attack primitives, with which malicious users can reliably bypass the internal safety alignment of online LLM services and circumvent state-of-the-art (SOTA) external content moderation systems simultaneously. Moreover, we found that addressing this threat is challenging, as aggressive defense mechanisms-such as input sanitization by removing special tokens entirely, as suggested in academia-are less effective than anticipated. This is because such defense can be evaded when the special tokens are replaced by regular ones with high semantic similarity within the tokenizer&#39;s embedding space. We systemically evaluated our method, named MetaBreak, on both lab environment and commercial LLM platforms. Our approach achieves jailbreak rates comparable to SOTA prompt-engineering-based solutions when no content moderation is deployed. However, when there is content moderation, MetaBreak outperforms SOTA solutions PAP and GPTFuzzer by 11.6% and 34.8%, respectively. Finally, since MetaBreak employs a fundamentally different strategy from prompt engineering, the two approaches can work synergistically. Notably, empowering MetaBreak on PAP and GPTFuzzer boosts jailbreak rates by 24.3% and 20.2%, respectively.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:2511.16709</identifier>
+        <datestamp>2025-11-24</datestamp>
+            <setSpec>cs:cs:CR</setSpec>
+            <setSpec>cs:cs:AI</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2511.16709</id>
+        <created>2025-11-20</created>
+            <updated>2025-11-24</updated>
+        <authors>
+                <author>
+                    <keyname>Li</keyname>
+                        <forenames>Yige</forenames>
+                </author>
+                <author>
+                    <keyname>Li</keyname>
+                        <forenames>Zhe</forenames>
+                </author>
+                <author>
+                    <keyname>Zhao</keyname>
+                        <forenames>Wei</forenames>
+                </author>
+                <author>
+                    <keyname>Min</keyname>
+                        <forenames>Nay Myat</forenames>
+                </author>
+                <author>
+                    <keyname>Huang</keyname>
+                        <forenames>Hanxun</forenames>
+                </author>
+                <author>
+                    <keyname>Ma</keyname>
+                        <forenames>Xingjun</forenames>
+                </author>
+                <author>
+                    <keyname>Sun</keyname>
+                        <forenames>Jun</forenames>
+                </author>
+        </authors>
+        <title>AutoBackdoor: Automating Backdoor Attacks via LLM Agents</title>
+            <categories>cs.CR cs.AI</categories>
+            <comments>23 pages</comments>
+            <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+            <abstract>Backdoor attacks pose a serious threat to the secure deployment of large language models (LLMs), enabling adversaries to implant hidden behaviors triggered by specific inputs. However, existing methods often rely on manually crafted triggers and static data pipelines, which are rigid, labor-intensive, and inadequate for systematically evaluating modern defense robustness. As AI agents become increasingly capable, there is a growing need for more rigorous, diverse, and scalable \textit{red-teaming frameworks} that can realistically simulate backdoor threats and assess model resilience under adversarial conditions. In this work, we introduce \textsc{AutoBackdoor}, a general framework for automating backdoor injection, encompassing trigger generation, poisoned data construction, and model fine-tuning via an autonomous agent-driven pipeline. Unlike prior approaches, AutoBackdoor uses a powerful language model agent to generate semantically coherent, context-aware trigger phrases, enabling scalable poisoning across arbitrary topics with minimal human effort. We evaluate AutoBackdoor under three realistic threat scenarios, including \textit{Bias Recommendation}, \textit{Hallucination Injection}, and \textit{Peer Review Manipulation}, to simulate a broad range of attacks. Experiments on both open-source and commercial models, including LLaMA-3, Mistral, Qwen, and GPT-4o, demonstrate that our method achieves over 90\% attack success with only a small number of poisoned samples. More importantly, we find that existing defenses often fail to mitigate these attacks, underscoring the need for more rigorous and adaptive evaluation techniques against agent-driven threats as explored in this work. All code, datasets, and experimental configurations will be merged into our primary repository at https://github.com/bboylyg/BackdoorLLM.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:2510.20768</identifier>
+        <datestamp>2025-12-17</datestamp>
+            <setSpec>cs:cs:CR</setSpec>
+            <setSpec>cs:cs:AI</setSpec>
+            <setSpec>cs:cs:IR</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2510.20768</id>
+        <created>2025-12-15</created>
+            <updated>2025-12-17</updated>
+        <authors>
+                <author>
+                    <keyname>Jia</keyname>
+                        <forenames>Austin</forenames>
+                </author>
+                <author>
+                    <keyname>Ramesh</keyname>
+                        <forenames>Avaneesh</forenames>
+                </author>
+                <author>
+                    <keyname>Shamsi</keyname>
+                        <forenames>Zain</forenames>
+                </author>
+                <author>
+                    <keyname>Zhang</keyname>
+                        <forenames>Daniel</forenames>
+                </author>
+                <author>
+                    <keyname>Liu</keyname>
+                        <forenames>Alex</forenames>
+                </author>
+        </authors>
+        <title>RAGRank: Using PageRank to Counter Poisoning in CTI LLM Pipelines</title>
+            <categories>cs.CR cs.AI cs.IR</categories>
+            <comments>Presented as a poster at the Annual Computer Security Applications Conference (ACSAC) 2025</comments>
+            <license>http://creativecommons.org/licenses/by-sa/4.0/</license>
+            <abstract>Retrieval-Augmented Generation (RAG) has emerged as the dominant architectural pattern to operationalize Large Language Model (LLM) usage in Cyber Threat Intelligence (CTI) systems. However, this design is susceptible to poisoning attacks, and previously proposed defenses can fail for CTI contexts as cyber threat information is often completely new for emerging attacks, and sophisticated threat actors can mimic legitimate formats, terminology, and stylistic conventions. To address this issue, we propose that the robustness of modern RAG defenses can be accelerated by applying source credibility algorithms on corpora, using PageRank as an example. In our experiments, we demonstrate quantitatively that our algorithm applies a lower authority score to malicious documents while promoting trusted content, using the standardized MS MARCO dataset. We also demonstrate proof-of-concept performance of our algorithm on CTI documents and feeds.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:2509.16950</identifier>
+        <datestamp>2025-10-14</datestamp>
+            <setSpec>cs:cs:CR</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2509.16950</id>
+        <created>2025-10-11</created>
+            <updated>2025-10-14</updated>
+        <authors>
+                <author>
+                    <keyname>Chen</keyname>
+                        <forenames>Xuan</forenames>
+                </author>
+                <author>
+                    <keyname>Feng</keyname>
+                        <forenames>Shiwei</forenames>
+                </author>
+                <author>
+                    <keyname>Xiong</keyname>
+                        <forenames>Zikang</forenames>
+                </author>
+                <author>
+                    <keyname>An</keyname>
+                        <forenames>Shengwei</forenames>
+                </author>
+                <author>
+                    <keyname>Mao</keyname>
+                        <forenames>Yunshu</forenames>
+                </author>
+                <author>
+                    <keyname>Yan</keyname>
+                        <forenames>Lu</forenames>
+                </author>
+                <author>
+                    <keyname>Tao</keyname>
+                        <forenames>Guanhong</forenames>
+                </author>
+                <author>
+                    <keyname>Guo</keyname>
+                        <forenames>Wenbo</forenames>
+                </author>
+                <author>
+                    <keyname>Zhang</keyname>
+                        <forenames>Xiangyu</forenames>
+                </author>
+        </authors>
+        <title>Temporal Logic-Based Multi-Vehicle Backdoor Attacks against Offline RL Agents in End-to-end Autonomous Driving</title>
+            <categories>cs.CR</categories>
+            <license>http://creativecommons.org/licenses/by/4.0/</license>
+            <abstract>Assessing the safety of autonomous driving (AD) systems against security threats, particularly backdoor attacks, is a stepping stone for real-world deployment. However, existing works mainly focus on pixel-level triggers that are impractical to deploy in the real world. We address this gap by introducing a novel backdoor attack against the end-to-end AD systems that leverage one or more other vehicles&#39; trajectories as triggers. To generate precise trigger trajectories, we first use temporal logic (TL) specifications to define the behaviors of attacker vehicles. Configurable behavior models are then used to generate these trajectories, which are quantitatively evaluated and iteratively refined based on the TL specifications. We further develop a negative training strategy by incorporating patch trajectories that are similar to triggers but are designated not to activate the backdoor. It enhances the stealthiness of the attack and refines the system&#39;s responses to trigger scenarios. Through extensive experiments on 5 offline reinforcement learning (RL) driving agents with 6 trigger patterns and target action combinations, we demonstrate the flexibility and effectiveness of our proposed attack, showing the under-exploration of existing end-to-end AD systems&#39; vulnerabilities to such trajectory-based backdoor attacks.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:2601.10173</identifier>
+        <datestamp>2026-01-16</datestamp>
+            <setSpec>cs:cs:CR</setSpec>
+            <setSpec>cs:cs:AI</setSpec>
+            <setSpec>cs:cs:CL</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2601.10173</id>
+        <created>2026-01-15</created>
+            <updated>2026-01-16</updated>
+        <authors>
+                <author>
+                    <keyname>Li</keyname>
+                        <forenames>Hao</forenames>
+                </author>
+                <author>
+                    <keyname>Yang</keyname>
+                        <forenames>Yankai</forenames>
+                </author>
+                <author>
+                    <keyname>Suh</keyname>
+                        <forenames>G. Edward</forenames>
+                </author>
+                <author>
+                    <keyname>Zhang</keyname>
+                        <forenames>Ning</forenames>
+                </author>
+                <author>
+                    <keyname>Xiao</keyname>
+                        <forenames>Chaowei</forenames>
+                </author>
+        </authors>
+        <title>ReasAlign: Reasoning Enhanced Safety Alignment against Prompt Injection Attack</title>
+            <categories>cs.CR cs.AI cs.CL</categories>
+            <comments>15 pages, 10 figures</comments>
+            <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+            <abstract>Large Language Models (LLMs) have enabled the development of powerful agentic systems capable of automating complex workflows across various fields. However, these systems are highly vulnerable to indirect prompt injection attacks, where malicious instructions embedded in external data can hijack agent behavior. In this work, we present ReasAlign, a model-level solution to improve safety alignment against indirect prompt injection attacks. The core idea of ReasAlign is to incorporate structured reasoning steps to analyze user queries, detect conflicting instructions, and preserve the continuity of the user&#39;s intended tasks to defend against indirect injection attacks. To further ensure reasoning logic and accuracy, we introduce a test-time scaling mechanism with a preference-optimized judge model that scores reasoning steps and selects the best trajectory. Comprehensive evaluations across various benchmarks show that ReasAlign maintains utility comparable to an undefended model while consistently outperforming Meta SecAlign, the strongest prior guardrail. On the representative open-ended CyberSecEval2 benchmark, which includes multiple prompt-injected tasks, ReasAlign achieves 94.6% utility and only 3.6% ASR, far surpassing the state-of-the-art defensive model of Meta SecAlign (56.4% utility and 74.4% ASR). These results demonstrate that ReasAlign achieves the best trade-off between security and utility, establishing a robust and practical defense against prompt injection attacks in real-world agentic systems. Our code and experimental results could be found at https://github.com/leolee99/ReasAlign.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+        <record>
+            <header status="deleted">
+                <identifier>oai:arXiv.org:2501.00001</identifier>
+                <datestamp>2025-10-20</datestamp>
+                <setSpec>cs:cs:CR</setSpec>
+            </header>
+        </record>
+        <resumptionToken cursor="0" completeListSize="2000">TOKEN123|1001</resumptionToken>
+    </ListRecords>
+</OAI-PMH>
