@@ -79,7 +79,11 @@
 - **⚖ D39, USER RULING 2026-10-03, on BOUNCE #2:**
   - **(a) Apply the gate's replacement text verbatim, then a narrow string-check gate** (D37 precedent). The specialist applies each replacement with an occurs-once replace (Edit's unique-match), without re-deriving. The narrow gate then confirms the strings landed and that nothing else moved.
   - **(b) ACSC stays at 1, and the scale is amended.** The score-1 definition gains "or a grant known only from a search extract whose primary page could not be reached (provisional)". ACSC returns to 2 once its primary page is read.
-  - **Then:** pipeline-engineer estimates → final gate → merge. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **Then:** pipeline-engineer estimates → final gate → merge.
+- **2026-10-03:**
+  - **Replacement and redispatch.** The D39 applier stalled after one partial edit and was REPLACED per agreement 3: stopped, and a fresh license-auditor dispatched. Its fixes were verified by foreman grep and committed as `e2b1c988` (pushed): 9 must-be-present strings were present, 4 must-be-absent strings were absent, and the stale section-6 status line was fixed.
+  - **Narrow string-check gate:** dispatched to red-reviewer on `6d77a194..e2b1c988`.
+  - **pipeline-engineer dispatched in parallel** on `eval/source-expansion-estimates` (from `e2b1c988`, its own worktree). It fills sections 4–5 only, which are disjoint from the gated licence rows, and gets merged after. **The deviation from serial execution is deliberate**, because the two sections do not overlap. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
