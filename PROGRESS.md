@@ -101,7 +101,12 @@
   - The foreman's transcription introduced em dashes, arrows and some compressed phrasing.
   - As a result, two of the gate's replacement strings did not match literally. The auditor matched them by content instead and disclosed that it had done so.
   - A dated correction has been added to all three records, with the originals preserved under agreement 4.
-  - **Lesson:** a record that calls itself verbatim must be pasted, not retyped. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **Lesson:** a record that calls itself verbatim must be pasted, not retyped.
+- **✅ LICENCE HALF PASS (red-reviewer, gate 4 string re-check, 2026-10-03, on `5163c10b`). No defects.**
+  - The verdict is in `docs/audits/source-expansion-tranche2-gate4-recheck-PASS-2026-10-03.md`, pasted rather than retyped.
+  - **Gate evidence [R]:** item-33 commands re-run, 284 / 277; stale-string sweep 0 hits; diff 7/7 with every hunk declared; invariants PASS.
+  - **Advisory, routed to the final merge pass:** the ANSSI Retrieval-method cell (line 238) still says "method-suspect" although gate 1 confirmed it. Change it to "gate-confirmed (curl, 2026-10-03)".
+  - **Remaining:** pipeline-engineer sections 4–5 → merge into `eval/source-expansion` → final red-reviewer gate on 4–5 → merge to main. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
