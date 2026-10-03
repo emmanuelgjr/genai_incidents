@@ -15,6 +15,17 @@ listed in the report under ABSENCE FINDINGS FOR SHELL VERIFICATION for a
 red-reviewer curl+grep on the raw HTML. Where a row rests on a structured
 endpoint (GitHub API JSON, a licence file in a repo) the row says so.
 
+**Rework 2026-10-03 (after red-reviewer gate 1, BOUNCE #1).** The gate verdict
+is `docs/audits/source-expansion-tranche2-gate1-verdict-2026-10-03.md` (dated
+record, do not regenerate). Rows below were corrected **by transcription from
+that verdict**, not by re-fetching: where a row says "verified by red-reviewer
+via curl, 2026-10-03" the quoted clause is the gate's, taken from raw HTML by
+shell, and was not re-measured by this agent (whose WebFetch tool is the one
+that produced the false negatives). The original wrong statements are not
+preserved inline; the verdict is the record of what was refuted. Section 1E
+(two tranche-1 sources) was added in the same rework and is this agent's own
+WebFetch/WebSearch work, method-suspect for absences.
+
 **Facts re-checked vs. taken from the brief:** nothing from the brief is
 carried forward unverified; each row's "Retrieval method" says what was
 actually fetched. Where a licence prior ("NCSC = OGL", "ACSC = CC BY 4.0")
@@ -38,37 +49,87 @@ outreach (user sends; none drafted here).
 
 Project data licence for the "relicense-compatible" column: **CC BY 4.0**.
 
-## Summary of pre-rows (27 candidates)
+## Summary of pre-rows (29 candidates; 27 tranche 2 + 2 tranche 1)
+
+Scores below are the **post-gate (2026-10-03)** scores. Verification status per
+row is in the table after this one.
 
 | # | Candidate | Score | Action | Blocking issue / condition |
 |---|---|---|---|---|
 | 1A.1 | UK NCSC | 3 | (a) | OGL v3.0 confirmed; per-record OGL notice; exclude third-party images/logos |
-| 1A.2 | ACSC Australia | 2 | (a) provisional | CC BY 4.0 known only from a search extract; the site timed out for every fetch; per-document "Australian" variant |
-| 1A.3 | CCCS Canada | 1 | (c) | Non-commercial reproduction only (CSE terms); **not** permissive, contrary to the brief's "trio" |
-| 1A.4 | ENISA | 2 | (a) PDF reports; (d) web/DB | CC BY 4.0 for reports (policy read); CC BY-NC-ND training material excluded; website text and databases not covered |
-| 1A.5 | BSI / CERT-Bund | 1 | (c) | Non-commercial, unmodified use only; WID-specific terms not read |
+| 1A.2 | ACSC Australia | 2 -> **1** (provisional) | (d) | **Unverified, extract-sourced.** Site-wide CC BY 4.0 never read from the primary page (gate: TLS then 0 bytes, 4 ways); only a per-document corroboration (ISM README). Would return to 2 if the copyright page is read |
+| 1A.3 | CCCS Canada | 1 | (c) | Non-commercial reproduction only (CSE terms; canada.ca terms same wording); **not** permissive, contrary to the brief's "trio" |
+| 1A.4 | ENISA | 2 (reports) / **1** (web text) | (a) PDF reports; (c) web text; (d) DB | CC BY 4.0 for reports (policy read); web text: legal notice authorises **reproduction** with source, no adaptation grant; CC BY-NC-ND training material excluded |
+| 1A.5 | BSI / CERT-Bund | 1 | (c) | Non-commercial, unmodified use only (BSI-wide); WID-specific terms **unverified** (JS app); sample CSAF has TLP:WHITE + liability-only disclaimer, no licence |
 | 1A.6 | ANSSI / CERT-FR | 3 | (a) | Licence Ouverte 2.0 confirmed; do not fetch `/pdf`, `/fiche/`; attribution |
-| 1A.7 | JPCERT/CC | 1 | (d) | No licence or ToS located (all-absence row, method-suspect) |
-| 1A.8 | JVN / JVN iPedia | 1 | (d) | "All rights reserved"; reuse guidelines referenced but not located; MyJVN terms cover tools, not data |
-| 1A.9 | SingCERT / CSA | 1 | (c) | All rights reserved; reproduction needs written permission |
-| 1A.10 | CERT-EU | 1 | (d) | Legal notice says CC BY 4.0, advisories page footer says "All rights reserved"; no AI advisories seen |
-| 1B.2 | EUVD | 1 | (d) | No licence/terms located; docs SPA unreadable; IPR policy does not name EUVD |
-| 1B.3 | cvelistV5 | 2 | (a) cond. | CVE ToU requires MITRE notice; **repo shows no such notice today** |
+| 1A.7 | JPCERT/CC | 1 | (d) notification | `guide.html` s2: quotation free with source/title/URL; redistribution needs notification to `office@jpcert.or.jp`; not an open licence |
+| 1A.8 | JVN / JVN iPedia | 1 | (d) | FAQ Q5-2 informal "no particular restrictions, please notify by email" vs "All rights reserved" footers; not a licence; jvn.jp side not covered by the FAQ |
+| 1A.9 | SingCERT / CSA | **0** (was 1) | (d); no link-only | All rights reserved **and** caching/links/framing prohibited without permission; even facts + link contested |
+| 1A.10 | CERT-EU | 1 | (d) | Legal notice (CERT-EU's own) says CC BY 4.0, same page footer says "All rights reserved"; no AI advisories seen |
+| 1B.2 | EUVD | 1 | (d) | ENISA legal notice authorises reproduction of website material (does it reach the API data? unknown); euvd-docs-public LICENSE bars reuse of the docs; no data licence |
+| 1B.3 | cvelistV5 | 2 | (a) cond. | CVE ToU requires MITRE notice; **no such notice in NOTICE-DATA / dep5 / SOURCE_LICENSES today** (targeted grep) |
 | 1B.4 | VulnCheck KEV | 0 | (d) | Service Terms bar making data available under an open licence and AI training on free data; conflicts with its attribution page |
 | 1B.5 | AVID | 2 | (a) cond. | MIT repo licence (structured); **already in corpus (109 entries) with no SOURCE_LICENSES row** |
 | 1C.1 | Italy Garante | 1 | (d)/(c) | No general licence located; PDFs disallowed by robots; Italian |
 | 1C.2 | EDPB registers | 2 / 1 | (c) + (d) | Custom reuse grant ("do not distort meaning"); national decisions' rights unclear |
-| 1C.3 | Dutch AP | 1 | (c) | Copyright reserved, personal use + quotation (search extract; site returns 403 to the fetch tool) |
-| 1C.4 | CNIL | 1 | (c); (a) open-data subset | Site text CC-BY-ND 4.0 FR; open-data decisions under Licence Ouverte not verified |
-| 1C.5 | UK ICO | 3 | (a) | OGL v3.0 on enforcement register; honour Crawl-delay 6; "except where otherwise stated" |
+| 1C.3 | Dutch AP | 1 | (c) | Copyright reserved, personal use + quotation; passing on to third parties or commercial processing requires contacting AP (gate read primary); robots GPTBot Disallow |
+| 1C.4 | CNIL | 1 | (c); (a) open-data subset | Site text CC-BY-ND 4.0 FR; data.gouv.fr dataset "Sanctions prononcees par la CNIL" is under fr-lo (Licence Ouverte), supports the open-data subset |
+| 1C.5 | UK ICO | 3 | (a) | OGL v3.0 "except where otherwise stated" (copyright-and-re-use page); required attribution string; honour Crawl-delay 6 |
 | 1C.6 | Brazil ANPD | 1 | (c) | CC BY-ND 3.0 on all content; Portuguese |
 | 1C.7 | Canada OPC | 1 | (c) | Non-commercial reproduction only |
 | 1C.8 | BAILII | 0 | (c) link only | Terms bar bulk download/storage; robots disallows judgment trees; BAILII cannot authorise copying |
-| 1C.9 | CanLII | 0 | (c) link only | Terms bar bulk/systematic download; robots `Disallow: /`; CanLII litigating over scraping (clause text second-hand, site 403) |
+| 1C.9 | CanLII | 0 | (c) link only | robots `Disallow: /` (gate-confirmed); terms clause **unverified, extract-sourced** (403 DataDome); CanLII litigating over scraping |
 | 1D.1 | arXiv cs.CR | 3 meta / 0 full text | (a) metadata incl. abstract | **Brief refuted:** abstract is CC0 metadata; never mirror e-prints; 1 req / 3 s |
-| 1D.2 | HackerOne Hacktivity | 1 | (c) | Researcher keeps copyright; licences run only to HackerOne and Customer; robots/Website ToS not read |
+| 1D.2 | HackerOne Hacktivity | 1 | (c) | Researcher keeps copyright; licences run only to HackerOne and Customer (current Community Member T&C, eff. 2026-05-11; Finder Terms 2023 superseded); no scrape clause found in 6 docs |
 | 1D.3 | Bugcrowd | 0 | (c) link only | "Copying, redistribution, use or publication of any portion of our Website is strictly prohibited"; submissions confidential/assigned |
-| 1D.4 | DEF CON AI Village / Black Hat | 1 | (c) | Speakers keep copyright; no downstream licence; fetches mostly failed |
+| 1D.4 | DEF CON AI Village / Black Hat | 1 | (c) | **Unverified, extract-sourced.** Speakers keep copyright; no downstream licence; fetches failed (reset / 403) |
+| 1E.1 | huntr (Protect AI / Palo Alto Networks) | 1 | (c) | Contributions assigned exclusively to Palo Alto Networks (Participation Terms s7.1); no public reuse grant seen; **unverified, no shell check yet** |
+| 1E.2 | CISA beyond KEV | 2 (CISA-authored) / 1 (co-sealed, third-party) | (a) with per-document filter | Federal works not copyrighted (17 U.S.C. s105, from general knowledge, not fetched), but co-sealed foreign-agency material is not; no CISA-wide licence statement located; **unverified, no shell check yet** |
+
+### Verification status per row
+
+**Key.** *gate-confirmed*: the gate re-measured the finding by shell on raw
+HTML and it stood. *gate-refuted-and-fixed*: the gate refuted an earlier
+statement and the row was rewritten from the gate's quotes. *unverifiable*:
+the gate could not reach the primary page; the row rests on search extracts or
+secondary sources and is labelled "unverified, extract-sourced" in the row.
+*not yet gated*: added after the gate (section 1E).
+
+| Row | Status |
+|---|---|
+| 1A.1 NCSC | gate-confirmed (OGL interop sentence corrected to verbatim) |
+| 1A.2 ACSC | **unverifiable**; score lowered to 1 provisional |
+| 1A.3 CCCS | gate-confirmed (citation corrected) |
+| 1A.4 ENISA | gate-refuted-and-fixed |
+| 1A.5 BSI/WID | no-open-licence half gate-confirmed; WID-specific terms **unverifiable** |
+| 1A.6 ANSSI | gate-confirmed |
+| 1A.7 JPCERT | gate-refuted-and-fixed |
+| 1A.8 JVN | gate-refuted-and-fixed |
+| 1A.9 CSA | gate-refuted-and-fixed (score 1 -> 0) |
+| 1A.10 CERT-EU | contradiction gate-confirmed; "CERT-EU not named" gate-refuted-and-fixed |
+| 1B.2 EUVD | gate-refuted-and-fixed |
+| 1B.3 cvelistV5 | gate-confirmed on substance; check 13 false-fired, fixed |
+| 1B.4 VulnCheck | gate-confirmed (both clauses verbatim) |
+| 1B.5 AVID | gate-confirmed (site IDs corrected to R1714) |
+| 1C.1 Garante | gate-confirmed |
+| 1C.2 EDPB | gate-confirmed |
+| 1C.3 Dutch AP | gate-confirmed, upgraded to primary |
+| 1C.4 CNIL | gate-confirmed (dataset licence added from data.gouv.fr API) |
+| 1C.5 ICO | gate-refuted-and-fixed (score stands) |
+| 1C.6 ANPD | gate-confirmed |
+| 1C.7 OPC | gate-confirmed |
+| 1C.8 BAILII | gate-confirmed |
+| 1C.9 CanLII | robots gate-confirmed; terms clause **unverifiable** |
+| 1D.1 arXiv | gate-confirmed |
+| 1D.2 HackerOne | gate-confirmed; terms superseded, fixed |
+| 1D.3 Bugcrowd | gate-confirmed |
+| 1D.4 DEF CON / Black Hat / AI Village | **unverifiable** |
+| 1E.1 huntr | not yet gated |
+| 1E.2 CISA beyond KEV | not yet gated |
+| Rejections 2.1 CNNVD/CNVD, 2.3 VulDB | **unverifiable** (JS wall / SPA shell / 403) |
+| Rejection 2.2 Snyk | gate-confirmed (2020 clause; current ToS makes Service Data Confidential Information) |
+| W1 Art. 73 | gate-confirmed; Digital Omnibus OJ dates **unverified** |
+| W2 EUVD API | gate-refuted-and-fixed (dated update added) |
 
 Deliberate rejections: section 2. Dated watch items: section 3. Pipeline
 estimates: section 4 (placeholder). Ranking: section 5 (placeholder).
@@ -90,7 +151,7 @@ offered for exactly these five classes). Not a structured advisory database.
 | License | **OGL v3.0 CONFIRMED (brief prior correct).** NCSC Website Terms & Conditions, `https://www.ncsc.gov.uk/section/about-this-website/terms-and-conditions`: *"Content on the Websites is, unless stated otherwise, subject to Crown copyright."* / *"you may use or reuse the content published on the Websites without prior permission but must adhere to and accept the terms of the Open Government Licence (OGL) v3.0."* / *"You must acknowledge the source of the content and include a link to the Open Government Licence wherever possible."* Carve-outs: *"Where materials are stated to include material under licence from third parties, those materials are not licenced for re-use."*; *"Images credited to a third party are not Crown copyright and are not licenced for re-use."*; logos are excluded from the OGL grant. |
 | Scrape-permitted | **robots.txt:** `https://www.ncsc.gov.uk/robots.txt` returned HTTP 404 to WebFetch (**ABSENCE FINDING, method-suspect; shell check listed**). **ToS:** the T&C page, fetched not truncated, contains no clause on automated access, scraping or APIs (**ABSENCE FINDING, method-suspect**). NCSC publishes RSS feeds (`https://www.ncsc.gov.uk/information/rss-feeds`: All, Guidance, News, Blog posts, Threat Reports); that page states no terms for the feeds. OGL v3.0 itself grants the right to "copy, publish, distribute and transmit" and to adapt and exploit commercially. |
 | Redistribute-verbatim | **YES** under OGL v3.0, with attribution (OGL attribution statement + link), excluding third-party-licensed material and third-party images. |
-| Relicense-compatible | **YES.** OGL v3.0 is attribution-only; a WebSearch extract of the National Archives' OGL v3 text (`https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/`) says v3.0 *"is interoperable with Creative Commons' Attribution 4.0"* and that adapted Information licensed under either licence satisfies the OGL conditions by complying with the other. We retain the NCSC attribution and the OGL notice alongside our CC BY 4.0 grant. The compatibility sentence is a search-engine extract, not a fetch of the licence page -- listed under "taken on trust (partially corroborated)". |
+| Relicense-compatible | **YES.** OGL v3.0 is attribution-only; a WebSearch extract of the National Archives' OGL v3 text (`https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/`) says (verbatim, verified by red-reviewer via curl, 2026-10-03; the earlier "interoperable" wording was not verbatim): *"These terms are compatible with the Creative Commons Attribution License 4.0 ... when the Information is adapted and licensed under either of those licences, you automatically satisfy the conditions of the OGL when you comply with the other."* We retain the NCSC attribution and the OGL notice alongside our CC BY 4.0 grant. The compatibility sentence is now read from the National Archives OGL page by the gate (raw HTML, curl); robots 404 (HTML "site unavailable" page) and the T&C absence of an access clause (only hit: "automatically waive") are gate-confirmed. |
 | Action | **(a) compatible.** Condition: per-record "Contains public sector information licensed under the Open Government Licence v3.0" notice; drop any item flagged as third-party material. |
 | Date-checked | 2026-10-02 |
 | Retrieval method | WebFetch (markdown-converting) of the T&C URL above, response stated "not truncated"; WebFetch of `/information/rss-feeds`; WebFetch of `/robots.txt` -> 404. Substrings read: "Crown copyright", "Open Government Licence", "third parties", "automated". Source kind: rendered HTML (method-exposed for absences, not for the positive OGL clause). |
@@ -102,12 +163,12 @@ offered for exactly these five classes). Not a structured advisory database.
 
 | Field | Value |
 |---|---|
-| Cleanliness score | **2** (grant is real, but the primary page could not be fetched by this agent, and the licence has an "Australian" variant on some documents) |
+| Cleanliness score | **1 (provisional; was 2)** -- **unverified, extract-sourced.** The site-wide CC BY 4.0 grant has never been read from a primary page by this agent or by the gate (gate 2026-10-03: `cyber.gov.au` and `asd.gov.au` both accept TLS then return 0 bytes, Akamai, four ways tried). The only primary corroboration is **per-document**: the ASD `ism-oscal` README, *"provided under a Creative Commons Attribution 4.0 International licence ... this licence only applies to material as set out in this document"*. A per-document grant does not establish a site-wide one, so this row is not scored as if the site-wide licence were confirmed; it would return to 2 (action (a) with conditions) once the copyright page is read. |
 | License | **CC BY 4.0 International, per search-engine extract of the site copyright page -- NOT read from the page itself.** WebFetch of `https://www.cyber.gov.au/about-us/copyright` **timed out three times** (60 s each) and `robots.txt` and the alerts-and-advisories page timed out likewise, so the operative clause below is a **WebSearch summary** of that page, not a quotation: all material "is provided under a Creative Commons Attribution 4.0 International licence, with the exception of the Commonwealth Coat of Arms, the Australian Cyber Security Centre logo, content supplied by third parties, and other material specifically not provided under a Creative Commons Attribution 4.0 licence"; attribution form "(c) Commonwealth of Australia 2026". The same search showed that **some ASD documents use "Creative Commons Attribution 4.0 Australian Licence"** (the 2024-25 Annual Cyber Threat Report) while others use the International version -- a per-document variation. The brief's prior "CC BY 4.0" is therefore **plausibly right but unverified at the primary page**; the brief's implied "uniform" is refuted by the per-document variant. |
 | Scrape-permitted | **robots.txt: NOT OBTAINED** (timeout). **ToS: NOT OBTAINED** beyond the copyright page summary. Timeouts on this host recurred for every URL tried, which suggests bot protection or a slow origin; this is a **fetch-tool limit, not a finding about ACSC**. Status: **UNKNOWN pending shell check**. |
 | Redistribute-verbatim | **YES per the CC BY 4.0 grant above, excluding** Coat of Arms, ACSC logo and third-party content (provisional until the page is read). |
 | Relicense-compatible | **YES** (CC BY 4.0 -> CC BY 4.0), provisional. The Australian-port variant is a sibling licence, not identical; per-document licence field must be read. |
-| Action | **(a) compatible, provisional.** Cannot be recorded as confirmed until red-reviewer curls the copyright page and robots.txt. |
+| Action | **(d) unknown until the copyright page is read**; the (a) path above applies only to the ISM OSCAL material under its README grant. A browser-session or different-network read of the copyright page is the route (curl and WebFetch both failed). |
 | Date-checked | 2026-10-02 (search summary only) |
 | Retrieval method | WebSearch query "cyber.gov.au copyright Creative Commons Attribution 4.0 content Australian Signals Directorate licence" (result summary, not page text). WebFetch of copyright, robots.txt, alerts page: all **timeout of 60000 ms**. Source kind: search-engine summary of rendered HTML (**weakest tier**). |
 | Non-English / facts-only | English. |
@@ -118,7 +179,7 @@ French (the site is bilingual; French is the official parallel text).
 
 | Field | Value |
 |---|---|
-| Cleanliness score | **1** (brief's "permissive trio" framing is refuted for this member) |
+| Cleanliness score | **1** (brief's "permissive trio" framing is refuted for this member). Gate 2026-10-03 (curl): non-commercial clause verbatim as quoted; robots 404; CSE terms contain no access clause. **Citation correction:** the cyber.gc.ca homepage footer links `https://www.canada.ca/en/transparency/terms.html` (same non-commercial wording), and the CSE terms are linked from the about page; conclusion unchanged. The "terms-href" test in check 3 matches the canada.ca global footer and cannot by itself refute "CSE terms only". |
 | License | **No open licence. Non-commercial reproduction only.** cyber.gc.ca footer links to the CSE terms (`https://cse-cst.gc.ca/en/corporate-information/terms-and-conditions`, confirmed via WebFetch of `https://www.cyber.gc.ca/en/about-cyber-centre`). That page, fetched 2026-10-02: *"Information on this site, other than government symbols and other graphics, has been posted with the intent that it be readily available for personal and public non-commercial use and may be reproduced, in part or in whole and by any means, without charge or further permission from CSE."* with conditions: due diligence on accuracy; CSE identified as source; reproduction *"not represented as an official version ... nor as having been made, in affiliation with or with the endorsement of CSE"*. And: *"Unless otherwise specified, you may not reproduce materials on these sites, in whole or in part, for the purposes of commercial redistribution without prior written permission of the CSE."* Non-Canadian commercial requests are "generally not permitted". |
 | Scrape-permitted | **robots.txt: NOT FETCHED.** **ToS:** the page above has no automated-access clause (**ABSENCE FINDING, method-suspect**). The terms page the footer points to is the CSE's; whether a separate cyber.gc.ca-specific terms page exists was not established (two guessed cyber.gc.ca terms URLs returned 404). |
 | Redistribute-verbatim | **NO for our purposes.** Non-commercial reproduction is permitted; this project's data is distributed under CC BY 4.0, which permits commercial downstream use, so verbatim CCCS text cannot be shipped under that grant. |
@@ -135,14 +196,14 @@ French (the site is bilingual; French is the official parallel text).
 
 | Field | Value |
 |---|---|
-| Cleanliness score | **2** (CC BY 4.0 default with "unless otherwise noted" and third-party carve-outs) |
-| License | **CC BY 4.0 for publications.** Boilerplate extracted from multiple ENISA PDFs by WebSearch: *"Unless otherwise noted, the reuse of this document is authorised under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence"*; for photos or other material not under ENISA copyright, permission is to be sought from the copyright holders. The search also returned a paraphrase of ENISA's IPR policy: public reports and media publications under CC BY 4.0, re-user must state changes and may not imply endorsement; this rests on Commission Decision 2011/833/EU. **Primary text now read** (ENISA IPR Policy, public version, December 2021, `https://www.enisa.europa.eu/about-enisa/legal-notice/enisa-ipr-policy-public-version`, served as a PDF and read page by page from the saved file): s2.1.1 *"ENISA shares its public reports and media publications under open license with the use of Creative Commons – Attribution 4.0 – International (CC BY 4.0)."* / *"any possible re-use is allowed under the condition that ENISA is properly referenced as the source"*, plus: modifiers must state changes; no implied endorsement; partial use keeps the link to the original; translations must say ENISA did not endorse them. **Carve-out found:** s2.2 *educational/training courses and material* are **CC BY-NC-ND 4.0** (non-commercial, no derivatives) -- these must be excluded. s2.3 software is EUPL v1.2. Principle of attribution (s1.3): works are *"in principle free to share, free of charges and free to re-use"*. The policy speaks of "reports", "publications", "websites content" and "databases" generically in its definitions but **grants CC BY 4.0 only to public reports and media publications**; **website page text and any ENISA-run database/service (EUVD, row 1B.2) are not expressly licensed by this policy**. Reuse questions: `info@enisa.europa.eu`. |
-| Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02):** `User-agent: *` with only Drupal-style disallows (`/core/`, `/profiles/`, `/admin/`, `/search/`, `/user/...`, `/node/add/`, `/media/oembed`); publications and news paths are not disallowed. **ToS: not located** (**ABSENCE FINDING, method-suspect**). |
-| Redistribute-verbatim | **YES for publications under CC BY 4.0** with attribution and change statement; not for third-party photos/material. |
-| Relicense-compatible | **YES** for CC BY 4.0 publications. |
-| Action | **(a) compatible** for PDF reports and media publications (CC BY 4.0), excluding the CC BY-NC-ND training material and third-party photos; ENISA website page text and ENISA-run databases are **not covered by the policy** -> treat as (d) unknown unless a page-level notice is found. |
+| Cleanliness score | **2 for PDF reports and media publications** (CC BY 4.0 with "unless otherwise noted" and third-party carve-outs); **1 for website page text** (reproduction authorised, adaptation not granted; see Legal notice below) |
+| License | **CC BY 4.0 for publications.** Boilerplate extracted from multiple ENISA PDFs by WebSearch: *"Unless otherwise noted, the reuse of this document is authorised under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence"*; for photos or other material not under ENISA copyright, permission is to be sought from the copyright holders. The search also returned a paraphrase of ENISA's IPR policy: public reports and media publications under CC BY 4.0, re-user must state changes and may not imply endorsement; this rests on Commission Decision 2011/833/EU. **Primary text now read** (ENISA IPR Policy, public version, December 2021, `https://www.enisa.europa.eu/about-enisa/legal-notice/enisa-ipr-policy-public-version`, served as a PDF and read page by page from the saved file): s2.1.1 *"ENISA shares its public reports and media publications under open license with the use of Creative Commons – Attribution 4.0 – International (CC BY 4.0)."* / *"any possible re-use is allowed under the condition that ENISA is properly referenced as the source"*, plus: modifiers must state changes; no implied endorsement; partial use keeps the link to the original; translations must say ENISA did not endorse them. **Carve-out found:** s2.2 *educational/training courses and material* are **CC BY-NC-ND 4.0** (non-commercial, no derivatives) -- these must be excluded. s2.3 software is EUPL v1.2. Principle of attribution (s1.3): works are *"in principle free to share, free of charges and free to re-use"*. The policy speaks of "reports", "publications", "websites content" and "databases" generically in its definitions but **grants CC BY 4.0 only to public reports and media publications**; **website page text and any ENISA-run database/service (EUVD, row 1B.2) are not expressly licensed by this policy**. Reuse questions: `info@enisa.europa.eu`. **Legal notice (website text), verified by red-reviewer via curl, 2026-10-03:** the homepage footer links `https://www.enisa.europa.eu/about-enisa/legal-notice`, which states: *"Reproduction of ENISA material published on this website is authorized, provided the source is acknowledged, unless it is stated otherwise."* This is a **reproduction** permission with attribution. It is not CC BY, it grants **no right to adapt** (no derivative-works or sublicensing wording), and it yields to "unless stated otherwise". So verbatim web text may be reproduced with the source acknowledged, but a CC BY 4.0 relicense of it (which presupposes the right to license adaptations) is not supported. The footer also links a 2024-12 IPR path, but the PDF served there still reads "Public version \| December 2021", so the IPR-policy citation above stands. |
+| Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02):** `User-agent: *` with only Drupal-style disallows (`/core/`, `/profiles/`, `/admin/`, `/search/`, `/user/...`, `/node/add/`, `/media/oembed`); publications and news paths are not disallowed. **ToS:** the legal notice above (found by the gate; the earlier "ToS not located" was refuted). No automated-access clause was reported by the gate in it. |
+| Redistribute-verbatim | **YES for publications under CC BY 4.0** with attribution and change statement; **YES (reproduction, source acknowledged) for website text** unless stated otherwise; not for third-party photos/material. |
+| Relicense-compatible | **YES** for CC BY 4.0 publications. **NO / not established for website text** (reproduction right only; no adaptation grant). |
+| Action | **(a) compatible** for PDF reports and media publications (CC BY 4.0), excluding the CC BY-NC-ND training material and third-party photos. **(c) facts + link + original summary** for website page text (reproduction authorised, relicensing not). ENISA-run databases (EUVD) are row 1B.2, **(d)**. |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebSearch (two queries) for the boilerplate; WebFetch of the IPR-policy URL -> returned a PDF that the markdown converter could not read; the saved PDF was then read directly with the Read tool (text layer + page images, pages 1-13, complete); WebFetch of robots.txt -> readable; WebFetch of two guessed legal-notice URLs -> 404. Source kind: primary PDF (policy clause, reliable) + search summary (boilerplate, weak) + robots.txt (reliable). |
+| Retrieval method | WebSearch (two queries) for the boilerplate; WebFetch of the IPR-policy URL -> returned a PDF that the markdown converter could not read; the saved PDF was then read directly with the Read tool (text layer + page images, pages 1-13, complete); WebFetch of robots.txt -> readable; WebFetch of two guessed legal-notice URLs -> 404 (the real path was found by the gate via the homepage footer). Legal-notice clause: red-reviewer via curl of raw HTML, 2026-10-03 (not re-fetched here). Source kind: primary PDF (policy clause, reliable) + search summary (boilerplate, weak) + robots.txt (reliable) + gate-read legal notice. |
 | Non-English / facts-only | English primary. Facts-only not needed for licence reasons. |
 
 #### 1A.5 BSI / CERT-Bund (Warn- und Informationsdienst, WID)
@@ -152,8 +213,8 @@ warnings, CSAF documents, RSS. *Language:* **German** (some English).
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** (verbatim not allowed; facts + link + original summary is the shape) |
-| License | **No open licence; non-commercial, unmodified use only.** BSI Nutzungsbedingungen, `https://www.bsi.bund.de/DE/Service/Nutzungsbedingungen/Nutzungsbedingungen_node.html` (WebFetch 2026-10-02): *"Software und Veröffentlichungen, die zum kostenfreien Download angeboten werden, dürfen nur zu nicht kommerziellen Zwecken verwendet werden."* / *"Eine weitergehende, insbesondere kommerzielle oder publizistische Verwendung bedarf der vorherigen Zustimmung durch das BSI."* / other downloadable content *"dürfen im Rahmen der gestatteten Verwendung nur unverändert verwendet werden."* (only IT-Grundschutz material may be modified, for internal security measures). **Gap:** the WID portal (`wid.cert-bund.de`) says it has its own "Nutzungsbedingungen"/Impressum; the fetches of the portal pages returned **only the page title** (JavaScript-rendered app shell or truncated), so the WID-specific terms and any licence field inside the CSAF documents were **not read**. Whether the WID terms are looser than the BSI-wide terms is **UNKNOWN**. |
-| Scrape-permitted | **robots.txt: NOT FETCHED** for `bsi.bund.de` or `wid.cert-bund.de`. **ToS:** no automated-access clause in the BSI page (**ABSENCE FINDING, method-suspect**). Official machine channels exist (RSS `https://wid.cert-bund.de/content/public/securityAdvisory/rss`, CSAF info page `https://wid.cert-bund.de/portal/wid/csaf/info`), which is evidence that machine access is intended, **not** evidence that reuse is licensed. |
+| License | **No open licence; non-commercial, unmodified use only.** BSI Nutzungsbedingungen, `https://www.bsi.bund.de/DE/Service/Nutzungsbedingungen/Nutzungsbedingungen_node.html` (WebFetch 2026-10-02): *"Software und Veröffentlichungen, die zum kostenfreien Download angeboten werden, dürfen nur zu nicht kommerziellen Zwecken verwendet werden."* / *"Eine weitergehende, insbesondere kommerzielle oder publizistische Verwendung bedarf der vorherigen Zustimmung durch das BSI."* / other downloadable content *"dürfen im Rahmen der gestatteten Verwendung nur unverändert verwendet werden."* (only IT-Grundschutz material may be modified, for internal security measures). **Gap:** the WID portal (`wid.cert-bund.de`) says it has its own "Nutzungsbedingungen"/Impressum; the fetches of the portal pages returned **only the page title** (JavaScript-rendered app shell or truncated), so the WID-specific terms and any licence field inside the CSAF documents were **not read**. Whether the WID terms are looser than the BSI-wide terms is **UNKNOWN -- unverified, extract-sourced: the gate also could not find them (WID is a JS app; 28 JS chunks grepped, route not found)**. Gate 2026-10-03 (curl): a sample CSAF advisory (wid-sec-w-2026-3717) carries `distribution` TLP:WHITE only and a liability-only `legal_disclaimer`, **no licence**; this supports "no open licence" but TLP:WHITE is a sharing marking, not a copyright grant. |
+| Scrape-permitted | **robots.txt:** `bsi.bund.de/robots.txt` has `Crawl-delay: 10` (gate, curl); `wid.cert-bund.de/robots.txt` is 404 (gate, curl). **ToS:** no automated-access clause in the BSI page (**ABSENCE FINDING, method-suspect; gate-confirmed for the BSI-wide page only**). Official machine channels exist (RSS `https://wid.cert-bund.de/content/public/securityAdvisory/rss`, CSAF info page `https://wid.cert-bund.de/portal/wid/csaf/info`), which is evidence that machine access is intended, **not** evidence that reuse is licensed. |
 | Redistribute-verbatim | **NO** (unmodified non-commercial use only; we would be modifying, translating and redistributing under a commercial-permitting licence). |
 | Relicense-compatible | **NO.** |
 | Action | **(c) prohibited -> facts + link + original summary** as the default. Possibly **(d)** if the WID/CSAF terms turn out looser: the CSAF `document.distribution` block is the first place to look and is a structured, JSON source, so a shell check of one real advisory settles it cheaply. |
@@ -184,13 +245,13 @@ an English subset.
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** |
-| License | **No licence located; treated as All Rights Reserved.** `https://www.jpcert.or.jp/english/` footer: *"© 1996-2026 JPCERT/CC"*, with a single policy link (`/english/privacy.html`). That privacy page contains only: *"In the case where different rules are otherwise specified in the Terms of Service of JPCERT/CC's website or other documents, the specified rules shall prevail."* A Terms of Service document is therefore referenced but **was not located**: guessed URLs `/english/site.html`, `/site.html`, `/policy.html` all returned 404. |
-| Scrape-permitted | **robots.txt:** `https://www.jpcert.or.jp/robots.txt` -> 404 (**ABSENCE FINDING, method-suspect**). **ToS: not located** (**ABSENCE FINDING, method-suspect**). |
-| Redistribute-verbatim | **UNKNOWN** -> treated as NO. |
-| Relicense-compatible | **UNKNOWN** -> treated as NO. |
-| Action | **(d) unknown.** Do not ingest verbatim. Before any outreach, red-reviewer must run the raw-HTML checks listed in the report, because the Terms of Service the privacy page points to probably exists at a URL this agent did not guess. Fallback shape: **(c) facts + link + original summary**. JPCERT advisory content is largely duplicated by JVN (row 1A.8), which is the better structured source. |
-| Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of `/english/`, `/english/privacy.html` (both read), guessed `/english/site.html`, `/site.html`, `/policy.html`, `/robots.txt` (404). Source kind: rendered HTML; **the whole row is an absence finding and method-suspect**. |
+| License | **Site terms exist (the earlier "No licence/ToS located" was REFUTED by the gate); they are a quotation/redistribution rule, not an open licence.** Verified by red-reviewer via curl of raw HTML, 2026-10-03: the homepage links `ご利用にあたって` = `https://www.jpcert.or.jp/guide.html`. Its section 2 (Japanese; gate's rendering, not re-read here): **quotation is free** provided source, title and URL are given; **転載・再配布 (reprinting / redistribution) requires notifying `office@jpcert.or.jp`**; JPCERT/CC coordinates third-party rights where needed; and **individual documents may carry their own conditions**. Footer `© 1996-2026 JPCERT/CC` stands. This is permission-with-notification for redistribution of JPCERT/CC's own text, not a CC/OGL-style grant: it says nothing about adaptation or sublicensing, so a CC BY 4.0 relicense is not supported. |
+| Scrape-permitted | **robots.txt:** `https://www.jpcert.or.jp/robots.txt` -> 404 (confirmed by the gate, curl). **ToS:** `guide.html` s2 above; no access/automation clause was reported by the gate. |
+| Redistribute-verbatim | **CONDITIONAL**: notification to `office@jpcert.or.jp` required per `guide.html` s2; per-document conditions may override. Not an unconditional YES. |
+| Relicense-compatible | **UNKNOWN -> treated as NO** (no adaptation/sublicensing grant). |
+| Action | **(d) notification/outreach.** The correct address is **`office@jpcert.or.jp`** (notification for redistribution; the earlier target was wrong). Do not ingest verbatim before notice is given and answered. Fallback shape: **(c) facts + link + original summary**, where quotation with source/title/URL is free. JPCERT advisory content is largely duplicated by JVN (row 1A.8). Score stays 1 (not 2): the redistribution permission is conditional and not a licence that supports CC BY. |
+| Date-checked | 2026-10-02; corrected 2026-10-03 from the gate verdict |
+| Retrieval method | Original: WebFetch of `/english/` and `/english/privacy.html` (guessed ToS URLs 404). That route missed the Japanese homepage's `ご利用にあたって` link. Correction: red-reviewer via curl of raw HTML (homepage link, `guide.html` s2, robots 404), 2026-10-03; not re-fetched here, and the Japanese text is carried from the gate's rendering. |
 | Non-English / facts-only | Japanese primary. Original English summary + link; generated offline. |
 
 #### 1A.8 JVN (Japan Vulnerability Notes, jvn.jp) and JVN iPedia (jvndb.jvn.jp)
@@ -204,13 +265,13 @@ in RSS 1.0 and the MyJVN API; English translations exist (`/en/`).
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** |
-| License | **No open licence found; copyright asserted; reuse terms deferred to a document not located.** JVN iPedia page footer: *"Copyright © 2007- IPA. All rights reserved."*; JVN feeds page (`https://jvn.jp/en/rss/index.html`): *"Copyright © 2000-2015 JPCERT/CC and IPA. All rights reserved."* and *"The tools provided in this website are available both to private and corporate users."* (a statement about the **tools**, not the data). JVN iPedia FAQ (`https://jvndb.jvn.jp/nav/jvndb_faq.html`, Q5-2): *"In regard to quotation, citation, and redistribution, please refer to the separately provided guidelines. When using this information, please confirm the applicable conditions in advance."* and Q5-1/Q4-4: commercial services *"must comply with MyJVN API Terms of Use"*. **Those guidelines were not located.** **Correction of a tempting reading:** the MyJVN terms (`https://jvndb.jvn.jp/apis/myjvn/document/termsofuse.pdf`, enacted 2023.3.29, read in full this pass via the saved PDF) govern only two **software tools** (mjcheck and MyJVN Version Checker for .NET): Art. 2 forbids copying/distributing *the tools*. They say nothing licensing the vulnerability **data**. A WebSearch summary claimed "no restrictions, asked to notify by email"; **that was not found in any page read** and is not relied on. |
-| Scrape-permitted | **robots.txt:** `https://jvndb.jvn.jp/robots.txt` -> 404 (**ABSENCE FINDING, method-suspect**). **ToS:** MyJVN API terms page (`/apis/termsofuse.html`) is the tool terms above; no data-scraping clause found (**ABSENCE FINDING, method-suspect**). The MyJVN API and RSS are *official machine channels* run for the purpose, which supports access, not reuse. |
-| Redistribute-verbatim | **UNKNOWN** -> treated as NO. Note CVE text itself is separately governed by the CVE Terms of Use (row 1B.3); JVN's added value is the Japanese/English analysis, CVSS and vendor-status fields, on which IPA/JPCERT assert copyright. |
-| Relicense-compatible | **UNKNOWN** -> treated as NO. |
-| Action | **(d) unknown -> outreach** to IPA (`isec-jvndb@ipa.go.jp`, the address the FAQ itself gives) asking for the "separately provided guidelines" on quotation/redistribution and whether CC-BY-compatible reuse is allowed. User sends. Interim shape: **(c) facts + link**, where facts = JVNDB id, CVE id, dates, affected-product names, link; CVSS scores are IPA's analysis and sit in the grey zone. |
-| Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of `jvndb.jvn.jp/en/`, `/en/nav/jvndbhelp.html`, `/nav/jvndb_faq.html`, `jvn.jp/en/rss/index.html`, `jvn.jp/en/nav/jvnhelp.html`, `/apis/termsofuse.html` (this one reported **character-encoding problems / truncation**), robots.txt (404); the MyJVN terms PDF was read in full from the tool's saved file. Source kind: rendered HTML + one PDF. The "guidelines not located" finding is an **absence finding, method-suspect**. |
+| License | **Copyright asserted ("All rights reserved"), with an informal FAQ statement of no restrictions plus a request to notify by email. No licence document.** JVN iPedia page footer: *"Copyright © 2007- IPA. All rights reserved."*; JVN feeds page (`https://jvn.jp/en/rss/index.html`): *"Copyright © 2000-2015 JPCERT/CC and IPA. All rights reserved."* **FAQ Q5-2** on `https://jvndb.jvn.jp/nav/jvndb_faq.html` (Shift_JIS; **verified by red-reviewer via curl, 2026-10-03**): 「引用、転載、再配布するにあたり、特に制限は設けておりません。また、ご利用の際はメールでお知らせいただくことをお願いしております。」 = *"no particular restrictions are set on quotation, reprinting or redistribution; when using it, we ask that you notify us by email."* **Q5-1** says the same for commercial use, subject to the MyJVN API terms. (The English-language FAQ path `/en/nav/jvndb_faq.html` is 404, and the "separately provided guidelines" sentence this row previously quoted is **not on the page**: 0 hits for "separately provided" and 別途. That sentence and the "guidelines not located" finding are withdrawn.) **MyJVN API terms** (`https://jvndb.jvn.jp/apis/termsofuse.html`, service terms 2010, rev. 2019, gate): disclaimer plus prohibited acts (malware, illegal acts, defamation); **no reuse restriction**. They are the API service terms, not "tool terms" (the separate PDF `.../myjvn/document/termsofuse.pdf`, enacted 2023.3.29, governs the two software tools, read earlier in full). **Auditor's reasoning on the score:** an informal FAQ permission is not a licence: it is unsigned by any rights-holder statement, conflicts with the "All rights reserved" footers on the same service, and says nothing about adaptation or sublicensing (so no basis for a CC BY 4.0 relicense). It also sits on **jvndb.jvn.jp (IPA)**; **jvn.jp (JPCERT/CC and IPA) is a separate site** whose own footer asserts rights and which the FAQ does not address. So the FAQ lowers the risk of facts + link but does not lift the score. |
+| Scrape-permitted | **robots.txt:** 404 on both `jvndb.jvn.jp` and `jvn.jp` (gate, curl). **ToS:** MyJVN API service terms above: no scraping or reuse clause. The MyJVN API and RSS are *official machine channels* run for the purpose, which supports access. |
+| Redistribute-verbatim | **UNKNOWN -> treated as NO** (informal FAQ statement only; conflicts with the footers). Note CVE text itself is separately governed by the CVE Terms of Use (row 1B.3); JVN's added value is the Japanese/English analysis, CVSS and vendor-status fields, on which IPA/JPCERT assert copyright. |
+| Relicense-compatible | **UNKNOWN -> treated as NO.** |
+| Action | **(d) unknown -> outreach** to IPA (`isec-jvndb@ipa.go.jp`, the address the FAQ itself gives) asking for a written statement of terms for quotation/redistribution/adaptation of JVN iPedia and JVN data, and whether CC BY-compatible reuse is allowed; the FAQ's own request to notify by email is the natural opener. User sends. Interim shape: **(c) facts + link**, where facts = JVNDB id, CVE id, dates, affected-product names, link; CVSS scores are IPA's analysis and sit in the grey zone. |
+| Date-checked | 2026-10-02; corrected 2026-10-03 from the gate verdict |
+| Retrieval method | Original: WebFetch of `jvndb.jvn.jp/en/`, `/en/nav/jvndbhelp.html`, `/nav/jvndb_faq.html`, `jvn.jp/en/rss/index.html`, `jvn.jp/en/nav/jvnhelp.html`, `/apis/termsofuse.html` (encoding problems / truncation), robots.txt (404), and the MyJVN tools PDF read in full. The WebFetch route misrepresented the Japanese FAQ (quoted a sentence not on the page). Correction: red-reviewer via curl of raw Shift_JIS HTML, 2026-10-03; Q5-1/Q5-2 and the API terms are carried from the gate, not re-fetched here. |
 | Non-English / facts-only | Japanese + English. English text exists upstream, so translation is not needed; the facts + link + original summary shape applies if (c). |
 
 #### 1A.9 SingCERT / CSA Singapore
@@ -218,15 +279,15 @@ in RSS 1.0 and the MyJVN API; English translations exist (`/en/`).
 
 | Field | Value |
 |---|---|
-| Cleanliness score | **1** (verbatim not allowed; no explicit ban on automated access or on extracting facts) |
-| License | **All rights reserved; written permission required.** CSA Terms of Use, `https://www.csa.gov.sg/terms-of-use/` (WebFetch 2026-10-02; corroborated by a WebSearch extract): *"Contents of this website shall not be reproduced, republished, uploaded, posted, transmitted or otherwise distributed"* without CSA's prior written permission; graphics and images likewise. The fetch reported no exception for government reuse or open-data frameworks, and the page's "Governing Law" sentence appeared cut off mid-sentence (**tool truncation or a page defect; the remainder of the page may hold more**). |
+| Cleanliness score | **0 (was 1).** Corrected after the gate: the terms also prohibit caching, links and framing without permission, which contests even the "facts + link" shape that score 1 requires to be uncontested. |
+| License | **All rights reserved; written permission required, for reproduction AND for linking.** CSA Terms of Use, `https://www.csa.gov.sg/terms-of-use/`: *"Contents of this website shall not be reproduced, republished, uploaded, posted, transmitted or otherwise distributed"* without CSA's prior written permission; graphics and images likewise. **Clause missed in the first pass, verified by red-reviewer via curl, 2026-10-03:** *"Except as set forth below, caching and links to, and the framing of this website or any of the Contents are prohibited. You must secure permission from CSA prior to hyperlinking to, or framing, this website or any of the Contents."* The "Governing Law" cut-off ("shall be hear.") is genuine on the page, **not** a tool artefact (gate). |
 | Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02):** `User-Agent: *` `Allow: /` `Disallow: /search`; sitemap listed. So robots permits crawling advisory pages. **ToS:** no explicit clause on robots, scraping or automated access found (**ABSENCE FINDING, method-suspect**), but the reproduction prohibition above applies to what scraping would yield. |
 | Redistribute-verbatim | **NO** without CSA's written permission. |
 | Relicense-compatible | **NO.** |
-| Action | **(c) prohibited -> facts + link + original summary.** No open-data licence for SingCERT advisories was found (**ABSENCE FINDING, method-suspect**: only the terms page was read; Singapore government open-data licensing was not searched). Whether CSA would grant permission is **(d)**, but the expected value is low. |
+| Action | **(d) written permission required; no ingest and no hyperlinks until granted** (the link prohibition removes the "link only" interim that other score-0 rows use). No open-data licence for SingCERT advisories was found (**ABSENCE FINDING, method-suspect**: only the terms page was read; Singapore government open-data licensing was not searched). Expected value of asking is low. |
 | Date-checked | 2026-10-02 |
 | Retrieval method | WebFetch of the terms URL and of `robots.txt` (both read); WebSearch (matching extract). Source kind: rendered HTML; the clause is positive, so not method-exposed; the absence of an automated-access clause is. |
-| Non-English / facts-only | English. Facts + link + original summary is the only available shape. |
+| Non-English / facts-only | English. No shape is available without permission (facts + link is itself contested by the link prohibition). |
 
 #### 1A.10 CERT-EU
 *Content class:* security advisories (14 published in 2026 up to 27 Sept, all
@@ -236,7 +297,7 @@ landscape reports, RSS (`/publications/security-advisories-rss`). *Language:* En
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** (two statements on the same site contradict each other) |
-| License | **CONTRADICTORY.** The legal notice at `https://cert.europa.eu/legal-notice` (WebFetch 2026-10-02) states reuse under the Commission policy: *"The reuse policy of European Commission documents is implemented by Commission Decision 2011/833/EU of 12 December 2011"*; content *"authorized under Creative Commons Attribution 4.0 International (CC-BY 4.0)"* with *"reuse is allowed, provided appropriate credit is given and changes are indicated"*; carve-outs for identifiable individuals, third-party works, and material under industrial property rights. **But** the security-advisories listing page, `https://cert.europa.eu/publications/security-advisories/` (WebFetch 2026-10-02), has the footer *"(c) 2022-2026 CERT-EU. All rights reserved."* and no TLP/licence marking. The legal-notice text read like generic Commission wording (it did not mention CERT-EU by name in the extract), so it is **not established that the legal-notice CC BY 4.0 grant is meant to cover CERT-EU's own advisory text.** Per the rule that ambiguity is not resolved in the project's favour: UNKNOWN. |
+| License | **CONTRADICTORY.** The legal notice at `https://cert.europa.eu/legal-notice` (WebFetch 2026-10-02) states reuse under the Commission policy: *"The reuse policy of European Commission documents is implemented by Commission Decision 2011/833/EU of 12 December 2011"*; content *"authorized under Creative Commons Attribution 4.0 International (CC-BY 4.0)"* with *"reuse is allowed, provided appropriate credit is given and changes are indicated"*; carve-outs for identifiable individuals, third-party works, and material under industrial property rights. **But** the security-advisories listing page, `https://cert.europa.eu/publications/security-advisories/` (WebFetch 2026-10-02), has the footer *"(c) 2022-2026 CERT-EU. All rights reserved."* and no TLP/licence marking. **Correction (gate, curl, 2026-10-03):** the legal notice **is CERT-EU's own** -- it reads "(c) ... (CERT-EU), 2023" and "CERT-EU maintains this website" -- so the earlier statement that it "did not mention CERT-EU" is refuted. The "All rights reserved" footer also appears **on the legal-notice page itself**, so the contradiction stands within a single document. Per the rule that ambiguity is not resolved in the project's favour: UNKNOWN. |
 | Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02):** blacklist-style; named bots (FAST/Scirus, Nutch, Sogou, Xenu, discoverybot, Youdao) are `Disallow: /`; `User-agent: *` -> `Allow: /`, `Disallow: /files/css/*`, `/files/js/*`. **ToS:** no automated-access clause in the legal-notice extract (**ABSENCE FINDING, method-suspect**). |
 | Redistribute-verbatim | **UNKNOWN**; CC BY 4.0 plausible per the legal notice, contradicted by the footer. |
 | Relicense-compatible | **UNKNOWN**; would be YES if CC BY 4.0 applies. |
@@ -253,14 +314,14 @@ lists, advisories, CVE<->EUVD mapping, KEV dump. *Language:* English.
 
 | Field | Value |
 |---|---|
-| Cleanliness score | **1** |
-| License | **None located for the database or API.** The ENISA IPR Policy (row 1A.4) grants CC BY 4.0 to *"public reports and media publications"* only; it does not name EUVD. A structured API response (`https://euvdservices.enisa.europa.eu/api/lastvulnerabilities`, fetched 2026-10-02 as JSON: fields `id, enisaUuid, description, datePublished, dateUpdated, baseScore, baseScoreVersion, baseScoreVector, references, aliases, assigner, epss, enisaIdVendor`) carries **no licence, terms or disclaimer field**. The UI/docs URLs `https://euvd.enisa.europa.eu/` and `/apidoc` returned only an error shell: *"The European Vulnerability Database application could not be loaded."* (a single-page app that the fetch tool could not run; **this is a tool limit, not a statement about the site**). Underlying data: CVE records (governed by the CVE ToU, row 1B.3), `epss` scores (FIRST), and CNA/ENISA enrichment. |
-| Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02) at `euvd.enisa.europa.eu`:** `User-agent: *` `Disallow:` (empty = everything allowed). **ToS: not located** (**ABSENCE FINDING, method-suspect**; the SPA shell is exactly the situation in which a ToS link exists but is invisible to this tool). The API is public and unauthenticated for the endpoint tried. |
+| Cleanliness score | **1** (unchanged after weighing the two items below) |
+| License | **No licence for the data; a reproduction notice that may or may not reach it; a docs-repo licence that covers the docs only.** (Earlier "None located" was REFUTED by the gate.) (1) **ENISA Legal Notice**, `https://www.enisa.europa.eu/about-enisa/legal-notice`: *"Reproduction of ENISA material published on this website is authorized, provided the source is acknowledged, unless it is stated otherwise."* The EUVD SPA bundle (`main.bdd2ef30.js`) footer links this same notice (red-reviewer, curl, 2026-10-03). It is a reproduction permission for material "published on this website"; whether JSON served from `euvdservices.enisa.europa.eu` counts as such material is **not established**, and it grants no adaptation or CC BY right (row 1A.4). (2) **Official docs repo** `github.com/enisaeu/euvd-docs-public` (pushed 2026-09-18; GitHub API spdx `NOASSERTION`), LICENSE: *"This repository is made available solely for programmatic access by the EUVD frontend. No reuse, redistribution, or modification of its contents is permitted without written permission from ENISA."* That covers the **documentation repo, not the data**, but it shows ENISA expressly withholding reuse rights for at least the EUVD documentation and does not help the data question. Net: no data licence; at most a reproduction permission of uncertain reach. Score 1, (d). The ENISA IPR Policy (row 1A.4) grants CC BY 4.0 to *"public reports and media publications"* only; it does not name EUVD. A structured API response (`https://euvdservices.enisa.europa.eu/api/lastvulnerabilities`, fetched 2026-10-02 as JSON: fields `id, enisaUuid, description, datePublished, dateUpdated, baseScore, baseScoreVersion, baseScoreVector, references, aliases, assigner, epss, enisaIdVendor`) carries **no licence, terms or disclaimer field**. The UI/docs URLs `https://euvd.enisa.europa.eu/` and `/apidoc` returned only an error shell: *"The European Vulnerability Database application could not be loaded."* (a single-page app that the fetch tool could not run; **this is a tool limit, not a statement about the site**). Underlying data: CVE records (governed by the CVE ToU, row 1B.3), `epss` scores (FIRST), and CNA/ENISA enrichment. |
+| Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02) at `euvd.enisa.europa.eu`:** `User-agent: *` `Disallow:` (empty = everything allowed). **ToS:** the ENISA Legal Notice above (linked from the SPA footer; found by the gate in the JS bundle). Official `apidoc.md` (in the docs repo): endpoints **"require no authentication"**; at most 8 or 100 records per request depending on endpoint; no versioning or changelog. API response headers carry no licence/Link/terms (gate, curl). |
 | Redistribute-verbatim | **UNKNOWN.** CVE-derived fields: YES under CVE ToU with the MITRE notice. ENISA-added fields (EUVD id, enrichment): UNKNOWN. EPSS: FIRST's own terms apply (not checked here -- on trust). |
 | Relicense-compatible | **UNKNOWN** for ENISA-added fields; CVE-derived fields compatible (row 1B.3). |
-| Action | **(d) unknown -> outreach** to ENISA (`info@enisa.europa.eu`, the IPR policy's contact) on EUVD reuse; interim shape **(c)**: EUVD id + CVE id + link, descriptions taken from the CVE record, not from EUVD. Third-party community docs (`github.com/bytew0lf/EUVD-API`, explicitly "not the official documentation") list endpoints; see watch item W2. |
+| Action | **(d) unknown -> outreach** to ENISA (`info@enisa.europa.eu`, the IPR policy's contact) on EUVD reuse; interim shape **(c)**: EUVD id + CVE id + link, descriptions taken from the CVE record, not from EUVD. Do not copy text from the `euvd-docs-public` repo (LICENSE bars it). The outreach should ask specifically whether the API data falls under the Legal Notice's reproduction clause and whether adaptation/CC BY relicensing is permitted. Third-party docs (`github.com/bytew0lf/EUVD-API`, "not official") are superseded by the official `apidoc.md`; see watch item W2. |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of `euvd.enisa.europa.eu/`, `/apidoc` -> error shell; WebFetch of `robots.txt` (readable); WebFetch of `euvdservices.enisa.europa.eu/api/lastvulnerabilities` -> JSON (**structured endpoint**); WebSearch for docs. Source kind: **JSON endpoint (reliable for fields present; silent on legal terms by construction)** + SPA shell (**method-suspect**). |
+| Retrieval method | WebFetch of `euvd.enisa.europa.eu/`, `/apidoc` -> error shell; WebFetch of `robots.txt` (readable); WebFetch of `euvdservices.enisa.europa.eu/api/lastvulnerabilities` -> JSON (**structured endpoint**); WebSearch for docs. Source kind: **JSON endpoint (reliable for fields present; silent on legal terms by construction)** + SPA shell (**method-suspect**: the shell hid the footer link; the gate found it in the JS bundle). Legal notice, docs-repo LICENSE and `apidoc.md` facts: red-reviewer via curl/GitHub, 2026-10-03; carried from the gate, not re-fetched here. |
 | Non-English / facts-only | English. |
 
 #### 1B.3 cvelistV5 (CVEProject/cvelistV5; CVE Program Terms of Use)
@@ -273,7 +334,7 @@ lists, advisories, CVE<->EUVD mapping, KEV dump. *Language:* English.
 | License | **CVE Terms of Use (SPDX id `CVE-TOU`).** GitHub repo license field is **`null`** (structured: `https://api.github.com/repos/CVEProject/cvelistV5`, fetched 2026-10-02 -- no repository LICENSE file; a `LICENSE` raw URL returned 404). README, `https://raw.githubusercontent.com/CVEProject/cvelistV5/main/README.md`: *"You may search, download, and use the content hosted in this repository, per the CVE Program Terms of Use."* The ToU text (`https://spdx.org/licenses/cve-tou.html`, fetched 2026-10-02; `cve.org/Legal/TermsOfUse` is a JS app the tool could not render): *"MITRE hereby grants you a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Common Vulnerabilities and Exposures (CVE). Any copy you make for such purposes is authorized provided that you reproduce MITRE's copyright designation and this license in any such copy."* |
 | Scrape-permitted | Not scraping: official bulk repo and release zips designed for mirroring (README: baseline zip daily, hourly delta zips, "about every 7 minutes" repo updates). GitHub API rate limits apply if cloned via API; use release assets or `git clone`. **robots.txt not applicable** (GitHub-hosted); **ToS** = the licence above. |
 | Redistribute-verbatim | **YES**, with MITRE's copyright designation and the licence text reproduced in copies. |
-| Relicense-compatible | **YES, with a notice condition.** The grant includes "sublicense" and "prepare derivative works", so a CC BY 4.0 grant by us over our derived dataset is allowed provided the MITRE notice and CVE-ToU text travel with it. **Existing-corpus gap, observed locally:** a Grep of `NOTICE*`, `README.md`, `docs/SOURCE_LICENSES.md` and `docs/DATASHEET.md` for "MITRE Corporation" or CVE terms-of-use found **nothing**; the corpus already carries NVD-derived CVE text (SOURCE_LICENSES 2.2). The MITRE notice requirement therefore applies **today**, independent of this evaluation. (Local grep, not method-exposed, but the glob form should be re-run by red-reviewer.) |
+| Relicense-compatible | **YES, with a notice condition.** The grant includes "sublicense" and "prepare derivative works", so a CC BY 4.0 grant by us over our derived dataset is allowed provided the MITRE notice and CVE-ToU text travel with it. **Existing-corpus gap:** the corpus already carries NVD-derived CVE text (SOURCE_LICENSES 2.2), so the MITRE notice requirement applies **today**, independent of this evaluation. **Correction (gate, 2026-10-03):** the earlier sentence "a grep for 'MITRE Corporation' found nothing" was **false** -- "MITRE Corporation" hits `NOTICE-DATA:41` and `.reuse/dep5:17`, but every such hit is the **MITRE ATLAS Apache notice**, not the CVE ToU. The real check is a targeted `git grep` for `Common Vulnerabilities and Exposures`, `hereby grants you a perpetual` and `cve.org/Legal`, which finds **no notice-file hits**; the gap is **confirmed** by that check (section 6 item 13). **CVE ToU grant, from cve.org's own source** (`CVEProject/cve-website`, `src/views/Legal/TermsOfUse.vue`, gate): the grant includes "sublicense" and the condition to *"reproduce MITRE's copyright designation"* with the licence in any copy. |
 | Action | **(a) compatible with condition.** Condition: add the CVE ToU notice (MITRE copyright designation + the licence sentence) to `NOTICE-DATA`/README for every CVE-derived record. For CNA-authored descriptions: the grant covers the CVE record; individual CNA text could in principle carry third-party rights, but the ToU does not carve any out. |
 | Date-checked | 2026-10-02 |
 | Retrieval method | **GitHub API JSON** (`license: null`), raw README via WebFetch, SPDX licence page via WebFetch (text of the licence), WebSearch (one extract agreeing). Source kind: **structured (API/SPDX) for the licence identity and text; README rendered**. `cve.org/Legal/TermsOfUse` not readable by the tool (JS app), so the canonical page was not read: the SPDX copy is the cited text. |
@@ -292,7 +353,7 @@ evidence and dates; JSON via VulnCheck Community API/index. *Language:* English.
 | Relicense-compatible | **UNKNOWN -> treated as NO.** The "no open licence" clause is the operative reason. |
 | Action | **(d) unknown -> outreach** to `community@vulncheck.com` (the address the attribution page gives for attribution questions) asking explicitly whether a CC BY 4.0 dataset containing VulnCheck KEV fields is permitted and whether the AI-training restriction reaches downstream users. Until answered: **do not ingest**. Note for the corpus: CISA KEV is already ingested (CC0, SOURCE_LICENSES 2.1); a VulnCheck-only `exploited_in_wild` flag would have to be shipped without redistributing the VulnCheck data (e.g. a pointer), which is a design question for the pipeline-engineer, not a licence fix. |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of `vulncheck.com/kev`, the attribution page, the FAQ (**truncated** -- redistribution Q&A not seen), `service-terms`; WebSearch. Source kind: rendered HTML. Clause texts are positive findings quoted through the markdown converter (paraphrase risk: the service-terms quotes should be re-read in raw HTML). The FAQ truncation means "no redistribution Q&A" is an **absence finding, method-suspect**. |
+| Retrieval method | WebFetch of `vulncheck.com/kev`, the attribution page, the FAQ (**truncated** -- redistribution Q&A not seen), `service-terms`; WebSearch. Source kind: rendered HTML. Clause texts are positive findings quoted through the markdown converter (paraphrase risk: the service-terms quotes should be re-read in raw HTML). **Gate 2026-10-03 (curl, script-stripped text): both service-terms clauses verbatim at `https://www.vulncheck.com/service-terms` (rev. April 20, 2026); the Free/Trial clause explicitly names the "community" version; the full untruncated FAQ has no redistribution Q&A, only "It's free! We only ask for prominent attribution."; the attribution page also says "Including VulnCheck KEV in your open source or commercial product is meant to be free". The conflict is real and sharper than recorded; 0 follows.** |
 | Non-English / facts-only | English. |
 
 #### 1B.5 AVID (AI Vulnerability Database)
@@ -326,7 +387,7 @@ paraphrase was not compared. Recorded only; `SOURCE_LICENSES.md` untouched.
 | Field | Value |
 |---|---|
 | Cleanliness score | **2** |
-| License | **MIT for the `avidml/avid-db` repository (structured).** GitHub API (`https://api.github.com/repos/avidml/avid-db`, fetched 2026-10-02): `license: {key: mit, spdx_id: MIT}`; raw LICENSE: *"MIT License / Copyright (c) 2022 AI Vulnerability Database (AVID)"*. Repo contents (API): `reports`, `scripts`, `vulnerabilities` (`2022`, `2023` subfolders), `LICENSE`, `README.md`; last push 2026-03-26. **Caveats:** (i) MIT is a software licence applied to a data repo; it is the only grant found, and it covers the repo as a whole; (ii) the live site (`https://avidml.org/database/`) lists reports up to AVID-2026-R0518+, so **the repo may lag the site**; (iii) records summarise third-party material (papers, news, other databases) whose rights are not AVID's to grant. The website database page showed **no licence statement** (**ABSENCE FINDING, method-suspect**; the page was truncated by the tool) and `https://docs.avidml.org/` showed none in the portion fetched. |
+| License | **MIT for the `avidml/avid-db` repository (structured).** GitHub API (`https://api.github.com/repos/avidml/avid-db`, fetched 2026-10-02): `license: {key: mit, spdx_id: MIT}`; raw LICENSE: *"MIT License / Copyright (c) 2022 AI Vulnerability Database (AVID)"*. Repo contents (API): `reports`, `scripts`, `vulnerabilities` (`2022`, `2023` subfolders), `LICENSE`, `README.md`; last push 2026-03-26. **Caveats:** (i) MIT is a software licence applied to a data repo; it is the only grant found, and it covers the repo as a whole; (ii) the live site (`https://avidml.org/database/`) lists reports up to **AVID-2026-R1714** (gate, curl, 1,785 IDs; the earlier "R0518" came from a truncated fetch), so **the repo may lag the site**; (iii) records summarise third-party material (papers, news, other databases) whose rights are not AVID's to grant. The website database page showed **no licence statement** (**gate-confirmed by curl: no licence string in 508 KB / 1,785 IDs**) and `https://docs.avidml.org/` showed none in the portion fetched. |
 | Scrape-permitted | Repo is public JSON on GitHub: clone, no scraping. Site `robots.txt`/ToS **not fetched** (not needed if the repo is the source). |
 | Redistribute-verbatim | **YES for the repo content under MIT**, with the copyright and permission notice retained; excluding any third-party text inside records (not audited). |
 | Relicense-compatible | **YES** (MIT is permissive and attribution-only), with the MIT notice reproduced. |
@@ -384,13 +445,13 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** |
-| License | **Copyright reserved; personal use and quotation with source citation; not an open licence (second-hand).** The AP copyright page, `https://autoriteitpersoonsgegevens.nl/over-deze-website/copyright`, **returned HTTP 403 to WebFetch** (the AP site blocks the fetch tool; the same happened for its English pages and, presumably, `robots.txt`). The text below is from a **WebSearch extract of that page**, not a fetch: *"Copyright rests on the texts, photos and other images of the Autoriteit Persoonsgegevens (AP) on this website"*; for texts, personal use (including copying) is permitted if the source is cited and quoting or using large parts of texts is allowed; photos and images may not be used; the AP logo is a registered Benelux trademark and no third-party use is permitted. **Refutation of a tempting shortcut:** `rijksoverheid.nl` publishes under CC0 1.0 (`https://www.rijksoverheid.nl/service/copyright`, fetched), but the AP is an independent authority with its own site and its own, narrower copyright page; the CC0 statement was **not** carried over. |
-| Scrape-permitted | **robots.txt: NOT OBTAINED** (403). **ToS: NOT OBTAINED** beyond the copyright extract. Status UNKNOWN pending shell check. |
-| Redistribute-verbatim | **NO** by the extract (personal use + quotation only). |
+| License | **Copyright reserved; personal use and quotation with source citation; not an open licence. Now read as primary by the gate (curl, HTTP 200, `-A 'Mozilla/5.0'`, 2026-10-03); no longer extract-only.** The AP copyright page, `https://autoriteitpersoonsgegevens.nl/over-deze-website/copyright`, returned HTTP 403 to this agent's WebFetch. **New clause from the gate:** *"doorleveren aan derden of commercieel verwerken"* (passing on to third parties or commercial processing) requires contacting the AP. The wording found earlier by WebSearch extract, now matched by the page: *"Copyright rests on the texts, photos and other images of the Autoriteit Persoonsgegevens (AP) on this website"*; for texts, personal use (including copying) is permitted if the source is cited and quoting or using large parts of texts is allowed; photos and images may not be used; the AP logo is a registered Benelux trademark and no third-party use is permitted. **Refutation of a tempting shortcut:** `rijksoverheid.nl` publishes under CC0 1.0 (`https://www.rijksoverheid.nl/service/copyright`, fetched), but the AP is an independent authority with its own site and its own, narrower copyright page; the CC0 statement was **not** carried over. |
+| Scrape-permitted | **robots.txt (gate, curl):** `GPTBot` is `Disallow: /`; `/documenten/*` is explicitly `Allow`ed. No other access clause reported. |
+| Redistribute-verbatim | **NO** (personal use + quotation only; third-party/commercial processing requires contacting AP). |
 | Relicense-compatible | **NO.** |
 | Action | **(c) facts + link + original summary.** **(d)** optional: ask the AP whether its published sanction decisions are available under any open-government-information reuse regime. (A WebSearch result surfaced a Dutch open-data-directive implementation memorandum; its application to the AP was **not** examined.) |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of AP copyright page and English fines page -> **403**; WebSearch (2 queries) -> extract; WebFetch of rijksoverheid.nl copyright (read, not the AP). Source kind: search-engine extract (**weakest tier**) for the AP's terms. |
+| Retrieval method | WebFetch of AP copyright page and English fines page -> **403**; WebSearch (2 queries) -> extract; WebFetch of rijksoverheid.nl copyright (read, not the AP). Correction: red-reviewer via curl, 2026-10-03, read the copyright page and robots.txt directly; this row's AP clauses are carried from the gate. |
 | Non-English / facts-only | **Dutch.** Original English summary + link, offline. |
 
 #### 1C.4 CNIL (France)
@@ -399,8 +460,8 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** (site text is ND; the open-data channel is open but a different surface) |
-| License | **Split by content type.** CNIL Mentions legales, `https://www.cnil.fr/fr/mentions-legales`, section "Reutilisation des contenus" (WebFetch 2026-10-02, quoted twice with the same result): texts: *"Les textes disponibles sur le site sont des contenus pédagogiques élaborés par la CNIL qui sont mis à disposition selon les termes de licence CC-BY-ND 4.0 FR"*; images/videos: CC-BY-NC-ND 4.0 FR; open data: *"Les données publiques détenues ou produites par la CNIL dans le cadre de l'open data sont mises à disposition par défaut selon les termes de la Licence ouverte"*. Also: *"Seules les délibérations adoptées en séance plénière et publiées sur légifrance sont de nature à engager la CNIL"*. **CC-BY-ND (no derivatives) is incompatible with a CC BY 4.0 relicense and with summaries that adapt the text**. The French open-data channel (decisions on Legifrance/data.gouv under Licence Ouverte) is the compatible route, but **which CNIL decisions are in that dataset, and its licence page, were not fetched**. |
-| Scrape-permitted | **robots.txt (fetched, readable, first ~60 lines only, 2026-10-02):** Drupal-style `User-agent: *` with asset allows and standard disallows; the remainder of the file was not read. **ToS:** no automated-access clause in the Mentions legales extract (**ABSENCE FINDING, method-suspect**). |
+| License | **Split by content type.** CNIL Mentions legales, `https://www.cnil.fr/fr/mentions-legales`, section "Reutilisation des contenus" (WebFetch 2026-10-02, quoted twice with the same result): texts: *"Les textes disponibles sur le site sont des contenus pédagogiques élaborés par la CNIL qui sont mis à disposition selon les termes de licence CC-BY-ND 4.0 FR"*; images/videos: CC-BY-NC-ND 4.0 FR; open data: *"Les données publiques détenues ou produites par la CNIL dans le cadre de l'open data sont mises à disposition par défaut selon les termes de la Licence ouverte"*. Also: *"Seules les délibérations adoptées en séance plénière et publiées sur légifrance sont de nature à engager la CNIL"*. **CC-BY-ND (no derivatives) is incompatible with a CC BY 4.0 relicense and with summaries that adapt the text**. The French open-data channel (decisions on Legifrance/data.gouv under Licence Ouverte) is the compatible route, but **which CNIL decisions are in that dataset was not established by this agent**. **Gate (data.gouv.fr API, 2026-10-03):** the dataset "Sanctions prononcées par la CNIL" exists with licence **`fr-lo` (Licence Ouverte)**, which supports the open-data subset; whether it contains AI-relevant decisions and how complete it is remain unmeasured. |
+| Scrape-permitted | **robots.txt (gate, curl, read through line 191):** only Drupal paths. The earlier 60-line read is superseded. **ToS:** no automated-access clause in the Mentions legales extract (**ABSENCE FINDING, method-suspect**). |
 | Redistribute-verbatim | **Site text: NO for our purpose** (ND forbids adaptation; verbatim copies could be redistributed under CC-BY-ND but not relicensed CC BY). **Open-data decisions: YES (Licence Ouverte), unverified.** |
 | Relicense-compatible | **Site text: NO. Open-data: YES in principle** (Licence Ouverte 2.0 is attribution-only; see row 1A.6). |
 | Action | **(a) for the open-data decision set once verified; (c) for site text.** Needs a follow-up fetch of the CNIL open-data/Legifrance licence page (not done). |
@@ -414,8 +475,8 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 | Field | Value |
 |---|---|
 | Cleanliness score | **3** |
-| License | **OGL v3.0.** ICO enforcement register page, `https://ico.org.uk/action-weve-taken/enforcement/` (WebFetch 2026-10-02): *"All text content is available under the Open Government Licence v3.0, except where otherwise stated."* with the OGL logo in the footer. Page also warns of date errors in some documents added before 31 December 2024. (An Apify third-party page claiming OGL was not relied on.) `ico.org.uk/global/copyright/` and a website-terms URL returned 404. |
-| Scrape-permitted | **robots.txt (fetched, readable, 2026-10-02):** `User-agent: *` `Crawl-delay: 6`, `Disallow: /private`, `/restricted`; `deepcrawl` bot is `Disallow: /`. So **6 s between requests**. **ToS: the website-terms page was not found** (**ABSENCE FINDING, method-suspect**). No export/RSS/API seen on the register page (**ABSENCE FINDING, method-suspect**). |
+| License | **OGL v3.0.** ICO enforcement register page, `https://ico.org.uk/action-weve-taken/enforcement/` (WebFetch 2026-10-02): *"All text content is available under the Open Government Licence v3.0, except where otherwise stated."* with the OGL logo in the footer. Page also warns of date errors in some documents added before 31 December 2024. (An Apify third-party page claiming OGL was not relied on.) `ico.org.uk/global/copyright/` and a website-terms URL returned 404. **Copyright-and-re-use page (found by the gate, footer link, curl, 2026-10-03):** `https://ico.org.uk/global/copyright-and-re-use-of-materials/` -- OGL v3.0 *"except where otherwise stated"*; required attribution string: *"Information Commission's Office, [name and date of publication], licensed under the Open Government Licence"*; no automated-access clause. (The gate's rendering of the body name is "Information Commission's Office"; use the string exactly as the page gives it, and re-read it before writing the notice.) |
+| Scrape-permitted | **robots.txt (fetched; `Crawl-delay: 6` confirmed by the gate):** `User-agent: *` `Crawl-delay: 6`, `Disallow: /private`, `/restricted`; `deepcrawl` bot is `Disallow: /`. So **6 s between requests**. **ToS:** the re-use page above has no automated-access clause (the earlier "website-terms page not found" was REFUTED). No export/RSS/API seen on the register page (**ABSENCE FINDING, method-suspect**). |
 | Redistribute-verbatim | **YES**, with OGL attribution; except where otherwise stated (third-party material). |
 | Relicense-compatible | **YES** (OGL v3.0 interoperable with CC BY 4.0; see row 1A.1 for the source of that statement). |
 | Action | **(a) compatible.** Conditions: honour `Crawl-delay: 6`; per-record OGL notice; the "except where otherwise stated" carve-out must be handled per page; personal-data caution (cross-cutting note). |
@@ -464,6 +525,7 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 | Redistribute-verbatim | **NO.** |
 | Relicense-compatible | **NO.** |
 | Action | **(c) link only, no pipeline fetch.** Do not crawl. A hand-curated list of citations (case name + neutral citation + BAILII link, entered by a human reading each case) is the most this source supports; the pipeline-engineer must not design a BAILII fetcher. Alternative primary sources (e.g. court-run public repositories) are outside this pass and **not assessed**. (d) is possible (BAILII invites authorisation requests) but the expected value is low. |
+| Gate note | s12(a)-(d) and "block entire domains" verbatim (gate, plain curl UA; the page sits behind an Anubis proof-of-work for Mozilla UAs). New: *"BAILII has no objection to links from other websites"*. |
 | Date-checked | 2026-10-02 |
 | Retrieval method | WebFetch of `copyright.html` x2, `robots.txt`. Source kind: rendered HTML (clauses positive, robots reliable). The tool-reported truncation means other clauses may exist, but all of them can only narrow the picture further. |
 | Non-English / facts-only | English. |
@@ -480,7 +542,7 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 | Relicense-compatible | **NO.** |
 | Action | **(c) link only, no pipeline fetch.** Same shape as BAILII: a hand-curated citation list, not a fetcher. (d) not recommended while litigation over exactly this behaviour is on foot. |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch `canlii.org/info/terms.html` and `/en/info/terms.html` -> **403**; WebFetch `canlii.org/robots.txt` (read); WebSearch (extracts); WebFetch of the API GitHub issue (read). Source kind: **search-engine extract for the clause text (weak)**, robots.txt reliable. The quoted prohibition should be confirmed in raw HTML by red-reviewer before it is relied on. |
+| Retrieval method | WebFetch `canlii.org/info/terms.html` and `/en/info/terms.html` -> **403**; WebFetch `canlii.org/robots.txt` (read); WebSearch (extracts); WebFetch of the API GitHub issue (read). Source kind: **search-engine extract for the clause text (weak)**, robots.txt reliable. **UNVERIFIED, extract-sourced (gate 2026-10-03: 403 DataDome persists for curl).** The terms clause stays second-hand; only the robots catch-all `User-agent: * Disallow: /` is gate-confirmed, and it alone keeps the score at 0. |
 | Non-English / facts-only | Bilingual. |
 
 ### 1D. Research and disclosure
@@ -528,7 +590,7 @@ remains (see Relicense-compatible).
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** (verbatim report text not allowed; facts + link not clearly contested) |
-| License | **No licence to the public; researchers keep ownership; licences run only to HackerOne and the Customer.** HackerOne Finder Terms (2023), `https://www.hackerone.com/terms/finder-2023` (WebFetch 2026-10-02): *"HackerOne does not claim any ownership rights in any Finder Submissions"*; by making a submission available to a Customer the finder grants HackerOne **and** the Customer *"a perpetual, irrevocable, non-exclusive, transferable, sublicensable, worldwide, royalty-free license to use, copy, reproduce, display, modify, adapt, transmit, and distribute copies of that Finder Submission"* (the fuller phrasing is from a WebSearch extract of the Finder Terms; the fetch confirmed the structure: licences to HackerOne and Customers only). **The researcher's copyright in report text therefore survives and no grant reaches third parties.** The Disclosure Guidelines (`https://www.hackerone.com/terms/disclosure-guidelines`): reports can become public (*"the contents of the Report will be made public within 30 days if the Report state is 'Resolved'"* under the Default setting) but the guidelines contain **no reuse or licensing statement** for disclosed reports. The "Terms" URL `https://www.hackerone.com/terms` is the **Customer** T&C and does not cover public visitors. HackerOne AI Terms (`/terms/AI`): bar HackerOne from training general-purpose AI on Customer input; silent on third-party use of disclosed reports. |
+| License | **No licence to the public; researchers keep ownership; licences run only to HackerOne and the Customer.** **Superseded terms (gate, curl, 2026-10-03):** `/terms/finder` now redirects to `/terms/community` (Community Member T&C, **effective May 11, 2026**), same substance (licences to HackerOne and the Customer only); the "Finder Terms 2023" below is the prior version and is kept as quoted. `hackerone.com/robots.txt` has only a `Sitemap` line; no scrape clause in 6 documents. HackerOne Finder Terms (2023), `https://www.hackerone.com/terms/finder-2023` (WebFetch 2026-10-02): *"HackerOne does not claim any ownership rights in any Finder Submissions"*; by making a submission available to a Customer the finder grants HackerOne **and** the Customer *"a perpetual, irrevocable, non-exclusive, transferable, sublicensable, worldwide, royalty-free license to use, copy, reproduce, display, modify, adapt, transmit, and distribute copies of that Finder Submission"* (the fuller phrasing is from a WebSearch extract of the Finder Terms; the fetch confirmed the structure: licences to HackerOne and Customers only). **The researcher's copyright in report text therefore survives and no grant reaches third parties.** The Disclosure Guidelines (`https://www.hackerone.com/terms/disclosure-guidelines`): reports can become public (*"the contents of the Report will be made public within 30 days if the Report state is 'Resolved'"* under the Default setting) but the guidelines contain **no reuse or licensing statement** for disclosed reports. The "Terms" URL `https://www.hackerone.com/terms` is the **Customer** T&C and does not cover public visitors. HackerOne AI Terms (`/terms/AI`): bar HackerOne from training general-purpose AI on Customer input; silent on third-party use of disclosed reports. |
 | Scrape-permitted | **robots.txt: NOT OBTAINED** (the fetch tool declined to print `www.hackerone.com/robots.txt` and returned only a sitemap pointer for `hackerone.com/robots.txt`). **ToS:** in the three HackerOne terms documents fetched (Customer T&C s3.3, General T&C, Finder Terms) **no explicit anti-scraping clause was found**, but s3.3 does prohibit bypassing *"any measures HackerOne may use to prevent or restrict access to the Services"* (**ABSENCE FINDING, method-suspect; and the Website Terms of Use / Copyright and IP Policy (`/dmca`) were not read**). Third-party scrapers of Hacktivity exist and say they use HackerOne's own web GraphQL API (WebSearch), which is **not** a documented public API and is not evidence of permission. |
 | Redistribute-verbatim | **NO** (researcher copyright; no downstream licence). |
 | Relicense-compatible | **NO.** |
@@ -559,13 +621,69 @@ remains (see Relicense-compatible).
 | Field | Value |
 |---|---|
 | Cleanliness score | **1** |
-| License | **No open licence found; speakers keep copyright and grant the conference distribution rights.** DEF CON: WebSearch extract of the DEF CON call-for-papers form: speakers grant DEF CON Communications *"permission to duplicate, record and redistribute this presentation ... for educational, on-line, and all other purposes"* and submit presentations/tools *"for publication on the DEF CON media server"*; the media server (`media.defcon.org`, **WebFetch failed with ECONNRESET twice**) is described as open to browse and download. Black Hat: WebSearch extract of CFP terms: speakers grant Black Hat permission *"to record, reproduce, distribute, advertise, and show presentations"*; Black Hat describes its archive as *"provided free of charge as a service to the worldwide computer security community."* `blackhat.com/terms.html` returned **403** to WebFetch. AI Village (`https://aivillage.org/`, fetched): *"no explicit licensing or terms information is stated"* for reports, GRT reports or datasets; its GitHub org is `github.com/aivillage` (repo licences not checked; one guessed repo API returned 404). Result: **a licence to the conference, not to us; "free to download" is not "free to redistribute".** |
+| License | **No open licence found; speakers keep copyright and grant the conference distribution rights.** DEF CON: WebSearch extract of the DEF CON call-for-papers form: speakers grant DEF CON Communications *"permission to duplicate, record and redistribute this presentation ... for educational, on-line, and all other purposes"* and submit presentations/tools *"for publication on the DEF CON media server"*; the media server (`media.defcon.org`, **WebFetch failed with ECONNRESET twice**) is described as open to browse and download. Black Hat: WebSearch extract of CFP terms: speakers grant Black Hat permission *"to record, reproduce, distribute, advertise, and show presentations"*; Black Hat describes its archive as *"provided free of charge as a service to the worldwide computer security community."* `blackhat.com/terms.html` returned **403** to WebFetch. AI Village (`https://aivillage.org/`, fetched): *"no explicit licensing or terms information is stated"* for reports, GRT reports or datasets; its GitHub org is `github.com/aivillage` (repo licences not checked; one guessed repo API returned 404). Result: **a licence to the conference, not to us; "free to download" is not "free to redistribute".** **UNVERIFIED, extract-sourced** (gate 2026-10-03: `defcon.org` connection reset, `blackhat.com/terms` 403, Black Hat robots only `Disallow: /errors/`); gate did read the AI Village GitHub org: repo licences mostly software (MIT/Apache), `awesome-ml-failures` none. |
 | Scrape-permitted | **robots.txt: NOT OBTAINED** for `defcon.org` (ECONNRESET), `media.defcon.org` or `blackhat.com` (403). **ToS: not located** (**ABSENCE FINDINGS, method-suspect; the whole row is one**). |
 | Redistribute-verbatim | **UNKNOWN -> treated as NO.** |
 | Relicense-compatible | **UNKNOWN -> treated as NO.** |
 | Action | **(c) facts + link + original summary** (talk title, speaker, year, venue, link to the archive entry; the conference listing of a title is a fact, our summary is ours). Per-repo licences for AI Village GitHub material (structured API licence field) is the cheap next check if any is wanted. |
 | Date-checked | 2026-10-02 |
 | Retrieval method | WebFetch (ECONNRESET x3, 403 x1, aivillage.org read), WebSearch x2 (extracts of CFP terms). Source kind: **search-engine extracts (weak)**; the CFP forms themselves were not fetched. |
+| Non-English / facts-only | English. |
+
+### 1E. Tranche 1 (partially reconstructed)
+
+**The tranche-1 evaluation record of ten sources was not found on any ref,
+transcript or artifact** (see PROGRESS.md: the foreman's searches of git,
+transcripts, memory and artifacts came back empty). **Only two names are known**
+from the user, and only they are evaluated here: huntr and CISA beyond KEV.
+The other eight are unknown and are **not** guessed at. These are fresh
+pre-rows written 2026-10-03 under the same scale, format, retrieval-method field
+and absence rule as section 1, and have **not been through red-reviewer**. Every
+absence statement in them is method-suspect and is routed to section 6 (items
+31-33).
+
+#### 1E.1 huntr (huntr.com, Protect AI / Palo Alto Networks)
+*Content class:* AI/ML bug-bounty platform; disclosed bounty reports at
+`huntr.com/bounties/<uuid>` (OSV = open-source vulnerabilities, MFV = model file
+vulnerabilities). *Language:* English.
+
+**Already referenced in the corpus.** A Grep of the worktree's
+`data/incidents.json` for `huntr\.(com|dev)/bounties` returns **432 matching
+lines**: NVD reference URLs already point at huntr bounties. That is URL
+references inside NVD-derived records, not ingestion of huntr report text, and
+`docs/SOURCE_LICENSES.md` has no huntr row (Grep, case-insensitive: no match).
+(Line count, not distinct-URL count; not deduplicated.)
+
+| Field | Value |
+|---|---|
+| Cleanliness score | **1** (verbatim report text not allowed; facts + link not shown to be contested, but the evidence is thin) |
+| License | **No public licence found; contributions are assigned exclusively to Palo Alto Networks.** huntr is now operated under Palo Alto Networks (footer: *"2026 Palo Alto Networks, All rights reserved."*, linking PANW's Terms of Use `https://www.paloaltonetworks.com/legal-notices/terms-of-use` and `/participation-terms`). Huntr Participation Terms, `https://huntr.com/participation-terms` (WebFetch 2026-10-03, **summarising converter, quotes below are its output and need raw-HTML confirmation**): s7.1 *"Contributors assign to Palo Alto Networks, Inc. on a worldwide, perpetual, irrevokable, and exclusive basis all their intellectual property rights"* (spelling as returned); s7.2 *"Contributors retain the non-exclusive right to use the Contribution for non-commercial research and educational purposes."*; s7.3 *"We may share the Contribution with third parties as we deem necessary or desirable."*; s4.4 *"Contributors shall not post the submission on any other platform or medium of communication, unless approved by us in writing."* The tool reported no clause on public reuse of published reports and none on automated access. The **PANW Terms of Use were not read** and may bear on website content. No statement of licence or copyright for published bounty reports appeared on the homepage (**ABSENCE FINDING, method-suspect**). Consequence if the extract is right: the rights holder in a report is PANW, not the reporter, and PANW has granted the public nothing found; the reporter's non-commercial retained right does not pass to us. |
+| Scrape-permitted | **robots.txt:** `https://huntr.com/robots.txt` -> **404 to WebFetch** (**ABSENCE FINDING, method-suspect**). **Demonstrated tool unreliability on this very site:** WebFetch returned 404 for `https://huntr.com/terms` and `https://huntr.com/guidelines`, yet a WebSearch result lists `https://huntr.com/guidelines` ("Participation Guidelines - huntr") as an existing page, so the 404s are at least partly false negatives and **no 404 from this tool on huntr.com may be read as "page absent"**. **ToS:** no automated-access clause in the Participation Terms extract (**ABSENCE FINDING, method-suspect**); the guidelines page and PANW Terms of Use were not read. A third-party WebSearch summary says reports are private by default and published in a four-step disclose/validate/reward/publish flow (secondary, not relied on). |
+| Redistribute-verbatim | **NO** (assigned to PANW; no public grant found). |
+| Relicense-compatible | **NO.** |
+| Action | **(c) facts + link + original summary** (huntr bounty URL, target repo, CVE id where present, CWE, dates, our own summary). **(d)** the user may ask PANW/huntr whether published bounty pages are reusable; the sensible first read is the **Participation Guidelines and PANW Terms of Use via shell**, which this agent could not reach. Do not scrape huntr.com before the raw-HTML checks (section 6, item 31). The NVD route, which already carries the bounty URL and a CVE-record description under the CVE ToU, is the licence-clean path to the same vulnerabilities. |
+| Date-checked | 2026-10-03 |
+| Retrieval method | WebFetch (markdown-converting, summarising): `huntr.com/participation-terms` (read, extract), `huntr.com` homepage (footer links), `huntr.com/terms`, `/robots.txt`, `/guidelines` (all 404, method-suspect); WebSearch x1 (titles and summaries only). Local Grep of `data/incidents.json` and `docs/SOURCE_LICENSES.md`. Source kind: **rendered HTML via a summarising converter; weak tier. Not shell-verified.** |
+| Non-English / facts-only | English. |
+
+#### 1E.2 CISA beyond KEV (advisories, alerts, joint AI-security guidance)
+*Content class:* ICS advisories, cybersecurity advisories and alerts, and joint
+guidance such as the "AI Data Security" Cybersecurity Information Sheet (CSI,
+released 2025-05-22; co-sealed per a WebSearch extract by NSA, CISA, FBI, ASD's
+ACSC, NCSC-NZ and NCSC-UK, marked TLP:CLEAR per that extract). *Language:* English.
+KEV itself is already ingested (`docs/SOURCE_LICENSES.md` s2.1) and is out of
+scope here.
+
+| Field | Value |
+|---|---|
+| Cleanliness score | **2 for CISA-authored text** (US federal work, no copyright in the US, but a per-document filter is needed); **1 for co-sealed or third-party material** (rights sit with the other agencies or authors) |
+| License | **No CISA-wide licence statement located; the basis is statute.** Works prepared by US federal government officers or employees as part of official duties are not eligible for copyright protection in the US under **17 U.S.C. s105** (statute named from general knowledge; not fetched or verified here). CISA's Linking Policy, `https://www.cisa.gov/linking-policy` (WebFetch 2026-10-03, extract): *"It is a public domain website, so you can link to CISA.gov at no cost and without specific permissions."* This is a **linking** statement, not a content licence, and the same page says *"The Cybersecurity and Infrastructure Security Agency does not and cannot authorize the use of copyrighted materials contained in linked websites."* (extract). The Privacy Policy (`/privacy-policy`) has no copyright, reuse or scraping wording (extract). `https://www.cisa.gov/about/website-policies` returned **404** to WebFetch (**ABSENCE FINDING, method-suspect**, and the huntr 404s on 1E.1 show this tool's 404s are unreliable). **Carve-outs that s105 does not cover:** (1) **co-sealed foreign-agency material** -- US s105 says nothing about NCSC-UK (Crown copyright / OGL, row 1A.1), ASD/ACSC (CC BY 4.0 on some documents, unverified, row 1A.2), or NCSC-NZ (not assessed); the AI Data Security CSI is a joint product, and who authored which parts is not stated in anything read; (2) third-party images, logos, quoted passages and vendor material inside advisories; (3) works by contractors, where copyright may be held; (4) the CSI PDF is hosted at `media.defense.gov` (NSA/DoD), not on CISA's site, so CISA's site policies would not govern it. The CISA alert page for the CSI says the product *"is provided subject to this Notification and this Privacy & Use policy"* (extract, with those policies linked; **not read**). |
+| Scrape-permitted | **robots.txt (`https://www.cisa.gov/robots.txt`, fetched, readable, 2026-10-03):** Drupal-style `User-agent: *` with asset allows and disallows for `/core/`, `/profiles/`, `/admin/`, `/search/`, `/user/...`, `/media/oembed`, README files; `PetalBot` is `Disallow: /`. Advisory and alert paths are not disallowed in that file. **ToS:** no automated-access clause found in the Privacy Policy or Linking Policy extracts (**ABSENCE FINDING, method-suspect**); the website-policies page was not reached. CISA publishes feeds and a KEV JSON, which support access but are not a licence statement. |
+| Redistribute-verbatim | **CISA-authored text: YES in the US by statute** (no copyright), with the Linking Policy's no-endorsement caution; **outside the US, not established** (other jurisdictions may protect US government works; not assessed). **Co-sealed material: NO until each agency's terms are applied.** |
+| Relicense-compatible | **For CISA-authored text: a CC BY 4.0 dataset may carry public-domain-in-US text, but we cannot assert a licence over it;** the dataset notice should say CISA-authored text is a US government work and not licensed by us. **Co-sealed: depends on each co-sealer (OGL compatible per row 1A.1; ACSC unverified; NCSC-NZ unknown).** |
+| Action | **(a) with conditions for CISA-authored advisories/alerts:** per-document provenance flag (author agency, co-seal list); exclude or downgrade to **(c) facts + link + original summary** any document with a co-seal, third-party image or vendor-supplied text; include the statute basis in the NOTICE-DATA row, as `SOURCE_LICENSES.md` s2.1 does for KEV (not re-read here). **(d) not needed for CISA-authored text; for the joint AI guidance, the question is which co-sealers' terms apply.** An AI-relevance filter is a pipeline matter. Do not assert "public domain" for co-sealed documents. |
+| Date-checked | 2026-10-03 |
+| Retrieval method | WebFetch (summarising): `cisa.gov/linking-policy` (read, extract), `/privacy-policy` (read, no relevant wording), `/robots.txt` (read in full), the CISA alert page for the AI Data Security CSI (read, extract), `/about/website-policies` (404) and a guessed CISA news URL (404); WebSearch x2 (co-sealer list and TLP marking, extract only). s105 text not fetched. Source kind: rendered HTML via a summarising converter (weak for absences) + robots.txt (reliable). **Not shell-verified.** |
 | Non-English / facts-only | English. |
 
 ---
@@ -587,7 +705,10 @@ in Mandarin. With no licence, no stable machine channel and a Mandarin-only
 corpus, the project would be taking unlicensed text through an unautomatable
 path. Provenance concerns raised by third parties (e.g. Recorded Future via
 CyberScoop, title only, not read) are **not** relied on. **Evidence kind:** search
-extracts; red-reviewer to run the raw-HTML check listed in the report.
+extracts. **UNVERIFIED, extract-sourced (gate 2026-10-03):** CNVD answers with a
+521 JS cookie wall, CNNVD with an SPA shell; neither terms page was read by the
+gate. The rejection rests on the absence of a licence plus login/interaction
+requirements, both secondary.
 
 ### 2.2 Snyk Vulnerability Database
 **Reason:** restrictive commercial terms on the data. A WebSearch extract of the
@@ -600,7 +721,9 @@ extract). **Caveat:** that is a 2020 **customer** agreement; the terms of the
 public `security.snyk.io` site were **not** read. The rejection stands on the
 published rule that Service Data may not be passed to third parties, which a
 CC BY 4.0 release would do; public GitHub/OSV-covered advisories are already
-reachable through GHSA/OSV (SOURCE_LICENSES 2.3, 2.4).
+reachable through GHSA/OSV (SOURCE_LICENSES 2.3, 2.4). **Gate 2026-10-03:** the 2020
+clause is verbatim in the PDF; the current `snyk.io` ToS makes Service Data
+Snyk Confidential Information, which strengthens the rejection.
 
 ### 2.3 VulDB
 **Reason:** non-commercial, share-alike licence. WebSearch extract of
@@ -610,7 +733,8 @@ context and have to attribute VulDB as source as defined by the license CC BY-NC
 and the public-access licence forbids use of the data *"within a commercial
 project"*; commercial use needs a paid subscription. CC BY-NC-SA is
 incompatible with a CC BY 4.0 dataset on both counts (NC and SA). **Evidence kind:**
-search extract, to be confirmed in raw HTML.
+search extract. **UNVERIFIED, extract-sourced:** the gate also got 403 from
+`vuldb.com/kb/terms` (2026-10-03).
 
 ### 2.4 News aggregators and newsletters (class)
 **Reason:** OECD AIM already supplies news-derived coverage, so a second
@@ -662,7 +786,25 @@ Commission, with confidentiality presumably under Regulation (EU) 2019/1020
 and any implementing act on publication of incident statistics. Do not describe
 Art. 73 as a source in any public claim.
 
+**Update 2026-10-03 (gate):** Art. 73 para 11 confirmed verbatim against the
+official OJ text (Publications Office Cellar; original 2024 text, not
+consolidated; EUR-Lex returned 202/WAF): 0 hits for publish / public / database /
+register. The Digital Omnibus OJ dates remain **unverified** (not fetched).
+
 ### W2. EUVD API maturation (dated 2026-10-02)
+
+**Update 2026-10-03 (red-reviewer gate 1; the bullets below are preserved as
+written 2026-10-02 and are superseded where this block disagrees; do not
+regenerate them as current).** The official API docs are **readable**:
+`apidoc.md` in `github.com/enisaeu/euvd-docs-public` (pushed 2026-09-18). It
+documents the endpoints, states they **"require no authentication"**, caps
+responses at **8 or 100 records per request** depending on endpoint, and shows
+**no versioning and no changelog**. So "official docs unreadable / third-party
+docs only" is refuted, and "Rate limits and authentication: not documented" is
+refuted for authentication (none) and partly for limits (per-request caps).
+The docs-repo LICENSE bars reuse of the docs (row 1B.2); do not copy its text.
+The "Terms: not found" bullet is also superseded by the ENISA Legal Notice
+(row 1B.2).
 - **Stability.** The UI at `https://euvd.enisa.europa.eu/` and `/apidoc` returned
   only *"The European Vulnerability Database application could not be loaded"*
   (a single-page-app error shell, 2026-10-02, tool limit; cannot distinguish
@@ -711,6 +853,14 @@ input, not the ranking.)*
 
 ## 6. Absence findings for shell verification
 
+**Status after gate 1 (2026-10-03).** Items 1-30 were run by red-reviewer
+(`docs/audits/source-expansion-tranche2-gate1-verdict-2026-10-03.md`, RESULTS
+table). Refuted: 4, 7, 8, 9 (new clause), 11, 20, and the web-text half of 10;
+item 13 false-fired and is replaced below; 2, 24, 28, 29 (CNVD/CNNVD/VulDB) and
+the WID half of 5 remain **unverifiable**. The commands below are kept as the
+record of what was run; the verdict is the record of results. Items 31-33 are
+new and have not been run.
+
 Every item below rests on WebFetch (a summarising converter) or WebSearch, so
 each is method-suspect. Run against **raw HTML** (`curl -sL`, add
 `-A 'Mozilla/5.0'` where noted). "Confirms" means the original finding stands;
@@ -739,7 +889,7 @@ clause stays search-extract-sourced and the row is not upgraded.
    `for u in https://www.jpcert.or.jp/ https://www.jpcert.or.jp/english/; do curl -sL $u | grep -io 'href="[^"]*"' | grep -iE 'term|site|polic|copyright|rule'; done` -> a terms/copyright link refutes "no ToS located"; read it.
 8. **JVN / iPedia (1A.8).**
    `curl -sIL https://jvndb.jvn.jp/robots.txt | head -1`.
-   `curl -sL https://jvndb.jvn.jp/nav/jvndb_faq.html | grep -iE -A6 '引用|転載|再配布'` and `curl -sL https://jvndb.jvn.jp/en/nav/jvndb_faq.html | grep -i -A6 'redistribut'` -> a link to the "separately provided guidelines" refutes "guidelines not located"; follow it.
+   `curl -sL https://jvndb.jvn.jp/nav/jvndb_faq.html | grep -iE -A6 '引用|転載|再配布'` and `curl -sL https://jvndb.jvn.jp/en/nav/jvndb_faq.html | grep -i -A6 'redistribut'` -> a link to the "separately provided guidelines" refutes "guidelines not located"; follow it. **Result (gate): REFUTED the other way** -- the quoted sentence is not on the page; actual Q5-1/Q5-2 are in row 1A.8 and both phrases are withdrawn.
 9. **CSA (1A.9).**
    `curl -sL https://www.csa.gov.sg/terms-of-use/ | grep -ioE 'automat|robot|scrap|spider'` -> no output confirms.
    `curl -sL https://www.csa.gov.sg/terms-of-use/ | grep -io 'Any claim relating to use of The Website[^<]*'` -> shows whether the page really cuts off.
@@ -750,8 +900,9 @@ clause stays search-extract-sourced and the row is not upgraded.
     `curl -sL https://euvd.enisa.europa.eu/ | grep -ioE 'legal|terms|licen[cs]e|copyright'`; grep the SPA's linked JS bundles for `terms` and `licen`.
     `curl -sI https://euvdservices.enisa.europa.eu/api/lastvulnerabilities` -> look for licence/Link/terms headers.
 12. **cvelistV5 repo licence (1B.3).** `curl -s https://api.github.com/repos/CVEProject/cvelistV5/license` -> 404 confirms `license: null`.
-13. **MITRE notice absent from our repo (1B.3).**
-    `grep -rIli "Copyright.*MITRE\|CVE.*Terms of Use" NOTICE* README.md docs/SOURCE_LICENSES.md docs/DATASHEET.md` -> no output confirms the compliance gap; any hit refutes it.
+13. **CVE ToU notice absent from our repo (1B.3). Check replaced after the gate.**
+    The original grep for "MITRE Corporation" **false-fired**: it hits `NOTICE-DATA:41` and `.reuse/dep5:17`, which are the MITRE ATLAS Apache notice, not the CVE ToU. Replacement:
+    `git grep -nE 'Common Vulnerabilities and Exposures|hereby grants you a perpetual|cve\.org/Legal' -- NOTICE-DATA .reuse/dep5 README.md docs/SOURCE_LICENSES.md docs/DATASHEET.md` -> **no output confirms the compliance gap** (gate result 2026-10-03: no notice-file hits); a hit in a notice file that actually reproduces the CVE ToU grant refutes it. Input that would make this check fail (i.e. show a false "gap"): a notice that carries the CVE grant in paraphrase without any of the three strings. Read `NOTICE-DATA` once by eye to exclude that.
 14. **VulnCheck (1B.4).**
     `curl -sL https://www.vulncheck.com/service-terms | grep -oiE '[^.]*(open source or similar license|artificial intelligence model)[^.]*'` -> both sentences present confirm the restrictive clauses (a miss refutes my quotes).
     `curl -sL https://docs.vulncheck.com/community/vulncheck-kev/faq | grep -ioE '[^.]*(redistribut|commercial|rate limit|token)[^.]*'` -> the FAQ fetch was truncated; any hit adds terms.
@@ -790,6 +941,20 @@ clause stays search-extract-sourced and the row is not upgraded.
 30. **Watch items (section 3).**
     Art. 73 text from EUR-Lex: `curl -sL 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401689' | grep -n -iE 'publicly available|serious incident'` -> any publication/register provision in Art. 73 refutes "no public register".
     Digital Omnibus Official Journal text: confirm the 27 July 2026 entry into force and the 2 Dec 2027 / 2 Aug 2028 dates, and whether Art. 73 timing moved.
-    `curl -sL https://euvd.enisa.europa.eu/apidoc` raw, for a version/changelog/terms statement.
+    `curl -sL https://euvd.enisa.europa.eu/apidoc` raw, for a version/changelog/terms statement. (Superseded: the gate read `apidoc.md` in the official docs repo.)
+
+New in the 2026-10-03 rework (tranche 1, section 1E; **not yet run**). Each states the input that would make the check fail, i.e. return the same output whether or not the thing is there.
+
+31. **huntr (1E.1).** WebFetch gave 404 for `/terms`, `/guidelines` and `/robots.txt` while WebSearch lists `/guidelines`, so the 404s are suspect.
+    `for u in robots.txt guidelines terms participation-terms code-of-conduct; do printf '%s ' $u; curl -s -o /dev/null -w '%{http_code}\n' -A 'Mozilla/5.0' https://huntr.com/$u; done` -> a 200 on `guidelines` refutes "404"; read it.
+    `curl -sL -A 'Mozilla/5.0' https://huntr.com/participation-terms | sed -e 's/<[^>]*>/ /g' | grep -ioE '[^.]*(assign|exclusive|licen[cs]e|scrap|crawl|automated|publish)[^.]*'` -> must reproduce s7.1/7.2/7.3/4.4 as quoted; a miss means the summarising converter misquoted them.
+    `curl -sL -A 'Mozilla/5.0' https://huntr.com/guidelines | sed -e 's/<[^>]*>/ /g' | grep -ioE '[^.]*(public|publish|disclos|licen[cs]e|copyright)[^.]*'` for a reuse statement on published reports.
+    `curl -sL https://www.paloaltonetworks.com/legal-notices/terms-of-use | sed -e 's/<[^>]*>/ /g' | grep -ioE '[^.]*(scrap|crawl|robot|automated|reproduc)[^.]*'` (the PANW terms were not read).
+    **Input that would make this fail silently:** a Cloudflare/JS challenge returning HTTP 200 with a challenge page; check the body contains "Participation" before trusting any grep. If the pages are an SPA shell, fetch the JS bundle as the gate did for EUVD and grep it.
+32. **CISA beyond KEV (1E.2).** WebFetch 404'd `/about/website-policies` (unreliable per item 31).
+    `curl -sIL https://www.cisa.gov/about/website-policies | head -3`; then `curl -sL https://www.cisa.gov/ | grep -ioE 'href="[^"]*(polic|copyright|reuse|terms)[^"]*"'` to find the real policies page, and grep each for `copyright|public domain|105|third.party|reus|scrap|automated`.
+    `curl -sL https://media.defense.gov/2025/May/22/2003720601/-1/-1/0/CSI_AI_DATA_SECURITY.PDF -o csi.pdf && pdftotext csi.pdf - | grep -inE 'copyright|license|licence|TLP|disclaimer|©|crown|creative commons'` -> any copyright or licence wording in the PDF itself bears on the co-sealed carve-out; also read the cover for which agencies co-seal (the co-seal list here is from a search extract).
+    **Input that would make this fail:** `pdftotext` on a scanned or image PDF returns nothing and looks like "no copyright wording"; check the output is non-empty and contains a known phrase ("AI Data Security") first.
+33. **17 U.S.C. s105 and the NVD route (1E.1/1E.2).** s105 was named from general knowledge: `curl -sL https://www.law.cornell.edu/uscode/text/17/105 | sed -e 's/<[^>]*>/ /g' | grep -ioE 'Copyright protection under this title is not available[^.]*\.'` -> must match; a miss means the citation in 1E.2 is wrong. Also confirm the corpus count: `grep -c 'huntr\.\(com\|dev\)/bounties' data/incidents.json` (line count, expected 432 on the worktree at 8ddb7702) and `grep -o 'huntr\.com/bounties/[0-9a-f-]*' data/incidents.json | sort -u | wc -l` for the distinct-URL count, which this agent did not measure. **Input that would make the count check fail:** a minified data file makes the line count 1; use the `-o | sort -u` form as the real measure.
 
 
