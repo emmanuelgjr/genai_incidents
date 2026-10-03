@@ -309,6 +309,20 @@ imports" as static, manual imports. **`docs/SOURCE_LICENSES.md` has no AVID row*
 (Grep for "AVID" in that file: no match) although invariant 10 has been active
 since that file landed. This pre-row can serve as the missing row.
 
+**Existing curated subset (foreman correction 2026-10-02, counts re-checked by
+Grep of the worktree).** `ingest/avid_owasp_incidents.json` has **130**
+`source_id` rows: **109** `AVID-` and **21** other (OWASP GenAI roundup items).
+It is hand-curated, with no ingest script (`ingest/README.md:37` per the
+foreman). `grep -i "avid_owasp\|arxiv_incidents"` over `docs/SOURCE_LICENSES.md`
+and `ingest/README.md` finds nothing in the former, so **no `SOURCE_LICENSES.md`
+row names this file.** (An earlier line of this row said "218 mentions"; that
+counted `AVID-20` strings in the JSON including cross-references, not rows.)
+**Would this pre-row cover the 109 AVID rows? Yes**, as they are AVID-derived
+and MIT applies; the MIT notice and per-record AVID link still have to be
+confirmed present. **It does not cover the 21 OWASP rows**, whose licence is
+unassessed here. Whether the 109 rows copy AVID text or are original
+paraphrase was not compared. Recorded only; `SOURCE_LICENSES.md` untouched.
+
 | Field | Value |
 |---|---|
 | Cleanliness score | **2** |
@@ -474,6 +488,18 @@ topic "AI", lead authority, GDPR article, outcome), binding decisions, opinions.
 #### 1D.1 arXiv cs.CR (filtered to AI-relevant papers)
 *Content class:* paper metadata (title, authors, **abstract**, categories, DOI,
 dates) and full text/e-prints. *Language:* English (some other).
+
+**Existing curated subset (foreman correction 2026-10-02, counts re-checked).**
+`ingest/arxiv_incidents.json` has **123** `source_id` rows (**116** `ARXIV-`,
+7 other id forms), hand-curated, no ingest script. No `SOURCE_LICENSES.md` row
+names it; section 4 of that file covers only the ten red-team benchmarks.
+**Would this pre-row cover it? Only for the metadata half:** title, authors,
+identifiers and abstract are CC0, so any of those fields in the 123 rows are
+covered. If the curated rows also hold prose that is not arXiv metadata (e.g.
+summaries of the full text), that prose is the maintainer's own, not covered
+by or needing this row. Whether any row copies full-text passages was **not
+checked**. Recorded only; `SOURCE_LICENSES.md` untouched. The proposed
+systematic ingest is evaluated below as briefed.
 
 **Correction to the brief's framing.** The brief says "metadata is CC0, but
 abstracts and full text carry per-paper licences; separate the two". The first
@@ -680,4 +706,90 @@ should not be estimated until a written permission exists.)*
 *(Placeholder. Not filled by license-auditor. Method and every factor score to
 be shown by the ranking step; licence-cleanliness scores from section 1 are an
 input, not the ranking.)*
+
+---
+
+## 6. Absence findings for shell verification
+
+Every item below rests on WebFetch (a summarising converter) or WebSearch, so
+each is method-suspect. Run against **raw HTML** (`curl -sL`, add
+`-A 'Mozilla/5.0'` where noted). "Confirms" means the original finding stands;
+"refutes" means the row must be revised. A 403/timeout that persists means the
+clause stays search-extract-sourced and the row is not upgraded.
+
+1. **NCSC (1A.1).**
+   `curl -sIL https://www.ncsc.gov.uk/robots.txt | head -1` -> 404 confirms no robots.txt; 200 refutes (read it).
+   `curl -sL https://www.ncsc.gov.uk/section/about-this-website/terms-and-conditions | grep -ioE 'automat|scrap|crawl|robot'` -> no output confirms no access clause; any hit refutes (read it).
+2. **ACSC (1A.2; fetches timed out).**
+   `curl -sL https://www.cyber.gov.au/about-us/copyright | grep -io 'creative commons attribution[^<]*'` -> CC BY 4.0 International text confirms the licence; other wording refutes.
+   `curl -sL https://www.cyber.gov.au/robots.txt` -> read for Disallow on advisories.
+3. **CCCS (1A.3).**
+   `curl -sL https://www.cyber.gc.ca/robots.txt`.
+   `curl -sL https://cse-cst.gc.ca/en/corporate-information/terms-and-conditions | grep -ioE 'automat|scrap|robot|crawl'` -> no output confirms.
+   `curl -sL https://www.cyber.gc.ca/en | grep -io 'href="[^"]*terms[^"]*"'` -> a cyber.gc.ca-specific terms page refutes "CSE terms only".
+4. **ENISA website text (1A.4).**
+   `curl -sL https://www.enisa.europa.eu/ | grep -ioE 'href="[^"]*(legal|copyright|terms)[^"]*"'`, then grep each target for `CC BY|Creative Commons|reuse` -> a page-level CC BY 4.0 grant refutes "web text not covered".
+5. **BSI / WID (1A.5).**
+   `curl -sL https://wid.cert-bund.de/robots.txt`; `curl -sL https://www.bsi.bund.de/robots.txt`.
+   `curl -sL https://wid.cert-bund.de/ | grep -io 'href="[^"]*nutzung[^"]*"'` then read that page.
+   Fetch one CSAF advisory (via `https://wid.cert-bund.de/portal/wid/csaf/info`) and `jq .document.distribution` -> a licence/TLP:WHITE reuse statement refutes "no open licence".
+6. **ANSSI (1A.6).** `curl -sL https://www.cert.ssi.gouv.fr/mentions-legales/ | grep -ioE 'automat|scrap|robot|moissonn'` -> no output confirms no access clause.
+7. **JPCERT (1A.7; whole row is absence).**
+   `curl -sIL https://www.jpcert.or.jp/robots.txt | head -1`.
+   `for u in https://www.jpcert.or.jp/ https://www.jpcert.or.jp/english/; do curl -sL $u | grep -io 'href="[^"]*"' | grep -iE 'term|site|polic|copyright|rule'; done` -> a terms/copyright link refutes "no ToS located"; read it.
+8. **JVN / iPedia (1A.8).**
+   `curl -sIL https://jvndb.jvn.jp/robots.txt | head -1`.
+   `curl -sL https://jvndb.jvn.jp/nav/jvndb_faq.html | grep -iE -A6 '引用|転載|再配布'` and `curl -sL https://jvndb.jvn.jp/en/nav/jvndb_faq.html | grep -i -A6 'redistribut'` -> a link to the "separately provided guidelines" refutes "guidelines not located"; follow it.
+9. **CSA (1A.9).**
+   `curl -sL https://www.csa.gov.sg/terms-of-use/ | grep -ioE 'automat|robot|scrap|spider'` -> no output confirms.
+   `curl -sL https://www.csa.gov.sg/terms-of-use/ | grep -io 'Any claim relating to use of The Website[^<]*'` -> shows whether the page really cuts off.
+10. **CERT-EU (1A.10).**
+    `curl -sL https://cert.europa.eu/legal-notice | grep -ioE 'cert-eu[^<]{0,150}|creative commons[^<]{0,100}'` -> CERT-EU named in the CC BY grant resolves the contradiction toward CC BY.
+    `curl -sL https://cert.europa.eu/publications/security-advisories/ | grep -io 'all rights reserved'` -> a hit confirms the footer conflict.
+11. **EUVD (1B.2).**
+    `curl -sL https://euvd.enisa.europa.eu/ | grep -ioE 'legal|terms|licen[cs]e|copyright'`; grep the SPA's linked JS bundles for `terms` and `licen`.
+    `curl -sI https://euvdservices.enisa.europa.eu/api/lastvulnerabilities` -> look for licence/Link/terms headers.
+12. **cvelistV5 repo licence (1B.3).** `curl -s https://api.github.com/repos/CVEProject/cvelistV5/license` -> 404 confirms `license: null`.
+13. **MITRE notice absent from our repo (1B.3).**
+    `grep -rIli "Copyright.*MITRE\|CVE.*Terms of Use" NOTICE* README.md docs/SOURCE_LICENSES.md docs/DATASHEET.md` -> no output confirms the compliance gap; any hit refutes it.
+14. **VulnCheck (1B.4).**
+    `curl -sL https://www.vulncheck.com/service-terms | grep -oiE '[^.]*(open source or similar license|artificial intelligence model)[^.]*'` -> both sentences present confirm the restrictive clauses (a miss refutes my quotes).
+    `curl -sL https://docs.vulncheck.com/community/vulncheck-kev/faq | grep -ioE '[^.]*(redistribut|commercial|rate limit|token)[^.]*'` -> the FAQ fetch was truncated; any hit adds terms.
+15. **AVID site licence (1B.5).** `curl -sL https://avidml.org/database/ | grep -ioE 'licen[cs]e|creative commons|CC[- ]BY'` -> no output confirms; a hit refutes (read it).
+16. **Garante (1C.1).** `curl -sL https://www.garanteprivacy.it/ | grep -io 'href="[^"]*"' | grep -iE 'note|legal|copyright|licen'` -> a note-legali page refutes "ToS not located".
+17. **EDPB (1C.2).**
+    `curl -sL 'https://www.edpb.europa.eu/registers/register-of-final-one-stop-shop-decisions_en' | grep -ioE 'rss|export|csv|\.xml|/api'` -> a hit refutes "no export/API".
+    `curl -sL https://www.edpb.europa.eu/concernant-le-cepd/mentions-legales/copyright_en | grep -ioE 'automat|scrap|robot'` -> no output confirms.
+18. **Dutch AP (1C.3; 403 to fetch tool).**
+    `curl -sL -A 'Mozilla/5.0' https://autoriteitpersoonsgegevens.nl/over-deze-website/copyright | grep -io 'copyright[^<]*'` -> must match the search-extract wording (personal use + quoting, source cited); `creative commons`/CC0 refutes.
+    `curl -sL -A 'Mozilla/5.0' https://autoriteitpersoonsgegevens.nl/robots.txt`.
+19. **CNIL (1C.4).**
+    `curl -sL https://www.cnil.fr/robots.txt | sed -n '60,200p'` (I read only 60 lines).
+    `curl -sL https://www.cnil.fr/fr/mentions-legales | grep -ioE 'robot|scrap|automat'` -> no output confirms.
+    Also locate the CNIL open-data/Legifrance licence page for decisions (not yet fetched).
+20. **ICO (1C.5).** `curl -sL https://ico.org.uk/ | grep -ioE 'href="[^"]*(terms|copyright|legal)[^"]*"'` -> find the website-terms page; read for automated-access wording.
+21. **ANPD (1C.6).** `curl -s https://www.gov.br/robots.txt | grep -n -i anpd` -> no output confirms no ANPD-specific disallow.
+22. **OPC (1C.7).** `curl -sI https://www.priv.gc.ca/robots.txt | head -1` -> 404 confirms.
+23. **BAILII (1C.8).** `curl -sL https://www.bailii.org/bailii/copyright.html | grep -ioE '[^.]*(bulk|abusive|robot|spider|storing)[^.]*'` -> must reproduce s12(a)-(d); a miss refutes my quotes.
+24. **CanLII (1C.9; 403 to fetch tool).** `curl -sL -A 'Mozilla/5.0' https://www.canlii.org/en/info/terms.html | grep -ioE '[^.]*(bulk|systematic|programmatic|robot)[^.]*'` -> must reproduce "bulk or systematic downloading ... programmatic means"; a persisting 403 leaves the clause second-hand.
+25. **arXiv (1D.1; positive, for completeness).** `curl -sL https://info.arxiv.org/help/api/tou.html | grep -io 'Descriptive metadata includes[^<]*'` -> must list "abstract"; absence refutes my correction of the brief.
+26. **HackerOne (1D.2).**
+    `curl -sL https://hackerone.com/robots.txt`; `curl -sL https://www.hackerone.com/robots.txt`.
+    `for u in terms/general terms/finder-2023 terms/disclosure-guidelines dmca; do curl -sL https://www.hackerone.com/$u | grep -ioE '[^.]*(scrap|crawl|automated|bot)[^.]*'; done` -> a hit refutes "no explicit anti-scraping clause". Also locate the website terms of use (not read).
+27. **Bugcrowd (1D.3).**
+    `curl -sL https://www.bugcrowd.com/website-terms-and-conditions/ | grep -ioE '[^.]*(scrap|crawl|robot|automated|spider)[^.]*'`.
+    `curl -sL https://www.bugcrowd.com/resources/hacker-resources/standard-disclosure-terms/ | grep -io 'exclusive, sub-licensable[^.]*'` -> must show the assignment/licence sentence.
+28. **DEF CON / Black Hat / AI Village (1D.4).**
+    `curl -sL https://defcon.org/robots.txt`; `curl -sL https://media.defcon.org/robots.txt`; `curl -sL https://www.blackhat.com/robots.txt`.
+    `curl -sL https://defcon.org/html/defcon-34/dc-34-cfp-form.html | grep -io 'permission to duplicate[^<]*'` -> must match the quoted grant.
+    `curl -s https://api.github.com/orgs/aivillage/repos | grep -E '"name"|spdx_id'` -> structured licence per repo.
+29. **Rejections (section 2).**
+    `curl -sIL https://www.cnvd.org.cn/` and `https://www.cnnvd.org.cn/`, then grep pages for `使用条款|版权|声明` -> a terms page refutes "no terms found".
+    `curl -sL -A 'Mozilla/5.0' https://vuldb.com/kb/terms | grep -io 'CC BY-NC-SA[^<]*'` -> must match.
+    Snyk: download the EULA PDF (URL in 2.2), `pdftotext <file> - | grep -i -B1 -A2 'Service Data'`; and `curl -sL https://security.snyk.io/ | grep -ioE 'href="[^"]*(terms|licen)[^"]*"'` for the public-site terms.
+30. **Watch items (section 3).**
+    Art. 73 text from EUR-Lex: `curl -sL 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401689' | grep -n -iE 'publicly available|serious incident'` -> any publication/register provision in Art. 73 refutes "no public register".
+    Digital Omnibus Official Journal text: confirm the 27 July 2026 entry into force and the 2 Dec 2027 / 2 Aug 2028 dates, and whether Art. 73 timing moved.
+    `curl -sL https://euvd.enisa.europa.eu/apidoc` raw, for a version/changelog/terms statement.
+
 
