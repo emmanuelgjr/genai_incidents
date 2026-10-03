@@ -62,7 +62,20 @@
   - **New rows:** huntr 1 (c); CISA beyond KEV 2 (CISA-authored text) and 1 (co-sealed material).
   - The huntr terms quotes came through a converter and are unverified.
 - **red-reviewer RE-GATE (attempt 2) DISPATCHED. A second bounce goes to the user.**
-- **Next:** re-gate verdict → pipeline-engineer estimates on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+- **⛔ BOUNCE #2 (red-reviewer, 2026-10-03, on `6d77a194`). This is the SECOND bounce, so it is ESCALATED TO THE USER (protocol step 6).** The full verdict text is in `docs/audits/source-expansion-tranche2-gate2-verdict-2026-10-03.md`.
+  - **What passed:** all gate-1 fixes D1–D7 landed correctly. Every changed score follows from its row except ACSC. Invariants PASS.
+  - **Defects in the new 1E rows:**
+    - D1: huntr §7.1 is misquoted. "irrevokable" was a converter artefact.
+    - D2: huntr's "tool unreliability" claim is refuted. The 404s were genuine. The PANW Terms of Use bar reproduction; score 1 (c) still follows.
+    - D3: the huntr corpus count. Measured [R]: 284 distinct bounty URLs (216 huntr.com + 68 huntr.dev; 277 distinct IDs) in 210 of 13,361 entries.
+    - D4: CISA "ToS not located" is refuted. The `/site-links` policy pages are found; §105 is now verified verbatim; the 2/1 split follows.
+  - **Gate-1 imprecision the reviewer carried forward itself:**
+    - D5: the CSA quote is truncated.
+    - D6: the "MITRE Corporation" line reference.
+  - **Smaller items:** D7 (AP Dutch verbatim), D8 (JPCERT quotation notice).
+  - **D9: ACSC score 1 contradicts the scale's own score-2 definition.** This needs a choice.
+  - **Every defect comes with replacement wording to apply verbatim** (D37 precedent).
+  - **Foreman stray check:** main porcelain clean. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
