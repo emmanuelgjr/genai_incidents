@@ -336,8 +336,7 @@ the 0din corpus were never written to disk.
 3. **The corpus already carries a GHSA-sourced malicious-package stream.** [M] 79
    entries titled `Malware in <package>`, all GHSA-keyed, 62 of them AI-named by the
    strict token list. OpenSSF is a second route to the same kind of record, and the
-   dedupe key has to be (ecosystem, package name), because the sampled OpenSSF records
-   have `aliases: null` (14 of 14).
+   dedupe key has to be (ecosystem, package name), because the sampled OpenSSF records have `aliases: null` (14 of 14). The packages are not GHSA-less: GitHub's advisory database has a `type=malware` GHSA for 72 of the 73 pypi and 85 of the 85 unscoped npm strict names (gate 2026-10-03, GHSA API `affects=` per name), of which 17 (all npm) are in the corpus today. Most of OpenSSF's AI/ML gap is therefore reachable through the CC BY 4.0 GHSA route the corpus already ingests, by widening its malware filter.
 4. **The headline AI litigation and the 2019-2024 FTC AI actions are already in the
    corpus** [M, name probes], through AIAAIC, AIID and OECD sources: 9 of 12 named US
    AI suits and 6 named FTC actions found by title (lists in the evidence file). Both
@@ -397,8 +396,7 @@ Each row: **Volume** · **Overlap** (dedupe key stated; not CVE alone) · **Shap
 #### T1.5 FTC enforcement actions (licence 2)
 - **Volume.** Not measurable: **the host is unreachable through `common.py` (E.0-1).**
   [E] 5-15 AI-related actions per year, from the author's knowledge of the 2023-2025
-  pace; no fetch backs it. The corpus signal is [M] 6 entries mention FTC or the Federal
-  Trade Commission and 2 carry an `ftc.gov` URL (INC-07386, INC-04395).
+  pace; no fetch backs it. The corpus signal is [M] 6 entries mention FTC or the Federal Trade Commission in title, description, affected or impact (10 anywhere in the record, references included) and 2 carry an `ftc.gov` URL (INC-07386, INC-04395).
 - **Overlap.** [M] By title, Rite Aid, Everalbum, DoNotPay, IntelliVision, Kurbo and Alexa
   COPPA are in the corpus (AIAAIC, AIID); not found: Rytr, Operation AI Comply, Workado,
   Air AI, Ascend Ecom, Click Profit, FBA Machine (names from the author's memory, not
@@ -456,8 +454,7 @@ Each row: **Volume** · **Overlap** (dedupe key stated; not CVE alone) · **Shap
 - **Overlap.** [M] 0 of 73 pypi and 17 of 91 npm candidates already have a corpus entry
   `Malware in <name>` (GHSA-keyed); by package name about 90% are net-new (147 of 164).
   [M] 1 corpus entry cites a `MAL-` id (INC-08450). **Dedupe key: (ecosystem, package
-  name)**, then GHSA alias; `aliases` is null in 14 of 14 sampled records, so a CVE or
-  GHSA key does not exist. The existing 79 GHSA malware entries are CC BY 4.0 and would
+  name)**, then GHSA alias; `aliases` is null in 14 of 14 sampled records, so the OpenSSF record carries no CVE or GHSA key; upstream, a `type=malware` GHSA exists for 157 of the 158 unscoped pypi and npm candidates (E.0-3), so a GHSA crosswalk by (ecosystem, package name) is available. The existing 79 GHSA malware entries are CC BY 4.0 and would
   win any text conflict.
 - **Shape.** OSV JSON, one file per record, id `MAL-YYYY-N`, in
   `osv/malicious/<ecosystem>/<package>/`. Reachable through `common.py`: the trees API
@@ -484,7 +481,7 @@ Each row: **Volume** · **Overlap** (dedupe key stated; not CVE alone) · **Shap
 excluding `MAL-` records from the OSV ingest because of Apache-2.0 (board note N6). I
 could not confirm an exclusion: the board text I read (`PROGRESS.md` on `origin/main`,
 `77e04846`) says the fix is to "either filter `MAL-` in the OSV ingest or attribute those
-records per record as Apache-2.0", with no decision recorded. Costs of the attribute
+records per record as Apache-2.0", with no decision recorded. **Update 2026-10-03 (gate):** the board recorded the decision at `0641ec1e`, after this section was committed: `MAL-` records are EXCLUDED from the OSV route (`is_openssf_malicious` in `scripts/ingest_cve_nvd_expanded.py`, branch `ws4/wave12-ingest`, not yet on `main`; `SOURCE_LICENSES` row 2.4 states it), with MAL-2026-3607 kept as a bare identifier plus links. The decision is scoped to the OSV route and does not by itself zero a direct, per-record-attributed OpenSSF ingest; it does record that the project declined the per-record Apache cost once, so T1.8 at L=2 needs the user to accept that cost for this route. Costs of the attribute
 route, for the roughly 80 rows above:
 1. **Schema.** `content_license` in `schema/incident.schema.json` is **one object per
    row** and its `obligations` enum is only `attribution` or `share-alike` [M]. Apache-2.0
@@ -562,7 +559,7 @@ below are **cited, not recomputed**.
 |---|---|---|---|---|---|---|
 | T1.4 CourtListener (bulk S3) | 2 | 2 | 2 | 2 | **16** | V is [E] (100-300 curated dockets); at V=1 the product is 8 |
 | T1.6 0din (HF corpus) | 2 | 1 | 2 | 3 | **12** | V=1 because 66 of 80 arrive via AVID in wave 1 (14 left) [M]; at V=2 (AVID skipped or mirror refreshed) it is 24 |
-| T1.8 OpenSSF AI/ML subset | 2 | 1 | 2 | 2 | **8** | V=1: about 80 records, 15-40 per year [E], straddles the V=2 line; at V=2 it is 16; at L=1 (Apache not accepted) 4; zero if excluded |
+| T1.8 OpenSSF AI/ML subset | 2 | 1 | 2 | 2 | **8** | V=1: about 80 records, 15-40 per year [E], straddles the V=2 line; at V=2 it is 16; at L=1 (Apache not accepted) 4; zero if excluded; dominated by GHSA: 157 of 158 candidates have a CC BY 4.0 GHSA malware twin (E.0-3) |
 | T1.5 FTC | 2 | 1 | 2 | 0 | **0** | M=0: robots.txt 403 through `common.py` (E.0-1); if reachable M=1 and the product is 4 |
 | T1.1 CISA beyond KEV | 2 | 1 | 1 | 1 | 2 | cited, tranche-2 section 5.2 |
 | T1.2 huntr (CVE route) | 2 | 2 | 3 | 3 | 36 | cited; a filter inside cvelistV5 |
@@ -586,7 +583,7 @@ Rows with product 0 are collapsed.
 | 6 | ANSSI / CERT-FR | 2 | 3 1 2 2 | 12 | hold | cited |
 | 6 | **0din (HF corpus)** | 1 (T1.6) | 2 1 2 3 | **12** | **3, after AVID merges** | 66 of 80 already arrive through AVID; adds at most 14, depends on the mirror being refreshed |
 | 9 | BSI / WID | 2 | 1 1 3 3 | 9 | hold | cited |
-| 10 | **OpenSSF AI/ML subset** | 1 (T1.8) | 2 1 2 2 | **8** | **4, gated on N6 and WS3** | about 80 records; duplicates part of the GHSA malware stream; Apache needs a schema change |
+| 10 | **OpenSSF AI/ML subset** | 1 (T1.8) | 2 1 2 2 | **8** | **4, gated on N6 and WS3** | about 80 records; 157 of 158 candidates have a GHSA malware twin (17 in the corpus), so the cheaper route is the existing GHSA ingest; Apache needs a schema change |
 | 11 | NCSC, JVN, ICO | 2 | | 6 | hold / 3 (ICO) | cited |
 | 14 | ENISA reports, EDPB register | 2 | | 4 | hold / 3 (EDPB) | cited |
 | 16 | CCCS | 2 | | 3 | hold | cited |
@@ -594,8 +591,7 @@ Rows with product 0 are collapsed.
 | 20 | **FTC** and the tranche-2 zero rows (ACSC, JPCERT/CC, CERT-EU, Dutch AP, CNIL, ANPD, OPC, HackerOne, huntr.com direct) | 1 / 2 | | 0 | hold | FTC: unreachable through `common.py` today |
 | n/a | CERT/CC, EPSS, GHSL | 1 | 1 | not estimated | hold | listed by name |
 
-**Sensitivity.** None of the tranche-1 estimates exceeds 24, and 24 is reached only by
-0din at its optimistic V. So **no estimated tranche-1 source outranks AVID, cvelistV5 or
+**Sensitivity.** None of the tranche-1 estimates exceeds 24, and 24 is reached only at an optimistic V: 0din at V=2, or CourtListener at V=3 (its V is [E], plus or minus one step). So **no estimated tranche-1 source outranks AVID, cvelistV5 or
 huntr, and none outranks arXiv except by a tie.** That answers the tranche-2 caveat
 (section 5.5) for the names estimated here: of the 8 reconstructed names, none that was
 estimated lands above wave 2, and the 3 listed by name have a ceiling of 27. Ordering
@@ -616,9 +612,7 @@ Nothing below changes them. These are proposals for a user ruling.
   names, a `common.py`-compatible chunked `Range` reader, and handling of `blocked`
   dockets. This sits with tranche-2's optional wave 3 (ICO, EDPB, Garante), which is
   also a regulatory and legal axis; the user's call whether that axis is wanted.
-- **Wave 4: OpenSSF AI/ML subset**, after the N6 ruling (exclude, or attribute per
-  record) and the WS3 decisions (one licence object per row, the obligations enum). If the
-  ruling is to exclude `MAL-`, the product is 0 and this row closes.
+- **Wave 4: OpenSSF AI/ML subset**, only if the user accepts per-record Apache-2.0 attribution for a direct route (N6 excluded `MAL-` from the OSV route at `0641ec1e`; that exclusion does not by itself close this row), and after the WS3 decisions (one licence object per row, the obligations enum). Because 157 of 158 candidates have a CC BY 4.0 GHSA malware twin (E.0-3), the cheaper alternative is to widen the existing GHSA malware filter, which needs neither.
 - **Hold:** FTC (unreachable; a route needs either FTC's operator to accept the project
   User-Agent or reviewed evidence that fits the allowlist standard, neither of which
   exists), CISA beyond KEV (cited), CERT/CC, EPSS and GHSL (licence 1, listed by name).
@@ -626,7 +620,7 @@ Nothing below changes them. These are proposals for a user ruling.
 ### R.5 What in the brief was not supported or not verified
 
 1. The brief says the project is excluding `MAL-` records from the OSV ingest. The board
-   text I read records the choice as open (E.1, T1.8). I treated it as undecided.
+   text I read records the choice as open (E.1, T1.8). I treated it as undecided. **Update 2026-10-03 (gate):** the brief was right on substance; the board recorded the exclusion at `0641ec1e`, after this section was written (see the T1.8 update in E.1).
 2. The brief describes FTC as reachable "via browse pages, Crawl-delay 5". The browse
    pages are not reachable through `common.py` (E.0-1); Crawl-delay is correct per the
    pre-row but could not be exercised.
