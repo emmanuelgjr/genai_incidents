@@ -117,7 +117,7 @@ _TARGET = [
 _EXCLUDE_TITLE = [
     r"survey", r"a review", r"systemati[sz]ation", r"sok", r"position",
     r"vision paper", r"taxonomy", r"roadmap", r"landscape", r"tutorial",
-    r"benchmark\w*", r"dataset", r"defen[cs]\w*", r"defending", r"mitigat\w+",
+    r"\w*bench\w*", r"dataset", r"defen[cs]\w*", r"defending", r"mitigat\w+",
     r"detect(?:ing|ion|or|ors)?", r"safeguard\w*", r"protect\w*", r"preventing",
     r"guardrails?", r"certified", r"watermark\w*", r"privacy[- ]preserving",
     r"differential\w*", r"federated", r"authenticat\w+", r"fingerprint\w*",
@@ -125,7 +125,7 @@ _EXCLUDE_TITLE = [
     r"robust\w*", r"purif\w+", r"unlearning", r"evaluat\w+ (?:of|the)",
     r"measur\w+", r"toolkit", r"framework", r"counter\w*", r"alignment",
     r"formali[sz]\w+", r"threat model\w*", r"prevent\w*", r"hardening",
-    r"attribution", r"improving", r"evaluating", r"hackworld",
+    r"attribution", r"improving", r"evaluating", r"hackworld", r"isolation",
     # AI used as the attacker's tool against non-AI targets, not an attack on AI
     r"smart[- ]contracts?", r"blockchain", r"defi",
 ]

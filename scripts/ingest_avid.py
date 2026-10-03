@@ -143,6 +143,20 @@ def _clean(s: str | None) -> str:
     return re.sub(r"\s+", " ", (s or "").replace("‍", "").replace("​", "")).strip()
 
 
+REASON_RE = re.compile(r"\s*Reason for inclusion in AVID:.*$", re.S | re.I)
+
+
+def strip_avid_rationale(text: str) -> str:
+    """AVID's 2026 bulk import appends a machine-written "Reason for inclusion
+    in AVID: ..." paragraph to the CNA text of its CVE reports (213 of the 309
+    rows this ingest emits). It is AVID's own after-the-fact justification, not
+    part of the CVE record, and not evidence of AI relevance (it argues, for
+    example, that Spring4Shell qualifies because Spring may be in a serving
+    stack). The description is the CNA text only, and relevance is judged on
+    that text and the affected product, never on the rationale."""
+    return REASON_RE.sub("", text).strip()
+
+
 def first_sentences(text: str, limit: int = 300) -> str:
     """Whole sentences up to *limit* chars (at least the first one)."""
     parts = re.split(r"(?<=[.!?])\s+", text)
@@ -196,7 +210,7 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
     cls = classof(rec)
     if not aid:
         return None
-    desc_full = _clean((rec.get("description") or {}).get("value"))
+    desc_full = strip_avid_rationale(_clean((rec.get("description") or {}).get("value")))
     ptitle = _clean(((rec.get("problemtype") or {}).get("description") or {}).get("value"))
     cves = sorted(set(CVE_RE.findall(ptitle) + CVE_RE.findall(
         " ".join(r.get("url") or "" for r in rec.get("references") or []))))

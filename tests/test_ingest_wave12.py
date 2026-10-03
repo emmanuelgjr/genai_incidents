@@ -112,6 +112,19 @@ def test_avid_third_party_report_description_is_cut_to_a_sentence():
     assert "cve_ids" not in row
 
 
+def test_avid_rationale_suffix_is_stripped_and_does_not_decide_relevance():
+    text = ("Spring Framework allows RCE via data binding. Reason for inclusion in AVID: "
+            "CVE-2022-22965 affects a stack that can host an AI model.")
+    assert AV.strip_avid_rationale(text) == "Spring Framework allows RCE via data binding."
+    rec = {"metadata": {"report_id": "AVID-2026-R9999"},
+           "problemtype": {"classof": "CVE Entry", "description": {"value": "Vulnerability CVE-2022-22965"}},
+           "affects": {"developer": ["VMware"], "artifacts": [{"name": "Spring Framework"}]},
+           "references": [{"url": "https://www.cve.org/CVERecord?id=CVE-2022-22965"}],
+           "description": {"value": text}, "reported_date": "2022-04-01"}
+    rows, stats, _ = AV.build({"reports/2026/AVID-2026-R9999.json": rec}, corpus=[])
+    assert rows == [] and stats["skipped_not_ai_relevant"] == 1
+
+
 def _tar(records: dict[str, dict]) -> bytes:
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
