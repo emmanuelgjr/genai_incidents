@@ -375,6 +375,69 @@ def fetch_once(
     return body, resp_headers
 
 
+def fetch_to_file(
+    url: str,
+    dest: Path,
+    *,
+    headers: dict[str, str] | None = None,
+    timeout: int = 120,
+    min_interval: float = DEFAULT_MIN_INTERVAL,
+    max_retries: int = 3,
+    chunk_size: int = 1 << 20,
+) -> tuple[str, int]:
+    """Stream ONE conduct-compliant download to *dest* without holding the
+    body in memory (for multi-hundred-MB release assets such as the
+    cvelistV5 baseline zip, which ``fetch_once`` would read whole).
+
+    Same conduct as ``fetch_once`` -- robots check (fail-closed), per-host
+    rate limit, forced ``USER_AGENT`` -- plus retry with exponential backoff
+    on transient failures. Writes to ``<dest>.part`` and renames on success,
+    so an interrupted download can never be mistaken for a complete one.
+    Returns ``(sha256_hex, size_bytes)`` computed while streaming.
+    """
+    import hashlib
+
+    if not robots_allowed(url, min_interval):
+        raise PermissionError(
+            f"refusing to fetch {url}: robots.txt disallows it for "
+            f"User-Agent {USER_AGENT!r}, or robots.txt itself could not be "
+            "verified and this host is not on ROBOTS_UNVERIFIABLE_ALLOWLIST "
+            "(fail-closed -- see docs/INGESTION_CONDUCT.md)"
+        )
+    host = urlparse(url).netloc
+    hdrs = {"User-Agent": USER_AGENT}
+    if headers:
+        hdrs.update({k: v for k, v in headers.items() if k.lower() != "user-agent"})
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    part = Path(str(dest) + ".part")
+    last_err: Exception | None = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            _rate_limit(host, min_interval)
+            req = urllib.request.Request(url, headers=hdrs, method="GET")
+            digest = hashlib.sha256()
+            size = 0
+            with urllib.request.urlopen(req, timeout=timeout) as resp, part.open("wb") as fh:
+                while True:
+                    chunk = resp.read(chunk_size)
+                    if not chunk:
+                        break
+                    fh.write(chunk)
+                    digest.update(chunk)
+                    size += len(chunk)
+            part.replace(dest)
+            return digest.hexdigest(), size
+        except (urllib.error.URLError, urllib.error.HTTPError,
+                TimeoutError, ConnectionError, OSError) as e:
+            last_err = e
+            if attempt < max_retries:
+                print(f"  [retry] attempt {attempt}/{max_retries} for {url}: {e}",
+                      file=sys.stderr)
+                time.sleep(2 ** attempt)
+    raise RuntimeError(f"Failed to fetch {url} after {max_retries} attempts: {last_err}")
+
+
 def robust_fetch(
     url: str,
     cache_path: Path,

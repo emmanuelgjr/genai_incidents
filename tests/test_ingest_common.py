@@ -480,3 +480,47 @@ def test_rate_limit_zero_interval_is_a_no_op(monkeypatch):
     u._rate_limit("example.com", min_interval=0)
     u._rate_limit("example.com", min_interval=0)
     assert sleeps == []
+
+
+# ----------------------------------------------------------------------------
+# fetch_to_file (streamed download for multi-hundred-MB release assets)
+# ----------------------------------------------------------------------------
+def _stream_resp(chunks):
+    resp = MagicMock()
+    resp.read.side_effect = list(chunks) + [b""]
+    resp.__enter__ = lambda s: s
+    resp.__exit__ = MagicMock(return_value=False)
+    return resp
+
+
+def test_fetch_to_file_streams_hashes_and_renames(tmp_path):
+    import hashlib
+
+    dest = tmp_path / "sub" / "asset.zip"
+    with patch("ingest.common.urllib.request.urlopen") as mock_open:
+        mock_open.return_value = _stream_resp([b"abc", b"def"])
+        digest, size = u.fetch_to_file("https://example.com/a.zip", dest, chunk_size=3)
+    assert size == 6 and dest.read_bytes() == b"abcdef"
+    assert digest == hashlib.sha256(b"abcdef").hexdigest()
+    assert not (tmp_path / "sub" / "asset.zip.part").exists()
+    sent = mock_open.call_args[0][0]
+    assert sent.get_header("User-agent") == u.USER_AGENT
+
+
+def test_fetch_to_file_never_leaves_a_partial_file_as_the_result(tmp_path):
+    dest = tmp_path / "asset.zip"
+    with patch("ingest.common.urllib.request.urlopen") as mock_open, \
+         patch("ingest.common.time.sleep"):
+        mock_open.side_effect = urllib.error.URLError("reset")
+        with pytest.raises(RuntimeError):
+            u.fetch_to_file("https://example.com/a.zip", dest, max_retries=2)
+    assert not dest.exists()
+
+
+@pytest.mark.real_robots
+def test_fetch_to_file_honours_robots_refusal(tmp_path, monkeypatch):
+    monkeypatch.setattr(u, "robots_allowed", lambda url, min_interval=1.0: False)
+    with patch("ingest.common.urllib.request.urlopen") as mock_open:
+        with pytest.raises(PermissionError):
+            u.fetch_to_file("https://example.com/a.zip", tmp_path / "x")
+    mock_open.assert_not_called()
