@@ -2,6 +2,38 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## ✅ Source-expansion evaluation (tranche 2 + partial tranche 1): **DONE and MERGED to main `2504fb89` (2026-10-03)**
+
+- **Final gate: PASS (fresh red-reviewer, gate 6, 2026-10-03, on `946a7e55`), no defects.** Verdict text in `docs/audits/source-expansion-tranche2-gate6-final-PASS-2026-10-03.md`.
+  - D1–D9 landed verbatim, and every stale string is gone.
+  - The evidence JSON loads as strict UTF-8.
+  - The diff is 3 files, +27/−31.
+  - `merge-tree` against origin/main returned rc=0.
+  - `SOURCE_LICENSES.md`, `data/`, `scripts/` and `ingest/` have 0 diff.
+- **Licence half PASSED at gate 4** (`5163c10b`). The full gate trail is gates 1–6 in `docs/audits/source-expansion-tranche2-*`.
+- **Deliverable:** `docs/specs/source-expansion-evaluation.md`, plus `docs/specs/source-expansion-estimates-evidence-2026-10-03.{md,json}` and the scope record.
+- **Foreman stray check:** the only untracked file was the gate-6 record, created deliberately. The merge touches 4 `docs/specs/` files, +3,190 lines.
+- **docs-warden (protocol step 7): not dispatched.** The merge changes no counts, public claims, licensing text, taxonomy lists or version strings; it adds internal evaluation specs only. `SOURCE_LICENSES.md` is untouched by design (invariant 10).
+- **⚖ DECISION OWED TO THE USER: first-wave approval.** The waves as gated:
+  - **Wave 1: AVID + cvelistV5**, with huntr as a CNA filter inside cvelistV5. cvelistV5's floor is ≥416 backlog and about 165/yr; AVID is about 1,070 net-new.
+  - **Wave 2: arXiv cs.CR (OAI-PMH metadata) + EUVD as enrichment.** EUVD needs ENISA outreach, which the user sends.
+  - **Wave 3 (optional):** hand-curated ICO/EDPB.
+  - The user's prior is "mostly not supported" (§5.4).
+  - The ranking covers 29 of about 37 candidates. **The other eight tranche-1 names are still needed from the user.**
+  - No ingest code until a ruling.
+- **NEW BOARD NOTES from this evaluation. These are routed to their owners but not yet dispatched; each needs its own task.**
+  - **N1 → pipeline-engineer (WS4, data integrity, highest priority).** **17 corpus entries (18 CVE ids) are `source_status: active` for CVEs that cve.org/NVD mark REJECTED.** Measured by pipeline-engineer and re-derived by gate 5 via cve.org (18/18). This is a WS4-T2 reconciliation gap on the shipped corpus.
+  - **N2 → pipeline-engineer (WS4).** **The CVE refresh is stale:** the newest corpus CVE month is 2026-07. pipeline-engineer estimated about 515 proxy-AI CVEs missing; gate 5 found an independent NVD lower bound of 334.
+  - **N3 → pipeline-engineer (WS4, invariant 5 machinery).**
+    - `ingest/common.py` never parses Crawl-delay; ICO 6, BSI 10 and arXiv 15 must be passed by callers today.
+    - stdlib `robotparser` has no RFC 9309 wildcard or longest-match support, so it wrongly refuses the Dutch AP's `/documenten/*`.
+  - **N4 → license-auditor (WS0).** The hand-curated inputs `ingest/avid_owasp_incidents.json` (130), `arxiv_incidents.json` (123), `research_incidents.json` (135) and `threat_reports_incidents.json` (82) have **no `SOURCE_LICENSES.md` row naming them**. AVID wave 1 would close the AVID part. The 21 OWASP rows and the other two files remain.
+  - **N5 → license-auditor (WS0).** The repo carries **no CVE Terms of Use notice** (gate 1 D7, confirmed). It is owed for cvelistV5 and arguably for the existing NVD-derived CVE text.
+- **Process lessons, recorded:**
+  - (a) The foreman retyped gate verdicts into "verbatim" records **twice**. The fix that worked was saving messages to disk as received and concatenating them by shell.
+  - (b) Requesting long verdicts in parts ("defects 1–5, then 6–9") delivered complete text with no truncation.
+  - (c) A stalled applier was replaced rather than re-prompted, per agreement 3, and the replacement finished in minutes.
+
 ## 🌍 Source-expansion evaluation, tranche 2 (worldwide): **license-auditor DISPATCHED 2026-10-02** on `eval/source-expansion` (pushed, `83da7445`) · ⚠ **the tranche-1 record does not exist**
 
 - **User brief, 2026-10-02.** Evaluate about 30 worldwide candidates under the same discipline as tranche 1:
