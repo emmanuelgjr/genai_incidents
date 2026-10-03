@@ -50,6 +50,17 @@
 - **✅ Tranche-1 licence pre-rows PASS (D41 string check, red-reviewer, 2026-10-03, on `d1a6774b`). No defects.** The verdict is in `docs/audits/source-expansion-tranche1-gate3-PASS-2026-10-03.md`.
   - **Gated scores:** CERT/CC 1 · CourtListener 2 (bulk) / 0 (crawl) · FTC 2 · 0din 2 (via the HF CC BY corpus) · EPSS 1 · OpenSSF 2 · HF drop · GHSL 1.
   - **Next:** tranche-1 estimates go to a fresh pipeline-engineer.
+- **Refresh-tripwire diagnosis DELIVERED (pipeline-engineer, `9ef355f5` on `ws4/refresh-tripwire-42`, pushed).** Record: `docs/audits/refresh-tripwire-2026-10-03.md`. Not yet gated.
+  - **The 42 rows:** 2 known + 30 new + 7 existing that gained an `aiid_id` + 3 mixed.
+  - **One mechanism:** OECD's `aiid_ids` act as merge keys while the AIID snapshot is stale.
+  - **No OECD narrative ships:** 42/42 descriptions are `build_description()`.
+  - **Only one fatal failure:** the tripwire is it. The AIRI download is `continue-on-error`; AIRI was relaunched as Next.js, its zip is gone and `/api/` is robots-disallowed. Last successful refresh: 2026-05-31.
+  - **Unblocking would write** 7 new `merged` deprecations (permanent; 3–4 look wrong on a title-only read), retitle 4 published IDs, and add `aiid_id` to 11 rows.
+- **⚖ D42, USER RULING 2026-10-03: keep D25(a) in force for OECD/AIID refresh merges.**
+  - The release ships waves 1–2 plus the rejected-CVE fix on today's committed OECD/AIID data.
+  - **Build WS4-T12** (OECD description provenance) and **WS4-T14** (an AIID snapshot step in the refresh) next.
+  - The 7 merges come back to the user as a reviewed list (D28 pattern) before any refresh merges.
+- **NEW BOARD NOTE N8 → WS0 + WS4.** The AIRI Navigator ingest is dead since 2026-05-31: the site was relaunched, the data zip is gone, and `/api/` is disallowed. It needs a redesign: find whether the bulk data is published elsewhere, and get a licence re-read.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
