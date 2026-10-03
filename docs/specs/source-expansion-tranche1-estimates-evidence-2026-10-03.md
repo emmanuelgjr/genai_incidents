@@ -182,3 +182,5 @@ pre-row line counts (28, 40, 0), which counted lines.
 - Re-run the FTC check: `python -c "from ingest import common as c;
   print(c.robots_allowed('https://www.ftc.gov/legal-library/', 5.0))"` prints False
   while the 403 persists. If it ever prints True, the M=0 below is stale.
+
+**Update 2026-10-03 (gate):** the FTC robots.txt 403 is UA-specific (the project UA, any UA containing a URL, and curl/8.x get 403; some other UAs get 200); it is an edge access control, not a robots rule. See docs/audits/source-expansion-tranche1-estimates-gate1-verdict-2026-10-03.md Part 2.
