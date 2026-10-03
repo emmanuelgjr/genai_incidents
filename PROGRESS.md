@@ -84,6 +84,14 @@
     - Bypassing it would be evasion.
     - **The only routes are FTC outreach (the user sends it) or a user ruling.**
   - The fixes went to pipeline-engineer for verbatim application.
+- **✅ Tranche 1 (reconstructed): DONE and MERGED to main** (`80d8b840`, merged `--no-ff`).
+  - **Gates:** licence pre-rows PASS at `d1a6774b`; estimates and ranking BOUNCE #1, then PASS at `80d8b840` (`docs/audits/source-expansion-tranche1-estimates-gate2-PASS-2026-10-03.md`).
+  - **Gate evidence [R]:** products 16 / 12 / 8 / 0 re-derived by independent routes; merge-tree rc=0; only `docs/specs/` touched.
+  - **Proposed waves (decision owed to the user):**
+    - **Wave 3:** CourtListener (bulk S3 only; needs a curated docket list and a privacy review) + 0din (HF CC BY corpus; at most 14 new records beyond AVID).
+    - **Wave 4:** OpenSSF only if the user accepts per-record Apache attribution. The cheaper route is to widen the GHSA malware filter, since 157 of 158 candidates have a GHSA twin.
+    - **Hold:** FTC (an edge rule returns 403 to the project UA; route is FTC outreach or a user ruling), plus CERT/CC, EPSS and GHSL.
+  - **Advisory 1 (wording) was not applied;** it is recorded in the PASS file.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
