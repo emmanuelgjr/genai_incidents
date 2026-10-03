@@ -47,6 +47,9 @@
   - **What passed:** no score, action letter or quote is wrong. The 23 applied quotes match the gate's raw captures.
   - **What failed:** leftover first-pass text contradicts the corrections, and statuses still say "pending". The verdict is in `docs/audits/source-expansion-tranche1-gate2-verdict-2026-10-03.md`, saved as received.
 - **⚖ D41, USER RULING 2026-10-03:** apply the gate's text verbatim, then a narrow string check (the D39 pattern). The fixes went to license-auditor.
+- **✅ Tranche-1 licence pre-rows PASS (D41 string check, red-reviewer, 2026-10-03, on `d1a6774b`). No defects.** The verdict is in `docs/audits/source-expansion-tranche1-gate3-PASS-2026-10-03.md`.
+  - **Gated scores:** CERT/CC 1 · CourtListener 2 (bulk) / 0 (crawl) · FTC 2 · 0din 2 (via the HF CC BY corpus) · EPSS 1 · OpenSSF 2 · HF drop · GHSL 1.
+  - **Next:** tranche-1 estimates go to a fresh pipeline-engineer.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
