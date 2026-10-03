@@ -235,7 +235,7 @@ for each. *Language:* **French** (some English).
 | Relicense-compatible | **YES.** Licence Ouverte 2.0 is an attribution-only licence that Etalab publishes as compatible with CC BY (taken on trust, see below). |
 | Action | **(a) compatible.** Condition: per-record attribution (source = CERT-FR/ANSSI, date of last update, link to Licence Ouverte v2.0); do not fetch `/pdf` or `/fiche/` paths; exclude the ANSSI logo. |
 | Date-checked | 2026-10-02 |
-| Retrieval method | WebFetch of the Mentions legales URL (clause quoted above, not reported truncated), WebFetch of `robots.txt`, WebSearch cross-check. Source kind: rendered HTML (positive clause reliable; absence of an automated-access clause method-suspect) + robots.txt (reliable). |
+| Retrieval method | WebFetch of the Mentions legales URL (clause quoted above, not reported truncated), WebFetch of `robots.txt`, WebSearch cross-check. Source kind: rendered HTML (positive clause reliable; absence of an automated-access clause gate-confirmed (curl, 2026-10-03)) + robots.txt (reliable). |
 | Non-English / facts-only | **French.** Because the licence is open, verbatim French text could be kept, but a French-only description in an English-schema corpus is of low value; the practical shape is original English summary + link, generated offline (pipeline-engineer decides). Licence does not force facts-only. |
 
 #### 1A.7 JPCERT/CC (jpcert.or.jp: alerts, advisories, weekly reports)
