@@ -1,0 +1,1550 @@
+{
+ "measured_on": "2026-10-03",
+ "corpus": {
+  "file": "data/incidents.json @ e2b1c988",
+  "entries": 13361,
+  "generated": "2026-09-18",
+  "latest_cve_entry_month": "2026-07 (15 entries; 2026-06: 504)"
+ },
+ "baseline": {
+  "entries": 13361,
+  "huntr_distinct_urls": 277,
+  "huntr_com": 216,
+  "huntr_dev": 61,
+  "huntr_distinct_ids": 277,
+  "huntr_entries": 210,
+  "huntr_entries_cat": {
+   "real-world": 11,
+   "vulnerability-disclosure": 199
+  },
+  "cve_in_source_ids": 6986,
+  "cve_any": 7156,
+  "cve_by_year_src": {
+   "2000": 7,
+   "2001": 1,
+   "2002": 2,
+   "2003": 1,
+   "2004": 1,
+   "2005": 5,
+   "2006": 11,
+   "2007": 17,
+   "2008": 27,
+   "2009": 20,
+   "2010": 27,
+   "2011": 34,
+   "2012": 42,
+   "2013": 50,
+   "2014": 58,
+   "2015": 45,
+   "2016": 52,
+   "2017": 74,
+   "2018": 88,
+   "2019": 136,
+   "2020": 168,
+   "2021": 319,
+   "2022": 519,
+   "2023": 542,
+   "2024": 823,
+   "2025": 1054,
+   "2026": 2863
+  },
+  "avid_ids_in_source_ids": 109,
+  "avid_any": 110,
+  "arxiv_in_source_ids": 116,
+  "arxiv_urls_distinct": 149,
+  "ghsa_any": 7227,
+  "ref_domain_counts": {
+   "jvndb.jvn.jp": 13,
+   "jvn.jp": 22,
+   "wid.cert-bund.de": 1,
+   "www.edpb.europa.eu": 1,
+   "www.garanteprivacy.it": 2,
+   "hackerone.com": 17,
+   "arxiv.org": 154,
+   "cert.europa.eu": 1,
+   "www.blackhat.com": 1,
+   "blackhat.com": 1,
+   "autoriteitpersoonsgegevens.nl": 3,
+   "www.gov.br": 1,
+   "huntr.com": 216,
+   "huntr.dev": 54
+  },
+  "sample_cve_sourceid_ex": [
+   "CVE-2000-0062",
+   "CVE-2000-0283",
+   "CVE-2000-0483"
+  ]
+ },
+ "github_api": {
+  "avid_truncated": false,
+  "avid_blobs": 1844,
+  "avid_files_by_dir_year": {
+   "reports/2022": 5,
+   "reports/2023": 7,
+   "reports/2025": 25,
+   "reports/2026": 1713,
+   "vulnerabilities/2022": 13,
+   "vulnerabilities/2023": 27
+  },
+  "cvelist_repo": {
+   "size": 3009799,
+   "pushed_at": "2026-10-03T12:07:51Z",
+   "default_branch": "main",
+   "license": null
+  },
+  "cvelist_releases": [
+   {
+    "name": "CVE 2026-10-03_1100Z",
+    "published": "2026-10-03T11:36:43Z",
+    "assets": [
+     [
+      "2026-10-03_all_CVEs_at_midnight.zip.zip",
+      619121588
+     ],
+     [
+      "2026-10-03_delta_CVEs_at_1100Z.zip",
+      1121646
+     ],
+     [
+      "release_notes.md",
+      8606
+     ]
+    ]
+   },
+   {
+    "name": "CVE 2026-10-03_1000Z",
+    "published": "2026-10-03T10:23:27Z",
+    "assets": [
+     [
+      "2026-10-03_all_CVEs_at_midnight.zip.zip",
+      619121588
+     ],
+     [
+      "2026-10-03_delta_CVEs_at_1000Z.zip",
+      154944
+     ],
+     [
+      "release_notes.md",
+      1739
+     ]
+    ]
+   },
+   {
+    "name": "CVE 2026-10-03_0900Z",
+    "published": "2026-10-03T09:28:18Z",
+    "assets": [
+     [
+      "2026-10-03_all_CVEs_at_midnight.zip.zip",
+      619121588
+     ],
+     [
+      "2026-10-03_delta_CVEs_at_0900Z.zip",
+      153153
+     ],
+     [
+      "release_notes.md",
+      1723
+     ]
+    ]
+   }
+  ],
+  "cisa_csaf_repo": {
+   "size": 58858,
+   "pushed_at": "2026-10-02T02:40:13Z",
+   "default_branch": "develop",
+   "license": null
+  },
+  "cisa_csaf_by_year": {
+   "IT/2024": 7,
+   "IT/2025": 32,
+   "IT/2026": 60,
+   "OT/2010": 6,
+   "OT/2011": 46,
+   "OT/2012": 79,
+   "OT/2013": 80,
+   "OT/2014": 95,
+   "OT/2015": 137,
+   "OT/2016": 128,
+   "OT/2017": 187,
+   "OT/2018": 222,
+   "OT/2019": 224,
+   "OT/2020": 249,
+   "OT/2021": 388,
+   "OT/2022": 385,
+   "OT/2023": 380,
+   "OT/2024": 422,
+   "OT/2025": 506,
+   "OT/2026": 416
+  },
+  "cisa_csaf_truncated": false,
+  "cisa_csaf_paths_sample": [
+   "Gold Eagle",
+   "Gold Eagle/definitions",
+   "Gold Eagle/definitions/Ubiquity_SSVC_definition.json",
+   "Gold Eagle/schemas",
+   "Gold Eagle/schemas/ge_document_extension_1.10.0.json",
+   "Gold Eagle/schemas/ge_vulnerability_extension_1.10.0.json",
+   "README.md",
+   "csaf_files",
+   "csaf_files/IT",
+   "csaf_files/IT/white",
+   "csaf_files/OT",
+   "csaf_files/OT/white",
+   "csaf_files/VA",
+   "csaf_files/VA/white",
+   "tools"
+  ]
+ },
+ "nvd_huntr_cna": {
+  "query": "GET services.nvd.nist.gov/rest/json/cves/2.0?sourceIdentifier=security@huntr.dev (resultsPerPage=2000, 2 pages)",
+  "total": 2496,
+  "non_rejected": 2385,
+  "rejected": 111,
+  "ai_regex_non_rejected_all_years": 410,
+  "ai_regex_window_2024-01_to_2026-06": 368,
+  "ai_regex_window_in_corpus": 135,
+  "ai_regex_window_missing_cve_ids": [
+   "CVE-2024-0404",
+   "CVE-2024-0520",
+   "CVE-2024-0521",
+   "CVE-2024-0549",
+   "CVE-2024-0798",
+   "CVE-2024-0815",
+   "CVE-2024-0817",
+   "CVE-2024-0818",
+   "CVE-2024-0917",
+   "CVE-2024-0964",
+   "CVE-2024-10019",
+   "CVE-2024-10047",
+   "CVE-2024-10099",
+   "CVE-2024-10109",
+   "CVE-2024-10131",
+   "CVE-2024-10359",
+   "CVE-2024-10361",
+   "CVE-2024-10363",
+   "CVE-2024-10366",
+   "CVE-2024-10457",
+   "CVE-2024-10513",
+   "CVE-2024-10549",
+   "CVE-2024-10550",
+   "CVE-2024-10553",
+   "CVE-2024-10569",
+   "CVE-2024-10572",
+   "CVE-2024-10624",
+   "CVE-2024-10648",
+   "CVE-2024-10834",
+   "CVE-2024-11041",
+   "CVE-2024-11167",
+   "CVE-2024-11169",
+   "CVE-2024-11170",
+   "CVE-2024-11171",
+   "CVE-2024-11172",
+   "CVE-2024-11302",
+   "CVE-2024-11821",
+   "CVE-2024-11822",
+   "CVE-2024-11824",
+   "CVE-2024-1183",
+   "CVE-2024-11850",
+   "CVE-2024-12039",
+   "CVE-2024-12055",
+   "CVE-2024-12217",
+   "CVE-2024-12433",
+   "CVE-2024-12450",
+   "CVE-2024-12580",
+   "CVE-2024-12766",
+   "CVE-2024-12776",
+   "CVE-2024-12779",
+   "CVE-2024-12869",
+   "CVE-2024-12870",
+   "CVE-2024-12871",
+   "CVE-2024-12880",
+   "CVE-2024-12882",
+   "CVE-2024-12886",
+   "CVE-2024-13059",
+   "CVE-2024-1456",
+   "CVE-2024-1483",
+   "CVE-2024-1511",
+   "CVE-2024-1520",
+   "CVE-2024-1522",
+   "CVE-2024-1558",
+   "CVE-2024-1560",
+   "CVE-2024-1561",
+   "CVE-2024-1569",
+   "CVE-2024-1593",
+   "CVE-2024-1594",
+   "CVE-2024-1600",
+   "CVE-2024-1601",
+   "CVE-2024-1603",
+   "CVE-2024-1646",
+   "CVE-2024-1727",
+   "CVE-2024-1728",
+   "CVE-2024-1729",
+   "CVE-2024-1873",
+   "CVE-2024-2178",
+   "CVE-2024-2206",
+   "CVE-2024-2288",
+   "CVE-2024-2299",
+   "CVE-2024-2356",
+   "CVE-2024-2358",
+   "CVE-2024-2359",
+   "CVE-2024-2360",
+   "CVE-2024-2361",
+   "CVE-2024-2362",
+   "CVE-2024-2366",
+   "CVE-2024-2548",
+   "CVE-2024-2624",
+   "CVE-2024-2912",
+   "CVE-2024-2913",
+   "CVE-2024-2928",
+   "CVE-2024-3025",
+   "CVE-2024-3028",
+   "CVE-2024-3029",
+   "CVE-2024-3099",
+   "CVE-2024-3101",
+   "CVE-2024-3102",
+   "CVE-2024-3110",
+   "CVE-2024-3126",
+   "CVE-2024-3149",
+   "CVE-2024-3150",
+   "CVE-2024-3152",
+   "CVE-2024-3153",
+   "CVE-2024-3166",
+   "CVE-2024-3279",
+   "CVE-2024-3283",
+   "CVE-2024-3322",
+   "CVE-2024-3435",
+   "CVE-2024-3569",
+   "CVE-2024-3573",
+   "CVE-2024-3848",
+   "CVE-2024-4084",
+   "CVE-2024-4263",
+   "CVE-2024-4267",
+   "CVE-2024-4284",
+   "CVE-2024-4286",
+   "CVE-2024-4287",
+   "CVE-2024-4320",
+   "CVE-2024-4322",
+   "CVE-2024-4325",
+   "CVE-2024-4326",
+   "CVE-2024-4328",
+   "CVE-2024-4403",
+   "CVE-2024-4498",
+   "CVE-2024-4499",
+   "CVE-2024-4841",
+   "CVE-2024-4940",
+   "CVE-2024-4941",
+   "CVE-2024-5125",
+   "CVE-2024-5187",
+   "CVE-2024-5208",
+   "CVE-2024-5211",
+   "CVE-2024-5213",
+   "CVE-2024-5216",
+   "CVE-2024-5482",
+   "CVE-2024-5550",
+   "CVE-2024-5933",
+   "CVE-2024-5979",
+   "CVE-2024-5986",
+   "CVE-2024-6040",
+   "CVE-2024-6250",
+   "CVE-2024-6394",
+   "CVE-2024-6587",
+   "CVE-2024-6674",
+   "CVE-2024-6838",
+   "CVE-2024-6842",
+   "CVE-2024-6854",
+   "CVE-2024-6863",
+   "CVE-2024-6959",
+   "CVE-2024-6986",
+   "CVE-2024-7048",
+   "CVE-2024-7058",
+   "CVE-2024-7765",
+   "CVE-2024-7768",
+   "CVE-2024-7771",
+   "CVE-2024-7776",
+   "CVE-2024-7783",
+   "CVE-2024-8017",
+   "CVE-2024-8021",
+   "CVE-2024-8062",
+   "CVE-2024-8063",
+   "CVE-2024-8156",
+   "CVE-2024-8196",
+   "CVE-2024-8248",
+   "CVE-2024-8249",
+   "CVE-2024-8251",
+   "CVE-2024-8581",
+   "CVE-2024-8616",
+   "CVE-2024-8736",
+   "CVE-2024-8859",
+   "CVE-2024-8898",
+   "CVE-2024-8966",
+   "CVE-2024-9053",
+   "CVE-2024-9056",
+   "CVE-2024-9070",
+   "CVE-2024-9597",
+   "CVE-2024-9919",
+   "CVE-2024-9920",
+   "CVE-2025-0184",
+   "CVE-2025-0312",
+   "CVE-2025-0315",
+   "CVE-2025-0317",
+   "CVE-2025-0453",
+   "CVE-2025-0454",
+   "CVE-2025-10279",
+   "CVE-2025-11750",
+   "CVE-2025-12638",
+   "CVE-2025-14279",
+   "CVE-2025-14287",
+   "CVE-2025-1451",
+   "CVE-2025-1473",
+   "CVE-2025-1474",
+   "CVE-2025-15031",
+   "CVE-2025-15036",
+   "CVE-2025-15379",
+   "CVE-2025-15381",
+   "CVE-2025-1750",
+   "CVE-2025-1796",
+   "CVE-2025-1975",
+   "CVE-2025-3467",
+   "CVE-2025-5662",
+   "CVE-2025-6088",
+   "CVE-2025-6507",
+   "CVE-2025-6544",
+   "CVE-2025-7104",
+   "CVE-2025-7105",
+   "CVE-2025-7106",
+   "CVE-2025-8848",
+   "CVE-2025-8850",
+   "CVE-2026-0545",
+   "CVE-2026-0558",
+   "CVE-2026-0560",
+   "CVE-2026-0562",
+   "CVE-2026-0596",
+   "CVE-2026-0847",
+   "CVE-2026-1114",
+   "CVE-2026-1116",
+   "CVE-2026-11816",
+   "CVE-2026-12479",
+   "CVE-2026-1462",
+   "CVE-2026-2393",
+   "CVE-2026-2611",
+   "CVE-2026-2614",
+   "CVE-2026-2651",
+   "CVE-2026-2652",
+   "CVE-2026-2734",
+   "CVE-2026-3960",
+   "CVE-2026-4035",
+   "CVE-2026-4137",
+   "CVE-2026-5241",
+   "CVE-2026-5497",
+   "CVE-2026-5627"
+  ],
+  "rejected_cves_held_active_in_corpus": [
+   "CVE-2024-12534",
+   "CVE-2024-12537",
+   "CVE-2024-4460",
+   "CVE-2024-4642",
+   "CVE-2024-7033",
+   "CVE-2024-7034",
+   "CVE-2024-7036",
+   "CVE-2024-7037",
+   "CVE-2024-7038",
+   "CVE-2024-7039",
+   "CVE-2024-7045",
+   "CVE-2024-7046",
+   "CVE-2024-7053",
+   "CVE-2024-7804",
+   "CVE-2024-7806",
+   "CVE-2024-7959",
+   "CVE-2024-7990",
+   "CVE-2024-8060"
+  ],
+  "by_pub_year_ai_regex": {
+   "2023": 28,
+   "2024": 154,
+   "2025": 172,
+   "2026": 53
+  }
+ },
+ "euvd": {
+  "queries": {
+   "large language model": [
+    199,
+    199
+   ],
+   "LLM": [
+    479,
+    479
+   ],
+   "machine learning": [
+    472,
+    472
+   ],
+   "artificial intelligence": [
+    176,
+    176
+   ],
+   "prompt injection": [
+    203,
+    203
+   ],
+   "langchain": [
+    95,
+    95
+   ],
+   "model context protocol": [
+    149,
+    149
+   ],
+   "MCP server": [
+    584,
+    584
+   ],
+   "pytorch": [
+    84,
+    84
+   ],
+   "tensorflow": [
+    444,
+    444
+   ],
+   "hugging face": [
+    47,
+    47
+   ],
+   "AI agent": [
+    32,
+    32
+   ],
+   "vector database": [
+    872,
+    872
+   ],
+   "mlflow": [
+    87,
+    87
+   ],
+   "ollama": [
+    47,
+    47
+   ],
+   "llama": [
+    93,
+    93
+   ],
+   "vllm": [
+    104,
+    104
+   ],
+   "neural network": [
+    12,
+    12
+   ],
+   "deep learning": [
+    9,
+    9
+   ],
+   "onnx": [
+    24,
+    24
+   ],
+   "gradio": [
+    72,
+    72
+   ],
+   "jupyter": [
+    114,
+    114
+   ],
+   "openai": [
+    174,
+    174
+   ],
+   "chatbot": [
+    260,
+    260
+   ],
+   "generative ai": [
+    0,
+    0
+   ],
+   "transformers": [
+    53,
+    53
+   ]
+  },
+  "distinct_items": 3873,
+  "items_without_cve_alias": 0,
+  "ai_regex_items": 2268,
+  "window_2024-01_to_2026-06": {
+   "ai_regex": 1213,
+   "cve_in_corpus": 911,
+   "cve_not_in_corpus": 302,
+   "not_in_corpus_cve_ids": [
+    "CVE-2024-0404",
+    "CVE-2024-0520",
+    "CVE-2024-0549",
+    "CVE-2024-0798",
+    "CVE-2024-0964",
+    "CVE-2024-10109",
+    "CVE-2024-10131",
+    "CVE-2024-10513",
+    "CVE-2024-10569",
+    "CVE-2024-10624",
+    "CVE-2024-10648",
+    "CVE-2024-11041",
+    "CVE-2024-11821",
+    "CVE-2024-1183",
+    "CVE-2024-11850",
+    "CVE-2024-12055",
+    "CVE-2024-12217",
+    "CVE-2024-12779",
+    "CVE-2024-12886",
+    "CVE-2024-13059",
+    "CVE-2024-1483",
+    "CVE-2024-1558",
+    "CVE-2024-1560",
+    "CVE-2024-1561",
+    "CVE-2024-1593",
+    "CVE-2024-1594",
+    "CVE-2024-1727",
+    "CVE-2024-1728",
+    "CVE-2024-1729",
+    "CVE-2024-2057",
+    "CVE-2024-2206",
+    "CVE-2024-2360",
+    "CVE-2024-24759",
+    "CVE-2024-27132",
+    "CVE-2024-27133",
+    "CVE-2024-27134",
+    "CVE-2024-27318",
+    "CVE-2024-27319",
+    "CVE-2024-28224",
+    "CVE-2024-2913",
+    "CVE-2024-2928",
+    "CVE-2024-3025",
+    "CVE-2024-3028",
+    "CVE-2024-3029",
+    "CVE-2024-3099",
+    "CVE-2024-3101",
+    "CVE-2024-3102",
+    "CVE-2024-3110",
+    "CVE-2024-3149",
+    "CVE-2024-3150",
+    "CVE-2024-3152",
+    "CVE-2024-3153",
+    "CVE-2024-31580",
+    "CVE-2024-31583",
+    "CVE-2024-3166",
+    "CVE-2024-3279",
+    "CVE-2024-3283",
+    "CVE-2024-34510",
+    "CVE-2024-3569",
+    "CVE-2024-3573",
+    "CVE-2024-37032",
+    "CVE-2024-37052",
+    "CVE-2024-37053",
+    "CVE-2024-37054",
+    "CVE-2024-37055",
+    "CVE-2024-37056",
+    "CVE-2024-37057",
+    "CVE-2024-37058",
+    "CVE-2024-37059",
+    "CVE-2024-37060",
+    "CVE-2024-37061",
+    "CVE-2024-3848",
+    "CVE-2024-39719",
+    "CVE-2024-39720",
+    "CVE-2024-39721",
+    "CVE-2024-39722",
+    "CVE-2024-4084",
+    "CVE-2024-4263",
+    "CVE-2024-4284",
+    "CVE-2024-4286",
+    "CVE-2024-4287",
+    "CVE-2024-4325",
+    "CVE-2024-45436",
+    "CVE-2024-47084",
+    "CVE-2024-47164",
+    "CVE-2024-47165",
+    "CVE-2024-47166",
+    "CVE-2024-47167",
+    "CVE-2024-47168",
+    "CVE-2024-47867",
+    "CVE-2024-47868",
+    "CVE-2024-47869",
+    "CVE-2024-47870",
+    "CVE-2024-47871",
+    "CVE-2024-47872",
+    "CVE-2024-48052",
+    "CVE-2024-4940",
+    "CVE-2024-4941",
+    "CVE-2024-51751",
+    "CVE-2024-5187",
+    "CVE-2024-5208",
+    "CVE-2024-5211",
+    "CVE-2024-5213",
+    "CVE-2024-5216",
+    "CVE-2024-6587",
+    "CVE-2024-6838",
+    "CVE-2024-6842",
+    "CVE-2024-7771",
+    "CVE-2024-7776",
+    "CVE-2024-7783",
+    "CVE-2024-8021",
+    "CVE-2024-8063",
+    "CVE-2024-8196",
+    "CVE-2024-8248",
+    "CVE-2024-8249",
+    "CVE-2024-8251",
+    "CVE-2024-8768",
+    "CVE-2024-8859",
+    "CVE-2024-8939",
+    "CVE-2024-8966",
+    "CVE-2024-9053",
+    "CVE-2025-0312",
+    "CVE-2025-0315",
+    "CVE-2025-0317",
+    "CVE-2025-0453",
+    "CVE-2025-10279",
+    "CVE-2025-10619",
+    "CVE-2025-11200",
+    "CVE-2025-11201",
+    "CVE-2025-11489",
+    "CVE-2025-12343",
+    "CVE-2025-12345",
+    "CVE-2025-13981",
+    "CVE-2025-14279",
+    "CVE-2025-14287",
+    "CVE-2025-1473",
+    "CVE-2025-1474",
+    "CVE-2025-15031",
+    "CVE-2025-15036",
+    "CVE-2025-15379",
+    "CVE-2025-15381",
+    "CVE-2025-1750",
+    "CVE-2025-1953",
+    "CVE-2025-1975",
+    "CVE-2025-2148",
+    "CVE-2025-2149",
+    "CVE-2025-23042",
+    "CVE-2025-2320",
+    "CVE-2025-2321",
+    "CVE-2025-2322",
+    "CVE-2025-2323",
+    "CVE-2025-2334",
+    "CVE-2025-23968",
+    "CVE-2025-24357",
+    "CVE-2025-27496",
+    "CVE-2025-2953",
+    "CVE-2025-29770",
+    "CVE-2025-2998",
+    "CVE-2025-2999",
+    "CVE-2025-3000",
+    "CVE-2025-3001",
+    "CVE-2025-30165",
+    "CVE-2025-3121",
+    "CVE-2025-3136",
+    "CVE-2025-32381",
+    "CVE-2025-32434",
+    "CVE-2025-33204",
+    "CVE-2025-33244",
+    "CVE-2025-33255",
+    "CVE-2025-3730",
+    "CVE-2025-4287",
+    "CVE-2025-44779",
+    "CVE-2025-45146",
+    "CVE-2025-46560",
+    "CVE-2025-48887",
+    "CVE-2025-48889",
+    "CVE-2025-48942",
+    "CVE-2025-48943",
+    "CVE-2025-48944",
+    "CVE-2025-48956",
+    "CVE-2025-49150",
+    "CVE-2025-51471",
+    "CVE-2025-51480",
+    "CVE-2025-52967",
+    "CVE-2025-53097",
+    "CVE-2025-53098",
+    "CVE-2025-5320",
+    "CVE-2025-54130",
+    "CVE-2025-58372",
+    "CVE-2025-58768",
+    "CVE-2025-59053",
+    "CVE-2025-59146",
+    "CVE-2025-59425",
+    "CVE-2025-59426",
+    "CVE-2025-60511",
+    "CVE-2025-61260",
+    "CVE-2025-62155",
+    "CVE-2025-62164",
+    "CVE-2025-62372",
+    "CVE-2025-6242",
+    "CVE-2025-62426",
+    "CVE-2025-63389",
+    "CVE-2025-63396",
+    "CVE-2025-6518",
+    "CVE-2025-66448",
+    "CVE-2025-67744",
+    "CVE-2025-68472",
+    "CVE-2025-6853",
+    "CVE-2025-6854",
+    "CVE-2025-6855",
+    "CVE-2025-69196",
+    "CVE-2025-71379",
+    "CVE-2025-8665",
+    "CVE-2026-0545",
+    "CVE-2026-0596",
+    "CVE-2026-0847",
+    "CVE-2026-10783",
+    "CVE-2026-10803",
+    "CVE-2026-10813",
+    "CVE-2026-11816",
+    "CVE-2026-12112",
+    "CVE-2026-12491",
+    "CVE-2026-13484",
+    "CVE-2026-1462",
+    "CVE-2026-2033",
+    "CVE-2026-22778",
+    "CVE-2026-22807",
+    "CVE-2026-2393",
+    "CVE-2026-24141",
+    "CVE-2026-24142",
+    "CVE-2026-24160",
+    "CVE-2026-24163",
+    "CVE-2026-24747",
+    "CVE-2026-24779",
+    "CVE-2026-2492",
+    "CVE-2026-2555",
+    "CVE-2026-25591",
+    "CVE-2026-25960",
+    "CVE-2026-2611",
+    "CVE-2026-2614",
+    "CVE-2026-2635",
+    "CVE-2026-2651",
+    "CVE-2026-2652",
+    "CVE-2026-27167",
+    "CVE-2026-2734",
+    "CVE-2026-27489",
+    "CVE-2026-27893",
+    "CVE-2026-27941",
+    "CVE-2026-28400",
+    "CVE-2026-28414",
+    "CVE-2026-28415",
+    "CVE-2026-28416",
+    "CVE-2026-28444",
+    "CVE-2026-28500",
+    "CVE-2026-30741",
+    "CVE-2026-31228",
+    "CVE-2026-31236",
+    "CVE-2026-32879",
+    "CVE-2026-34445",
+    "CVE-2026-34446",
+    "CVE-2026-34447",
+    "CVE-2026-34753",
+    "CVE-2026-34755",
+    "CVE-2026-34756",
+    "CVE-2026-35029",
+    "CVE-2026-35030",
+    "CVE-2026-3573",
+    "CVE-2026-3962",
+    "CVE-2026-4035",
+    "CVE-2026-4137",
+    "CVE-2026-41481",
+    "CVE-2026-41523",
+    "CVE-2026-42027",
+    "CVE-2026-42203",
+    "CVE-2026-42208",
+    "CVE-2026-42271",
+    "CVE-2026-43900",
+    "CVE-2026-44209",
+    "CVE-2026-44222",
+    "CVE-2026-44223",
+    "CVE-2026-44484",
+    "CVE-2026-4530",
+    "CVE-2026-4538",
+    "CVE-2026-47155",
+    "CVE-2026-48545",
+    "CVE-2026-48746",
+    "CVE-2026-49468",
+    "CVE-2026-5125",
+    "CVE-2026-5241",
+    "CVE-2026-53923",
+    "CVE-2026-54233",
+    "CVE-2026-54235",
+    "CVE-2026-54236",
+    "CVE-2026-5497",
+    "CVE-2026-5627",
+    "CVE-2026-56340",
+    "CVE-2026-6494",
+    "CVE-2026-7020",
+    "CVE-2026-7021",
+    "CVE-2026-7482",
+    "CVE-2026-8335",
+    "CVE-2026-9540"
+   ]
+  },
+  "published_2026-07_onward": {
+   "ai_regex": 537,
+   "cve_in_corpus": 22
+  },
+  "updated_gt30d_after_publish_share_pre_2026-04": 0.583,
+  "fields": "id,enisaUuid,description,datePublished,dateUpdated,baseScore,baseScoreVersion,baseScoreVector,references,aliases,assigner,epss,exploitedSince(5/3873),enisaIdProduct,enisaIdVendor"
+ },
+ "avid_sample_2026_reports": [
+  [
+   "AVID-2026-R0928",
+   "CVE Entry",
+   [
+    "CVE-2021-44832"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1148",
+   "CVE Entry",
+   [
+    "CVE-2022-41898"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1601",
+   "CVE Entry",
+   [
+    "CVE-2024-7714"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0955",
+   "CVE Entry",
+   [
+    "CVE-2022-21741"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0927",
+   "CVE Entry",
+   [
+    "CVE-2021-44228"
+   ],
+   false,
+   true
+  ],
+  [
+   "AVID-2026-R1042",
+   "CVE Entry",
+   [
+    "CVE-2022-31188"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1204",
+   "CVE Entry",
+   [
+    "CVE-2023-25672"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0390",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0380",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1648",
+   "CVE Entry",
+   [
+    "CVE-2025-0744"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1050",
+   "CVE Entry",
+   [
+    "CVE-2022-33891"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0976",
+   "CVE Entry",
+   [
+    "CVE-2022-23574"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1291",
+   "CVE Entry",
+   [
+    "CVE-2023-48022"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1259",
+   "CVE Entry",
+   [
+    "CVE-2023-38669"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1626",
+   "CVE Entry",
+   [
+    "CVE-2024-8859"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0383",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0193",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0916",
+   "CVE Entry",
+   [
+    "CVE-2021-41226"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0623",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0292",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0186",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1105",
+   "CVE Entry",
+   [
+    "CVE-2022-36011"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1660",
+   "CVE Entry",
+   [
+    "CVE-2025-23045"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1422",
+   "CVE Entry",
+   [
+    "CVE-2024-2206"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1301",
+   "CVE Entry",
+   [
+    "CVE-2023-50731"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0086",
+   "Third-party Report",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1221",
+   "CVE Entry",
+   [
+    "CVE-2023-27291"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0813",
+   "CVE Entry",
+   [
+    "CVE-2021-32635"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0929",
+   "CVE Entry",
+   [
+    "CVE-2021-45074"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1341",
+   "CVE Entry",
+   [
+    "CVE-2024-0087"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1515",
+   "CVE Entry",
+   [
+    "CVE-2024-41130"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1262",
+   "CVE Entry",
+   [
+    "CVE-2023-38674"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1333",
+   "CVE Entry",
+   [
+    "CVE-2023-6831"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0324",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R1278",
+   "CVE Entry",
+   [
+    "CVE-2023-41626"
+   ],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0031",
+   "CVE Entry",
+   [
+    "CVE-2024-6842"
+   ],
+   false,
+   true
+  ],
+  [
+   "AVID-2026-R1705",
+   "CVE Entry",
+   [
+    "CVE-2025-46567"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R1084",
+   "CVE Entry",
+   [
+    "CVE-2022-35983"
+   ],
+   true,
+   true
+  ],
+  [
+   "AVID-2026-R0130",
+   "LLM Evaluation",
+   [],
+   false,
+   false
+  ],
+  [
+   "AVID-2026-R0122",
+   "Third-party Report",
+   [],
+   false,
+   false
+  ]
+ ],
+ "arxiv_oai_weekly_samples": {
+  "2023-06": {
+   "week": [
+    "2023-06-05",
+    "2023-06-11"
+   ],
+   "records_modified_in_week": 114,
+   "records_created_same_month": 105,
+   "pages": 1,
+   "ai": 43,
+   "ai_attack": 26,
+   "ai_titles": [
+    "Subject Membership Inference Attacks in Federated Learning",
+    "A Note On Interpreting Canary Exposure",
+    "Covert Communication Based on the Poisoning Attack in Federated Learning"
+   ]
+  },
+  "2024-06": {
+   "week": [
+    "2024-06-03",
+    "2024-06-09"
+   ],
+   "records_modified_in_week": 169,
+   "records_created_same_month": 133,
+   "pages": 1,
+   "ai": 68,
+   "ai_attack": 33,
+   "ai_titles": [
+    "Degree-Preserving Randomized Response for Graph Neural Networks under Local Diff",
+    "Agent Smith: A Single Image Can Jailbreak One Million Multimodal LLM Agents Expo",
+    "Acquiring Clean Language Models from Backdoor Poisoned Datasets by Downscaling F"
+   ]
+  },
+  "2025-06": {
+   "week": [
+    "2025-06-02",
+    "2025-06-08"
+   ],
+   "records_modified_in_week": 203,
+   "records_created_same_month": 107,
+   "pages": 1,
+   "ai": 66,
+   "ai_attack": 37,
+   "ai_titles": [
+    "Sharpness-Aware Data Poisoning Attack",
+    "Data Poisoning for In-context Learning",
+    "Certified Robustness to Clean-Label Poisoning Using Diffusion Denoising"
+   ]
+  },
+  "2026-06": {
+   "week": [
+    "2026-06-01",
+    "2026-06-07"
+   ],
+   "records_modified_in_week": 456,
+   "records_created_same_month": 190,
+   "pages": 1,
+   "ai": 116,
+   "ai_attack": 59,
+   "ai_titles": [
+    "A Unified Framework for Adversary-Aware Differential Privacy Bounds",
+    "Benign Inputs, Harmful Outputs: Cross-Modal Jailbreaking via Distributed Semanti",
+    "Jailbreak Attack Initializations as Extractors of Compliance Directions"
+   ]
+  }
+ },
+ "jvn_myjvn_hnd_by_datePublic_year": {
+  "hnd|": {
+   "2023": 198,
+   "2024": 207,
+   "2025": 179
+  },
+  "hnd|LLM": {
+   "2023": 0,
+   "2024": 0,
+   "2025": 0
+  },
+  "hnd|machine learning": {
+   "2023": 0,
+   "2024": 5,
+   "2025": 4
+  },
+  "hnd|TensorFlow": {
+   "2023": 0,
+   "2024": 0,
+   "2025": 0
+  },
+  "hnd|PyTorch": {
+   "2023": 0,
+   "2024": 0,
+   "2025": 0
+  },
+  "hnd|artificial intelligence": {
+   "2023": 2,
+   "2024": 0,
+   "2025": 0
+  },
+  "hnd|AI": {
+   "2023": 0,
+   "2024": 0,
+   "2025": 2
+  },
+  "sec|": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|LLM": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|machine learning": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|TensorFlow": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|PyTorch": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|artificial intelligence": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  },
+  "sec|AI": {
+   "2023": "noparse",
+   "2024": "noparse",
+   "2025": "noparse"
+  }
+ },
+ "feeds": {
+  "ncsc": {
+   "bytes": 11631,
+   "items": 20,
+   "ai_title_hits": 3,
+   "ai_titles": [
+    "The hidden risks of shadow AI",
+    "Managing the cyber risk of agentic AI",
+    "NCSC statement in response to recent incidents resulting from frontier AI evaluations"
+   ],
+   "first_date": [
+    "Mon, 28 Sep 2026 12:00:00 +0000"
+   ],
+   "last_date": [
+    "Thu, 09 Jul 2026 12:00:00 +0000"
+   ]
+  },
+  "cccs": {
+   "bytes": 143555,
+   "items": 50,
+   "ai_title_hits": 0,
+   "ai_titles": [],
+   "first_date": [
+    "2026-10-02T18:01:09Z"
+   ],
+   "last_date": [
+    "2026-09-23T15:13:27Z"
+   ]
+  },
+  "anssi_avis": {
+   "bytes": 23480,
+   "items": 40,
+   "ai_title_hits": 0,
+   "ai_titles": [],
+   "first_date": [
+    "Tue, 10 Sep 2019 00:00:00 +0000"
+   ],
+   "last_date": [
+    "Fri, 02 Oct 2026 00:00:00 +0000"
+   ]
+  },
+  "anssi_alerte": {
+   "bytes": 25950,
+   "items": 40,
+   "ai_title_hits": 0,
+   "ai_titles": [],
+   "first_date": [
+    "Fri, 24 Jul 2015 00:00:00 +0000"
+   ],
+   "last_date": [
+    "Mon, 28 Sep 2026 00:00:00 +0000"
+   ]
+  },
+  "jpcert_en": {
+   "err": "HTTP 404"
+  },
+  "jvn_en": {
+   "bytes": 16106,
+   "items": 20,
+   "ai_title_hits": 0,
+   "ai_titles": [],
+   "first_date": [
+    "2026-09-30T12:30:00+09:00"
+   ],
+   "last_date": [
+    "2026-09-09T14:00:00+09:00"
+   ]
+  },
+  "wid": {
+   "bytes": 134177,
+   "items": 250,
+   "ai_title_hits": 2,
+   "ai_titles": [
+    "[UPDATE] [mittel] Red Hat Enterprise Linux AI (libaom): Mehrere Schwachstellen",
+    "[UPDATE] [mittel] Red Hat OpenShift und OpenShift AI (urllib3): Schwachstelle ermöglicht Denial of Service"
+   ],
+   "first_date": [
+    "Fri, 02 Oct 2026 11:26:29 GMT"
+   ],
+   "last_date": [
+    "Thu, 01 Oct 2026 10:07:21 GMT"
+   ]
+  },
+  "certeu": {
+   "bytes": 9372,
+   "items": 10,
+   "ai_title_hits": 0,
+   "ai_titles": [],
+   "first_date": [
+    "Sun, 27 Sep 2026 19:40:52 CEST"
+   ],
+   "last_date": [
+    "Thu, 30 Apr 2026 11:25:30 CEST"
+   ]
+  },
+  "cisa_all": {
+   "err": "HTTP 403"
+  }
+ },
+ "wid_csaf_white_index": {
+  "url": "https://wid.cert-bund.de/.well-known/csaf/white/index.txt",
+  "advisories_total": 13874,
+  "by_id_year": {
+   "2022": 1208,
+   "2023": 3055,
+   "2024": 2953,
+   "2025": 2940,
+   "2026_to_oct": 3718
+  }
+ },
+ "edpb_register": {
+  "unfiltered_last_page_index": 143,
+  "per_page": 11,
+  "filtered_topic_552_AI_and_technology_last_page_index": 4
+ },
+ "sitemaps": {
+  "enisa_urls": 2946,
+  "enisa_publications": 594,
+  "enisa_ai_slug": 11,
+  "ncsc_urls": 2638,
+  "ncsc_ai_slug": 70
+ },
+ "common_py_robots_gate_results": {
+  "refused_explicit_disallow": [
+   "export.arxiv.org (User-agent * Disallow: /)",
+   "www.cert.ssi.gouv.fr/fiche/",
+   "autoriteitpersoonsgegevens.nl/documenten (stdlib robotparser is first-match-in-file-order, not RFC 9309 longest-match; page lists Allow /documenten/* and Disallow /documenten)",
+   "static.data.gouv.fr/resources/ (Disallow: /resources; CNIL open-data CSV host)"
+  ],
+  "refused_unverifiable_fail_closed": [
+   "www.cyber.gov.au (read timed out)",
+   "defcon.org and media.defcon.org (connection closed)"
+  ],
+  "allowed_but_content_403": [
+   "www.cisa.gov (robots 403 -> allowlisted; /cybersecurity-advisories/all.xml, /ics-advisories.xml, /news.xml all HTTP 403 to project UA)"
+  ],
+  "allowed": [
+   "oaipmh.arxiv.org",
+   "rss.arxiv.org",
+   "services.nvd.nist.gov",
+   "api.github.com",
+   "raw.githubusercontent.com",
+   "github.com release assets",
+   "objects.githubusercontent.com",
+   "euvdservices.enisa.europa.eu",
+   "www.ncsc.gov.uk",
+   "www.cyber.gc.ca",
+   "www.cert.ssi.gouv.fr (avis, alerte)",
+   "jvndb.jvn.jp",
+   "jvn.jp",
+   "wid.cert-bund.de",
+   "cert.europa.eu",
+   "ico.org.uk",
+   "www.edpb.europa.eu",
+   "www.cnil.fr",
+   "www.garanteprivacy.it",
+   "www.gov.br",
+   "www.priv.gc.ca",
+   "hackerone.com",
+   "huntr.com",
+   "www.blackhat.com",
+   "aivillage.org"
+  ],
+  "crawl_delay_parsed_by_common_py": false
+ },
+ "huntr_com_probe": {
+  "sitemap.xml": 404,
+  "bounties": 404,
+  "bounty_page_GET": "200, 75,276 B, generic <title>, 0 occurrences of CVE-/CWE/Severity/Disclosed/Repository/cvss"
+ },
+ "ico_register_probe": "HTML 49,963 B; results container shows \"Loading...\"; 0 result links in static HTML",
+ "cnil_open_data": {
+  "dataset": "Sanctions prononcees par la CNIL",
+  "license": "fr-lo",
+  "dataset_last_modified": "2025-05-05",
+  "sanctions_csv_last_modified": "2024-10-01",
+  "csv_fetch": "refused by common.py robots (static.data.gouv.fr Disallow: /resources)"
+ }
+}
