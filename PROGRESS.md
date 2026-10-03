@@ -43,6 +43,10 @@
   - **The committed `ingest/cve_nvd_expanded.json` carries 2 `MAL-` records with verbatim Apache-2.0 OpenSSF text under a CC BY claim**: MAL-2026-3607 and MAL-2026-2144. The repo itself is a distribution channel.
   - The published `data/incidents.json` carries no MAL text today. INC-08450's description comes from GHSA.
   - **The fix rides the wave-1/2 licence PR:** correct row 2.4 in place, as a live surface, and either filter `MAL-` in the OSV ingest or attribute those records per record as Apache-2.0.
+- **Tranche-1 gate-1 fixes applied, `6608869a`.** Foreman-verified: 10 gate phrases present. Then **⛔ BOUNCE #2 (string re-check, 2026-10-03), escalated.**
+  - **What passed:** no score, action letter or quote is wrong. The 23 applied quotes match the gate's raw captures.
+  - **What failed:** leftover first-pass text contradicts the corrections, and statuses still say "pending". The verdict is in `docs/audits/source-expansion-tranche1-gate2-verdict-2026-10-03.md`, saved as received.
+- **⚖ D41, USER RULING 2026-10-03:** apply the gate's text verbatim, then a narrow string check (the D39 pattern). The fixes went to license-auditor.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
