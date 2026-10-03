@@ -470,6 +470,29 @@ kind of pacing/identification discipline as `ingest/common.py`) is a
 design decision for a future task, flagged here, not decided or
 implemented in this one.
 
+### 3. `git clone` of `avidml/avid-db` and `CVEProject/cvelistV5` (PENDING, conditional; added 2026-10-03)
+
+**Status: PENDING and conditional.** Source-expansion waves 1 (AVID,
+cvelistV5; `docs/SOURCE_LICENSES.md` sections 6.1 and 6.2) are not yet
+implemented. The evaluation (`docs/specs/source-expansion-evaluation.md`,
+AVID Shape) recommends the `git` route or the repo tarball for the AVID
+backlog (about 1,790 files; one raw fetch per file at the 3 s floor is
+about 85 minutes). A tarball or release-asset download is HTTP and goes
+through `ingest/common.py`, needing **no entry here**. A `git clone` is
+non-HTTP egress and **requires this entry to be completed in the same PR
+that introduces it** (invariants 5 and 10).
+
+- **What:** `git clone --depth 1` (or fetch) of the two public GitHub
+  repositories named above. Owner: pipeline-engineer.
+- **Conduct properties to be stated by the implementing PR (not stated
+  here because none exist yet):** identification (git's own client string;
+  whether a project contact is sent), pacing (one clone per run, no
+  loop), robots equivalent (GitHub-hosted, none applies, as for entry 1),
+  and the fail-closed behaviour on clone error.
+- **If the implementing PR uses the tarball/release-asset route instead,
+  delete nothing: replace this entry's status line with "not used,
+  HTTP route taken" so the decision is on record.**
+
 ### Scoping note: excluded from this register
 
 `scripts/persist_refresh_state.sh:66`'s own `git clone` (invoked from

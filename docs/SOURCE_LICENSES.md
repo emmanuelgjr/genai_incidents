@@ -194,11 +194,11 @@ against the `OSV_TARGETS` list of PyPI, npm, and Go-ecosystem packages).
 
 | Field | Value |
 |---|---|
-| License | OSV.dev is an **aggregator**; the *code* (`google/osv.dev` repo, fetched 2026-07-15) is Apache-2.0, but individual **records carry their originating database's license**, per `google.github.io/osv.dev/data/` (fetched 2026-07-15): PyPI Advisory Database = **CC-BY 4.0**, GitHub Advisory Database = **CC-BY 4.0**, Go Vulnerability Database = **CC-BY 4.0** (confirmed separately at `vuln.go.dev/copyright`, fetched 2026-07-15: *"licensed under the Creative Commons Attribution 4.0 License"*). Given `OSV_TARGETS` only queries PyPI/npm/Go ecosystems, every source database actually reachable by this script is CC-BY 4.0. |
+| License | OSV.dev is an **aggregator**; the *code* (`google/osv.dev` repo, fetched 2026-07-15) is Apache-2.0, but individual **records carry their originating database's license**, per `google.github.io/osv.dev/data/` (fetched 2026-07-15): PyPI Advisory Database = **CC-BY 4.0**, GitHub Advisory Database = **CC-BY 4.0**, Go Vulnerability Database = **CC-BY 4.0** (confirmed separately at `vuln.go.dev/copyright`, fetched 2026-07-15: *"licensed under the Creative Commons Attribution 4.0 License"*). **OSV aggregates databases under different licences, and not all are CC-BY 4.0.** The same data page lists "OpenSSF Malicious Packages (Apache 2.0)" beside "GitHub Advisory Database (CC-BY 4.0)", and the `ossf/malicious-packages` repo licence is Apache-2.0 (GitHub API). Its records carry `MAL-` ids; both committed examples are PyPI packages (MAL-2026-3607, guardrails-ai; MAL-2026-2144, litellm). **Handling: `MAL-` records are excluded from ingest by a pipeline filter** (being implemented by pipeline-engineer on the ingest branch); no Apache-2.0 notice is added because no MAL content is kept. Of the other databases reachable via `OSV_TARGETS`, PyPI, GitHub and Go are CC-BY 4.0 as stated above. *Correction note (2026-10-03):* an earlier version of this cell said "every source database actually reachable by this script is CC-BY 4.0"; that was false. It was found by the tranche-1 gate (`docs/audits/source-expansion-tranche1-gate1-verdict-2026-10-03.md`, Part 2 "OSV ADVISORY"), which also measured that the committed `ingest/cve_nvd_expanded.json` holds 2 `MAL-` records (MAL-2026-3607, MAL-2026-2144) with verbatim OpenSSF report text, and that the published `data/incidents.json` carries no MAL text. |
 | Scrape-permitted | **YES** — official public API designed for this query pattern. |
 | Redistribute-verbatim | **YES**, with attribution to the specific originating advisory database (not just "OSV"). |
 | Relicense-compatible | **YES.** |
-| Action | **(a) compatible.** Ensure per-entry attribution names the originating DB (e.g. "PyPI Advisory Database via OSV.dev"), not just "OSV," since that's whose license actually applies. |
+| Action | **(a) compatible for CC-BY 4.0 origins only; `MAL-` (OpenSSF, Apache-2.0) records are excluded.** Ensure per-entry attribution names the originating DB (e.g. "PyPI Advisory Database via OSV.dev"), not just "OSV," since that's whose license actually applies. |
 | Date-checked | 2026-07-15 |
 
 ---
@@ -331,6 +331,83 @@ robots.txt check, per-host rate limiting, and retry/backoff — is a conduct
 question, not a per-source license question, so it is described and
 evidenced in `docs/INGESTION_CONDUCT.md`, the authoritative doc for that
 policy, rather than restated here.
+
+---
+
+## 6. Source-expansion waves 1-2 (user-approved 2026-10-03)
+
+*Added 2026-10-03 under invariant 10, in the same PR line as the ingest code.*
+Provenance of every fact below: `docs/specs/source-expansion-evaluation.md`
+(gated PASS, merged `2504fb89`), rows 1B.5, 1B.3, 1E.1, 1D.1, 1B.2 and section
+6 items 12-13, 15, 25, 31-33. Quotes marked "gate" were verified by
+red-reviewer via curl on 2026-10-03 and are carried verbatim; **this section
+re-fetched nothing** (the one exception is stated in the cvelistV5 row's
+Retrieval method cell). The only fresh measurements are local `Grep` counts of
+the two curated files (stated in the rows). Each row states its source kind
+per this document's standing rule on absence findings.
+
+### 6.1 AVID (AI Vulnerability Database; `avidml/avid-db`)
+*Ingested by:* **pending** (wave 1; systematic ingest from the repo, owner
+pipeline-engineer). *Already in the corpus via:* `ingest/avid_owasp_incidents.json`
+(hand-curated, no ingest script).
+
+| Field | Value |
+|---|---|
+| License | **MIT**, for the `avidml/avid-db` repository. Structured source: GitHub API `https://api.github.com/repos/avidml/avid-db` -> `license: {key: mit, spdx_id: MIT}`; raw LICENSE reads *"MIT License / Copyright (c) 2022 AI Vulnerability Database (AVID)"* (evaluation row 1B.5; fetched 2026-10-02, gate-confirmed). **Caveats carried from the gate:** (i) MIT is a software licence applied to a data repo; it is the only grant found and covers the repo as a whole; (ii) records summarise third-party material (papers, news, other databases, CNA text) whose rights are not AVID's to grant, so the MIT grant does not reach that text; (iii) the website `avidml.org/database/` shows no licence statement (gate: curl, no licence string in 508 KB / 1,785 IDs), which is why the ingest source is the repo and not the site. |
+| Scrape-permitted | Not scraping: public JSON in a public git repo (clone or tarball). Site `robots.txt`/ToS were not fetched and are not needed if the repo is the source; **the ingest must not read `avidml.org`**. HTTP retrieval goes through `ingest/common.py` (invariant 5); a `git clone` would be non-HTTP egress and needs its `docs/INGESTION_CONDUCT.md` register entry (pending entry 3 there). |
+| Redistribute-verbatim | **YES for AVID-authored repo content under MIT**, with the copyright and permission notice retained (added to `NOTICE-DATA` and `.reuse/dep5`, 2026-10-03). **NO claim** over third-party text inside records (not audited). Records classed "CVE Entry" carry CNA text, which is governed by the CVE ToU (section 6.2), not by MIT. |
+| Relicense-compatible | **YES** (MIT is permissive, attribution-only), with the MIT notice reproduced. |
+| Action | **(a) compatible with conditions:** keep the MIT notice with AVID-derived data (done in `NOTICE-DATA`/`.reuse/dep5`); per-record reference to the AVID id/URL; ingest from the repo, not the website; store reports as facts + link + original summary where the record text is third-party-derived. **Existing curated file `ingest/avid_owasp_incidents.json` (Grep, 2026-10-03: 130 `source_id` rows, of which 109 `AVID-` and 21 `OWASP-GENAI-*`):** this row covers the **109 `AVID-` rows** (AVID-derived, MIT applies; the MIT notice now exists to travel with them). It does **NOT cover the 21 `OWASP-GENAI-*` rows**; their upstream (the OWASP GenAI Security Project roundup) has no row in this document and **they stay OPEN / unassessed** until one is written. Not compared: whether the 109 rows copy AVID text or are original paraphrase (the evaluation read them as short original-looking descriptions keyed to an AVID URL; unverified). One of the 110 AVID ids in the corpus, `AVID-2023-V025`, is not in the repo (upstream removal or renumber): handle as `status`, never deletion (invariants 3, 9). |
+| Date-checked | 2026-10-02 (licence, gate-confirmed 2026-10-03); counts 2026-10-03 |
+| Retrieval method | **Structured: GitHub API JSON** (`license` field) and raw LICENSE first lines; site absence finding verified by red-reviewer via curl on raw HTML (evaluation section 6 item 15). Carried from the gated evaluation, not re-fetched. The full MIT permission text in `NOTICE-DATA` is the standard SPDX MIT text; **red-reviewer should diff it against the raw LICENSE** (check below). |
+| Non-English / facts-only | English. |
+
+### 6.2 cvelistV5 (`CVEProject/cvelistV5`; CVE Program Terms of Use) including the huntr CNA slice
+*Ingested by:* **pending** (wave 1; CVE JSON 5 records, filtered by the WS4-T4
+allowlist; owner pipeline-engineer).
+
+| Field | Value |
+|---|---|
+| License | **CVE Terms of Use (SPDX `CVE-TOU`).** GitHub repo `license` field is `null` (structured: `https://api.github.com/repos/CVEProject/cvelistV5`; no LICENSE file; raw URL 404). Repo README: *"You may search, download, and use the content hosted in this repository, per the CVE Program Terms of Use."* The grant (SPDX copy `https://spdx.org/licenses/cve-tou.html`; same text in cve.org's own source `CVEProject/cve-website`, `src/views/Legal/TermsOfUse.vue`, gate): *"MITRE hereby grants you a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Common Vulnerabilities and Exposures (CVE). Any copy you make for such purposes is authorized provided that you reproduce MITRE's copyright designation and this license in any such copy."* |
+| Scrape-permitted | Not scraping: the official bulk repo and release zips, built for mirroring (README: daily baseline zip, hourly delta zips). robots.txt not applicable (GitHub-hosted). Release assets are HTTP and go through `ingest/common.py`; `git clone` would need its `INGESTION_CONDUCT.md` register entry (pending entry 3). |
+| Redistribute-verbatim | **YES**, with MITRE's copyright designation and the licence text reproduced in copies. Individual CNA-authored description text could in principle carry third-party rights; the ToU carves none out (evaluation row 1B.3). |
+| Relicense-compatible | **YES, with a notice condition.** The grant includes "sublicense" and "prepare derivative works", so a CC BY 4.0 grant by us over our derived dataset is allowed provided the MITRE designation and the CVE-ToU licence text travel with it. **The condition applies TODAY to the existing corpus**, not only to new ingest: it already carries NVD-derived CVE text (section 2.2). The gate confirmed no CVE-ToU notice existed in `NOTICE-DATA`, `.reuse/dep5` or this file (targeted `git grep`, evaluation section 6 item 13). The existing "MITRE" notices are the ATLAS **Apache-2.0** notice, a different instrument. **Remedied 2026-10-03:** the CVE ToU notice is now in `NOTICE-DATA` and `.reuse/dep5`. |
+| Action | **(a) compatible with condition (condition now met in the notice files).** Filter by allowlist (WS4-T4), not by keyword alone. **huntr CNA slice (evaluation 1E.1):** huntr enters **only** as CVE records whose assigner is huntr (`security@huntr.dev` / `@huntr_ai`), under this row's CVE ToU grant. **huntr.com report text is NOT ingested**: huntr row 1E.1 is **(c)** (Participation Terms s7.1 assign contributions exclusively to Palo Alto Networks; PANW Terms of Use bar reproduction; no public reuse grant found), and huntr.com serves no structured report fields anyway. The bounty URL may be kept as a reference link inside a CVE record (facts + link). Nothing from `huntr.com` is fetched. The huntr route is the CNA filter, not a separate source. |
+| Date-checked | 2026-10-02 (licence); gate re-verification 2026-10-03 |
+| Retrieval method | **Structured (GitHub API JSON `license: null`, SPDX licence text)**; README rendered. `cve.org/Legal/TermsOfUse` is a JS app the tools could not render, so the cited text is the SPDX copy, corroborated by the gate's read of cve.org's own Vue source. The exact wording of "MITRE's copyright designation" was not established by the evaluation. The line used in `NOTICE-DATA`, `Copyright © 1999-2026, The MITRE Corporation.`, is cve.org's own site copyright: `CVEProject/cve-website` `src/components/FooterModule.vue` (rendered as 1999-{currentYear}), verified by foreman via curl 2026-10-03. It carries no "All rights reserved." A WebFetch of the Vue ToU source on 2026-10-03 returned only a summary stating the page contains no explicit copyright line; that is a summarising converter and is not evidence either way. |
+| Non-English / facts-only | English. |
+
+### 6.3 arXiv cs.CR metadata via OAI-PMH (`oaipmh.arxiv.org`)
+*Ingested by:* **pending** (wave 2; metadata only, selection by a deterministic
+rule plus a committed human-approved list; owner pipeline-engineer).
+*Already in the corpus via:* `ingest/arxiv_incidents.json` (hand-curated, no ingest script).
+
+| Field | Value |
+|---|---|
+| License | **Descriptive metadata: CC0 1.0.** arXiv API Terms of Use `https://info.arxiv.org/help/api/tou.html`: *"You are free to use descriptive metadata about arXiv e-prints under the terms of the Creative Commons Universal (CC0 1.0) Public Domain Declaration."* Footnote 1: *"Descriptive metadata includes information for discovery and identification purposes, and includes fields such as title, abstract, authors, identifiers, and classification terms."* The abstract is **inside** the CC0 metadata (gate-confirmed, evaluation section 6 item 25, positive finding). **Full text / e-prints: NOT covered**; per-paper author licences (CC BY, BY-SA, BY-NC-SA, BY-NC-ND, arXiv perpetual non-exclusive, CC0) and the ToU bar storing and serving e-prints without permission. |
+| Scrape-permitted | **YES via OAI-PMH only.** `export.arxiv.org` robots.txt is `Disallow: /`, so the API named in the ToU is **unreachable through `ingest/common.py`** (fail-closed) and a `common.py` exception is not wanted; the route is **`oaipmh.arxiv.org`** (robots allows it; set `cs:cs:CR`). ToU: *"make no more than one request every three seconds, and limit requests to a single connection at a time."* Never fetch `arxiv.org` (Crawl-delay 15; `Disallow: /e-print`, `/src`, `/api`, `/search`) for this ingest. |
+| Redistribute-verbatim | **Metadata incl. abstract: YES (CC0).** **Full text: NO**, never mirrored, never fetched. |
+| Relicense-compatible | **YES for CC0 metadata** (CC0 imposes nothing). **Residual caution, not resolved in our favour:** the CC0 dedication is **arXiv's**; the abstract text is the **author's** expression, licensed to arXiv non-exclusively, and nothing read shows authors waived rights in abstract prose. The conservative shape, adopted here: ship **title, authors, identifiers, classification and an original summary written by us from the paper, with the arXiv id as link**; carry the verbatim abstract only if the maintainer decides to accept that residual. |
+| Action | **(a) compatible for metadata; verbatim abstract carries the residual above.** Fields: title, authors, arXiv id/DOI, categories, dates, abstract (see residual). **Never** e-prints, PDFs or full text. Selection ("demonstrates a concrete attack") is deterministic in the build: heuristic candidate feeder plus a committed human-approved list; no model call in the build path. Honour OAI-PMH deletion headers as `status` changes, not deletion (invariants 3, 9). **Existing curated file `ingest/arxiv_incidents.json` (Grep, 2026-10-03: 123 `source_id` rows):** this row covers **only the metadata half** (title, authors, identifiers, abstract, classification) of those rows. It does **NOT** cover any prose in them that is not arXiv metadata, which is the maintainer's own and needs no row, **nor** any full-text passage copied from a paper: whether any of the 123 rows copies full-text passages was **not checked** and stays **OPEN** until a reviewer compares them (check below). Section 4's ten benchmark citations are separate and unchanged. |
+| Date-checked | 2026-10-02 (gate-confirmed 2026-10-03) |
+| Retrieval method | Positive grant quoted from primary arXiv pages (rendered HTML, via WebFetch in the evaluation, then curl by the gate); robots findings read directly. **Not an absence finding.** Carried from the gated evaluation, not re-fetched. |
+| Non-English / facts-only | Mostly English; some papers in other languages. |
+
+### 6.4 EUVD (European Vulnerability Database, ENISA): NOT INGESTED, pending outreach
+*Ingested by:* **nothing. EUVD is not ingested.** The user approved wave 2, but
+the licence is **(d)** and outreach must settle it first.
+
+| Field | Value |
+|---|---|
+| License | **UNKNOWN (no data licence).** ENISA Legal Notice `https://www.enisa.europa.eu/about-enisa/legal-notice`: *"Reproduction of ENISA material published on this website is authorized, provided the source is acknowledged, unless it is stated otherwise."* Whether JSON served from `euvdservices.enisa.europa.eu` is "material published on this website" is **not established**, and the notice grants no adaptation or CC BY right. The official docs repo `enisaeu/euvd-docs-public` LICENSE: *"No reuse, redistribution, or modification of its contents is permitted without written permission from ENISA."* (documentation only, but it shows reuse expressly withheld). Both gate-verified by red-reviewer via curl, 2026-10-03 (evaluation row 1B.2). |
+| Scrape-permitted | robots.txt at `euvd.enisa.europa.eu` allows all; API requires no authentication. Moot until the licence question is answered. |
+| Redistribute-verbatim | **UNKNOWN -> treated as NO.** CVE-derived fields are covered by the CVE ToU (section 6.2) and are taken from cvelistV5, not from EUVD. |
+| Relicense-compatible | **UNKNOWN -> treated as NO** for ENISA-added fields (EUVD id, enrichment) and for EPSS (FIRST's terms, unchecked). |
+| Action | **(d) outreach drafted, not sent:** `docs/outreach/enisa-euvd-reuse-2026-10-03.md`; the user sends. Until answered: **no EUVD field enters the corpus**, no EUVD text is copied, nothing from the docs repo is copied. EUVD is 100% CVE-duplicate of cvelistV5 (3,873 of 3,873 items [M], evaluation), so nothing in the CVE coverage depends on it; the only unique value is EUVD ids and EPSS. |
+| Outreach date | **Drafted 2026-10-03; not sent.** Logged in `docs/outreach/README.md` when the user sends. |
+| Date-checked | 2026-10-02 (gate-verified 2026-10-03) |
+| Retrieval method | JSON endpoint (structured; silent on legal terms by construction); legal notice and docs-repo LICENSE verified by red-reviewer via curl. The SPA shell was method-suspect (it hid the footer link). Carried from the gated evaluation, not re-fetched. |
+| Non-English / facts-only | English. |
 
 ---
 
