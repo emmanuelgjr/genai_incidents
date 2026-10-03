@@ -834,19 +834,523 @@ The "Terms: not found" bullet is also superseded by the ENISA Legal Notice
 
 ## 4. Volume / overlap / ingest shape / corpus fit / reconciliation / non-English (pipeline-engineer)
 
-*(Placeholder. Not filled by license-auditor. Per candidate that is not
-licence-blocked: AI-relevant volume and method, overlap/dedupe against the
-existing corpus, ingest shape, corpus fit, WS4-T2 reconciliation cost, and the
-non-English handling for each non-English row above. Rows scored 0 in section 1
-should not be estimated until a written permission exists.)*
+**Author of sections 4-5:** pipeline-engineer, 2026-10-03. Evidence (commands, raw
+counts, ID lists): `docs/specs/source-expansion-estimates-evidence-2026-10-03.md`
+and `.json` (same directory, dated records). Nothing here changes sections 1-3.
+No ingest code exists or is proposed before a user ruling.
+
+**Labels.** **[M]** = measured on 2026-10-03 (command in the evidence file).
+**[E]** = estimated (reasoning given). "Proxy count" = a regex over descriptions,
+spot-read but not a label. The corpus is `data/incidents.json` at `e2b1c988`: 13,361
+entries, `generated` 2026-09-18, of which 6,986 carry a `CVE-` source id.
+
+### 4.0 Findings that cut across candidates
+
+1. **The corpus's own CVE refresh is stale, independent of any new source.** [M]
+   The newest CVE-sourced entries are dated 2026-07 (15 entries; 2026-06 has 504).
+   EUVD lists 537 proxy-AI CVEs published since 2026-07-01 and the corpus holds 22
+   of them. That ~515-entry gap is a refresh backlog, not a new-source gain, and
+   is **excluded** from every "new" figure below unless stated.
+2. **The CVE-keyed sources are one universe seen through different doors.** [M]
+   All 3,873 EUVD items returned by 26 AI queries carry a CVE alias; none is
+   EUVD-only. huntr, EUVD, JVN, WID, ANSSI and cvelistV5 all key on CVE, so their
+   AI-relevant sets overlap each other almost completely; only the ones that add
+   fields beyond CVE text (EPSS, EUVD id, AVID taxonomy, huntr bounty URL) add
+   information.
+3. **The existing keyword sweep misses a measurable slice.** [M] In the window
+   2024-01..2026-06 (clear of finding 1), 25% of EUVD's proxy-AI CVEs (302 of
+   1,213) are not in the corpus, and 63% of huntr's (233 of 368). Spot-read items
+   (12 + 15 + 14 sampled) are AI frameworks and apps (anything-llm, vLLM, Triton,
+   gradio, lunary, dify, ragflow, MLflow). This is the WS4-T4 allowlist argument
+   in numbers, and it means the new-CVE gain is real but modest.
+4. **Accretion is already visible.** [M] 17 corpus entries (18 CVE ids), all
+   `status: active` with no rejection marker, correspond to CVEs that NVD now marks
+   `Rejected`, found by looking only at huntr's CNA slice (111 of 2,496 = 4.4% of
+   that CNA's CVEs are Rejected). Every CVE-keyed source needs WS4-T2.
+5. **`ingest/common.py` cannot reach several sources as it stands** [M]: see 4.1.
+   It also does not parse `Crawl-delay` (the string never appears in the module),
+   so ICO (6), BSI (10) and arXiv's main host (15) must be passed as
+   `min_interval=` by the caller or the module extended.
+
+### 4.1 Reachability through `ingest/common.py` (measured with `robots_allowed()` and live fetches)
+
+| Result | Hosts / paths | Consequence |
+|---|---|---|
+| Refused: explicit Disallow | `export.arxiv.org` (`User-agent: * / Disallow: /`, read directly); `cert.ssi.gouv.fr/fiche/` and `/pdf`; `static.data.gouv.fr/resources/` (`Disallow: /resources`: the CNIL open-data CSVs live there); `autoriteitpersoonsgegevens.nl/documenten` | arXiv must use `oaipmh.arxiv.org` (allowed), not the API the ToU names. CNIL's open-data subset cannot be downloaded by the pipeline. The AP result is stdlib `robotparser` taking the **first** matching rule in file order, where the AP file lists `Disallow: /documenten` and `Allow: /documenten/*`; RFC 9309 would take the longest match. A parser fix, not a robots change, is the issue. |
+| Refused: robots unverifiable, fail-closed | `www.cyber.gov.au` (read timed out), `defcon.org`, `media.defcon.org` (connection closed) | ACSC and DEF CON cannot be fetched. Neither qualifies for `ROBOTS_UNVERIFIABLE_ALLOWLIST` without dated evidence that every client is refused. |
+| Allowed by allowlist, content 403 | `www.cisa.gov`: robots 403 (allowlisted), then `/cybersecurity-advisories/all.xml`, `/ics-advisories.xml`, `/news.xml` all HTTP 403 to the project User-Agent | CISA "beyond KEV" HTML/RSS is unreachable as identified. The structured route is `github.com/cisagov/CSAF`. |
+| Allowed, usable | `oaipmh.arxiv.org`, `rss.arxiv.org`, NVD, `api.github.com`, `raw.githubusercontent.com`, GitHub release assets and `objects.githubusercontent.com`, `euvdservices.enisa.europa.eu`, NCSC, CCCS, `cert.ssi.gouv.fr` (avis, alerte), `jvndb.jvn.jp`, `jvn.jp`, `wid.cert-bund.de`, `cert.europa.eu`, `ico.org.uk`, `www.edpb.europa.eu`, `www.cnil.fr`, `www.garanteprivacy.it`, `www.gov.br`, `www.priv.gc.ca`, `hackerone.com`, `huntr.com`, `www.blackhat.com`, `aivillage.org`, `www.data.gouv.fr` (API only) | Reachable does not mean usable: see per-row shape (huntr, ICO). |
+| Non-HTTP egress | `git clone` of `CVEProject/cvelistV5` (API-reported size 3.0 GB) | Must be registered in `docs/INGESTION_CONDUCT.md` (invariant 5 as amended D22). Avoidable: the HTTP release assets (daily baseline zip 619 MB; hourly delta zips 0.15-1.1 MB) go through `common.py`. |
+
+### 4.2 Candidate rows
+
+Each row: **Volume** (backlog + per-year rate, how, filter) · **Overlap** (new /
+conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.**
+(structure score 0-3: 3 = fixed machine format, 0 = scraped and undocumented) ·
+**Non-English** where it applies. "Dedupe key" refers to `scripts/merge_and_dedupe.py`
+(CVE, then reference URL, then fuzzy title).
+
+#### cvelistV5 (1B.3, licence 2) 
+- **Volume.** Universe = CVE records matching the WS4-T4 allowlist. No bulk
+  AI count exists in the repo, so the measure is indirect: in the window
+  2024-01..2026-06, EUVD's 26 AI queries return 1,213 proxy-AI CVEs, of which 302
+  are not in the corpus [M]. That is a **lower bound** (26 query terms, not an
+  allowlist). Steady state ~120 new/yr (302 over 30 months) plus the ~515 refresh
+  backlog of finding 1 [E for the rate, M for the counts]. Filter: allowlist on
+  CNA `affected[].vendor/product/packageName/collectionURL` (what the keyword
+  sweep cannot see), keyword as candidate feeder only (WS4-T4).
+- **Overlap.** ~75% already in the corpus (911 of 1,213 [M], window). Dedupe key:
+  CVE. Conflicts: the corpus holds one severity per CVE; CNA-supplied CVSS in
+  cvelistV5 vs NVD-derived values will differ for some fraction (**not measured**;
+  [E] 10-30%, to be measured on the first fetch). Each divergence goes to
+  `conflicts` per WS3.
+- **Shape.** Bulk dump: baseline zip daily, hourly delta zips, CVE JSON 5, no auth,
+  no rate limit beyond GitHub's; HTTP through `common.py` (host checks pass [M]).
+- **Fit.** Vulnerabilities (the corpus's second-largest category, 5,784 of 13,361).
+- **Reconciliation.** Best of the lot: `cveMetadata.state` (PUBLISHED/REJECTED)
+  and `dateUpdated` are in every record; deltas hourly. Rejection churn [M, huntr
+  slice]: 4.4% of a CNA's CVEs end Rejected; 17 corpus entries already stale.
+- **Maint.** Structure 3. The CVE JSON 5 schema is versioned. Cost is size, not
+  fragility. **Precondition:** the allowlist (WS4-T4) and the CVE ToU notice,
+  which is missing from `NOTICE-DATA` today (section 1B.3).
+
+#### huntr (1E.1; licence 1 for huntr.com, 2 for the CVE-route subset)
+- **Volume.** **Measured via the CVE route, because the site has no structured
+  channel.** NVD `sourceIdentifier=security@huntr.dev` returns 2,496 CVEs [M]; 111
+  Rejected; 410 of the rest match the AI proxy regex, 368 in the window. By
+  publication year (proxy): 2023: 28, 2024: 154, 2025: 172, 2026 to 3 Oct: 53 [M],
+  so the rate is falling (~70/yr at the 2026 pace [E]). Filter: CNA = huntr plus
+  the allowlist.
+- **Overlap.** The gate's corpus figure reproduces: 277 distinct bounty IDs in 210
+  of 13,361 entries [M] (216 huntr.com URLs; the huntr.dev count is 61 or 67
+  depending on URL-form regex, 68 at the gate, immaterial). Through the CNA path:
+  254 corpus entries are huntr-CNA CVEs (3.6% of the 6,986 CVE entries). Of the
+  368 window AI CVEs, 135 are in the corpus and **233 (63%) are not** [M]. The
+  two paths agree in direction (237 of the 277 corpus bounty IDs appear in the CNA
+  set's NVD references; 2,381 of 2,496 huntr CVEs carry a bounty URL). Dedupe key:
+  CVE. Conflicts: none expected (same NVD text).
+- **Shape.** **huntr.com cannot be ingested as a source.** [M] `/sitemap.xml` and
+  `/bounties` are 404; a bounty page returns HTTP 200, 75 KB, a generic title and
+  **none** of the CVE, CWE, severity, status or repository fields. The page is a
+  client-rendered shell and the FAQ says new reports are visible only to the
+  reporter and maintainers (section 1E.1). The structured channel is the CNA's CVE
+  records: this row is a **filter inside cvelistV5** (`assigner = security@huntr.dev`
+  / `@huntr_ai`), keeping the bounty URL as a reference.
+- **Fit.** Vulnerabilities in AI/ML open-source software.
+- **Reconciliation.** As cvelistV5. huntr-specific: the CNA's 2026 rate drop
+  (53 vs 172) after the Palo Alto acquisition means a flat extrapolation overstates.
+- **Maint.** Structure 3 via CVE records; 0 for huntr.com itself.
+
+#### AVID (1B.5, licence 2)
+- **Volume.** [M] `avidml/avid-db` holds **1,790** distinct IDs: 40 vulnerabilities
+  (2022: 13, 2023: 27) and 1,750 reports (2022: 5, 2023: 7, 2025: 25, **2026:
+  1,713**, max R1714, matching the site's count at the gate). The repo is
+  **current**, which closes the lag question in the 1B.5 caveat (ii).
+  **Per-year rate is not estimable:** 25 reports in 2025 against 1,713 in 2026 is
+  a bulk import, not a rate. Filter: none needed (the database is the filter).
+- **Overlap.** The corpus has 110 AVID ids (109 in `source_ids`); 109 are in the
+  repo and one, `AVID-2023-V025`, is **not** (an upstream removal or renumber:
+  a retraction case already in the corpus). 1,681 repo IDs are absent from the
+  corpus. A 40-report random sample of the 2026 reports [M, n=40] found 29 (73%)
+  are CVE entries ("classof: CVE Entry", description copied from the CNA text),
+  of which 14 (48%; 16 counting any mention) are already in the corpus as CVE
+  entries; 11 (27%) are AVID-native ("LLM Evaluation", "Third-party Report").
+  Net-new entries therefore ≈ 1,681 × (0.27 + 0.73 × 0.5) ≈ **1,070 (range 800-1,300,
+  n=40, wide)** [E]; the other ~600 merge into existing CVE entries as extra
+  `source_ids` and add AVID's SEP taxonomy. Dedupe key: AVID id, then CVE. Conflicts:
+  CNA text vs corpus text (same CVE) are expected to be identical; taxonomy
+  fields are additive.
+- **Shape.** Git repo of JSON files, fixed schema (`data_version 0.3.3`),
+  MIT, no auth. Walk the tree API (one call) and fetch changed files through
+  `raw.githubusercontent.com`. A raw fetch per file at 3 s is ~85 min for the
+  backlog, so use the `git` route (register it) or the repo tarball.
+- **Fit.** Mixed: the CVE-derived majority are vulnerabilities; the native
+  minority are incident/evaluation reports.
+- **Reconciliation.** Repo history is the change log; ID-set diff catches removals
+  (1 in 109 corpus ids already). No tombstones, so absence must be handled as
+  `status` change, never deletion.
+- **Maint.** Structure 3. Risk: AVID's 2026 import is automated, so its quality
+  and cadence can change without notice. Needs the missing `SOURCE_LICENSES` row
+  and the WS7-T1 sentence (1B.5).
+
+#### arXiv cs.CR metadata (1D.1, licence 3 for metadata and abstract)
+- **Volume.** [M, sampled] OAI-PMH, set `cs:cs:CR`, the first full week of June:
+  papers created that month in the week's datestamps were 105 (2023), 133 (2024),
+  107 (2025), 190 (2026); proxy-AI share 41%, 51%, 62%, 61%; proxy "AI attack"
+  share (AI terms plus attack/vulnerability terms) 25%, 25%, 35%, 31%. Annualising
+  single weeks is [E] and noisy: ~2,200 (2023) rising to ~6,000 (2026) proxy-AI
+  papers/yr, ~1,400-3,100 attack-flavoured.
+  The corpus's curated criterion (a paper demonstrating a concrete attack) is
+  far narrower: 252 `research` entries exist today. [E] 60-100/yr after human
+  triage; an unfiltered attack-flavoured ingest would add ~1,400-3,100/yr and swamp every statistic.
+- **Overlap.** [M] 2 of 535 sampled papers (0.4%) are already in the corpus
+  (149 arXiv ids total). Dedupe key: reference URL (arXiv abs id). Conflicts: none
+  (no shared fields beyond id and title).
+- **Shape.** **The API named in the ToU is unreachable through `common.py`**
+  (`export.arxiv.org` robots `Disallow: /`, read directly). The reachable
+  sanctioned channels are OAI-PMH (`oaipmh.arxiv.org`, allowed) and RSS
+  (`rss.arxiv.org`, allowed). One response page covered a full week (630 KB, no
+  resumption token). Keep the 3 s floor; the main host's Crawl-delay 15 applies
+  only to `arxiv.org`, which we would not fetch.
+- **Fit.** Capabilities / research (the existing `research` and
+  `research-demonstrated` categories).
+- **Reconciliation.** OAI-PMH carries deletion headers, so tombstones exist. Churn
+  is high: [M] in the weeks sampled, 47% (2025) and 58% (2026) of the records
+  touched were papers created in earlier months (version replacements and metadata
+  edits). Detection by datestamp is easy; deciding whether a revision changes the
+  entry's claim is not.
+- **Maint.** Structure 3 (OAI-PMH is a fixed standard); the cost is the selection
+  filter, which is a curation problem.
+
+#### EUVD (1B.2, licence 1)
+- **Volume.** Same universe as cvelistV5. [M] 1,213 proxy-AI items in the
+  window (302 not in the corpus), 537 since 2026-07.
+- **Overlap.** **~100% CVE-duplicate of cvelistV5**: 3,873 of 3,873 items carry a
+  CVE alias, 0 EUVD-only [M]. Its unique content is the EUVD id, `epss` (present on
+  all items), `exploitedSince` (5 of 3,873), ENISA's vendor/product mapping and the
+  `assigner`. Dedupe key: CVE.
+- **Shape.** JSON API, no auth, no versioning, 100 records/page. Quirks [M]: dates
+  are locale strings with a narrow no-break space ("Aug 17, 2026, 9:16:10 PM"),
+  the schema differs by endpoint, and the text search is fuzzy (872 hits for
+  "vector database"). Rate limit undocumented; 3 s spacing was accepted.
+- **Fit.** Vulnerabilities (as enrichment).
+- **Reconciliation.** `dateUpdated` is a poor change signal: 58% of proxy-AI
+  items published before 2026-04 (765 of 1,312) were updated more than 30 days
+  after publication [M]. Detection must hash fields, not trust the date. No
+  tombstone seen.
+- **Maint.** Structure 2. Licence is (d) and unresolved; fields would be
+  facts + link only.
+
+#### ANSSI / CERT-FR (1A.6, licence 3; French)
+- **Volume.** [M] 0 AI titles among 80 feed items (40 AVI + 40 ALE). Serial numbers
+  give the rate: `CERTFR-2026-AVI-1257` on 2 Oct (≈1,650/yr annualised) and
+  `ALE-011` (~14/yr). AI-relevant: [E] 5-15/yr, nearly all CVE-keyed vendor
+  advisories (vendor products; none seen in the sample). Backlog [E] ~30-60.
+- **Overlap.** CVE-keyed, so ~100% dup of cvelistV5 once that is in; new content is
+  a French summary. Dedupe key: CVE, then URL.
+- **Shape.** RSS (40 items, rolling) plus per-advisory HTML under `/avis/` and
+  `/alerte/`; `/pdf` and `/fiche/` are disallowed (refused by `common.py`). The
+  feed body is not valid UTF-8 (undecodable bytes, probably Latin-1) [M]: a
+  parser must not assume UTF-8.
+- **Fit.** Vulnerabilities (advisories).
+- **Reconciliation.** Advisories are revised in place ("mise à jour") under the
+  same id; detection by content hash. Retractions rare.
+- **Maint.** Structure 2 (feed + HTML). **Non-English: French.** Summaries are
+  original English, generated offline, committed under `data/summaries/`, never
+  by a model call in `make build`; they count as original prose (WS0-T3).
+  Volume [E] 5-15/yr.
+
+#### BSI / WID (1A.5, licence 1; German)
+- **Volume.** [M] CSAF white index: 13,874 advisories; by id year 2022: 1,208,
+  2023: 3,055, 2024: 2,953, 2025: 2,940, 2026 to 3 Oct: 3,718. Feed sample: 2 of
+  250 items mention "AI" (OpenShift AI). AI-relevant [E] ~1% = ~30/yr, all
+  CVE-keyed.
+- **Overlap.** Dup of cvelistV5; BSI's own contribution is its severity rating and
+  German summary. Dedupe key: CVE.
+- **Shape.** CSAF 2.0: `provider-metadata.json`, ROLIE feeds, `index.txt` (416 KB),
+  one JSON per advisory; no auth. **Crawl-delay 10** must be passed as
+  `min_interval=10`. Licence-wise a CSAF file has TLP:WHITE and no licence (1A.5),
+  so the shape is facts + link.
+- **Fit.** Vulnerabilities. **Reconciliation.** CSAF `tracking.revision_history`
+  and `current_release_date` are explicit; heavy `[UPDATE]` churn (250 feed items in
+  ~2 days).
+- **Maint.** Structure 3. **Non-English: German.** Because CVE text is English,
+  translation is largely unnecessary; any BSI-specific summary is written offline
+  from the vendor advisory (1A.5). Volume [E] 0-30/yr.
+
+#### JVN (1A.8, licence 1; Japanese and English)
+- **Volume.** [M] MyJVN `feed=hnd` by `datePublic` year: 198 (2023), 207 (2024),
+  179 (2025) JVN notes in total. Keyword counts: "machine learning" 0 / 5 / 4,
+  "artificial intelligence" 2 / 0 / 0, "AI" 0 / 0 / 2, LLM / TensorFlow / PyTorch 0.
+  Backlog [E] ~15, rate ~5/yr. JVN iPedia (the larger NVD-style mirror) could not
+  be counted (`feed=sec` is invalid; the valid feed names were not found).
+- **Overlap.** CVE-keyed; ~100% dup of cvelistV5 once ingested. The unique content
+  is Japan-specific vendor coordination.
+- **Shape.** Documented XML/RSS API, no auth, robots 404. Quirks [M]: errors come
+  back as HTTP 200 with an `errCd`, the status schema version varies between
+  calls (3.2 and 3.3), and a wrong parameter family silently returns `totalRes=0`.
+- **Fit.** Vulnerabilities. **Reconciliation.** JVNDB ids carry revisions; low
+  churn. **Maint.** Structure 3, quirky. **Non-English:** English text exists
+  upstream, so no translation. Licence (d): outreach first.
+
+#### CISA beyond KEV (1E.2, licence 2 for CISA-authored)
+- **Volume.** [M] The structured route is `github.com/cisagov/CSAF`: OT/ICS
+  advisories 422 (2024), 506 (2025), 416 (2026 to 2 Oct); IT advisories 7 / 32 /
+  60. These are ICS and enterprise-product advisories; AI-relevance was **not
+  measured** (the feeds are 403 and counting needs per-file reads). AI-relevant
+  [E] ~0-5/yr from CSAF, plus joint AI-security guidance documents (~3-6/yr,
+  backlog ~10-15, from the section 1E.2 description, not counted).
+- **Overlap.** The corpus has 1 line referencing `cisa.gov` [M]; KEV is separate.
+  Dedupe key: CVE for advisories, URL for guidance.
+- **Shape.** HTML/RSS on `cisa.gov` returns 403 to the project User-Agent (see 4.1);
+  CSAF via GitHub works. Guidance PDFs sit on `media.defense.gov` (403 at the gate).
+- **Fit.** Mostly guidance (not a corpus category) plus a few product advisories.
+- **Reconciliation.** CSAF has revision history; low churn.
+- **Maint.** Structure 3 for CSAF, 0 for guidance. Per-document provenance flag
+  (co-seals) is required by 1E.2.
+
+#### UK NCSC (1A.1, licence 3)
+- **Volume.** [M] sitemap 2,638 URLs; 70 have an AI token in the slug (lower
+  bound). RSS: 20 items over 9 Jul to 28 Sep 2026 (≈90/yr), 3 AI titles
+  → ~13 AI items/yr [E]. Filter: slug/title/body AI terms, then human keep only
+  items documenting an incident or vulnerability (1 of the 25 AI titles seen is
+  incident-like: the statement on incidents from frontier-AI evaluations).
+- **Overlap.** 0 corpus references to `ncsc.gov.uk` [M]; all new. No ID to
+  conflict on. Dedupe key: URL.
+- **Shape.** RSS + sitemap + HTML; robots 404; no auth.
+- **Fit.** Guidance and commentary: **not** a corpus category; a few
+  incident-like items.
+- **Reconciliation.** Pages are edited in place; the RSS carries no modified date;
+  detection by hash. Churn low.
+- **Maint.** Structure 2. English.
+
+#### ICO enforcement (1C.5, licence 3)
+- **Volume.** [E] AI-relevant enforcement: ~3-8/yr, backlog ~15. Not countable:
+  [M] the register page's static HTML (50 KB) has a "Loading..." container and no
+  result links; the data comes from an undocumented XHR.
+- **Overlap.** Likely partial with AIAAIC/OECD for headline cases [E] ~50%. Dedupe
+  key: URL, then fuzzy title (route ambiguous merges to the review queue,
+  WS4-T5).
+- **Shape.** HTML shell over an XHR, no feed. Crawl-delay 6 (`min_interval=6`).
+- **Fit.** Real-world incidents (regulatory action). **Reconciliation.** Documents
+  carry date errors before 31 Dec 2024 (the page says so); notices are
+  occasionally amended.
+- **Maint.** Structure 1. English.
+
+#### ENISA reports (1A.4, licence 2 for CC BY 4.0 reports)
+- **Volume.** [M] sitemap 2,946 URLs, 594 under `/publications/`, 11 with an AI
+  token (lower bound). Rate [E] 2-4/yr.
+- **Overlap.** 0 corpus references [M]. Dedupe key: URL.
+- **Shape.** Sitemap + HTML + PDFs; robots allows. `lastmod` is unreliable (9 of 11
+  show 2024).
+- **Fit.** Reports/guidance, not incidents or vulnerabilities. **Reconciliation.**
+  Static documents; low. **Maint.** Structure 2. English.
+
+#### EDPB register (1C.2, licence 1 for the shape we would use)
+- **Volume.** [M] 1,582 decisions (144 pages × 11); the "AI and technology" topic
+  filter ends at pager index 4, so ≤55 decisions. That topic also holds
+  biometrics and profiling; AI-incident-relevant [E] ~10-15, rate ~2-4/yr.
+- **Overlap.** 1 corpus reference to `edpb.europa.eu` [M]. Dedupe key: URL, then
+  title.
+- **Shape.** Server-rendered Drupal HTML, topic facet, pager; no API/RSS seen; no
+  Crawl-delay stated.
+- **Fit.** Real-world incidents (enforcement). **Reconciliation.** Decisions are
+  final once registered; low. **Maint.** Structure 2.
+- **Non-English.** The register gives English summaries; the decisions are in
+  national languages and are not needed (facts + link + original summary from the
+  English text). Translation volume [E] ~0.
+
+#### CCCS Canada (1A.3, licence 1)
+- **Volume.** [M] RSS 50 items in 9 days (≈1,800/yr, vendor advisories), 0 AI
+  titles. Backlog/rate [E] ≤10 and ≤3/yr.
+- **Overlap.** 0 corpus references [M]. Dedupe key: URL. Not CVE-keyed in the feed.
+- **Shape.** RSS/Atom endpoint (`/api/cccs/rss/v1/get`), robots 404. **Fit.** Advisories mirroring
+  vendors; weak. **Reconciliation.** Frequent updates. **Maint.** Structure 3.
+  Bilingual: English originals exist, no translation. Non-commercial terms mean
+  facts + link only.
+
+#### Garante (1C.1, licence 1; Italian)
+- **Volume.** [E] (no structured channel reached) AI-relevant provvedimenti
+  ~8-12/yr, backlog ~40-60 since 2020 (ChatGPT/OpenAI, Replika, DeepSeek, Clothoff,
+  Clearview, delivery-platform algorithms are the kind of case). Overlap with
+  AIAAIC/OECD for headline cases ~50-70% [E].
+- **Shape.** HTML docweb; every PDF/print variant is robots-disallowed; reachable
+  through `common.py` [M] but no feed measured. **Fit.** Real-world incidents.
+  **Reconciliation.** Decisions are rarely amended; appeals appear as new
+  documents. **Maint.** Structure 1.
+- **Non-English: Italian.** Original English summaries, offline, committed;
+  [E] ~10-15 per year, ~50 for the backlog.
+
+#### Black Hat / DEF CON / AI Village (1D.4, licence 1, unverified)
+- **Volume.** [E] ~30-50 AI-related talks/yr across both. Not countable: `defcon.org`
+  and `media.defcon.org` are unreadable through `common.py` (fail-closed) [M];
+  Black Hat's robots permit its schedule pages [M] but no page was counted.
+- **Overlap.** 2 corpus references to `blackhat.com` [M]. **Shape.** HTML per-year
+  schedule pages; DEF CON side unreachable. **Fit.** Capabilities (talks), not
+  incidents or vulnerabilities. **Reconciliation.** Static per year.
+  **Maint.** Structure 1. English.
+
+#### Candidates with a volume of roughly zero or no reachable channel (still not licence-blocked)
+- **ACSC (1A.2, scored 1 provisional per D39).** Not measurable: `cyber.gov.au` robots
+  read timed out, so `common.py` fails closed [M]. Volume [E] ≤10 AI documents
+  (AI guidance is co-published with NCSC/CISA/NSA, which are counted there).
+  Non-commercial concerns do not apply; the licence is unverified.
+- **JPCERT/CC (1A.7, licence 1; Japanese).** [M] English RDF: 6 items over
+  10 Jun to 9 Sep 2026, all Microsoft/Adobe patch alerts, 0 AI. The Japanese RDF
+  (36 items) was fetched but not analysed. AI-relevant [E] ≤2/yr; translation
+  volume ≤2/yr. Content is largely duplicated by JVN.
+- **CERT-EU (1A.10, licence 1).** [M] 10 advisories 30 Apr to 27 Sep 2026, 0 AI.
+  The section-1 row already notes none AI-related. [E] ~0/yr.
+- **Dutch AP (1C.3, licence 1; Dutch).** [E] ~2-4 AI-relevant decisions/yr,
+  backlog ~10 (a Clearview fine, an Uber/algorithm case are of the type). Reachability:
+  `common.py` refuses `/documenten` because of rule order (4.1) [M]. Translation
+  ~2-4/yr. English pages exist.
+- **CNIL (1C.4, licence 1; French; open-data subset (a)).** The licence-clean dataset
+  "Sanctions prononcées par la CNIL" (`fr-lo`) was last updated 2025-05-05 and its
+  sanctions CSV 2024-10-01 [M]; the CSV host is robots-disallowed [M]. AI-relevant
+  [E] ~1-3/yr. Translation ~2-4/yr (including AI guidance).
+- **Brazil ANPD (1C.6, licence 1; Portuguese).** [E] ~1-3/yr, backlog <10.
+  Translation ~1-3/yr. CC BY-ND bars adaptation, so facts + link only.
+- **Canada OPC (1C.7, licence 1; bilingual).** [E] ~1-2/yr (joint investigations),
+  backlog ~5; English originals exist.
+- **HackerOne (1D.2, licence 1).** [E] no documented public API; the only bulk
+  route is the undocumented GraphQL endpoint that section 1D.2 says not to build
+  on; 17 corpus references to `hackerone.com` [M]. Volume of AI-program
+  disclosures not estimable without it.
+- **huntr.com bounty pages directly** are covered under huntr above (no fields in
+  the HTML).
+
+### 4.3 Scored 0 in section 1: listed by name only
+
+**Not estimated until written permission exists:** CSA / SingCERT (1A.9), VulnCheck
+KEV (1B.4), BAILII (1C.8), CanLII (1C.9), Bugcrowd (1D.3), and arXiv full text
+(1D.1, the 0 half; the metadata half is estimated above). Section 1 agrees with
+the brief on all six: each is scored 0 there.
+
+### 4.4 Non-English summary
+
+Every translated or summarised sentence is **original prose generated offline and
+committed** (for example under `data/summaries/`), per the WS0-T3 determinism
+rule; **no model call enters the `make build` path**, and a translated summary
+is treated as a derivative that needs its own provenance record (the AIAAIC D2
+caution cited in 1A.5). [E] annual volume if every non-English row were adopted:
+Garante 10-15, ANSSI 5-15, CNIL 2-4, AP 2-4, ANPD 1-3, JPCERT ≤2, BSI 0-30 (mostly
+unnecessary: CVE text is English), JVN and EDPB and CCCS and OPC 0 (English exists)
+→ **~20-45 summaries/yr excluding BSI (up to ~75 with it), plus a backlog of ~100-120**. None of this volume is
+measured; it is the reason the non-English rows rank low.
 
 ---
 
 ## 5. Ranking and waves
 
-*(Placeholder. Not filled by license-auditor. Method and every factor score to
-be shown by the ranking step; licence-cleanliness scores from section 1 are an
-input, not the ranking.)*
+### 5.1 Method
+
+Ranking = licence cleanliness × volume × corpus fit × inverse maintenance cost
+(the scope record, discipline 4). Each factor 0-3; product 0-81; a 0 on any factor
+zeroes the candidate, deliberately (an unreachable or empty source is not worth a
+wave).
+
+| Factor | 3 | 2 | 1 | 0 |
+|---|---|---|---|---|
+| **L** licence cleanliness | section-1 score of the **subset actually ingested** (0-3) | | | |
+| **V** new-entry volume after dedupe against the current corpus | ≥1,000 backlog or ≥200/yr | 100-999 or 20-199/yr | 10-99 or 3-19/yr | <10 and <3/yr |
+| **F** corpus fit | squarely a current category with direct field mapping (CVE-keyed vulnerability, AI-vuln record) | fits a current category with partial mapping (enforcement action, curated research) | mostly guidance/capability content the corpus does not hold | no fit |
+| **M** inverse maintenance cost | structured, fixed-format, reaches `common.py` cleanly | structured with quirks, or feed + stable HTML | scraped HTML/XHR, or needs a `common.py` change | cannot go through `common.py`, or only an undocumented endpoint |
+
+ACSC is scored L=1 (provisional, D39) and every row whose section-1 status is
+"unverifiable" is flagged **(U)**. V uses the numbers of section 4; it excludes the
+515-entry refresh backlog of finding 4.0-1.
+
+### 5.2 Factor table, sorted by product
+
+| Rank | Candidate | L | V | F | M | Product | Note |
+|---|---|---|---|---|---|---|---|
+| 1 | **AVID** | 2 | 3 | 3 | 3 | **54** | V=3 rests on ~1,070 net-new [E, n=40]; at V=2 it ties cvelistV5 (36) |
+| 2 | **cvelistV5** | 2 | 2 | 3 | 3 | **36** | needs allowlist + CVE ToU notice |
+| 2 | huntr (CVE route) | 2 | 2 | 3 | 3 | 36 | **a filter inside cvelistV5**, not additive |
+| 4 | **arXiv cs.CR metadata** | 3 | 2 | 2 | 2 | **24** | V depends on human triage; unfiltered it swamps the corpus |
+| 5 | EUVD | 1 | 2 | 3 | 2 | 12 | ~100% CVE-dup of cvelistV5; licence (d) |
+| 5 | ANSSI / CERT-FR | 3 | 1 | 2 | 2 | 12 | clean licence, almost no AI content |
+| 7 | BSI / WID (U, WID-specific terms) | 1 | 1 | 3 | 3 | 9 | CVE-dup; facts + link |
+| 8 | NCSC | 3 | 1 | 1 | 2 | 6 | guidance, not a corpus category |
+| 8 | JVN | 1 | 1 | 3 | 2 | 6 | ~5 AI/yr; licence (d) |
+| 8 | ICO | 3 | 1 | 2 | 1 | 6 | register is an XHR; Crawl-delay 6 |
+| 11 | ENISA reports | 2 | 1 | 1 | 2 | 4 | |
+| 11 | EDPB register | 1 | 1 | 2 | 2 | 4 | ≤55 decisions in AI topic |
+| 13 | CCCS | 1 | 1 | 1 | 3 | 3 | non-commercial; 0 AI in 50-item sample |
+| 14 | Garante | 1 | 1 | 2 | 1 | 2 | Italian; outreach |
+| 14 | CISA beyond KEV | 2 | 1 | 1 | 1 | 2 | cisa.gov feeds 403; ICS-heavy |
+| 14 | Black Hat / DEF CON (U) | 1 | 2 | 1 | 1 | 2 | DEF CON unreachable |
+| 17 | ACSC (L=1, provisional, U) | 1 | 1 | 1 | 0 | 0 | unreachable via `common.py` |
+| 17 | JPCERT/CC | 1 | 0 | 1 | 3 | 0 | no AI items; duplicated by JVN |
+| 17 | CERT-EU | 1 | 0 | 1 | 3 | 0 | no AI items |
+| 17 | Dutch AP | 1 | 1 | 2 | 0 | 0 | refused by `common.py` rule order |
+| 17 | CNIL | 1 | 1 | 2 | 0 | 0 | open-data host robots-disallowed |
+| 17 | Brazil ANPD | 1 | 0 | 2 | 1 | 0 | |
+| 17 | Canada OPC | 1 | 0 | 2 | 1 | 0 | |
+| 17 | HackerOne | 1 | 1 | 3 | 0 | 0 | undocumented API only |
+| 17 | huntr.com bounty pages (direct) | 1 | 1 | 3 | 0 | 0 | HTML has no report fields |
+| — | CSA, VulnCheck KEV, BAILII, CanLII, Bugcrowd, arXiv full text | 0 | — | — | — | not estimated | permission first |
+
+**Sensitivity.** The top two do not move under a one-step change of any single
+factor of AVID or cvelistV5 (AVID at L=1 gives 27, still above arXiv's 24; at V=2
+it ties cvelistV5 at 36). Everything below rank 4 is at most 12, so ordering there
+is within estimation error, and no source below arXiv adds more than ~50 entries/yr
+by these measurements.
+
+### 5.3 Waves
+
+**Wave 1: AVID + cvelistV5 (with huntr as a filter inside it).** Why together:
+they are the only candidates that add hundreds of entries on a clean licence, and
+they share a dedupe key (CVE), so ingesting them together lets AVID's CVE-derived
+reports merge into the CVE entries instead of racing them. huntr belongs here as a
+CNA filter, not as a source of its own, because huntr.com serves no report fields.
+**Needs before ingest:** (AVID) the missing `SOURCE_LICENSES.md` row and MIT notice
+for the 109 existing AVID entries, the WS7-T1 neighbour sentence, a decision on the
+repo `git` route (register in `INGESTION_CONDUCT.md`) vs tarball; (cvelistV5) the
+CVE ToU notice in `NOTICE-DATA` (a gap that exists today), the WS4-T4 allowlist as
+the filter (without it the ingest is unfiltered), WS4-T2 reconciliation handling
+`REJECTED` before the first merge (17 stale entries already); (huntr) a WS0-T1 row
+stating that only CVE-record text is taken and the bounty URL kept as a link.
+No outreach needed. **Expected yield:** AVID ~1,070 net-new entries (800-1,300,
+n=40 [E]) plus ~600 enrichments of existing CVE entries; cvelistV5 ~300 backlog in
+the 30-month window [M, lower bound] plus ~120/yr [E], inside which huntr is 233
+backlog [M] and ~40-70/yr [E]. **First-year total ≈ 1,200-1,600 net-new entries
+(about +9-12% on 13,361)**; this is less than the sum of the parts because AVID's
+CVE-keyed new reports and cvelistV5's new CVEs are largely the same universe
+(not double counted), and it excludes the ~515 refresh backlog that a plain CVE
+refresh would add anyway.
+
+**Wave 2: arXiv cs.CR (OAI-PMH) + EUVD as enrichment only.** Why: arXiv is the only
+remaining source with both a CC0 licence and a large gap (99.6% new), but its yield
+is a curation decision, not a pipeline one. EUVD is dominated by cvelistV5 for
+coverage and is worth it only for EPSS and EUVD ids on CVE entries that wave 1
+creates, so it follows wave 1 and the ENISA reply. **Needs:** (arXiv) a
+`SOURCE_LICENSES.md` row, a triage rule for "demonstrates a concrete attack" that is
+deterministic in the build (keyword/heuristic candidate feeder plus a committed
+human-approved list, as WS4-T4 does for CVEs), and a decision whether a `common.py`
+exception for the API is wanted (not recommended: OAI-PMH works unmodified);
+(EUVD) outreach to ENISA, which the user sends, on whether the API data is within
+the Legal Notice's reproduction clause. **Expected yield:** arXiv 60-100 curated
+entries/yr [E] (backlog a few hundred if the curated list is back-filled); EUVD 0 new
+CVE entries [M]; enrichment (EPSS present on 3,873 of 3,873 items) of up to the
+6,986 CVE-keyed corpus entries.
+
+**Wave 3 (optional, low yield): regulators, ICO + EDPB (+ Garante).** Why: the only
+incident-category additions, and the only place where the corpus gains something
+AIID/AIAAIC/OECD may not carry. They are small (≤55 EDPB decisions in the AI topic;
+ICO and Garante single digits per year), expensive per entry (HTML/XHR, Crawl-delay
+6, Italian translation) and partially duplicated by AIAAIC/OECD. **Needs:** ICO
+OGL notice and the XHR endpoint documented or the source hand-curated; EDPB facts +
+link rule for national decisions; Garante outreach and an offline-translation
+step. **Expected yield:** ~25-40 entries in the first year, ~10-15/yr after [E].
+Recommendation: hand-curate rather than build parsers unless the user wants
+the regulatory axis.
+
+**Hold:** ANSSI, BSI, JVN, NCSC, ENISA, CCCS (low AI content or not a corpus
+category), JPCERT, CERT-EU, AP, CNIL, ANPD, OPC, HackerOne (no AI content or no
+reachable channel), ACSC (unverified, unreachable), CISA beyond KEV (403, ICS-heavy),
+Black Hat / DEF CON.
+
+### 5.4 Testing the prior
+
+| Prior | What the measurement says |
+|---|---|
+| **Wave 1 = CISA (beyond KEV) + huntr + EUVD** | **Mostly not supported.** *CISA beyond KEV*: product 2. `cisa.gov` feeds return 403 to the project User-Agent; the structured route is the ICS-heavy CSAF repo; AI-relevant content is a handful of guidance documents a year; licence 2 with a co-seal carve-out. *huntr*: **supported as a target, not as a source.** 233 AI-relevant CVEs missing (63% of its window set) is the strongest single-CNA gap found, but huntr.com serves no report fields (HTTP 200 shell, 0 of 6 field markers), so it is a CNA filter inside cvelistV5. *EUVD*: not supported for wave one. 3,873 of 3,873 items are CVE-duplicates of cvelistV5, the licence is (d) with an outreach prerequisite, and the date format and fuzzy search are maintenance costs; its unique fields (EPSS, EUVD id) are enrichment. **Missing from the prior and ranked first:** AVID (already 109 entries, repo current at 1,790 IDs) and cvelistV5. |
+| **Wave 2 = NCSC / ACSC / CCCS** | **Not supported.** NCSC is cleanly licensed (3) but publishes guidance and commentary, not incidents or vulnerabilities (product 6; 1 incident-like item in the 25 AI titles seen). **CCCS is non-commercial only**, so facts + link at best, with 0 AI titles in a 50-item sample (product 3). **ACSC cannot be reached through `common.py`** (robots read times out, fail-closed) and its licence is an unverified extract (product 0). The "permissive trio" is one permissive source with the wrong content, one restricted, one unreachable. |
+
+### 5.5 Cross-tranche caveat
+
+Tranche 1 was ten sources, but **only huntr and CISA beyond KEV are known** (the
+record was lost; scope record 2026-10-02). This ranking therefore covers **29 of the
+~37 candidates** (27 tranche 2 + 2 tranche 1; the other 8 tranche-1 names are
+unknown). **It must not be presented as the final cross-tranche ranking**, and any
+of the eight could outrank the 54 and 36 above.
+
+### 5.6 Decision record: rejections and watch items (one line each, from sections 2-3)
+
+- **Rejected:** CNNVD / CNVD (no reuse terms found, login-gated, Mandarin; extract-sourced, unverifiable); Snyk (Service Data may not be passed to third parties; current ToS makes it Confidential Information); VulDB (CC BY-NC-SA 4.0, incompatible; extract-sourced, 403); news aggregators and newsletters (OECD AIM already supplies news-derived coverage; discovery-only use is not an ingest).
+- **Watch:** EU AI Act Article 73 (no public register in the text; revisit on final Commission guidance, 2 Dec 2027 and any publication act; Digital Omnibus OJ dates unverified); EUVD API maturation (docs `apidoc.md` is readable, no auth, 8/100 per request, no versioning or changelog; revisit when terms and a changelog exist; this section found the date format and per-endpoint schema differences, which add to that list).
 
 ---
 
