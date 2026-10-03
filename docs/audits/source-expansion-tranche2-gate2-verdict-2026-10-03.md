@@ -30,3 +30,7 @@ CONFIRMED (carried "verified by red-reviewer" quotes match measured): NCSC OGL s
 INVARIANTS: PASS — three-dot origin/main...origin/eval/source-expansion touches only the two specs files (1,060 insertions); SOURCE_LICENSES.md and data/ 0 lines; remote ref = 6d77a194; symbolic-ref refs/heads/eval/source-expansion; worktree porcelain empty (working tree only); never moved HEAD.
 
 Brief was accurate; the one gap — the auditor's item-33 "distinct" command undercounts (D3).
+
+---
+
+**Dated correction, 2026-10-03 (foreman): this record is NOT byte-verbatim.** The header says the verdict is reproduced "with no edits by the foreman". That is true of substance, and false of punctuation and phrasing. The foreman transcribed this text from the gate's message and introduced em dashes, "→" arrows and some compressed phrasing that the delivered message does not carry. **Found by** license-auditor during the D39 gate-3 application: two of the gate's replacement strings, as quoted here, did not occur literally in the target file. The file had a comma where this record shows an em dash. **Consequence:** do not use this record as an exact-match source for `str.replace` or Edit operations. Locate each target by its content and confirm that it is unambiguous. The defects, figures, quoted page clauses and verdict are unaffected. The original text above is preserved under working agreement 4.

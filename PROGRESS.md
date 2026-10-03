@@ -91,7 +91,17 @@
     - D3: five stale "not gated / method-suspect" status lines.
   - **What passed:** everything else, including verbatim landing of D1–D9, no undeclared moves, ACSC at 1 with the new scale clause cited, and invariants.
   - **⚖ Foreman call, surfaced to the user:** this is treated as falling WITHIN D39 (apply the gate's text verbatim, then a string-check), not as a third bounce. Every defect is the gate's own exact text and needs no re-measure. **The user may overrule.**
-  - **Next:** the fixes went to the same fresh license-auditor for verbatim application, followed by a string re-check. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **Next:** the fixes went to the same fresh license-auditor for verbatim application, followed by a string re-check.
+- **Gate-3 fixes APPLIED and verified by the foreman, then committed as `5163c10b` (pushed).**
+  - All 6 must-be-0 strings are at 0, and all 4 must-be-≥1 strings are present.
+  - **Huntr figures re-derived by a different route [R]:**
+    - the gate's two commands give **284** URLs and **277** IDs;
+    - an independent per-entry Python scan gives **210 of 13,361** entries.
+- **⚠ Foreman defect, found by license-auditor: the three gate-verdict records are not byte-verbatim.**
+  - The foreman's transcription introduced em dashes, arrows and some compressed phrasing.
+  - As a result, two of the gate's replacement strings did not match literally. The auditor matched them by content instead and disclosed that it had done so.
+  - A dated correction has been added to all three records, with the originals preserved under agreement 4.
+  - **Lesson:** a record that calls itself verbatim must be pasted, not retyped. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
