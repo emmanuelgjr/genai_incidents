@@ -75,6 +75,15 @@
 - **Tranche-1 estimates DELIVERED** (`85deb30d`, pushed).
   - **Proposed waves:** CourtListener (bulk) and 0din → wave 3; OpenSSF → wave 4; FTC on hold (robots 403 to the project UA); CERT/CC, EPSS and GHSL held.
   - **Gate dispatched** to the tranche-2 §4–5 reviewer.
+- **⛔ Tranche-1 estimates: BOUNCE #1** (red-reviewer, on `85deb30d`). The verdict is in `docs/audits/source-expansion-tranche1-estimates-gate1-verdict-2026-10-03.md`, saved as received.
+  - **D1:** OpenSSF is dominated by GHSA. 157 of its 158 candidates have a CC BY GHSA malware twin.
+  - **D2:** the N6 text was stale; exclusion via OSV does not zero T1.8.
+  - **D3:** the sensitivity sentence. **D4:** an FTC [M] scope.
+  - **Products confirmed:** 16, 12, 8, 0.
+  - **FTC 403 diagnosis:** an edge rule rejects UAs containing a URL, which includes the project UA. It is not robots.
+    - Bypassing it would be evasion.
+    - **The only routes are FTC outreach (the user sends it) or a user ruling.**
+  - The fixes went to pipeline-engineer for verbatim application.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
