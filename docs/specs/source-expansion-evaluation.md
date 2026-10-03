@@ -131,8 +131,7 @@ secondary sources and is labelled "unverified, extract-sourced" in the row.
 | W1 Art. 73 | gate-confirmed; Digital Omnibus OJ dates **unverified** |
 | W2 EUVD API | gate-refuted-and-fixed (dated update added) |
 
-Deliberate rejections: section 2. Dated watch items: section 3. Pipeline
-estimates: section 4 (placeholder). Ranking: section 5 (placeholder).
+Deliberate rejections: section 2. Dated watch items: section 3. Pipeline estimates: section 4. Ranking and waves: section 5 (pipeline-engineer, 2026-10-03).
 
 ---
 
@@ -842,7 +841,7 @@ No ingest code exists or is proposed before a user ruling.
 **Labels.** **[M]** = measured on 2026-10-03 (command in the evidence file).
 **[E]** = estimated (reasoning given). "Proxy count" = a regex over descriptions,
 spot-read but not a label. The corpus is `data/incidents.json` at `e2b1c988`: 13,361
-entries, `generated` 2026-09-18, of which 6,986 carry a `CVE-` source id.
+entries, `generated` 2026-09-18, of which 5,293 carry a `CVE-` source id (6,986 distinct CVE ids).
 
 ### 4.0 Findings that cut across candidates
 
@@ -858,13 +857,12 @@ entries, `generated` 2026-09-18, of which 6,986 carry a `CVE-` source id.
    fields beyond CVE text (EPSS, EUVD id, AVID taxonomy, huntr bounty URL) add
    information.
 3. **The existing keyword sweep misses a measurable slice.** [M] In the window
-   2024-01..2026-06 (clear of finding 1), 25% of EUVD's proxy-AI CVEs (302 of
-   1,213) are not in the corpus, and 63% of huntr's (233 of 368). Spot-read items
+   2024-01..2026-06 (clear of finding 1), 24% of EUVD's proxy-AI CVEs (293 of 1,213) are not in the corpus, and 62% of huntr's (228 of 368); the two sets share 105 ids, so their union is 416. (The evidence lists hold 302 and 233 ids; gate 2026-10-03 found 9 and 5 of them already in the corpus as AVID-keyed entries whose title names the CVE, e.g. INC-04083 `AVID-2026-R0006` for CVE-2024-10513, because membership was keyed on `CVE-` source ids only.) Spot-read items
    (12 + 15 + 14 sampled) are AI frameworks and apps (anything-llm, vLLM, Triton,
    gradio, lunary, dify, ragflow, MLflow). This is the WS4-T4 allowlist argument
    in numbers, and it means the new-CVE gain is real but modest.
 4. **Accretion is already visible.** [M] 17 corpus entries (18 CVE ids), all
-   `status: active` with no rejection marker, correspond to CVEs that NVD now marks
+   `source_status: active` with no rejection marker, correspond to CVEs that NVD now marks
    `Rejected`, found by looking only at huntr's CNA slice (111 of 2,496 = 4.4% of
    that CNA's CVEs are Rejected). Every CVE-keyed source needs WS4-T2.
 5. **`ingest/common.py` cannot reach several sources as it stands** [M]: see 4.1.
@@ -876,7 +874,7 @@ entries, `generated` 2026-09-18, of which 6,986 carry a `CVE-` source id.
 
 | Result | Hosts / paths | Consequence |
 |---|---|---|
-| Refused: explicit Disallow | `export.arxiv.org` (`User-agent: * / Disallow: /`, read directly); `cert.ssi.gouv.fr/fiche/` and `/pdf`; `static.data.gouv.fr/resources/` (`Disallow: /resources`: the CNIL open-data CSVs live there); `autoriteitpersoonsgegevens.nl/documenten` | arXiv must use `oaipmh.arxiv.org` (allowed), not the API the ToU names. CNIL's open-data subset cannot be downloaded by the pipeline. The AP result is stdlib `robotparser` taking the **first** matching rule in file order, where the AP file lists `Disallow: /documenten` and `Allow: /documenten/*`; RFC 9309 would take the longest match. A parser fix, not a robots change, is the issue. |
+| Refused: explicit Disallow | `export.arxiv.org` (`User-agent: * / Disallow: /`, read directly); `cert.ssi.gouv.fr/fiche/` and `/pdf`; `static.data.gouv.fr/resources/` (`Disallow: /resources`: the CNIL open-data CSVs live there); `autoriteitpersoonsgegevens.nl/documenten` | arXiv must use `oaipmh.arxiv.org` (allowed), not the API the ToU names. CNIL's open-data subset cannot be downloaded by the pipeline. The AP result is stdlib `robotparser`, which does not implement RFC 9309 wildcards: it stores `Allow: /documenten/*` as the literal prefix `/documenten/%2A`, which no real path matches, so `Disallow: /documenten` applies. (It also takes the first match in file order rather than RFC 9309's longest match, but reordering alone does not change the result: gate experiment 2026-10-03.) A parser fix (wildcards and longest match), not a robots change, is the issue. |
 | Refused: robots unverifiable, fail-closed | `www.cyber.gov.au` (read timed out), `defcon.org`, `media.defcon.org` (connection closed) | ACSC and DEF CON cannot be fetched. Neither qualifies for `ROBOTS_UNVERIFIABLE_ALLOWLIST` without dated evidence that every client is refused. |
 | Allowed by allowlist, content 403 | `www.cisa.gov`: robots 403 (allowlisted), then `/cybersecurity-advisories/all.xml`, `/ics-advisories.xml`, `/news.xml` all HTTP 403 to the project User-Agent | CISA "beyond KEV" HTML/RSS is unreachable as identified. The structured route is `github.com/cisagov/CSAF`. |
 | Allowed, usable | `oaipmh.arxiv.org`, `rss.arxiv.org`, NVD, `api.github.com`, `raw.githubusercontent.com`, GitHub release assets and `objects.githubusercontent.com`, `euvdservices.enisa.europa.eu`, NCSC, CCCS, `cert.ssi.gouv.fr` (avis, alerte), `jvndb.jvn.jp`, `jvn.jp`, `wid.cert-bund.de`, `cert.europa.eu`, `ico.org.uk`, `www.edpb.europa.eu`, `www.cnil.fr`, `www.garanteprivacy.it`, `www.gov.br`, `www.priv.gc.ca`, `hackerone.com`, `huntr.com`, `www.blackhat.com`, `aivillage.org`, `www.data.gouv.fr` (API only) | Reachable does not mean usable: see per-row shape (huntr, ICO). |
@@ -893,13 +891,12 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
 #### cvelistV5 (1B.3, licence 2) 
 - **Volume.** Universe = CVE records matching the WS4-T4 allowlist. No bulk
   AI count exists in the repo, so the measure is indirect: in the window
-  2024-01..2026-06, EUVD's 26 AI queries return 1,213 proxy-AI CVEs, of which 302
-  are not in the corpus [M]. That is a **lower bound** (26 query terms, not an
-  allowlist). Steady state ~120 new/yr (302 over 30 months) plus the ~515 refresh
+  2024-01..2026-06, EUVD's 26 AI queries return 1,213 proxy-AI CVEs, of which 293 are not in the corpus [M]; the huntr CNA route adds 123 more outside that set (union 416 [M]). That is a **lower bound** (26 query terms, not an
+  allowlist). Steady state ~165 new/yr (416 over 30 months) plus the ~515 refresh
   backlog of finding 1 [E for the rate, M for the counts]. Filter: allowlist on
   CNA `affected[].vendor/product/packageName/collectionURL` (what the keyword
   sweep cannot see), keyword as candidate feeder only (WS4-T4).
-- **Overlap.** ~75% already in the corpus (911 of 1,213 [M], window). Dedupe key:
+- **Overlap.** ~76% already in the corpus (920 of 1,213 [M], window). Dedupe key:
   CVE. Conflicts: the corpus holds one severity per CVE; CNA-supplied CVSS in
   cvelistV5 vs NVD-derived values will differ for some fraction (**not measured**;
   [E] 10-30%, to be measured on the first fetch). Each divergence goes to
@@ -924,8 +921,8 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
 - **Overlap.** The gate's corpus figure reproduces: 277 distinct bounty IDs in 210
   of 13,361 entries [M] (216 huntr.com URLs; the huntr.dev count is 61 or 67
   depending on URL-form regex, 68 at the gate, immaterial). Through the CNA path:
-  254 corpus entries are huntr-CNA CVEs (3.6% of the 6,986 CVE entries). Of the
-  368 window AI CVEs, 135 are in the corpus and **233 (63%) are not** [M]. The
+  254 corpus CVE ids are huntr-CNA CVEs, in 199 entries (3.6% of the 6,986 CVE ids). Of the
+  368 window AI CVEs, 140 are in the corpus and **228 (62%) are not** [M]. The
   two paths agree in direction (237 of the 277 corpus bounty IDs appear in the CNA
   set's NVD references; 2,381 of 2,496 huntr CVEs carry a bounty URL). Dedupe key:
   CVE. Conflicts: none expected (same NVD text).
@@ -1004,7 +1001,7 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
 
 #### EUVD (1B.2, licence 1)
 - **Volume.** Same universe as cvelistV5. [M] 1,213 proxy-AI items in the
-  window (302 not in the corpus), 537 since 2026-07.
+  window (293 not in the corpus), 537 since 2026-07.
 - **Overlap.** **~100% CVE-duplicate of cvelistV5**: 3,873 of 3,873 items carry a
   CVE alias, 0 EUVD-only [M]. Its unique content is the EUVD id, `epss` (present on
   all items), `exploitedSince` (5 of 3,873), ENISA's vendor/product mapping and the
@@ -1056,7 +1053,7 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
   ~2 days).
 - **Maint.** Structure 3. **Non-English: German.** Because CVE text is English,
   translation is largely unnecessary; any BSI-specific summary is written offline
-  from the vendor advisory (1A.5). Volume [E] 0-30/yr.
+  from the vendor advisory (1A.5). Rule: translated summaries are original prose, generated offline and committed (WS0-T3), never by a model call in `make build`. Volume [E] 0-30/yr.
 
 #### JVN (1A.8, licence 1; Japanese and English)
 - **Volume.** [M] MyJVN `feed=hnd` by `datePublic` year: 198 (2023), 207 (2024),
@@ -1141,7 +1138,7 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
   English text). Translation volume [E] ~0.
 
 #### CCCS Canada (1A.3, licence 1)
-- **Volume.** [M] RSS 50 items in 9 days (≈1,800/yr, vendor advisories), 0 AI
+- **Volume.** [M] RSS 50 items in 9 days (vendor advisories; ≈1,800/yr if annualised from those 9 days [E]), 0 AI
   titles. Backlog/rate [E] ≤10 and ≤3/yr.
 - **Overlap.** 0 corpus references [M]. Dedupe key: URL. Not CVE-keyed in the feed.
 - **Shape.** RSS/Atom endpoint (`/api/cccs/rss/v1/get`), robots 404. **Fit.** Advisories mirroring
@@ -1159,7 +1156,7 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
   **Reconciliation.** Decisions are rarely amended; appeals appear as new
   documents. **Maint.** Structure 1.
 - **Non-English: Italian.** Original English summaries, offline, committed;
-  [E] ~10-15 per year, ~50 for the backlog.
+  [E] ~10-15 per year, ~50 for the backlog. They count as original prose; never generated by a model call in `make build` (WS0-T3).
 
 #### Black Hat / DEF CON / AI Village (1D.4, licence 1, unverified)
 - **Volume.** [E] ~30-50 AI-related talks/yr across both. Not countable: `defcon.org`
@@ -1177,20 +1174,19 @@ conflict / dedupe key) · **Shape** · **Fit** · **Reconciliation** · **Maint.
   Non-commercial concerns do not apply; the licence is unverified.
 - **JPCERT/CC (1A.7, licence 1; Japanese).** [M] English RDF: 6 items over
   10 Jun to 9 Sep 2026, all Microsoft/Adobe patch alerts, 0 AI. The Japanese RDF
-  (36 items) was fetched but not analysed. AI-relevant [E] ≤2/yr; translation
-  volume ≤2/yr. Content is largely duplicated by JVN.
+  (36 items) was fetched but not analysed. AI-relevant [E] ≤2/yr; translation volume ≤2/yr. Rule: translated summaries are original prose, generated offline and committed (WS0-T3), never by a model call in `make build`. Content is largely duplicated by JVN.
 - **CERT-EU (1A.10, licence 1).** [M] 10 advisories 30 Apr to 27 Sep 2026, 0 AI.
   The section-1 row already notes none AI-related. [E] ~0/yr.
 - **Dutch AP (1C.3, licence 1; Dutch).** [E] ~2-4 AI-relevant decisions/yr,
   backlog ~10 (a Clearview fine, an Uber/algorithm case are of the type). Reachability:
-  `common.py` refuses `/documenten` because of rule order (4.1) [M]. Translation
-  ~2-4/yr. English pages exist.
+  `common.py` refuses `/documenten` because stdlib `robotparser` ignores the `*` wildcard in `Allow: /documenten/*` (4.1) [M]. Translation
+  ~2-4/yr. English pages exist. Rule: translated summaries are original prose, generated offline and committed (WS0-T3), never by a model call in `make build`.
 - **CNIL (1C.4, licence 1; French; open-data subset (a)).** The licence-clean dataset
   "Sanctions prononcées par la CNIL" (`fr-lo`) was last updated 2025-05-05 and its
   sanctions CSV 2024-10-01 [M]; the CSV host is robots-disallowed [M]. AI-relevant
-  [E] ~1-3/yr. Translation ~2-4/yr (including AI guidance).
+  [E] ~1-3/yr. Translation ~2-4/yr (including AI guidance). Rule: translated summaries are original prose, generated offline and committed (WS0-T3), never by a model call in `make build`.
 - **Brazil ANPD (1C.6, licence 1; Portuguese).** [E] ~1-3/yr, backlog <10.
-  Translation ~1-3/yr. CC BY-ND bars adaptation, so facts + link only.
+  Translation ~1-3/yr. Rule: translated summaries are original prose, generated offline and committed (WS0-T3), never by a model call in `make build`. CC BY-ND bars adaptation, so facts + link only.
 - **Canada OPC (1C.7, licence 1; bilingual).** [E] ~1-2/yr (joint investigations),
   backlog ~5; English originals exist.
 - **HackerOne (1D.2, licence 1).** [E] no documented public API; the only bulk
@@ -1264,7 +1260,7 @@ ACSC is scored L=1 (provisional, D39) and every row whose section-1 status is
 | 17 | ACSC (L=1, provisional, U) | 1 | 1 | 1 | 0 | 0 | unreachable via `common.py` |
 | 17 | JPCERT/CC | 1 | 0 | 1 | 3 | 0 | no AI items; duplicated by JVN |
 | 17 | CERT-EU | 1 | 0 | 1 | 3 | 0 | no AI items |
-| 17 | Dutch AP | 1 | 1 | 2 | 0 | 0 | refused by `common.py` rule order |
+| 17 | Dutch AP | 1 | 1 | 2 | 0 | 0 | refused by `common.py` (stdlib robotparser, no wildcard support) |
 | 17 | CNIL | 1 | 1 | 2 | 0 | 0 | open-data host robots-disallowed |
 | 17 | Brazil ANPD | 1 | 0 | 2 | 1 | 0 | |
 | 17 | Canada OPC | 1 | 0 | 2 | 1 | 0 | |
@@ -1293,9 +1289,7 @@ the filter (without it the ingest is unfiltered), WS4-T2 reconciliation handling
 `REJECTED` before the first merge (17 stale entries already); (huntr) a WS0-T1 row
 stating that only CVE-record text is taken and the bounty URL kept as a link.
 No outreach needed. **Expected yield:** AVID ~1,070 net-new entries (800-1,300,
-n=40 [E]) plus ~600 enrichments of existing CVE entries; cvelistV5 ~300 backlog in
-the 30-month window [M, lower bound] plus ~120/yr [E], inside which huntr is 233
-backlog [M] and ~40-70/yr [E]. **First-year total ≈ 1,200-1,600 net-new entries
+n=40 [E]) plus ~600 enrichments of existing CVE entries; cvelistV5 ≥416 backlog in the 30-month window [M, lower bound: union of the EUVD-route 293 and the huntr-route 228, which share 105 ids] plus ~165/yr [E], of which the huntr CNA slice is 228 backlog [M] and ~40-70/yr [E]. **First-year total ≈ 1,200-1,600 net-new entries
 (about +9-12% on 13,361)**; this is less than the sum of the parts because AVID's
 CVE-keyed new reports and cvelistV5's new CVEs are largely the same universe
 (not double counted), and it excludes the ~515 refresh backlog that a plain CVE
@@ -1314,12 +1308,12 @@ exception for the API is wanted (not recommended: OAI-PMH works unmodified);
 the Legal Notice's reproduction clause. **Expected yield:** arXiv 60-100 curated
 entries/yr [E] (backlog a few hundred if the curated list is back-filled); EUVD 0 new
 CVE entries [M]; enrichment (EPSS present on 3,873 of 3,873 items) of up to the
-6,986 CVE-keyed corpus entries.
+5,293 CVE-keyed corpus entries (6,986 CVE ids).
 
 **Wave 3 (optional, low yield): regulators, ICO + EDPB (+ Garante).** Why: the only
 incident-category additions, and the only place where the corpus gains something
 AIID/AIAAIC/OECD may not carry. They are small (≤55 EDPB decisions in the AI topic;
-ICO and Garante single digits per year), expensive per entry (HTML/XHR, Crawl-delay
+ICO ~3-8/yr, Garante ~8-12/yr [E]), expensive per entry (HTML/XHR, Crawl-delay
 6, Italian translation) and partially duplicated by AIAAIC/OECD. **Needs:** ICO
 OGL notice and the XHR endpoint documented or the source hand-curated; EDPB facts +
 link rule for national decisions; Garante outreach and an offline-translation
@@ -1336,7 +1330,7 @@ Black Hat / DEF CON.
 
 | Prior | What the measurement says |
 |---|---|
-| **Wave 1 = CISA (beyond KEV) + huntr + EUVD** | **Mostly not supported.** *CISA beyond KEV*: product 2. `cisa.gov` feeds return 403 to the project User-Agent; the structured route is the ICS-heavy CSAF repo; AI-relevant content is a handful of guidance documents a year; licence 2 with a co-seal carve-out. *huntr*: **supported as a target, not as a source.** 233 AI-relevant CVEs missing (63% of its window set) is the strongest single-CNA gap found, but huntr.com serves no report fields (HTTP 200 shell, 0 of 6 field markers), so it is a CNA filter inside cvelistV5. *EUVD*: not supported for wave one. 3,873 of 3,873 items are CVE-duplicates of cvelistV5, the licence is (d) with an outreach prerequisite, and the date format and fuzzy search are maintenance costs; its unique fields (EPSS, EUVD id) are enrichment. **Missing from the prior and ranked first:** AVID (already 109 entries, repo current at 1,790 IDs) and cvelistV5. |
+| **Wave 1 = CISA (beyond KEV) + huntr + EUVD** | **Mostly not supported.** *CISA beyond KEV*: product 2. `cisa.gov` feeds return 403 to the project User-Agent; the structured route is the ICS-heavy CSAF repo; AI-relevant content is a handful of guidance documents a year; licence 2 with a co-seal carve-out. *huntr*: **supported as a target, not as a source.** 228 AI-relevant CVEs missing (62% of its window set) is the strongest single-CNA gap found, but huntr.com serves no report fields (HTTP 200 shell, 0 of 6 field markers), so it is a CNA filter inside cvelistV5. *EUVD*: not supported for wave one. 3,873 of 3,873 items are CVE-duplicates of cvelistV5, the licence is (d) with an outreach prerequisite, and the date format and fuzzy search are maintenance costs; its unique fields (EPSS, EUVD id) are enrichment. **Missing from the prior and ranked first:** AVID (already 109 entries, repo current at 1,790 IDs) and cvelistV5. |
 | **Wave 2 = NCSC / ACSC / CCCS** | **Not supported.** NCSC is cleanly licensed (3) but publishes guidance and commentary, not incidents or vulnerabilities (product 6; 1 incident-like item in the 25 AI titles seen). **CCCS is non-commercial only**, so facts + link at best, with 0 AI titles in a 50-item sample (product 3). **ACSC cannot be reached through `common.py`** (robots read times out, fail-closed) and its licence is an unverified extract (product 0). The "permissive trio" is one permissive source with the wrong content, one restricted, one unreachable. |
 
 ### 5.5 Cross-tranche caveat

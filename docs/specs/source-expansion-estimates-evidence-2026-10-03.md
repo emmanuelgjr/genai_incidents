@@ -32,6 +32,8 @@ a CVE-id regex that matches nothing (the checks return both in-corpus and
 not-in-corpus items, 911 / 302 for EUVD, 135 / 233 for huntr, so they
 discriminate).
 
+**Gate update 2026-10-03 (do not regenerate):** the membership test keyed on `CVE-` ids in `source_ids` only. 9 of the 302 EUVD ids and 5 of the 233 huntr ids are in the corpus as AVID-keyed entries whose title names the CVE. Corrected: 293 and 228; union 416. The input that makes this check fail is a CVE held under a non-CVE source id.
+
 ## Proxy AI-relevance regex (`TIGHT`, case-insensitive, on CVE description)
 
 `llms? | large language models? | language models? | machine[- ]learning |
