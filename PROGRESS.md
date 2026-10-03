@@ -83,7 +83,15 @@
 - **2026-10-03:**
   - **Replacement and redispatch.** The D39 applier stalled after one partial edit and was REPLACED per agreement 3: stopped, and a fresh license-auditor dispatched. Its fixes were verified by foreman grep and committed as `e2b1c988` (pushed): 9 must-be-present strings were present, 4 must-be-absent strings were absent, and the stale section-6 status line was fixed.
   - **Narrow string-check gate:** dispatched to red-reviewer on `6d77a194..e2b1c988`.
-  - **pipeline-engineer dispatched in parallel** on `eval/source-expansion-estimates` (from `e2b1c988`, its own worktree). It fills sections 4–5 only, which are disjoint from the gated licence rows, and gets merged after. **The deviation from serial execution is deliberate**, because the two sections do not overlap. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
+  - **pipeline-engineer dispatched in parallel** on `eval/source-expansion-estimates` (from `e2b1c988`, its own worktree). It fills sections 4–5 only, which are disjoint from the gated licence rows, and gets merged after. **The deviation from serial execution is deliberate**, because the two sections do not overlap.
+- **Gate 3, the D39 narrow string-check (red-reviewer, 2026-10-03, on `e2b1c988`): BOUNCE on 3 text-only defects.** The verdict text is in `docs/audits/source-expansion-tranche2-gate3-D39-stringcheck-2026-10-03.md`.
+  - **The 3 defects:**
+    - D1: the stale "need raw-HTML confirmation" header in the huntr cell.
+    - D2: item 33's command returns 277, not 284. The pattern was partly the gate's own omission; corrected commands were re-run and give 284 and 277.
+    - D3: five stale "not gated / method-suspect" status lines.
+  - **What passed:** everything else, including verbatim landing of D1–D9, no undeclared moves, ACSC at 1 with the new scale clause cited, and invariants.
+  - **⚖ Foreman call, surfaced to the user:** this is treated as falling WITHIN D39 (apply the gate's text verbatim, then a string-check), not as a third bounce. Every defect is the gate's own exact text and needs no re-measure. **The user may overrule.**
+  - **Next:** the fixes went to the same fresh license-auditor for verbatim application, followed by a string re-check. on the rows not licence-blocked → ranked waves to the user. Still blocked on the user's tranche-1 names for the cross-tranche ranking.
 
 ## 🖼 README PR #100 — **MERGED `e1260900` (2026-10-01)** · D32 post-cut queue COMPLETE
 
