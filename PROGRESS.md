@@ -178,6 +178,12 @@
   - **Fixes:** release notes `7a4614b0` (distribution-engineer); D1 and D2 fixed at `07532bb6`. The README omits the bare 2,305 because `check_stats_drift` forbids it.
   - **Dispatched:** a combined pass, the integration re-check plus the release-notes gate (VERSIONING step 1).
 - **NEW BOARD NOTE N10 → pipeline-engineer:** 21 AVID-only CVEs on new wave-12 entries have no rejection state. The next rejection refresh should pick them up (never-checked first); verify after the first run.
+- **v2.12.0 gates so far:**
+  - **Integration (`release/v2.12.0`): CLOSED, PASS** (re-check at `07532bb6`).
+  - **Release notes, BOUNCE #1** (`docs/audits/v2.12.0-notes-gate1-verdict-2026-10-04.md`): confidence split, the issue-#88 suppression of 410 rows (not folding), backlog dates, carried-figure labels.
+  - **Fixes at `9f00cf6c`.** **BOUNCE #2** (`...-notes-gate2-...`): a 14% share misattributed to the 410, and the 112 figure unlabelled. **The foreman's brief repeated the author's wrong 14% sentence; the gate refuted it.**
+- **⚖ D47, USER RULING 2026-10-04:** apply verbatim, then a string check. Next: the cut.
+- **NEW BOARD NOTE N11 → maintainer (user):** 410 of the wave-12 emitted rows (352 cvelistV5, 58 AVID, 79 of them huntr) are suppressed by the issue-#88 out-of-scope list (`data/issue88_remediation.json`). Some may be wrongly listed, for example CVE-2023-7215 (chatgpt-web). This is a maintainer review, not settled by v2.12.0.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
