@@ -442,6 +442,8 @@ def to_row(rec: dict, reasons: dict) -> dict:
         }],
         "tags": ["arxiv", "auto-selected", "paper"],
         "description_provenance": "original",
+        # machine-selected only, no human-approved list (D43): explicit `auto`
+        "quality_tier": "auto",
     }
 
 

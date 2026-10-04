@@ -519,3 +519,14 @@ def test_arxiv_window_applies_to_v1_month_not_latest_version_date():
     assert rows == [] and stats["v1_before_window"] == 1
     rows, _, _ = AX.build([dict(rec, id="2510.00001")], since=__import__("datetime").date(2025, 10, 1), known=set())
     assert rows[0]["date"] == "2025-10"
+
+
+def test_arxiv_rows_are_machine_selected_and_reach_the_corpus_as_auto():
+    import merge_and_dedupe as M
+    recs, _ = _arxiv_records()
+    r = next(x for x in recs if x["id"] == "2510.10271")
+    row = AX.to_row(r, AX.select(r)[1])
+    assert row["quality_tier"] == "auto"
+    assert M.normalize_entry(row)["quality_tier"] == "auto"
+    # a source cannot self-promote
+    assert "quality_tier" not in M.normalize_entry(dict(row, quality_tier="curated"))

@@ -1,6 +1,6 @@
 # Wave 1 + wave 2 ingest: field-level delta (2026-10-03)
 
-Branch `ws4/wave12-ingest`, code commit `b45095fe` (the data commit follows it).
+Branch `ws4/wave12-ingest`, code commit `394b35ac` (the data commit follows it).
 Machine-readable twin: `wave12-ingest-delta-2026-10-03.json`. Produced by
 `scripts/audit/wave12_delta.py` from the corpus at `9604752f` (before) and the
 rebuilt corpus (after). Working agreement 2: unintended deltas are defects.
@@ -371,7 +371,7 @@ or deployed target, not the famous ones. If the maintainer wants the curated rat
 curated taste, that needs a committed approval list (as WS4-T4 does for CVEs), not a
 sharper regex. Dedupe against the 123 curated rows: by arXiv id in source ids and reference
 URLs (0 collisions) and by the merger's URL/title keys
-(0). No human approved these 55.
+(0). No human approved these 55 (user ruling D43: deterministic selection only, no approved list): every row ships `quality_tier: auto` (enum curated/reviewed/auto), hence `confidence: low` and `tier: feed`. Before this fix they were silently classed `reviewed` because the merger's ARXIV- prefix rule treats the id as a research catalogue; `normalize_entry` now honours an explicit `auto` from a source (never curated/reviewed).
 
 Spot-read: 30 of 55, seeded random (seed 2026). Read as "is this an attack
 paper whose target is a GenAI/agentic system": **28 yes, 2 borderline, 0 no.** (Rows are now original text; the read is of title and abstract.)

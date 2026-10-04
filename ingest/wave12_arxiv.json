@@ -19,7 +19,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.04261",
@@ -41,7 +42,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.10271",
@@ -63,7 +65,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.10281",
@@ -85,7 +88,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.17277",
@@ -107,7 +111,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.17904",
@@ -129,7 +134,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.21190",
@@ -151,7 +157,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2510.22963",
@@ -173,7 +180,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.02376",
@@ -195,7 +203,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.05797",
@@ -217,7 +226,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.07876",
@@ -239,7 +249,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.16110",
@@ -261,7 +272,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.16709",
@@ -283,7 +295,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2511.21180",
@@ -305,7 +318,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2601.09625",
@@ -327,7 +341,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2601.12460",
@@ -349,7 +364,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2602.04653",
@@ -371,7 +387,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2602.05401",
@@ -393,7 +410,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2602.19450",
@@ -415,7 +433,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2602.22242",
@@ -437,7 +456,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2603.09246",
@@ -459,7 +479,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2603.13420",
@@ -481,7 +502,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2603.13847",
@@ -503,7 +525,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2603.27522",
@@ -525,7 +548,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2603.28013",
@@ -547,7 +571,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.05809",
@@ -569,7 +594,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.12232",
@@ -591,7 +617,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.15368",
@@ -613,7 +640,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.21829",
@@ -635,7 +663,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.23711",
@@ -657,7 +686,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2604.28157",
@@ -679,7 +709,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2605.11229",
@@ -701,7 +732,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2605.14460",
@@ -723,7 +755,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2605.17971",
@@ -745,7 +778,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2605.18133",
@@ -767,7 +801,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2605.30667",
@@ -789,7 +824,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2606.06244",
@@ -811,7 +847,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2606.10742",
@@ -833,7 +870,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2606.15788",
@@ -855,7 +893,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2606.21077",
@@ -877,7 +916,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.00481",
@@ -899,7 +939,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.02961",
@@ -921,7 +962,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.05120",
@@ -943,7 +985,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.07433",
@@ -965,7 +1008,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.15657",
@@ -987,7 +1031,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.19267",
@@ -1009,7 +1054,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.23444",
@@ -1031,7 +1077,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2607.25936",
@@ -1053,7 +1100,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2608.04741",
@@ -1075,7 +1123,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2608.23471",
@@ -1097,7 +1146,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2609.01222",
@@ -1119,7 +1169,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2609.04533",
@@ -1141,7 +1192,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2609.09553",
@@ -1163,7 +1215,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2609.32635",
@@ -1185,7 +1238,8 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   },
   {
     "source_id": "ARXIV-2609.39902",
@@ -1207,6 +1261,7 @@
       "auto-selected",
       "paper"
     ],
-    "description_provenance": "original"
+    "description_provenance": "original",
+    "quality_tier": "auto"
   }
 ]

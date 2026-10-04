@@ -4,7 +4,7 @@
   "window": {
     "v1_month_since": "2025-10",
     "note": "dated by v1 (id YYMM), not by the OAI created field",
-    "datestamp_until": "2026-10-03"
+    "datestamp_until": "2026-10-04"
   },
   "min_interval_seconds": 3.0,
   "stats": {
