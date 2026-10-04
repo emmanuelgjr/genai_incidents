@@ -165,6 +165,13 @@
     - **Gate measurements [R]:** D1–D6 were verified failing-first at gate 2, and the D46 single-merge plan was confirmed by `git merge-tree`.
     - **Escalation path:** 3 bounces were taken under D46 rulings; the last was a 2-word attribution fix.
   - **Next: integration.** pipeline-engineer merges both branches onto `release/v2.12.0`, hand-resolves the Makefile (keeping both targets), rebuilds and publishes one field-level delta against main. The stale-tree check is mandatory because both branches are based on `9604752f`.
+- **v2.12.0 INTEGRATION DELIVERED** (`release/v2.12.0` @ `9aed2a4a`, pushed).
+  - **Counts:** **15,666 entries; `incident_count` 15,637 (+2,276 vs main); `retracted_count` 29;** landmark 1,915 (unchanged).
+  - **Delta:** 2,305 new (wave12) + 163 field changes on 35 entries (WS4-T2), **0 unintended** (`docs/audits/v2.12.0-integration-delta-2026-10-04.md`).
+  - **Build and checks:** double rebuild byte-identical; 583 tests; no stale-tree deletions.
+  - **Foreman checks [R]:** licence surfaces are singular (row 2.5, §6.2, CVE grant with ™).
+  - **The engineer correctly refused one part of the foreman's brief:** the wave12 targets stay OUT of `ingest-all`, per the gated design note.
+  - **In parallel:** the integration gate (fresh red-reviewer) and the release-notes draft (distribution-engineer, VERSIONING step 1).
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
