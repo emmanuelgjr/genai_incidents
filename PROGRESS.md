@@ -92,6 +92,26 @@
     - **Wave 4:** OpenSSF only if the user accepts per-record Apache attribution. The cheaper route is to widen the GHSA malware filter, since 157 of 158 candidates have a GHSA twin.
     - **Hold:** FTC (an edge rule returns 403 to the project UA; route is FTC outreach or a user ruling), plus CERT/CC, EPSS and GHSL.
   - **Advisory 1 (wording) was not applied;** it is recorded in the PASS file.
+- **⛔ Wave 1–2 ingest PR: BOUNCE #1** (red-reviewer, on `d49d9647`). The verdict is in `docs/audits/wave12-ingest-gate1-verdict-2026-10-03.md`.
+  - **NOT a precision failure [R]:** cvelistV5 precision is about 97% counting only clear false positives, about 91% counting borderline cases as misses. The corpus's existing CVE/GHSA feed measures about 48% by the same method.
+  - **Delta confirmed [R]:** 0 existing entries changed, rebuild byte-exact, guard tests fire when mutated.
+  - **The 7 defects:**
+    - D1: arXiv dates use the latest-version date; 8 papers are pre-window.
+    - D2: AVID CVE-class rows carry CNA text under an MIT marker.
+    - D3: 87 AVID third-party rows ship verbatim text.
+    - D4: `INGESTION_CONDUCT` entry 3 still says pending.
+    - D5: `SOURCE_LICENSES` cells contradict the code.
+    - D6: about 20 clear false positives that would become permanent IDs (Linux-kernel `llm`, MitraStar GPT routers, product self-descriptions).
+    - D7: the NOTICE-DATA MITRE trademark line.
+  - **Foreman routing:**
+    - D3 is resolved by making the code match row 6.1 (original prose); this is not a licensing change.
+    - D1, D2, D4, D6 and the code half of D5(c) → pipeline-engineer.
+    - D5(a), (b), (e) and D7 → license-auditor.
+    - D5(c) row text follows the code.
+- **⚖ D43, USER RULING 2026-10-04 (gate defect 5(d)):** arXiv selection is deterministic only.
+  - Ship the filter-selected papers as quality_tier `auto`.
+  - license-auditor amends row 6.3 to describe the real filter.
+  - A human curation pass may follow later.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
