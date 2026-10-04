@@ -2,6 +2,44 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🎉 v2.12.0 PUBLISHED 2026-10-04: all VERSIONING steps done and independently verified
+
+- **Count:** **`incident_count` 15,637 (from 13,361, +2,276); `retracted_count` 29; 15,666 entries in the file** (D44 semantics). Landmark count 1,915, unchanged.
+- **What ships:**
+  - wave 1–2 sources (AVID, cvelistV5 with the huntr CNA, arXiv cs.CR metadata): 2,305 new entries, all `auto`/`feed`;
+  - WS4-T2: 29 retracted and 6 flagged for REJECTED CVEs;
+  - schema `status`, `status_reason` and `rejected_cve_ids`;
+  - licence rows 2.4 (corrected), 2.5 and 6.1–6.4; CVE ToU and AVID MIT notices;
+  - redirect-checked conduct.
+- **Gates (all records in `docs/audits/`):**
+  - wave12: BOUNCE ×2 under D45, then PASS (`29e98fee`);
+  - WS4-T2: BOUNCE ×3 under D46, then PASS (`1600178f`);
+  - integration: PASS (`07532bb6`);
+  - notes: BOUNCE ×2 under D47, then PASS (`47781e06`);
+  - pre-publish: BOUNCE ×1, then PASS (`9962ae44`).
+- **Step 6 [R]:** `--no-ff` merge `1813599f` on main. Tag `v2.12.0` (`8e3a6ad0`) is pushed, and `git ls-remote origin 'refs/tags/v2.12.0*'` shows `^{}` = `1813599f`, the merge commit. The merged tree has 0 deletions vs the previous main and `PROGRESS.md` is unchanged.
+- **Step 7 [R]:** Release published, not a draft. The body is byte-identical to `docs/releases/v2.12.0.md` (19,743 B, API with UTF-8 decode).
+- **Step 8 [R]:** Zenodo version DOI **`10.5281/zenodo.23144567`**. doi.org returns 302; the record has version 2.12.0, concept DOI 10.5281/zenodo.20248675, published 2026-10-04.
+- **Step 8b [R]:** the DOI is filled into the notes (`36f760fd`). The Release body was re-synced and re-verified byte-identical (20,074 B).
+- **Step 9 [R]:** `publish.yml` and `huggingface.yml` both show event `release`, headBranch `v2.12.0`, completed/success.
+  - **PyPI** latest is 2.12.0, with wheel and sdist.
+  - **HF card** (`emmanuelgjr/genai-incidents`): "Dataset version `2.12.0`", 15,637.
+  - The live STIX/TAXII check is pending the Pages deploy.
+- **The goal's tranche-names item:** not found on any surface, so the list was reconstructed, gated and merged (`docs/specs/source-expansion-tranche1-*`). The user may amend it.
+- **Open for the user:**
+  - wave 3 (CourtListener bulk + 0din) and wave 4 (OpenSSF, or widen the GHSA filter);
+  - the D42 review of 17 OECD/AIID refresh changes;
+  - the duplicate-rejection policy (3 entries);
+  - N11, the issue-#88 suppression review (410 rows);
+  - sending the ENISA/EUVD outreach.
+- **Follow-ups:**
+  - N9 (CVE/GHSA feed precision);
+  - N10 (21 AVID-only CVEs need their first rejection check);
+  - STIX `revoked`;
+  - the `load_incidents` doc;
+  - the refresh branch (WS4-T12/T14) gate and merge;
+  - the HF card template phrase "real-world and research incidents".
+
 ## 🚚 2026-10-03 — USER GOAL: waves 1+2 APPROVED · count update · release if it bumps · tranche-1 names · push and merge
 
 - **⚖ D40, USER RULING 2026-10-03: waves 1 and 2 are APPROVED.**
