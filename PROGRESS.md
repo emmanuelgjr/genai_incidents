@@ -2,6 +2,104 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🚚 2026-10-03 — USER GOAL: waves 1+2 APPROVED · count update · release if it bumps · tranche-1 names · push and merge
+
+- **⚖ D40, USER RULING 2026-10-03: waves 1 and 2 are APPROVED.**
+  - **Wave 1:** AVID + cvelistV5, with huntr as a CNA filter inside cvelistV5.
+  - **Wave 2:** arXiv cs.CR via OAI-PMH, metadata only, with EUVD as enrichment.
+  - **EUVD is NOT ingested until outreach settles its licence (d).** Its outreach email is drafted for the user to send (protocol step 8).
+  - **Release:** the user directed checking the count, updating it, and cutting a release if it bumps.
+- **Tranche-1 names, searched again by new routes:** Gmail (the only "huntr" hits are the unrelated huntr.co job newsletter), Google Drive (OWASP documents only), and every earlier route. **Not found.**
+  - **Solution, at the user's direction:** a reconstruction from the tranche-2 brief's own phrasing, which is the US and industry counterpart of each worldwide category. It is recorded with each name's basis in `docs/specs/source-expansion-tranche1-reconstruction-2026-10-03.md` (`8699cc35` on `ws0/tranche1-reconstructed`, pushed).
+  - The 8 reconstructed names: CERT/CC VU, CourtListener, FTC, 0din, EPSS, OpenSSF malicious-packages, HF security, GHSL. **The user may amend them.**
+- **Count-update finding: the weekly auto-refresh has FAILED on every run since the unfreeze.**
+  - The failing runs are 09-20 and 09-27. Both fail on the E21 tripwire `test_oecd_aiid_content_disagreement_is_unique_to_inc00437`, which found 42 rows against an expected 2.
+  - As a result no refresh PR has opened, and `incident_count` has been 13,361 since 2026-09-18.
+  - The AIRI download URL also returns 404.
+- **Dispatched in parallel, one worktree each.** The deviation from serial execution is deliberate: the tasks are independent, and integration happens by rebuild.
+  - license-auditor: wave 1–2 `SOURCE_LICENSES` rows, the CVE ToU and AVID MIT notices, and the EUVD outreach draft (`ws0/wave12-licence-rows`).
+  - license-auditor: reconstructed tranche-1 pre-rows (`ws0/tranche1-reconstructed`).
+  - pipeline-engineer: refresh-tripwire diagnosis, measurement only (`ws4/refresh-tripwire-42`).
+  - pipeline-engineer: N1, the 17 entries still active for rejected CVEs, reconciled under invariant 3 with a field-level delta (`ws4/rejected-cve-reconcile`).
+  - pipeline-engineer: wave 1–2 ingest (AVID, cvelistV5 + huntr CNA + the post-2026-06 CVE catch-up, arXiv OAI-PMH), with a field-level delta (`ws4/wave12-ingest`).
+- **Delivered so far:**
+  - **Wave 1–2 licence rows:** `ad8ddfb5` on `ws0/wave12-licence-rows`, pushed. Not gated alone; they gate together with the ingest PR (invariant 10). The AVID MIT text was foreman-verified word-identical to upstream.
+  - **Foreman correction to the auditor's draft:** the MITRE copyright line was written from memory with "All rights reserved". Per cve.org's own `FooterModule.vue` it is "Copyright © 1999-{currentYear}, The MITRE Corporation.", and it has been fixed.
+  - **Tranche-1 pre-rows:** `06c7d561` on `ws0/tranche1-reconstructed`, pushed.
+    - **Foreman refuted:** T1.9 (Hugging Face advisories) does not exist as a source and is to be dropped.
+    - T1.8 and T1.10 largely duplicate ingested OSV and GHSA.
+    - red-reviewer has been dispatched to run the 24 absence checks.
+- **⛔ Tranche-1 pre-rows: BOUNCE #1 (red-reviewer, 2026-10-03, on `06c7d561`). 8 defects.** The verdict is in `docs/audits/source-expansion-tranche1-gate1-verdict-2026-10-03.md`, both parts saved as received and concatenated by shell.
+  - **Refuted by shell:**
+    - T1.6 0din: a CC BY 4.0 HF corpus exists, so 1 → 2.
+    - T1.7 EPSS: FIRST's terms exist and are purpose-limited; it stays 1, no longer provisional.
+  - **T1.4 CourtListener splits:** 2 for bulk S3, 0 for crawling, because robots.txt says `Disallow: /`.
+  - **Text corrections:** T1.3, T1.5, T1.8, T1.9 and T1.10.
+  - **Gate measurements [R]:** of the 24 checks, 13 confirmed, 6 refuted, 4 resolved.
+  - **The foreman's framing was confirmed** on T1.9 (drop it) and on the OSV question.
+  - Fixes have gone to license-auditor for verbatim application.
+- **N6 CONFIRMED by gate [R], and now RELEASE-BLOCKING.**
+  - `SOURCE_LICENSES.md` row 2.4's "every reachable OSV database is CC-BY 4.0" is FALSE. OSV lists "OpenSSF Malicious Packages (Apache 2.0)".
+  - **The committed `ingest/cve_nvd_expanded.json` carries 2 `MAL-` records with verbatim Apache-2.0 OpenSSF text under a CC BY claim**: MAL-2026-3607 and MAL-2026-2144. The repo itself is a distribution channel.
+  - The published `data/incidents.json` carries no MAL text today. INC-08450's description comes from GHSA.
+  - **The fix rides the wave-1/2 licence PR:** correct row 2.4 in place, as a live surface, and either filter `MAL-` in the OSV ingest or attribute those records per record as Apache-2.0.
+- **Tranche-1 gate-1 fixes applied, `6608869a`.** Foreman-verified: 10 gate phrases present. Then **⛔ BOUNCE #2 (string re-check, 2026-10-03), escalated.**
+  - **What passed:** no score, action letter or quote is wrong. The 23 applied quotes match the gate's raw captures.
+  - **What failed:** leftover first-pass text contradicts the corrections, and statuses still say "pending". The verdict is in `docs/audits/source-expansion-tranche1-gate2-verdict-2026-10-03.md`, saved as received.
+- **⚖ D41, USER RULING 2026-10-03:** apply the gate's text verbatim, then a narrow string check (the D39 pattern). The fixes went to license-auditor.
+- **✅ Tranche-1 licence pre-rows PASS (D41 string check, red-reviewer, 2026-10-03, on `d1a6774b`). No defects.** The verdict is in `docs/audits/source-expansion-tranche1-gate3-PASS-2026-10-03.md`.
+  - **Gated scores:** CERT/CC 1 · CourtListener 2 (bulk) / 0 (crawl) · FTC 2 · 0din 2 (via the HF CC BY corpus) · EPSS 1 · OpenSSF 2 · HF drop · GHSL 1.
+  - **Next:** tranche-1 estimates go to a fresh pipeline-engineer.
+- **Refresh-tripwire diagnosis DELIVERED (pipeline-engineer, `9ef355f5` on `ws4/refresh-tripwire-42`, pushed).** Record: `docs/audits/refresh-tripwire-2026-10-03.md`. Not yet gated.
+  - **The 42 rows:** 2 known + 30 new + 7 existing that gained an `aiid_id` + 3 mixed.
+  - **One mechanism:** OECD's `aiid_ids` act as merge keys while the AIID snapshot is stale.
+  - **No OECD narrative ships:** 42/42 descriptions are `build_description()`.
+  - **Only one fatal failure:** the tripwire is it. The AIRI download is `continue-on-error`; AIRI was relaunched as Next.js, its zip is gone and `/api/` is robots-disallowed. Last successful refresh: 2026-05-31.
+  - **Unblocking would write** 7 new `merged` deprecations (permanent; 3–4 look wrong on a title-only read), retitle 4 published IDs, and add `aiid_id` to 11 rows.
+- **⚖ D42, USER RULING 2026-10-03: keep D25(a) in force for OECD/AIID refresh merges.**
+  - The release ships waves 1–2 plus the rejected-CVE fix on today's committed OECD/AIID data.
+  - **Build WS4-T12** (OECD description provenance) and **WS4-T14** (an AIID snapshot step in the refresh) next.
+  - The 7 merges come back to the user as a reviewed list (D28 pattern) before any refresh merges.
+- **NEW BOARD NOTE N8 → WS0 + WS4.** The AIRI Navigator ingest is dead since 2026-05-31: the site was relaunched, the data zip is gone, and `/api/` is disallowed. It needs a redesign: find whether the bulk data is published elsewhere, and get a licence re-read.
+- **Wave 1–2 ingest DELIVERED** (pipeline-engineer, `ws4/wave12-ingest`, pushed). The licence rows were merged in under invariant 10 → `d49d9647`.
+  - **Claimed:** 13,361 → **15,872 (+2,511)**, 0 changes to existing entries, IDs INC-14911..17421. By source: cvelistV5-only 2,240, AVID 103 + 105, arXiv 63. Tests 520 pass.
+  - **Design choices the engineer made:**
+    - AVID enrichment of existing CVE entries was dropped on purpose: it would have tripped the split guard, and it rewrote 79 fields.
+    - `scripts/corpus_overlap.py` skips any row that would fold into an existing entry.
+    - The cvelistV5 bulk asset comes in via the new `fetch_to_file`, not `git clone`.
+    - The OpenSSF `MAL-` text is purged by `scripts/audit/purge_openssf_mal.py` (verified: "Per source details" now has 0 hits).
+  - **⚠ Deviation the foreman flagged for the gate:** cvelistV5's 2,240 is about 5× the gated estimate (≥416 + ~165/yr). **Filter precision is the crux.**
+  - **red-reviewer dispatched** with a precision sample of ≥60 + 20 + 15, delta re-derivation, invariants and licensing.
+- **N6 handling, recorded as a decision (it was implemented before it was recorded; a specialist caught the gap):** `MAL-` (OpenSSF, Apache-2.0) records are **EXCLUDED** from the OSV route, via `is_openssf_malicious` in `scripts/ingest_cve_nvd_expanded.py`. `SOURCE_LICENSES` row 2.4 now states this.
+  - **Open, for the gate and possibly the user:** MAL-2026-3607 is kept as a bare identifier plus links, so that INC-08450 does not split.
+- **Tranche-1 estimates DELIVERED** (`85deb30d`, pushed).
+  - **Proposed waves:** CourtListener (bulk) and 0din → wave 3; OpenSSF → wave 4; FTC on hold (robots 403 to the project UA); CERT/CC, EPSS and GHSL held.
+  - **Gate dispatched** to the tranche-2 §4–5 reviewer.
+- **⛔ Tranche-1 estimates: BOUNCE #1** (red-reviewer, on `85deb30d`). The verdict is in `docs/audits/source-expansion-tranche1-estimates-gate1-verdict-2026-10-03.md`, saved as received.
+  - **D1:** OpenSSF is dominated by GHSA. 157 of its 158 candidates have a CC BY GHSA malware twin.
+  - **D2:** the N6 text was stale; exclusion via OSV does not zero T1.8.
+  - **D3:** the sensitivity sentence. **D4:** an FTC [M] scope.
+  - **Products confirmed:** 16, 12, 8, 0.
+  - **FTC 403 diagnosis:** an edge rule rejects UAs containing a URL, which includes the project UA. It is not robots.
+    - Bypassing it would be evasion.
+    - **The only routes are FTC outreach (the user sends it) or a user ruling.**
+  - The fixes went to pipeline-engineer for verbatim application.
+- **✅ Tranche 1 (reconstructed): DONE and MERGED to main** (`80d8b840`, merged `--no-ff`).
+  - **Gates:** licence pre-rows PASS at `d1a6774b`; estimates and ranking BOUNCE #1, then PASS at `80d8b840` (`docs/audits/source-expansion-tranche1-estimates-gate2-PASS-2026-10-03.md`).
+  - **Gate evidence [R]:** products 16 / 12 / 8 / 0 re-derived by independent routes; merge-tree rc=0; only `docs/specs/` touched.
+  - **Proposed waves (decision owed to the user):**
+    - **Wave 3:** CourtListener (bulk S3 only; needs a curated docket list and a privacy review) + 0din (HF CC BY corpus; at most 14 new records beyond AVID).
+    - **Wave 4:** OpenSSF only if the user accepts per-record Apache attribution. The cheaper route is to widen the GHSA malware filter, since 157 of 158 candidates have a GHSA twin.
+    - **Hold:** FTC (an edge rule returns 403 to the project UA; route is FTC outreach or a user ruling), plus CERT/CC, EPSS and GHSL.
+  - **Advisory 1 (wording) was not applied;** it is recorded in the PASS file.
+- **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
+- **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
+- **Integration plan:**
+  1. Merge the licence rows into the ingest branch (invariant 10).
+  2. red-reviewer gates each data branch.
+  3. Integrate on a release branch and rebuild.
+  4. Run the VERSIONING.md cut if the count bumps.
+
 ## ✅ Source-expansion evaluation (tranche 2 + partial tranche 1): **DONE and MERGED to main `2504fb89` (2026-10-03)**
 
 - **Final gate: PASS (fresh red-reviewer, gate 6, 2026-10-03, on `946a7e55`), no defects.** Verdict text in `docs/audits/source-expansion-tranche2-gate6-final-PASS-2026-10-03.md`.
