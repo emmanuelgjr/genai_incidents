@@ -7114,15 +7114,15 @@ All **15,666** incidents in a single table, newest-first. Each `INC-*****` link 
 | 6,984 | 2026-02 | [`INC-09453`](docs/incidents/2026.md#inc-09453) | NiceGUI's Path Traversal via Unsanitized FileUpload.name Enables Arbitrary File Write | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-25732` |
 | 6,985 | 2026-02 | [`INC-09454`](docs/incidents/2026.md#inc-09454) | NiceGUI's XSS vulnerability in ui.markdown() allows arbitrary JavaScript execution through unsanitized HTML c… | Medium | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-25516` |
 | 6,986 | 2026-02 | [`INC-09405`](docs/incidents/2026.md#inc-09405) | Nokogiri does not check the return value from xmlC14NExecute | Medium | LLM04 | ASI04 |  |
-| 6,987 | 2026-02 | [`INC-15013`](docs/incidents/2026.md#inc-15013) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Artistic Escalation" Tactic | Medium | LLM01 |  |  |
-| 6,988 | 2026-02 | [`INC-15001`](docs/incidents/2026.md#inc-15001) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Classical Art Reframing" Tactic | Medium | LLM01 |  |  |
-| 6,989 | 2026-02 | [`INC-15008`](docs/incidents/2026.md#inc-15008) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Debug Framework Simulation" Tactic | Medium | LLM01 |  |  |
-| 6,990 | 2026-02 | [`INC-15012`](docs/incidents/2026.md#inc-15012) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Feminist Art Description" Tactic | Medium | LLM01 |  |  |
-| 6,991 | 2026-02 | [`INC-15010`](docs/incidents/2026.md#inc-15010) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Historical NSFW" Tactic | Medium | LLM01 |  |  |
-| 6,992 | 2026-02 | [`INC-15017`](docs/incidents/2026.md#inc-15017) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Historical Polaroid" Tactic | Medium | LLM01 |  |  |
-| 6,993 | 2026-02 | [`INC-15019`](docs/incidents/2026.md#inc-15019) | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Surprise Attack" Tactic | Medium | LLM01 |  |  |
-| 6,994 | 2026-02 | [`INC-15003`](docs/incidents/2026.md#inc-15003) | NSFWOpenAI Sora Guardrail Jailbreak via "Anatomical Escalation" Tactic | Medium | LLM01 |  |  |
-| 6,995 | 2026-02 | [`INC-15009`](docs/incidents/2026.md#inc-15009) | NSFWOpenAI Sora Guardrail Jailbreak via "Hypothetical Anatomy" Tactic | Medium | LLM01 |  |  |
+| 6,987 | 2026-02 | [`INC-15013`](docs/incidents/2026.md#inc-15013) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Artistic Escalation" Tactic | Medium | LLM01 |  |  |
+| 6,988 | 2026-02 | [`INC-15001`](docs/incidents/2026.md#inc-15001) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Classical Art Reframing" Tactic | Medium | LLM01 |  |  |
+| 6,989 | 2026-02 | [`INC-15008`](docs/incidents/2026.md#inc-15008) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Debug Framework Simulation" Tactic | Medium | LLM01 |  |  |
+| 6,990 | 2026-02 | [`INC-15012`](docs/incidents/2026.md#inc-15012) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Feminist Art Description" Tactic | Medium | LLM01 |  |  |
+| 6,991 | 2026-02 | [`INC-15010`](docs/incidents/2026.md#inc-15010) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Historical NSFW" Tactic | Medium | LLM01 |  |  |
+| 6,992 | 2026-02 | [`INC-15017`](docs/incidents/2026.md#inc-15017) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Historical Polaroid" Tactic | Medium | LLM01 |  |  |
+| 6,993 | 2026-02 | [`INC-15019`](docs/incidents/2026.md#inc-15019) | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Surprise Attack" Tactic | Medium | LLM01 |  |  |
+| 6,994 | 2026-02 | [`INC-15003`](docs/incidents/2026.md#inc-15003) | NSFW OpenAI Sora Guardrail Jailbreak via "Anatomical Escalation" Tactic | Medium | LLM01 |  |  |
+| 6,995 | 2026-02 | [`INC-15009`](docs/incidents/2026.md#inc-15009) | NSFW OpenAI Sora Guardrail Jailbreak via "Hypothetical Anatomy" Tactic | Medium | LLM01 |  |  |
 | 6,996 | 2026-02 | [`INC-01569`](docs/incidents/2026.md#inc-01569) | Open WebUI — Xss (CVE-2026-26192) | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-26192` |
 | 6,997 | 2026-02 | [`INC-01570`](docs/incidents/2026.md#inc-01570) | Open WebUI — Xss (CVE-2026-26193) | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2026-26193` |
 | 6,998 | 2026-02 | [`INC-15011`](docs/incidents/2026.md#inc-15011) | OpenAI GPT-4o Guardrail Jailbreak via "Layered Summarization" Tactic | Medium | LLM01 |  |  |

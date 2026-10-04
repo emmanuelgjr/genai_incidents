@@ -1,6 +1,6 @@
 # Wave 1 + wave 2 ingest: field-level delta (2026-10-03)
 
-Branch `ws4/wave12-ingest`, code commit `487843ca` (the data commit follows it).
+Branch `ws4/wave12-ingest`, code commit `c3c0442e` (the data commit follows it).
 Machine-readable twin: `wave12-ingest-delta-2026-10-03.json`. Produced by
 `scripts/audit/wave12_delta.py` from the corpus at `9604752f` (before) and the
 rebuilt corpus (after). Working agreement 2: unintended deltas are defects.
@@ -196,7 +196,7 @@ disclosures). 0 false positives in the sample.
 | AVID-2026-R0095 | prompt-injection | Meta LLaMa 3.3, Mistral Mistra | Multiple Model Guardrail Jailbreak via "Servile Scientist" Tactic |
 | AVID-2026-R0104 | prompt-injection | OpenAI GPT-4o | OpenAI GPT-4o Guardrail Jailbreak via "Zero-Width Unicode" Tactic |
 | AVID-2026-R0106 | prompt-injection | Google Gemini 2.0 Flash, OpenA | Multiple Model Guardrail Jailbreak via "Fictional API Detection" Tacti |
-| AVID-2026-R0107 | prompt-injection | DALL-E3 | NSFWOpenAI DALL-E3 Guardrail Jailbreak via "Surprise Attack" Tactic |
+| AVID-2026-R0107 | prompt-injection | DALL-E3 | NSFW OpenAI DALL-E3 Guardrail Jailbreak via "Surprise Attack" Tactic |
 | AVID-2026-R0110 | prompt-injection | Alibaba Qwen Turbo, Google Gem | Multiple Model Guardrail Jailbreak via "Apocalyptic Scenario" Tactic |
 | AVID-2026-R0114 | prompt-injection | Alibaba Qwen Plus, Alibaba Qwe | Multiple Model Guardrail Jailbreak via "Chaotic Formatting" Tactic |
 | AVID-2026-R0419 | third-party-report | Kiro IDE | Amazon Kiro IDE Data Exfiltration via Steering File |
@@ -462,3 +462,22 @@ make ingest-avid && make ingest-cvelistv5 && make ingest-arxiv      # in that or
 
 `make` is not installed on the machine this was run on; the recipes were run as the
 commands above, which is what the Makefile targets expand to.
+
+## 10. Dated note, 2026-10-04 (gate advisories)
+
+- The "code commit" in the header names the commit this file was generated against; earlier
+  generations named stale commits. This generation: code commit `c3c0442e`, base `9604752f`; both are
+  also in the JSON `meta` (`tip_sha`, `base_sha`, `date`).
+- Re-measured at this code commit: after a build from the base data, a second
+  `parse_existing` + `merge_and_dedupe` over the committed output reproduced `data/incidents.json` and
+  `data/incidents.min.json` byte for byte (sha256 of incidents.json starts `b6dfc2c1daeeca8c`). The section 3 claim
+  "rebuilt twice" is this measurement.
+- `quality_tier`: all 2,305 new entries are `auto` (cvelistV5's CVSS is CNA/ADP-supplied, not NVD analyst
+  review, so the merger's "CVSS-scored CVE => reviewed" rule is not honoured for them); 0 changes to existing entries.
+- Conduct (invariant 5): `ingest/common.py` installs a redirect handler, so every 302 target (the GitHub
+  release-asset CDN, `codeload.github.com`) gets the robots check and per-host pacing; tests use two local
+  servers (a disallowed redirect target is never contacted; an allowed one is followed and paced) and fail
+  with the handler removed.
+- MAL-2026-3607 durability: `ingest_cve_nvd_expanded.carry_bare_identifiers` is called by the writer, so a
+  regenerating cve-enrich run keeps the bare-identifier row (a test regenerates the file).
+- AVID titles with a glued `NSFW` label now read `NSFW OpenAI ...` (0 `NSFWOpenAI` titles remain).
