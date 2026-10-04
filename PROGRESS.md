@@ -155,6 +155,9 @@
   - **⚠ Gate refuted in part, by the record:** D7(b) said no reviewer checked the ToU by curl on 10-03. The tranche-2 gate-1 record shows a different red-reviewer instance did. The record's foreman note cites it.
 - **⚖ D46, USER RULING 2026-10-04:** ship both branches in ONE release merge, so the §6.2 reference and the notice reach main together, and apply the precise attribution wording (citing the 10-03 gate record plus the 10-04 re-fetch).
 - **Replacements, per agreement 3:** the wave-12 D45 specialists stalled for 4 h with work unstarted and were replaced with fresh `pe-wave12-d45` and `la-wave12-d45`.
+- **D45 fixes delivered.** `69fde622` is the row 6.2 text, committed by the foreman (it had been left uncommitted by the stalled instance; verified verbatim). `29e98fee` (fresh pipeline-engineer) covers the empty-run guard before the carry, a `main()`-level test with failing-first proof, the seed deduped to 88, the robots-redirect guard and the delta note. `data/` is byte-identical.
+- **D46 fix delivered:** `4dc80b77`, the row 2.5 attribution.
+- **Narrow checks dispatched on both branches.**
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
