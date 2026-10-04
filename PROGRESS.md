@@ -131,6 +131,24 @@
   - **Routed to pipeline-engineer:** A2 (cvelistV5 rows `reviewed` → `auto`; the CNA's CVSS is not analyst review), A1 (make the MAL bare row durable in the NVD writer), A4 (`common.py` follows redirects to an unchecked host: an invariant-5 conduct fix), A6 (the NSFW title prefix), and the delta leftovers.
   - **NEW BOARD NOTE N9 (A3) → pipeline-engineer + label-scientist.** A scope audit of the existing CVE/GHSA feed: the gate measured about 48% precision (n=40). This is a bigger precision issue than the PR itself; related to #88.
 - **Refresh (`586f40c8`) is NOT in this release.** It is built: T12 labels 3,936 rows' provenance, and T14 adds the AIID snapshot step. Its merge needs a rebuilt `data/` plus the D42 review of 17 proposed changes (7 merges, 10 retitles; evidence in `docs/audits/D42-refresh-merge-review-2026-10-03.md` on that branch). It follows the release.
+- **Rejected-CVE (WS4-T2):** gate-1 BOUNCE #1, re-scoped to `2fad3865` (D1–D6). The verdict is in `docs/audits/rejected-cve-gate1-verdict-2026-10-04.md`, saved as received.
+  - **Gate measurements [R]:** 37/29/6 confirmed against the cvelistV5 bulk asset over all 6,998 CVEs; 0 of wave12's 2,525 CVEs is REJECTED.
+  - **schema-architect ADOPTED** the schema with four tightenings (`2fad3865`).
+  - **Fixes delivered:**
+    - `6780dfe2`: D1–D4.
+    - `e22b04ee`: row 2.5 quotes the CVE ToU, committed by the foreman.
+    - `11a16eea`: A6 and A7.
+    - `2fcc659a`: D5 and D6.
+  - **Re-gate dispatched.**
+- **Wave 1–2:** gate-2 **BOUNCE #2 (escalated)**. The verdict is in `docs/audits/wave12-ingest-gate2-verdict-2026-10-04.md`.
+  - **What passed:** all 7 gate-1 defects; precision ≥91% strict on a fresh sample; byte-exact rebuild; 15,666 with 0 existing entries changed.
+  - **The one real defect:** the MAL carry runs before the empty-write guard, so a blocked refresh would overwrite the ingest file with 1 row.
+- **⚖ D45, USER RULING 2026-10-04:** apply the gate's fix verbatim, then a narrow check. The code goes to pipeline-engineer; the 6.2 text and the "88" count go to license-auditor.
+- **Open policy question for later (not blocking):** should CVEs rejected as DUPLICATES be re-pointed to their canonical CVE instead of retracted? This covers 3 entries whose canonical CVE is absent.
+- **Follow-ups logged:**
+  - retracted STIX objects to be emitted as `revoked` rather than dropped;
+  - a `load_incidents()` docstring or filter;
+  - N9, the CVE/GHSA feed precision audit.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
