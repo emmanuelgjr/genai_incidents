@@ -22,20 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 from ingest_cve_nvd_expanded import is_openssf_malicious_row  # noqa: E402
 
-BARE_IDENTIFIER = {"MAL-2026-3607"}
-STUB_MARK = "Bare identifier for OpenSSF Malicious Packages report"
-
-
-def stub(row: dict) -> dict:
-    row = dict(row)
-    row["description"] = (
-        f"{STUB_MARK} {row['source_id']} "
-        f"(affected: {row.get('affected') or 'n/a'}). The report text is Apache-2.0 and is not "
-        "reproduced here; the OSV link and the references below are the sources. Kept so the "
-        "incident cluster that cites this report keeps its identifier and links."
-    )
-    row["description_provenance"] = "original"
-    return row
+from ingest_cve_nvd_expanded import BARE_IDENTIFIER, BARE_IDENTIFIER_MARK as STUB_MARK, make_bare_identifier as stub  # noqa: E402
 
 
 p = ROOT / "ingest" / "cve_nvd_expanded.json"

@@ -231,7 +231,7 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
         description = desc_full
         category = "vulnerability-disclosure"
     else:
-        title = ptitle or desc_full[:120]
+        title = re.sub(r"^(NSFW|SFW)(?=[A-Z])", lambda m: m.group(1) + " ", ptitle or desc_full[:120])  # upstream glues the label on
         description = "-"   # replaced below by original prose (needs the date)
         category = "vulnerability-disclosure" if cls == CLASS_THIRD_PARTY else "research"
     if not title or not description:

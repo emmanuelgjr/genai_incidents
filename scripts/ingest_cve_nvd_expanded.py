@@ -997,6 +997,41 @@ def is_openssf_malicious_row(row: dict) -> bool:
     return any(str(row.get(k) or "").startswith("MAL-") for k in ("source_id", "osv_id"))
 
 
+# Ids that must survive as a bare identifier (facts + links, no Apache-2.0 text).
+# MAL-2026-3607 is the bridge that holds corpus entry INC-08450 together; if the
+# row disappeared from this file the merger would split INC-08450, which the
+# WS4-T19 guard refuses without a user ruling (board N7).
+BARE_IDENTIFIER = {"MAL-2026-3607"}
+BARE_IDENTIFIER_MARK = "Bare identifier for OpenSSF Malicious Packages report"
+
+
+def make_bare_identifier(row: dict) -> dict:
+    row = dict(row)
+    row["description"] = (
+        f"{BARE_IDENTIFIER_MARK} {row['source_id']} "
+        f"(affected: {row.get('affected') or 'n/a'}). The report text is Apache-2.0 and is not "
+        "reproduced here; the OSV link and the references below are the sources. Kept so the "
+        "incident cluster that cites this report keeps its identifier and links."
+    )
+    row["description_provenance"] = "original"
+    return row
+
+
+def carry_bare_identifiers(rows: list[dict], prev_rows: list[dict]) -> list[dict]:
+    """Deterministically keep every bare-identifier row of the previous
+    committed file (and reduce any freshly converted BARE_IDENTIFIER MAL row to
+    that shape) so a cve-enrich run, whose OSV path now excludes MAL- records,
+    does not drop the bridge. Nothing else from the MAL record is carried."""
+    out = [make_bare_identifier(r) if is_openssf_malicious_row(r) and r["source_id"] in BARE_IDENTIFIER
+           else r for r in rows if not (is_openssf_malicious_row(r) and r["source_id"] not in BARE_IDENTIFIER)]
+    have = {r["source_id"] for r in out}
+    for r in prev_rows:
+        if (is_openssf_malicious_row(r) and (r.get("description") or "").startswith(BARE_IDENTIFIER_MARK)
+                and r["source_id"] not in have):
+            out.append(r)
+    return out
+
+
 def osv_to_record(v: dict) -> dict | None:
     if is_openssf_malicious(v):
         return None
@@ -1195,6 +1230,11 @@ def main():
     out = sorted(records.values(),
                  key=lambda r: (r.get("year") or 0, r.get("date") or ""),
                  reverse=True)
+    try:
+        prev_rows = json.loads(OUT_FILE.read_text("utf-8")) if OUT_FILE.exists() else []
+    except ValueError:
+        prev_rows = []
+    out = carry_bare_identifiers(out, prev_rows)
     if not out:
         # Refuse to overwrite the committed, ~22.6 MB OUT_FILE with an
         # empty result (WS0-T4 re-gate, A6). A fully-blocked run (e.g. all

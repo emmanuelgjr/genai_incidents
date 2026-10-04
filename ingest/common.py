@@ -214,6 +214,33 @@ def _rate_limit(host: str, min_interval: float) -> None:
         time.sleep(wait)
 
 
+# ---- redirect targets are fetches too -------------------------------------
+# urllib follows a 302 to a different host on its own (a GitHub release asset
+# redirects to its CDN, the tarball API to codeload.github.com). Without this
+# handler only the FIRST host was robots-checked and rate-limited. The handler
+# runs the same two checks on every redirect target and refuses (PermissionError,
+# not retried) when robots.txt disallows it or cannot be verified. It is
+# installed as the process-wide opener so ``urllib.request.urlopen`` -- the one
+# call in this module -- uses it, and test mocks of urlopen are unaffected.
+_redirect_ctx = threading.local()
+
+
+class _CheckedRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        interval = getattr(_redirect_ctx, "min_interval", DEFAULT_MIN_INTERVAL)
+        if not robots_allowed(newurl, interval):
+            raise PermissionError(
+                f"refusing to follow redirect to {newurl}: robots.txt disallows it for "
+                f"User-Agent {USER_AGENT!r}, or could not be verified and the host is not on "
+                "ROBOTS_UNVERIFIABLE_ALLOWLIST (fail-closed -- see docs/INGESTION_CONDUCT.md)"
+            )
+        _rate_limit(urlparse(newurl).netloc, interval)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+urllib.request.install_opener(urllib.request.build_opener(_CheckedRedirectHandler))
+
+
 def _get_robots_parser(
     url: str, min_interval: float = DEFAULT_MIN_INTERVAL
 ) -> urllib.robotparser.RobotFileParser | None:
@@ -372,6 +399,7 @@ def fetch_once(
 
     host = urlparse(url).netloc
     _rate_limit(host, min_interval)
+    _redirect_ctx.min_interval = min_interval
 
     hdrs = {"User-Agent": USER_AGENT}
     if headers:
@@ -418,6 +446,7 @@ def fetch_to_file(
     if headers:
         hdrs.update({k: v for k, v in headers.items() if k.lower() != "user-agent"})
 
+    _redirect_ctx.min_interval = min_interval
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = Path(str(dest) + ".part")
     last_err: Exception | None = None
@@ -437,6 +466,8 @@ def fetch_to_file(
                     size += len(chunk)
             part.replace(dest)
             return digest.hexdigest(), size
+        except PermissionError:
+            raise        # robots refusal (including a redirect target): not transient
         except (urllib.error.URLError, urllib.error.HTTPError,
                 TimeoutError, ConnectionError, OSError) as e:
             last_err = e

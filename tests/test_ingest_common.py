@@ -524,3 +524,76 @@ def test_fetch_to_file_honours_robots_refusal(tmp_path, monkeypatch):
         with pytest.raises(PermissionError):
             u.fetch_to_file("https://example.com/a.zip", tmp_path / "x")
     mock_open.assert_not_called()
+
+
+# ----------------------------------------------------------------------------
+# Redirect targets get the same robots check and pacing (gate A4)
+# ----------------------------------------------------------------------------
+import http.server
+import threading
+
+
+def _serve(handler_cls):
+    srv = http.server.HTTPServer(("127.0.0.1", 0), handler_cls)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+def _two_hosts():
+    hits = {"cdn": 0}
+
+    class Cdn(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            hits["cdn"] += 1
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"asset-bytes")
+
+        def log_message(self, *a):
+            pass
+
+    cdn = _serve(Cdn)
+
+    class Origin(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(302)
+            self.send_header("Location", f"http://127.0.0.1:{cdn.server_port}/asset")
+            self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    return _serve(Origin), cdn, hits
+
+
+def test_redirect_to_a_disallowed_host_is_refused_before_any_request(monkeypatch, tmp_path):
+    origin, cdn, hits = _two_hosts()
+    try:
+        checked = []
+
+        def robots(url, min_interval=1.0):
+            checked.append(url)
+            return f":{cdn.server_port}" not in url      # the CDN host disallows us
+
+        monkeypatch.setattr(u, "robots_allowed", robots)
+        with pytest.raises(PermissionError, match="redirect"):
+            u.fetch_once(f"http://127.0.0.1:{origin.server_port}/dl", min_interval=0)
+        assert hits["cdn"] == 0                           # never contacted
+        assert any(f":{cdn.server_port}" in c for c in checked)
+        with pytest.raises(PermissionError):              # same for the streaming path
+            u.fetch_to_file(f"http://127.0.0.1:{origin.server_port}/dl", tmp_path / "a", min_interval=0)
+        assert hits["cdn"] == 0 and not (tmp_path / "a").exists()
+    finally:
+        origin.shutdown(); cdn.shutdown()
+
+
+def test_redirect_to_an_allowed_host_is_followed_and_paced(monkeypatch):
+    origin, cdn, hits = _two_hosts()
+    try:
+        paced = []
+        monkeypatch.setattr(u, "_rate_limit", lambda host, mi: paced.append(host))
+        body, _ = u.fetch_once(f"http://127.0.0.1:{origin.server_port}/dl", min_interval=0)
+        assert body == b"asset-bytes" and hits["cdn"] == 1
+        assert f"127.0.0.1:{cdn.server_port}" in paced     # the redirect target was paced too
+    finally:
+        origin.shutdown(); cdn.shutdown()

@@ -540,3 +540,48 @@ def test_avid_and_cvelistv5_rows_are_machine_ingested_auto():
     for row in (a, c):
         assert row["quality_tier"] == "auto"
         assert M.normalize_entry(row)["quality_tier"] == "auto"
+
+
+def test_avid_glued_nsfw_label_gets_a_space():
+    rec = _load("avid", "AVID-2026-R0420.json")
+    rec = json.loads(json.dumps(rec))
+    rec["problemtype"]["description"]["value"] = 'NSFWOpenAI DALL-E3 Guardrail Jailbreak via "X" Tactic'
+    row = AV.to_row(rec, "reports/2026/AVID-2026-R0420.json")
+    assert row["title"] == 'NSFW OpenAI DALL-E3 Guardrail Jailbreak via "X" Tactic'
+    rec["problemtype"]["description"]["value"] = "NSFW content filter bypass"
+    assert AV.to_row(rec, "reports/2026/AVID-2026-R0420.json")["title"] == "NSFW content filter bypass"
+
+
+# ----------------------------------------------------------------------------
+# A1: the MAL-2026-3607 bare-identifier bridge survives a regenerating writer
+# ----------------------------------------------------------------------------
+def _committed_nvd_rows():
+    return json.loads((Path(__file__).parents[1] / "ingest" / "cve_nvd_expanded.json").read_text(encoding="utf-8"))
+
+
+def test_bare_identifier_row_survives_a_regenerated_file():
+    prev = _committed_nvd_rows()
+    fresh = [r for r in prev if not NVD.is_openssf_malicious_row(r)]       # what the filtered OSV path now yields
+    assert not [r for r in fresh if r["source_id"] == "MAL-2026-3607"]
+    out = NVD.carry_bare_identifiers(fresh, prev)
+    kept = [r for r in out if r["source_id"] == "MAL-2026-3607"]
+    assert len(kept) == 1 and kept[0]["description"].startswith(NVD.BARE_IDENTIFIER_MARK)
+    assert NVD.carry_bare_identifiers(out, out) == out                      # idempotent
+    # an unlisted MAL row in the fresh data is dropped, a listed one is reduced to the stub shape
+    raw_mal = dict(kept[0], description="verbatim Apache text", description_provenance="verbatim")
+    other = dict(raw_mal, source_id="MAL-2026-9", osv_id="MAL-2026-9")
+    res = NVD.carry_bare_identifiers(fresh + [raw_mal, other], [])
+    assert [r["source_id"] for r in res if NVD.is_openssf_malicious_row(r)] == ["MAL-2026-3607"]
+    assert "Apache text" not in json.dumps(res)
+
+
+def test_bare_identifier_carry_fires_without_it():
+    prev = _committed_nvd_rows()
+    fresh = [r for r in prev if not NVD.is_openssf_malicious_row(r)]
+    assert not [r for r in fresh if r["source_id"] == "MAL-2026-3607"]      # without carry the bridge is gone
+
+
+def test_writer_calls_carry_bare_identifiers():
+    src = (Path(__file__).parents[1] / "scripts" / "ingest_cve_nvd_expanded.py").read_text(encoding="utf-8")
+    main_body = src[src.index("def main()"):]
+    assert "carry_bare_identifiers(out, prev_rows)" in main_body
