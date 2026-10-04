@@ -158,6 +158,13 @@
 - **D45 fixes delivered.** `69fde622` is the row 6.2 text, committed by the foreman (it had been left uncommitted by the stalled instance; verified verbatim). `29e98fee` (fresh pipeline-engineer) covers the empty-run guard before the carry, a `main()`-level test with failing-first proof, the seed deduped to 88, the robots-redirect guard and the delta note. `data/` is byte-identical.
 - **D46 fix delivered:** `4dc80b77`, the row 2.5 attribution.
 - **Narrow checks dispatched on both branches.**
+- **✅ BOTH DATA BRANCHES PASS (2026-10-04).**
+  - **Wave 1–2 (`ws4/wave12-ingest` @ `29e98fee`):** D45 narrow check PASS (`docs/audits/wave12-ingest-gate3-PASS-2026-10-04.md`).
+    - **Gate measurements [R]:** the empty-run guard was verified through the real `main()`; the mutation fails the new test; byte-identical rebuild; 15,666; 563 tests.
+  - **Rejected CVEs (`ws4/rejected-cve-reconcile` @ `1600178f`):** D8 string check PASS (`docs/audits/rejected-cve-gate3-PASS-2026-10-04.md`).
+    - **Gate measurements [R]:** D1–D6 were verified failing-first at gate 2, and the D46 single-merge plan was confirmed by `git merge-tree`.
+    - **Escalation path:** 3 bounces were taken under D46 rulings; the last was a 2-word attribution fix.
+  - **Next: integration.** pipeline-engineer merges both branches onto `release/v2.12.0`, hand-resolves the Makefile (keeping both targets), rebuilds and publishes one field-level delta against main. The stale-tree check is mandatory because both branches are based on `9604752f`.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
