@@ -4,7 +4,7 @@
  "release_tag": "cve_2026-10-03_1400Z",
  "asset": "2026-10-03_all_CVEs_at_midnight.zip.zip",
  "asset_sha256": "2fa5d5e25b35bf87f0eec4cee20c6f1f8c140f512002fd17ff1b4f6e631abd79",
- "fetched": "2026-10-03",
+ "fetched": "2026-10-04",
  "window": {
   "backlog": {
    "in_window": 121318,

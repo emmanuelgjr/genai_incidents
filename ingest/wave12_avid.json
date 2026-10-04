@@ -38,6 +38,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -107,6 +108,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -170,6 +172,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -234,6 +237,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -304,6 +308,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -373,6 +378,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -443,6 +449,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -500,6 +507,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -539,6 +547,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -578,6 +587,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -617,6 +627,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -656,6 +667,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -695,6 +707,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -734,6 +747,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -773,6 +787,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -812,6 +827,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -851,6 +867,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -890,6 +907,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -929,6 +947,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -968,6 +987,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1007,6 +1027,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1046,6 +1067,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1085,6 +1107,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1124,6 +1147,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1163,6 +1187,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1202,6 +1227,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1241,6 +1267,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1280,6 +1307,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1319,6 +1347,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1358,6 +1387,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1397,6 +1427,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1436,6 +1467,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1475,6 +1507,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1514,6 +1547,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1553,6 +1587,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1592,6 +1627,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1631,6 +1667,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1670,6 +1707,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1709,6 +1747,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1748,6 +1787,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1787,6 +1827,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1826,6 +1867,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1865,6 +1907,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1904,6 +1947,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1943,6 +1987,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -1982,6 +2027,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2021,6 +2067,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2060,6 +2107,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2099,6 +2147,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2138,6 +2187,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2177,6 +2227,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2216,6 +2267,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2255,6 +2307,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2294,6 +2347,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2333,6 +2387,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2372,6 +2427,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2411,6 +2467,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2450,6 +2507,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2489,6 +2547,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2528,6 +2587,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2567,6 +2627,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2606,6 +2667,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2645,6 +2707,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2684,6 +2747,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2723,6 +2787,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2762,6 +2827,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2801,6 +2867,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2840,6 +2907,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2879,6 +2947,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2918,6 +2987,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -2957,6 +3027,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3019,6 +3090,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -3079,6 +3151,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3118,6 +3191,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3161,6 +3235,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3210,6 +3285,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3254,6 +3330,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3298,6 +3375,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3342,6 +3420,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3386,6 +3465,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3429,6 +3509,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3468,6 +3549,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3507,6 +3589,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3551,6 +3634,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3594,6 +3678,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3653,6 +3738,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3697,6 +3783,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3741,6 +3828,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3785,6 +3873,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3828,6 +3917,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3871,6 +3961,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3914,6 +4005,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3953,6 +4045,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -3992,6 +4085,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -4031,6 +4125,7 @@
       "third-party-report"
     ],
     "avid_categories": [],
+    "quality_tier": "auto",
     "description_provenance": "original",
     "content_license": {
       "source": "avid",
@@ -4088,6 +4183,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4156,6 +4252,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4231,6 +4328,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4298,6 +4396,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4362,6 +4461,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4435,6 +4535,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4506,6 +4607,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4572,6 +4674,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4631,6 +4734,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4705,6 +4809,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4775,6 +4880,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4840,6 +4946,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4903,6 +5010,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -4967,6 +5075,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5034,6 +5143,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5097,6 +5207,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5160,6 +5271,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5223,6 +5335,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5292,6 +5405,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5365,6 +5479,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5435,6 +5550,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5506,6 +5622,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5579,6 +5696,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5660,6 +5778,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5735,6 +5854,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5798,6 +5918,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5861,6 +5982,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5924,6 +6046,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -5987,6 +6110,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6050,6 +6174,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6113,6 +6238,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6176,6 +6302,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6240,6 +6367,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6308,6 +6436,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6376,6 +6505,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6443,6 +6573,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6506,6 +6637,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6570,6 +6702,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6653,6 +6786,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6716,6 +6850,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6782,6 +6917,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6850,6 +6986,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6921,6 +7058,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -6986,6 +7124,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7055,6 +7194,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7126,6 +7266,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7197,6 +7338,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7268,6 +7410,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7339,6 +7482,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7412,6 +7556,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7484,6 +7629,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7553,6 +7699,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7623,6 +7770,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7691,6 +7839,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7757,6 +7906,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7825,6 +7975,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7893,6 +8044,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -7959,6 +8111,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8026,6 +8179,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8089,6 +8243,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8158,6 +8313,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8227,6 +8383,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8292,6 +8449,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8356,6 +8514,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8421,6 +8580,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8491,6 +8651,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8560,6 +8721,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8625,6 +8787,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8694,6 +8857,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8763,6 +8927,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8831,6 +8996,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8900,6 +9066,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -8965,6 +9132,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9029,6 +9197,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9095,6 +9264,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9166,6 +9336,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9234,6 +9405,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9305,6 +9477,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9377,6 +9550,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9446,6 +9620,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9514,6 +9689,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9580,6 +9756,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9653,6 +9830,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9721,6 +9899,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9787,6 +9966,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9860,6 +10040,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -9943,6 +10124,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10018,6 +10200,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10087,6 +10270,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10161,6 +10345,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10234,6 +10419,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10315,6 +10501,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10385,6 +10572,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10454,6 +10642,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10527,6 +10716,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10600,6 +10790,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10670,6 +10861,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10731,6 +10923,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10799,6 +10992,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10865,6 +11059,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -10934,6 +11129,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11002,6 +11198,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11075,6 +11272,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11142,6 +11340,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11206,6 +11405,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11279,6 +11479,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11341,6 +11542,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11402,6 +11604,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11465,6 +11668,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11528,6 +11732,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11592,6 +11797,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11658,6 +11864,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11722,6 +11929,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11782,6 +11990,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11842,6 +12051,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11911,6 +12121,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -11978,6 +12189,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12044,6 +12256,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12117,6 +12330,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12180,6 +12394,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12244,6 +12459,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12310,6 +12526,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12381,6 +12598,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12449,6 +12667,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12515,6 +12734,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12586,6 +12806,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12652,6 +12873,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12717,6 +12939,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12780,6 +13003,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12844,6 +13068,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12910,6 +13135,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -12976,6 +13202,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13039,6 +13266,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13102,6 +13330,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13165,6 +13394,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13228,6 +13458,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13292,6 +13523,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13366,6 +13598,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13431,6 +13664,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13496,6 +13730,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13562,6 +13797,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13633,6 +13869,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13714,6 +13951,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13788,6 +14026,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13854,6 +14093,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13922,6 +14162,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -13991,6 +14232,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14055,6 +14297,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14119,6 +14362,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14187,6 +14431,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14252,6 +14497,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14320,6 +14566,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14388,6 +14635,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14454,6 +14702,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14528,6 +14777,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14596,6 +14846,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14665,6 +14916,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14743,6 +14995,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14822,6 +15075,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14886,6 +15140,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -14953,6 +15208,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15033,6 +15289,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15114,6 +15371,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15195,6 +15453,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15276,6 +15535,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15352,6 +15612,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15426,6 +15687,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15510,6 +15772,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15584,6 +15847,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15648,6 +15912,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15727,6 +15992,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15805,6 +16071,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15878,6 +16145,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -15941,6 +16209,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {
@@ -16019,6 +16288,7 @@
     "avid_categories": [
       "S0100"
     ],
+    "quality_tier": "auto",
     "description_provenance": "verbatim",
     "description_source": "cve-cna-via-avid",
     "content_license": {

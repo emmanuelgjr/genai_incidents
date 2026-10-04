@@ -1,6 +1,6 @@
 # Wave 1 + wave 2 ingest: field-level delta (2026-10-03)
 
-Branch `ws4/wave12-ingest`, code commit `394b35ac` (the data commit follows it).
+Branch `ws4/wave12-ingest`, code commit `487843ca` (the data commit follows it).
 Machine-readable twin: `wave12-ingest-delta-2026-10-03.json`. Produced by
 `scripts/audit/wave12_delta.py` from the corpus at `9604752f` (before) and the
 rebuilt corpus (after). Working agreement 2: unintended deltas are defects.
@@ -25,6 +25,7 @@ re-templated README, DATASHEET and `docs/index.html` from `data/stats.json`;
 brief; this task did not re-verify the plan's Active-from table.
 
 **New entries: 2,305. Changes to existing entries: 0.**
+All new entries ship `quality_tier: auto` (D43: machine-ingested, no human review; each ingest sets it explicitly, because the merger's own rules would class AVID- ids and CVSS-scored CVEs `reviewed`: before the fix 2,035 cvelistV5-only, 204 AVID and 55 arXiv new entries were `reviewed`, 11 `auto`).
 No ID removed, new IDs are a contiguous append above INC-14910
 (INC-14911 .. INC-17215), no existing ID changed meaning.
 

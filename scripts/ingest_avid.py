@@ -296,6 +296,9 @@ def to_row(rec: dict, rel_path: str) -> dict | None:
         "references": refs,
         "tags": sorted(set(tags)),
         "avid_categories": sep_codes(rec),
+        # machine-ingested, no human review (D43): explicit `auto`; the merger would
+        # otherwise class it `reviewed` (AVID- prefix / CVSS-scored CVE rule)
+        "quality_tier": "auto",
     }
     if cls == CLASS_CVE:
         # CNA text, governed by the CVE ToU (SOURCE_LICENSES 6.1/6.2), only

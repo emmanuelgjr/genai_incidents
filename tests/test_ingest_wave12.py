@@ -530,3 +530,13 @@ def test_arxiv_rows_are_machine_selected_and_reach_the_corpus_as_auto():
     assert M.normalize_entry(row)["quality_tier"] == "auto"
     # a source cannot self-promote
     assert "quality_tier" not in M.normalize_entry(dict(row, quality_tier="curated"))
+
+
+def test_avid_and_cvelistv5_rows_are_machine_ingested_auto():
+    import merge_and_dedupe as M
+    a = AV.to_row(_load("avid", "AVID-2026-R0045.json"), "reports/2026/AVID-2026-R0045.json")
+    rec = _load("cvelistv5", "CVE-2024-2928.json")
+    c = CV.to_row(rec, {})
+    for row in (a, c):
+        assert row["quality_tier"] == "auto"
+        assert M.normalize_entry(row)["quality_tier"] == "auto"

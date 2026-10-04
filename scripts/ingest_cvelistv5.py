@@ -289,6 +289,9 @@ def to_row(rec: dict, why: dict) -> dict | None:
         "tags": sorted(tag_set),
         "description_provenance": "verbatim",
         "description_source": "cvelistv5",
+        # machine-ingested, no human review (D43): explicit `auto`; the merger would
+        # otherwise class it `reviewed` (AVID- prefix / CVSS-scored CVE rule)
+        "quality_tier": "auto",
         "content_license": dict(CVE_TOU_MARKER),
     }
     cv = cvss_of(rec)
@@ -399,6 +402,7 @@ def main() -> int:
     ap.add_argument("--backlog-end", default="2026-06-30",
                     help="last day of the evaluated backlog window; later records are reported as post-window")
     ap.add_argument("--from-file", metavar="OUTER_ZIP", help="use a saved baseline asset instead of fetching")
+    ap.add_argument("--release-tag", default="(local file)", help="release tag to record with --from-file")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -408,7 +412,7 @@ def main() -> int:
         with outer.open("rb") as fh:
             for chunk in iter(lambda: fh.read(1 << 20), b""):
                 h.update(chunk)
-        info, digest = {"tag": "(local file)", "name": outer.name, "published_at": ""}, h.hexdigest()
+        info, digest = {"tag": args.release_tag, "name": outer.name, "published_at": ""}, h.hexdigest()
     else:
         info = latest_baseline()
         outer, digest = ensure_baseline(info)
