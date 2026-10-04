@@ -7,10 +7,13 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
-> **Planned as v2.12.0 (minor).** Notes written and gated before the cut:
-> [`docs/releases/v2.12.0.md`](docs/releases/v2.12.0.md) (figures, consumer
-> impact, known limitations, and the re-derivation recipe). Version strings
-> still read `2.11.0`; this section is re-tensed at the cut.
+## [2.12.0] — 2026-10-04
+
+> **These notes were gated before the cut** and the release was cut on
+> 2026-10-04. Full disclosure, the consumer-impact section on the changed
+> meaning of `incident_count`, and the re-derivation recipe for every figure:
+> [`docs/releases/v2.12.0.md`](docs/releases/v2.12.0.md). Minor release: the new
+> schema fields are optional and additive.
 
 ### Added - wave 1-2 sources: +2,305 machine-ingested entries (D40, D43)
 
