@@ -24,7 +24,7 @@
 - **Step 9 [R]:** `publish.yml` and `huggingface.yml` both show event `release`, headBranch `v2.12.0`, completed/success.
   - **PyPI** latest is 2.12.0, with wheel and sdist.
   - **HF card** (`emmanuelgjr/genai-incidents`): "Dataset version `2.12.0`", 15,637.
-  - The live STIX/TAXII check is pending the Pages deploy.
+  - **Live STIX/TAXII [R]** (after Pages run `def08cdf` completed/success): the STIX bundle has 65,141 objects / 15,637 incidents, and the TAXII collection objects have 65,141 / 15,637. That matches the gated notes.
 - **The goal's tranche-names item:** not found on any surface, so the list was reconstructed, gated and merged (`docs/specs/source-expansion-tranche1-*`). The user may amend it.
 - **Open for the user:**
   - wave 3 (CourtListener bulk + 0din) and wave 4 (OpenSSF, or widen the GHSA filter);
