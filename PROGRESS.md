@@ -172,6 +172,12 @@
   - **Foreman checks [R]:** licence surfaces are singular (row 2.5, §6.2, CVE grant with ™).
   - **The engineer correctly refused one part of the foreman's brief:** the wave12 targets stay OUT of `ingest-all`, per the gated design note.
   - **In parallel:** the integration gate (fresh red-reviewer) and the release-notes draft (distribution-engineer, VERSIONING step 1).
+- **Integration gate 1 (`9aed2a4a`): data PASS, 2 doc defects** (`docs/audits/v2.12.0-integration-gate1-verdict-2026-10-04.md`).
+  - **Gate measurements [R]:** the 3-way per-field delta has 0 mismatches; exporters re-run show 15,637 incidents and 0 rejected CVEs emitted; byte-identical rebuild.
+  - **The 2 defects:** the README count attribution, and the sweep scope (21 AVID-only CVEs on new entries are unchecked).
+  - **Fixes:** release notes `7a4614b0` (distribution-engineer); D1 and D2 fixed at `07532bb6`. The README omits the bare 2,305 because `check_stats_drift` forbids it.
+  - **Dispatched:** a combined pass, the integration re-check plus the release-notes gate (VERSIONING step 1).
+- **NEW BOARD NOTE N10 → pipeline-engineer:** 21 AVID-only CVEs on new wave-12 entries have no rejection state. The next rejection refresh should pick them up (never-checked first); verify after the first run.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
