@@ -37,7 +37,7 @@ separate, deliberately non-code enforcement mechanism.
 `USER_AGENT` (`ingest/common.py:96-99`) is a single module-level constant:
 
 ```
-genai_incidents/2.11.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
+genai_incidents/2.12.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
 ```
 
 It names the project, links to the repo, and gives a contact address
