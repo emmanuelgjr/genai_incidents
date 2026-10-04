@@ -63,7 +63,9 @@ def test_marker_is_shed_when_cve_no_longer_rejected():
 
 def test_status_fields_are_content_fields():
     # so a retraction bumps `updated` exactly once (invariant 4)
-    assert {"status", "status_reason", "rejected_cve_ids"} <= set(m._CONTENT_FIELDS)
+    assert {"status", "rejected_cve_ids"} <= set(m._CONTENT_FIELDS)
+    # ...but a re-check date is not content (it would churn `updated` weekly)
+    assert "status_reason" not in m._CONTENT_FIELDS
 
 
 # ----- the build -----
@@ -136,3 +138,56 @@ def test_no_entry_resting_only_on_rejected_cves_ships_active():
 def test_every_rejected_cve_on_any_entry_is_flagged():
     data, rejected = _committed()
     assert validate.check_status(data, rejected) == []
+
+
+# ----- gate 1 fixes -----
+
+def test_stix_and_misp_do_not_emit_rejected_cves_as_vulnerabilities():
+    import export_misp
+    import export_stix
+    inc = {"id": "INC-00001", "title": "t", "date": "2026-01", "year": 2026,
+           "severity": "High", "description": "d", "category": "x",
+           "cve_ids": ["CVE-2099-0001", "CVE-2025-1"],
+           "rejected_cve_ids": ["CVE-2099-0001"],
+           "references": [{"url": "https://example.com/a"}], "tags": []}
+    bundle = export_stix.build_bundle([inc])
+    names = {o["name"] for o in bundle["objects"] if o["type"] == "vulnerability"}
+    assert names == {"CVE-2025-1"}
+    sdo = next(o for o in bundle["objects"] if o["type"] == "x-genai-incident")
+    assert sdo["x_rejected_cve_ids"] == ["CVE-2099-0001"]
+    assert sdo["x_cve_ids"] == ["CVE-2099-0001", "CVE-2025-1"]
+    vuln_ids = {o["id"] for o in bundle["objects"] if o["type"] == "vulnerability"}
+    assert all(o["target_ref"] in vuln_ids
+               for o in bundle["objects"] if o.get("relationship_type") == "exploits")
+    vals = {a["value"] for a in export_misp._incident_attributes(inc) if a["type"] == "vulnerability"}
+    assert vals == {"CVE-2025-1"}
+
+
+def test_recheck_with_unchanged_verdict_does_not_bump_updated(tmp_path, monkeypatch):
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    snap = tmp_path / "cve_rejections.json"
+    monkeypatch.setattr(m, "CVE_REJECTIONS_PATH", snap)
+    (ingest / "src.json").write_text(json.dumps([_cve_row("CVE-2099-0001")]), encoding="utf-8")
+
+    class _D(m.date):
+        _pinned = None
+
+        @classmethod
+        def today(cls):
+            return cls._pinned
+    import datetime
+    monkeypatch.setattr(m, "date", _D)
+    monkeypatch.setattr(m, "utc_today", lambda: _D._pinned)
+
+    def build(day, checked):
+        _D._pinned = datetime.date(*day)
+        snap.write_text(json.dumps({"states": {"CVE-2099-0001": {"state": "REJECTED", "checked": checked}}}),
+                        encoding="utf-8")
+        m.main()
+        return json.loads((data / "incidents.json").read_text(encoding="utf-8"))["incidents"][0]
+
+    a = build((2099, 6, 1), "2099-06-01")
+    b = build((2099, 6, 8), "2099-06-08")
+    assert a["status"] == b["status"] == "retracted"
+    assert b["status_reason"]["as_of"] == "2099-06-08", "the re-check date is still recorded"
+    assert (b["updated"], b["last_seen"]) == (a["updated"], a["last_seen"]), "...without churning updated"

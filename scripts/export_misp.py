@@ -115,7 +115,10 @@ def _incident_attributes(e: dict) -> list[dict]:
     title = (e.get("title") or e["id"]).strip()
     if title:
         attrs.append(_attr(e, "text", "Other", title[:600], False, tags, seq="title"))
+    rejected = set(e.get("rejected_cve_ids") or [])  # WS4-T2: not valid identifiers
     for c in e.get("cve_ids") or []:
+        if c in rejected:
+            continue
         attrs.append(_attr(e, "vulnerability", "External analysis", c, False,
                            [_tag(f'genai-incidents:incident-id="{e["id"]}"')]))
     seen_urls: set[str] = set()

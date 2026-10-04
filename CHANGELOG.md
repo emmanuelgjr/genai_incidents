@@ -24,7 +24,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - New optional fields `status`, `status_reason`, `rejected_cve_ids` (absence
   of `status` means the entry stands). New ingest
   `scripts/ingest_cve_rejections.py` -> `ingest/cve_rejections.json`; the
-  merge applies the rule offline. Delta:
+  merge applies the rule offline. 4 of the 29 were rejected as duplicates of
+  another CVE; see the delta. STIX/MISP/TAXII no longer emit rejected CVEs as
+  vulnerabilities (`x_rejected_cve_ids` added). Delta:
   `docs/audits/rejected-cve-reconcile-delta-2026-10-03.md`.
 
 ### Changed — STIX/TAXII OWASP LLM `source_name` relabel (live since 2026-10-01, after the v2.11.0 cut)

@@ -1331,7 +1331,9 @@ _CONTENT_FIELDS = (
     "nist_ai_rmf", "mitre_atlas", "mitre_atlas_tactics", "cve_ids", "cwe_ids",
     "cvss_score", "cvss_vector", "aiid_id", "disclosure_date",
     "exploited_in_wild", "kev_date_added",
-    "status", "status_reason", "rejected_cve_ids",
+    # status_reason is deliberately NOT here: its as_of moves on every re-check
+    # of an unchanged verdict and must not churn `updated`.
+    "status", "rejected_cve_ids",
     "mitigations", "references", "tags",
 )
 

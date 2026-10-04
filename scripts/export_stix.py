@@ -90,6 +90,12 @@ def _atlas_names() -> dict[str, str]:
         return {}
 
 
+def _live_cves(i: dict) -> list[str]:
+    """cve_ids minus those the CVE Program has REJECTED (WS4-T2)."""
+    rej = set(i.get("rejected_cve_ids") or [])
+    return [c for c in (i.get("cve_ids") or []) if c not in rej]
+
+
 def build_bundle(incidents: list[dict]) -> dict:
     atlas_names = _atlas_names()
     objects: list[dict] = []
@@ -111,7 +117,7 @@ def build_bundle(incidents: list[dict]) -> dict:
                  "url": ATLAS_URL + base.replace("AML.", "")},
             ],
         })
-    cves = sorted({c for i in incidents for c in (i.get("cve_ids") or [])})
+    cves = sorted({c for i in incidents for c in _live_cves(i)})
     for c in cves:
         oid = _sid("vulnerability", c)
         cve_ids[c] = oid
@@ -166,6 +172,9 @@ def build_bundle(incidents: list[dict]) -> dict:
             "x_mitre_atlas": i.get("mitre_atlas") or [],
             "x_mitre_atlas_tactics": i.get("mitre_atlas_tactics") or [],
             "x_cve_ids": i.get("cve_ids") or [],
+            # WS4-T2: CVE Program REJECTED ids stay in x_cve_ids for traceability
+            # but get no vulnerability/relationship object below.
+            "x_rejected_cve_ids": i.get("rejected_cve_ids") or [],
         }
         # Landmark-tier labels are optional and unassessed-by-absence: emit
         # only when present so unlabeled entries carry no null/empty claim.
@@ -187,7 +196,7 @@ def build_bundle(incidents: list[dict]) -> dict:
                 "relationship_type": "uses",
                 "source_ref": oid, "target_ref": technique_ids[t],
             })
-        for c in i.get("cve_ids") or []:
+        for c in _live_cves(i):
             rid = _sid("relationship", iid, "exploits", c)
             objects.append({
                 "type": "relationship", "spec_version": "2.1", "id": rid,
