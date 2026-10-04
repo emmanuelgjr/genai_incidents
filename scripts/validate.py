@@ -46,6 +46,18 @@ def _has_primary_source(entry: dict) -> bool:
               for r in (entry.get("references") or []))
 
 
+def check_envelope(data: dict) -> list[str]:
+    """``incident_count + retracted_count == len(incidents)`` (WS4-T2)."""
+    n_ret = sum(1 for e in data["incidents"] if e.get("status") == "retracted")
+    problems = []
+    if data.get("retracted_count", 0) != n_ret:
+        problems.append(f"retracted_count {data.get('retracted_count', 0)} != {n_ret} retracted entries")
+    if data.get("incident_count", len(data["incidents"])) + n_ret != len(data["incidents"]):
+        problems.append(
+            f"incident_count {data.get('incident_count')} + {n_ret} retracted != {len(data['incidents'])} entries")
+    return problems
+
+
 def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
     """WS4-T2 status/retraction invariants (never-delete: a retracted entry
     stays, marked). Returns violation messages (empty == clean).
@@ -650,6 +662,14 @@ def main():
             if r.get("state") == "REJECTED"
         }
     problems += check_status(data, rejected)
+    # The slim file carries the same envelope; its count must agree too.
+    slim_path = ROOT / "data" / "incidents.min.json"
+    if slim_path.exists():
+        slim = json.loads(slim_path.read_text(encoding="utf-8"))
+        problems += [f"incidents.min.json: {p}" for p in check_envelope(slim)]
+        if (slim.get("incident_count"), slim.get("retracted_count", 0)) != (
+                data.get("incident_count"), data.get("retracted_count", 0)):
+            problems.append("incidents.min.json: count envelope differs from incidents.json")
 
     # Source-freshness registry: shape, then the row markers that inherit
     # from it. Freshness is a property of the SOURCE; the per-row marker is

@@ -212,3 +212,18 @@ def test_ingest_survives_nvd_error_on_a_rejected_hit(tmp_path, monkeypatch, caps
     st = json.loads(out.read_text(encoding="utf-8"))["states"]
     assert st["CVE-2099-0001"]["state"] == "REJECTED" and st["CVE-2099-0001"]["nvd_vuln_status"] is None
     assert st["CVE-2099-0002"]["state"] == "PUBLISHED", "the sweep continued past the NVD error"
+
+
+def test_slim_envelope_corruption_is_caught():
+    slim = {"incident_count": 1, "retracted_count": 1,
+            "incidents": [{"id": "INC-1", "status": "retracted"}, {"id": "INC-2"}]}
+    assert validate.check_envelope(slim) == []
+    slim["incident_count"] = 2  # stale count: retracted entry counted
+    assert validate.check_envelope(slim)
+    slim.update(incident_count=1, retracted_count=0)
+    assert validate.check_envelope(slim)
+
+
+def test_committed_slim_file_envelope_is_consistent():
+    slim = json.loads((ROOT / "data" / "incidents.min.json").read_text(encoding="utf-8"))
+    assert validate.check_envelope(slim) == []

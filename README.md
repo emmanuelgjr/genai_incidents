@@ -45,7 +45,7 @@
 
 <table>
 <tr>
-<td align="center"><b><!-- stats:incident_count -->13,332<!-- /stats:incident_count --></b><br><sub>entries</sub></td>
+<td align="center"><b><!-- stats:incident_count -->13,332<!-- /stats:incident_count --></b><br><sub>incidents</sub></td>
 <td align="center"><b><!-- stats:landmark_count -->1,915<!-- /stats:landmark_count --></b><br><sub><code>tier: landmark</code></sub></td>
 <td align="center"><b><!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max --></b><br><sub>coverage</sub></td>
 <td align="center"><b>6</b><br><sub>taxonomies (4 core)</sub></td>
