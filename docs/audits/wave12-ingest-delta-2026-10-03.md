@@ -491,3 +491,10 @@ commands above, which is what the Makefile targets expand to.
 - Reproduce note: `make ingest-cvelistv5` without `--from-file` fetches a newer baseline and changes the data; the
   committed rows are pinned to release `cve_2026-10-03_1400Z` (use `--from-file ... --release-tag cve_2026-10-03_1400Z`;
   see `ingest/README.md`).
+
+
+## Dated note, 2026-10-04 (release-notes gate 1): 410 emitted rows are suppressed at merge; original text above unchanged
+
+The text above explains the gap between rows emitted (270 + 2,502 + 55 = 2,827) and new entries (2,305) by folding and by the skip lists. Folding explains only part of it. **410 emitted rows never reach the corpus: 352 of the 2,502 cvelistV5 rows and 58 of the 270 AVID rows.** The merge drops them before dedupe in the issue-#88 exclusion step (build log: `[issue88-exclude] suppressed ...`), because every one of their CVE ids is in `data/issue88_remediation.json` `exclude_suppress_source_ids`, the maintainer's out-of-scope key list. 79 of the 352 cvelistV5 rows are huntr rows (447 emitted, 368 present as entries). Of the 3 missing post-2026-06 rows (1,377 emitted, 1,374 entries), none is folded; they are suppressed.
+
+How measured (release/v2.12.0 @ 07532bb6): for each row in `ingest/wave12_cvelistv5.json` and `ingest/wave12_avid.json`, test whether its CVE id(s) appear in the `cve_ids` of any entry of `data/incidents.json`; rows with none are the missing ones (352 and 58), and each of those CVE ids is a member of `exclude_suppress_source_ids` (352 of 352, 58 of 58). The remaining 112 of the 522-row excess is folding (104 AVID rows folded into cvelistV5 entries; 8 extra AVID rows attached to 3 entries). The 112 folding split (104 + 8 rows on 3 entries) is the notes gate's measurement, not repeated here. Do not regenerate.

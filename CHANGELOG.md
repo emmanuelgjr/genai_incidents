@@ -16,7 +16,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 - **2,305 new entries, `INC-14911` to `INC-17215`** (contiguous append; none
   removed; no existing entry changed by the ingest). All are
-  `quality_tier: auto`, `confidence: low`, `tier: feed`: 2,250
+  `quality_tier: auto`, `tier: feed`, `confidence` derived per entry (2,070 medium, 131 low, 104 high): 2,250
   `vulnerability-disclosure` and 55 `research`, all in the `security` corpus.
   `incident_count` (stands) 13,361 -> 15,637 together with the retraction
   below; the landmark count (1,915) is unchanged.
@@ -29,9 +29,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   filter `scripts/ai_relevance.py` write `ingest/wave12_*.json`.
 - **Not new-source coverage:** 1,374 of the 2,250 new vulnerability entries
   are dated after 2026-06 and mostly fill the corpus's stalled NVD refresh;
-  876 are backlog (2024-01 to 2026-06). Existing entries are **not**
+  876 are dated 2026-06 or earlier (857 in 2024-01 to 2026-06, 19 earlier; the ingest window is by publication date). Existing entries are **not**
   enriched by these sources (498 + 2,139 CVE-already-in-corpus rows and 72
   would-fold rows are skipped, crosswalk kept in the provenance files).
+- **410 emitted rows (352 cvelistV5, 58 AVID; 79 of them huntr) are suppressed
+  at merge** because their CVE ids are on the issue-#88 out-of-scope key list
+  (`data/issue88_remediation.json`); they never reach the corpus.
 - **EUVD (ENISA) is not ingested**: licence unresolved, outreach drafted and
   not sent.
 - Delta: `docs/audits/wave12-ingest-delta-2026-10-03.md`; integration delta
