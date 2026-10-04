@@ -60,9 +60,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 - **29 entries now carry `status: retracted`** and 6 more carry a
   `rejected_cve_ids` flag. A full sweep of the 6,998 CVE ids in the corpus
-  against the CVE record found 37 REJECTED (all 37 also `Rejected` in NVD);
+  **before wave 1-2** against the CVE record found 37 REJECTED (all 37 also `Rejected` in NVD);
   the evaluation's 18 were the huntr slice of them. Nothing was deleted and
-  every `INC-*` ID still resolves.
+  every `INC-*` ID still resolves. The 2,150 cvelistV5-sourced CVEs on the new entries were PUBLISHED at ingest (that ingest drops every non-PUBLISHED record), and the 21 CVEs that reach new entries only through AVID have no recorded rejection state yet; the next refresh checks never-checked ids first.
 - **`incident_count` now counts incidents that stand** (D44): measured alone
   against 13,361 entries it was 13,332 (-29); integrated with the wave 1-2
   ingest above it is **15,637**. Retracted entries stay in `incidents` (file
