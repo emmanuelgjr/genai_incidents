@@ -112,6 +112,14 @@
   - Ship the filter-selected papers as quality_tier `auto`.
   - license-auditor amends row 6.3 to describe the real filter.
   - A human curation pass may follow later.
+- **2026-10-04, foreman found by reading the tree (agreement 3): all three engineer branches finished on 10-03 and never reported.** That is the idle-without-report failure shape.
+  - **Wave 1–2:** `12f58dd9`, rebuilt at 15,666 (+2,305), with the BOUNCE #1 fixes applied. The licence edits for 5(a), (b), (e) and D7 were committed by the foreman as `394b35ac`.
+  - **Rejected CVEs:** `50ce7dbe`. A full sweep of 6,998 corpus CVEs found **37 REJECTED**, so **29 entries are retracted** (`status: retracted`) and 6 flagged. `incident_count` 13,361 → 13,332 with `retracted_count` 29. 163 fields changed, 0 unintended, nothing deleted. A schema change sits in its own commit, `e9092586`.
+  - **Refresh:** `586f40c8`, containing WS4-T12, WS4-T14, the tripwire replacement and the per-merge evidence.
+- **⚠ STALE-TREE DAMAGE in `50ce7dbe` (found by foreman, fixed `11706b11`).** The commit's tree predated the tranche-1 merge, so it silently **deleted 9 merged tranche-1 spec and gate-verdict records and 98 lines of `PROGRESS.md` board entries** (the D40 block onward).
+  - It was restored byte-for-byte from its own parent, `6957df48`, in a separate commit.
+  - The other two branches were checked the same way and are clean.
+  - **This is the same shape as the earlier revert that deleted board records.** The control was a `--diff-filter=D` and `PROGRESS.md` check against the merge base before gating. Make that a standing pre-gate step.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
