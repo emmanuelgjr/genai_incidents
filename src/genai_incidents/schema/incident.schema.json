@@ -211,6 +211,36 @@
       "description": "EMISSION status, not liveness status. Whether the entry is still emitted by at least one source on the latest build (`active`) or was retained from a prior build after all its sources dropped it (`retained`). Read the sentence a consumer will actually form, and reject it: `active` does NOT mean the upstream source is still alive or still being refreshed successfully. It means only that the entry appeared in this build's inputs — and an ingest snapshot committed to the repository re-emits its rows on every build whether or not the source that produced it still exists. That misreading is what let 1,380 AIRI-derived rows read as current for the seven weeks after that source's last successful refresh on 2026-05-31, without any field in the data being false. Source FRESHNESS is a separate, independent axis: published per source in data/source_freshness.json and surfaced per row as `source_freshness`. The two combine freely — an entry can be active-and-fresh, active-and-stale, retained-and-fresh, or retained-and-stale — which is why freshness is not, and must not become, a third value of this enum.",
       "enum": ["active", "retained"]
     },
+    "status": {
+      "type": "string",
+      "description": "Editorial/lifecycle status of the ENTRY (WS4-T2, invariant 3: entries are never deleted; they are marked and keep resolving). Emitted ONLY when not the default: ABSENCE means the entry stands as published (there is deliberately no `active` value, so the ~13k unaffected rows carry no new field, and so this cannot be confused with `source_status`, which is an emission status). `retracted`: the upstream identifier(s) this entry rests on were withdrawn, currently because every CVE the entry carries is REJECTED by the CVE Program AND the entry has no other evidence (every `source_ids` element is one of those CVEs; an entry corroborated by any other source stands, flagged only via `rejected_cve_ids`). See `status_reason`. The entry stays in the file and its ID stays resolvable, but it is not counted in `incident_count` and should not be cited as an incident. `disputed` is reserved for upstream-disputed records and is not emitted yet. Derived by scripts/merge_and_dedupe.py from the committed snapshot ingest/cve_rejections.json; never hand-authored.",
+      "enum": ["retracted", "disputed"]
+    },
+    "status_reason": {
+      "type": "object",
+      "description": "Why `status` is set. Present exactly when `status` is present (both directions enforced below). `code` is a controlled, additive vocabulary: new codes are added only alongside a DATA_DICTIONARY entry and a validate.py rule (e.g. a `disputed` code when `disputed` is first emitted); consumers should treat an unrecognised code as opaque, not as an error.",
+      "required": ["code", "as_of"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": ["cve-rejected"],
+          "description": "`cve-rejected`: every CVE id on the entry has cveMetadata.state REJECTED in the CVE Program record (CVEProject/cvelistV5), per ingest/cve_rejections.json."
+        },
+        "as_of": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "description": "Date the rejection was last checked against the CVE record (the earliest `checked` date among the rejected CVEs)."
+        }
+      }
+    },
+    "rejected_cve_ids": {
+      "type": "array",
+      "description": "Subset of `cve_ids` that the CVE Program currently marks REJECTED. Present on any entry with at least one, whether or not the entry is retracted: on a retracted entry it equals `cve_ids`; on a multi-source entry that stands on other evidence (e.g. an aggregate advisory) the rejected ids are kept in `cve_ids` for traceability but flagged here, and any CVSS/severity taken from them should be read accordingly. Sorted, unique. Derived, never hand-authored.",
+      "items": { "type": "string", "pattern": "^CVE-[0-9]{4}-[0-9]{4,9}$" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
     "source_freshness": {
       "type": "object",
       "description": "Derived per-row projection of data/source_freshness.json: at least one source that contributed to this entry has stopped refreshing successfully, so part of this entry's content is current only up to `as_of`. Inherited BY REFERENCE, never authored per row — every value here is reconstructable from the registry plus the entry's source tags, and each `sources` element is a key into the registry's `sources` object where the full source-level record (label, stale_since, hold, notes) lives. Emitted ONLY on entries with at least one `stale` contributing source; its ABSENCE means no contributing source is currently registered stale — NOT that the entry is verified current, and NOT that its sources are tracked at all (data/source_freshness.json `coverage` names the ingests nothing measures). Independent of `source_status`, which is an emission status; see that field. Deliberately self-sufficient — status, date and source keys are all inline — so a consumer holding only incidents.min.json or the HuggingFace projection can read it without joining to the registry.",
@@ -344,6 +374,16 @@
     }
   },
   "allOf": [
+    {
+      "$comment": "WS4-T2: a status always carries its reason.",
+      "if": { "required": ["status"] },
+      "then": { "required": ["status_reason"] }
+    },
+    {
+      "$comment": "WS4-T2: and a reason never appears without its status.",
+      "if": { "required": ["status_reason"] },
+      "then": { "required": ["status"] }
+    },
     {
       "$comment": "Row-level license obligations are per-source. Every entry whose `description_source` is `aiaaic` must also carry `content_license` (enforced below) — that direction still holds. The converse does not: since E16/D18 (2026-07-29), the 95 hand-curated AIAAIC rows also carry `content_license` via their AIAAIC-sourced title/facts, even though their `description` is project-authored and carries no `description_source`. When another source acquires row-level obligations, extend the conditional per source — re-scope it, never drop it.",
       "if": {

@@ -449,6 +449,7 @@ REGISTERED_PRODUCERS = {
     "parse_existing.py": "INTERNAL (build input)",
     "ingest_aiaaic_sheet.py": "INTERNAL (ingest, reads the corpus for cross-reference)",
     "ingest_aiid_snapshot.py": "INTERNAL (ingest)",
+    "ingest_cve_rejections.py": "INTERNAL (ingest, reads the corpus only for its CVE ids; writes a status snapshot, no per-row fields)",
     "ingest_airi_navigator.py": "INTERNAL (ingest)",
     "ingest_oecd_aim.py": "INTERNAL (ingest)",
     "migrate_oecd_description_reduction.py": "INTERNAL (one-shot migration over build inputs)",

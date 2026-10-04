@@ -1047,6 +1047,9 @@ def load_source(path: Path) -> list[dict]:
 DEPRECATIONS_PATH = DATA / "id_deprecations.json"
 CURATION_OVERRIDES_PATH = DATA / "curation_overrides.json"
 CISA_KEV_PATH = INGEST / "cisa_kev.json"
+# WS4-T2 / board note N1: CVE Program lifecycle state per corpus CVE, written by
+# scripts/ingest_cve_rejections.py. Read as a committed snapshot, never live.
+CVE_REJECTIONS_PATH = INGEST / "cve_rejections.json"
 CWE_VECTOR_PATH = MAPPINGS / "cwe_attack_vector.json"
 SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
 # WS4-T19: the pre-authorization guard's input. A committed, docs/-only
@@ -1122,6 +1125,53 @@ def _load_cisa_kev() -> dict[str, dict]:
     except (json.JSONDecodeError, OSError):
         return {}
     return raw.get("vulnerabilities", {}) if isinstance(raw, dict) else {}
+
+
+def _load_cve_rejections() -> dict[str, dict]:
+    """Load the committed CVE-state snapshot (ingest/cve_rejections.json) and
+    return ``{cve_id: record}`` for the REJECTED CVEs only. Reading the
+    snapshot rather than the CVE feeds keeps the build offline and
+    deterministic. Returns ``{}`` if the snapshot is absent."""
+    if not CVE_REJECTIONS_PATH.exists():
+        return {}
+    try:
+        raw = json.loads(CVE_REJECTIONS_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    states = raw.get("states", {}) if isinstance(raw, dict) else {}
+    return {c: r for c, r in states.items() if r.get("state") == "REJECTED"}
+
+
+def _apply_cve_rejections(e: dict, rejected: dict[str, dict]) -> bool:
+    """WS4-T2: propagate a CVE Program REJECTED state onto an entry, never by
+    deletion (invariant 3). Re-derived from scratch every build (the three
+    fields are popped first), so an entry sheds the marker if the snapshot no
+    longer lists the CVE. Returns True if the entry ends up ``retracted``.
+
+    * ``rejected_cve_ids`` is set on ANY entry carrying a rejected CVE. The
+      ids stay in ``cve_ids`` for traceability; the flag is what tells a
+      consumer not to trust them.
+    * ``status: retracted`` is set only when the entry has NO evidence beyond
+      the rejected record(s): every CVE id on it is rejected AND every
+      ``source_id`` is one of those CVE ids. An entry corroborated by another
+      source (an advisory aggregate, AIID, AVID, a news row) stands, flagged.
+    """
+    for k in ("status", "status_reason", "rejected_cve_ids"):
+        e.pop(k, None)
+    cves = set(e.get("cve_ids") or [])
+    hit = sorted(cves & rejected.keys())
+    if not hit:
+        return False
+    e["rejected_cve_ids"] = hit
+    sources = set(e.get("source_ids") or [])
+    if cves <= rejected.keys() and sources <= rejected.keys():
+        e["status"] = "retracted"
+        e["status_reason"] = {
+            "code": "cve-rejected",
+            "as_of": min(rejected[c].get("checked", "") for c in hit),
+        }
+        return True
+    return False
 
 
 def _load_curation_overrides() -> dict[str, dict]:
@@ -1281,6 +1331,9 @@ _CONTENT_FIELDS = (
     "nist_ai_rmf", "mitre_atlas", "mitre_atlas_tactics", "cve_ids", "cwe_ids",
     "cvss_score", "cvss_vector", "aiid_id", "disclosure_date",
     "exploited_in_wild", "kev_date_added",
+    # status_reason is deliberately NOT here: its as_of moves on every re-check
+    # of an unchanged verdict and must not churn `updated`.
+    "status", "rejected_cve_ids",
     "mitigations", "references", "tags",
 )
 
@@ -1984,6 +2037,19 @@ def main():
                 flagged += 1
         print(f"[cisa-kev] flagged {flagged} incident(s) as exploited-in-the-wild")
 
+    # 4f) WS4-T2: propagate REJECTED CVEs (status + flag, never deletion).
+    #     Content fields, so set before history stamping: a retraction bumps
+    #     `updated`. Deterministic: reads the committed snapshot only.
+    cve_rejected = _load_cve_rejections()
+    if cve_rejected:
+        n_ret = n_flag = 0
+        for e in surviving:
+            if _apply_cve_rejections(e, cve_rejected):
+                n_ret += 1
+            elif e.get("rejected_cve_ids"):
+                n_flag += 1
+        print(f"[cve-rejections] {n_ret} retracted, {n_flag} flagged-only")
+
     # 5) Apply stable timestamps + classifiers (quality_tier, corpus).
     for e in surviving:
         _apply_history(e, prev_ts)
@@ -2234,6 +2300,10 @@ def main():
         e["source_count"] = len(e.get("source_ids") or [])
         e["confidence"] = _derive_confidence(e)
         e.setdefault("source_status", "active")
+        if e["source_status"] == "retained" and cve_rejected:
+            # Retained priors bypass step 4f (carried verbatim from the last
+            # build); re-derive so a late rejection still reaches them.
+            _apply_cve_rejections(e, cve_rejected)
         if e.get("added"):
             e["first_seen"] = e["added"]
         if e.get("updated"):
@@ -2509,6 +2579,7 @@ def main():
         print(f"[output] wrote {DEPRECATIONS_PATH.name} ({len(deprecations_all)} entries)")
 
     # 9) Write outputs
+    n_retracted = sum(1 for e in deduped if e.get("status") == "retracted")
     out = {
         "version": "2.11.0",
         "generated": generated,
@@ -2521,7 +2592,11 @@ def main():
             "computed at export time (see docs/TAXONOMIES.md)."
         ),
         "schema": "schema/incident.schema.json",
-        "incident_count": len(deduped),
+        # incident_count counts incidents that stand; retracted entries (WS4-T2)
+        # stay in `incidents` so their IDs keep resolving, but are not counted.
+        # incident_count + retracted_count == len(incidents).
+        "incident_count": len(deduped) - n_retracted,
+        "retracted_count": n_retracted,
         "incidents": deduped,
     }
     (DATA / "incidents.json").write_text(
@@ -2592,12 +2667,19 @@ def main():
         # freshness signal that reliably reaches them (D8 application spec §4).
         if e.get("source_freshness"):
             item["source_freshness"] = e["source_freshness"]
+        # WS4-T2: a retraction must reach slim-shape consumers too; the flag
+        # and status are conditional (absence = the entry stands).
+        if e.get("status"):
+            item["status"] = e["status"]
+        if e.get("rejected_cve_ids"):
+            item["rejected_cve_ids"] = e["rejected_cve_ids"]
         return item
 
     slim = {
         "version": out["version"],
         "generated": out["generated"],
-        "incident_count": len(deduped),
+        "incident_count": out["incident_count"],
+        "retracted_count": n_retracted,
         "incidents": [_slim_entry(e) for e in deduped],
     }
     (DATA / "incidents.min.json").write_text(

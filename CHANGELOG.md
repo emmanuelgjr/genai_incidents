@@ -7,6 +7,28 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - 29 entries retracted because their CVEs are REJECTED (WS4-T2, board note N1)
+
+- **29 entries now carry `status: retracted`** and 6 more carry a
+  `rejected_cve_ids` flag. A full sweep of the 6,998 CVE ids in the corpus
+  against the CVE record found 37 REJECTED (all 37 also `Rejected` in NVD);
+  the evaluation's 18 were the huntr slice of them. Nothing was deleted and
+  every `INC-*` ID still resolves.
+- **`incident_count` is now 13,332 (was 13,361): it counts incidents that
+  stand.** Retracted entries stay in `incidents` (file length is still
+  13,361) and are counted in the new `retracted_count`
+  (`incident_count + retracted_count == len(incidents)`). They are omitted
+  from the INCIDENTS.md tables and charts, the site, and the
+  STIX/MISP/TAXII/Hugging Face feeds; their year-shard cards stay, bannered.
+  **Consumers asserting `len(incidents) == incident_count` must change.**
+- New optional fields `status`, `status_reason`, `rejected_cve_ids` (absence
+  of `status` means the entry stands). New ingest
+  `scripts/ingest_cve_rejections.py` -> `ingest/cve_rejections.json`; the
+  merge applies the rule offline. 4 of the 29 were rejected as duplicates of
+  another CVE; see the delta. STIX/MISP/TAXII no longer emit rejected CVEs as
+  vulnerabilities (`x_rejected_cve_ids` added). Delta:
+  `docs/audits/rejected-cve-reconcile-delta-2026-10-03.md`.
+
 ### Changed — STIX/TAXII OWASP LLM `source_name` relabel (live since 2026-10-01, after the v2.11.0 cut)
 
 - **Every OWASP LLM `external_reference` in the STIX bundle
