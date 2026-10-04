@@ -75,7 +75,8 @@ def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
             missed = sorted((cves & rejected) - flagged)
             if missed:
                 problems.append(f"{e['id']}: carries REJECTED CVE(s) {missed} without a rejected_cve_ids flag")
-            if cves and cves <= rejected and set(e.get("source_ids") or []) <= rejected                     and e.get("status") != "retracted":
+            if (cves and cves <= rejected and set(e.get("source_ids") or []) <= rejected
+                    and e.get("status") != "retracted"):
                 problems.append(f"{e['id']}: rests only on REJECTED CVE(s) {sorted(cves)} but is not retracted")
     n_ret = sum(1 for e in incidents if e.get("status") == "retracted")
     if data.get("retracted_count", 0) != n_ret:

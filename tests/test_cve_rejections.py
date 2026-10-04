@@ -191,3 +191,24 @@ def test_recheck_with_unchanged_verdict_does_not_bump_updated(tmp_path, monkeypa
     assert a["status"] == b["status"] == "retracted"
     assert b["status_reason"]["as_of"] == "2099-06-08", "the re-check date is still recorded"
     assert (b["updated"], b["last_seen"]) == (a["updated"], a["last_seen"]), "...without churning updated"
+
+
+def test_ingest_survives_nvd_error_on_a_rejected_hit(tmp_path, monkeypatch, capsys):
+    import sys
+    import ingest_cve_rejections as ing
+    inc = tmp_path / "incidents.json"
+    inc.write_text(json.dumps({"incidents": [
+        {"cve_ids": ["CVE-2099-0001"]}, {"cve_ids": ["CVE-2099-0002"]}]}), encoding="utf-8")
+    out = tmp_path / "cve_rejections.json"
+    monkeypatch.setattr(ing, "INCIDENTS", inc)
+    monkeypatch.setattr(ing, "OUT_FILE", out)
+    monkeypatch.setattr(ing, "check_cvelist", lambda c: {"state": "REJECTED" if c.endswith("1") else "PUBLISHED"})
+
+    def boom(c):
+        raise OSError("NVD 503")
+    monkeypatch.setattr(ing, "check_nvd", boom)
+    monkeypatch.setattr(sys, "argv", ["x"])
+    ing.main()
+    st = json.loads(out.read_text(encoding="utf-8"))["states"]
+    assert st["CVE-2099-0001"]["state"] == "REJECTED" and st["CVE-2099-0001"]["nvd_vuln_status"] is None
+    assert st["CVE-2099-0002"]["state"] == "PUBLISHED", "the sweep continued past the NVD error"

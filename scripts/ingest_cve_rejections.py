@@ -160,12 +160,18 @@ def main() -> None:
             continue
         try:
             rec = check_cvelist(cve_id)
+            rec["checked"] = today
+            if rec["state"] == "REJECTED":
+                # The CVE record is authoritative; the NVD cross-check is
+                # corroboration. If NVD errors, keep the verdict (status None).
+                try:
+                    rec["nvd_vuln_status"] = check_nvd(cve_id)
+                except Exception as e:  # noqa: BLE001
+                    rec["nvd_vuln_status"] = None
+                    print(f"  [warn] NVD cross-check {cve_id}: {e}", file=sys.stderr, flush=True)
         except Exception as e:  # noqa: BLE001 - keep the sweep alive, retry next run
             print(f"  [warn] {cve_id}: {e}", file=sys.stderr, flush=True)
             continue
-        rec["checked"] = today
-        if rec["state"] == "REJECTED":
-            rec["nvd_vuln_status"] = check_nvd(cve_id)
         states[cve_id] = rec
         done += 1
         if done % 200 == 0:
