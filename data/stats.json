@@ -1,9 +1,9 @@
 {
-  "incident_count": 13332,
+  "incident_count": 15637,
   "retracted_count": 29,
   "landmark_count": 1915,
   "version": "2.11.0",
-  "generated": "2026-10-03",
+  "generated": "2026-10-04",
   "year_min": 1983,
   "year_max": 2026
 }

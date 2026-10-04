@@ -1015,6 +1015,11 @@ def normalize_entry(raw: dict) -> dict | None:
     # validate() rather than reaching the same guard's else-branch silently.
     if raw.get("corpus") in ("security", "ai-harm"):
         entry["corpus"] = raw["corpus"]
+    # A source may declare `auto` for rows it selected by machine only (D43:
+    # the wave-2 arXiv rows). Only `auto` is honoured here, so a source cannot
+    # self-promote to curated/reviewed; step 5 keeps respecting an explicit value.
+    if raw.get("quality_tier") == "auto":
+        entry["quality_tier"] = "auto"
     # `aiaaic_ethical_tags` / `aiaaic_seed_facts` are INTERNAL classification-
     # seed fields only — neither has a schema entry and both must never reach
     # data/incidents.json (root schema is additionalProperties:false). They

@@ -49,6 +49,70 @@ it:
     https://www.apache.org/licenses/LICENSE-2.0 and the garak row of
     docs/SOURCE_LICENSES.md.
 
+Two further upstream notices are required by their licences and are
+reproduced here so they travel with the dataset. Neither makes the
+material they cover Apache-2.0 or otherwise exempt from the CC BY 4.0
+grant in LICENSE-DATA; each requires only that the notice accompany
+copies. Third-party text that an upstream record merely quotes or
+summarises is not covered by these notices (see the rows in
+docs/SOURCE_LICENSES.md section 6).
+
+CVE Program content. Records derived from the CVE Program (CVE
+identifiers, descriptions and related record fields, including those
+obtained via NVD and the CVEProject/cvelistV5 repository, and including
+the subset of CVE records assigned by the huntr CNA) are used under the
+CVE Terms of Use, https://www.cve.org/Legal/TermsOfUse (SPDX: CVE-TOU):
+
+  Copyright © 1999-2026, The MITRE Corporation.
+  CVE is a trademark and the CVE logo is a registered trademark of
+  The MITRE Corporation.
+
+  MITRE hereby grants you a perpetual, worldwide, non-exclusive,
+  no-charge, royalty-free, irrevocable copyright license to reproduce,
+  prepare derivative works of, publicly display, publicly perform,
+  sublicense, and distribute Common Vulnerabilities and Exposures
+  (CVE™). Any copy you make for such purposes is authorized provided
+  that you reproduce MITRE's copyright designation and this license in
+  any such copy.
+
+This is not the MITRE ATLAS notice above; that one is Apache License
+2.0 and concerns a different body of text. See the cvelistV5 row of
+docs/SOURCE_LICENSES.md (section 6.2).
+
+AVID (AI Vulnerability Database) content. Records derived from the
+avidml/avid-db repository, https://github.com/avidml/avid-db, are used
+under the MIT License:
+
+  MIT License
+
+  Copyright (c) 2022 AI Vulnerability Database (AVID)
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+The MIT grant covers AVID-authored content only; it does not extend to
+third-party material (papers, news, other databases, CNA text) that an
+AVID record summarises. See the AVID row of docs/SOURCE_LICENSES.md
+(section 6.1), including which rows of ingest/avid_owasp_incidents.json
+it does and does not cover.
+
 The AIAAIC Repository is a CC BY-SA 4.0 source (share-alike). Per
 project decision D2, AIAAIC's own narrative/descriptive cell text is
 never carried in this dataset -- what is kept is the AIAAIC-authored

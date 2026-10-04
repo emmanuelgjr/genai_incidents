@@ -452,6 +452,9 @@ REGISTERED_PRODUCERS = {
     "ingest_cve_rejections.py": "INTERNAL (ingest, reads the corpus only for its CVE ids; writes a status snapshot, no per-row fields)",
     "ingest_airi_navigator.py": "INTERNAL (ingest)",
     "ingest_oecd_aim.py": "INTERNAL (ingest)",
+    "ingest_avid.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
+    "ingest_cvelistv5.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
+    "ingest_arxiv_oaipmh.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
     "migrate_oecd_description_reduction.py": "INTERNAL (one-shot migration over build inputs)",
     "migrate_owasp_llm_2026.py": "INTERNAL (one-shot migration over build inputs)",
 }

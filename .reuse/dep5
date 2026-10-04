@@ -72,6 +72,22 @@ Comment: This dataset aggregates entries from many upstream sources, each
  took precedence instead -- tracked at the same posture as AIAAIC's
  retained-headline question above. See NOTICE-DATA and
  docs/SOURCE_LICENSES.md section 1.5 for the full framing.
+ CVE Program content (CVE ids, descriptions and record fields, via NVD
+ and CVEProject/cvelistV5, including the huntr-CNA-assigned subset) is
+ used under the CVE Terms of Use (SPDX: CVE-TOU,
+ https://www.cve.org/Legal/TermsOfUse): Copyright © 1999-2026, The
+ MITRE Corporation. MITRE grants a perpetual,
+ worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+ copyright license to reproduce, prepare derivative works of, publicly
+ display, publicly perform, sublicense, and distribute CVE, provided
+ that any copy reproduces MITRE's copyright designation and this
+ license. The full text is in NOTICE-DATA. This is distinct from the
+ MITRE ATLAS Apache-2.0 notice above. AVID-derived records (from
+ github.com/avidml/avid-db) are used under the MIT License, Copyright
+ (c) 2022 AI Vulnerability Database (AVID); the full MIT permission
+ notice is in NOTICE-DATA and covers AVID-authored content only, not
+ third-party material that an AVID record summarises. See
+ docs/SOURCE_LICENSES.md sections 6.1 and 6.2.
 
 Files: docs/*
 Copyright: 2026 Emmanuel G. Jr. and contributors

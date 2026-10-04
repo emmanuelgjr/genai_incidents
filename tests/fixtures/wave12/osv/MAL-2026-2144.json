@@ -1,0 +1,10 @@
+{
+  "id": "MAL-2026-2144",
+  "summary": "Malicious code in litellm (PyPI)",
+  "details": "Malicious code in litellm (PyPI). The package was compromised and published versions that exfiltrate credentials.",
+  "modified": "2026-03-25T10:00:00Z",
+  "published": "2026-03-25T09:00:00Z",
+  "database_specific": {"source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/pypi/litellm/MAL-2026-2144.json"},
+  "references": [{"type": "WEB", "url": "https://github.com/BerriAI/litellm/issues/24518"}],
+  "_pkg": {"name": "litellm", "ecosystem": "PyPI"}
+}

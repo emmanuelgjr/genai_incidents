@@ -1,0 +1,1267 @@
+[
+  {
+    "source_id": "ARXIV-2510.01342",
+    "title": "Fine-Tuning Jailbreaks under Highly Constrained Black-Box Settings: A Three-Pronged Approach",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.01342 (Xiangfang Li et al., 2025-10; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaks\", the paper concerns gpt-4, gpt-4o, large language models, llms, and its abstract makes a real-world claim (\"real-world deployment\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4, gpt-4o, openai",
+    "references": [
+      {
+        "title": "Fine-Tuning Jailbreaks under Highly Constrained Black-Box Settings: A Three-Pronged Approach (Xiangfang Li et al.)",
+        "url": "https://arxiv.org/abs/2510.01342",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.04261",
+    "title": "VortexPIA: Indirect Prompt Injection Attack against LLMs for Efficient Extraction of User Privacy",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.04261 (Yu Cui et al., 2025-10; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"real-world deployments\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "VortexPIA: Indirect Prompt Injection Attack against LLMs for Efficient Extraction of User Privacy (Yu Cui et al.)",
+        "url": "https://arxiv.org/abs/2510.04261",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.10271",
+    "title": "MetaBreak: Jailbreaking Online LLM Services via Special Token Manipulation",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.10271 (Wentian Zhu et al., 2025-10; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"commercial llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "MetaBreak: Jailbreaking Online LLM Services via Special Token Manipulation (Wentian Zhu et al.)",
+        "url": "https://arxiv.org/abs/2510.10271",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.10281",
+    "title": "ArtPerception: ASCII Art-based Jailbreak on LLMs with Recognition Pre-test",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.10281 (Guan-Yan Yang et al., 2025-10; cs.CR, cs.AI, cs.CL, cs.CV, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreak\", the paper concerns claude, gpt-4o, large language models, llm, llms, multi-modal, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o, claude, deepseek-v3, llama",
+    "references": [
+      {
+        "title": "ArtPerception: ASCII Art-based Jailbreak on LLMs with Recognition Pre-test (Guan-Yan Yang et al.)",
+        "url": "https://arxiv.org/abs/2510.10281",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.17277",
+    "title": "PolyJailbreak: Cross-Modal Jailbreaking Attacks on Black-Box Multimodal LLMs",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.17277 (Xinkai Wang et al., 2025-10; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns gemini, gpt-4o, large language models, llms, mllms, multimodal, and its abstract makes a real-world claim (\"real-world applications\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o, gemini",
+    "references": [
+      {
+        "title": "PolyJailbreak: Cross-Modal Jailbreaking Attacks on Black-Box Multimodal LLMs (Xinkai Wang et al.)",
+        "url": "https://arxiv.org/abs/2510.17277",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.17904",
+    "title": "BreakFun: Jailbreaking LLMs via Object Instantiation under Simulated Code Execution",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.17904 (Amirkia Rafiei Oskooei et al., 2025-10; cs.CR, cs.AI, cs.CL). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "BreakFun: Jailbreaking LLMs via Object Instantiation under Simulated Code Execution (Amirkia Rafiei Oskooei et al.)",
+        "url": "https://arxiv.org/abs/2510.17904",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.21190",
+    "title": "The Trojan Example: Jailbreaking LLMs through Template Filling and Unsafety Reasoning",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.21190 (Mingrui Liu et al., 2025-10; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns gpt-4o, large language models, llms, and its abstract makes a real-world claim (\"commercial systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o, deepseek-3",
+    "references": [
+      {
+        "title": "The Trojan Example: Jailbreaking LLMs through Template Filling and Unsafety Reasoning (Mingrui Liu et al.)",
+        "url": "https://arxiv.org/abs/2510.21190",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2510.22963",
+    "title": "When Compression Becomes an Attack Surface: Black-Box Attacks on Prompt-Compressed LLM Agents",
+    "date": "2025-10",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2510.22963 (Zesen Liu et al., 2025-10; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attack\", the paper concerns llm, llms, rag, and its abstract makes a real-world claim (\"real-world agent\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "When Compression Becomes an Attack Surface: Black-Box Attacks on Prompt-Compressed LLM Agents (Zesen Liu et al.)",
+        "url": "https://arxiv.org/abs/2510.22963",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.02376",
+    "title": "AutoAdv: Automated Adversarial Prompting for Multi-Turn Jailbreaking of Large Language Models",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.02376 (Aashray Reddy et al., 2025-11; cs.CL, cs.AI, cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns gpt-4o, large language models, llms, and its abstract makes a real-world claim (\"real-world attacks\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "llama-3, gpt-4o",
+    "references": [
+      {
+        "title": "AutoAdv: Automated Adversarial Prompting for Multi-Turn Jailbreaking of Large Language Models (Aashray Reddy et al.)",
+        "url": "https://arxiv.org/abs/2511.02376",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.05797",
+    "title": "When AI Meets the Web: Prompt Injection Risks in Third-Party AI Chatbot Plugins",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.05797 (Yigitcan Kaya et al., 2025-11; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns chatbot, chatbots, large language models, llm, llms, and its abstract makes a real-world claim (\"commercial llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "When AI Meets the Web: Prompt Injection Risks in Third-Party AI Chatbot Plugins (Yigitcan Kaya et al.)",
+        "url": "https://arxiv.org/abs/2511.05797",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.07876",
+    "title": "LoopLLM: Transferable Energy-Latency Attacks in LLMs via Repetitive Generation",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.07876 (Xingyu Li et al., 2025-11; cs.CR, cs.AI, cs.CL). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacks\", the paper concerns gemini, large language models, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "deepseek-v3, gemini",
+    "references": [
+      {
+        "title": "LoopLLM: Transferable Energy-Latency Attacks in LLMs via Repetitive Generation (Xingyu Li et al.)",
+        "url": "https://arxiv.org/abs/2511.07876",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.16110",
+    "title": "Multi-Faceted Attack: Exposing Cross-Model Vulnerabilities in Defense-Equipped Vision-Language Models",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.16110 (Yijun Yang et al., 2025-11; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attack\", the paper concerns gpt-4o, vision-language, vlms, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o, llama-4",
+    "references": [
+      {
+        "title": "Multi-Faceted Attack: Exposing Cross-Model Vulnerabilities in Defense-Equipped Vision-Language Models (Yijun Yang et al.)",
+        "url": "https://arxiv.org/abs/2511.16110",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.16709",
+    "title": "AutoBackdoor: Automating Backdoor Attacks via LLM Agents",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.16709 (Yige Li et al., 2025-11; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"backdoor\", the paper concerns ai agents, gpt-4o, language model, large language models, llm, llms, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "llama-3, mistral, qwen, gpt-4o",
+    "references": [
+      {
+        "title": "AutoBackdoor: Automating Backdoor Attacks via LLM Agents (Yige Li et al.)",
+        "url": "https://arxiv.org/abs/2511.16709",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2511.21180",
+    "title": "CAHS-Attack: CLIP-Aware Heuristic Search Attack Method for Stable Diffusion",
+    "date": "2025-11",
+    "year": 2025,
+    "category": "research",
+    "description": "arXiv:2511.21180 (Shuhan Xia et al., 2025-11; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attack\", the paper concerns diffusion, generative, text-to-image, and its abstract makes a real-world claim (\"real-world deployments\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "stable diffusion",
+    "references": [
+      {
+        "title": "CAHS-Attack: CLIP-Aware Heuristic Search Attack Method for Stable Diffusion (Shuhan Xia et al.)",
+        "url": "https://arxiv.org/abs/2511.21180",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2601.09625",
+    "title": "The Promptware Kill Chain: How Prompt Injections Gradually Evolved Into a Multistep Malware Delivery Mechanism",
+    "date": "2026-01",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2601.09625 (Oleg Brodt et al., 2026-01; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injections\", the paper concerns large language model, llm, and its abstract makes a real-world claim (\"production llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "The Promptware Kill Chain: How Prompt Injections Gradually Evolved Into a Multistep Malware Delivery Mechanism (Oleg Brodt et al.)",
+        "url": "https://arxiv.org/abs/2601.09625",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2601.12460",
+    "title": "TrojanPraise: Jailbreak LLMs via Benign Fine-Tuning",
+    "date": "2026-01",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2601.12460 (Zhixin Xie et al., 2026-01; cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreak\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "TrojanPraise: Jailbreak LLMs via Benign Fine-Tuning (Zhixin Xie et al.)",
+        "url": "https://arxiv.org/abs/2601.12460",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2602.04653",
+    "title": "Inference-Time Backdoors via Chat Templates: From LLM Supply Chains to Agentic System Compromise",
+    "date": "2026-02",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2602.04653 (Ariel Fogel et al., 2026-02; cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"backdoors\", the paper concerns agentic, language models, llm, and its abstract makes a real-world claim (\"real-world agent\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Inference-Time Backdoors via Chat Templates: From LLM Supply Chains to Agentic System Compromise (Ariel Fogel et al.)",
+        "url": "https://arxiv.org/abs/2602.04653",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2602.05401",
+    "title": "BadTemplate: A Training-Free Backdoor Attack via Chat Template Against Large Language Models",
+    "date": "2026-02",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2602.05401 (Zihan Wang et al., 2026-02; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"backdoor\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"real-world systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "BadTemplate: A Training-Free Backdoor Attack via Chat Template Against Large Language Models (Zihan Wang et al.)",
+        "url": "https://arxiv.org/abs/2602.05401",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2602.19450",
+    "title": "Red-Teaming Claude Opus and ChatGPT-based Security Advisors for Trusted Execution Environments",
+    "date": "2026-02",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2602.19450 (Kunal Mukherjee et al., 2026-02; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"red-teaming\", the paper concerns assistants, claude, large language model, llm, llms, and its abstract makes a real-world claim (\"deployed llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude",
+    "references": [
+      {
+        "title": "Red-Teaming Claude Opus and ChatGPT-based Security Advisors for Trusted Execution Environments (Kunal Mukherjee et al.)",
+        "url": "https://arxiv.org/abs/2602.19450",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2602.22242",
+    "title": "Analysis of LLMs Against Prompt Injection and Jailbreak Attacks",
+    "date": "2026-02",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2602.22242 (Piyush Jaiswal et al., 2026-02; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"real-world systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "mistral, deepseek-r1, llama, qwen",
+    "references": [
+      {
+        "title": "Analysis of LLMs Against Prompt Injection and Jailbreak Attacks (Piyush Jaiswal et al.)",
+        "url": "https://arxiv.org/abs/2602.22242",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2603.09246",
+    "title": "Reasoning-Oriented Programming: Chaining Semantic Gadgets to Jailbreak Large Vision Language Models",
+    "date": "2026-03",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2603.09246 (Quanchen Zou et al., 2026-03; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreak\", the paper concerns claude, gpt-4o, lvlms, vision language, vision-language, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o, claude",
+    "references": [
+      {
+        "title": "Reasoning-Oriented Programming: Chaining Semantic Gadgets to Jailbreak Large Vision Language Models (Quanchen Zou et al.)",
+        "url": "https://arxiv.org/abs/2603.09246",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2603.13420",
+    "title": "Accelerating Suffix Jailbreak attacks with Prefix-Shared KV-cache",
+    "date": "2026-03",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2603.13420 (Xinhai Wang et al., 2026-03; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreak\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"deployed llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Accelerating Suffix Jailbreak attacks with Prefix-Shared KV-cache (Xinhai Wang et al.)",
+        "url": "https://arxiv.org/abs/2603.13420",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2603.13847",
+    "title": "Sirens' Whisper: Inaudible Near-Ultrasonic Jailbreaks of Speech-Driven LLMs",
+    "date": "2026-03",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2603.13847 (Zijian Ling et al., 2026-03; cs.CR, cs.AI, cs.SD). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaks\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Sirens' Whisper: Inaudible Near-Ultrasonic Jailbreaks of Speech-Driven LLMs (Zijian Ling et al.)",
+        "url": "https://arxiv.org/abs/2603.13847",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2603.27522",
+    "title": "Hidden Ads: Behavior Triggered Semantic Backdoors for Advertisement Injection in Vision Language Models",
+    "date": "2026-03",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2603.27522 (Duanyi Yao et al., 2026-03; cs.CL, cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"backdoors\", the paper concerns vision language, vision-language, vlm, vlms, and its abstract makes a real-world claim (\"real-world deployment\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Hidden Ads: Behavior Triggered Semantic Backdoors for Advertisement Injection in Vision Language Models (Duanyi Yao et al.)",
+        "url": "https://arxiv.org/abs/2603.27522",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2603.28013",
+    "title": "Kill-Chain Canaries: Stage-Level Tracking of Prompt Injection Across Attack Surfaces and Five Production LLMs",
+    "date": "2026-03",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2603.28013 (Haochuan Kevin Wang et al., 2026-03; cs.CR, cs.AI, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns claude, llm, llms, and its abstract makes a real-world claim (\"production llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude, deepseek",
+    "references": [
+      {
+        "title": "Kill-Chain Canaries: Stage-Level Tracking of Prompt Injection Across Attack Surfaces and Five Production LLMs (Haochuan Kevin Wang et al.)",
+        "url": "https://arxiv.org/abs/2603.28013",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.05809",
+    "title": "Adjustable Text-Guided Backdoor Attacks with Natural-Word Triggers on Multimodal Pretrained Models",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.05809 (Yiyang Zhang et al., 2026-04; cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"backdoor\", the paper concerns multimodal, and its abstract makes a real-world claim (\"real-world deployments\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Adjustable Text-Guided Backdoor Attacks with Natural-Word Triggers on Multimodal Pretrained Models (Yiyang Zhang et al.)",
+        "url": "https://arxiv.org/abs/2604.05809",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.12232",
+    "title": "TEMPLATEFUZZ: Fine-Grained Chat Template Fuzzing for Jailbreaking and Red Teaming LLMs",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.12232 (Qingchao Shen et al., 2026-04; cs.CR, cs.AI, cs.SE). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "TEMPLATEFUZZ: Fine-Grained Chat Template Fuzzing for Jailbreaking and Red Teaming LLMs (Qingchao Shen et al.)",
+        "url": "https://arxiv.org/abs/2604.12232",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.15368",
+    "title": "LogJack: Indirect Prompt Injection Through Cloud Logs Against LLM Debugging Agents",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.15368 (Harsh Shah, 2026-04; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns claude, llm, and its abstract makes a real-world claim (\"remote code execution\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude, llama",
+    "references": [
+      {
+        "title": "LogJack: Indirect Prompt Injection Through Cloud Logs Against LLM Debugging Agents (Harsh Shah)",
+        "url": "https://arxiv.org/abs/2604.15368",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.21829",
+    "title": "Black-Box Skill Stealing Attack from Proprietary LLM Agents: An Empirical Study",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.21829 (Zihan Wang et al., 2026-04; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"stealing\", the paper concerns large language model, llm, llms, and its abstract makes a real-world claim (\"commercial agent\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Black-Box Skill Stealing Attack from Proprietary LLM Agents: An Empirical Study (Zihan Wang et al.)",
+        "url": "https://arxiv.org/abs/2604.21829",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.23711",
+    "title": "Spore: Efficient and Training-Free Privacy Extraction Attack on LLMs via Inference-Time Hybrid Probing",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.23711 (Yu Cui et al., 2026-04; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"privacy extraction\", the paper concerns assistants, large language model, llm, llms, openclaw, and its abstract makes a real-world claim (\"real-world deployments\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "openclaw",
+    "references": [
+      {
+        "title": "Spore: Efficient and Training-Free Privacy Extraction Attack on LLMs via Inference-Time Hybrid Probing (Yu Cui et al.)",
+        "url": "https://arxiv.org/abs/2604.23711",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2604.28157",
+    "title": "FlashRT: Towards Computationally and Memory Efficient Red-Teaming for Prompt Injection and Knowledge Corruption",
+    "date": "2026-04",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2604.28157 (Yanting Wang et al., 2026-04; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns assistants, autonomous agents, large language models, llm, llms, retrieval-augmented, and its abstract makes a real-world claim (\"real-world applications\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "FlashRT: Towards Computationally and Memory Efficient Red-Teaming for Prompt Injection and Knowledge Corruption (Yanting Wang et al.)",
+        "url": "https://arxiv.org/abs/2604.28157",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2605.11229",
+    "title": "Comment and Control: Hijacking Agentic Workflows via Context-Grounded Evolution",
+    "date": "2026-05",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2605.11229 (Neil Fendley et al., 2026-05; cs.CR, cs.AI, cs.SE). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"hijacking\", the paper concerns agentic, claude, cursor, gemini, large language model, llm, and its abstract makes a real-world claim (\"responsibly disclos\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude, gemini, qwen, cursor, anthropic",
+    "references": [
+      {
+        "title": "Comment and Control: Hijacking Agentic Workflows via Context-Grounded Evolution (Neil Fendley et al.)",
+        "url": "https://arxiv.org/abs/2605.11229",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2605.14460",
+    "title": "Exploiting LLM Agent Supply Chains via Payload-less Skills",
+    "date": "2026-05",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2605.14460 (Xinyu Liu et al., 2026-05; cs.CR, cs.SE). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"exploiting\", the paper concerns autonomous agents, coding, generative, large language models, llm, llms, and its abstract makes a real-world claim (\"remote code execution\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Exploiting LLM Agent Supply Chains via Payload-less Skills (Xinyu Liu et al.)",
+        "url": "https://arxiv.org/abs/2605.14460",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2605.17971",
+    "title": "Babel: Jailbreaking Safety Attention via Obfuscation Distribution Optimized Sampling",
+    "date": "2026-05",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2605.17971 (Ziwei Wang et al., 2026-05; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns gpt-4o, large language models, llms, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-4o",
+    "references": [
+      {
+        "title": "Babel: Jailbreaking Safety Attention via Obfuscation Distribution Optimized Sampling (Ziwei Wang et al.)",
+        "url": "https://arxiv.org/abs/2605.17971",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2605.18133",
+    "title": "An Empirical Study of Privacy Leakage Chains via Prompt Injection in Black-Box Chatbot Environments",
+    "date": "2026-05",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2605.18133 (Hongjang Yang et al., 2026-05; cs.CR, cs.AI, cs.HC, cs.IR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns chatbot, and its abstract makes a real-world claim (\"proof-of-concept\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "An Empirical Study of Privacy Leakage Chains via Prompt Injection in Black-Box Chatbot Environments (Hongjang Yang et al.)",
+        "url": "https://arxiv.org/abs/2605.18133",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2605.30667",
+    "title": "Automatically Attacking Software Reverse Engineering AI Agents",
+    "date": "2026-05",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2605.30667 (Brian Crawford et al., 2026-05; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacking\", the paper concerns agentic, ai agents, large language models, llm, llms, and its abstract makes a real-world claim (\"proof-of-concept\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Automatically Attacking Software Reverse Engineering AI Agents (Brian Crawford et al.)",
+        "url": "https://arxiv.org/abs/2605.30667",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2606.06244",
+    "title": "Steering LLM Viewpoints through Fabricated Evidence Injection",
+    "date": "2026-06",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2606.06244 (Xi Yang et al., 2026-06; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"injection\", the paper concerns chatbots, gpt-5, llm, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-5",
+    "references": [
+      {
+        "title": "Steering LLM Viewpoints through Fabricated Evidence Injection (Xi Yang et al.)",
+        "url": "https://arxiv.org/abs/2606.06244",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2606.10742",
+    "title": "MemVenom: Triggered Poisoning of Multimodal Memories in Web Agents",
+    "date": "2026-06",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2606.10742 (Yv Zhang et al., 2026-06; cs.CR, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"poisoning\", the paper concerns multimodal, vision-language, web agents, web-agent, and its abstract makes a real-world claim (\"end-to-end attack\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "MemVenom: Triggered Poisoning of Multimodal Memories in Web Agents (Yv Zhang et al.)",
+        "url": "https://arxiv.org/abs/2606.10742",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2606.15788",
+    "title": "GAS-Leak-LLM: Genetic Algorithm-Based Suffix Optimization for Black-Box LLM Jailbreaking",
+    "date": "2026-06",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2606.15788 (Aman Anifer et al., 2026-06; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"commercial systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "GAS-Leak-LLM: Genetic Algorithm-Based Suffix Optimization for Black-Box LLM Jailbreaking (Aman Anifer et al.)",
+        "url": "https://arxiv.org/abs/2606.15788",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2606.21077",
+    "title": "OTTER: A Red-Teaming System for Toxicity-Evading Jailbreak Prompt Optimization",
+    "date": "2026-06",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2606.21077 (Jerry Wang et al., 2026-06; cs.CR, cs.CL). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreak\", the paper concerns llms, and its abstract makes a real-world claim (\"production llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "OTTER: A Red-Teaming System for Toxicity-Evading Jailbreak Prompt Optimization (Jerry Wang et al.)",
+        "url": "https://arxiv.org/abs/2606.21077",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.00481",
+    "title": "Beyond the Prompt: Jailbreaking Function-Calling LLMs via Simulated Moderation Traces",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.00481 (Junlong Liu et al., 2026-07; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns large language models, llm, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Beyond the Prompt: Jailbreaking Function-Calling LLMs via Simulated Moderation Traces (Junlong Liu et al.)",
+        "url": "https://arxiv.org/abs/2607.00481",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.02961",
+    "title": "Overloading Large Vision-Language Models for Jailbreaking",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.02961 (Haoyu Zhang et al., 2026-07; cs.CV, cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"jailbreaking\", the paper concerns assistants, large language model, lvlm, lvlms, multimodal, vision-language, and its abstract makes a real-world claim (\"real-world applications\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Overloading Large Vision-Language Models for Jailbreaking (Haoyu Zhang et al.)",
+        "url": "https://arxiv.org/abs/2607.02961",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.05120",
+    "title": "Agent Data Injection Attacks are Realistic Threats to AI Agents",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.05120 (Woohyuk Choi et al., 2026-07; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"injection attacks\", the paper concerns ai agent, ai agents, claude, codex, coding agents, gemini, and its abstract makes a real-world claim (\"real-world agents\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude, gemini",
+    "references": [
+      {
+        "title": "Agent Data Injection Attacks are Realistic Threats to AI Agents (Woohyuk Choi et al.)",
+        "url": "https://arxiv.org/abs/2607.05120",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.07433",
+    "title": "Beware of Agentic Botnets: Scalable Untargeted Promptware Attacks via Universal and Transferable Adversarial HalluSquatting",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.07433 (Aya Spira et al., 2026-07; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacks\", the paper concerns agentic, llm, llms, and its abstract makes a real-world claim (\"production llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Beware of Agentic Botnets: Scalable Untargeted Promptware Attacks via Universal and Transferable Adversarial HalluSquatting (Aya Spira et al.)",
+        "url": "https://arxiv.org/abs/2607.07433",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.15657",
+    "title": "Do Agents Dream of False Memories? Black-box Visual Attacks on Long-term Memory in Multimodal AI Agents",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.15657 (Halima Bouzidi et al., 2026-07; cs.CR, cs.CV, cs.LG). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacks\", the paper concerns ai agents, mllm, multimodal, and its abstract makes a real-world claim (\"deployed systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Do Agents Dream of False Memories? Black-box Visual Attacks on Long-term Memory in Multimodal AI Agents (Halima Bouzidi et al.)",
+        "url": "https://arxiv.org/abs/2607.15657",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.19267",
+    "title": "They'll Verify. They Just Won't Act. How Authority Framing and Laundered Code Turn a Trusted Agentic CI/CD Pipeline Into an Attack Surface",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.19267 (Yohann Sidot, 2026-07; cs.CR, cs.AI, cs.MA). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attack\", the paper concerns agentic, llm, llms, and its abstract makes a real-world claim (\"production llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "They'll Verify. They Just Won't Act. How Authority Framing and Laundered Code Turn a Trusted Agentic CI/CD Pipeline Into an Attack Surface (Yohann Sidot)",
+        "url": "https://arxiv.org/abs/2607.19267",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.23444",
+    "title": "Isolated but Exposed: Persistence-Based Memory Extraction Attack on LLM Agents",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.23444 (Xinyu Gao et al., 2026-07; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attack\", the paper concerns large language models, llm, and its abstract makes a real-world claim (\"production systems\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "Isolated but Exposed: Persistence-Based Memory Extraction Attack on LLM Agents (Xinyu Gao et al.)",
+        "url": "https://arxiv.org/abs/2607.23444",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2607.25936",
+    "title": "From Role Prompt to Infinite Thinking: Exploiting Persona Conditioning for Inference Cost Attacks in LLMs",
+    "date": "2026-07",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2607.25936 (Zhiyi Mou et al., 2026-07; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"exploiting\", the paper concerns llm, llms, and its abstract makes a real-world claim (\"real-world applications\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "From Role Prompt to Infinite Thinking: Exploiting Persona Conditioning for Inference Cost Attacks in LLMs (Zhiyi Mou et al.)",
+        "url": "https://arxiv.org/abs/2607.25936",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2608.04741",
+    "title": "LoginTrap: Uncovering Task-Agnostic Phishing-Style Indirect Prompt Injection Attacks against LLM-based Web Agents",
+    "date": "2026-08",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2608.04741 (Longtao Guo et al., 2026-08; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns llm, web agent, web agents, and its abstract makes a real-world claim (\"end-to-end attack\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "LoginTrap: Uncovering Task-Agnostic Phishing-Style Indirect Prompt Injection Attacks against LLM-based Web Agents (Longtao Guo et al.)",
+        "url": "https://arxiv.org/abs/2608.04741",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2608.23471",
+    "title": "InjecMEM: Memory Injection Attack on LLM Agent Memory Systems",
+    "date": "2026-08",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2608.23471 (Hanling Tian et al., 2026-08; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"memory injection\", the paper concerns llm, and its abstract makes a real-world claim (\"deployed llm\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "InjecMEM: Memory Injection Attack on LLM Agent Memory Systems (Hanling Tian et al.)",
+        "url": "https://arxiv.org/abs/2608.23471",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2609.01222",
+    "title": "What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness",
+    "date": "2026-09",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2609.01222 (Zichuan Li et al., 2026-09; cs.CR). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacks\", the paper concerns ai agent, claude, codex, and its abstract makes a real-world claim (\"real-world agent\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "claude",
+    "references": [
+      {
+        "title": "What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness (Zichuan Li et al.)",
+        "url": "https://arxiv.org/abs/2609.01222",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2609.04533",
+    "title": "Repeat-After-Me: Black-Box Adaptive Visual Prompt Injection",
+    "date": "2026-09",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2609.04533 (Sizhe Chen et al., 2026-09; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"prompt injection\", the paper concerns ai agents, gpt-5, openclaw, vlms, and its abstract makes a real-world claim (\"remote code execution\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "gpt-5, openclaw",
+    "references": [
+      {
+        "title": "Repeat-After-Me: Black-Box Adaptive Visual Prompt Injection (Sizhe Chen et al.)",
+        "url": "https://arxiv.org/abs/2609.04533",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2609.09553",
+    "title": "Arbitrary Cipher Attacks Against Large Language Models Do Not Require Fine-Tuning",
+    "date": "2026-09",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2609.09553 (Thomas Rivasseau, 2026-09; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"attacks\", the paper concerns large language model, large language models, and its abstract makes a real-world claim (\"commercial models\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "anthropic, openai",
+    "references": [
+      {
+        "title": "Arbitrary Cipher Attacks Against Large Language Models Do Not Require Fine-Tuning (Thomas Rivasseau)",
+        "url": "https://arxiv.org/abs/2609.09553",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2609.32635",
+    "title": "Trust the Brand, Lose Control: How Identity Hijacks LLM Agent Orchestration",
+    "date": "2026-09",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2609.32635 (Xutao Mao et al., 2026-09; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"hijacks\", the paper concerns llm, openclaw, and its abstract makes a real-world claim (\"production agent\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "openclaw",
+    "references": [
+      {
+        "title": "Trust the Brand, Lose Control: How Identity Hijacks LLM Agent Orchestration (Xutao Mao et al.)",
+        "url": "https://arxiv.org/abs/2609.32635",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  },
+  {
+    "source_id": "ARXIV-2609.39902",
+    "title": "CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code Completion",
+    "date": "2026-09",
+    "year": 2026,
+    "category": "research",
+    "description": "arXiv:2609.39902 (Zhen Liang et al., 2026-09; cs.CR, cs.AI). Flagged by the project's deterministic attack-on-GenAI selection filter, not by human review: the title carries the attack term \"exploiting\", the paper concerns large language models, llms, and its abstract makes a real-world claim (\"commercial llms\"). Read the abstract and paper at the arXiv link before relying on it.",
+    "affected": "",
+    "references": [
+      {
+        "title": "CodeMimicry: Exploiting Safety Generalization Lag in Large Language Models via Structured Code Completion (Zhen Liang et al.)",
+        "url": "https://arxiv.org/abs/2609.39902",
+        "type": "paper"
+      }
+    ],
+    "tags": [
+      "arxiv",
+      "auto-selected",
+      "paper"
+    ],
+    "description_provenance": "original",
+    "quality_tier": "auto"
+  }
+]

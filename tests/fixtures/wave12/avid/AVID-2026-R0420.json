@@ -1,0 +1,48 @@
+{
+  "data_type": "AVID",
+  "metadata": {
+    "report_id": "AVID-2026-R0420"
+  },
+  "affects": {
+    "developer": [
+      "Google"
+    ],
+    "deployer": [],
+    "artifacts": [
+      {
+        "type": "System",
+        "name": "Gemini CLI"
+      }
+    ]
+  },
+  "problemtype": {
+    "classof": "Third-party Report",
+    "description": {
+      "lang": "eng",
+      "value": "Google Gemini CLI Tool Discovery Code Execution"
+    },
+    "type": "Advisory"
+  },
+  "references": [
+    {
+      "label": "Mindgard Disclosure",
+      "url": "https://mindgard.ai/disclosures/google-gemini-cli-tool-discovery-code-execution"
+    }
+  ],
+  "description": {
+    "lang": "eng",
+    "value": "The gemini-cli is vulnerable to Arbitrary Code Execution (RCE) via malicious Model Context Protocol (MCP) server definitions in workspace settings. Workspace settings can configure MCP servers through the mcpServers or mcp.serverCommand fields in .gemini/settings.json. ‍"
+  },
+  "credit": [
+    {
+      "lang": "eng",
+      "value": "Piotr Ryciak"
+    },
+    {
+      "lang": "eng",
+      "value": "Mindgard"
+    }
+  ],
+  "reported_date": "2025-12-26",
+  "data_version": "0.3.3"
+}

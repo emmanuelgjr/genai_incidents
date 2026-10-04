@@ -962,7 +962,7 @@ def fetch_osv() -> list[dict]:
         vulns = data.get("vulns", []) or []
         for v in vulns:
             vid = v.get("id")
-            if not vid or vid in seen:
+            if not vid or vid in seen or is_openssf_malicious(v):
                 continue
             seen.add(vid)
             v["_pkg"] = {"name": name, "ecosystem": eco}
@@ -978,7 +978,63 @@ def fetch_osv() -> list[dict]:
     return all_vulns
 
 
+def is_openssf_malicious(v: dict) -> bool:
+    """True for OpenSSF Malicious Packages records (``MAL-`` ids, Apache-2.0,
+    not the CC BY 4.0 OSV applies to its own records). Their report text may
+    not be carried verbatim under this repo's licence posture
+    (docs/SOURCE_LICENSES.md row 2.4), so the OSV path never admits them.
+    Deterministic: id / alias prefix, or the record's own source marker."""
+    ids = [v.get("id") or ""] + list(v.get("aliases") or [])
+    if any(str(i).startswith("MAL-") for i in ids):
+        return True
+    src = str((v.get("database_specific") or {}).get("source") or "")
+    return "ossf/malicious-packages" in src
+
+
+def is_openssf_malicious_row(row: dict) -> bool:
+    """Same test on an already-converted ingest row (for the one-off purge of
+    the committed file, scripts/audit/purge_openssf_mal.py)."""
+    return any(str(row.get(k) or "").startswith("MAL-") for k in ("source_id", "osv_id"))
+
+
+# Ids that must survive as a bare identifier (facts + links, no Apache-2.0 text).
+# MAL-2026-3607 is the bridge that holds corpus entry INC-08450 together; if the
+# row disappeared from this file the merger would split INC-08450, which the
+# WS4-T19 guard refuses without a user ruling (board N7).
+BARE_IDENTIFIER = {"MAL-2026-3607"}
+BARE_IDENTIFIER_MARK = "Bare identifier for OpenSSF Malicious Packages report"
+
+
+def make_bare_identifier(row: dict) -> dict:
+    row = dict(row)
+    row["description"] = (
+        f"{BARE_IDENTIFIER_MARK} {row['source_id']} "
+        f"(affected: {row.get('affected') or 'n/a'}). The report text is Apache-2.0 and is not "
+        "reproduced here; the OSV link and the references below are the sources. Kept so the "
+        "incident cluster that cites this report keeps its identifier and links."
+    )
+    row["description_provenance"] = "original"
+    return row
+
+
+def carry_bare_identifiers(rows: list[dict], prev_rows: list[dict]) -> list[dict]:
+    """Deterministically keep every bare-identifier row of the previous
+    committed file (and reduce any freshly converted BARE_IDENTIFIER MAL row to
+    that shape) so a cve-enrich run, whose OSV path now excludes MAL- records,
+    does not drop the bridge. Nothing else from the MAL record is carried."""
+    out = [make_bare_identifier(r) if is_openssf_malicious_row(r) and r["source_id"] in BARE_IDENTIFIER
+           else r for r in rows if not (is_openssf_malicious_row(r) and r["source_id"] not in BARE_IDENTIFIER)]
+    have = {r["source_id"] for r in out}
+    for r in prev_rows:
+        if (is_openssf_malicious_row(r) and (r.get("description") or "").startswith(BARE_IDENTIFIER_MARK)
+                and r["source_id"] not in have):
+            out.append(r)
+    return out
+
+
 def osv_to_record(v: dict) -> dict | None:
+    if is_openssf_malicious(v):
+        return None
     osv_id = v.get("id") or ""
     aliases = v.get("aliases") or []
     cve_id = next((a for a in aliases if a.startswith("CVE-")), None)
@@ -1188,6 +1244,14 @@ def main():
             f"overwrite {OUT_FILE} with an empty result", flush=True,
         )
     else:
+        # The bare-identifier carry runs only AFTER the empty-result refusal:
+        # carrying first would make a fully blocked run non-empty (1 row) and
+        # overwrite the committed file (wave12 gate 2, DEFECT 1).
+        try:
+            prev_rows = json.loads(OUT_FILE.read_text("utf-8")) if OUT_FILE.exists() else []
+        except ValueError:
+            prev_rows = []
+        out = carry_bare_identifiers(out, prev_rows)
         OUT_FILE.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"\nWrote {len(out)} entries -> {OUT_FILE}", flush=True)
 
