@@ -1,0 +1,10 @@
+{
+  "id": "GHSA-xxxx-yyyy-zzzz",
+  "aliases": ["CVE-2025-00001"],
+  "summary": "Path traversal in litellm proxy",
+  "details": "A path traversal in the litellm proxy server allows reading arbitrary files.",
+  "modified": "2025-05-01T00:00:00Z",
+  "published": "2025-05-01T00:00:00Z",
+  "references": [{"type": "ADVISORY", "url": "https://github.com/advisories/GHSA-xxxx-yyyy-zzzz"}],
+  "_pkg": {"name": "litellm", "ecosystem": "PyPI"}
+}

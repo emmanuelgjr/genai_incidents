@@ -115,7 +115,10 @@ def _incident_attributes(e: dict) -> list[dict]:
     title = (e.get("title") or e["id"]).strip()
     if title:
         attrs.append(_attr(e, "text", "Other", title[:600], False, tags, seq="title"))
+    rejected = set(e.get("rejected_cve_ids") or [])  # WS4-T2: not valid identifiers
     for c in e.get("cve_ids") or []:
+        if c in rejected:
+            continue
         attrs.append(_attr(e, "vulnerability", "External analysis", c, False,
                            [_tag(f'genai-incidents:incident-id="{e["id"]}"')]))
     seen_urls: set[str] = set()
@@ -250,6 +253,9 @@ public disclosures, not active-campaign IOCs (threat level: low).
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
+    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
+    # their IDs resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if e.get("status") != "retracted"]
     n_events, n_attr = build(incidents)
     print(f"[misp] wrote MISP feed: {n_events} year-events, {n_attr} attributes "
           f"-> docs/misp/")

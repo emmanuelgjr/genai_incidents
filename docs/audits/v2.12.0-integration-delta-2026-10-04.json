@@ -1,0 +1,1387 @@
+{
+ "before_ref": "origin/main",
+ "changes": [
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-00601"
+  },
+  {
+   "after": [
+    "CVE-2026-35021",
+    "CVE-2026-35022"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-00601"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-00601"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-00601"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-00601"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-01291"
+  },
+  {
+   "after": [
+    "CVE-2023-32785"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-01291"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-01291"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-01560"
+  },
+  {
+   "after": [
+    "CVE-2026-0767"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-01560"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-01560"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-01560"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-01560"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-01561"
+  },
+  {
+   "after": [
+    "CVE-2026-0766"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-01561"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-01561"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-01561"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-01561"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-01562"
+  },
+  {
+   "after": [
+    "CVE-2026-0765"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-01562"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-01562"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-01562"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-01562"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-04",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-01723"
+  },
+  {
+   "after": [
+    "CVE-2025-34351"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-01723"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-04",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-01723"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-02984"
+  },
+  {
+   "after": [
+    "CVE-2024-12534",
+    "CVE-2024-12537"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-02984"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-02984"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-04061"
+  },
+  {
+   "after": [
+    "CVE-2024-7959"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-04061"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-04061"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-04061"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-04061"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-08934"
+  },
+  {
+   "after": [
+    "CVE-2026-39398"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-08934"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-08934"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-08934"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-08934"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-09202"
+  },
+  {
+   "after": [
+    "CVE-2026-34508"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-09202"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-02",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-09202"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10556"
+  },
+  {
+   "after": [
+    "CVE-2024-8060"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10556"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10556"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10556"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10556"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10559"
+  },
+  {
+   "after": [
+    "CVE-2024-7990"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10559"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10559"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10559"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10559"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10561"
+  },
+  {
+   "after": [
+    "CVE-2024-7804"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10561"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10561"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10561"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10561"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10563"
+  },
+  {
+   "after": [
+    "CVE-2024-7806"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10563"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10563"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10563"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10563"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10564"
+  },
+  {
+   "after": [
+    "CVE-2024-7045"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10564"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10564"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10564"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10564"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10565"
+  },
+  {
+   "after": [
+    "CVE-2024-7053"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10565"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10565"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10565"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10565"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10566"
+  },
+  {
+   "after": [
+    "CVE-2024-7046"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10566"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10566"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10566"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10566"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10568"
+  },
+  {
+   "after": [
+    "CVE-2024-7033"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10568"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10568"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10568"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10568"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10569"
+  },
+  {
+   "after": [
+    "CVE-2024-7039"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10569"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10569"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10569"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10569"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10570"
+  },
+  {
+   "after": [
+    "CVE-2024-7036"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10570"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10570"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10570"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10570"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10572"
+  },
+  {
+   "after": [
+    "CVE-2024-7034"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10572"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10572"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10572"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10572"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10642"
+  },
+  {
+   "after": [
+    "CVE-2024-57000"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10642"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10642"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10642"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10642"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10812"
+  },
+  {
+   "after": [
+    "CVE-2024-7037"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10812"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10812"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10812"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10812"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10814"
+  },
+  {
+   "after": [
+    "CVE-2024-7038"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10814"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10814"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10814"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10814"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-10991"
+  },
+  {
+   "after": [
+    "CVE-2024-4460"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-10991"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-10991"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-10991"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-10991"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11085"
+  },
+  {
+   "after": [
+    "CVE-2024-4642"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11085"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11085"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11085"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11085"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11374"
+  },
+  {
+   "after": [
+    "CVE-2023-45960"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11374"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11374"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11374"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11374"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11565"
+  },
+  {
+   "after": [
+    "CVE-2023-31508"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11565"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11565"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11565"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11565"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11635"
+  },
+  {
+   "after": [
+    "CVE-2023-28426"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11635"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11635"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11635"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11635"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11708"
+  },
+  {
+   "after": [
+    "CVE-2022-23529"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11708"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11708"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11708"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11708"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11728"
+  },
+  {
+   "after": [
+    "CVE-2022-46464"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11728"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11728"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11728"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11728"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11750"
+  },
+  {
+   "after": [
+    "CVE-2022-39390"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11750"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11750"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11750"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11750"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-11766"
+  },
+  {
+   "after": [
+    "CVE-2021-46849"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-11766"
+  },
+  {
+   "after": "retracted",
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status",
+   "id": "INC-11766"
+  },
+  {
+   "after": {
+    "as_of": "2026-10-03",
+    "code": "cve-rejected"
+   },
+   "before": null,
+   "class": "ws4-t2",
+   "field": "status_reason",
+   "id": "INC-11766"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-06-10",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-11766"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-14121"
+  },
+  {
+   "after": [
+    "CVE-2026-28483"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-14121"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-14121"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "last_seen",
+   "id": "INC-14123"
+  },
+  {
+   "after": [
+    "CVE-2026-32066"
+   ],
+   "before": null,
+   "class": "ws4-t2",
+   "field": "rejected_cve_ids",
+   "id": "INC-14123"
+  },
+  {
+   "after": "2026-10-03",
+   "before": "2026-07-03",
+   "class": "ws4-t2",
+   "field": "updated",
+   "id": "INC-14123"
+  }
+ ],
+ "classification": {
+  "unintended": 0,
+  "wave12": 2305,
+  "ws4-t2": 163
+ },
+ "counts": {
+  "added": 2305,
+  "entries_after": 15666,
+  "entries_before": 13361,
+  "existing_entries_changed": 35,
+  "expected_flag": 6,
+  "expected_retract": 29,
+  "incident_count_derived": 15637,
+  "removed": 0,
+  "retracted_count_derived": 29
+ },
+ "defects": [],
+ "fires": {
+  "severity_on_retracted_entry": [
+   "INC-04061.severity: unintended change"
+  ],
+  "title_on_untouched_entry": [
+   "INC-04853.title: unintended change"
+  ]
+ },
+ "flag_ids": [
+  "INC-01291",
+  "INC-01723",
+  "INC-02984",
+  "INC-09202",
+  "INC-14121",
+  "INC-14123"
+ ],
+ "header": {
+  "generated": {
+   "after": "2026-10-04",
+   "before": "2026-09-18"
+  },
+  "incident_count": {
+   "after": 15637,
+   "before": 13361
+  },
+  "retracted_count": {
+   "after": 29,
+   "before": null
+  }
+ },
+ "new_ids_range": [
+  "INC-14911",
+  "INC-17215"
+ ],
+ "retract_ids": [
+  "INC-00601",
+  "INC-01560",
+  "INC-01561",
+  "INC-01562",
+  "INC-04061",
+  "INC-08934",
+  "INC-10556",
+  "INC-10559",
+  "INC-10561",
+  "INC-10563",
+  "INC-10564",
+  "INC-10565",
+  "INC-10566",
+  "INC-10568",
+  "INC-10569",
+  "INC-10570",
+  "INC-10572",
+  "INC-10642",
+  "INC-10812",
+  "INC-10814",
+  "INC-10991",
+  "INC-11085",
+  "INC-11374",
+  "INC-11565",
+  "INC-11635",
+  "INC-11708",
+  "INC-11728",
+  "INC-11750",
+  "INC-11766"
+ ]
+}

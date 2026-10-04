@@ -179,6 +179,9 @@ curl -s "{api_root}collections/{COLLECTION_ID}/objects.json" \\
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
+    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
+    # their IDs resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if e.get("status") != "retracted"]
     n = build(incidents)
     print(f"[taxii] wrote static TAXII-compatible discovery document ({n} objects, 1 collection) "
           f"-> docs/taxii2/  [collection {COLLECTION_ID}]")

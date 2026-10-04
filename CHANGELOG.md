@@ -7,6 +7,85 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+## [2.12.0] — 2026-10-04
+
+> **These notes were gated before the cut** and the release was cut on
+> 2026-10-04. Full disclosure, the consumer-impact section on the changed
+> meaning of `incident_count`, and the re-derivation recipe for every figure:
+> [`docs/releases/v2.12.0.md`](docs/releases/v2.12.0.md). Minor release: the new
+> schema fields are optional and additive.
+
+### Added - wave 1-2 sources: +2,305 machine-ingested entries (D40, D43)
+
+- **2,305 new entries, `INC-14911` to `INC-17215`** (contiguous append; none
+  removed; no existing entry changed by the ingest). All are
+  `quality_tier: auto`, `tier: feed`, `confidence` derived per entry (2,070 medium, 131 low, 104 high): 2,250
+  `vulnerability-disclosure` and 55 `research`, all in the `security` corpus.
+  `incident_count` (stands) 13,361 -> 15,637 together with the retraction
+  below; the landmark count (1,915) is unchanged.
+- **Sources:** AVID (`avidml/avid-db`, MIT; repo tarball, not the website),
+  cvelistV5 (CVE Program, CVE-TOU; including the huntr CNA slice, as CVE
+  records only), and arXiv cs.CR metadata via OAI-PMH (CC0; deterministic
+  selection only, no human-approved list, D43; the abstract is discarded and
+  the description is original prose). New ingests `scripts/ingest_avid.py`,
+  `scripts/ingest_cvelistv5.py`, `scripts/ingest_arxiv_oaipmh.py` and shared
+  filter `scripts/ai_relevance.py` write `ingest/wave12_*.json`.
+- **Not new-source coverage:** 1,374 of the 2,250 new vulnerability entries
+  are dated after 2026-06 and mostly fill the corpus's stalled NVD refresh;
+  876 are dated 2026-06 or earlier (857 in 2024-01 to 2026-06, 19 earlier; the ingest window is by publication date). Existing entries are **not**
+  enriched by these sources (498 + 2,139 CVE-already-in-corpus rows and 72
+  would-fold rows are skipped, crosswalk kept in the provenance files).
+- **410 emitted rows (352 cvelistV5, 58 AVID; 79 of them huntr) are suppressed
+  at merge** because their CVE ids are on the issue-#88 out-of-scope key list
+  (`data/issue88_remediation.json`); they never reach the corpus.
+- **EUVD (ENISA) is not ingested**: licence unresolved, outreach drafted and
+  not sent.
+- Delta: `docs/audits/wave12-ingest-delta-2026-10-03.md`; integration delta
+  `docs/audits/v2.12.0-integration-delta-2026-10-04.md` (0 unintended).
+
+### Changed - licensing and ingest conduct
+
+- `docs/SOURCE_LICENSES.md`: new rows 2.5, 6.1 (AVID), 6.2 (cvelistV5/huntr),
+  6.3 (arXiv OAI-PMH), 6.4 (EUVD, not ingested). CVE Terms of Use and AVID MIT
+  notices added to `NOTICE-DATA` and `.reuse/dep5`.
+- **Row 2.4 (OSV.dev) corrected in place:** the claim that every OSV database
+  reachable by the script is CC-BY 4.0 was false; OpenSSF `MAL-` records
+  (Apache-2.0) are now excluded from the OSV path.
+- `ingest/common.py`: redirect targets are now robots-checked and
+  rate-limited (previously only the first host was); new `fetch_to_file` for
+  large streamed downloads. The refresh workflows gain a rejection-snapshot
+  step.
+
+### Known limitations (v2.12.0)
+
+- The OECD/AIID weekly refresh remains frozen (D25(a), kept by D42).
+- The AIRI Navigator ingest has been dead since 2026-05-31 (board note N8).
+- The CVE/GHSA feed precision audit is open (board note N9).
+
+### Changed - 29 entries retracted because their CVEs are REJECTED (WS4-T2, board note N1)
+
+- **29 entries now carry `status: retracted`** and 6 more carry a
+  `rejected_cve_ids` flag. A full sweep of the 6,998 CVE ids in the corpus
+  **before wave 1-2** against the CVE record found 37 REJECTED (all 37 also `Rejected` in NVD);
+  the evaluation's 18 were the huntr slice of them. Nothing was deleted and
+  every `INC-*` ID still resolves. The 2,150 cvelistV5-sourced CVEs on the new entries were PUBLISHED at ingest (that ingest drops every non-PUBLISHED record), and the 21 CVEs that reach new entries only through AVID have no recorded rejection state yet; the next refresh checks never-checked ids first.
+- **`incident_count` now counts incidents that stand** (D44): measured alone
+  against 13,361 entries it was 13,332 (-29); integrated with the wave 1-2
+  ingest above it is **15,637**. Retracted entries stay in `incidents` (file
+  length is 15,666) and are counted in the new `retracted_count` (29;
+  `incident_count + retracted_count == len(incidents)`). `load_incidents()`
+  and the slim JSON return the retracted rows too. They are omitted
+  from the INCIDENTS.md tables and charts, the site, and the
+  STIX/MISP/TAXII/Hugging Face feeds; their year-shard cards stay, bannered.
+  **Consumers asserting `len(incidents) == incident_count` must change.**
+- New optional fields `status`, `status_reason`, `rejected_cve_ids` (absence
+  of `status` means the entry stands). New ingest
+  `scripts/ingest_cve_rejections.py` -> `ingest/cve_rejections.json`; the
+  merge applies the rule offline. 4 of the 29 were rejected as duplicates of
+  another CVE; see the delta. STIX/MISP/TAXII no longer emit rejected CVEs as
+  vulnerabilities (`x_rejected_cve_ids` added). Delta:
+  `docs/audits/rejected-cve-reconcile-delta-2026-10-03.md`.
+
 ### Changed — STIX/TAXII OWASP LLM `source_name` relabel (live since 2026-10-01, after the v2.11.0 cut)
 
 - **Every OWASP LLM `external_reference` in the STIX bundle
@@ -26,7 +105,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   `owasp-llm-top10-2025` with `owasp-llm-top10-2026` in your queries, or
   match both strings during the transition.
 - **Re-import the STIX bundle.** The relabel changed object content
-  (**11,753 `x-genai-incident` objects** carrying the 17,750 references)
+  (**11,753 `x-genai-incident` objects** carrying the 17,750 references, as measured on the v2.11.0 corpus; the v2.12.0 bundle carries 21,017 on 14,004 objects)
   without changing `modified`; SDO `id` and `modified` are unchanged
   (`modified` derives from entry dates). Consumers that treat an unchanged
   (`id`, `modified`) as an already-seen object version, as STIX 2.1

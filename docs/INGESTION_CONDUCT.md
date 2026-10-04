@@ -37,7 +37,7 @@ separate, deliberately non-code enforcement mechanism.
 `USER_AGENT` (`ingest/common.py:96-99`) is a single module-level constant:
 
 ```
-genai_incidents/2.11.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
+genai_incidents/2.12.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
 ```
 
 It names the project, links to the repo, and gives a contact address
@@ -72,8 +72,9 @@ justified the `Mozilla/5.0` prefix had no supporting measurement. Full
 evidence: `docs/audits/WS0-T4-network-chokepoint-inventory-2026-07-29.md`
 §13.
 
-Version number (`2.11.0`) and the full reasoning above are in the comment
-immediately above the constant (`ingest/common.py:62-95`).
+Version number (`2.12.0`, bumped at every cut per `docs/VERSIONING.md` step 2)
+is in the constant itself; the full reasoning above is in the comment
+immediately above it (`ingest/common.py:62-95`).
 
 ### 2. A robots.txt check before every fetch, fail-closed
 
@@ -469,6 +470,27 @@ a `make setup-external` target using `git clone --depth 1` under the same
 kind of pacing/identification discipline as `ingest/common.py`) is a
 design decision for a future task, flagged here, not decided or
 implemented in this one.
+
+### 3. git clone of avidml/avid-db and CVEProject/cvelistV5 (NOT USED, HTTP route taken; added 2026-10-03, status updated 2026-10-03)
+
+**Status: not used, HTTP route taken.** The wave 1/2 ingest (branch ws4/wave12-ingest) fetches AVID as the GitHub tarball (api.github.com/repos/avidml/avid-db/tarball/main, ingest/common.py fetch_once) and cvelistV5 as the daily baseline release asset (ingest/common.py fetch_to_file: fail-closed robots check, per-host rate limit, project User-Agent). scripts/ingest_avid.py, scripts/ingest_cvelistv5.py and scripts/ingest_arxiv_oaipmh.py contain no git clone, subprocess or other non-HTTP egress (red-reviewer grep, 2026-10-03). The text below is kept as the record of the conditional decision. The evaluation (`docs/specs/source-expansion-evaluation.md`,
+AVID Shape) recommends the `git` route or the repo tarball for the AVID
+backlog (about 1,790 files; one raw fetch per file at the 3 s floor is
+about 85 minutes). A tarball or release-asset download is HTTP and goes
+through `ingest/common.py`, needing **no entry here**. A `git clone` is
+non-HTTP egress and **requires this entry to be completed in the same PR
+that introduces it** (invariants 5 and 10).
+
+- **What:** `git clone --depth 1` (or fetch) of the two public GitHub
+  repositories named above. Owner: pipeline-engineer.
+- **Conduct properties to be stated by the implementing PR (not stated
+  here because none exist yet):** identification (git's own client string;
+  whether a project contact is sent), pacing (one clone per run, no
+  loop), robots equivalent (GitHub-hosted, none applies, as for entry 1),
+  and the fail-closed behaviour on clone error.
+- **If the implementing PR uses the tarball/release-asset route instead,
+  delete nothing: replace this entry's status line with "not used,
+  HTTP route taken" so the decision is on record.**
 
 ### Scoping note: excluded from this register
 

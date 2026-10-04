@@ -46,6 +46,60 @@ def _has_primary_source(entry: dict) -> bool:
               for r in (entry.get("references") or []))
 
 
+def check_envelope(data: dict) -> list[str]:
+    """``incident_count + retracted_count == len(incidents)`` (WS4-T2)."""
+    n_ret = sum(1 for e in data["incidents"] if e.get("status") == "retracted")
+    problems = []
+    if data.get("retracted_count", 0) != n_ret:
+        problems.append(f"retracted_count {data.get('retracted_count', 0)} != {n_ret} retracted entries")
+    if data.get("incident_count", len(data["incidents"])) + n_ret != len(data["incidents"]):
+        problems.append(
+            f"incident_count {data.get('incident_count')} + {n_ret} retracted != {len(data['incidents'])} entries")
+    return problems
+
+
+def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
+    """WS4-T2 status/retraction invariants (never-delete: a retracted entry
+    stays, marked). Returns violation messages (empty == clean).
+
+    * ``status`` and ``status_reason`` appear together.
+    * ``rejected_cve_ids`` is a subset of ``cve_ids``; a retracted entry's
+      equals its ``cve_ids`` (retraction means ALL its CVEs are rejected).
+    * ``incident_count + retracted_count == len(incidents)`` and
+      ``retracted_count`` equals the number of retracted entries.
+    * Against the committed CVE-state snapshot (``rejected``): every REJECTED
+      CVE carried by any entry is flagged on it. This is the check that fails
+      when the merge rule is skipped or an entry ships a rejected CVE unmarked.
+    """
+    problems: list[str] = []
+    incidents = data["incidents"]
+    for e in incidents:
+        has_s, has_r = "status" in e, "status_reason" in e
+        if has_s != has_r:
+            problems.append(f"{e['id']}: status and status_reason must appear together")
+        cves = set(e.get("cve_ids") or [])
+        flagged = set(e.get("rejected_cve_ids") or [])
+        if not flagged <= cves:
+            problems.append(f"{e['id']}: rejected_cve_ids {sorted(flagged - cves)} not in cve_ids")
+        if e.get("status") == "retracted" and flagged != cves:
+            problems.append(f"{e['id']}: retracted but rejected_cve_ids != cve_ids")
+        if rejected is not None:
+            missed = sorted((cves & rejected) - flagged)
+            if missed:
+                problems.append(f"{e['id']}: carries REJECTED CVE(s) {missed} without a rejected_cve_ids flag")
+            if (cves and cves <= rejected and set(e.get("source_ids") or []) <= rejected
+                    and e.get("status") != "retracted"):
+                problems.append(f"{e['id']}: rests only on REJECTED CVE(s) {sorted(cves)} but is not retracted")
+    n_ret = sum(1 for e in incidents if e.get("status") == "retracted")
+    if data.get("retracted_count", 0) != n_ret:
+        problems.append(f"retracted_count {data.get('retracted_count', 0)} != {n_ret} retracted entries")
+    if data.get("incident_count", len(incidents)) + n_ret != len(incidents):
+        problems.append(
+            f"incident_count {data.get('incident_count')} + {n_ret} retracted != {len(incidents)} entries"
+        )
+    return problems
+
+
 def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[str]:
     """Cross-entry invariants the JSON schema can't express. Returns a list
     of violation messages (empty == clean).
@@ -600,6 +654,22 @@ def main():
             "deprecations", []
         )
     problems = check_integrity(data, deprecations)
+    rej_path = ROOT / "ingest" / "cve_rejections.json"
+    rejected = None
+    if rej_path.exists():
+        rejected = {
+            c for c, r in json.loads(rej_path.read_text(encoding="utf-8"))["states"].items()
+            if r.get("state") == "REJECTED"
+        }
+    problems += check_status(data, rejected)
+    # The slim file carries the same envelope; its count must agree too.
+    slim_path = ROOT / "data" / "incidents.min.json"
+    if slim_path.exists():
+        slim = json.loads(slim_path.read_text(encoding="utf-8"))
+        problems += [f"incidents.min.json: {p}" for p in check_envelope(slim)]
+        if (slim.get("incident_count"), slim.get("retracted_count", 0)) != (
+                data.get("incident_count"), data.get("retracted_count", 0)):
+            problems.append("incidents.min.json: count envelope differs from incidents.json")
 
     # Source-freshness registry: shape, then the row markers that inherit
     # from it. Freshness is a property of the SOURCE; the per-row marker is

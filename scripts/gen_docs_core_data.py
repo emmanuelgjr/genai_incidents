@@ -94,7 +94,8 @@ DETAIL_FIELDS = [
 
 def main() -> int:
     payload = json.loads(SRC.read_text(encoding="utf-8"))
-    incidents = payload["incidents"]
+    # WS4-T2: retracted entries are not listed on the site (IDs still resolve in data/).
+    incidents = [e for e in payload["incidents"] if e.get("status") != "retracted"]
 
     core_incidents = []
     detail_by_year: dict[str, dict[str, dict]] = {}
@@ -111,7 +112,7 @@ def main() -> int:
     core_payload = {
         "version": payload.get("version"),
         "generated": payload.get("generated"),
-        "incident_count": payload.get("incident_count", len(core_incidents)),
+        "incident_count": len(core_incidents),
         "incidents": core_incidents,
     }
 

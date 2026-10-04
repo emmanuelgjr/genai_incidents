@@ -94,7 +94,7 @@ from urllib.parse import urlparse
 # earlier WAF-rejection concern that justified keeping `Mozilla/5.0` had no
 # supporting measurement and does not hold up against one).
 USER_AGENT = (
-    "genai_incidents/2.11.0 (+https://github.com/emmanuelgjr; "
+    "genai_incidents/2.12.0 (+https://github.com/emmanuelgjr; "
     "contact: emmanuelgjr@gmail.com)"
 )
 
@@ -172,6 +172,15 @@ _last_request_at: dict[str, float] = {}
 _robots_cache: dict[str, urllib.robotparser.RobotFileParser] = {}
 
 
+def url_with_query(base: str, params: dict[str, str], *, safe: str = "") -> str:
+    """``base?k=v&...`` with percent-encoding. A pure string helper (no
+    network); lives here so ingest scripts need no ``urllib`` import of their
+    own (tests/test_network_chokepoint.py pins which scripts mention it)."""
+    from urllib.parse import urlencode
+
+    return base + "?" + urlencode(params, safe=safe)
+
+
 def _reset_state_for_tests() -> None:
     """Test-only: clear the rate-limit and robots caches between test cases,
     so state (and, more importantly, an accidental real time.sleep or a real
@@ -203,6 +212,35 @@ def _rate_limit(host: str, min_interval: float) -> None:
         _last_request_at[host] = now + wait
     if wait > 0:
         time.sleep(wait)
+
+
+# ---- redirect targets are fetches too -------------------------------------
+# urllib follows a 302 to a different host on its own (a GitHub release asset
+# redirects to its CDN, the tarball API to codeload.github.com). Without this
+# handler only the FIRST host was robots-checked and rate-limited. The handler
+# runs the same two checks on every redirect target and refuses (PermissionError,
+# not retried) when robots.txt disallows it or cannot be verified. It is
+# installed as the process-wide opener so ``urllib.request.urlopen`` -- the one
+# call in this module -- uses it, and test mocks of urlopen are unaffected.
+_redirect_ctx = threading.local()
+
+
+class _CheckedRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        interval = getattr(_redirect_ctx, "min_interval", DEFAULT_MIN_INTERVAL)
+        # A robots.txt that itself redirects must not re-enter robots_allowed():
+        # the host's robots.txt is not cached yet, so that would recurse.
+        if urlparse(newurl).path != "/robots.txt" and not robots_allowed(newurl, interval):
+            raise PermissionError(
+                f"refusing to follow redirect to {newurl}: robots.txt disallows it for "
+                f"User-Agent {USER_AGENT!r}, or could not be verified and the host is not on "
+                "ROBOTS_UNVERIFIABLE_ALLOWLIST (fail-closed -- see docs/INGESTION_CONDUCT.md)"
+            )
+        _rate_limit(urlparse(newurl).netloc, interval)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+urllib.request.install_opener(urllib.request.build_opener(_CheckedRedirectHandler))
 
 
 def _get_robots_parser(
@@ -363,6 +401,7 @@ def fetch_once(
 
     host = urlparse(url).netloc
     _rate_limit(host, min_interval)
+    _redirect_ctx.min_interval = min_interval
 
     hdrs = {"User-Agent": USER_AGENT}
     if headers:
@@ -373,6 +412,72 @@ def fetch_once(
         body = resp.read()
         resp_headers = resp.headers
     return body, resp_headers
+
+
+def fetch_to_file(
+    url: str,
+    dest: Path,
+    *,
+    headers: dict[str, str] | None = None,
+    timeout: int = 120,
+    min_interval: float = DEFAULT_MIN_INTERVAL,
+    max_retries: int = 3,
+    chunk_size: int = 1 << 20,
+) -> tuple[str, int]:
+    """Stream ONE conduct-compliant download to *dest* without holding the
+    body in memory (for multi-hundred-MB release assets such as the
+    cvelistV5 baseline zip, which ``fetch_once`` would read whole).
+
+    Same conduct as ``fetch_once`` -- robots check (fail-closed), per-host
+    rate limit, forced ``USER_AGENT`` -- plus retry with exponential backoff
+    on transient failures. Writes to ``<dest>.part`` and renames on success,
+    so an interrupted download can never be mistaken for a complete one.
+    Returns ``(sha256_hex, size_bytes)`` computed while streaming.
+    """
+    import hashlib
+
+    if not robots_allowed(url, min_interval):
+        raise PermissionError(
+            f"refusing to fetch {url}: robots.txt disallows it for "
+            f"User-Agent {USER_AGENT!r}, or robots.txt itself could not be "
+            "verified and this host is not on ROBOTS_UNVERIFIABLE_ALLOWLIST "
+            "(fail-closed -- see docs/INGESTION_CONDUCT.md)"
+        )
+    host = urlparse(url).netloc
+    hdrs = {"User-Agent": USER_AGENT}
+    if headers:
+        hdrs.update({k: v for k, v in headers.items() if k.lower() != "user-agent"})
+
+    _redirect_ctx.min_interval = min_interval
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    part = Path(str(dest) + ".part")
+    last_err: Exception | None = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            _rate_limit(host, min_interval)
+            req = urllib.request.Request(url, headers=hdrs, method="GET")
+            digest = hashlib.sha256()
+            size = 0
+            with urllib.request.urlopen(req, timeout=timeout) as resp, part.open("wb") as fh:
+                while True:
+                    chunk = resp.read(chunk_size)
+                    if not chunk:
+                        break
+                    fh.write(chunk)
+                    digest.update(chunk)
+                    size += len(chunk)
+            part.replace(dest)
+            return digest.hexdigest(), size
+        except PermissionError:
+            raise        # robots refusal (including a redirect target): not transient
+        except (urllib.error.URLError, urllib.error.HTTPError,
+                TimeoutError, ConnectionError, OSError) as e:
+            last_err = e
+            if attempt < max_retries:
+                print(f"  [retry] attempt {attempt}/{max_retries} for {url}: {e}",
+                      file=sys.stderr)
+                time.sleep(2 ** attempt)
+    raise RuntimeError(f"Failed to fetch {url} after {max_retries} attempts: {last_err}")
 
 
 def robust_fetch(

@@ -1,0 +1,74 @@
+{
+  "data_type": "AVID",
+  "data_version": "0.1",
+  "metadata": {
+    "vuln_id": "AVID-2022-V002"
+  },
+  "affects": {
+    "developer": [],
+    "deployer": [
+      "HuggingFace"
+    ],
+    "artifacts": [
+      {
+        "type": "Model",
+        "name": "xlm-roberta-base"
+      }
+    ]
+  },
+  "problemtype": {
+    "classof": "LLM Evaluation",
+    "description": {
+      "lang": "eng",
+      "value": "Gender Bias in Sentence Completion Tasks performed by xlm-roberta-base"
+    }
+  },
+  "references": [
+    {
+      "label": "xlm-roberta-base on Hugging Face",
+      "url": "https://huggingface.co/xlm-roberta-base"
+    }
+  ],
+  "description": {
+    "lang": "eng",
+    "value": "Sentence Completion Tasks performed by xlm-roberta-base demonstrate significant gender bias, perpetuating negative social and professional stereotypes against females."
+  },
+  "reports": [
+    {
+      "report_id": "AVID-2022-R0002",
+      "type": "Detection",
+      "name": "Gender Bias in Sentence Completion Tasks performed by xlm-roberta-base using the HONEST metric"
+    },
+    {
+      "report_id": "AVID-2022-R0004",
+      "type": "Detection",
+      "name": "Profession bias reinforcing gender stereotypes found in xlm-roberta-base, as measured on the Winobias dataset"
+    }
+  ],
+  "impact": {
+    "avid": {
+      "risk_domain": [
+        "Ethics"
+      ],
+      "sep_view": [
+        "E0101: Group fairness"
+      ],
+      "lifecycle_view": [
+        "L05: Evaluation"
+      ],
+      "taxonomy_version": "0.1"
+    }
+  },
+  "credit": [
+    {
+      "lang": "eng",
+      "value": "Harry Saini, AVID"
+    },
+    {
+      "lang": "eng",
+      "value": "Sasha Luccioni, Hugging Face"
+    }
+  ],
+  "published_date": "2022-12-23",
+  "last_modified_date": "2022-12-23"
+}

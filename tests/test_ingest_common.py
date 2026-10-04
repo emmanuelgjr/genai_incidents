@@ -480,3 +480,133 @@ def test_rate_limit_zero_interval_is_a_no_op(monkeypatch):
     u._rate_limit("example.com", min_interval=0)
     u._rate_limit("example.com", min_interval=0)
     assert sleeps == []
+
+
+# ----------------------------------------------------------------------------
+# fetch_to_file (streamed download for multi-hundred-MB release assets)
+# ----------------------------------------------------------------------------
+def _stream_resp(chunks):
+    resp = MagicMock()
+    resp.read.side_effect = list(chunks) + [b""]
+    resp.__enter__ = lambda s: s
+    resp.__exit__ = MagicMock(return_value=False)
+    return resp
+
+
+def test_fetch_to_file_streams_hashes_and_renames(tmp_path):
+    import hashlib
+
+    dest = tmp_path / "sub" / "asset.zip"
+    with patch("ingest.common.urllib.request.urlopen") as mock_open:
+        mock_open.return_value = _stream_resp([b"abc", b"def"])
+        digest, size = u.fetch_to_file("https://example.com/a.zip", dest, chunk_size=3)
+    assert size == 6 and dest.read_bytes() == b"abcdef"
+    assert digest == hashlib.sha256(b"abcdef").hexdigest()
+    assert not (tmp_path / "sub" / "asset.zip.part").exists()
+    sent = mock_open.call_args[0][0]
+    assert sent.get_header("User-agent") == u.USER_AGENT
+
+
+def test_fetch_to_file_never_leaves_a_partial_file_as_the_result(tmp_path):
+    dest = tmp_path / "asset.zip"
+    with patch("ingest.common.urllib.request.urlopen") as mock_open, \
+         patch("ingest.common.time.sleep"):
+        mock_open.side_effect = urllib.error.URLError("reset")
+        with pytest.raises(RuntimeError):
+            u.fetch_to_file("https://example.com/a.zip", dest, max_retries=2)
+    assert not dest.exists()
+
+
+@pytest.mark.real_robots
+def test_fetch_to_file_honours_robots_refusal(tmp_path, monkeypatch):
+    monkeypatch.setattr(u, "robots_allowed", lambda url, min_interval=1.0: False)
+    with patch("ingest.common.urllib.request.urlopen") as mock_open:
+        with pytest.raises(PermissionError):
+            u.fetch_to_file("https://example.com/a.zip", tmp_path / "x")
+    mock_open.assert_not_called()
+
+
+# ----------------------------------------------------------------------------
+# Redirect targets get the same robots check and pacing (gate A4)
+# ----------------------------------------------------------------------------
+import http.server
+import threading
+
+
+def _serve(handler_cls):
+    srv = http.server.HTTPServer(("127.0.0.1", 0), handler_cls)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+def _two_hosts():
+    hits = {"cdn": 0}
+
+    class Cdn(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            hits["cdn"] += 1
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"asset-bytes")
+
+        def log_message(self, *a):
+            pass
+
+    cdn = _serve(Cdn)
+
+    class Origin(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(302)
+            self.send_header("Location", f"http://127.0.0.1:{cdn.server_port}/asset")
+            self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    return _serve(Origin), cdn, hits
+
+
+def test_redirect_to_a_disallowed_host_is_refused_before_any_request(monkeypatch, tmp_path):
+    origin, cdn, hits = _two_hosts()
+    try:
+        checked = []
+
+        def robots(url, min_interval=1.0):
+            checked.append(url)
+            return f":{cdn.server_port}" not in url      # the CDN host disallows us
+
+        monkeypatch.setattr(u, "robots_allowed", robots)
+        with pytest.raises(PermissionError, match="redirect"):
+            u.fetch_once(f"http://127.0.0.1:{origin.server_port}/dl", min_interval=0)
+        assert hits["cdn"] == 0                           # never contacted
+        assert any(f":{cdn.server_port}" in c for c in checked)
+        with pytest.raises(PermissionError):              # same for the streaming path
+            u.fetch_to_file(f"http://127.0.0.1:{origin.server_port}/dl", tmp_path / "a", min_interval=0)
+        assert hits["cdn"] == 0 and not (tmp_path / "a").exists()
+    finally:
+        origin.shutdown(); cdn.shutdown()
+
+
+def test_redirect_to_an_allowed_host_is_followed_and_paced(monkeypatch):
+    origin, cdn, hits = _two_hosts()
+    try:
+        paced = []
+        monkeypatch.setattr(u, "_rate_limit", lambda host, mi: paced.append(host))
+        body, _ = u.fetch_once(f"http://127.0.0.1:{origin.server_port}/dl", min_interval=0)
+        assert body == b"asset-bytes" and hits["cdn"] == 1
+        assert f"127.0.0.1:{cdn.server_port}" in paced     # the redirect target was paced too
+    finally:
+        origin.shutdown(); cdn.shutdown()
+
+
+def test_redirect_to_robots_txt_skips_the_robots_check(monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("robots_allowed re-entered for a /robots.txt redirect")
+
+    monkeypatch.setattr(u, "robots_allowed", boom)
+    monkeypatch.setattr(u, "_rate_limit", lambda host, mi: None)
+    import urllib.request as ur
+    req = ur.Request("http://example.test/robots.txt")
+    new = u._CheckedRedirectHandler().redirect_request(
+        req, None, 301, "Moved", {}, "http://example.test/robots.txt")
+    assert new is not None

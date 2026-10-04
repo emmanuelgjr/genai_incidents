@@ -1,0 +1,70 @@
+{
+  "data_type": "AVID",
+  "data_version": "0.3.3",
+  "metadata": {
+    "report_id": "AVID-2026-R1127"
+  },
+  "affects": {
+    "developer": [
+      "n/a"
+    ],
+    "deployer": [
+      "n/a"
+    ],
+    "artifacts": [
+      {
+        "type": "System",
+        "name": "n/a"
+      }
+    ]
+  },
+  "problemtype": {
+    "classof": "CVE Entry",
+    "type": "Advisory",
+    "description": {
+      "lang": "eng",
+      "value": "Vulnerability CVE-2022-40432"
+    }
+  },
+  "references": [
+    {
+      "type": "source",
+      "label": "NVD entry",
+      "url": "https://www.cve.org/CVERecord?id=CVE-2022-40432"
+    },
+    {
+      "type": "source",
+      "label": "https://pypi.org/project/d8s-strings/",
+      "url": "https://pypi.org/project/d8s-strings/"
+    },
+    {
+      "type": "source",
+      "label": "https://pypi.org/project/democritus-hypothesis/",
+      "url": "https://pypi.org/project/democritus-hypothesis/"
+    },
+    {
+      "type": "source",
+      "label": "https://github.com/democritus-project/d8s-strings/issues/21",
+      "url": "https://github.com/democritus-project/d8s-strings/issues/21"
+    }
+  ],
+  "description": {
+    "lang": "eng",
+    "value": "The d8s-strings for python, as distributed on PyPI, included a potential code-execution backdoor inserted by a third party. The backdoor is the democritus-hypothesis package. The affected version is 0.1.0.\n\nReason for inclusion in AVID: CVE-2022-40432 describes a code-execution backdoor injected into a Python PyPI package (d8s-strings) by a third party, affecting at least version 0.1.0. This is a software supply-chain vulnerability in a package that could be used within AI software stacks (dependencies or tooling in ML pipelines). The vulnerability is security-related (RCE) and there is explicit evidence in the CVE entry and linked sources (NVD, PyPI pages, issue discussion). This aligns with AVID’s focus on software supply chain issues affecting general-purpose AI systems."
+  },
+  "impact": {
+    "avid": {
+      "risk_domain": [
+        "Security"
+      ],
+      "sep_view": [
+        "S0100: Software Vulnerability"
+      ],
+      "lifecycle_view": [
+        "L06: Deployment"
+      ],
+      "taxonomy_version": "0.2"
+    }
+  },
+  "reported_date": "2022-09-19"
+}

@@ -19,6 +19,7 @@ committed (chat-only deliverables have now been lost three times — see the new
 | `aiaaic-correction.md` | AIAAIC (same thread as `aiaaic-facts-link.md`) | E17 correction: the sent retention description understated which fields carry AIAAIC content | **2026-07-29** — sent as written (post-E16-merge, alternate paragraph not used) |
 | `airi-draft4-export-request.md` | MIT AI Risk Initiative — `airisk@mit.edu` | E18 redraft: substantive sanctioned-export/API request + transitive-AIID provenance question. **D8's 30-day clock starts on this send** | **2026-07-29** — D8's 30-day clock started; decision point 2026-08-28 or MIT's reply |
 | `oecd-aim-terms.md` | OECD.AI / AI Incidents and Hazards Monitor team (contact UNCONFIRMED — see file) | Reuse-terms question for AIM's own structured data (our own terms-retrieval hit a 403) + a sanctioned-bulk-channel question | **2026-07-31** — sent to `ai@oecd.org`, user-confirmed. Follow-up window 2026-08-21 (21 days). Closes criterion 9 clause 2 at 4-of-4 and retires FLAG 3 of the Phase-1 exit checklist. |
+| `enisa-euvd-reuse-2026-10-03.md` | ENISA EUVD team (contact UNCONFIRMED; `info@enisa.europa.eu` per the IPR policy) | Whether EUVD API data (EUVD ids, EPSS) may be redistributed under CC BY 4.0 with attribution; gates any EUVD ingest | **Not sent** (drafted 2026-10-03; the user sends and logs the date) |
 
 **Separate and NOT in this package:** the substantive `airisk@mit.edu` export
 request (AIRI Draft 4, E10/D8) — queue step 3, drafted separately.
