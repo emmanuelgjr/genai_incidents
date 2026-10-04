@@ -334,6 +334,13 @@ predates the rules and is superseded.
 | CVE-2026-94486 | vercel/next.js | model context protocol |
 | CVE-2026-96525 | Unknown/MCP Server for WordPress | mcp server |
 
+### Dated note, 2026-10-04 (gate 2 like-for-like figures; original text above unchanged)
+
+The description-only figures above compare different populations. Like for like (wave12 gate 2): description-only rows
+fell from 454 of 2,705 emitted to 206 of 2,502; for cvelistV5-only entries, from 384 of 2,240 to 150 of 2,046.
+`ECOSYSTEM_SEED` has 88 unique entries (90 items before; `mindsdb` and `crawl4ai` were listed twice, now deduplicated;
+the set is unchanged and the rebuilt data is byte-identical).
+
 ## 6. arXiv cs.CR (`ingest/wave12_arxiv.json`, 55 rows)
 
 Channel: `oaipmh.arxiv.org` (no robots.txt there, 404 == no restriction), set `cs:cs:CR`,

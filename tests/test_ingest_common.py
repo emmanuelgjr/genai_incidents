@@ -597,3 +597,16 @@ def test_redirect_to_an_allowed_host_is_followed_and_paced(monkeypatch):
         assert f"127.0.0.1:{cdn.server_port}" in paced     # the redirect target was paced too
     finally:
         origin.shutdown(); cdn.shutdown()
+
+
+def test_redirect_to_robots_txt_skips_the_robots_check(monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("robots_allowed re-entered for a /robots.txt redirect")
+
+    monkeypatch.setattr(u, "robots_allowed", boom)
+    monkeypatch.setattr(u, "_rate_limit", lambda host, mi: None)
+    import urllib.request as ur
+    req = ur.Request("http://example.test/robots.txt")
+    new = u._CheckedRedirectHandler().redirect_request(
+        req, None, 301, "Moved", {}, "http://example.test/robots.txt")
+    assert new is not None

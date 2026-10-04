@@ -89,13 +89,13 @@ ECOSYSTEM_SEED = [
     "smolagents", "agno-agi", "mem0", "letta", "dspy", "invoke-ai",
     "kohya-ss", "whisper-cpp", "claude", "vertex-ai", "gemini-cli",
     "copilot-studio", "microsoft-365-copilot", "copilot-chat", "ollama-mcp",
-    "cohere-terrarium", "qwen-agent", "autogpt", "mindsdb", "ray-project",
+    "cohere-terrarium", "qwen-agent", "autogpt", "ray-project",
     "aimhubio", "applio", "embedai", "apache-submarine", "odh-dashboard",
     "openshift-data-science", "cvat", "watson-studio",
     # Added with the description-only second-signal rule (BOUNCE #1, D6): AI-native
     # products that were being admitted only by their self-description.
     "nanobot", "weknora", "tensorzero", "llava", "desktopcommandermcp", "pyspur",
-    "docling", "lumiverse", "aliasrobotics", "aix-db", "firecrawl", "crawl4ai",
+    "docling", "lumiverse", "aliasrobotics", "aix-db", "firecrawl",
 ]
 
 # Red Hat container-image names (``rhoai/odh-...-rhel9``, ``rhaiis/vllm-...``)

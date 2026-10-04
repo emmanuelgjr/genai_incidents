@@ -575,13 +575,30 @@ def test_bare_identifier_row_survives_a_regenerated_file():
     assert "Apache text" not in json.dumps(res)
 
 
-def test_bare_identifier_carry_fires_without_it():
+def _run_main_with_fetchers(monkeypatch, tmp_path, rows):
+    """Run NVD.main() with every fetch_* stubbed, against a tmp copy of OUT_FILE."""
+    import shutil
+    tmp_out = tmp_path / "cve_nvd_expanded.json"
+    shutil.copyfile(NVD.OUT_FILE, tmp_out)
+    before = tmp_out.read_bytes()
+    monkeypatch.setattr(NVD, "OUT_FILE", tmp_out)
+    monkeypatch.setattr(NVD, "NVD_KEYWORDS", ["x"])
+    monkeypatch.setattr(NVD, "fetch_nvd_keyword", lambda kw: [{"id": r["source_id"]} for r in rows])
+    monkeypatch.setattr(NVD, "nvd_to_record", lambda v: next((dict(r) for r in rows if r["source_id"] == v["id"]), None))
+    monkeypatch.setattr(NVD, "fetch_ghsa", lambda *a, **k: [])
+    monkeypatch.setattr(NVD, "fetch_osv", lambda *a, **k: [])
+    NVD.main()
+    return before, tmp_out
+
+
+def test_main_refuses_to_overwrite_committed_file_with_an_empty_run(monkeypatch, tmp_path):
+    before, tmp_out = _run_main_with_fetchers(monkeypatch, tmp_path, [])
+    assert tmp_out.read_bytes() == before                                   # fully blocked run writes nothing
+
+
+def test_main_writes_fresh_rows_plus_the_bare_identifier_row(monkeypatch, tmp_path):
     prev = _committed_nvd_rows()
-    fresh = [r for r in prev if not NVD.is_openssf_malicious_row(r)]
-    assert not [r for r in fresh if r["source_id"] == "MAL-2026-3607"]      # without carry the bridge is gone
-
-
-def test_writer_calls_carry_bare_identifiers():
-    src = (Path(__file__).parents[1] / "scripts" / "ingest_cve_nvd_expanded.py").read_text(encoding="utf-8")
-    main_body = src[src.index("def main()"):]
-    assert "carry_bare_identifiers(out, prev_rows)" in main_body
+    fresh = [dict(next(r for r in prev if not NVD.is_openssf_malicious_row(r)), source_id="CVE-2099-0001")]
+    _, tmp_out = _run_main_with_fetchers(monkeypatch, tmp_path, fresh)
+    ids = {r["source_id"] for r in json.loads(tmp_out.read_text(encoding="utf-8"))}
+    assert ids == {"CVE-2099-0001", "MAL-2026-3607"}

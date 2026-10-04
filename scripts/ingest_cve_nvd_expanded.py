@@ -1230,11 +1230,6 @@ def main():
     out = sorted(records.values(),
                  key=lambda r: (r.get("year") or 0, r.get("date") or ""),
                  reverse=True)
-    try:
-        prev_rows = json.loads(OUT_FILE.read_text("utf-8")) if OUT_FILE.exists() else []
-    except ValueError:
-        prev_rows = []
-    out = carry_bare_identifiers(out, prev_rows)
     if not out:
         # Refuse to overwrite the committed, ~22.6 MB OUT_FILE with an
         # empty result (WS0-T4 re-gate, A6). A fully-blocked run (e.g. all
@@ -1249,6 +1244,14 @@ def main():
             f"overwrite {OUT_FILE} with an empty result", flush=True,
         )
     else:
+        # The bare-identifier carry runs only AFTER the empty-result refusal:
+        # carrying first would make a fully blocked run non-empty (1 row) and
+        # overwrite the committed file (wave12 gate 2, DEFECT 1).
+        try:
+            prev_rows = json.loads(OUT_FILE.read_text("utf-8")) if OUT_FILE.exists() else []
+        except ValueError:
+            prev_rows = []
+        out = carry_bare_identifiers(out, prev_rows)
         OUT_FILE.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"\nWrote {len(out)} entries -> {OUT_FILE}", flush=True)
 

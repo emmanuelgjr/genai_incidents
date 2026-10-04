@@ -228,7 +228,9 @@ _redirect_ctx = threading.local()
 class _CheckedRedirectHandler(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         interval = getattr(_redirect_ctx, "min_interval", DEFAULT_MIN_INTERVAL)
-        if not robots_allowed(newurl, interval):
+        # A robots.txt that itself redirects must not re-enter robots_allowed():
+        # the host's robots.txt is not cached yet, so that would recurse.
+        if urlparse(newurl).path != "/robots.txt" and not robots_allowed(newurl, interval):
             raise PermissionError(
                 f"refusing to follow redirect to {newurl}: robots.txt disallows it for "
                 f"User-Agent {USER_AGENT!r}, or could not be verified and the host is not on "
