@@ -120,6 +120,17 @@
   - It was restored byte-for-byte from its own parent, `6957df48`, in a separate commit.
   - The other two branches were checked the same way and are clean.
   - **This is the same shape as the earlier revert that deleted board records.** The control was a `--diff-filter=D` and `PROGRESS.md` check against the merge base before gating. Make that a standing pre-gate step.
+- **⚖ D44, USER RULING 2026-10-04:** `incident_count` counts only entries that stand, and **retracted entries are excluded**. A new `retracted_count` is published beside it.
+  - Retracted entries stay in the file with resolvable IDs, but leave the STIX/MISP/TAXII/HF feeds.
+  - The release notes must warn that `len(file) = incident_count + retracted_count`.
+- **Wave 1–2 status:**
+  - Gate part 2 is appended verbatim to the gate-1 record.
+  - **Gate measurements [R]:** precision about 97% (91% strict) against a corpus baseline of about 48%. Rebuild is byte-exact; mutation tests fire.
+  - The 1,521 post-June rows are mostly the stalled NVD refresh, **not new-source coverage**. The release notes must not claim them as new-source coverage.
+  - Gate-1 defects are fixed at `941868e6`, and arXiv now ships `auto` per D43.
+  - **Routed to pipeline-engineer:** A2 (cvelistV5 rows `reviewed` → `auto`; the CNA's CVSS is not analyst review), A1 (make the MAL bare row durable in the NVD writer), A4 (`common.py` follows redirects to an unchecked host: an invariant-5 conduct fix), A6 (the NSFW title prefix), and the delta leftovers.
+  - **NEW BOARD NOTE N9 (A3) → pipeline-engineer + label-scientist.** A scope audit of the existing CVE/GHSA feed: the gate measured about 48% precision (n=40). This is a bigger precision issue than the PR itself; related to #88.
+- **Refresh (`586f40c8`) is NOT in this release.** It is built: T12 labels 3,936 rows' provenance, and T14 adds the AIID snapshot step. Its merge needs a rebuilt `data/` plus the D42 review of 17 proposed changes (7 merges, 10 retitles; evidence in `docs/audits/D42-refresh-merge-review-2026-10-03.md` on that branch). It follows the release.
 - **NEW BOARD NOTE N7 → corpus-surgeon (WS1).** INC-08450 merges three unrelated packages (beproduct GHSA-6xwp, mistralai GHSA-wx9m / CVE-2026-46412, guardrails-ai MAL-2026-3607) under one ID. It is a possible over-merge, not investigated.
 - **NEW BOARD NOTE N6 → license-auditor (WS0, shipped data).** `SOURCE_LICENSES.md` row 2.4 says every reachable OSV database is CC BY 4.0. OSV lists OpenSSF malicious-packages (`MAL-`) as **Apache-2.0**, and `MAL-` aliases are in the corpus. The red-reviewer advisory is pending.
 - **Integration plan:**
