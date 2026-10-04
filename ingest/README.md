@@ -56,6 +56,20 @@ they sort after every existing source, and each new-source ingest skips any
 row the merger would fold into an existing entry (`scripts/corpus_overlap.py`).
 Keep both properties when adding a source.
 
+## Re-running `ingest-cvelistv5` changes the data unless pinned
+
+`make ingest-cvelistv5` with no arguments fetches the NEWEST baseline asset, so the output (and the
+corpus) changes. The committed `wave12_cvelistv5.json` is pinned to release `cve_2026-10-03_1400Z`, asset
+`2026-10-03_all_CVEs_at_midnight.zip.zip` (sha256 `2fa5d5e25b35...`, in the provenance file). To reproduce it
+from a cached copy:
+
+```
+python scripts/ingest_cvelistv5.py --from-file ingest/_cache/cvelistv5/2026-10-03_all_CVEs_at_midnight.zip.zip     --release-tag cve_2026-10-03_1400Z
+```
+
+Run `make ingest-avid` first (cvelistV5 reads its AVID-to-CVE crosswalk), and against the pre-ingest corpus
+(`git checkout <base> -- data/`): both scripts skip anything already in `data/incidents.json`.
+
 ## Don't
 
 - Don't paste full HTML scrapes here. Summarize.

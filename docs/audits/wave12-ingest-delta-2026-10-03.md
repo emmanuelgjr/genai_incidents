@@ -481,3 +481,6 @@ commands above, which is what the Makefile targets expand to.
 - MAL-2026-3607 durability: `ingest_cve_nvd_expanded.carry_bare_identifiers` is called by the writer, so a
   regenerating cve-enrich run keeps the bare-identifier row (a test regenerates the file).
 - AVID titles with a glued `NSFW` label now read `NSFW OpenAI ...` (0 `NSFWOpenAI` titles remain).
+- Reproduce note: `make ingest-cvelistv5` without `--from-file` fetches a newer baseline and changes the data; the
+  committed rows are pinned to release `cve_2026-10-03_1400Z` (use `--from-file ... --release-tag cve_2026-10-03_1400Z`;
+  see `ingest/README.md`).
