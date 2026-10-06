@@ -118,6 +118,14 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
         "consolidated incidents (<!-- stats:incident_count -->99999<!-- /stats:incident_count -->)\n",
         encoding="utf-8",
     )
+    # Release-consistency fixtures (all at 2.8.0) so only the planted count can fail.
+    (tmp_path / "CHANGELOG.md").write_text("## [2.8.0] - 2026-07-12\n", encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        "## Latest release\n\n**2.8.0 - released 2026-07-12.** x\n", encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text('version = "2.8.0"\n', encoding="utf-8")
+    (tmp_path / ".zenodo.json").write_text('{"version": "2.8.0"}', encoding="utf-8")
+    (tmp_path / "CITATION.cff").write_text(
+        'version: "2.8.0"\ndate-released: "2026-07-12"\n', encoding="utf-8")
     monkeypatch.setattr(lib, "STATS_PATH", stats_path)
     monkeypatch.setattr(lib, "DOC_SURFACES", [surface])
     monkeypatch.setattr(checker, "DOC_SURFACES", [surface])

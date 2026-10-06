@@ -7,6 +7,18 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
+
+- `scripts/check_stats_drift.py` additionally fails CI when the README
+  `## Latest release` lead line names a version or release date different from
+  `data/stats.json` / the top released CHANGELOG heading, when `pyproject.toml`,
+  `.zenodo.json` or `CITATION.cff` (version, `date-released`) disagree with them,
+  or when the Hugging Face card template in `scripts/export_huggingface.py`
+  loses its `{count}`/`{version}` placeholders or gains a literal total or
+  version. Previously a stale release date beside a current `stats:version`
+  marker passed. No data or published-doc content changed (the audit found
+  nothing stale at 4edd6bad).
+
 ## [2.12.0] — 2026-10-04
 
 > **These notes were gated before the cut** and the release was cut on
