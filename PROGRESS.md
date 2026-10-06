@@ -2,6 +2,36 @@
 # Status: todo | in-progress | review | done | blocked
 # The main session (Foreman Protocol) is the ONLY writer of this file.
 
+## 🧭 2026-10-06 — USER GOAL: v2.13.0 queue (9 items, in order) · premise check `4edd6bad`
+
+Queue (user brief, 2026-10-06): (1) latest-release drift, (2) ATLAS refresh + lint + taxonomy_versions, (3) rejected-CVE sweep, (4) the silent IDs, (5) N9 precision sampler + gate, (6) AIRI sunset memo **[user decision]**, (7) OECD/AIID unfreeze memo + branch **[user decision]**, (8) export integrity, (9) OWASP ASI 2026 edition. One branch and one CHANGELOG draft per item.
+The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`, and three of the brief's premises are partly refuted:
+- **item 1:** README already reads 2.12.0;
+- **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
+- **item 6:** 1,382 AIRI rows, not 1,380.
+
+### ⛔ Item 1 (latest-release drift) — **BOUNCE #1 (red-reviewer, 2026-10-06, on `e8dafcdc`, branch `ws6/v2130-latest-release-drift`)**
+The gate's verdict, in its own words: "The code works. It catches what the task asked for, and the full suite passes. It bounces on two narrow defects, both of the kind your brief said to treat as defects: the documented release procedure now contradicts the check, and the CHANGELOG entry claims more than the check does."
+1. **`docs/VERSIONING.md` cut steps now contradict the new check.** Following the documented order (bump the strings in step 2, run `make build` in step 3, run the step-4 drift check, which "must exit 0") gives rc=1, because the README date is only fixed in step 5 and no step promotes the CHANGELOG `[Unreleased]` heading. Step 5's "only thing that catches" sentence is now partly false. Mitigation: a replay of every commit in the last three cut windows gives zero failures, because each real cut was done in one commit.
+2. **The CHANGELOG overclaims the HF-card check.** An ungrouped `15637` and a `2.9.0` literal in the CARD both pass (rc=0).
+
+Evidence the gate measured:
+- the drift check rc=0 at `e8dafcdc`;
+- pytest 590 passed, 1 xfailed;
+- control: a stale README date passes the `4edd6bad` checker and fails the new one;
+- historical replay clean for v2.10.0 through 4edd6bad;
+- 15 plants;
+- scope: 4 files, 0 deletions, PROGRESS.md and data/ untouched.
+
+ADVISORY items, folded into the redispatch:
+- an en-dash CHANGELOG heading is a false pass;
+- CITATION with its version lines removed is a false pass;
+- the USER_AGENT and INCIDENTS.md Version literals are unchecked;
+- the pyproject `^version` regex is fragile.
+
+Gated by a throwaway worktree. The main tree HEAD was asserted to be `refs/heads/main` at both ends.
+**Status: in-progress, redispatched to WS6 with the defects.**
+
 ## 🎉 v2.12.0 PUBLISHED 2026-10-04: all VERSIONING steps done and independently verified
 
 - **Count:** **`incident_count` 15,637 (from 13,361, +2,276); `retracted_count` 29; 15,666 entries in the file** (D44 semantics). Landmark count 1,915, unchanged.
