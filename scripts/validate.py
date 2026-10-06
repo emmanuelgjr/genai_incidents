@@ -629,6 +629,29 @@ def check_freshness_completeness(data: dict, registry: dict) -> list[str]:
     return problems
 
 
+_TAXONOMY_KEYS = ("atlas", "owasp_llm", "owasp_asi", "capec", "veris")
+
+
+def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
+    """data/stats.json must carry ``taxonomy_versions`` (the five pinned
+    taxonomies, additive key) and it must equal the value derived from
+    mappings/*.json right now -- a stale stats.json (mapping re-pinned, build
+    not re-run) fails here instead of publishing the wrong version."""
+    tv = stats.get("taxonomy_versions")
+    if not isinstance(tv, dict):
+        return ["stats.json: missing `taxonomy_versions` object"]
+    problems: list[str] = []
+    if set(tv) != set(_TAXONOMY_KEYS):
+        problems.append(f"stats.json: taxonomy_versions keys {sorted(tv)} != {sorted(_TAXONOMY_KEYS)}")
+    for k in _TAXONOMY_KEYS:
+        v = tv.get(k)
+        if v is not None and not isinstance(v, str):
+            problems.append(f"stats.json: taxonomy_versions.{k} must be a string or null, got {v!r}")
+    if tv != derived:
+        problems.append(f"stats.json: taxonomy_versions {tv} != derived from mappings/ {derived}")
+    return problems
+
+
 def main():
     schema = json.loads((ROOT / "schema" / "incident.schema.json").read_text(encoding="utf-8"))
     data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
@@ -662,6 +685,10 @@ def main():
             if r.get("state") == "REJECTED"
         }
     problems += check_status(data, rejected)
+    from taxonomy_versions import taxonomy_versions as _derive_tv
+    problems += check_taxonomy_versions(
+        json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8")), _derive_tv()
+    )
     # The slim file carries the same envelope; its count must agree too.
     slim_path = ROOT / "data" / "incidents.min.json"
     if slim_path.exists():

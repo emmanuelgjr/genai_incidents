@@ -7,6 +7,40 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - MITRE ATLAS pin refreshed 2026.06 -> 2026.09; `taxonomy_versions` published (draft)
+
+- **ATLAS pin: 2026.06 -> 2026.09** (`collection.version` of the upstream release;
+  `mitre-atlas/atlas-data` `dist/ATLAS-latest.yaml` is a text pointer to
+  `dist/v6/ATLAS-2026.09.yaml`). The verbatim release is committed under `ingest/atlas/`
+  with a sha256 (Apache-2.0, notice in `NOTICE-DATA`); `mappings/mitre_atlas.json` is now
+  derived from it by `scripts/atlas_pin.py`, never hand-edited. Release diff: 38
+  techniques/subtechniques added, 3 retired (`AML.T0019`, `AML.T0058`, `AML.T0104`, folded
+  into the new `AML.T0115` "Publish Poisoned AI Artifacts"), 4 renamed, 5 technique->tactic
+  links changed, tactic `AML.TA0001` renamed "AI Attack Staging" -> "AI Attack Adaptation"
+  (`docs/audits/atlas-refresh-2026.09-release-diff.md`).
+- **5,841 entries change `mitre_atlas` and/or `mitre_atlas_tactics`; no entry added,
+  removed or re-IDed.** 2,540 have a superseded technique id mechanically translated
+  (`AML.T0058` -> `AML.T0115.001` on 2,498, `AML.T0019` -> `AML.T0115.000` on 41,
+  `AML.T0015.001` -> `AML.T0015` on 1, an id that never existed in these releases); 3,309
+  change tactics only, through the new technique->tactic links. On those entries `updated`
+  (and `last_seen`) move to the build date and nothing else does. Mapping heuristics are
+  unchanged. Every changed entry, with before/after and reason, and the per-entity proof
+  that the other 9,825 are byte-identical:
+  `docs/audits/atlas-refresh-delta-2026-10-06.md`. **Consumer impact:** anything filtering
+  on `AML.T0058`/`AML.T0019` must use the `AML.T0115.*` ids; the old ids stay in the pin
+  marked `deprecated`, never deleted.
+- **`taxonomy_versions`** (`atlas`, `owasp_llm`, `owasp_asi`, `capec`, `veris`), derived
+  from the pinned `mappings/*.json` and published in `data/stats.json`, as
+  `x_taxonomy_versions` on a STIX `identity` object, as `genai-incidents:taxonomy-*` tags
+  on every MISP event and manifest entry, in the Hugging Face card, and as
+  `genai_incidents.taxonomy_versions()` in the package. `capec` is `null`: the CWE->CAPEC
+  map predates version recording.
+- **New CI lint** `scripts/lint_atlas_ids.py` (in `make build` and `validate.yml`): fails on
+  any `AML.*` id in the corpus or `mappings/` that is absent from, or deprecated in, the pin,
+  and on a pin that does not match the committed snapshot. **New monthly workflow**
+  `.github/workflows/atlas-refresh.yml` re-pulls ATLAS and opens a PR with the diff report
+  and the per-entry delta.
+
 ## [2.12.0] — 2026-10-04
 
 > **These notes were gated before the cut** and the release was cut on

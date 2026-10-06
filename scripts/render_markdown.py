@@ -22,6 +22,8 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from taxonomy_versions import taxonomy_versions
+
 
 def utc_today() -> date:
     """Calendar date in UTC. CI builds run in UTC; a contributor whose local
@@ -539,6 +541,9 @@ def render():
         "generated": raw.get("generated", ""),
         "year_min": years[0] if years else None,
         "year_max": years[-1] if years else None,
+        # Versions of the pinned taxonomies the corpus codes belong to, derived
+        # from mappings/*.json by scripts/taxonomy_versions.py (never literals).
+        "taxonomy_versions": taxonomy_versions(),
     }
     _write_lf(DATA / "stats.json", json.dumps(stats, indent=2))
 
@@ -783,6 +788,11 @@ def render():
         _write_lf(SITE_DATA_DIR / "incidents.min.json", body, add_newline=False)
         _write_lf(PKG_DATA_DIR / "incidents.min.json", body, add_newline=False)
         print(f"copied {slim_src.name} -> docs/data/ + src/genai_incidents/data/")
+    # Package metadata: genai_incidents.taxonomy_versions() reads this file.
+    _write_lf(
+        PKG_DATA_DIR / "taxonomy_versions.json",
+        json.dumps(stats["taxonomy_versions"], indent=2, sort_keys=True),
+    )
     deprec_src = DATA / "id_deprecations.json"
     if deprec_src.exists():
         _write_lf(

@@ -3,7 +3,14 @@
   "retracted_count": 29,
   "landmark_count": 1915,
   "version": "2.12.0",
-  "generated": "2026-10-04",
+  "generated": "2026-10-06",
   "year_min": 1983,
-  "year_max": 2026
+  "year_max": 2026,
+  "taxonomy_versions": {
+    "atlas": "2026.09",
+    "owasp_llm": "2026",
+    "owasp_asi": "2025",
+    "capec": null,
+    "veris": "1.4.1"
+  }
 }
