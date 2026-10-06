@@ -10,6 +10,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ⛔⛔ Item 1 (latest-release drift) — **BOUNCE #2 (red-reviewer, 2026-10-06, on `0dca6321`) — ESCALATED TO USER**
+The gate's verdict, in its own words: "Neither remaining defect is in the mechanism: the drift check works and the documented cut order now passes. Both defects are the same two classes as last time, each narrower and each fixable in one line."
+1. **The HF-card check still overclaims.** The lookbehind `(?<![\w.])` lets a v-prefixed version (`Dataset v2.9.0`) pass, but the CHANGELOG says "any `X.Y.Z` version literal". Suggested fix: change it to `(?<![\d.])` and add a `v2.9.0` plant test.
+2. **VERSIONING.md step 4 contradicts itself.** The bullet "Two surfaces this step does not cover" still says the drift checker never reads INCIDENTS.md, but it now does. Correct it in place. The HF bullet should say the template is checked and the generated `dist/hf/README.md` is not.
+
+Evidence:
+- 595 passed, 1 xfailed;
+- drift check rc=0;
+- **a mock 2.13.0 cut following VERSIONING exactly gives step 4 clean, rc=0** (bounce #1 defect 1 closed);
+- the negative control mid-cut gives rc=1, 7 errors;
+- HF plants: 6 fire, `v2.9.0` passes;
+- scope: 5 files, 0 deletions, PROGRESS.md and data/ untouched.
+
+ADVISORY:
+- tomllib raises the dev floor to 3.11 while the metadata says >=3.10; CI is unaffected;
+- the ungrouped-number check gives loud false positives on arXiv, CVE and INC ids;
+- the step-5 dated note is acceptable, but this fix should be in place.
+
 ### ⛔ Item 1 (latest-release drift) — **BOUNCE #1 (red-reviewer, 2026-10-06, on `e8dafcdc`, branch `ws6/v2130-latest-release-drift`)**
 The gate's verdict, in its own words: "The code works. It catches what the task asked for, and the full suite passes. It bounces on two narrow defects, both of the kind your brief said to treat as defects: the documented release procedure now contradicts the check, and the CHANGELOG entry claims more than the check does."
 1. **`docs/VERSIONING.md` cut steps now contradict the new check.** Following the documented order (bump the strings in step 2, run `make build` in step 3, run the step-4 drift check, which "must exit 0") gives rc=1, because the README date is only fixed in step 5 and no step promotes the CHANGELOG `[Unreleased]` heading. Step 5's "only thing that catches" sentence is now partly false. Mitigation: a replay of every commit in the last three cut windows gives zero failures, because each real cut was done in one commit.
