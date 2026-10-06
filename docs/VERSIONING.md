@@ -105,6 +105,15 @@ caught at gate review, not by this file. Run both checks as part of step
      bullet silently — either the string moves with the rest, or this
      checklist records why it didn't for this specific cut.
 
+   **Two release-text edits belong to this step too, because step 4's drift
+   check now fails without them** (`scripts/check_stats_drift.py`,
+   v2.13.0 item 1): (i) promote `CHANGELOG.md`'s `## [Unreleased]` content
+   to a `## [X.Y.Z] — YYYY-MM-DD` heading (keep a fresh empty
+   `## [Unreleased]` above it) — the top *released* heading is what the
+   check treats as the current version and release date; (ii) update the
+   README `## 🚨 Latest release` lead line to
+   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date.
+
 3. **Rebuild with `make build` — never hand-edit `data/stats.json` or
    `data/incidents.json`, and never run only half the pipeline.** The
    `Makefile` target is `build: merge render render-docs-stats validate` —
@@ -160,7 +169,15 @@ caught at gate review, not by this file. Run both checks as part of step
    `scripts/stats_docs_lib.py`'s `DOC_SURFACES` names — `README.md`,
    `docs/DATASHEET.md`, `docs/index.html`, `docs/_config.yml`,
    `CITATION.cff` — not "every" surface. `python scripts/check_stats_drift.py`
-   must exit 0 against those five.
+   must exit 0 against those five. It also now fails if, after step 2, any
+   of these disagree with `data/stats.json` `version` / the top released
+   `CHANGELOG.md` heading: the README Latest-release lead line (version and
+   release date), `pyproject.toml`'s `[project]` version, `.zenodo.json`,
+   `CITATION.cff` (both versions and `date-released`), the `ingest/common.py`
+   `USER_AGENT` version, `INCIDENTS.md`'s `**Version:**` line, and any
+   hardcoded count or version literal in the Hugging Face card template.
+   If it fails here, you skipped a step-2 edit; fix that, do not defer to
+   step 5.
 
    **Two surfaces this step does not cover, so they need their own check:**
    - **`INCIDENTS.md`** is not in `DOC_SURFACES` at all. Its version line
@@ -213,7 +230,11 @@ caught at gate review, not by this file. Run both checks as part of step
    reproduced verbatim on the very next cut. This is not evidence the
    underlying problem is fixed — it is evidence this class of failure
    recurs on every cut by default, and evidence that a manual, non-marker
-   read-through step is currently the only thing that catches it.
+   read-through step is needed for the *prose* of the Latest-release
+   paragraph. (Updated v2.13.0: the paragraph's lead-line version and
+   release date are now caught by the drift check in step 4; the rest of
+   the paragraph's English, links and "previous release" text are still
+   only caught by this read-through.)
 
 6. **Tag, and push the tag.** `git tag -a v<version> -m "v<version>"` on
    the commit that carries the bumped strings, then `git push origin

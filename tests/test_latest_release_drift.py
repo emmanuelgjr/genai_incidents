@@ -64,3 +64,58 @@ def test_hf_card_template_real_is_clean_and_planted_literals_fail():
     assert checker.check_hf_card_template(export_huggingface.CARD) == []
     planted = export_huggingface.CARD.replace("{count}", "13,060").replace("`{version}`", "`2.9.0`")
     assert len(checker.check_hf_card_template(planted)) >= 3
+
+
+def test_hf_card_ungrouped_total_and_version_literals_fail():
+    # inputs: '(15637 at last count)' and '(2.9.0 on Zenodo)' appended to the real card
+    import export_huggingface
+    card = export_huggingface.CARD
+    assert any("15637" in e for e in checker.check_hf_card_template(card + " (15637 at last count)"))
+    assert any("2.9.0" in e for e in checker.check_hf_card_template(card + " (2.9.0 on Zenodo)"))
+    # a year or 'VERIS 1.4.1' alone is not a false positive
+    assert checker.check_hf_card_template(card + " in 2026, VERIS 1.4.1") == []
+
+
+def test_changelog_en_dash_and_hyphen_headings_are_read():
+    for dash in ("—", "–", "-"):
+        cl = f"## [Unreleased]\n\n## [2.12.0] {dash} 2026-10-04\n"
+        assert checker.changelog_top_release(cl) == ("2.12.0", "2026-10-04")
+    # input: en-dash heading with a stale README date must still fail (was skipped silently)
+    cl = "## [2.12.0] – 2026-10-04\n"
+    assert checker.check_latest_release(_RM.replace("2026-10-04", "2026-09-01"), _ST, cl)
+    # en-dash in the README lead line is read too
+    assert checker.check_latest_release(_RM.replace("—", "–"), _ST, _CL) == []
+
+
+def test_citation_missing_version_lines_fail():
+    py = '[project]\nversion = "2.12.0"\n'
+    zen = '{"version": "2.12.0"}'
+    cff = 'version: "2.12.0"\ndate-released: "2026-10-04"\npreferred-citation:\n  version: "2.12.0"\n'
+    no_top = cff.replace('version: "2.12.0"\ndate', "date")
+    no_nested = cff.replace('  version: "2.12.0"\n', "")
+    assert any("top-level" in e for e in checker.check_version_metadata(_ST, py, zen, no_top, _CL))
+    assert any("preferred-citation" in e
+               for e in checker.check_version_metadata(_ST, py, zen, no_nested, _CL))
+    assert checker.check_version_metadata(_ST, py, zen, "date-released: \"2026-10-04\"\n", _CL)
+
+
+def test_pyproject_version_anchored_to_project_table():
+    zen = '{"version": "2.12.0"}'
+    cff = 'version: "2.12.0"\ndate-released: "2026-10-04"\n  version: "2.12.0"\n'
+    # input: a tool-table version equal to stats, [project] version stale -> must fail
+    py = '[project]\nversion = "2.9.0"\n[tool.x]\nversion = "2.12.0"\n'
+    assert checker.check_version_metadata(_ST, py, zen, cff, _CL)
+    # and a tool-table version before [project] must not satisfy the check
+    py2 = '[tool.x]\nversion = "2.12.0"\n[project]\nname = "a"\n'
+    assert checker.check_version_metadata(_ST, py2, zen, cff, _CL)
+
+
+def test_user_agent_and_incidents_md_version_literals():
+    ua = 'USER_AGENT = (\n    "genai_incidents/2.12.0 (+https://x; c)"\n)\n'
+    md = "# T\n\n- **Version:** 2.12.0\n"
+    assert checker.check_other_version_literals(_ST, ua, md) == []
+    assert checker.check_other_version_literals(_ST, ua.replace("2.12", "2.9"), md)
+    assert checker.check_other_version_literals(_ST, ua, md.replace("2.12", "2.9"))
+    assert checker.check_other_version_literals(_ST, "no ua", "no version line")
+    # a stale historical quote in a comment before the assignment must not be mistaken for it
+    assert checker.check_other_version_literals(_ST, "# was genai_incidents/2.8.0 once\n" + ua, md) == []
