@@ -205,7 +205,7 @@ def check_hf_card_template(card: str) -> list[str]:
     for m in re.finditer(r"(?<![\w.])(?!(?:19|20)\d\d\b)\d{4,}\b", card):
         errors.append(f"scripts/export_huggingface.py CARD hardcodes ungrouped number {m.group(0)!r}")
     # any X.Y.Z literal, except third-party taxonomy versions written 'VERIS X.Y.Z'
-    for m in re.finditer(r"(?<![\w.])\d+\.\d+\.\d+(?![\w.])", card):
+    for m in re.finditer(r"(?<![\d.])\d+\.\d+\.\d+(?![\w.])", card):
         if not card[:m.start()].endswith("VERIS "):
             errors.append(f"scripts/export_huggingface.py CARD hardcodes version literal {m.group(0)!r}")
     return errors

@@ -179,13 +179,17 @@ caught at gate review, not by this file. Run both checks as part of step
    If it fails here, you skipped a step-2 edit; fix that, do not defer to
    step 5.
 
-   **Two surfaces this step does not cover, so they need their own check:**
-   - **`INCIDENTS.md`** is not in `DOC_SURFACES` at all. Its version line
-     is written by `render_markdown.py` (part of `make render`, already
-     run in step 3), but the drift checker never reads it — a stale line
-     there would not fail this step or step 3. Confirm it by eye
-     (`grep -n '^- \*\*Version:\*\*' INCIDENTS.md`) as part of step 5.
-   - **The Hugging Face card** is *not* templated by `render_docs_stats.py`
+   **Two surfaces to be clear about:**
+   - **`INCIDENTS.md`** is not in `DOC_SURFACES` (no stats markers), but the
+     drift checker does read its `**Version:**` line (written by
+     `render_markdown.py`, part of `make render`, already run in step 3)
+     and fails this step if it disagrees with `data/stats.json`. The eyeball
+     check in step 5 (`grep -n '^- \*\*Version:\*\*' INCIDENTS.md`) is
+     optional redundancy, not the only guard.
+   - **The Hugging Face card**: the *template* (`CARD` in
+     `scripts/export_huggingface.py`) is checked by this step for
+     placeholders and literals; the *generated* `dist/hf/README.md` is not.
+     It is *not* templated by `render_docs_stats.py`
      despite reading like one of "the" doc surfaces — it is generated
      separately, by `scripts/export_huggingface.py`, which reads
      `data/incidents.json`'s own `"version"` field directly (already
