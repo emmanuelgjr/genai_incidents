@@ -24,6 +24,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔄 2026-10-09 dispatches after the item 3 merge
+- **Live check (A2/A3):** `gh workflow run auto-refresh.yml --ref main` started run **37992134374** (workflow_dispatch). The foreman reads its jobs when it ends: does `cve-sweep` produce the artifact, does `refresh` download it, and is the summary cell the step outcome? The PR step is still expected to skip, because the E21 tripwire test fails (the item-7 accidental freeze); that is not item 3.
+- **schema-architect** on `ws3/v2130-schema-disputed-reviewby` (worktree `ws3-v2130-schema`, base `2254560a`):
+  - **D61:** the `cve-disputed` enum turns emission on, and the rebuild is expected to mark 22 entries. A full field-level delta is required.
+  - **D57:** AIRI review date 2027-01-07. The design is the specialist's call: a new `review_by` field, or replacing the lapsed D8 `hold` with a D57 hold. Any 1,382-row `updated` bump comes back to the user.
+- **docs-warden:** item-3 sweep of every public surface.
+
 ### ✅ Item 3 (rejected-CVE sweep) — **DONE: advisory re-check PASS on `79ce7deb`, MERGED to main `81344e7b` (2026-10-09)**
 - **Advisory re-check, in the gate's words:** "Both fixes hold. When the report fails, the step still exits 0, the PR still opens, the body says the retraction state is UNKNOWN, and the PR gets `needs-ruling`. The stale label is removed only on an explicit clean result."
 - **Gate evidence:**
