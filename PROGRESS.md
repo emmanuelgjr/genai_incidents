@@ -24,6 +24,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+- **⚖ D55, USER RULING 2026-10-09 (item 7 bounce #3): "Fresh author fixes + scoped re-gate".** A fresh license-auditor applies the 5 defects plus A1 (date R7; replace the `curl -sI` Location check, which cannot fire) and A3. The bounce-#3 reviewer then re-checks only the diff and re-runs the commands.
+
 ### ⛔ Item 7 — **BOUNCE #3 (fresh full gate on `9ad77d10`, under D53, 2026-10-09)**: ESCALATED to the user
 - **Verdict:** the gate says every figure corrected at bounces #1 and #2 now re-derives correctly; these 5 are new findings outside the cells earlier gates checked.
 - **Defects:**
