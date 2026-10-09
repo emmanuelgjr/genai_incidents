@@ -10,6 +10,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔄 Items 6 + 7 (AIRI sunset memo, OECD/AIID unfreeze memo) — **DISPATCHED in parallel, 2026-10-09**
+- Both are memo-first governance items that end in a user decision, and neither touches data/, exports or schema/, so they run in their own worktrees while item 3 is in flight.
+- **Item 7:** license-auditor on `ws0/v2130-oecd-unfreeze-memo` (worktree `ws0-v2130-oecd-memo`, base `07f22c09`). Deliverable: `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md`, covering what D25(a) blocked, E23 + title-only, the first unfrozen run's changes, residual licence risk, and the spec for the unfreeze branch. A pipeline-engineer builds that branch after the memo, against the spec. **Nothing is unfrozen.**
+- **Item 6:** license-auditor on `ws0/v2130-airi-sunset-memo` (worktree `ws0-v2130-airi-memo`, base `07f22c09`). Deliverables: independent confirmation that the bulk channel is withdrawn (robots respected), the AIRI row count with its command, and `docs/audits/airi-navigator-sunset-memo-2026-10-09.md` with options A (frozen + stale tag + review_by) and B (tombstone retirement) and a spec for the stale tagging. The tagging work goes to WS6 later (it overlaps item 8's exports). **STOP for the user's decision.**
+- **Item 3** (pipeline-engineer, `ws4/v2130-rejected-cve-sweep`) is still running: gap doc `0f8e43c7`, with sweep code, delta script and tests uncommitted in its worktree.
+
 ### ✅ Item 2 (ATLAS refresh) — **DONE: advisory re-check PASS on `3dbfbac6`, MERGED to main under D52 (2026-10-09)**
 - **Verdict, in the gate's words:** "VERDICT: PASS ... The diff is exactly the 7 named files, all six advisories are closed truthfully, nothing regressed, and no data path changed."
 - **Gate evidence:**
