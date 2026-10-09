@@ -5,7 +5,7 @@
 > 2026-10-09, not a source. If later work overtakes it, add a dated update
 > beneath this header (CLAUDE.md working agreement 4); do not rewrite the
 > findings. **The retire-or-keep question is the USER'S decision. This memo
-> presents both options and recommends; it decides nothing.**
+> presents options A, B1, B2 and R and recommends; it decides nothing.**
 >
 > Branch `ws0/v2130-airi-sunset-memo`. No data, export, schema, or licence file
 > was edited. Tool constraint: this author has WebFetch (markdown-converted,
@@ -67,6 +67,43 @@
 >    the foreman (was "the foreman measured").
 > 5. Bounce #1 note item 4 itself corrected: "274 non-October rows are all
 >    July" was false (276 non-October rows: 274 July, 2 September).
+>
+> ### Corrections at gate bounce #3 (2026-10-09, D56)
+> Made in place by the same no-shell author, scoped to the gate's defects.
+> Line numbers are those of the file at tip cac1724c (before this pass).
+> Note on naming: the earlier logs above (bounce #1 item 3, bounce #2 item 2)
+> still say "option C"; that is the option now named **R (re-ingest)**. It was
+> renamed because PROGRESS.md records D8 as "AIRI: HOLD (option C)", a
+> different thing. The old logs are left as written.
+> 1. `last_seen`/`updated` is the content-change date, not the rebuild date
+>    (was line 165 table header "build/refresh date"; lines 173-174 "touched
+>    by a rebuild"; lines 291-292 Option A risk "re-emitting with last_seen =
+>    rebuild date"). Sources read: DATA_DICTIONARY.md:21 ("last-content-change
+>    dates (content-gated, so unchanged entries don't churn)"); `_apply_history`
+>    `scripts/merge_and_dedupe.py:1484-1502` (keeps `prev_updated` when the
+>    content snapshot is unchanged); `last_seen = updated` at :2363. Conclusion
+>    kept: 1,106 rows carry a date after the feed died and can be read as fresh.
+> 2. `intentional` is a tag, not a field (was lines 219, 236, 306). Now
+>    "`intentional` tag (672 rows today, all AIRI; ~667 by E18)", 0 rows have an
+>    `intentional` key (foreman-measured, not re-run by me). Deployment-stage
+>    tag now "1,382 rows today: ai-post-deployment 1,348, ai-pre-deployment 26,
+>    ai-other 9 (tag occurrences, total 1,383, one row carries two); 1,380 at
+>    E18". B1's strip list (line 305-306 and §3 line 235-236) now also names
+>    the `airi-navigator` tag, the `source_freshness` marker and the
+>    airi-navigator.com references, with `severity` marked "possibly; the dry
+>    run decides". "Subject to the dry run" kept.
+> 3. Advisories: §7 item 6 lists all three min mirrors (adds
+>    `data/incidents.min.json`); the header says options A, B1, B2 and R (was
+>    "both options"); §3 and §9 check 6 use `source_id` for the ingest files
+>    and `source_ids` for corpus rows (checked in the ingest files and
+>    `scripts/ingest_airi_navigator.py:139`); §7 selector and the §2 Python use
+>    `eu-ai-act-` with the hyphen, because INC-02549 (feed tier, non-AIRI)
+>    carries a bare `eu-ai-act` tag (foreman-confirmed, not re-checked by me);
+>    §2 now names the axes for "active 15,657" (`source_status`) versus
+>    "15,637 active" (`status` / `incident_count`); changelog and
+>    `ALLOW_DOWNLOAD` claims are labelled foreman testimony, unconfirmed on the
+>    live site 2026-10-09 (`/changelog` returns 404; flag name in no chunk),
+>    with the compiled-out gates stated as the verified part.
 
 ## 1. Channel status (evidence)
 
@@ -82,8 +119,8 @@ ZIP row is a status line; the `/incidents/browse` row is not my fetch.
 | `https://airi-navigator.com/downloads/airi-data.zip` and `https://www.airi-navigator.com/downloads/airi-data.zip` (the `ZIP_URL` in `scripts/ingest_airi_navigator.py:34`) | HTTP 404. This is ONE endpoint, not two: the apex redirects (307) to www, which 404s. | status line |
 | `https://www.airi-navigator.com/datasets` | Lists "AI Incident Tracker: 1,497 incidents" (AIID-derived), v1.3.2; no download or licence text. | rendered fetch |
 | `https://www.airi-navigator.com/incidents/browse` (robots-allowed) | Not re-fetched by me (5 MB, beyond my tool). Foreman-reproduced and red-reviewer-measured (curl + node, 2026-10-09): HTTP 200, 5,262,949 bytes, embeds the full set (1,497 `euAiActRiskLevel` occurrences = 1,497 record objects, 1,496 distinct ids with id 1378 duplicated; latest date 2026-05-31). | raw HTML, foreman/red-reviewer measurement |
-| JS chunk `/_next/static/chunks/b5439732ff8b66e8.js` | Contains `DownloadResultsButton` ("Download results as CSV", client-side Blob, filename `airi-<key>-...csv`). **I read it: the component is gated by `u="FALSE".toUpperCase()!=="FALSE"` and returns null when false, so as shipped the CSV button renders nothing.** Changelog v1.2.9 (2026-04-29) introduced it (foreman). | raw JS via WebFetch |
-| JS chunk `/_next/static/chunks/906798798b22d561.js` | Footer "Download data" links to `/downloads/airi-data.zip`, wrapped in the same compiled-out `"FALSE".toUpperCase()!=="FALSE"` comparison (both mobile and desktop). The flag NAME `ALLOW_DOWNLOAD` did not appear in my fetch; the foreman reports it from the changelog (0.29.1). So the ZIP was switched off deliberately. | raw JS via WebFetch |
+| JS chunk `/_next/static/chunks/b5439732ff8b66e8.js` | Contains `DownloadResultsButton` ("Download results as CSV", client-side Blob, filename `airi-<key>-...csv`). **I read it: the component is gated by `u="FALSE".toUpperCase()!=="FALSE"` and returns null when false, so as shipped the CSV button renders nothing.** Changelog v1.2.9 (2026-04-29) introduced it (foreman testimony; unconfirmed on the live site 2026-10-09: `/changelog` returns 404). | raw JS via WebFetch |
+| JS chunk `/_next/static/chunks/906798798b22d561.js` | Footer "Download data" links to `/downloads/airi-data.zip`, wrapped in the same compiled-out `"FALSE".toUpperCase()!=="FALSE"` comparison (both mobile and desktop). The flag NAME `ALLOW_DOWNLOAD` did not appear in my fetch and the reviewer found it in no chunk; the foreman reports it from the changelog (0.29.1), foreman testimony, unconfirmed on the live site 2026-10-09 (`/changelog` returns 404). The compiled-out gates themselves are verified; that they are a deliberate switch-off is an inference from them. | raw JS via WebFetch |
 | JS chunk `/_next/static/chunks/fdfcd250c3d32eb2.js` (Terms of Use) | "The data presented on this site is drawn from the MIT AI Risk Repository and related research datasets. It is provided as-is for informational and research purposes. While we strive for accuracy, we make no guarantees regarding completeness or timeliness." No licence clause. | raw JS via WebFetch |
 | `https://www.airi-navigator.com/` | "MIT AI Risk Navigator", described as a research prototype whose "data and analyses are preliminary and not yet validated"; v1.3.2; latest listed incident dated 2026-05-31; no download/export/API link, no GitHub/HF/Zenodo link; a "Privacy & Terms" link, whose content is the Terms chunk quoted in the row above. | rendered fetch, absence-based (method-suspect; the footer and browse-page findings above show a rendered fetch missed channels) |
 | `https://airisk.mit.edu/` | No data-download, Google Sheet, HF, Zenodo or GitHub link. Footer: "Data from the MIT AI Risk Initiative is licensed under CC BY 4.0" (link `creativecommons.org/licenses/by/4.0/`). | rendered fetch; the licence line matches the raw-HTML finding in SOURCE_LICENSES 1.4 |
@@ -149,20 +186,21 @@ Count by ripgrep: tag `"airi-navigator"` 1,382 lines; per-row marker
 Re-derivation (reviewer to run, from repo root):
 
 ```
-python -I -c "import json,collections as C;d=json.load(open('data/incidents.json',encoding='utf-8'));r=[e for e in d['incidents'] if 'airi-navigator' in (e.get('tags') or [])];print(len(r));print(sum(1 for e in r if 'airi_navigator' in (e.get('source_freshness') or {}).get('sources',[])));print(C.Counter(e.get('tier') for e in r));print(C.Counter(e.get('last_seen') for e in r).most_common());print(C.Counter(e.get('source_status') for e in r));print(C.Counter(e.get('status') for e in r));print(sum(1 for e in r if any(t.startswith('eu-ai-act') for t in e['tags'])))"
+python -I -c "import json,collections as C;d=json.load(open('data/incidents.json',encoding='utf-8'));r=[e for e in d['incidents'] if 'airi-navigator' in (e.get('tags') or [])];print(len(r));print(sum(1 for e in r if 'airi_navigator' in (e.get('source_freshness') or {}).get('sources',[])));print(C.Counter(e.get('tier') for e in r));print(C.Counter(e.get('last_seen') for e in r).most_common());print(C.Counter(e.get('source_status') for e in r));print(C.Counter(e.get('status') for e in r));print(sum(1 for e in r if any(t.startswith('eu-ai-act-') for t in e['tags'])))"
 ```
 
 (If the top-level key is not `incidents`, the first line of the file is a
 dict with `version`, `generated`, `incident_count`; use the list key that
 follows.) Expected: 1382; 1382; `{'landmark': 1382}`; `source_status` all
-`active` or `retained` (corpus-wide per the foreman: active 15,657, retained
-9); `status` `{None: 1382}` (retraction is the `status` field, corpus-wide 29
+`active` or `retained` (corpus-wide per the foreman, on the `source_status`
+axis: active 15,657, retained 9, which sums to 15,666 = 15,637 active +
+29 retracted on the separate `status` / `incident_count` axis); `status` `{None: 1382}` (retraction is the `status` field, corpus-wide 29
 `retracted`, 0 on AIRI rows); eu-ai-act-* rows 1382.
 
 Distribution (ripgrep, multiline over the tags-to-`last_seen` span of each
 entry, equal totals as a cross-check):
 
-| `last_seen` (= `updated`, i.e. build/refresh date) | Rows |
+| `last_seen` (= `updated`, the content-change date: content-gated, bumps when any field changes in a rebuild, not when the upstream source supplies data) | Rows |
 |---|---|
 | 2026-10-06 | 1,106 |
 | 2026-09-xx | 2 |
@@ -170,10 +208,15 @@ entry, equal totals as a cross-check):
 | total | 1,382 |
 
 **Observation that matters for the tagging spec:** `last_seen` is documented
-as an alias of `updated` (DATA_DICTIONARY line 22), the date the row was last
-touched by a rebuild, not when the upstream source last supplied it. 1,106 of
-these frozen rows read `last_seen 2026-10-06`, four months after the feed died.
-Consumers filtering on `last_seen` see them as fresh. The only truthful date is
+as an alias of `updated` (DATA_DICTIONARY line 22). `updated` is the
+content-change date (DATA_DICTIONARY line 21: "last-content-change dates
+(content-gated, so unchanged entries don't churn)"; `_apply_history`,
+`scripts/merge_and_dedupe.py:1484-1502`, keeps the previous `updated` when the
+content snapshot is unchanged and sets today otherwise; `last_seen = updated`
+at :2363). It bumps when any field of the row changes in a rebuild, not when
+the upstream source supplies data. 1,106 of these frozen rows nonetheless
+carry a date (`2026-10-06`) after the feed died, four months after
+`as_of`, so consumers filtering on `last_seen` can read them as fresh. The only truthful date is
 `source_freshness.as_of = 2026-05-31`.
 
 **Landmarks:** all 1,382 carry `"tier": "landmark"` (ripgrep: 1,382 matches for
@@ -216,11 +259,17 @@ could not fail; replaced.
   `tests/test_e23_aiid_dead_letter_tripwire.py`); AIRI descriptions match on 0
   rows and `affected` on 0 (E18 BOUNCE note).
 - AIRI-derived content that ships: EU AI Act tier tags (1,382 rows today,
-  all AIRI; 1,380 by the older E18 measure), deployment-stage tag (1,380), `intentional` field (~667
-  AIRI-unique), `severity` (798) -- E10 / E18 testimony, not re-measured here.
+  all AIRI; 1,380 by the older E18 measure), deployment-stage tag (1,382 rows
+  today: `ai-post-deployment` 1,348, `ai-pre-deployment` 26, `ai-other` 9, as
+  tag occurrences, which total 1,383, so one row carries two of them; 1,380 at
+  E18), `intentional` tag (672 rows today, all AIRI; ~667 by E18; it is a tag,
+  not a field: 0 rows have an `intentional` key), `severity` (798) -- the 672,
+  the 0 and the per-tag counts are foreman-measured; the E18 figures and 798
+  are E10 / E18 testimony; none re-measured here.
 - AIRI-sole vs AIID-shared (corrected): **0 AIRI-sole / 1,382 AIID-shared
-  today.** red-reviewer measured at gate #1 (and the foreman re-checked) that all 1,456 distinct AIRI source_ids in
-  `ingest/airi_navigator_incidents.json` (1,457 rows; ids are `AIID-n`) are
+  today.** red-reviewer measured at gate #1 (and the foreman re-checked) that all 1,456 distinct AIRI `source_id` values in
+  `ingest/airi_navigator_incidents.json` (1,457 rows; ids are `AIID-n`; ingest
+  rows use the singular `source_id`, corpus rows the list `source_ids`) are
   present in `ingest/aiid_full.json` union `ingest/aiid_incidents.json`
   (`len(airi_keys - aiid_keys) == 0`). The earlier "~280 AIRI-sole / ~1,100
   shared" (PROGRESS line 1953) predates the 2026-07-18 official AIID snapshot
@@ -229,12 +278,14 @@ could not fail; replaced.
   retention code (`scripts/merge_and_dedupe.py:2205-2233`): a prior entry is
   carried only if none of its keys is covered by fresh entries, so AIRI-keyed
   priors covered by AIID are not retained. Command (reviewer): load both
-  ingest files, collect `source_ids`, assert the set difference is empty; the
+  ingest files, collect `source_id`, assert the set difference is empty; the
   logic is key coverage, **not a simulated build** -- a real dry-run of the
   merge without the AIRI file is the stronger check and should be run.
   Consequence: removing AIRI would remove the AIRI OVERLAY (`eu-ai-act-*` tags,
-  deployment-stage, `intentional`, `severity` where AIRI-supplied) from all
-  1,382 rows and tombstone none (subject to that dry run). `tier: landmark` is
+  deployment-stage tags, the `intentional` tag, the `airi-navigator` tag, the
+  `source_freshness` marker, the airi-navigator.com references, and possibly
+  `severity` -- the dry run decides) from all 1,382 rows and tombstone none
+  (subject to that dry run). `tier: landmark` is
   NOT part of the overlay (section 2).
 - Surfaces carrying them: `data/incidents.json`, the three min mirrors,
   `INCIDENTS.md` / `docs/incidents/*`, STIX bundle, TAXII static files, MISP
@@ -288,8 +339,9 @@ term.
   visibly marked.
 - Citations: unchanged; per-row AIRI reference stays. No ID change.
 - Downstream consumers: no breakage. New optional fields are additive.
-- Risks: the rows keep re-emitting with `last_seen` = rebuild date, so
-  non-marker-aware consumers still see fresh dates. The marker is the only
+- Risks: 1,106 of the rows carry a `last_seen` (content-change date) of
+  2026-10-06, after the feed died, so non-marker-aware consumers can read them
+  as fresh. The marker is the only
   signal. Frozen EU-AI-Act tags age silently. A review_by date turns an
   indefinite hold into a dated one (the D8 hold, `until 2026-08-28`, has
   already lapsed 42 days, 2026-08-28 to 2026-10-09 counting the lapse date
@@ -303,8 +355,9 @@ Sub-options (corrected: the population is 0 AIRI-sole / 1,382 AIID-shared, so
 the earlier "tombstone ~280, strip ~1,100" split does not exist):
 
 - **B1 (overlay strip):** remove the AIRI overlay only (`eu-ai-act-*` tags,
-  deployment-stage tag, `intentional`/`severity` where AIRI-supplied) from all
-  1,382 rows; keep the rows, which the AIID snapshot path still serves. **As
+  deployment-stage tags, the `intentional` tag, the `airi-navigator` tag, the
+  `source_freshness` marker, the airi-navigator.com references, and possibly
+  `severity` where AIRI-supplied -- the dry run decides) from all 1,382 rows; keep the rows, which the AIID snapshot path still serves. **As
   defined this tombstones 0 rows** (subject to the dry-run in section 3). The
   rows stay `active`, the count is unchanged, and the cost is a field-level
   change on 1,382 rows. **Landmark: B1 moves 0 rows out of the landmark tier
@@ -321,7 +374,9 @@ the earlier "tombstone ~280, strip ~1,100" split does not exist):
   "sunsetting AIRI" and is the harshest reading. Landmark: unlike B1, B2 does
   remove 1,382 rows from the active landmark tier (1,915 -> 533), because the
   rows themselves are gone, not because their tier changed.
-- **C (re-ingest via the Navigator's embedded data):** see below.
+- **R (re-ingest via the Navigator's embedded data; formerly "Option C",
+  renamed at bounce #3 to avoid confusion with PROGRESS.md's D8 "AIRI: HOLD
+  (option C)", a different thing):** see below.
 
 Consequences:
 
@@ -364,7 +419,7 @@ Consequences:
 - Reversible: tombstones are reversible only by a deliberate un-retraction;
   the public-record effect (DOI'd Zenodo versions, HF revisions) is not.
 
-### Option C: refresh from the Navigator's embedded data (sub-option; user's call)
+### Option R (re-ingest): refresh from the Navigator's embedded data (sub-option; user's call)
 
 What it is: re-ingest from the data the robots-allowed `/incidents/browse`
 page embeds (1,497 record objects, 1,496 distinct ids, latest 2026-05-31), or
@@ -372,7 +427,7 @@ from the CSV button if it is ever re-enabled, instead of the dead ZIP.
 Effects (red-reviewer measurement, curl + node over the page's embedded data,
 2026-10-09): 40 of the 1,496 ids are not among our 1,456 AIRI ingest keys; 39
 of those 40 are already in the corpus via `ingest/aiid_full.json`; only
-AIID-1474 is absent. So C would add **at most 1 new row**, plus the AIRI
+AIID-1474 is absent. So R would add **at most 1 new row**, plus the AIRI
 overlay (`eu-ai-act-*` tags and the like) on the 39 existing rows. Nothing
 newer exists (the source looks frozen at 2026-05-31), so `last_success` would
 barely move and the rows would still be correctly `stale`-eligible; a new
@@ -390,9 +445,9 @@ will not resolve in the project's favour:
   the same as invited.
 - The transitive-AIID share-alike question (open since 2026-07) would apply
   to the new rows as well.
-I make no recommendation to scrape. Whether Option C is acceptable, or should
+I make no recommendation to scrape. Whether Option R is acceptable, or should
 wait for MIT's reply, is the user's decision. Options A and B1 do not depend on
-it; if C were taken, A's wording changes from "frozen" to "refreshed once, then
+it; if R were taken, A's wording changes from "frozen" to "refreshed once, then
 frozen at 2026-05-31".
 
 ## 7. Implementation spec for stale tagging and review_by (for the later specialist; applies to Option A, and to Option B1/B2 for any surviving rows)
@@ -400,7 +455,11 @@ frozen at 2026-05-31".
 Which rows: exactly the entries whose `source_freshness.sources` contains
 `airi_navigator` (today 1,382; selector is the registry `row_marker`
 `{kind: tag, value: airi-navigator}`). Do not select by `last_seen`. Do not
-select by title text. Derive from the per-row marker, never author per row.
+select by title text. Do not select by tag prefix with
+`startswith('eu-ai-act')`: INC-02549 (feed tier, non-AIRI) carries a bare
+`eu-ai-act` tag (foreman-confirmed); use the row marker, or the prefix
+`eu-ai-act-` WITH the hyphen. Derive from the per-row marker, never author per
+row.
 
 Tag values:
 - status: `stale` (marker `status`)
@@ -451,8 +510,9 @@ Surfaces:
    Work is limited to the card paragraph (add `review_by` to the
    `{status, as_of, sources}` description) and a test that the HF row carries
    it. Confirm the card says rows are frozen as of `as_of`. HF repo is `genai-incidents` (hyphen).
-6. **Docs/mirrors:** `docs/data/incidents.min.json` and
-   `src/genai_incidents/data/incidents.min.json` already carry the marker via
+6. **Docs/mirrors:** the three min mirrors, `data/incidents.min.json`,
+   `docs/data/incidents.min.json` and
+   `src/genai_incidents/data/incidents.min.json`, already carry the marker via
    the slim path; confirm `review_by` rides along. README/DATASHEET wording
    about freshness and the landmark feed note.
 7. **Tests that must fail on corruption** (working agreement 6): drop the
@@ -468,7 +528,7 @@ defect.
 
 Choose **Option A now**, set a `review_by` of roughly 90 days out (a
 user-set date; suggestion 2027-01-07), and keep B1 as a pre-scoped
-alternative for the next review. Option C is raised for the user's decision,
+alternative for the next review. Option R is raised for the user's decision,
 not recommended; nothing in A depends on it. Reasons: (1) no licence fact
 forces retirement; (2) 72% of the landmark tier is AIRI-tagged, so B2 would
 gut the landmark feed, while stale-marking is reversible and honest; (3) every
@@ -511,7 +571,7 @@ trigger, "AIRI-sole count confirmed ~280", is withdrawn: the count is 0.)
 5. Confirm CC BY 4.0 irrevocability from the legalcode (section 6) and that
    the airisk footer sentence is still present in raw HTML.
 6. Re-derive the AIRI-sole vs AIID-shared split (expected 0 / 1,382) by set
-   difference of `source_ids` between `ingest/airi_navigator_incidents.json`
+   difference of `source_id` (singular in the ingest files) between `ingest/airi_navigator_incidents.json`
    and `ingest/aiid_full.json` plus `ingest/aiid_incidents.json`; then the
    stronger check, a merge dry-run with the AIRI file removed, listing which
    of the 1,382 ids survive and which fields change. The expected result is
@@ -524,7 +584,7 @@ trigger, "AIRI-sole count confirmed ~280", is withdrawn: the count is 0.)
 ## 10. Open questions for the user (decisions are yours)
 
 1. Option A (keep, stale-tagged, review_by), B1 (strip overlay, tombstone
-   none), B2 (tombstone all 1,382; needs a new retraction reason), or C
+   none), B2 (tombstone all 1,382; needs a new retraction reason), or R
    (re-ingest from the Navigator's embedded data)? Recommendation is A.
 2. If B: authorise the merge dry-run (section 9, check 6) first. (The earlier
    open question "is `tier: landmark` AIRI-derived?" is removed: it is a code
