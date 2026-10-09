@@ -24,6 +24,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔍 Item 7 stage 1 — **REVIEW: `7f03c352` (pushed), red-reviewer dispatched**
+- **Specialist:**
+  - ported via `git apply --3way` of a7343274..586f40c8, with hand-resolved merge_and_dedupe.py and auto-refresh.yml; item-3 machinery kept;
+  - delta 3,936 rows × {description_provenance, description_source}, 0 `updated`, ID set and deprecations identical;
+  - E21 tripwire test removed (tombstone comment) and replaced by `test_aiid_signal_provenance.py`;
+  - the weekly run now fails at "Re-merge + render + validate" with "[FATAL] D42/D25(a) ... Nothing was written. This freeze is deliberate (D58, stage 1)"; the PR is skipped;
+  - 728 passed.
+- **Premise corrections:**
+  - memo S5's "every OECD row's description is the template" is false for 167 of 4,104 (162 AIID template, 5 other-source; asserted as a partition);
+  - there is no pinned prior crawl, so the gate abort is shown on a constructed input (2 changes), not the live 11/17;
+  - `ingest_aiid_snapshot.py` pre-existed on main.
+- **For the user's ruling package:**
+  1. While the gate fires, NOTHING else in the weekly refresh reaches a PR (AIRI, AIAAIC, KEV, the cve-sweep results, D60 flagging). Item 3's path is starved until stage 2.
+  2. Option: keep the Enforce steps running on abort (`!cancelled()`).
+  3. A ~108 MB AIID snapshot download is added weekly.
+  4. Red every week is not guaranteed; that depends on the week's inputs.
+- **Foreman [R]** (python per-entity vs `git show b8e5ed00:data/incidents.json`): ID sets equal (15,666); Counter {description_provenance 3936, description_source 3936}; the new value is `oecd-aim` on all 3,936; `git diff b8e5ed00 -- ingest data/id_deprecations.json` empty.
+
 ### 🔄 Item 4 (silent IDs) — **DISPATCHED: schema-architect on `ws3/v2130-silent-ids` (worktree `ws3-v2130-silent-ids`, base `816b9271`)**, under D49: `resolve_id()` unchanged; new `resolve_id_status(id, release=None)` covering all 17 silent IDs; `valid_for_releases` only on appended records. The specialist verifies the user's two successor mappings (INC-03128→INC-14909, INC-08185→INC-14742) from evidence before applying them, and identifies and closes the disclosed deviation in ID_POLICY. It runs in parallel with item 7 stage 1; the two overlap only on appending to `id_deprecations.json`.
 
 ### 🔄 Item 7 stage 1 (D58) — **DISPATCHED: pipeline-engineer on `ws4/v2130-oecd-stage1` (worktree `ws4-v2130-oecd-stage1`, base `b8e5ed00`)**. It ports the T12/T14 + D42 gate from `586f40c8` (12 files, by hand or cherry-pick, not a wholesale merge), with an EMPTY approval set and a label-only rebuild, per memo §7 S1-S5. It must STOP if labelling bumps `updated`. The E21-tripwire replacement and the exact weekly fail-closed behaviour go in a dated build audit. S6 docs go to WS0 afterwards.
