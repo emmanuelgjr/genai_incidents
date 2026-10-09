@@ -10,6 +10,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+- **Item 7 D53 fix at `9ad77d10` (pushed).** Foreman string check: `grep -n "vs 4,160"` rc 1; R3 now reads "3,937/4,104"; a bounce-#2 corrections section has been added. The §8 commands now use `source_ids` and per-row title matching. **A fresh red-reviewer has been dispatched for the full gate.**
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
