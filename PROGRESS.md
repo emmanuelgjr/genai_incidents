@@ -10,6 +10,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🧑‍⚖️ 2026-10-09 — USER DECISION D50 (item 1 after bounce #3): "Apply fixes + scoped re-gate"
+- A fresh specialist applies the gate's tested regex `(?<![\d.])\d+\.\d+\.\d+(?!\w|\.\d)` and the step-3 replacement sentence verbatim, adds a `v2.9.0.` plant, and fixes the two VERSIONING advisories (the :187 dangling step-5 reference; the step-5 "does not read English" sentence).
+- The re-gate is **limited to that diff**, plus a string check and pytest.
+
 ### ⛔⛔⛔ Item 1 — **BOUNCE #3 (red-reviewer, 2026-10-09, on `9d9d5661`) — ESCALATED TO USER (D48 re-gate failed)**
 The gate's verdict, in its own words: "The specialist applied both D48 fixes verbatim and correctly ... Both defects below were already present at 0dca6321 and I missed them at bounce #2. That is my miss, not the specialist's."
 1. **Sentence-final versions still pass the HF-card check.** The lookahead `(?![\w.])` at `scripts/check_stats_drift.py:208` rejects a version followed by a period: `card+" Dataset v2.9.0."` gives `[]`. Tested fix: `(?<![\d.])\d+\.\d+\.\d+(?!\w|\.\d)` plus a `v2.9.0.` plant.
