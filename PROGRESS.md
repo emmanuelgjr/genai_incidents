@@ -24,6 +24,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⛔ Item 6 — **BOUNCE #3 (fresh full gate under D54, on `cac1724c`, 2026-10-09)**: ESCALATED to the user
+- **Verdict:** two wording defects. The gate re-derived every key figure the brief listed by an independent route, and every claim in the corrections notes now matches the body.
+- **Defects:**
+  1. **`last_seen`/`updated` are described as the rebuild date, but they are the content-change date** (DATA_DICTIONARY:21; `_apply_history` merge_and_dedupe.py:1484-1502). The memo's own July/September dates disprove "rebuild date". The conclusion (1,106 rows look fresh) still stands. Affects lines 165, 173-174 and 291-292.
+  2. **`intentional` is a tag, not a field** (0 rows have the key; 672 AIRI rows carry the tag, 0 non-AIRI). The deployment-stage tag count, given in the present tense, is stale: 1,380, where today it is 1,382. Affects lines 219, 236 and 306.
+- **Advisories:**
+  - §7 omits `data/incidents.min.json` from the mirror list;
+  - **"Option C" clashes with D8's "HOLD (option C)"**, so rename it;
+  - the header says "both options" where there are four;
+  - `source_id` (ingest) vs `source_ids` (corpus);
+  - B1's strip list is not exhaustive (tag, marker, refs, maybe severity);
+  - selector trap: INC-02549 carries a bare `eu-ai-act` tag;
+  - two different "active" axes;
+  - the changelog/`ALLOW_DOWNLOAD` claims remain testimony (site /changelog 404).
+- **Gate evidence:**
+  - §2 python run verbatim; a corruption test fires (1383);
+  - its own scripts give landmark 1,915, AIRI-with-aiid 1,382, B2 14,255 / 1,411 / 533;
+  - browse page via curl + python, with ids taken two ways (id field and cite URL): 1,496 distinct, 40 gap, only AIID-1474 absent;
+  - CC BY §6(c) and §2(a)(1) quoted from legalcode.txt;
+  - all code and doc citations checked; scope is one file.
+- **Foreman [R]:** DATA_DICTIONARY:21 reads "last-content-change dates (content-gated ...)". Python: rows with an `intentional` key = **0**; with the tag = **672**, all AIRI. Both defects are confirmed.
+
 ### 🔁 Item 3 — **BOUNCE #1 (red-reviewer on `5a96fd42`, 2026-10-09)**: in progress; a FRESH pipeline-engineer is on the fixes
 - **Verdict, in the gate's words:** "The data side is clean ... all of the specialist's data claims hold. The branch bounces on two defects."
 - **Defects:**
