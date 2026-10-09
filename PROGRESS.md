@@ -10,6 +10,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔍 Item 6 (AIRI sunset memo) — **REVIEW: memo delivered `25899446` (pushed), red-reviewer dispatched 2026-10-09**
+- **Deliverable:** `docs/audits/airi-navigator-sunset-memo-2026-10-09.md` (337 lines; options A / B1 / B2; spec for stale tagging and `review_by`). Agent recommendation: **A**, frozen + stale-tagged, `review_by` about 2027-01-07. **Agent-suggested; the decision is the user's.**
+- **Foreman [R]** (python on `data/incidents.json`): 1,382 rows tagged `airi-navigator`. All 1,382 carry the `airi_navigator` freshness marker and all are `tier: landmark`, out of 1,915 landmarks corpus-wide.
+- **Premise errors reported by the specialist:**
+  - the cause is a 404 on the ZIP, not robots;
+  - the first failure was 2026-06-07 (`last_success` 2026-05-31);
+  - HF already carries per-row `source_freshness`, so only STIX and MISP lack it;
+  - the D8 hold lapsed on 2026-08-28 without a decision;
+  - NOTICE-DATA cites 1,457 AIRI rows (unresolved);
+  - 72% of landmarks are AIRI rows (new).
+- **Gate brief:** check the absence claims with raw-HTML curl, because the specialist saw only rendered pages. Also re-derive the AIRI-sole vs AIID-shared split, resolve 1,457 vs 1,382, and check the B2 arithmetic.
+
 ### 🔄 Items 6 + 7 (AIRI sunset memo, OECD/AIID unfreeze memo) — **DISPATCHED in parallel, 2026-10-09**
 - Both are memo-first governance items that end in a user decision, and neither touches data/, exports or schema/, so they run in their own worktrees while item 3 is in flight.
 - **Item 7:** license-auditor on `ws0/v2130-oecd-unfreeze-memo` (worktree `ws0-v2130-oecd-memo`, base `07f22c09`). Deliverable: `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md`, covering what D25(a) blocked, E23 + title-only, the first unfrozen run's changes, residual licence risk, and the spec for the unfreeze branch. A pipeline-engineer builds that branch after the memo, against the spec. **Nothing is unfrozen.**
