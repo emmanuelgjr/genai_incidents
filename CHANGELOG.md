@@ -71,6 +71,38 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   `.github/workflows/atlas-refresh.yml` re-pulls ATLAS and opens a PR with the diff report
   and the per-entry delta.
 
+### Changed - rejected-CVE sweep runs on every weekly refresh; DISPUTED CVEs are detected (agent-suggested, draft)
+
+- **First full sweep (2026-10-09).** All 9,169 corpus CVE ids were checked against the CVE
+  List (0 fetch failures): 37 REJECTED (the same 37 as 2026-10-03, all `Rejected` in NVD, no
+  disagreement), 9,124 PUBLISHED, 8 not in the CVE List. This covers the 2,171 CVEs on the wave
+  1-2 entries that had no recorded state (2,150 from cvelistV5, 21 AVID-only): none is
+  rejected. **No entry was newly retracted**; the 29 retractions stand. Their
+  `status_reason.as_of` moved from 2026-10-03 to 2026-10-09 (the re-check date), which is the
+  only change to `data/incidents.json` (29 fields, no `updated` bump).
+- **The weekly refresh budget rose from 600 to 1,200 CVE fetches per run**, so every corpus
+  CVE is re-checked within ceil(9,169 / 1,200) = 8 weeks instead of 16. The sweep runs as its
+  own job (own 60-minute limit) with a 40-minute wall-clock cap (`--max-seconds 2400`; 1,200
+  requests measure about 21 minutes), because inside the refresh job, after a 26-51 minute OECD
+  step, it could be cancelled with the job. The 8 weeks assumes up to 2.0 s per request
+  (measured 1.07).
+  The refresh PR body now lists every entry the build newly retracts (retracted in this build,
+  not on `main`: entry, CVE ids, tier) and the PR is labelled `needs-ruling` when one is a
+  landmark entry or more than 10 are retracted; the refresh is flagged, never blocked. The
+  summary shows the sweep step's own outcome, so a failed sweep reads as failed.
+  Never-checked ids, then records that predate dispute detection, then the stalest check, go
+  first. Every run writes a dated log (`docs/audits/cve-sweep/<date>.md` and `.json`: ids
+  checked, state changes, NVD disagreements, new REJECTED, new DISPUTED, failures, coverage)
+  and exits non-zero if more than 10 percent of fetches fail.
+- **DISPUTED detection.** Upstream, "disputed" is not a record state: it is a CNA or ADP
+  `disputed` tag, or a `** DISPUTED **` description prefix. The sweep now records it on the
+  PUBLISHED record (`disputed: true`, `dispute_signals`): 26 CVEs today, all CNA tags, on 22
+  entries that rest only on those CVEs. The merge can mark such an entry `status: disputed`
+  with `status_reason.code: cve-disputed` and lower its `confidence` one level (it stays in
+  `incident_count`), and `validate.py` checks it, **but it does not apply this yet: it needs
+  one new value in `schema/incident.schema.json` (`status_reason.code` enum), which the
+  schema owner has to add.** Until then the 22 entries are unchanged in the data.
+
 ## [2.12.0] — 2026-10-04
 
 > **These notes were gated before the cut** and the release was cut on

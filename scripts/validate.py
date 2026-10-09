@@ -58,7 +58,15 @@ def check_envelope(data: dict) -> list[str]:
     return problems
 
 
-def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
+def _schema_allows_disputed(schema: dict) -> bool:
+    try:
+        return "cve-disputed" in schema["properties"]["status_reason"]["properties"]["code"]["enum"]
+    except KeyError:
+        return False
+
+
+def check_status(data: dict, rejected: set[str] | None = None,
+                 disputed: set[str] | None = None) -> list[str]:
     """WS4-T2 status/retraction invariants (never-delete: a retracted entry
     stays, marked). Returns violation messages (empty == clean).
 
@@ -70,6 +78,13 @@ def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
     * Against the committed CVE-state snapshot (``rejected``): every REJECTED
       CVE carried by any entry is flagged on it. This is the check that fails
       when the merge rule is skipped or an entry ships a rejected CVE unmarked.
+    * ``disputed`` (v2.13.0 item 3): ``status: disputed`` carries
+      ``status_reason.code == "cve-disputed"`` (and ``retracted`` carries
+      ``cve-rejected``); a disputed entry is never ``confidence: high`` (the
+      merge lowers it one level, and the unlowered rule would be high only at
+      the top); against the snapshot's disputed set, a ``disputed`` entry has
+      at least one disputed CVE, and an entry resting only on disputed/rejected
+      CVEs that is neither retracted nor disputed is a violation.
     """
     problems: list[str] = []
     incidents = data["incidents"]
@@ -83,6 +98,18 @@ def check_status(data: dict, rejected: set[str] | None = None) -> list[str]:
             problems.append(f"{e['id']}: rejected_cve_ids {sorted(flagged - cves)} not in cve_ids")
         if e.get("status") == "retracted" and flagged != cves:
             problems.append(f"{e['id']}: retracted but rejected_cve_ids != cve_ids")
+        want_code = {"retracted": "cve-rejected", "disputed": "cve-disputed"}.get(e.get("status"))
+        if want_code and (e.get("status_reason") or {}).get("code") != want_code:
+            problems.append(f"{e['id']}: status {e['status']!r} must carry status_reason.code {want_code!r}")
+        if e.get("status") == "disputed" and e.get("confidence") == "high":
+            problems.append(f"{e['id']}: disputed entry still has confidence 'high' (must be lowered)")
+        if disputed is not None:
+            standing = (rejected or set()) | disputed
+            if e.get("status") == "disputed" and not cves & disputed:
+                problems.append(f"{e['id']}: status disputed but none of its CVEs is disputed in the snapshot")
+            if (cves & disputed and cves <= standing and set(e.get("source_ids") or []) <= standing
+                    and e.get("status") not in ("retracted", "disputed")):
+                problems.append(f"{e['id']}: rests only on disputed CVE(s) {sorted(cves & disputed)} but is not marked disputed")
         if rejected is not None:
             missed = sorted((cves & rejected) - flagged)
             if missed:
@@ -678,13 +705,17 @@ def main():
         )
     problems = check_integrity(data, deprecations)
     rej_path = ROOT / "ingest" / "cve_rejections.json"
-    rejected = None
+    rejected = disputed = None
     if rej_path.exists():
-        rejected = {
-            c for c, r in json.loads(rej_path.read_text(encoding="utf-8"))["states"].items()
-            if r.get("state") == "REJECTED"
-        }
-    problems += check_status(data, rejected)
+        snap_states = json.loads(rej_path.read_text(encoding="utf-8"))["states"]
+        rejected = {c for c, r in snap_states.items() if r.get("state") == "REJECTED"}
+        disputed = {c for c, r in snap_states.items()
+                    if r.get("state") == "PUBLISHED" and r.get("disputed")}
+    if disputed and not _schema_allows_disputed(schema):
+        print(f"disputed: {len(disputed)} disputed CVE(s) in the snapshot are not applied until the schema "
+              "carries status_reason code 'cve-disputed' (schema-architect); dispute checks skipped")
+        disputed = None
+    problems += check_status(data, rejected, disputed)
     from taxonomy_versions import taxonomy_versions as _derive_tv
     problems += check_taxonomy_versions(
         json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8")), _derive_tv()

@@ -202,6 +202,7 @@ def test_ingest_survives_nvd_error_on_a_rejected_hit(tmp_path, monkeypatch, caps
     out = tmp_path / "cve_rejections.json"
     monkeypatch.setattr(ing, "INCIDENTS", inc)
     monkeypatch.setattr(ing, "OUT_FILE", out)
+    monkeypatch.setattr(ing, "LOG_DIR", tmp_path / "sweep-log")
     monkeypatch.setattr(ing, "check_cvelist", lambda c: {"state": "REJECTED" if c.endswith("1") else "PUBLISHED"})
 
     def boom(c):

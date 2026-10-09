@@ -22,9 +22,78 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # WS4-T2 / v2.13.0 item 3: a CVE rejected after it was ingested must be
+  # retracted, not left live. Feeder = NVD CVEs modified in the last 10 days (a
+  # rejection is a modification); the rotation budget re-checks the stalest ids.
+  #
+  # WHY A SEPARATE JOB (BOUNCE #1, docs/audits/rejected-cve-sweep-gap-2026-10-09.md
+  # addendum 2026-10-09b): the OECD step alone takes 25-51 min and the refresh
+  # job's limit is 60, so a sweep step inside it could be cancelled with the
+  # job -- losing the health-counter persistence, the re-merge, the tests, the
+  # PR and the sweep's own snapshot. Here the sweep has its own 60-minute
+  # limit; it is capped by wall clock (--max-seconds 2400) so it stops cleanly
+  # and writes its snapshot and log; and its output reaches the refresh job as
+  # an artifact uploaded with `if: always()`.
+  #
+  # Throughput: --max-requests 1200 at about 1.07 s/request measured (1 req/s
+  # floor in ingest/common.py) = about 21 min; 2400 s allows 1,200 requests even
+  # at 2.0 s/request. Every corpus CVE is re-checked within ceil(N/1200) weeks
+  # (9,169 ids = 8 weeks; 16 at the old budget of 600). Never-checked ids and
+  # records that predate dispute detection sort first. The step also records
+  # DISPUTED CVEs and writes the dated log docs/audits/cve-sweep/<date>.{md,json};
+  # it exits non-zero when more than 10% of the fetches fail (continue-on-error:
+  # the PR is not blocked, the outcome is shown in the summary).
+  cve-sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # The sweep only reads the repo; the artifact upload uses the runner's
+    # ACTIONS_RUNTIME_TOKEN, not GITHUB_TOKEN, so no write scope is needed.
+    permissions:
+      contents: read
+    # The sweep step is continue-on-error (the PR must not be blocked), which
+    # makes this job's own `result` always `success`. Expose the STEP outcome
+    # so the refresh job's summary can show a >10% fail rate, a crash or the
+    # backstop as a failure.
+    outputs:
+      sweep_outcome: ${{ steps.ingest_cve_rejections.outcome }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Refresh CVE rejection snapshot
+        id: ingest_cve_rejections
+        timeout-minutes: 45
+        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 1200 --max-seconds 2400
+        continue-on-error: true
+
+      - name: Collect sweep output
+        if: always()
+        run: |
+          mkdir -p sweep-out
+          cp ingest/cve_rejections.json sweep-out/ 2>/dev/null || true
+          cp docs/audits/cve-sweep/"$(date -u +%F)".* sweep-out/ 2>/dev/null || true
+          ls -la sweep-out
+
+      - name: Upload sweep output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cve-sweep-output
+          path: sweep-out
+          if-no-files-found: warn
+          retention-days: 3
+
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs: cve-sweep
+    # run even when the sweep job failed or was skipped: it is not a gate
+    if: ${{ !cancelled() }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -112,13 +181,6 @@ jobs:
         run: python scripts/ingest_cisa_kev.py
         continue-on-error: true
 
-      # WS4-T2: a CVE rejected after it was ingested must be retracted, not
-      # left live. Feeder = NVD CVEs modified in the last 10 days (a rejection
-      # is a modification); the rotation budget re-checks the stalest ids.
-      - name: Refresh CVE rejection snapshot
-        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 600
-        continue-on-error: true
-
       # The ingest steps are continue-on-error so one flaky source doesn't
       # block the others — but if ALL of them failed, the "refreshed" data is
       # just last week's cache and the PR would ship silent staleness. Surface
@@ -128,6 +190,7 @@ jobs:
           AIRI: ${{ steps.ingest_airi.outcome }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
+          CVE_SWEEP: ${{ needs.cve-sweep.outputs.sweep_outcome || needs.cve-sweep.result }}
         run: |
           {
             echo "### Source refresh results"
@@ -136,6 +199,7 @@ jobs:
             echo "| AIRI Navigator | $AIRI |"
             echo "| AIAAIC sheet | $AIAAIC |"
             echo "| OECD AI Incidents Monitor | $OECD |"
+            echo "| CVE rejection/dispute sweep (separate job; not counted toward the all-failed abort) | $CVE_SWEEP |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
           [ "$AIRI" = "success" ] && ok=$((ok+1))
@@ -248,6 +312,30 @@ jobs:
             echo "::notice::$STATE_FILE does not exist yet (nothing skipped this run); nothing to persist."
           fi
 
+      # v2.13.0 item 3: bring the sweep job's snapshot and dated log into this
+      # job's tree before the merge reads ingest/cve_rejections.json. Missing
+      # artifact (sweep job died before upload) = keep the committed snapshot.
+      - name: Download CVE sweep output
+        uses: actions/download-artifact@v4
+        with:
+          name: cve-sweep-output
+          path: sweep-out
+        continue-on-error: true
+
+      - name: Apply CVE sweep output
+        run: |
+          if [ -f sweep-out/cve_rejections.json ]; then
+            cp sweep-out/cve_rejections.json ingest/cve_rejections.json
+            mkdir -p docs/audits/cve-sweep
+            for f in sweep-out/*.md sweep-out/[0-9]*.json; do
+              [ -f "$f" ] && cp "$f" docs/audits/cve-sweep/ || true
+            done
+            echo "::notice::Applied the CVE sweep job's snapshot and log."
+          else
+            echo "::warning::No CVE sweep output; the committed ingest/cve_rejections.json is used unchanged."
+          fi
+          rm -rf sweep-out
+
       - name: Re-merge + render + validate
         run: |
           python scripts/parse_existing.py
@@ -269,7 +357,57 @@ jobs:
           python -c "import json; d=json.load(open('data/incidents.json')); print('total:', d['incident_count']); print('generated:', d['generated'])"
           echo "::endgroup::"
 
+      # v2.13.0 item 3 / D60: flag, don't block. List every entry this build
+      # newly retracts (retracted here, not retracted on main) in the PR body,
+      # and label the PR `needs-ruling` when any of them is a landmark entry or
+      # more than 10 are retracted. See scripts/newly_retracted_report.py.
+      - name: Newly retracted entries report
+        id: retracted
+        # D60 "never block": a failure here must not skip the PR. The script
+        # below already has a fallback; continue-on-error is the belt to that
+        # braces. An unknown retraction state is flagged, not passed as clean:
+        # the fallback sets needs_ruling=true, and the label/removal steps treat
+        # anything other than an explicit 'false' as "needs a ruling".
+        continue-on-error: true
+        run: |
+          cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
+          Automated weekly refresh of external sources:
+          AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
+
+          On each run this branch is recreated from the current `main`, so the
+          diff is always relative to the latest `main` *at run time*. **Merge
+          promptly** — if commits land on `main` after this PR opens, the open
+          branch goes stale and merging it can revert that newer work. If it
+          has sat open across other merges, close it and re-run this workflow
+          (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
+
+          Review the diff before merging — flag any unexpected mass deletions
+          or large taxonomy shifts. Schema validation and the full unit-test
+          suite both ran green in this workflow before the PR was opened.
+
+          BODY
+          if python scripts/newly_retracted_report.py --before-ref HEAD \
+               --out-md "$RUNNER_TEMP/newly-retracted.md" --github-output "$GITHUB_OUTPUT"; then
+            cat "$RUNNER_TEMP/newly-retracted.md" >> "$RUNNER_TEMP/pr-body.md"
+          else
+            echo "::warning::newly_retracted_report.py failed; flagging the PR needs-ruling (unknown retraction state)."
+            {
+              echo "### Newly retracted entries (CVE rejection sweep)"
+              echo
+              echo "**The retraction report could not be produced** (see the workflow run). The retraction state of this refresh is UNKNOWN, so the PR is labelled \`needs-ruling\`; compare \`status: retracted\` against \`main\` by hand. The refresh was not blocked."
+            } >> "$RUNNER_TEMP/pr-body.md"
+            echo "count=unknown" >> "$GITHUB_OUTPUT"
+            echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure needs-ruling label exists
+        if: steps.retracted.outputs.needs_ruling != 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh label create needs-ruling --color B60205 --description "Refresh retracts a landmark entry or more than 10 entries; needs a human ruling" || true
+
       - name: Open / update refresh PR
+        id: cpr
         # Pinned to a full commit SHA (v7) for supply-chain safety; bump
         # deliberately rather than tracking a mutable tag.
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
@@ -279,21 +417,17 @@ jobs:
           base: main
           delete-branch: true
           title: "Weekly data refresh"
-          labels: data-refresh, automated
-          body: |
-            Automated weekly refresh of external sources:
-            AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
+          labels: ${{ steps.retracted.outputs.needs_ruling != 'false' && 'data-refresh, automated, needs-ruling' || 'data-refresh, automated' }}
+          body-path: ${{ runner.temp }}/pr-body.md
 
-            On each run this branch is recreated from the current `main`, so the
-            diff is always relative to the latest `main` *at run time*. **Merge
-            promptly** — if commits land on `main` after this PR opens, the open
-            branch goes stale and merging it can revert that newer work. If it
-            has sat open across other merges, close it and re-run this workflow
-            (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
-
-            Review the diff before merging — flag any unexpected mass deletions
-            or large taxonomy shifts. Schema validation and the full unit-test
-            suite both ran green in this workflow before the PR was opened.
+      # A later CLEAN run updating the same open PR must not leave a stale
+      # needs-ruling label from an earlier run. Only on an explicit 'false'.
+      - name: Remove stale needs-ruling label
+        if: steps.retracted.outputs.needs_ruling == 'false' && steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: gh pr edit "$PR" --remove-label needs-ruling || true
 
       # Runs LAST (after the PR is already opened, carrying whatever sources
       # did refresh — the source-health counter itself lives on

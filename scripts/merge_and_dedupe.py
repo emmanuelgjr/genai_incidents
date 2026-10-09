@@ -1191,7 +1191,52 @@ def _load_cve_rejections() -> dict[str, dict]:
     return {c: r for c, r in states.items() if r.get("state") == "REJECTED"}
 
 
-def _apply_cve_rejections(e: dict, rejected: dict[str, dict]) -> bool:
+SCHEMA_PATH = ROOT / "schema" / "incident.schema.json"
+
+
+def _disputed_emission_enabled() -> bool:
+    """True once schema/incident.schema.json lists ``cve-disputed`` as a
+    ``status_reason.code``. The schema is owned by schema-architect; until it
+    carries the value, emitting ``status: disputed`` would make every disputed
+    entry fail validation, so the merge records disputes in the snapshot but
+    does not apply them. The day the schema edit lands, the next build emits
+    them with no further code change (gap doc section 5)."""
+    try:
+        sch = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+        return "cve-disputed" in sch["properties"]["status_reason"]["properties"]["code"]["enum"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        return False
+
+
+def _load_cve_disputes() -> dict[str, dict]:
+    """``{cve_id: record}`` for the PUBLISHED-but-disputed CVEs in the committed
+    snapshot (v2.13.0 item 3). DISPUTED is a CNA/ADP ``disputed`` tag or a
+    ``** DISPUTED **`` description prefix on a PUBLISHED record, never a
+    ``cveMetadata.state``; the sweep records it as ``disputed: true``."""
+    if not CVE_REJECTIONS_PATH.exists():
+        return {}
+    try:
+        raw = json.loads(CVE_REJECTIONS_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    states = raw.get("states", {}) if isinstance(raw, dict) else {}
+    return {c: r for c, r in states.items()
+            if r.get("state") == "PUBLISHED" and r.get("disputed")}
+
+
+_CONFIDENCE_DOWN = {"high": "medium", "medium": "low", "low": "low"}
+
+
+def _lower_confidence_if_disputed(e: dict) -> None:
+    """A disputed entry drops ONE confidence level (agent-suggested rule; see
+    docs/audits/rejected-cve-sweep-gap-2026-10-09.md). Applied after
+    ``_derive_confidence``; deterministic and self-reversing."""
+    if e.get("status") == "disputed" and e.get("confidence") in _CONFIDENCE_DOWN:
+        e["confidence"] = _CONFIDENCE_DOWN[e["confidence"]]
+
+
+def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
+                          disputed: dict[str, dict] | None = None) -> bool:
     """WS4-T2: propagate a CVE Program REJECTED state onto an entry, never by
     deletion (invariant 3). Re-derived from scratch every build (the three
     fields are popped first), so an entry sheds the marker if the snapshot no
@@ -1204,22 +1249,36 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict]) -> bool:
       the rejected record(s): every CVE id on it is rejected AND every
       ``source_id`` is one of those CVE ids. An entry corroborated by another
       source (an advisory aggregate, AIID, AVID, a news row) stands, flagged.
+    * ``status: disputed`` (only when *disputed* is given): the entry is not
+      retracted, at least one CVE id is disputed, every CVE id is disputed or
+      rejected, and every ``source_id`` is one of those CVE ids (no evidence
+      beyond the CVE record). It stays counted; confidence is lowered by the
+      caller via ``_lower_confidence_if_disputed``. A corroborated entry that
+      merely carries a disputed CVE is not status-marked.
     """
+    disputed = disputed or {}
     for k in ("status", "status_reason", "rejected_cve_ids"):
         e.pop(k, None)
     cves = set(e.get("cve_ids") or [])
     hit = sorted(cves & rejected.keys())
-    if not hit:
-        return False
-    e["rejected_cve_ids"] = hit
     sources = set(e.get("source_ids") or [])
-    if cves <= rejected.keys() and sources <= rejected.keys():
-        e["status"] = "retracted"
+    if hit:
+        e["rejected_cve_ids"] = hit
+        if cves <= rejected.keys() and sources <= rejected.keys():
+            e["status"] = "retracted"
+            e["status_reason"] = {
+                "code": "cve-rejected",
+                "as_of": min(rejected[c].get("checked", "") for c in hit),
+            }
+            return True
+    dhit = sorted(cves & disputed.keys())
+    standing = rejected.keys() | disputed.keys()
+    if dhit and cves <= standing and sources <= standing:
+        e["status"] = "disputed"
         e["status_reason"] = {
-            "code": "cve-rejected",
-            "as_of": min(rejected[c].get("checked", "") for c in hit),
+            "code": "cve-disputed",
+            "as_of": min(disputed[c].get("checked", "") for c in dhit),
         }
-        return True
     return False
 
 
@@ -2090,14 +2149,21 @@ def main():
     #     Content fields, so set before history stamping: a retraction bumps
     #     `updated`. Deterministic: reads the committed snapshot only.
     cve_rejected = _load_cve_rejections()
-    if cve_rejected:
-        n_ret = n_flag = 0
+    cve_disputed = _load_cve_disputes()
+    if cve_disputed and not _disputed_emission_enabled():
+        print(f"[cve-rejections] {len(cve_disputed)} disputed CVE(s) recorded in the snapshot but "
+              "NOT applied: schema/incident.schema.json has no status_reason code 'cve-disputed' yet")
+        cve_disputed = {}
+    if cve_rejected or cve_disputed:
+        n_ret = n_flag = n_disp = 0
         for e in surviving:
-            if _apply_cve_rejections(e, cve_rejected):
+            if _apply_cve_rejections(e, cve_rejected, cve_disputed):
                 n_ret += 1
+            elif e.get("status") == "disputed":
+                n_disp += 1
             elif e.get("rejected_cve_ids"):
                 n_flag += 1
-        print(f"[cve-rejections] {n_ret} retracted, {n_flag} flagged-only")
+        print(f"[cve-rejections] {n_ret} retracted, {n_flag} flagged-only, {n_disp} disputed")
 
     # 5) Apply stable timestamps + classifiers (quality_tier, corpus).
     for e in surviving:
@@ -2353,10 +2419,11 @@ def main():
         e["source_count"] = len(e.get("source_ids") or [])
         e["confidence"] = _derive_confidence(e)
         e.setdefault("source_status", "active")
-        if e["source_status"] == "retained" and cve_rejected:
+        if e["source_status"] == "retained" and (cve_rejected or cve_disputed):
             # Retained priors bypass step 4f (carried verbatim from the last
             # build); re-derive so a late rejection still reaches them.
-            _apply_cve_rejections(e, cve_rejected)
+            _apply_cve_rejections(e, cve_rejected, cve_disputed)
+        _lower_confidence_if_disputed(e)
         if e.get("added"):
             e["first_seen"] = e["added"]
         if e.get("updated"):
