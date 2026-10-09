@@ -80,8 +80,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   rejected. **No entry was newly retracted**; the 29 retractions stand. Their
   `status_reason.as_of` moved from 2026-10-03 to 2026-10-09 (the re-check date), which is the
   only change to `data/incidents.json` (29 fields, no `updated` bump).
-- **The weekly refresh budget rose from 600 to 1,200 CVE fetches per run** (step timeout 40
-  min), so every corpus CVE is re-checked within ceil(9,169 / 1,200) = 8 weeks instead of 16.
+- **The weekly refresh budget rose from 600 to 1,200 CVE fetches per run**, so every corpus
+  CVE is re-checked within ceil(9,169 / 1,200) = 8 weeks instead of 16. The sweep runs as its
+  own job (own 60-minute limit) with a 40-minute wall-clock cap (`--max-seconds 2400`; 1,200
+  requests measure about 21 minutes), because inside the refresh job, after a 26-51 minute OECD
+  step, it could be cancelled with the job. The 8 weeks assumes up to 2.0 s per request
+  (measured 1.07).
   Never-checked ids, then records that predate dispute detection, then the stalest check, go
   first. Every run writes a dated log (`docs/audits/cve-sweep/<date>.md` and `.json`: ids
   checked, state changes, NVD disagreements, new REJECTED, new DISPUTED, failures, coverage)

@@ -398,29 +398,170 @@ def test_failed_fetch_keeps_the_prior_record(tmp_path, monkeypatch):
     assert st["CVE-2024-0001"]["checked"] == "2026-09-01", "stale stays stale; it is retried next run"
 
 
-# ----- the weekly refresh actually runs the sweep, at a budget that meets the stated bound -----
+# ----- the weekly refresh actually runs the sweep, at a GUARANTEED budget that meets the stated bound -----
+#
+# BOUNCE #1: the nominal --max-requests figure is not what a week is guaranteed to deliver. The sweep
+# runs under a wall-clock cap (--max-seconds) inside a job with a hard limit, so the throughput a week
+# can rely on is min(max-requests, max-seconds / PESSIMISTIC_SECONDS_PER_REQUEST). The full-cycle bound
+# is judged against that, not against the nominal request count.
 
-STATED_BOUND_WEEKS = 10   # docs: 9,169 ids / 1,200 per run = 8 weeks today; 10 leaves headroom for growth
+STATED_BOUND_WEEKS = 10             # docs: 9,169 ids / 1,200 per run = 8 weeks today; 10 leaves headroom for growth
+PESSIMISTIC_SECONDS_PER_REQUEST = 2.0   # measured 1.07 s/request (1 req/s floor in ingest/common.py + latency)
+JOB_LIMIT_MARGIN_MINUTES = 10       # setup + upload + an in-flight fetch must fit between the sweep's own cap and the job limit
+WORKFLOW = ROOT / ".github" / "workflows" / "auto-refresh.yml"
 
 
-def _weekly_budget(text: str) -> int | None:
+def _sweep_cmd(text: str) -> tuple[int | None, int | None]:
     import re
-    mm = re.search(r"ingest_cve_rejections\.py[^\n]*--max-requests\s+(\d+)", text)
-    return int(mm.group(1)) if mm else None
+    line = re.search(r"ingest_cve_rejections\.py[^\n]*", text)
+    if not line:
+        return None, None
+    mr = re.search(r"--max-requests\s+(\d+)", line.group(0))
+    ms = re.search(r"--max-seconds\s+(\d+)", line.group(0))
+    return (int(mr.group(1)) if mr else None, int(ms.group(1)) if ms else None)
 
 
-def test_weekly_workflow_budget_rotates_the_corpus_within_the_stated_bound():
-    text = (ROOT / ".github" / "workflows" / "auto-refresh.yml").read_text(encoding="utf-8")
-    budget = _weekly_budget(text)
-    assert budget, "auto-refresh.yml must run ingest_cve_rejections.py with a --max-requests budget"
+def guaranteed_weekly_requests(max_requests: int, max_seconds: int | None) -> int:
+    if not max_seconds:
+        return 0   # no wall-clock cap: nothing is guaranteed (the job limit may cancel the step)
+    return min(max_requests, int(max_seconds / PESSIMISTIC_SECONDS_PER_REQUEST))
+
+
+def _sweep_job(wf: dict) -> tuple[str, dict]:
+    for name, job in wf["jobs"].items():
+        for st in job.get("steps", []):
+            if "ingest_cve_rejections.py" in str(st.get("run", "")):
+                return name, job
+    raise AssertionError("no job runs ingest_cve_rejections.py")
+
+
+def test_weekly_workflow_guaranteed_budget_rotates_the_corpus_within_the_stated_bound():
+    mr, ms = _sweep_cmd(WORKFLOW.read_text(encoding="utf-8"))
+    assert mr, "auto-refresh.yml must run ingest_cve_rejections.py with a --max-requests budget"
+    assert ms, "auto-refresh.yml must give the sweep a --max-seconds wall-clock cap"
+    g = guaranteed_weekly_requests(mr, ms)
     n = len(ing.corpus_cve_ids())
-    assert math.ceil(n / budget) <= STATED_BOUND_WEEKS, (
-        f"{n} corpus CVEs / {budget} per weekly run = {math.ceil(n / budget)} weeks "
+    assert g > 0 and math.ceil(n / g) <= STATED_BOUND_WEEKS, (
+        f"{n} corpus CVEs / {g} GUARANTEED per weekly run (min of --max-requests {mr} and "
+        f"--max-seconds {ms} / {PESSIMISTIC_SECONDS_PER_REQUEST}s) = {math.ceil(n / max(g, 1))} weeks "
         f"> stated bound {STATED_BOUND_WEEKS}")
 
 
-def test_budget_check_fails_at_the_old_budget():
+def test_sweep_cap_fits_inside_its_job_limit_and_is_not_in_the_oecd_job():
+    import yaml
+    wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    name, job = _sweep_job(wf)
+    _, ms = _sweep_cmd(WORKFLOW.read_text(encoding="utf-8"))
+    assert name != "refresh", "the sweep must not share a job (and its 60-minute limit) with the OECD crawl"
+    assert ms / 60 + JOB_LIMIT_MARGIN_MINUTES <= job["timeout-minutes"], (
+        f"sweep cap {ms}s + {JOB_LIMIT_MARGIN_MINUTES} min margin exceeds the sweep job limit {job['timeout-minutes']} min")
+    step = next(s for s in job["steps"] if "ingest_cve_rejections.py" in str(s.get("run", "")))
+    assert step["timeout-minutes"] * 60 > ms, "step backstop must be longer than the cap it backs up"
+    assert any("upload-artifact" in str(s.get("uses", "")) and s.get("if") == "always()" for s in job["steps"]), \
+        "the sweep's snapshot and log must be uploaded even when the step fails"
+    needs = wf["jobs"]["refresh"]["needs"]
+    assert name in ([needs] if isinstance(needs, str) else needs), "the refresh job must wait for the sweep output"
+
+
+def test_budget_check_fails_at_the_old_budget_and_at_a_too_small_wall_clock():
     old = "run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 600"
-    assert _weekly_budget(old) == 600
-    assert math.ceil(len(ing.corpus_cve_ids()) / 600) > STATED_BOUND_WEEKS, \
-        "at the pre-change budget (16 weeks) the bound would be violated: the check can fail"
+    assert _sweep_cmd(old)[0] == 600
+    n = len(ing.corpus_cve_ids())
+    assert math.ceil(n / 600) > STATED_BOUND_WEEKS, "pre-change budget (16 weeks) violates the bound"
+    # nominal 1200 requests but only 10 minutes of wall clock: guaranteed 300/week = 31 weeks
+    small = "run: python scripts/ingest_cve_rejections.py --max-requests 1200 --max-seconds 600"
+    mr, ms = _sweep_cmd(small)
+    g = guaranteed_weekly_requests(mr, ms)
+    assert g == 300 and math.ceil(n / g) > STATED_BOUND_WEEKS, "the nominal budget alone would have passed this"
+    # no cap at all guarantees nothing
+    assert guaranteed_weekly_requests(1200, None) == 0
+
+
+# ----- wall-clock budget, restart accounting, NVD feeder outage (BOUNCE #1 + advisory A5) -----
+
+def test_max_seconds_stops_cleanly_and_saves_snapshot_and_log(tmp_path, monkeypatch):
+    import datetime
+    ids = [f"CVE-2024-{n:04d}" for n in range(1, 21)]
+    tick = {"t": 0.0}
+
+    def clock():
+        tick["t"] += 1.0
+        return tick["t"]
+    monkeypatch.setattr(ing, "_now", clock)
+    rc, seen, st = _run_main(tmp_path, monkeypatch, ids, None, -1, datetime.date(2026, 10, 9),
+                             extra=("--max-seconds", "6"))
+    assert rc == 0 and 0 < len(seen) < len(ids), "stopped early on the clock"
+    assert len(st) == len(seen), "what was checked before the cap is saved"
+    log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
+    assert log["stopped_by"] == "max-seconds" and log["args"]["max_seconds"] == 6
+    ok = tmp_path / "ok"
+    ok.mkdir()
+    _, seen2, _ = _run_main(ok, monkeypatch, ids, None, -1, datetime.date(2026, 10, 10))
+    assert len(seen2) == len(ids), "without the cap the same run covers everything"
+
+
+def test_same_day_restart_carries_failures_over_with_attempted(tmp_path, monkeypatch):
+    import datetime
+    ids = [f"CVE-2024-{n:04d}" for n in range(1, 11)]
+    day = datetime.date(2026, 10, 9)
+
+    def boom(c):
+        raise OSError("503")
+    rc, _, _ = _run_main(tmp_path, monkeypatch, ids, None, -1, day, boom)
+    assert rc == 1
+    prev = json.loads((tmp_path / "cve_rejections.json").read_text(encoding="utf-8"))["states"]
+    # Restart the same day with no budget: nothing is re-fetched, so nothing can be forgotten.
+    # Before the fix `failures` restarted empty and this returned 0 for a day that was 10/10 failed.
+    rc, seen, _ = _run_main(tmp_path, monkeypatch, ids, prev, 0, day)
+    log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
+    assert seen == [] and log["attempted"] == 10 and log["failed_count"] == 10
+    assert rc == 1, "the carried failures still fail the step"
+    # A restart that fixes some of them drops exactly those from the record.
+    def half(c):
+        if c <= "CVE-2024-0005":
+            return {"state": "PUBLISHED", "v": 2}
+        raise OSError("503")
+    _run_main(tmp_path, monkeypatch, ids, prev, -1, day, half)
+    log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
+    assert sorted(log["failures"]) == [f"CVE-2024-{n:04d}" for n in range(6, 11)]
+    assert log["attempted"] == 20
+
+
+def test_nvd_feeder_outage_is_recorded_and_the_rotation_still_runs(tmp_path, monkeypatch):
+    import datetime
+
+    def down(days, corpus):
+        raise OSError("NVD 503")
+    monkeypatch.setattr(ing, "nvd_recently_rejected", down)
+    ids = [f"CVE-2024-{n:04d}" for n in range(1, 31)]
+    rc, seen, st = _run_main(tmp_path, monkeypatch, ids, None, -1, datetime.date(2026, 10, 9),
+                             extra=("--nvd-modified-days", "10"))
+    assert len(seen) == 30 and len(st) == 30, "the rotation ran despite the dead feeder"
+    log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
+    assert "nvd-feeder" in log["failures"] and "503" in log["failures"]["nvd-feeder"]
+    assert log["attempted"] == 31 and rc == 0   # 1/31 is under the 10% rule: recorded, not fatal
+    bad = tmp_path / "bad"
+    bad.mkdir()
+
+    def boom(c):
+        raise OSError("503")
+    rc, _, _ = _run_main(bad, monkeypatch, ids, None, -1, datetime.date(2026, 10, 10), boom,
+                         extra=("--nvd-modified-days", "10"))
+    assert rc == 1, "feeder outage plus a failing rotation is red"
+
+
+def test_nvd_feeder_per_id_failure_does_not_abort(tmp_path, monkeypatch):
+    import datetime
+    monkeypatch.setattr(ing, "nvd_recently_rejected", lambda d, c: {"CVE-2024-0001"})
+    calls = []
+
+    def chk(c):
+        calls.append(c)
+        if len(calls) == 1:
+            raise OSError("503")   # the feeder's confirmation fetch
+        return {"state": "PUBLISHED", "v": 2}
+    _, _, st = _run_main(tmp_path, monkeypatch, [f"CVE-2024-{n:04d}" for n in range(1, 31)], None, -1,
+                         datetime.date(2026, 10, 9), chk, extra=("--nvd-modified-days", "10"))
+    assert len(st) == 30, "the same id was retried by the rotation and succeeded"
+    log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
+    assert log["failures"] == {}, "a failure later fixed in the same run is not left on record"

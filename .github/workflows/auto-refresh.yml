@@ -22,9 +22,68 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # WS4-T2 / v2.13.0 item 3: a CVE rejected after it was ingested must be
+  # retracted, not left live. Feeder = NVD CVEs modified in the last 10 days (a
+  # rejection is a modification); the rotation budget re-checks the stalest ids.
+  #
+  # WHY A SEPARATE JOB (BOUNCE #1, docs/audits/rejected-cve-sweep-gap-2026-10-09.md
+  # addendum 2026-10-09b): the OECD step alone takes 25-51 min and the refresh
+  # job's limit is 60, so a sweep step inside it could be cancelled with the
+  # job -- losing the health-counter persistence, the re-merge, the tests, the
+  # PR and the sweep's own snapshot. Here the sweep has its own 60-minute
+  # limit; it is capped by wall clock (--max-seconds 2400) so it stops cleanly
+  # and writes its snapshot and log; and its output reaches the refresh job as
+  # an artifact uploaded with `if: always()`.
+  #
+  # Throughput: --max-requests 1200 at about 1.07 s/request measured (1 req/s
+  # floor in ingest/common.py) = about 21 min; 2400 s allows 1,200 requests even
+  # at 2.0 s/request. Every corpus CVE is re-checked within ceil(N/1200) weeks
+  # (9,169 ids = 8 weeks; 16 at the old budget of 600). Never-checked ids and
+  # records that predate dispute detection sort first. The step also records
+  # DISPUTED CVEs and writes the dated log docs/audits/cve-sweep/<date>.{md,json};
+  # it exits non-zero when more than 10% of the fetches fail (continue-on-error:
+  # the PR is not blocked, the outcome is shown in the summary).
+  cve-sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Refresh CVE rejection snapshot
+        id: ingest_cve_rejections
+        timeout-minutes: 45
+        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 1200 --max-seconds 2400
+        continue-on-error: true
+
+      - name: Collect sweep output
+        if: always()
+        run: |
+          mkdir -p sweep-out
+          cp ingest/cve_rejections.json sweep-out/ 2>/dev/null || true
+          cp docs/audits/cve-sweep/"$(date -u +%F)".* sweep-out/ 2>/dev/null || true
+          ls -la sweep-out
+
+      - name: Upload sweep output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cve-sweep-output
+          path: sweep-out
+          if-no-files-found: warn
+          retention-days: 3
+
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs: cve-sweep
+    # run even when the sweep job failed or was skipped: it is not a gate
+    if: ${{ !cancelled() }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -112,26 +171,6 @@ jobs:
         run: python scripts/ingest_cisa_kev.py
         continue-on-error: true
 
-      # WS4-T2: a CVE rejected after it was ingested must be retracted, not
-      # left live. Feeder = NVD CVEs modified in the last 10 days (a rejection
-      # is a modification); the rotation budget re-checks the stalest ids.
-      #
-      # v2.13.0 item 3: the rotation budget is 1200 fetches/run (about 24 min at
-      # the 1 req/s raw.githubusercontent.com interval in ingest/common.py), so
-      # never-checked ids clear in ceil(U/1200) runs and EVERY corpus CVE is
-      # re-checked within ceil(N/1200) weeks (9,169 ids at v2.13.0 = 8 weeks;
-      # it was 16 at the old budget of 600). Never-checked ids and records
-      # that predate dispute detection sort first. The step also records
-      # DISPUTED CVEs (CNA/ADP tag or "** DISPUTED **") and writes the dated
-      # sweep log docs/audits/cve-sweep/<date>.{md,json}; it exits non-zero
-      # when more than 10% of the fetches fail, so a dead feed is a red step
-      # (still continue-on-error: the PR is not blocked, the outcome is shown).
-      - name: Refresh CVE rejection snapshot
-        id: ingest_cve_rejections
-        timeout-minutes: 40
-        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 1200
-        continue-on-error: true
-
       # The ingest steps are continue-on-error so one flaky source doesn't
       # block the others — but if ALL of them failed, the "refreshed" data is
       # just last week's cache and the PR would ship silent staleness. Surface
@@ -141,7 +180,7 @@ jobs:
           AIRI: ${{ steps.ingest_airi.outcome }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
-          CVE_SWEEP: ${{ steps.ingest_cve_rejections.outcome }}
+          CVE_SWEEP: ${{ needs.cve-sweep.result }}
         run: |
           {
             echo "### Source refresh results"
@@ -150,7 +189,7 @@ jobs:
             echo "| AIRI Navigator | $AIRI |"
             echo "| AIAAIC sheet | $AIAAIC |"
             echo "| OECD AI Incidents Monitor | $OECD |"
-            echo "| CVE rejection/dispute sweep (not counted toward the all-failed abort) | $CVE_SWEEP |"
+            echo "| CVE rejection/dispute sweep (separate job; not counted toward the all-failed abort) | $CVE_SWEEP |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
           [ "$AIRI" = "success" ] && ok=$((ok+1))
@@ -262,6 +301,30 @@ jobs:
           else
             echo "::notice::$STATE_FILE does not exist yet (nothing skipped this run); nothing to persist."
           fi
+
+      # v2.13.0 item 3: bring the sweep job's snapshot and dated log into this
+      # job's tree before the merge reads ingest/cve_rejections.json. Missing
+      # artifact (sweep job died before upload) = keep the committed snapshot.
+      - name: Download CVE sweep output
+        uses: actions/download-artifact@v4
+        with:
+          name: cve-sweep-output
+          path: sweep-out
+        continue-on-error: true
+
+      - name: Apply CVE sweep output
+        run: |
+          if [ -f sweep-out/cve_rejections.json ]; then
+            cp sweep-out/cve_rejections.json ingest/cve_rejections.json
+            mkdir -p docs/audits/cve-sweep
+            for f in sweep-out/*.md sweep-out/[0-9]*.json; do
+              [ -f "$f" ] && cp "$f" docs/audits/cve-sweep/ || true
+            done
+            echo "::notice::Applied the CVE sweep job's snapshot and log."
+          else
+            echo "::warning::No CVE sweep output; the committed ingest/cve_rejections.json is used unchanged."
+          fi
+          rm -rf sweep-out
 
       - name: Re-merge + render + validate
         run: |
