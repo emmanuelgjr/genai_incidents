@@ -24,6 +24,46 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Item 7 stage 1 — **PASS (red-reviewer on `7f03c352`, 2026-10-09)**. RULING PACKAGE for the user (D58: "bring all I need to rule here")
+- **Verdict, in the gate's words:** "The branch does what D58 stage 1 asked for. Exactly 3,936 rows gain two label fields and nothing else moves. The approval set is empty. The gate aborts on a bridging input I built myself ... and it does not abort on the committed inputs. The rebuild reproduces the committed tree byte for byte, twice."
+- **Gate evidence:**
+  - its own per-entity delta: Counter {description_source 3936, description_provenance 3936}, all absent→oecd-aim/original, all OECD-sourced, ID order identical;
+  - removing the backfill reverts all 7,876 diff lines and fails the label test;
+  - partition via raw stored descriptions: 3,937 / 162 / 5, with 4,104/4,104 attributed;
+  - STIX, MISP and TAXII identical (cmp/diff); HF jsonl differs on exactly 3,936 lines;
+  - an independent bridging input (AIID-1577 + AIID-1525) gives rc 1, "[FATAL] D42/D25(a) ... (3) ... Nothing was written", data sha unchanged;
+  - gate replaced by `pass` makes the gate test fail;
+  - 728 passed;
+  - D42 audit files and ported tests are blob-identical to 586f40c8;
+  - all of main's item-3 workflow steps are present.
+- **Advisories:**
+  - A1: INC-00437's two label keys changed order (bytes, not values), undeclared. **Being declared** in the build record.
+  - A2: the gate is proven only on constructed inputs; the live weekly counts on current main are unmeasured, and 11/17 is 2026-10-03 history.
+  - A3: a week where the gate does NOT fire opens an ordinary refresh PR carrying the full first-run unfreeze (~1,500 OECD rows with LLM titles, 24 upstream AIID title edits) with no S8/S9 licence assertions. Merging that PR by hand is the only defence. The same was true under the accidental tripwire.
+  - A4: while the gate fires, NO weekly PR opens, which starves AIRI, AIAAIC, KEV, cve-sweep and D60. The Enforce steps are skipped, and ~108 MB of AIID snapshot is downloaded weekly for nothing.
+  - A5: S6 docs for WS0: INGESTION_CONDUCT:122 should add AIID to the weekly run; SOURCE_LICENSES §1.2a; HF card; NOTICE-DATA 3,667/3,829 → 3,937/4,104. No new egress register entry is owed.
+  - A6: the E21 replacement is a real replacement. Residual hole: titles are matched against any ingest file; E23's tripwire still covers it.
+  - A7: tamper-plus-recompute of the approval file is undetectable until S7 pins the hash; the gate's wiring is covered by a single test.
+
+**THE RULING PACKAGE (what the user decides now):**
+1. **Merge or decline `ws4/v2130-oecd-stage1`.**
+   - Effect of merging: 3,936 OECD rows gain `description_provenance: original` and `description_source: oecd-aim` in `data/incidents.json` and the HF export. Nothing else changes.
+   - The accidental E21 tripwire is replaced by a deliberate D42 gate: an empty approval set, fail-closed, "Nothing was written".
+   - Declining keeps today's state: the weekly run is red on an accidental test, and the labels don't ship.
+2. **Starvation trade-off (A4).** Either side, no weekly PR reaches main while OECD/AIID bridges exist. The difference is that merge makes this explicit. Options:
+   - (a) accept it;
+   - (b) a follow-up decouples the other sources, letting the weekly PR carry AIRI/AIAAIC/KEV/cve-sweep while OECD/AIID changes are held. That needs design work.
+3. **Unfired-week exposure (A3).** Without stage 2, a week with no bridging change would open a PR containing the whole unfrozen OECD crawl. Options:
+   - (a) rely on not merging such PRs;
+   - (b) also hold OECD row additions behind the gate until stage 2.
+4. **Stage 2 prerequisites, for later rulings, not now:**
+   - S7 suppression list or heuristic change;
+   - S8 delta from a pinned crawl, re-deriving the 7 merges + 10 retitles on current main;
+   - S9 licence assertions;
+   - R1: OECD LLM-title exposure grows by ~1,533 rows (37.4% of 4,104; an estimate, not measured);
+   - R6: OECD outreach (sent 2026-07-31; follow-up window 2026-08-21; no reply recorded).
+5. **S6 docs** (WS0) follow a merge.
+
 ### 🔍 Item 7 stage 1 — **REVIEW: `7f03c352` (pushed), red-reviewer dispatched**
 - **Specialist:**
   - ported via `git apply --3way` of a7343274..586f40c8, with hand-resolved merge_and_dedupe.py and auto-refresh.yml; item-3 machinery kept;
