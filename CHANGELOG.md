@@ -7,6 +7,30 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - rejected-CVE sweep runs on every weekly refresh; DISPUTED CVEs are detected (agent-suggested, draft)
+
+- **First full sweep (2026-10-09).** All 9,169 corpus CVE ids were checked against the CVE
+  List (0 fetch failures): 37 REJECTED (the same 37 as 2026-10-03, all `Rejected` in NVD, no
+  disagreement), 9,124 PUBLISHED, 8 not in the CVE List. This covers the 2,171 CVEs on the wave
+  1-2 entries that had no recorded state (2,150 from cvelistV5, 21 AVID-only): none is
+  rejected. **No entry was newly retracted**; the 29 retractions stand. Their
+  `status_reason.as_of` moved from 2026-10-03 to 2026-10-09 (the re-check date), which is the
+  only change to `data/incidents.json` (29 fields, no `updated` bump).
+- **The weekly refresh budget rose from 600 to 1,200 CVE fetches per run** (step timeout 40
+  min), so every corpus CVE is re-checked within ceil(9,169 / 1,200) = 8 weeks instead of 16.
+  Never-checked ids, then records that predate dispute detection, then the stalest check, go
+  first. Every run writes a dated log (`docs/audits/cve-sweep/<date>.md` and `.json`: ids
+  checked, state changes, NVD disagreements, new REJECTED, new DISPUTED, failures, coverage)
+  and exits non-zero if more than 10 percent of fetches fail.
+- **DISPUTED detection.** Upstream, "disputed" is not a record state: it is a CNA or ADP
+  `disputed` tag, or a `** DISPUTED **` description prefix. The sweep now records it on the
+  PUBLISHED record (`disputed: true`, `dispute_signals`): 26 CVEs today, all CNA tags, on 22
+  entries that rest only on those CVEs. The merge can mark such an entry `status: disputed`
+  with `status_reason.code: cve-disputed` and lower its `confidence` one level (it stays in
+  `incident_count`), and `validate.py` checks it, **but it does not apply this yet: it needs
+  one new value in `schema/incident.schema.json` (`status_reason.code` enum), which the
+  schema owner has to add.** Until then the 22 entries are unchanged in the data.
+
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 
 - `scripts/check_stats_drift.py` additionally fails CI when the README

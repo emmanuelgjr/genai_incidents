@@ -115,8 +115,21 @@ jobs:
       # WS4-T2: a CVE rejected after it was ingested must be retracted, not
       # left live. Feeder = NVD CVEs modified in the last 10 days (a rejection
       # is a modification); the rotation budget re-checks the stalest ids.
+      #
+      # v2.13.0 item 3: the rotation budget is 1200 fetches/run (about 24 min at
+      # the 1 req/s raw.githubusercontent.com interval in ingest/common.py), so
+      # never-checked ids clear in ceil(U/1200) runs and EVERY corpus CVE is
+      # re-checked within ceil(N/1200) weeks (9,169 ids at v2.13.0 = 8 weeks;
+      # it was 16 at the old budget of 600). Never-checked ids and records
+      # that predate dispute detection sort first. The step also records
+      # DISPUTED CVEs (CNA/ADP tag or "** DISPUTED **") and writes the dated
+      # sweep log docs/audits/cve-sweep/<date>.{md,json}; it exits non-zero
+      # when more than 10% of the fetches fail, so a dead feed is a red step
+      # (still continue-on-error: the PR is not blocked, the outcome is shown).
       - name: Refresh CVE rejection snapshot
-        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 600
+        id: ingest_cve_rejections
+        timeout-minutes: 40
+        run: python scripts/ingest_cve_rejections.py --nvd-modified-days 10 --max-requests 1200
         continue-on-error: true
 
       # The ingest steps are continue-on-error so one flaky source doesn't
@@ -128,6 +141,7 @@ jobs:
           AIRI: ${{ steps.ingest_airi.outcome }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
+          CVE_SWEEP: ${{ steps.ingest_cve_rejections.outcome }}
         run: |
           {
             echo "### Source refresh results"
@@ -136,6 +150,7 @@ jobs:
             echo "| AIRI Navigator | $AIRI |"
             echo "| AIAAIC sheet | $AIAAIC |"
             echo "| OECD AI Incidents Monitor | $OECD |"
+            echo "| CVE rejection/dispute sweep (not counted toward the all-failed abort) | $CVE_SWEEP |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
           [ "$AIRI" = "success" ] && ok=$((ok+1))
