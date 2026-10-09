@@ -10,6 +10,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔄 2026-10-09 — in flight (user: "keep going")
+- **Item 2 (ATLAS refresh):** full red-reviewer gate dispatched on `df61dcad`, covering the per-entity field delta, translation honesty (invariant 2), upstream-latest, determinism, lint fire test, taxonomy_versions in every export, workflow egress (invariant 5), and benchmark F1 (invariant 8). **Even on PASS, the 5,841-entry relabel goes to the user before merge** (D28 precedent).
+- **Item 3 (rejected-CVE sweep):** WS4 dispatched on new branch `ws4/v2130-rejected-cve-sweep`, worktree `.claude/worktrees/ws4-v2130-rejected-cve-sweep`, from `5546e058`. This runs in parallel with item 2's gate because the code is disjoint; item 3's data delta is re-derived after item 2 merges. Its governance stop: retractions of landmark entries, or more than 10 entries, go to the user.
+
 ### ✅ Item 1 (latest-release drift) — **DONE: PASS (red-reviewer truth-only gate, 2026-10-09, on `e415624f`), MERGED to main**
 - **Verdict, in the gate's words:** "VERDICT: PASS. The new step-3 and step-5 text in docs/VERSIONING.md at e415624f matches the code. The diff 6b43db5c..e415624f touches only those two passages. DEFECTS: none."
 - **What the gate measured:**
