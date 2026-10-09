@@ -24,6 +24,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔄 Item 4 (silent IDs) — **DISPATCHED: schema-architect on `ws3/v2130-silent-ids` (worktree `ws3-v2130-silent-ids`, base `816b9271`)**, under D49: `resolve_id()` unchanged; new `resolve_id_status(id, release=None)` covering all 17 silent IDs; `valid_for_releases` only on appended records. The specialist verifies the user's two successor mappings (INC-03128→INC-14909, INC-08185→INC-14742) from evidence before applying them, and identifies and closes the disclosed deviation in ID_POLICY. It runs in parallel with item 7 stage 1; the two overlap only on appending to `id_deprecations.json`.
+
 ### 🔄 Item 7 stage 1 (D58) — **DISPATCHED: pipeline-engineer on `ws4/v2130-oecd-stage1` (worktree `ws4-v2130-oecd-stage1`, base `b8e5ed00`)**. It ports the T12/T14 + D42 gate from `586f40c8` (12 files, by hand or cherry-pick, not a wholesale merge), with an EMPTY approval set and a label-only rebuild, per memo §7 S1-S5. It must STOP if labelling bumps `updated`. The E21-tripwire replacement and the exact weekly fail-closed behaviour go in a dated build audit. S6 docs go to WS0 afterwards.
 
 ### ✅ Schema branch — **MERGED to main (2026-10-09), after user rulings D63/D64**
