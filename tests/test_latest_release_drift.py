@@ -74,6 +74,9 @@ def test_hf_card_ungrouped_total_and_version_literals_fail():
     assert any("2.9.0" in e for e in checker.check_hf_card_template(card + " (2.9.0 on Zenodo)"))
     # input: a v-prefixed literal 'Dataset v2.9.0' must also fail (old lookbehind let it pass)
     assert any("2.9.0" in e for e in checker.check_hf_card_template(card + " Dataset v2.9.0"))
+    # input: a sentence-final literal 'Dataset v2.9.0.' must fire; dotted quads must not
+    assert any("2.9.0" in e for e in checker.check_hf_card_template(card + " Dataset v2.9.0."))
+    assert checker.check_hf_card_template(card + " see 1.2.3.4 and 10.0.0.1") == []
     # a year or 'VERIS 1.4.1' alone is not a false positive
     assert checker.check_hf_card_template(card + " in 2026, VERIS 1.4.1") == []
 

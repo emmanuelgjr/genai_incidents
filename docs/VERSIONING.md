@@ -121,10 +121,9 @@ caught at gate review, not by this file. Run both checks as part of step
    equivalent to `make build` and must not be treated as such: `render`
    (`scripts/render_markdown.py`) is what writes `INCIDENTS.md`'s own
    `**Version:**`/`**Generated:**` lines, and `validate` is the schema/ID
-   gate. Running only `merge` ships `INCIDENTS.md` at the old version with
-   nothing downstream able to catch it — see step 4's note on why the
-   drift checker specifically cannot see that file. Run `make build` in
-   full.
+   gate. Running only `merge` ships `INCIDENTS.md` at the old version; step
+   4's drift check now fails on that, because it reads the **Version:**
+   line, but run `make build` in full.
 
    **Verify the rebuild changed no corpus row**, at the field level, not
    just a line count (`git diff --stat` reports lines changed in the
@@ -183,9 +182,9 @@ caught at gate review, not by this file. Run both checks as part of step
    - **`INCIDENTS.md`** is not in `DOC_SURFACES` (no stats markers), but the
      drift checker does read its `**Version:**` line (written by
      `render_markdown.py`, part of `make render`, already run in step 3)
-     and fails this step if it disagrees with `data/stats.json`. The eyeball
-     check in step 5 (`grep -n '^- \*\*Version:\*\*' INCIDENTS.md`) is
-     optional redundancy, not the only guard.
+     and fails this step if it disagrees with `data/stats.json`. To eyeball it
+     yourself, `grep -n '^- \*\*Version:\*\*' INCIDENTS.md` shows the line;
+     that is optional redundancy, not the only guard.
    - **The Hugging Face card**: the *template* (`CARD` in
      `scripts/export_huggingface.py`) is checked by this step for
      placeholders and literals; the *generated* `dist/hf/README.md` is not.
@@ -210,8 +209,10 @@ caught at gate review, not by this file. Run both checks as part of step
      spot-check, not a step this checklist requires.
 
 5. **Sweep live surfaces for prose the bump just made false.** The
-   drift check in step 4 catches stale *numbers* inside markers; it does
-   not read English. The `v2.9.0` cut hit exactly this: after the version
+   drift check in step 4 catches stale *numbers* inside markers, plus the version literals it
+   is told to read (the README Latest-release lead line, the `INCIDENTS.md`
+   **Version:** line and the HF card template's version literals); it does
+   not read English prose. The `v2.9.0` cut hit exactly this: after the version
    marker updated to read `2.9.0`, an adjacent paragraph still claimed *no
    version had been bumped or tagged yet* — true when it was written, false
    the moment the marker next to it changed, and nothing failed because the
