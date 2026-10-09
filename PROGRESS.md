@@ -10,6 +10,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ⛔⛔⛔ Item 1 — **BOUNCE #3 (red-reviewer, 2026-10-09, on `9d9d5661`) — ESCALATED TO USER (D48 re-gate failed)**
+The gate's verdict, in its own words: "The specialist applied both D48 fixes verbatim and correctly ... Both defects below were already present at 0dca6321 and I missed them at bounce #2. That is my miss, not the specialist's."
+1. **Sentence-final versions still pass the HF-card check.** The lookahead `(?![\w.])` at `scripts/check_stats_drift.py:208` rejects a version followed by a period: `card+" Dataset v2.9.0."` gives `[]`. Tested fix: `(?<![\d.])\d+\.\d+\.\d+(?!\w|\.\d)` plus a `v2.9.0.` plant.
+2. **VERSIONING.md:124-126 (step 3) still says the drift checker "cannot see" INCIDENTS.md**, which contradicts the corrected step 4. A mock cut shows the checker does fail on it.
+- **Foreman re-derivation [R]**, by a different route (a standalone regex probe, not the gate's exec):
+  - the old regex gives `[]` for `'Dataset v2.9.0.'` and `'release 2.9.0.'`;
+  - the proposed regex gives `['2.9.0']` for both, and `[]` for `1.2.3.4` and `10.0.0.1`;
+  - `git show 9d9d5661:docs/VERSIONING.md | grep -n "cannot see"` gives line 126.
+- **Gate evidence:**
+  - fix diff is in scope (3 files);
+  - fire/no-fire re-derived via in-memory regex swap;
+  - mock cut step 4 rc=0;
+  - pytest 595 passed, 1 xfailed;
+  - drift check rc=0;
+  - cumulative diff: data/ and PROGRESS.md 0 files.
+- **ADVISORY:**
+  - VERSIONING:187 points to a step-5 grep that no longer exists;
+  - step 5 still says the drift check "does not read English";
+  - the VERIS exception is case- and prefix-sensitive.
+
 ### 🧑‍⚖️ 2026-10-09 — USER DECISIONS D48, D49 (the brief was re-issued; the queue resumes)
 - **D48 (item 1 escalation):** "Apply verbatim + re-gate". A **fresh** WS6 specialist applies exactly the bounce-#2 fixes and nothing else: lookbehind `(?<![\d.])` plus a `v2.9.0` plant test, and the VERSIONING step-4 bullet corrected in place. Then one red-reviewer pass and a string check.
 - **D49 (item 4 API shape):** **keep `resolve_id() -> str | None` unchanged** (non-breaking). Add `resolve_id_status(id, release=None)`, which returns a typed result: successor / group (with its set) / release-dependent / pre-tombstone. It covers all **17** silent IDs, not only the brief's 8. `valid_for_releases` arrives on *appended* deprecation records only (invariant 9).
