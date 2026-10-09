@@ -10,6 +10,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔍 Item 7 (OECD/AIID unfreeze memo) — **REVIEW: memo delivered `9646d00e` (pushed), red-reviewer dispatched 2026-10-09**
+- **Deliverable:** `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md` (413 lines). Agent recommendation: **C, staged**. Stage 1 rebases `ws4/refresh-tripwire-42` (T12/T14 machinery) and merges it with an EMPTY approval set plus the label-only rebuild. Stage 2, the real unfreeze, waits on the user and on a new suppression capability. **Agent-suggested; the decision is the user's.**
+- **Premise errors reported by the specialist:**
+  - T12/T14 *are* built (`586f40c8`, ungated, not on main);
+  - D25(a) is not in `auto-refresh.yml`; the freeze is only the E21 tripwire test failing;
+  - the merge set is 17 changes (7 merges + 10 retitles), not 7;
+  - the 2026-10-03 measurements predate waves 1–2;
+  - merge 5 is contested between two records;
+  - NOTICE-DATA's 3,829 OECD figure is stale.
+- **Foreman [R] spot-checks:**
+  - `grep -c description_provenance scripts/ingest_oecd_aim.py` on main gives 0;
+  - `grep D25 .github/workflows/auto-refresh.yml` finds nothing;
+  - `gh run list --workflow auto-refresh.yml` shows a scheduled FAILURE on 2026-09-20, 09-27 and 10-04, plus a manual (workflow_dispatch) run that failed on 2026-09-14.
+
 ### 🔍 Item 6 (AIRI sunset memo) — **REVIEW: memo delivered `25899446` (pushed), red-reviewer dispatched 2026-10-09**
 - **Deliverable:** `docs/audits/airi-navigator-sunset-memo-2026-10-09.md` (337 lines; options A / B1 / B2; spec for stale tagging and `review_by`). Agent recommendation: **A**, frozen + stale-tagged, `review_by` about 2027-01-07. **Agent-suggested; the decision is the user's.**
 - **Foreman [R]** (python on `data/incidents.json`): 1,382 rows tagged `airi-navigator`. All 1,382 carry the `airi_navigator` freshness marker and all are `tier: landmark`, out of 1,915 landmarks corpus-wide.
