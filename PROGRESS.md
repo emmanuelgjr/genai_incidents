@@ -10,6 +10,44 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ⛔ Item 2 (ATLAS refresh) — **BOUNCE #1 (red-reviewer, 2026-10-09, on `df61dcad`)** → redispatched to WS4
+The gate's verdict, in its own words: "The data operation itself held up under every independent check I ran ... The bounce is for the workflow and for records/disclosure: four defects, all fixable without touching data/incidents.json."
+1. **The monthly workflow is not a no-op on an unchanged release, and it overwrites the dated audit.**
+   - `fetch_atlas.py` always rewrites `ATLAS.provenance.json` `fetched`, so "Detect change" is always true.
+   - `atlas_pin.py --report docs/audits/atlas-refresh-${VER}-release-diff.md` then clobbers the committed 2026.09 audit; the gate reproduced "2026.09 -> 2026.09 / added (0)".
+2. **The "2,540 entries" figure (CHANGELOG + delta audit line 11) is false.** It sums per-id counts, and 8 entries carry both T0019 and T0058. The per-entity figure is **2,532**, and 2,532 + 3,309 = 5,841.
+3. **CORRECTIONS.md is not updated.** Two pre-existing errors were fixed silently:
+   - INC-06842 carried the nonexistent AML.T0015.001;
+   - the old pin listed T0009, T0030, T0038 and T0045 as "2026.06" though 2026.06 lacks them.
+4. **`docs/SOURCE_LICENSES.md` §3.1 is stale.** It still describes local-clone ingest only, but this PR adds an HTTP fetch and a committed release. Invariant 10 is **not** violated (not a new source), but this is a live surface, so it is corrected in place.
+
+**Foreman re-derivation [R]**, own script on `git show 12f0a98f:` vs `df61dcad:data/incidents.json`:
+- technique-set changed 2,532; tactics changed 3,581; union 5,841; tactics-only 3,309;
+- entries carrying both T0019 and T0058 before: 8.
+
+**Gate evidence:**
+- upstream `ATLAS-latest.yaml` → v6 → 2026.09; sha256 `935efa93…` matches the committed snapshot byte for byte (`cmp`), and 2026.10 returns 404;
+- own YAML parse: 3 removed, 38 added, 4+1 renamed, 5 link changes;
+- **per-entity delta:** 15,666 entries before and after, same IDs in the same order, 5,841 changed;
+- only `mitre_atlas`, `mitre_atlas_tactics`, `updated` and `last_seen` moved; `updated` bumped on exactly the changed set;
+- **9,825 untouched entries byte-identical** (proven to fire with a plant);
+- control build from merge-base data equals the branch except for dates;
+- determinism: rebuild twice, `git status` empty;
+- lint fires on deprecated, absent and phantom ids, and on mappings/;
+- taxonomy_versions present in stats.json, STIX identity, MISP tags, the rendered HF card, and `taxonomy_versions()`;
+- pytest 610 passed, 1 xfailed;
+- trial merge onto 97e6ee77: one CHANGELOG conflict (keep both); merged tree 622 passed.
+
+**Brief corrections (foreman was wrong):** invariants 2 and 8 are **pre-activation**. WS2-T3 and WS2-T1 are not done, and `benchmark_atlas.py` does not exist.
+
+**ADVISORY:**
+- owasp_asi "2025" now ships in every export (item 9 reconciles it);
+- STIX `capec: null` has not been run through a validator;
+- the lint misses the heuristic tables and ingest/*.json;
+- `refresh_atlas_codes` never removes tactics;
+- validate.yml likely won't fire on GITHUB_TOKEN PRs;
+- INGESTION_CONDUCT should name atlas-refresh.yml, and its build-target line is stale.
+
 ### 🔄 2026-10-09 — in flight (user: "keep going")
 - **Item 2 (ATLAS refresh):** full red-reviewer gate dispatched on `df61dcad`, covering the per-entity field delta, translation honesty (invariant 2), upstream-latest, determinism, lint fire test, taxonomy_versions in every export, workflow egress (invariant 5), and benchmark F1 (invariant 8). **Even on PASS, the 5,841-entry relabel goes to the user before merge** (D28 precedent).
 - **Item 3 (rejected-CVE sweep):** WS4 dispatched on new branch `ws4/v2130-rejected-cve-sweep`, worktree `.claude/worktrees/ws4-v2130-rejected-cve-sweep`, from `5546e058`. This runs in parallel with item 2's gate because the code is disjoint; item 3's data delta is re-derived after item 2 merges. Its governance stop: retractions of landmark entries, or more than 10 entries, go to the user.
