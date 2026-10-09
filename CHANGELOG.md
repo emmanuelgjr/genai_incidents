@@ -7,6 +7,70 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
+
+- `scripts/check_stats_drift.py` additionally fails CI when the README
+  `## Latest release` lead line names a version or release date different from
+  `data/stats.json` / the top released CHANGELOG heading, when `pyproject.toml`,
+  `.zenodo.json` or `CITATION.cff` (version, `date-released`) disagree with them,
+  (version read from the `[project]` table; CITATION must carry both a
+  top-level and a preferred-citation `version:`), when the `ingest/common.py`
+  `USER_AGENT` version or `INCIDENTS.md`'s `**Version:**` line disagree, or
+  when the Hugging Face card template in `scripts/export_huggingface.py`
+  loses its `{count}`/`{version}` placeholders or gains a literal total
+  (grouped or ungrouped, 4+ digits, bare years excepted) or any `X.Y.Z`
+  version literal (third-party `VERIS X.Y.Z` excepted). CHANGELOG headings
+  with em dash, en dash or hyphen are all read. `docs/VERSIONING.md` steps 2,
+  4 and 5 updated to match (CHANGELOG heading promotion and README lead line
+  now belong to step 2). Previously a stale release date beside a current `stats:version`
+  marker passed. No data or published-doc content changed (the audit found
+  nothing stale at 4edd6bad).
+
+### Changed - MITRE ATLAS pin refreshed 2026.06 -> 2026.09; `taxonomy_versions` published (draft)
+
+- **ATLAS pin: 2026.06 -> 2026.09** (`collection.version` of the upstream release;
+  `mitre-atlas/atlas-data` `dist/ATLAS-latest.yaml` is a text pointer to
+  `dist/v6/ATLAS-2026.09.yaml`). The verbatim release is committed under `ingest/atlas/`
+  with a sha256 (Apache-2.0, notice in `NOTICE-DATA`); `mappings/mitre_atlas.json` is now
+  derived from it by `scripts/atlas_pin.py`, never hand-edited. Release diff: 38
+  techniques/subtechniques added, 3 retired (`AML.T0019`, `AML.T0058`, `AML.T0104`, folded
+  into the new `AML.T0115` "Publish Poisoned AI Artifacts"), 4 renamed, 5 technique->tactic
+  links changed, tactic `AML.TA0001` renamed "AI Attack Staging" -> "AI Attack Adaptation"
+  (`docs/audits/atlas-refresh-2026.09-release-diff.md`). Upstream also published 2026.07
+  and 2026.08 in between; the pin went straight from 2026.06 to 2026.09, so this diff
+  covers 2026.06 to 2026.09 directly and does not attribute changes to the intermediate releases.
+- **5,841 entries change `mitre_atlas` and/or `mitre_atlas_tactics`; no entry added,
+  removed or re-IDed.** 2,532 have a superseded technique id mechanically translated
+  (`AML.T0058` -> `AML.T0115.001` on 2,498 entries, `AML.T0019` -> `AML.T0115.000` on 41,
+  `AML.T0015.001` -> `AML.T0015` on 1, an id that never existed in these releases; those
+  per-id counts sum to 2,540 but 8 entries carry both `AML.T0019` and `AML.T0058`, so 2,532
+  distinct entries; re-derive with the command in the delta audit's correction note); 3,309
+  change tactics only, through the new technique->tactic links. On those entries `updated`
+  (and `last_seen`) move to the build date and nothing else does. Mapping heuristics are
+  unchanged. 2,532 + 3,309 = 5,841. Every changed entry, with before/after and reason, and the per-entity proof
+  that the other 9,825 are byte-identical:
+  `docs/audits/atlas-refresh-delta-2026-10-06.md`. **Consumer impact:** anything filtering
+  on `AML.T0058`/`AML.T0019` must use the `AML.T0115.*` ids; the old ids stay in the pin
+  marked `deprecated`, never deleted.
+- **Two pre-existing pin errors corrected (also in `CORRECTIONS.md`).** (a) `INC-06842`
+  (AVID-2023-V012, `quality_tier: reviewed`) carried `AML.T0015.001`, an id absent from
+  ATLAS 2026.06 and 2026.09 alike; it is now `AML.T0015`. (b) The old
+  `mappings/mitre_atlas.json` listed `AML.T0009`, `AML.T0030`, `AML.T0038` and `AML.T0045`
+  as part of "2026.06", but ATLAS 2026.06 does not contain them (nor 2025.12 or 2026.01,
+  checked against the upstream releases); they are now marked `deprecated` in the pin
+  (retained, never deleted). No entry in the corpus carried them.
+- **`taxonomy_versions`** (`atlas`, `owasp_llm`, `owasp_asi`, `capec`, `veris`), derived
+  from the pinned `mappings/*.json` and published in `data/stats.json`, as
+  `x_taxonomy_versions` on a STIX `identity` object, as `genai-incidents:taxonomy-*` tags
+  on every MISP event and manifest entry, in the Hugging Face card, and as
+  `genai_incidents.taxonomy_versions()` in the package. `capec` is `null`: the CWE->CAPEC
+  map predates version recording.
+- **New CI lint** `scripts/lint_atlas_ids.py` (in `make build` and `validate.yml`): fails on
+  any `AML.*` id in the corpus or `mappings/` that is absent from, or deprecated in, the pin,
+  and on a pin that does not match the committed snapshot. **New monthly workflow**
+  `.github/workflows/atlas-refresh.yml` re-pulls ATLAS and opens a PR with the diff report
+  and the per-entry delta.
+
 ### Changed - rejected-CVE sweep runs on every weekly refresh; DISPUTED CVEs are detected (agent-suggested, draft)
 
 - **First full sweep (2026-10-09).** All 9,169 corpus CVE ids were checked against the CVE
@@ -30,25 +94,6 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   `incident_count`), and `validate.py` checks it, **but it does not apply this yet: it needs
   one new value in `schema/incident.schema.json` (`status_reason.code` enum), which the
   schema owner has to add.** Until then the 22 entries are unchanged in the data.
-
-### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
-
-- `scripts/check_stats_drift.py` additionally fails CI when the README
-  `## Latest release` lead line names a version or release date different from
-  `data/stats.json` / the top released CHANGELOG heading, when `pyproject.toml`,
-  `.zenodo.json` or `CITATION.cff` (version, `date-released`) disagree with them,
-  (version read from the `[project]` table; CITATION must carry both a
-  top-level and a preferred-citation `version:`), when the `ingest/common.py`
-  `USER_AGENT` version or `INCIDENTS.md`'s `**Version:**` line disagree, or
-  when the Hugging Face card template in `scripts/export_huggingface.py`
-  loses its `{count}`/`{version}` placeholders or gains a literal total
-  (grouped or ungrouped, 4+ digits, bare years excepted) or any `X.Y.Z`
-  version literal (third-party `VERIS X.Y.Z` excepted). CHANGELOG headings
-  with em dash, en dash or hyphen are all read. `docs/VERSIONING.md` steps 2,
-  4 and 5 updated to match (CHANGELOG heading promotion and README lead line
-  now belong to step 2). Previously a stale release date beside a current `stats:version`
-  marker passed. No data or published-doc content changed (the audit found
-  nothing stale at 4edd6bad).
 
 ## [2.12.0] — 2026-10-04
 

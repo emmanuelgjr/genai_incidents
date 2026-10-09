@@ -229,6 +229,22 @@ def _load_atlas_technique_tactics() -> dict[str, list[str]]:
 
 _ATLAS_TECHNIQUE_TACTICS = _load_atlas_technique_tactics()
 
+
+def _load_atlas_translations() -> dict[str, str]:
+    """old technique id -> replacement id, for ids absent from the pinned ATLAS
+    release (mappings/atlas_id_translations.json). Mechanical translation only:
+    the heuristics that EMIT the old ids are unchanged; this keeps their output
+    valid against the pin (scripts/lint_atlas_ids.py enforces that)."""
+    try:
+        raw = json.loads((MAPPINGS / "atlas_id_translations.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+    return {k: v["to"] for k, v in (raw.get("translations") or {}).items()
+            if isinstance(v, dict) and v.get("to")}
+
+
+_ATLAS_TRANSLATIONS = _load_atlas_translations()
+
 CANONICAL_HOSTS = {
     "nvd.nist.gov": "advisory",
     "cve.org": "advisory",
@@ -821,6 +837,9 @@ def fill_taxonomy(entry: dict) -> dict:
             atlas.add(t)
         for n in ASI_TO_NIST.get(c, []):
             nist.add(n)
+    # Pinned-release id translation (see _load_atlas_translations). Applied to
+    # the final technique set, before tactics are derived from it.
+    atlas = {_ATLAS_TRANSLATIONS.get(t, t) for t in atlas}
     entry["mitre_atlas"] = sorted(atlas)
     entry["nist_ai_rmf"] = sorted(nist)
     # Derive ATLAS tactics from the (final) technique set — subtechniques
@@ -835,6 +854,31 @@ def fill_taxonomy(entry: dict) -> dict:
     if tactics:
         entry["mitre_atlas_tactics"] = sorted(tactics)
     return entry
+
+
+def refresh_atlas_codes(entry: dict) -> bool:
+    """Re-apply the PINNED ATLAS release to an entry's ATLAS codes only: translate
+    superseded technique ids, then add the tactics the pin links the (translated)
+    techniques to. Touches nothing else -- in particular it does NOT re-run the
+    OWASP->ATLAS backfill heuristics. Used for retained priors (step 6c), which
+    are carried verbatim and so bypass fill_taxonomy(); without this a re-pin
+    would silently leave them on the previous release's ids/links. Tactics are
+    only ever added here (union), matching fill_taxonomy(). Returns True if
+    anything changed."""
+    before = (list(entry.get("mitre_atlas") or []), list(entry.get("mitre_atlas_tactics") or []))
+    atlas = {_ATLAS_TRANSLATIONS.get(t, t) for t in before[0]}
+    tactics = set(before[1])
+    for t in atlas:
+        tac = _ATLAS_TECHNIQUE_TACTICS.get(t)
+        if not tac and t.count(".") >= 2:
+            tac = _ATLAS_TECHNIQUE_TACTICS.get(t.rsplit(".", 1)[0])
+        if tac:
+            tactics.update(tac)
+    if before[0]:
+        entry["mitre_atlas"] = sorted(atlas)
+    if tactics:
+        entry["mitre_atlas_tactics"] = sorted(tactics)
+    return (list(entry.get("mitre_atlas") or []), list(entry.get("mitre_atlas_tactics") or [])) != before
 
 
 def normalize_entry(raw: dict) -> dict | None:
@@ -2247,6 +2291,10 @@ def main():
         if (keys & covered_keys) or pid in used_ids:
             continue
         prior["source_status"] = "retained"  # carried after all sources dropped it
+        # Carried verbatim, so it would bypass the pinned-ATLAS translation and
+        # tactic links applied to fresh rows; apply that (and only that) here.
+        if refresh_atlas_codes(prior):
+            prior["updated"] = today_str
         surviving.append(prior)
         covered_keys.update(keys)
         used_ids.add(pid)

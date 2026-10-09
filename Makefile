@@ -1,9 +1,9 @@
-.PHONY: build validate render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
+.PHONY: build validate lint-atlas atlas-fetch atlas-pin render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
 
-build: merge render render-docs-stats validate
+build: merge render render-docs-stats validate lint-atlas
 
 test:
 	pytest tests -q
@@ -28,6 +28,23 @@ check-stats-drift:
 
 validate:
 	python scripts/validate.py
+
+# CI lint (v2.13.0 item 2): fails on any AML.* id in data/incidents.json or
+# mappings/ that is absent from, or deprecated in, the pinned ATLAS release
+# (mappings/mitre_atlas.json), and on a pin that no longer matches the committed
+# snapshot under ingest/atlas/. Offline; part of `make build`.
+lint-atlas:
+	python scripts/lint_atlas_ids.py
+
+# NETWORK (not part of `make build`): pull the latest ATLAS release through
+# ingest/common.py into ingest/atlas/ (+ sha256 provenance), then re-derive the
+# pin offline. The monthly workflow .github/workflows/atlas-refresh.yml runs
+# these, rebuilds, and opens a PR carrying the diff report.
+atlas-fetch:
+	python scripts/fetch_atlas.py
+
+atlas-pin:
+	python scripts/atlas_pin.py build --write
 
 # STIX 2.1 bundle for threat-intel platforms (build artifact, not committed).
 stix:

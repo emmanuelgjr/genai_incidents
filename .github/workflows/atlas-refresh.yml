@@ -1,0 +1,202 @@
+name: Monthly ATLAS refresh
+
+# v2.13.0 item 2. Re-pulls the latest MITRE ATLAS release, re-derives the pin
+# (mappings/mitre_atlas.json), re-runs the merge against it, and opens ONE PR
+# carrying the release diff, the per-entry field-level delta and the lint /
+# validate / test outcomes. It never pushes to main. ATLAS ships roughly
+# monthly (month-end), so the run is on the 3rd, after the previous month's
+# release; a run that finds the same release as the committed snapshot is a
+# no-op and opens nothing (fetch_atlas.py writes nothing when the sha256 matches
+# the committed provenance, so `git status` stays clean; atlas_pin.py refuses to
+# overwrite an existing dated audit).
+#
+# Same version, changed bytes: if upstream re-issues the SAME version with
+# different content, fetch_atlas.py overwrites ingest/atlas/ATLAS-<ver>.yaml and
+# the provenance (changed=true), but the dated diff report
+# docs/audits/atlas-refresh-<ver>-release-diff.md already exists, so the
+# "Re-derive pin" step fails (atlas_pin.py exits 2, refusing to overwrite a
+# dated record; that step deliberately has no continue-on-error). Nothing is
+# written past that point and no PR is opened; the failed run is the signal.
+# Human: read the upstream change, then either (a) move/rename the old report
+# deliberately and re-run the workflow, or (b) decide the re-issue is not worth
+# adopting and leave the pin as is. The per-entry delta step has the same
+# refuse-if-exists guard (atlas_entry_delta.py exits 2 when its dated file
+# exists, i.e. a second changed run on the same UTC date); it is
+# continue-on-error, so that is recorded in the PR body, not fatal.
+#
+# Network: ONLY scripts/fetch_atlas.py, which goes through ingest/common.py
+# (robots.txt, rate limit, identifying User-Agent). Everything after it is
+# offline and deterministic.
+
+on:
+  schedule:
+    - cron: "0 5 3 * *"
+  workflow_dispatch:
+
+# Least privilege: the PR action needs to push a branch and open a PR, nothing
+# else (no issues, no packages, no id-token).
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: atlas-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Capture pre-refresh state
+        run: |
+          mkdir -p /tmp/atlas-before
+          cp data/incidents.json /tmp/atlas-before/incidents.json
+          cp mappings/mitre_atlas.json /tmp/atlas-before/mitre_atlas.json
+
+      - name: Pull latest ATLAS release (network, via ingest/common.py)
+        run: python scripts/fetch_atlas.py
+
+      - name: Detect change
+        id: changed
+        run: |
+          if [ -z "$(git status --porcelain ingest/atlas)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Upstream ATLAS release is identical to the committed snapshot; nothing to do."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Supply-chain guard on the refreshed upstream text. The hard gate is
+      # build_pin() (ids well-formed, names plain text); this prints the
+      # informational counts that go into the PR body.
+      - name: Scan new release for suspicious content
+        if: steps.changed.outputs.changed == 'true'
+        id: scan
+        continue-on-error: true
+        shell: bash   # -eo pipefail: a scan hit must not be masked by tee
+        run: python scripts/atlas_pin.py scan | tee /tmp/atlas-scan.json
+
+      - name: Re-derive pin + diff report
+        if: steps.changed.outputs.changed == 'true'
+        id: pin
+        run: |
+          VER=$(python -c "import json;print(json.load(open('ingest/atlas/ATLAS.provenance.json'))['collection_version'])")
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          python scripts/atlas_pin.py build --write --report "docs/audits/atlas-refresh-${VER}-release-diff.md"
+
+      - name: Re-run merge + render + validate against the new pin
+        if: steps.changed.outputs.changed == 'true'
+        id: build
+        run: |
+          python scripts/parse_existing.py
+          python scripts/merge_and_dedupe.py
+          python scripts/render_markdown.py
+          python scripts/render_docs_stats.py
+          python scripts/validate.py
+
+      # Non-zero when an entry outside the declared change set moved, or the
+      # ID set changed: recorded in the PR table instead of blocking the PR.
+      - name: Per-entry delta report
+        if: steps.changed.outputs.changed == 'true'
+        id: delta
+        continue-on-error: true
+        shell: bash
+        run: |
+          DAY=$(date -u +%F)
+          python scripts/atlas_entry_delta.py /tmp/atlas-before/incidents.json data/incidents.json \
+            "docs/audits/atlas-refresh-delta-${DAY}.md" --old-pin /tmp/atlas-before/mitre_atlas.json \
+            | tee /tmp/atlas-delta.txt
+
+      # Recorded, not fatal: the PR must open even when the lint fails (an id
+      # removed upstream that mappings/atlas_id_translations.json does not yet
+      # translate needs a HUMAN decision; the failing lint on the PR is the
+      # signal). NOTE: a PR opened with the default GITHUB_TOKEN does NOT trigger
+      # pull_request workflows (GitHub's recursion guard), so validate.yml will
+      # not run on this PR by itself. That is why lint, validate.py and pytest
+      # all run in THIS workflow and their outcomes are tabulated in the PR
+      # body. A human reviewer who wants the full CI matrix closes and reopens
+      # the PR (or pushes a commit as themselves), which does trigger it.
+      - name: Lint ATLAS ids against the new pin
+        if: steps.changed.outputs.changed == 'true'
+        id: lint
+        continue-on-error: true
+        run: python scripts/lint_atlas_ids.py 2>&1 | tee /tmp/atlas-lint.txt; exit "${PIPESTATUS[0]}"
+
+      - name: Unit tests
+        if: steps.changed.outputs.changed == 'true'
+        id: tests
+        continue-on-error: true
+        run: pytest tests -q
+
+      - name: Assemble PR body
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          VER: ${{ steps.pin.outputs.version }}
+          LINT: ${{ steps.lint.outcome }}
+          TESTS: ${{ steps.tests.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          SCAN: ${{ steps.scan.outcome }}
+          DELTA: ${{ steps.delta.outcome }}
+        run: |
+          {
+            echo "Automated monthly refresh of the pinned MITRE ATLAS release to **${VER}**."
+            echo
+            echo "| Check | Outcome |"
+            echo "|---|---|"
+            echo "| merge + render + validate | ${BUILD} |"
+            echo "| lint_atlas_ids.py | ${LINT} |"
+            echo "| pytest | ${TESTS} |"
+            echo "| suspicious-content scan of the new release | ${SCAN} |"
+            echo "| per-entry delta (untouched entries identical, ID set unchanged) | ${DELTA} |"
+            echo
+            echo '```'
+            cat /tmp/atlas-scan.json 2>/dev/null || true
+            cat /tmp/atlas-delta.txt 2>/dev/null || true
+            cat /tmp/atlas-lint.txt 2>/dev/null || true
+            echo '```'
+            echo
+            echo "Release diff (added / removed / renamed technique and tactic ids, tactic-link changes):"
+            echo
+            cat "docs/audits/atlas-refresh-${VER}-release-diff.md"
+            echo
+            echo "The per-entry delta (every entry whose codes changed: id, before, after, reason;"
+            echo "every other field that moved; entry count and ID set) is in"
+            echo "\`docs/audits/atlas-refresh-delta-*.md\` in this PR."
+            echo
+            echo "**Reviewer checklist (required before merge):**"
+            echo
+            echo "- [ ] I read the release diff and the per-entry delta; every changed entry has a stated reason and none is marked UNEXPLAINED."
+            echo "- [ ] Every id removed upstream has an entry in \`mappings/atlas_id_translations.json\` (or the lint failure above is understood and resolved)."
+            echo "- [ ] Untouched entries are reported byte-identical and only \`updated\`/\`last_seen\` moved on changed ones."
+            echo "- [ ] The suspicious-content scan shows zero hits (or each hit is explained)."
+            echo "- [ ] The lint / validate / pytest outcomes in the table above are green (this PR was opened with GITHUB_TOKEN, so the validate.yml CI matrix did not run; close and reopen the PR to trigger it before merging)."
+            echo
+            echo "Recreated from current \`main\` on every run: **merge promptly**, or close it and re-run"
+            echo "(Actions -> Monthly ATLAS refresh -> Run workflow) if \`main\` has moved."
+          } > /tmp/atlas-pr-body.md
+
+      - name: Open / update refresh PR
+        if: steps.changed.outputs.changed == 'true'
+        # Pinned to a full commit SHA for supply-chain safety (same pin as
+        # auto-refresh.yml); bump deliberately rather than tracking a mutable tag.
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          commit-message: "chore(data): monthly ATLAS refresh to ${{ steps.pin.outputs.version }}"
+          branch: atlas-refresh/monthly
+          base: main
+          delete-branch: true
+          title: "Monthly ATLAS refresh: ${{ steps.pin.outputs.version }}"
+          # Deliberately NOT the weekly `data-refresh` label: the closed-unmerged
+          # tripwire keyed on that label talks about source-health counters,
+          # which do not apply here.
+          labels: atlas-refresh, automated
+          body-path: /tmp/atlas-pr-body.md

@@ -10,6 +10,224 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+- **Item 7 D53 fix at `9ad77d10` (pushed).** Foreman string check: `grep -n "vs 4,160"` rc 1; R3 now reads "3,937/4,104"; a bounce-#2 corrections section has been added. The §8 commands now use `source_ids` and per-row title matching. **A fresh red-reviewer has been dispatched for the full gate.**
+- **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
+- **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
+
+### ⛔ Item 7 — **BOUNCE #2 (scoped re-gate on `e00d54d4`, 2026-10-09)**: ESCALATED to the user (protocol step 6)
+- **Verdict, in the gate's words:** "One residual wrong figure is left, and the memo's own corrections note says it was fixed. It is a one-cell change. Everything else in the fix is correct, and every new number reproduces when I run it myself."
+- **Defect:** R3 (line 220) still reads "3,667/3,829 vs 4,160", and the corrections note claims R3 was corrected. The fix is to replace "(3,667/3,829 vs 4,160)" with "(3,667/3,829 vs 3,937/4,104)". String check: `grep -n "vs 4,160"` returns rc 1.
+- **Advisories:**
+  - the 4,104 command matches a substring anywhere in the row; a `source_ids` form is sturdier;
+  - the 3,937 command uses set membership rather than a per-row match;
+  - "foreman-confirmed" is attribution.
+- **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
+- **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
+
+### 🔄 Item 3 (rejected-CVE sweep) — **specialist reported `04fde40b` (pushed); held before the gate: the base is stale**
+- **Foreman [R]:** the tree is clean. `git rev-list --count 04fde40b..origin/main` gives **18**: the branch sits on 5546e058 and predates the item 2 merge, which the brief required the delta to follow. The specialist has been sent back to merge origin/main, rebuild, and re-derive the delta as a dated addendum, before the red-reviewer gate.
+- **Specialist's claims (testimony until gated):**
+  - the full sweep covered 9,169 corpus CVEs with 0 fetch failures;
+  - **0 new REJECTED** (the same 37), and NVD agrees 37/37;
+  - **26 DISPUTED** CVEs (CNA tag), on **22 sole-evidence entries**, none of them landmark;
+  - the v2.12.0 "21" is correct, so no CORRECTIONS entry;
+  - the committed delta vs 5546e058 is 29 entries / 29 fields, all `status_reason.as_of`, with 15,637 byte-identical;
+  - weekly budget 1,200 requests (8-week full cycle), and the run exits 1 above a 10% fetch-failure rate;
+  - 627 passed / 1 xfailed.
+- **Governance for the user (collected, not yet asked):**
+  1. Confidence rule for disputed entries: drop one level (chosen) vs a floor at `low`.
+  2. The weekly budget of 1,200 requests.
+  - **The schema edit** adding `cve-disputed` to the `status_reason.code` enum goes to **schema-architect** (WS3). Until it lands, the 22 entries stay unmarked behind the `_disputed_emission_enabled()` gate.
+- **No retraction stop:** 0 new REJECTED.
+
+### 🔁 Item 6 — **BOUNCE #1 (red-reviewer on `25899446`, 2026-10-09)**: in progress; specialist redispatched
+- **Defects:**
+  1. **Wrong tombstone field.** The memo uses `source_status` (emission enum {active 15657, retained 9}) where retraction is `status` (retracted 29; DATA_DICTIONARY:17). Its "none retracted" command therefore could not fail (agreement 6a). It also omits that `status: retracted` is defined today only as CVE-REJECTED, so retiring AIRI rows needs schema and pipeline work.
+  2. **AIRI-sole/AIID-shared split is 0 / 1,382, not ~280 / ~1,100.** The ~280 dates from before the 2026-07-18 official AIID snapshot (8e624ba7). B1 as defined would tombstone 0 rows and only strip the AIRI overlay.
+  3. **A replacement channel exists.** `airi-navigator.com/incidents/browse` (robots-allowed) embeds 1,497 incidents (latest 2026-05-31). A JS chunk ships a "Download results as CSV" button (runtime visibility unconfirmed). The ZIP is switched off by an `ALLOW_DOWNLOAD` flag rather than broken.
+- **Advisories:**
+  - the ZIP check is one endpoint (307 → 404);
+  - the 274 non-October `last_seen` rows are all July;
+  - NOTICE-DATA's 1,457 is the ingest-file row count and is accurate;
+  - CC BY no-termination is §6(c);
+  - there is no TAXII landmark collection;
+  - the HF export dumps rows verbatim;
+  - the hold lapsed 42 days ago;
+  - the ToU has no licence clause;
+  - airisk robots.txt has no Disallow.
+- **Foreman [R], by a different route:**
+  - python gives source_status {active 15657, retained 9} and status {None 15637, retracted 29};
+  - `len(airi_keys − (aiid_full ∪ aiid_incidents keys))` = **0** of 1,456;
+  - `curl` on `/incidents/browse` gives **200, 5,262,949 B**.
+  - All 3 defects are confirmed.
+- **Note for the user's decision:** defect 3 adds a re-ingest option (page or CSV channel). Its conduct and licence questions are the user's call, and the memo will present them without recommending scraping.
+
+### 🔍 Item 7 — bounce #1 fixes at `e00d54d4` (pushed). Foreman grep finds the 4,104 / 3,937-of-4,104 / INC-01579 / a7343274 / corrections note present. Scoped re-gate dispatched; a second bounce goes to the user.
+
+### 🔁 Item 7 — **BOUNCE #1 (red-reviewer on `9646d00e`, 2026-10-09)**: in progress; specialist redispatched
+- **Verdict, in the gate's words:** "VERDICT: BOUNCE ... structure and nearly all of its claims hold up when checked by a different route. Three factual statements in this dated, do-not-regenerate record are wrong."
+- **Defects:**
+  1. R1 uses 4,160 OECD-AIM- id *occurrences* as a row count. The true counts are 4,104 rows, of which 3,937 ship an OECD title, so the like-for-like NOTICE-DATA figure is 3,937 of 4,104.
+  2. The "4 retitles to OECD headlines" are really 3 OECD (01514, 01994, 00699) plus 1 AIID title (INC-01579).
+  3. R6 says a follow-up was "sent", but only a follow-up *window* (2026-08-21) is recorded.
+- **Advisories:**
+  - A1: merge-base is a7343274 (109 behind / 3 ahead);
+  - A2: the 10-04 run failed on the same tripwire, 42 rows;
+  - A3: option A's counts contradict themselves;
+  - A4: the memo gives a spec, not a rebased branch (foreman's call);
+  - A5: 3,728 rows already carry `description_provenance`.
+- **Gate evidence:**
+  - `merge-base --is-ancestor 586f40c8 main` gives 1 (not merged);
+  - the 10-04 run log shows "FAILED tests/test_e21_partA_inc00437_provenance.py::test_oecd_aiid_content_disagreement_is_unique_to_inc00437 ... found 42";
+  - `merge_and_dedupe.py:1814-1870` on 586f40c8 aborts on any unapproved change;
+  - 3,936 OECD-template rows lack provenance.
+- **Foreman [R], by a different route:**
+  - entries whose JSON contains `OECD-AIM-`: **4,104**;
+  - `586f40c8:refresh-tripwire-2026-10-03.md:236-241` lists INC-01579;
+  - `docs/outreach/README.md:21` says "Follow-up window".
+  - All 3 defects are confirmed.
+- **A4 decision (foreman):** a rebased stage-1 branch would be built only after the user picks C, so the spec satisfies "prepare" for now. Building the branch before the ruling would spend a full rebuild on an option the user may decline.
+
+### 🔍 Item 7 (OECD/AIID unfreeze memo) — **REVIEW: memo delivered `9646d00e` (pushed), red-reviewer dispatched 2026-10-09**
+- **Deliverable:** `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md` (413 lines). Agent recommendation: **C, staged**. Stage 1 rebases `ws4/refresh-tripwire-42` (T12/T14 machinery) and merges it with an EMPTY approval set plus the label-only rebuild. Stage 2, the real unfreeze, waits on the user and on a new suppression capability. **Agent-suggested; the decision is the user's.**
+- **Premise errors reported by the specialist:**
+  - T12/T14 *are* built (`586f40c8`, ungated, not on main);
+  - D25(a) is not in `auto-refresh.yml`; the freeze is only the E21 tripwire test failing;
+  - the merge set is 17 changes (7 merges + 10 retitles), not 7;
+  - the 2026-10-03 measurements predate waves 1–2;
+  - merge 5 is contested between two records;
+  - NOTICE-DATA's 3,829 OECD figure is stale.
+- **Foreman [R] spot-checks:**
+  - `grep -c description_provenance scripts/ingest_oecd_aim.py` on main gives 0;
+  - `grep D25 .github/workflows/auto-refresh.yml` finds nothing;
+  - `gh run list --workflow auto-refresh.yml` shows a scheduled FAILURE on 2026-09-20, 09-27 and 10-04, plus a manual (workflow_dispatch) run that failed on 2026-09-14.
+
+### 🔍 Item 6 (AIRI sunset memo) — **REVIEW: memo delivered `25899446` (pushed), red-reviewer dispatched 2026-10-09**
+- **Deliverable:** `docs/audits/airi-navigator-sunset-memo-2026-10-09.md` (337 lines; options A / B1 / B2; spec for stale tagging and `review_by`). Agent recommendation: **A**, frozen + stale-tagged, `review_by` about 2027-01-07. **Agent-suggested; the decision is the user's.**
+- **Foreman [R]** (python on `data/incidents.json`): 1,382 rows tagged `airi-navigator`. All 1,382 carry the `airi_navigator` freshness marker and all are `tier: landmark`, out of 1,915 landmarks corpus-wide.
+- **Premise errors reported by the specialist:**
+  - the cause is a 404 on the ZIP, not robots;
+  - the first failure was 2026-06-07 (`last_success` 2026-05-31);
+  - HF already carries per-row `source_freshness`, so only STIX and MISP lack it;
+  - the D8 hold lapsed on 2026-08-28 without a decision;
+  - NOTICE-DATA cites 1,457 AIRI rows (unresolved);
+  - 72% of landmarks are AIRI rows (new).
+- **Gate brief:** check the absence claims with raw-HTML curl, because the specialist saw only rendered pages. Also re-derive the AIRI-sole vs AIID-shared split, resolve 1,457 vs 1,382, and check the B2 arithmetic.
+
+### 🔄 Items 6 + 7 (AIRI sunset memo, OECD/AIID unfreeze memo) — **DISPATCHED in parallel, 2026-10-09**
+- Both are memo-first governance items that end in a user decision, and neither touches data/, exports or schema/, so they run in their own worktrees while item 3 is in flight.
+- **Item 7:** license-auditor on `ws0/v2130-oecd-unfreeze-memo` (worktree `ws0-v2130-oecd-memo`, base `07f22c09`). Deliverable: `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md`, covering what D25(a) blocked, E23 + title-only, the first unfrozen run's changes, residual licence risk, and the spec for the unfreeze branch. A pipeline-engineer builds that branch after the memo, against the spec. **Nothing is unfrozen.**
+- **Item 6:** license-auditor on `ws0/v2130-airi-sunset-memo` (worktree `ws0-v2130-airi-memo`, base `07f22c09`). Deliverables: independent confirmation that the bulk channel is withdrawn (robots respected), the AIRI row count with its command, and `docs/audits/airi-navigator-sunset-memo-2026-10-09.md` with options A (frozen + stale tag + review_by) and B (tombstone retirement) and a spec for the stale tagging. The tagging work goes to WS6 later (it overlaps item 8's exports). **STOP for the user's decision.**
+- **Item 3** (pipeline-engineer, `ws4/v2130-rejected-cve-sweep`) is still running: gap doc `0f8e43c7`, with sweep code, delta script and tests uncommitted in its worktree.
+
+### ✅ Item 2 (ATLAS refresh) — **DONE: advisory re-check PASS on `3dbfbac6`, MERGED to main under D52 (2026-10-09)**
+- **Verdict, in the gate's words:** "VERDICT: PASS ... The diff is exactly the 7 named files, all six advisories are closed truthfully, nothing regressed, and no data path changed."
+- **Gate evidence:**
+  - the guard fires (direct run: rc 2, audit sha unchanged). Control: the af4f7c31 script overwrote a valid record (rc 0), so the guard closes a real hole;
+  - the §3.1 count of 1 robots + 3 content requests is checked against common.py:172/292/301/394;
+  - the workflow header was checked against atlas_pin.py:279-284 and the step flags;
+  - `gh api …/contents/dist/v6` lists 2026.06/.07/.08/.09 (625,790 / 717,172 / 808,834 / 841,482 B) and no .10;
+  - CORRECTIONS: only the evidence cell changed;
+  - tip: 615 passed; validate, lint and drift exit 0; data, mappings and ingest diff 0 lines.
+- **Foreman [R] after merge:**
+  - `--no-ff` merge; the CHANGELOG [Unreleased] conflict was resolved by keeping both entries (item 1 above item 2), 0 markers left;
+  - `git diff --diff-filter=D --name-only HEAD^1 HEAD | wc -l` gives 0;
+  - `python scripts/validate.py` rc 0;
+  - `lint_atlas_ids.py` OK (71 ids, 2026.09);
+  - drift clean;
+  - `pytest tests -q` gives **627 passed, 1 xfailed**;
+  - `git status --porcelain` empty.
+- **docs-warden sweep after merge (2026-10-09, @ `fa731114`):** 6 findings, routed as notes into an **item-2 follow-up branch** (queued after item 3's gate, so CHANGELOG/README edits don't collide):
+  - **N-c (Medium, governance-scribe):** `docs/paper/genai-incidents-methods.md:96` states the pin as "ATLAS v2026.06"; this is a live paper surface, so fix in place.
+  - **N-d (Medium, pipeline-engineer):** `scripts/ingest_external.py:68` still parses `ATLAS-2026.06.yaml` for case studies while the pin is 2026.09, and nothing documents the decoupling. Re-point it, or record that the decoupling is deliberate. A re-point would change data, so it needs its own delta.
+  - **N-e (Low–Med, license-auditor):** SOURCE_LICENSES §3.1 path (1) at :226 names 2026.06 and reads as current. It tracks N-d.
+  - **N-f (Low, governance-scribe):** the README.md:327 `make build` comment omits lint-atlas.
+  - **N-g (Low, governance-scribe):** the README.md:278-310 repo tree omits the new ATLAS scripts, mappings and the `ingest/atlas/` directory.
+  - **N-h (Low, schema-architect + governance-scribe):** `taxonomy_versions` is undocumented in DATA_DICTIONARY and DATASHEET. DATASHEET:117's MISP tag list lacks `genai-incidents:taxonomy-*`.
+  - **Clean (warden evidence):**
+    - stats `taxonomy_versions` matches every mapping file's version;
+    - no doc references the retired T0019, T0058 or T0104;
+    - INCIDENTS top-technique T0115.001 = 2,498 (re-counted);
+    - counts are 15,637 / 29 / 1,915, with 15,666 rows;
+    - no "release behind" wording on any live surface.
+  - **Item 9 blast radius (owasp_asi "2025"):**
+    - the mapping file, stats.json, `src/.../taxonomy_versions.json`, and the STIX, MISP and HF exports;
+    - about 30 name mentions across README, CONTRIBUTING, DATASHEET, TAXONOMIES, docs/index.html, _config.yml, CITATION.cff, .zenodo.json, INCIDENTS.md, pyproject, render/merge scripts and SVGs;
+    - README links point to the 2025 *Threats and Mitigations* doc;
+    - a code-set change would also touch per-entry `owasp_asi` and TAXII `x_owasp_asi`.
+- **ADVISORY (follow-ups):**
+  1. CORRECTIONS row 1 cites two audits that do not mention the four phantom ids; only CHANGELOG records them;
+  2. "up to four" requests becomes 5 if a transient robots.txt retry happens;
+  3. the new guard test uses nonexistent inputs, so it would not catch the guard being moved after compute().
+
+### 🧑‍⚖️ 2026-10-09 — USER DECISION D52 (item 2 merge): **"Fix advisories, then merge"**
+- The user approved the 5,841-entry ATLAS relabel for merge, **conditional on** WS4 first fixing the 6 re-gate advisories on the branch.
+- A short scoped re-check (advisory diff only, data paths must stay empty) follows; then the merge.
+- The foreman's recommendation was "merge now, fix after"; **the user chose the stricter order.**
+
+### ✅ Item 2 (ATLAS refresh) — **PASS (red-reviewer re-gate, 2026-10-09, on `af4f7c31`) · merge AWAITING USER (5,841-entry relabel, D28 precedent)**
+The gate's verdict, in its own words: "VERDICT: PASS ... All four defects from bounce #1 are closed, and the fix introduced no regression."
+- **What the gate measured:**
+  - scope: fix diff of 9 files; data paths empty.
+  - **Defect 1, live:** `fetch_atlas.py` via common.py printed NO-OP with `git status` empty. A planted `#tamper` was rewritten (the guard fires). `atlas_pin --report` onto the existing audit gave rc=2. Every workflow step after "Detect change" is gated on `changed=='true'`.
+  - **Defect 2:** own per-entity script gives 2,532 (8 carry both T0019 and T0058); 2,532 + 3,309 = 5,841; the audit one-liner prints `2532 3309`; no other double-counted aggregate.
+  - **Defect 3:** the 4 phantom ids and T0015.001 have 0 id-lines in five upstream releases, and T0015 is present in each. INC-06842 moved only last_seen, mitre_atlas and updated. The CORRECTIONS date convention is the date of the change.
+  - **Defect 4:** §3.1 matches ingest_external.py:68, fetch_atlas.py, `.reuse/dep5` and the live upstream LICENSE.
+  - **Folded advisories:** match Makefile:6, auto-refresh.yml:275, atlas-refresh.yml:177 and validate.yml (a reopen triggers CI).
+  - **Invariant 5:** HTTP-only via common.py; the register covers non-HTTP egress only, so it is adequate.
+  - tip: pytest 614 passed, 1 xfailed; validate, lint and drift clean.
+  - trial merge onto f4d0e0b2: one CHANGELOG [Unreleased] conflict, both additive, keep both; merged tree 626 passed, 1 xfailed.
+  - specialist worktree: no strays.
+- **ADVISORY (follow-ups):**
+  1. delta audit :24 says "below"; it should say "above".
+  2. a same-version re-issue with changed bytes fails loudly at the pin step; document this in the workflow header.
+  3. `atlas_entry_delta.py` has no overwrite guard; it predates this fix.
+  4. §3.1 "three small requests" is really up to 4 with robots, plus an 840 KB file; its date-checked cell is stale.
+  5. the CORRECTIONS row cites a branch name; repoint it to the merge or release.
+  6. upstream 2026.07 and 2026.08 were skipped; one line in the release notes.
+
+### ⛔ Item 2 (ATLAS refresh) — **BOUNCE #1 (red-reviewer, 2026-10-09, on `df61dcad`)** → redispatched to WS4
+The gate's verdict, in its own words: "The data operation itself held up under every independent check I ran ... The bounce is for the workflow and for records/disclosure: four defects, all fixable without touching data/incidents.json."
+1. **The monthly workflow is not a no-op on an unchanged release, and it overwrites the dated audit.**
+   - `fetch_atlas.py` always rewrites `ATLAS.provenance.json` `fetched`, so "Detect change" is always true.
+   - `atlas_pin.py --report docs/audits/atlas-refresh-${VER}-release-diff.md` then clobbers the committed 2026.09 audit; the gate reproduced "2026.09 -> 2026.09 / added (0)".
+2. **The "2,540 entries" figure (CHANGELOG + delta audit line 11) is false.** It sums per-id counts, and 8 entries carry both T0019 and T0058. The per-entity figure is **2,532**, and 2,532 + 3,309 = 5,841.
+3. **CORRECTIONS.md is not updated.** Two pre-existing errors were fixed silently:
+   - INC-06842 carried the nonexistent AML.T0015.001;
+   - the old pin listed T0009, T0030, T0038 and T0045 as "2026.06" though 2026.06 lacks them.
+4. **`docs/SOURCE_LICENSES.md` §3.1 is stale.** It still describes local-clone ingest only, but this PR adds an HTTP fetch and a committed release. Invariant 10 is **not** violated (not a new source), but this is a live surface, so it is corrected in place.
+
+**Foreman re-derivation [R]**, own script on `git show 12f0a98f:` vs `df61dcad:data/incidents.json`:
+- technique-set changed 2,532; tactics changed 3,581; union 5,841; tactics-only 3,309;
+- entries carrying both T0019 and T0058 before: 8.
+
+**Gate evidence:**
+- upstream `ATLAS-latest.yaml` → v6 → 2026.09; sha256 `935efa93…` matches the committed snapshot byte for byte (`cmp`), and 2026.10 returns 404;
+- own YAML parse: 3 removed, 38 added, 4+1 renamed, 5 link changes;
+- **per-entity delta:** 15,666 entries before and after, same IDs in the same order, 5,841 changed;
+- only `mitre_atlas`, `mitre_atlas_tactics`, `updated` and `last_seen` moved; `updated` bumped on exactly the changed set;
+- **9,825 untouched entries byte-identical** (proven to fire with a plant);
+- control build from merge-base data equals the branch except for dates;
+- determinism: rebuild twice, `git status` empty;
+- lint fires on deprecated, absent and phantom ids, and on mappings/;
+- taxonomy_versions present in stats.json, STIX identity, MISP tags, the rendered HF card, and `taxonomy_versions()`;
+- pytest 610 passed, 1 xfailed;
+- trial merge onto 97e6ee77: one CHANGELOG conflict (keep both); merged tree 622 passed.
+
+**Brief corrections (foreman was wrong):** invariants 2 and 8 are **pre-activation**. WS2-T3 and WS2-T1 are not done, and `benchmark_atlas.py` does not exist.
+
+**ADVISORY:**
+- owasp_asi "2025" now ships in every export (item 9 reconciles it);
+- STIX `capec: null` has not been run through a validator;
+- the lint misses the heuristic tables and ingest/*.json;
+- `refresh_atlas_codes` never removes tactics;
+- validate.yml likely won't fire on GITHUB_TOKEN PRs;
+- INGESTION_CONDUCT should name atlas-refresh.yml, and its build-target line is stale.
+
+### 🔄 2026-10-09 — in flight (user: "keep going")
+- **Item 2 (ATLAS refresh):** full red-reviewer gate dispatched on `df61dcad`, covering the per-entity field delta, translation honesty (invariant 2), upstream-latest, determinism, lint fire test, taxonomy_versions in every export, workflow egress (invariant 5), and benchmark F1 (invariant 8). **Even on PASS, the 5,841-entry relabel goes to the user before merge** (D28 precedent).
+- **Item 3 (rejected-CVE sweep):** WS4 dispatched on new branch `ws4/v2130-rejected-cve-sweep`, worktree `.claude/worktrees/ws4-v2130-rejected-cve-sweep`, from `5546e058`. This runs in parallel with item 2's gate because the code is disjoint; item 3's data delta is re-derived after item 2 merges. Its governance stop: retractions of landmark entries, or more than 10 entries, go to the user.
+
 ### ✅ Item 1 (latest-release drift) — **DONE: PASS (red-reviewer truth-only gate, 2026-10-09, on `e415624f`), MERGED to main**
 - **Verdict, in the gate's words:** "VERDICT: PASS. The new step-3 and step-5 text in docs/VERSIONING.md at e415624f matches the code. The diff 6b43db5c..e415624f touches only those two passages. DEFECTS: none."
 - **What the gate measured:**
