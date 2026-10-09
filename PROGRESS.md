@@ -24,6 +24,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⛔ Item 3 — **BOUNCE #2 (re-gate on `29e5d729`, 2026-10-09)**: ESCALATED to the user together with the item-3 policy package
+- **Verdict:** the gate checked D1's job split, the artifact hand-off, the wall-clock cap, D2's recipe and the A5 accounting itself, and all pass; every fire proof fires. One new regression, introduced by the fix commit.
+- **Defect (agreement 6a):**
+  - The summary's CVE-sweep cell now reads `needs.cve-sweep.result` (auto-refresh.yml:183).
+  - The sweep step is `continue-on-error`, so the job result is `success` even when the >10% fetch-failure rule fires, the backstop hits, or the script crashes. The signal named as the fail-loud surface therefore cannot show failure.
+  - **Fix:** add a job output carrying the step outcome, and assert it in a test that is shown to fire.
+- **Advisories:**
+  - A1: least-privilege `permissions: contents: read` for `cve-sweep`.
+  - A2: about 94 min end to end is acceptable. `cve-enrich.yml` also writes `cve_rejections.json` (pre-existing).
+  - A3: the hand-off is judged from the docs only; do one `workflow_dispatch` run before the first scheduled Sunday.
+  - A4: open user calls (governance stop, `as_of` churn, the confidence rule, 8 NOT_IN_CVELIST ids, the schema edit).
+  - A5: when disputes emit, the 22 entries also bump `updated`/`last_seen` (counted in the 139).
+- **Gate evidence:**
+  - fresh clone build reproduces the tree byte-for-byte; 664 passed;
+  - 5 mutation fire proofs;
+  - the D2 recipe run verbatim gives 51 / 139 / 22 / 17 + 5, and its own per-entity diff agrees;
+  - scope is the 7 files claimed.
+- **Foreman [R]:** `git show 29e5d729:.github/workflows/auto-refresh.yml` line 183 reads `CVE_SWEEP: ${{ needs.cve-sweep.result }}` with no job `outputs:`. Confirmed.
+
 ### ⚖ D57 + D58, USER RULINGS 2026-10-09 (items 6 and 7)
 - **D57, item 6 (AIRI): Option A.** Keep all 1,382 rows frozen and tag them stale in STIX (`x_source_freshness`), MISP and HF, with `review_by` 2027-01-07 (90 days). No tombstones and no count change.
   - Implementation routing: `review_by` in `schema/source_freshness.schema.json` goes to **schema-architect**, together with the item-3 `cve-disputed` enum value once its policy calls are ruled. The exporter tagging goes to **distribution-engineer** within item 8 (export integrity), per memo §7.
