@@ -2466,6 +2466,14 @@ def main():
                 "as_of": min(freshness_sources[k]["last_success"] for k in stale),
                 "sources": stale,
             }
+            # v2.13.0 (D57): the review date rides along, inherited by
+            # reference like `as_of` -- the EARLIEST registry `hold.until`
+            # among the listed stale sources. Declarative: never compared with
+            # the wall clock here (deterministic build path).
+            holds = [freshness_sources[k]["hold"]["until"] for k in stale
+                     if (freshness_sources[k].get("hold") or {}).get("until")]
+            if holds:
+                e["source_freshness"]["review_by"] = min(holds)
             n_freshness += 1
     print(f"[linkage] capec_ids on {n_capec} entr(ies); purl on {n_purl} entr(ies)")
     print(f"[freshness] source_freshness marker on {n_freshness} entr(ies)")

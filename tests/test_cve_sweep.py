@@ -233,22 +233,47 @@ def _real_entry():
 
 
 def test_schema_needs_cve_disputed_code_and_accepts_it_once_added():
+    """Landed by schema-architect (v2.13.0, D61): the committed schema carries
+    `cve-disputed` and accepts a disputed entry. The old pre-edit half survives
+    as a control: the committed schema with the value REMOVED must reject the
+    same entry, so this test still fires if the enum ever loses it."""
     import jsonschema
     e = _real_entry()
     e["status"] = "disputed"
     e["status_reason"] = {"code": "cve-disputed", "as_of": "2026-10-09"}
+    e["confidence"] = "medium"  # a disputed entry is never `high` (schema rule, D61)
     committed = _schema()
     codes = committed["properties"]["status_reason"]["properties"]["code"]["enum"]
-    if "cve-disputed" in codes:
-        # schema-architect has landed the edit: the committed schema must accept it
-        assert not list(jsonschema.Draft202012Validator(committed).iter_errors(e))
-        return
-    errs = list(jsonschema.Draft202012Validator(committed).iter_errors(e))
-    assert errs, "without the edit a disputed entry is rejected (this is why the edit is required)"
-    patched = copy.deepcopy(committed)
-    patched["properties"]["status_reason"]["properties"]["code"]["enum"].append("cve-disputed")
-    assert not list(jsonschema.Draft202012Validator(patched).iter_errors(e)), \
-        "the proposed one-value edit is sufficient"
+    assert "cve-disputed" in codes
+    assert not list(jsonschema.Draft202012Validator(committed).iter_errors(e))
+    control = copy.deepcopy(committed)
+    control["properties"]["status_reason"]["properties"]["code"]["enum"].remove("cve-disputed")
+    assert list(jsonschema.Draft202012Validator(control).iter_errors(e)), \
+        "without the enum value a disputed entry is rejected (the control fires)"
+
+
+def test_schema_pairs_each_status_with_its_own_code_and_caps_disputed_confidence():
+    """Each corruption is a single change from a valid entry and must fail."""
+    import jsonschema
+    val = jsonschema.Draft202012Validator(_schema())
+    ok = _real_entry()
+    ok.update(status="disputed", status_reason={"code": "cve-disputed", "as_of": "2026-10-09"},
+              confidence="medium")
+    assert not list(val.iter_errors(ok))
+    mutations = (
+        lambda x: x.update(confidence="high"),                       # disputed is never high
+        lambda x: x["status_reason"].update(code="cve-rejected"),    # wrong code for disputed
+        lambda x: x.update(status="retracted"),                      # retracted + cve-disputed
+        lambda x: x["status_reason"].update(code="cve-withdrawn"),   # unknown code
+    )
+    for mutate in mutations:
+        bad = copy.deepcopy(ok)
+        mutate(bad)
+        assert list(val.iter_errors(bad)), (bad.get("status"), bad.get("status_reason"), bad.get("confidence"))
+    ret = copy.deepcopy(ok)
+    ret.update(status="retracted", status_reason={"code": "cve-rejected", "as_of": "2026-10-09"},
+               confidence="high")
+    assert not list(val.iter_errors(ret)), "retracted + cve-rejected stays valid at any confidence"
 
 
 # ----- rotation: never-checked first, bound, loudness -----

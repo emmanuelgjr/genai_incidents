@@ -557,6 +557,10 @@ def check_source_freshness(data: dict, registry: dict) -> list[str]:
     6. `as_of` must equal the EARLIEST `last_success` among the listed
        sources — the conservative choice, and the only deterministic one.
     7. `sources` must be sorted, so the field is byte-stable across builds.
+    8. `review_by` (v2.13.0, D57) must equal the EARLIEST `hold.until`
+       among the listed sources, and be absent iff none carries a hold.
+       That every `stale` source carries a hold is the registry schema's
+       job (its stale-requires-hold rule), checked by the shape pass.
 
     COMPLETENESS — that every entry carrying a stale source's `row_marker`
     tag actually has the marker — is checked separately, by
@@ -617,6 +621,21 @@ def check_source_freshness(data: dict, registry: dict) -> list[str]:
                     f"{e['id']}: source_freshness.as_of is {marker.get('as_of')!r}; "
                     f"earliest last_success of its sources is {expected!r}"
                 )
+        # 8. (v2.13.0, D57) `review_by` must equal the EARLIEST registry
+        #    `hold.until` among the listed sources, and be absent iff none of
+        #    them carries a hold. Registry content only; no date maths against
+        #    today (deterministic build path).
+        untils = [
+            ((sources.get(k) or {}).get("hold") or {}).get("until")
+            for k in listed
+        ]
+        untils = [u for u in untils if u]
+        expected_rb = min(untils) if untils else None
+        if marker.get("review_by") != expected_rb:
+            problems.append(
+                f"{e['id']}: source_freshness.review_by is {marker.get('review_by')!r}; "
+                f"earliest hold.until of its sources is {expected_rb!r}"
+            )
     return problems
 
 

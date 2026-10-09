@@ -49,7 +49,7 @@
 <td align="center"><b><!-- stats:landmark_count -->1,915<!-- /stats:landmark_count --></b><br><sub><code>tier: landmark</code></sub></td>
 <td align="center"><b><!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max --></b><br><sub>coverage</sub></td>
 <td align="center"><b>6</b><br><sub>taxonomies (4 core)</sub></td>
-<td align="center"><b>v<!-- stats:version -->2.12.0<!-- /stats:version --></b><br><sub>built <!-- stats:generated -->2026-10-06<!-- /stats:generated --></sub></td>
+<td align="center"><b>v<!-- stats:version -->2.12.0<!-- /stats:version --></b><br><sub>built <!-- stats:generated -->2026-10-09<!-- /stats:generated --></sub></td>
 </tr>
 </table>
 

@@ -103,6 +103,28 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   one new value in `schema/incident.schema.json` (`status_reason.code` enum), which the
   schema owner has to add.** Until then the 22 entries are unchanged in the data.
 
+### Changed - 22 CVE-disputed entries marked; AIRI rows carry a review date (agent-suggested, draft)
+
+- **`cve-disputed` is now a `status_reason.code`** (user ruling D61). This turns on the
+  emission described in the entry above. **22 entries are now `status: disputed`**: all
+  `tier: feed`, none landmark. Their `confidence` drops one level (17 high to medium, 5 medium
+  to low). They **stay counted**: `incident_count` is still 15,637, `retracted_count` is
+  still 29, and the ID set is the same 15,666. Each of the 22 changes `status`,
+  `status_reason`, `confidence`, `updated` and `last_seen`, and nothing else. The schema now also
+  enforces two pairings: `retracted` goes only with `cve-rejected`, and `disputed` goes only
+  with `cve-disputed` and never with `confidence: high`. `status_reason.as_of` is described
+  as the date of the last re-check (D62), for both codes.
+- **AIRI Navigator review date: 2027-01-07** (user ruling D57, option A). The registry's lapsed
+  D8 hold (until 2026-08-28) is replaced by a D57 hold until 2027-01-07. Its note records the
+  D8 lapse. Every `stale` source in `data/source_freshness.json` must now carry a dated
+  `hold`. The 1,382 marked rows gain `source_freshness.review_by: 2027-01-07`, which is derived
+  from the registry. This adds no `updated` bump, because the marker is not a content field.
+  There is no separate `review_by` field in the registry; see
+  `docs/audits/ws3-v2130-review-by-design-2026-10-09.md`. Tagging the date in the STIX, MISP
+  and HF exports is a separate change.
+- Field-level delta: `docs/audits/cve-sweep/v2130-schema-delta-2026-10-09.md` and `.json`.
+  It covers 1,404 entries and 1,492 fields, with 0 defects.
+
 ## [2.12.0] — 2026-10-04
 
 > **These notes were gated before the cut** and the release was cut on

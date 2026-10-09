@@ -22,9 +22,9 @@
       "stale_since": "2026-06-07",
       "row_marker": { "kind": "tag", "value": "airi-navigator" },
       "hold": {
-        "decision": "D8",
-        "until": "2026-08-28",
-        "note": "Retire-or-replace is deliberately deferred. Resolved earlier if MIT replies to the sanctioned-export request sent 2026-07-29; otherwise the decision becomes live on this date. The MARKING (this registry entry and the row markers it drives) never depended on that reply and is not part of the hold."
+        "decision": "D57",
+        "until": "2027-01-07",
+        "note": "User ruling D57 (2026-10-09), option A of docs/audits/airi-navigator-sunset-memo-2026-10-09.md: keep all rows frozen and marked stale, no tombstones, no count change; re-decide (retire / replace / restore / keep) by this date, 90 days on. Resolved earlier if MIT replies to the sanctioned-export request sent 2026-07-29 or a sanctioned bulk channel reappears. Supersedes the D8 hold (until 2026-08-28), which lapsed with no recorded decision and was closed by D57. Rows inherit this date as source_freshness.review_by. The MARKING (this registry entry and the row markers it drives) never depended on any reply and is not part of the hold."
       },
       "note": "The public bulk download was withdrawn; refreshes have 404'd since 2026-06-07. The corpus did not shrink and will not, because ingest/airi_navigator_incidents.json is a COMMITTED SNAPSHOT that re-feeds the same rows on every build — frozen, not broken. That is precisely why these rows read as current without anything in the data being false, and why freshness had to become its own published axis rather than a value of `source_status`. The EU AI Act risk-tier tags (`eu-ai-act-*`) on these rows are AIRI-derived and are current as of `last_success`, not as of the build date; they are deliberately kept, not stripped (D8)."
     },
