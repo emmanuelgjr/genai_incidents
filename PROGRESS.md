@@ -10,6 +10,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ✅ Item 2 (ATLAS refresh) — **DONE: advisory re-check PASS on `3dbfbac6`, MERGED to main under D52 (2026-10-09)**
+- **Verdict, in the gate's words:** "VERDICT: PASS ... The diff is exactly the 7 named files, all six advisories are closed truthfully, nothing regressed, and no data path changed."
+- **Gate evidence:**
+  - the guard fires (direct run: rc 2, audit sha unchanged). Control: the af4f7c31 script overwrote a valid record (rc 0), so the guard closes a real hole;
+  - the §3.1 count of 1 robots + 3 content requests is checked against common.py:172/292/301/394;
+  - the workflow header was checked against atlas_pin.py:279-284 and the step flags;
+  - `gh api …/contents/dist/v6` lists 2026.06/.07/.08/.09 (625,790 / 717,172 / 808,834 / 841,482 B) and no .10;
+  - CORRECTIONS: only the evidence cell changed;
+  - tip: 615 passed; validate, lint and drift exit 0; data, mappings and ingest diff 0 lines.
+- **Foreman [R] after merge:**
+  - `--no-ff` merge; the CHANGELOG [Unreleased] conflict was resolved by keeping both entries (item 1 above item 2), 0 markers left;
+  - `git diff --diff-filter=D --name-only HEAD^1 HEAD | wc -l` gives 0;
+  - `python scripts/validate.py` rc 0;
+  - `lint_atlas_ids.py` OK (71 ids, 2026.09);
+  - drift clean;
+  - `pytest tests -q` gives **627 passed, 1 xfailed**;
+  - `git status --porcelain` empty.
+- **ADVISORY (follow-ups):**
+  1. CORRECTIONS row 1 cites two audits that do not mention the four phantom ids; only CHANGELOG records them;
+  2. "up to four" requests becomes 5 if a transient robots.txt retry happens;
+  3. the new guard test uses nonexistent inputs, so it would not catch the guard being moved after compute().
+
 ### 🧑‍⚖️ 2026-10-09 — USER DECISION D52 (item 2 merge): **"Fix advisories, then merge"**
 - The user approved the 5,841-entry ATLAS relabel for merge, **conditional on** WS4 first fixing the 6 re-gate advisories on the branch.
 - A short scoped re-check (advisory diff only, data paths must stay empty) follows; then the merge.
