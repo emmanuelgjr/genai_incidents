@@ -166,10 +166,20 @@ _WS4T22_TWELVE = {
     "INC-00754": None,
     "INC-01897": None,
     "INC-00497": None,
-    "INC-03128": None,
+    # [UPDATE 2026-10-09, v2.13.0 item 4] INC-03128 and INC-08185 were None
+    # here when WS4-T22 landed (D28's fan-out, no single successor written).
+    # The user's item 4 appended single-successor records for both
+    # (docs/audits/ID-silent-ids-appends-2026-10-09.json), so resolve_id now
+    # returns them. Pinned to the new answers, not deleted, so a revert of
+    # those records still fails this test. The other six stay None.
+    "INC-03128": "INC-14909",
     "INC-08139": None,
-    "INC-08185": None,
+    "INC-08185": "INC-14742",
 }
+
+# The four WS4-T22 itself changed (the no-collateral sweep below compares
+# against the pre-WS4-T22 oracle, which the item-4 records do not touch).
+_WS4T22_FIXED_FOUR = {"INC-07771", "INC-08109", "INC-08133", "INC-08146"}
 
 
 def test_resolve_id_named_twelve():
@@ -230,7 +240,7 @@ def test_resolve_id_no_collateral_change_across_full_corpus():
     for d in raw.get("deprecations", []):
         if d.get("from") and d.get("into"):
             deprec[d["from"]] = d["into"]
-    expected_to_change = {k for k, v in _WS4T22_TWELVE.items() if v is not None}
+    expected_to_change = set(_WS4T22_FIXED_FOUR)
     changed = {}
     for inc_id in all_from_ids:
         old = _pre_ws4t22_resolve_id(inc_id, deprec, gi.by_id)

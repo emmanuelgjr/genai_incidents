@@ -422,6 +422,8 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
     # WS4-T10 build guard: this harness deliberately builds from a
     # from-scratch tmp corpus with no legacy_consolidated.json, which is
     # exactly the shape main() otherwise refuses to build from silently
@@ -1884,6 +1886,8 @@ def test_missing_legacy_consolidated_fails_loudly(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
     monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
     # No legacy_consolidated.json written into `data` -- the real-world
     # mistake of running merge_and_dedupe.py standalone (skipping
@@ -1918,6 +1922,8 @@ def test_missing_legacy_consolidated_opt_out_still_builds(tmp_path, monkeypatch)
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
     monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
     (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
     m.main()
@@ -2363,3 +2369,79 @@ def test_keep_id_decision_does_not_trigger_retirement(tmp_path, monkeypatch):
     )
     assert not any(d["from"] == old_id and d["reason"] == "split" for d in deps), \
         "a keep_id decision must not write a retirement 'split' record"
+
+
+# --- v2.13.0 item 4 / D49: ruled deprecation appends (step 8b) -----------
+
+def _write_ruled(path, records):
+    path.write_text(_json.dumps({"entries": [{"record": r} for r in records]}),
+                    encoding="utf-8")
+
+
+def test_ruled_appends_land_once_and_never_edit(tmp_path, monkeypatch):
+    """Append-only and idempotent. Fails if 8b re-appends on a second build
+    (records grow every refresh), or touches the pre-existing record."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    prior = {"from": "INC-09999", "into": None, "reason": "out-of-scope", "date": "2026-01-01"}
+    (data / "id_deprecations.json").write_text(
+        _json.dumps({"deprecations": [prior]}), encoding="utf-8")
+    ruled = [
+        {"from": "INC-09999", "into": None, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+        {"from": "INC-09998", "into": None, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+    ]
+    _write_ruled(data / "ruled_appends.json", ruled)
+    (ingest / "src.json").write_text(_json.dumps([_oecd_entry("OECD-AIM-A", "A")]), encoding="utf-8")
+    m.main()
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    assert deps == [prior] + ruled
+
+
+def test_malformed_ruled_appends_fail_loudly(tmp_path, monkeypatch):
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    _write_ruled(data / "ruled_appends.json", [{"from": "INC-09999", "reason": "merged"}])
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    with pytest.raises(SystemExit, match="ruled-appends"):
+        m.main()
+
+
+def test_ruled_successor_is_not_reverted_by_d28_resplit_correction(tmp_path, monkeypatch):
+    """The real interaction: INC-03128/INC-08185 carry a D28
+    `resplit_redirect` entry whose approved set is the fan-out. Step 8a
+    appends a corrective record whenever the current chain disagrees with
+    that set -- so without 8a's skip for ruled `from`s, the narrowed record
+    would be "corrected" back on the very next build (verified live on the
+    real data: 2 corrective records appended). Fails if the skip is removed."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+    inbound_id = "INC-80003"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+    m.main()  # phase 1: the ordinary split; old_id keeps X
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    fresh_id = next(e["id"] for e in out["incidents"] if e["source_ids"] == ["OECD-AIM-Y"])
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [old_id]},  # D28-style approval: the old answer
+        ],
+        monkeypatch=monkeypatch,
+    )
+    ruled = {"from": inbound_id, "into": fresh_id, "reason": "successor-identified",
+             "date": "2026-10-09"}
+    _write_ruled(data / "ruled_appends.json", [ruled])
+    m.main()
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    mine = [d for d in deps if d["from"] == inbound_id]
+    assert mine[-1] == ruled, mine
+    assert len(mine) == 2, mine

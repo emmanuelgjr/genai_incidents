@@ -1101,6 +1101,14 @@ CISA_KEV_PATH = INGEST / "cisa_kev.json"
 CVE_REJECTIONS_PATH = INGEST / "cve_rejections.json"
 CWE_VECTOR_PATH = MAPPINGS / "cwe_attack_vector.json"
 SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
+# v2.13.0 item 4 / D49 (schema-architect): curated, ruled deprecation
+# records to APPEND to id_deprecations.json -- the successor, release-scoped
+# and pre-tombstone records for the 17 published IDs that answered with
+# silence. A docs/-side input like SPLIT_AUTHORIZATION_PATH: the build reads
+# it, never writes it. See `_load_ruled_deprecation_appends` and step 8b.
+RULED_DEPRECATION_APPENDS_PATH = (
+    ROOT / "docs" / "audits" / "ID-silent-ids-appends-2026-10-09.json"
+)
 # WS4-T19: the pre-authorization guard's input. A committed, docs/-only
 # list (never data/, never schema/) of which previously-single published
 # ids are authorized to newly resolve to more than one row on the
@@ -1280,6 +1288,59 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
             "as_of": min(disputed[c].get("checked", "") for c in dhit),
         }
     return False
+
+
+_RULED_RECORD_KEYS = {"from", "into", "reason", "date", "valid_for_releases"}
+
+
+def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
+    """Records to append to ``id_deprecations.json`` by ruling (step 8b).
+
+    Returns each entry's ``record`` in file order. A missing file means
+    "nothing ruled" (``[]``). A PRESENT file that is malformed raises
+    ``SystemExit`` -- a ruling that silently fails to apply is the
+    "record looked filed and was not" failure, so this fails loudly
+    rather than building without it. Shape only; referential checks
+    (targets live, scoped sets disjoint, last record unscoped) are
+    ``scripts/validate.py``'s job, run on the written file."""
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise SystemExit(f"[ruled-appends] {path}: unreadable: {exc}") from exc
+    out: list[dict] = []
+    for n, entry in enumerate(data.get("entries") or []):
+        rec = entry.get("record") if isinstance(entry, dict) else None
+        if (
+            not isinstance(rec, dict)
+            or not rec.get("from")
+            or not rec.get("reason")
+            or not rec.get("date")
+            or "into" not in rec
+            or set(rec) - _RULED_RECORD_KEYS
+        ):
+            raise SystemExit(f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r}")
+        out.append(dict(rec))
+    return out
+
+
+def _append_ruled_records(deprecations_all: list[dict], ruled: list[dict]) -> int:
+    """Step 8b: append each ruled record unless an identical record is
+    already in the file. Idempotent (a second build appends nothing) and
+    append-only (never edits or drops an existing record). Returns the
+    number appended. Identity is whole-record equality, so a ruling that
+    changes a record appends a NEW record rather than being skipped."""
+    present = {json.dumps(d, sort_keys=True) for d in deprecations_all}
+    appended = 0
+    for rec in ruled:
+        key = json.dumps(rec, sort_keys=True)
+        if key in present:
+            continue
+        deprecations_all.append(dict(rec))
+        present.add(key)
+        appended += 1
+    return appended
 
 
 def _load_curation_overrides() -> dict[str, dict]:
@@ -2593,6 +2654,8 @@ def main():
     #     that function's docstring for why the canonical copy lives in
     #     this module (import direction) and what invariant the two call
     #     sites must jointly preserve.
+    _ruled_appends = _load_ruled_deprecation_appends(RULED_DEPRECATION_APPENDS_PATH)
+    _ruled_froms = {r["from"] for r in _ruled_appends}
     _resplit_auth = _load_verified_split_authorization_data(SPLIT_AUTHORIZATION_PATH)
     if _resplit_auth:
         _live_ids_now = {e["id"] for e in deduped if e.get("id")}
@@ -2608,6 +2671,13 @@ def main():
             if entry.get("decision") != "resplit_redirect":
                 continue
             frm = entry.get("from")
+            # v2.13.0 item 4: a later ruling (step 8b's input) supersedes
+            # D28's fan-out for this id (INC-03128, INC-08185). Without this
+            # skip, every rebuild would see the narrowed record "disagree"
+            # with D28's approved set and append a corrective record undoing
+            # the ruling -- a new record on every build, flip-flopping.
+            if frm in _ruled_froms:
+                continue
             approved = entry.get("new_targets") or []
             if not frm or not approved:
                 continue
@@ -2633,6 +2703,16 @@ def main():
             print(f"[resplit-redirect] corrected {_resplit_corrected} pre-existing "
                   f"inbound redirect(s) to match D28's approved new_targets "
                   f"(docs/audits/WS4-T19-authorized-splits-2026-09-18.json)")
+
+    # 8b) v2.13.0 item 4 / D49: append the ruled records (successors for
+    #     INC-03128/INC-08185, release-scoped records for INC-00497/
+    #     INC-08139 each followed by an unscoped restatement, and the nine
+    #     pre-tombstone records) unless already present. Append-only and
+    #     idempotent; see `_append_ruled_records`.
+    _ruled_n = _append_ruled_records(deprecations_all, _ruled_appends)
+    if _ruled_n:
+        print(f"[ruled-appends] appended {_ruled_n} ruled deprecation record(s) "
+              f"from {RULED_DEPRECATION_APPENDS_PATH.name}")
 
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
     # deprecation whose CURRENTLY AUTHORITATIVE `into` was that bucket (or

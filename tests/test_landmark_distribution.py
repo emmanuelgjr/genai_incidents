@@ -232,6 +232,8 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
     return data, ingest
 
 

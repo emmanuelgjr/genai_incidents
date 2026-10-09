@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/emmanuelgjr/genai_incidents/schema/id_deprecations.schema.json",
+  "title": "GenAI Incidents: ID deprecation records (data/id_deprecations.json)",
+  "description": "Append-only history of every retired incident ID. File order is decision order: for a given `from`, the LAST record without `valid_for_releases` is authoritative. Records carrying `valid_for_releases` are release-scoped and answer only for those releases. Cross-record rules (targets resolve to live entries, scoped sets disjoint, last record per `from` unscoped) are enforced by scripts/validate.py. Policy: docs/ID_POLICY.md. Field reference: docs/DATA_DICTIONARY.md.",
+  "type": "object",
+  "required": ["deprecations"],
+  "additionalProperties": false,
+  "properties": {
+    "deprecations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    }
+  },
+  "$defs": {
+    "incId": { "type": "string", "pattern": "^INC-[0-9]{5}$" },
+    "record": {
+      "type": "object",
+      "required": ["from", "into", "reason", "date"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "$ref": "#/$defs/incId", "description": "The retired ID." },
+        "into": {
+          "description": "Successor. null = terminal (no successor); a string = one successor (possibly itself retired: follow the chain); an array = every successor of a split.",
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/incId" },
+            { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/incId" } }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "merged",
+            "transitive-merge",
+            "out-of-scope",
+            "orphaned-ingest-source-retired",
+            "split",
+            "resplit",
+            "successor-identified",
+            "release-scoped",
+            "release-dependent",
+            "unrecorded-drop-v2.1.0"
+          ]
+        },
+        "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "description": "Date the record was decided (appended), not the incident date." },
+        "retired_source_ids": { "type": "array", "items": { "type": "string" } },
+        "retired_cve_ids": { "type": "array", "items": { "type": "string" } },
+        "valid_for_releases": {
+          "description": "Release-scoped record (v2.13.0, D49): `into` is this ID's successor only for a citation taken from one of these releases. Only ever on appended records.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["valid_for_releases"] },
+          "then": { "properties": { "into": { "$ref": "#/$defs/incId" }, "reason": { "const": "release-scoped" } } }
+        },
+        {
+          "if": { "properties": { "reason": { "const": "release-scoped" } } },
+          "then": { "required": ["valid_for_releases"] }
+        },
+        {
+          "if": { "properties": { "reason": { "const": "unrecorded-drop-v2.1.0" } } },
+          "then": { "properties": { "into": { "type": "null" } } }
+        }
+      ]
+    }
+  }
+}

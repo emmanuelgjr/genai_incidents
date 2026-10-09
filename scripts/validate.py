@@ -218,6 +218,61 @@ def check_integrity(data: dict, deprecations: list[dict] | None = None) -> list[
                     f"deprecation {frm} -> {into} does not resolve to a live entry"
                 )
         problems.extend(check_deprecation_coverage(data, deprecations, _latest=latest))
+        problems.extend(check_release_scoped_deprecations(data, deprecations, _latest=latest))
+    return problems
+
+
+def check_release_scoped_deprecations(
+    data: dict, deprecations: list[dict], _latest: dict[str, dict] | None = None,
+) -> list[str]:
+    """v2.13.0 / D49: cross-record rules for release-scoped records (those
+    carrying `valid_for_releases`). The per-record shape is
+    schema/id_deprecations.schema.json's job; these are the rules a
+    per-record schema cannot express.
+
+    (a) The LAST record for a `from` that has scoped records must itself be
+        unscoped. This is what keeps every last-record-wins reader (the
+        v2.11.0/v2.12.0 packages, `_latest_by_from` above, a direct JSON
+        reader following the published rule) from mistaking a scoped answer
+        for the release-independent one.
+    (b) A `from`'s scoped records cover disjoint release sets, so a
+        (id, release) pair has exactly one answer.
+    (c) Every scoped `into` resolves to a live entry (or an `into: null`
+        removal) through the authoritative chain.
+
+    Named failing inputs (agreement 6): append a scoped record after the
+    restatement (a); give two scoped records of one `from` a shared
+    release (b); point a scoped record at a nonexistent ID (c)."""
+    problems: list[str] = []
+    live_ids = {e["id"] for e in data["incidents"]}
+    latest = _latest if _latest is not None else _latest_by_from(deprecations)
+    into_map = {f: r.get("into") for f, r in latest.items()}
+    removed_ids = {f for f, r in latest.items() if r.get("into") is None}
+    seen_releases: dict[str, dict[str, int]] = {}
+    for n, d in enumerate(deprecations):
+        if "valid_for_releases" not in d:
+            continue
+        frm = d.get("from")
+        if "valid_for_releases" in latest.get(frm, {}):
+            problems.append(
+                f"release-scoped record #{n} ({frm}): the last record for {frm} is "
+                "release-scoped; it must be followed by an unscoped record"
+            )
+        for rel in d.get("valid_for_releases") or []:
+            prev = seen_releases.setdefault(frm, {}).get(rel)
+            if prev is not None:
+                problems.append(
+                    f"release-scoped records #{prev} and #{n} ({frm}) both claim {rel}"
+                )
+            seen_releases[frm][rel] = n
+        into = d.get("into")
+        if not isinstance(into, str) or not _resolves_to_live(
+            into, into_map, live_ids, removed_ids
+        ):
+            problems.append(
+                f"release-scoped record #{n} ({frm} -> {into!r}) does not resolve "
+                "to a live entry"
+            )
     return problems
 
 
@@ -723,6 +778,16 @@ def main():
             "deprecations", []
         )
     problems = check_integrity(data, deprecations)
+    # Per-record shape of the deprecations file (v2.13.0 / D49). The
+    # cross-record rules live in check_integrity above.
+    dep_schema_path = ROOT / "schema" / "id_deprecations.schema.json"
+    if dep_path.exists():
+        dep_schema = json.loads(dep_schema_path.read_text(encoding="utf-8"))
+        for err in jsonschema.Draft202012Validator(dep_schema).iter_errors(
+            json.loads(dep_path.read_text(encoding="utf-8"))
+        ):
+            path = ".".join(str(p) for p in err.path)
+            problems.append(f"id_deprecations.json: {path}: {err.message[:200]}")
     rej_path = ROOT / "ingest" / "cve_rejections.json"
     rejected = disputed = None
     if rej_path.exists():
