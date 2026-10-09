@@ -27,6 +27,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - drift clean;
   - `pytest tests -q` gives **627 passed, 1 xfailed**;
   - `git status --porcelain` empty.
+- **docs-warden sweep after merge (2026-10-09, @ `fa731114`):** 6 findings, routed as notes into an **item-2 follow-up branch** (queued after item 3's gate, so CHANGELOG/README edits don't collide):
+  - **N-c (Medium, governance-scribe):** `docs/paper/genai-incidents-methods.md:96` states the pin as "ATLAS v2026.06"; this is a live paper surface, so fix in place.
+  - **N-d (Medium, pipeline-engineer):** `scripts/ingest_external.py:68` still parses `ATLAS-2026.06.yaml` for case studies while the pin is 2026.09, and nothing documents the decoupling. Re-point it, or record that the decoupling is deliberate. A re-point would change data, so it needs its own delta.
+  - **N-e (Low–Med, license-auditor):** SOURCE_LICENSES §3.1 path (1) at :226 names 2026.06 and reads as current. It tracks N-d.
+  - **N-f (Low, governance-scribe):** the README.md:327 `make build` comment omits lint-atlas.
+  - **N-g (Low, governance-scribe):** the README.md:278-310 repo tree omits the new ATLAS scripts, mappings and the `ingest/atlas/` directory.
+  - **N-h (Low, schema-architect + governance-scribe):** `taxonomy_versions` is undocumented in DATA_DICTIONARY and DATASHEET. DATASHEET:117's MISP tag list lacks `genai-incidents:taxonomy-*`.
+  - **Clean (warden evidence):**
+    - stats `taxonomy_versions` matches every mapping file's version;
+    - no doc references the retired T0019, T0058 or T0104;
+    - INCIDENTS top-technique T0115.001 = 2,498 (re-counted);
+    - counts are 15,637 / 29 / 1,915, with 15,666 rows;
+    - no "release behind" wording on any live surface.
+  - **Item 9 blast radius (owasp_asi "2025"):**
+    - the mapping file, stats.json, `src/.../taxonomy_versions.json`, and the STIX, MISP and HF exports;
+    - about 30 name mentions across README, CONTRIBUTING, DATASHEET, TAXONOMIES, docs/index.html, _config.yml, CITATION.cff, .zenodo.json, INCIDENTS.md, pyproject, render/merge scripts and SVGs;
+    - README links point to the 2025 *Threats and Mitigations* doc;
+    - a code-set change would also touch per-entry `owasp_asi` and TAXII `x_owasp_asi`.
 - **ADVISORY (follow-ups):**
   1. CORRECTIONS row 1 cites two audits that do not mention the four phantom ids; only CHANGELOG records them;
   2. "up to four" requests becomes 5 if a transient robots.txt retry happens;
