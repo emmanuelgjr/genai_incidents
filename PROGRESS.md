@@ -24,6 +24,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Schema branch — **MERGED to main (2026-10-09), after user rulings D63/D64**
+- **⚖ D63 (D57 design): "Accept + queue overdue alert".** `hold.until` is the registry review date; `review_by` is on rows. **NEW BOARD NOTE → WS4:** a scheduled overdue-review check that alerts when a stale source's `hold.until` has passed. Not in the build (no wall-clock in `make build`).
+- **⚖ D64 (dispute rendering): "Add a DISPUTED card note + count".** **NEW BOARD NOTE → WS6, folded into item 8:** a DISPUTED card note parallel to the retracted banner (render_markdown.py:351), plus `disputed_count` in stats.json and every surface that quotes counts. It needs its own delta and gate.
+- **Foreman [R] after merge:**
+  - porcelain empty; 0 deletions; validate rc 0; drift clean; lint OK;
+  - **684 passed, 1 xfailed**;
+  - python: status {None 15,615, retracted 29, disputed 22}; rows with `review_by` 2027-01-07 = **1,382**; incident_count **15,637**.
+- **Live run 37992134374 (workflow_dispatch on 81344e7b), foreman [R] from `gh run view --log`:**
+  - `cve-sweep` succeeded and uploaded artifact `cve-sweep-output` (107,786 B);
+  - `refresh` downloaded it ("Download artifact has finished successfully"), and Apply logged "Applied the CVE sweep job's snapshot and log";
+  - the summary shows `CVE_SWEEP: success` from the job output;
+  - the sweep "checked 0 this run" because all 9,169 ids were checked today (same-day skip, ingest_cve_rejections.py:361);
+  - `refresh` failed ONLY at Unit tests on `test_e21_partA_inc00437_provenance.py::test_oecd_aiid_content_disagreement_is_unique_to_inc00437` (1 failed, 675 passed). That is the item-7 accidental freeze, which stage 1 replaces.
+  - **The item-3 live-check advisory is closed.** Not yet exercised live: the label paths, because the PR step skipped behind the tripwire.
+  - Cosmetic: the log line "26 new DISPUTED" counts existing disputes as "new". **Note → WS4.**
+
 ### ✅ Schema branch (D61 + D57) — **PASS (red-reviewer on `6689f12b`, 2026-10-09)**. Merge waits on the user, because advisory 1 changes the D57 design.
 - **Verdict:** "PASS. DEFECTS: none."
 - **Gate evidence:**
