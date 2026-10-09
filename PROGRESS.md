@@ -24,6 +24,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔄 Item 3 (rejected-CVE sweep) — **specialist reported `04fde40b` (pushed); held before the gate: the base is stale**
+- **Foreman [R]:** the tree is clean. `git rev-list --count 04fde40b..origin/main` gives **18**: the branch sits on 5546e058 and predates the item 2 merge, which the brief required the delta to follow. The specialist has been sent back to merge origin/main, rebuild, and re-derive the delta as a dated addendum, before the red-reviewer gate.
+- **Specialist's claims (testimony until gated):**
+  - the full sweep covered 9,169 corpus CVEs with 0 fetch failures;
+  - **0 new REJECTED** (the same 37), and NVD agrees 37/37;
+  - **26 DISPUTED** CVEs (CNA tag), on **22 sole-evidence entries**, none of them landmark;
+  - the v2.12.0 "21" is correct, so no CORRECTIONS entry;
+  - the committed delta vs 5546e058 is 29 entries / 29 fields, all `status_reason.as_of`, with 15,637 byte-identical;
+  - weekly budget 1,200 requests (8-week full cycle), and the run exits 1 above a 10% fetch-failure rate;
+  - 627 passed / 1 xfailed.
+- **Governance for the user (collected, not yet asked):**
+  1. Confidence rule for disputed entries: drop one level (chosen) vs a floor at `low`.
+  2. The weekly budget of 1,200 requests.
+  - **The schema edit** adding `cve-disputed` to the `status_reason.code` enum goes to **schema-architect** (WS3). Until it lands, the 22 entries stay unmarked behind the `_disputed_emission_enabled()` gate.
+- **No retraction stop:** 0 new REJECTED.
+
 ### 🔁 Item 6 — **BOUNCE #1 (red-reviewer on `25899446`, 2026-10-09)**: in progress; specialist redispatched
 - **Defects:**
   1. **Wrong tombstone field.** The memo uses `source_status` (emission enum {active 15657, retained 9}) where retraction is `status` (retracted 29; DATA_DICTIONARY:17). Its "none retracted" command therefore could not fail (agreement 6a). It also omits that `status: retracted` is defined today only as CVE-REJECTED, so retiring AIRI rows needs schema and pipeline work.
