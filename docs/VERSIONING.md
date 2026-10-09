@@ -105,17 +105,31 @@ caught at gate review, not by this file. Run both checks as part of step
      bullet silently — either the string moves with the rest, or this
      checklist records why it didn't for this specific cut.
 
+   **Two release-text edits belong to this step too, because step 4's drift
+   check now fails without them** (`scripts/check_stats_drift.py`,
+   v2.13.0 item 1): (i) promote `CHANGELOG.md`'s `## [Unreleased]` content
+   to a `## [X.Y.Z] — YYYY-MM-DD` heading (keep a fresh empty
+   `## [Unreleased]` above it) — the top *released* heading is what the
+   check treats as the current version and release date; (ii) update the
+   README `## 🚨 Latest release` lead line to
+   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date.
+
 3. **Rebuild with `make build` — never hand-edit `data/stats.json` or
    `data/incidents.json`, and never run only half the pipeline.** The
    `Makefile` target is `build: merge render render-docs-stats validate` —
    `merge` alone (`parse_existing.py` + `merge_and_dedupe.py`) is **not**
    equivalent to `make build` and must not be treated as such: `render`
-   (`scripts/render_markdown.py`) is what writes `INCIDENTS.md`'s own
-   `**Version:**`/`**Generated:**` lines, and `validate` is the schema/ID
-   gate. Running only `merge` ships `INCIDENTS.md` at the old version with
-   nothing downstream able to catch it — see step 4's note on why the
-   drift checker specifically cannot see that file. Run `make build` in
-   full.
+   (`scripts/render_markdown.py`) is what writes both `data/stats.json` and
+   `INCIDENTS.md`'s own `**Version:**`/`**Generated:**` lines, and `validate`
+   is the schema/ID gate. Running only `merge` writes the new version into
+   `data/incidents.json` but leaves both `data/stats.json` and `INCIDENTS.md`
+   at the old version (`render` writes both). Step 4's drift check still
+   fails, but not on `INCIDENTS.md`: that file agrees with the stale
+   `stats.json`, so its **Version:** check stays silent. It fails because
+   the step-2 edits (`pyproject.toml`, `.zenodo.json`, both `CITATION.cff`
+   versions, the `USER_AGENT`) disagree with the stale `stats.json`, and
+   because `stats.json` disagrees with the top released `CHANGELOG.md`
+   heading. Run `make build` in full.
 
    **Verify the rebuild changed no corpus row**, at the field level, not
    just a line count (`git diff --stat` reports lines changed in the
@@ -160,15 +174,27 @@ caught at gate review, not by this file. Run both checks as part of step
    `scripts/stats_docs_lib.py`'s `DOC_SURFACES` names — `README.md`,
    `docs/DATASHEET.md`, `docs/index.html`, `docs/_config.yml`,
    `CITATION.cff` — not "every" surface. `python scripts/check_stats_drift.py`
-   must exit 0 against those five.
+   must exit 0 against those five. It also now fails if, after step 2, any
+   of these disagree with `data/stats.json` `version` / the top released
+   `CHANGELOG.md` heading: the README Latest-release lead line (version and
+   release date), `pyproject.toml`'s `[project]` version, `.zenodo.json`,
+   `CITATION.cff` (both versions and `date-released`), the `ingest/common.py`
+   `USER_AGENT` version, `INCIDENTS.md`'s `**Version:**` line, and any
+   hardcoded count or version literal in the Hugging Face card template.
+   If it fails here, you skipped a step-2 edit; fix that, do not defer to
+   step 5.
 
-   **Two surfaces this step does not cover, so they need their own check:**
-   - **`INCIDENTS.md`** is not in `DOC_SURFACES` at all. Its version line
-     is written by `render_markdown.py` (part of `make render`, already
-     run in step 3), but the drift checker never reads it — a stale line
-     there would not fail this step or step 3. Confirm it by eye
-     (`grep -n '^- \*\*Version:\*\*' INCIDENTS.md`) as part of step 5.
-   - **The Hugging Face card** is *not* templated by `render_docs_stats.py`
+   **Two surfaces to be clear about:**
+   - **`INCIDENTS.md`** is not in `DOC_SURFACES` (no stats markers), but the
+     drift checker does read its `**Version:**` line (written by
+     `render_markdown.py`, part of `make render`, already run in step 3)
+     and fails this step if it disagrees with `data/stats.json`. To eyeball it
+     yourself, `grep -n '^- \*\*Version:\*\*' INCIDENTS.md` shows the line;
+     that is optional redundancy, not the only guard.
+   - **The Hugging Face card**: the *template* (`CARD` in
+     `scripts/export_huggingface.py`) is checked by this step for
+     placeholders and literals; the *generated* `dist/hf/README.md` is not.
+     It is *not* templated by `render_docs_stats.py`
      despite reading like one of "the" doc surfaces — it is generated
      separately, by `scripts/export_huggingface.py`, which reads
      `data/incidents.json`'s own `"version"` field directly (already
@@ -189,8 +215,11 @@ caught at gate review, not by this file. Run both checks as part of step
      spot-check, not a step this checklist requires.
 
 5. **Sweep live surfaces for prose the bump just made false.** The
-   drift check in step 4 catches stale *numbers* inside markers; it does
-   not read English. The `v2.9.0` cut hit exactly this: after the version
+   drift check in step 4 catches stale *numbers* inside markers, plus the version literals it
+   is told to read (the full list is in step 4: the README Latest-release lead
+   line, `pyproject.toml`, `.zenodo.json`, `CITATION.cff`, the `USER_AGENT`,
+   the `INCIDENTS.md` **Version:** line and the HF card template); it does
+   not read English prose. The `v2.9.0` cut hit exactly this: after the version
    marker updated to read `2.9.0`, an adjacent paragraph still claimed *no
    version had been bumped or tagged yet* — true when it was written, false
    the moment the marker next to it changed, and nothing failed because the
@@ -213,7 +242,11 @@ caught at gate review, not by this file. Run both checks as part of step
    reproduced verbatim on the very next cut. This is not evidence the
    underlying problem is fixed — it is evidence this class of failure
    recurs on every cut by default, and evidence that a manual, non-marker
-   read-through step is currently the only thing that catches it.
+   read-through step is needed for the *prose* of the Latest-release
+   paragraph. (Updated v2.13.0: the paragraph's lead-line version and
+   release date are now caught by the drift check in step 4; the rest of
+   the paragraph's English, links and "previous release" text are still
+   only caught by this read-through.)
 
 6. **Tag, and push the tag.** `git tag -a v<version> -m "v<version>"` on
    the commit that carries the bumped strings, then `git push origin

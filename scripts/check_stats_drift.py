@@ -24,7 +24,10 @@ surface is clean.
 
 from __future__ import annotations
 
+import json
+import re
 import sys
+import tomllib
 
 from stats_docs_lib import (
     DOC_SURFACES,
@@ -102,6 +105,127 @@ def check_unmarked_totals(path, text: str) -> list[str]:
     return errors
 
 
+LATEST_HEADING_RE = re.compile(r"^##\s+\S*\s*Latest release\s*$", re.MULTILINE)
+LATEST_LINE_RE = re.compile(
+    r"\*\*(?:<!--\s*stats:version\s*-->)?(?P<version>\d+\.\d+\.\d+)"
+    r"(?:<!--\s*/stats:version\s*-->)?\s*[—–-]+\s*released\s+(?P<date>\d{4}-\d{2}-\d{2})"
+)
+CHANGELOG_TOP_RE = re.compile(
+    r"^##\s+\[(?P<version>\d+\.\d+\.\d+)\]\s*[—–-]+\s*(?P<date>\d{4}-\d{2}-\d{2})",
+    re.MULTILINE,
+)
+
+
+def changelog_top_release(changelog: str) -> tuple[str, str] | None:
+    """(version, date) of the first released heading; ``[Unreleased]`` has no
+    date and so never matches."""
+    m = CHANGELOG_TOP_RE.search(changelog)
+    return (m.group("version"), m.group("date")) if m else None
+
+
+def check_latest_release(readme: str, stats: dict, changelog: str) -> list[str]:
+    """The README ``## Latest release`` lead line must name the same version as
+    ``stats.json`` and the same version+date as the top released CHANGELOG
+    heading. Fails on: heading/lead line missing (renamed away), a stale
+    version, or a stale date. A ``stats:version`` marker alone passes when the
+    marker's own text is current but the sentence around it (the date) is not."""
+    top = changelog_top_release(changelog)
+    if top is None:
+        return ["CHANGELOG.md: no released '## [X.Y.Z] - YYYY-MM-DD' heading found"]
+    cl_version, cl_date = top
+    errors = []
+    if str(stats["version"]) != cl_version:
+        errors.append(
+            f"data/stats.json version {stats['version']!r} != top released "
+            f"CHANGELOG heading {cl_version!r}"
+        )
+    h = LATEST_HEADING_RE.search(readme)
+    if h is None:
+        return errors + ["README.md: '## Latest release' heading not found"]
+    m = LATEST_LINE_RE.search(readme, h.end())
+    if m is None or readme.count("\n", h.end(), m.start()) > 4:
+        return errors + [
+            "README.md: Latest-release section has no '**X.Y.Z - released YYYY-MM-DD.**' lead line"
+        ]
+    if m.group("version") != cl_version:
+        errors.append(
+            f"README.md Latest release names version {m.group('version')!r} but "
+            f"CHANGELOG/stats say {cl_version!r}"
+        )
+    if m.group("date") != cl_date:
+        errors.append(
+            f"README.md Latest release says released {m.group('date')!r} but "
+            f"CHANGELOG top heading says {cl_date!r}"
+        )
+    return errors
+
+
+def check_version_metadata(stats: dict, pyproject: str, zenodo: str, citation: str,
+                           changelog: str) -> list[str]:
+    """Version/date literals in packaging + citation metadata must equal stats.json
+    (and CITATION date-released the top CHANGELOG date)."""
+    want = str(stats["version"])
+    errors = []
+    try:
+        pv = tomllib.loads(pyproject).get("project", {}).get("version")
+    except tomllib.TOMLDecodeError as exc:
+        pv = f"<unparseable: {exc}>"
+    if pv != want:
+        errors.append(f"pyproject.toml [project] version {pv!r} != stats {want!r}")
+    zv = json.loads(zenodo).get("version")
+    if zv != want:
+        errors.append(f".zenodo.json version {zv!r} != stats {want!r}")
+    # top-level `version:` (column 0) and preferred-citation's (indented) must both exist
+    top_v = re.findall(r'^version:\s*"([^"]+)"', citation, re.MULTILINE)
+    nested_v = re.findall(r'^[ \t]+version:\s*"([^"]+)"', citation, re.MULTILINE)
+    if not top_v:
+        errors.append("CITATION.cff has no top-level version: line")
+    if not nested_v:
+        errors.append("CITATION.cff has no preferred-citation version: line")
+    for v in top_v + nested_v:
+        if v != want:
+            errors.append(f"CITATION.cff version {v!r} != stats {want!r}")
+    d = re.search(r'^date-released:\s*"([^"]+)"', citation, re.MULTILINE)
+    top = changelog_top_release(changelog)
+    if top and (not d or d.group(1) != top[1]):
+        errors.append(
+            f"CITATION.cff date-released {d.group(1) if d else None!r} != top CHANGELOG date {top[1]!r}"
+        )
+    return errors
+
+
+def check_hf_card_template(card: str) -> list[str]:
+    """The HF card template must take count/version from the build, never carry a
+    literal: needs the {count} and {version} placeholders and no grouped totals."""
+    errors = [f"scripts/export_huggingface.py CARD lacks {{{p}}} placeholder"
+              for p in ("count", "version") if "{" + p + "}" not in card]
+    for m in NUMBER_LITERAL_RE.finditer(card):
+        errors.append(f"scripts/export_huggingface.py CARD hardcodes total {m.group(0)!r}")
+    # ungrouped integers of 4+ digits (a total typed without commas); bare years excluded
+    for m in re.finditer(r"(?<![\w.])(?!(?:19|20)\d\d\b)\d{4,}\b", card):
+        errors.append(f"scripts/export_huggingface.py CARD hardcodes ungrouped number {m.group(0)!r}")
+    # any X.Y.Z literal, except third-party taxonomy versions written 'VERIS X.Y.Z'
+    for m in re.finditer(r"(?<![\d.])\d+\.\d+\.\d+(?!\w|\.\d)", card):
+        if not card[:m.start()].endswith("VERIS "):
+            errors.append(f"scripts/export_huggingface.py CARD hardcodes version literal {m.group(0)!r}")
+    return errors
+
+
+def check_other_version_literals(stats: dict, common_src: str, incidents_md: str) -> list[str]:
+    """ingest/common.py's USER_AGENT and INCIDENTS.md's ``**Version:**`` line both
+    carry the dataset version as a literal and must equal stats.json."""
+    want = str(stats["version"])
+    errors = []
+    # anchored to the assignment: comments elsewhere quote historical versions
+    m = re.search(r'^USER_AGENT\s*=\s*\(?\s*"genai_incidents/(\d+\.\d+\.\d+)', common_src, re.MULTILINE)
+    if not m or m.group(1) != want:
+        errors.append(f"ingest/common.py USER_AGENT version {m.group(1) if m else None!r} != stats {want!r}")
+    m = re.search(r"^- \*\*Version:\*\*\s*(\S+)", incidents_md, re.MULTILINE)
+    if not m or m.group(1) != want:
+        errors.append(f"INCIDENTS.md **Version:** {m.group(1) if m else None!r} != stats {want!r}")
+    return errors
+
+
 def main() -> int:
     stats = load_stats()
     all_errors: list[str] = []
@@ -114,6 +238,18 @@ def main() -> int:
         all_errors.extend(check_marked_drift(rel, text, stats))
         all_errors.extend(check_unmarked_totals(rel, text))
 
+    def read(rel: str) -> str:
+        return (ROOT / rel).read_text(encoding="utf-8")
+
+    changelog = read("CHANGELOG.md")
+    all_errors.extend(check_latest_release(read("README.md"), stats, changelog))
+    all_errors.extend(check_version_metadata(
+        stats, read("pyproject.toml"), read(".zenodo.json"), read("CITATION.cff"), changelog))
+    all_errors.extend(check_other_version_literals(
+        stats, read("ingest/common.py"), read("INCIDENTS.md")))
+    import export_huggingface
+    all_errors.extend(check_hf_card_template(export_huggingface.CARD))
+
     if all_errors:
         print("::error::Doc surfaces have drifted from data/stats.json (invariant 6):")
         for e in all_errors:
@@ -121,7 +257,8 @@ def main() -> int:
         return 1
 
     print(f"[check-stats-drift] clean: {len(DOC_SURFACES)} doc surfaces match data/stats.json, "
-          f"no unmarked hardcoded totals")
+          f"no unmarked hardcoded totals; Latest-release line, version metadata and "
+          f"HF card template consistent")
     return 0
 
 

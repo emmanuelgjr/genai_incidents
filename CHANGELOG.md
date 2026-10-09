@@ -7,6 +7,25 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
+
+- `scripts/check_stats_drift.py` additionally fails CI when the README
+  `## Latest release` lead line names a version or release date different from
+  `data/stats.json` / the top released CHANGELOG heading, when `pyproject.toml`,
+  `.zenodo.json` or `CITATION.cff` (version, `date-released`) disagree with them,
+  (version read from the `[project]` table; CITATION must carry both a
+  top-level and a preferred-citation `version:`), when the `ingest/common.py`
+  `USER_AGENT` version or `INCIDENTS.md`'s `**Version:**` line disagree, or
+  when the Hugging Face card template in `scripts/export_huggingface.py`
+  loses its `{count}`/`{version}` placeholders or gains a literal total
+  (grouped or ungrouped, 4+ digits, bare years excepted) or any `X.Y.Z`
+  version literal (third-party `VERIS X.Y.Z` excepted). CHANGELOG headings
+  with em dash, en dash or hyphen are all read. `docs/VERSIONING.md` steps 2,
+  4 and 5 updated to match (CHANGELOG heading promotion and README lead line
+  now belong to step 2). Previously a stale release date beside a current `stats:version`
+  marker passed. No data or published-doc content changed (the audit found
+  nothing stale at 4edd6bad).
+
 ## [2.12.0] — 2026-10-04
 
 > **These notes were gated before the cut** and the release was cut on
