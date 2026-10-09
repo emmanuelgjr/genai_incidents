@@ -10,6 +10,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ⛔ Item 7 — **BOUNCE #2 (scoped re-gate on `e00d54d4`, 2026-10-09)**: ESCALATED to the user (protocol step 6)
+- **Verdict, in the gate's words:** "One residual wrong figure is left, and the memo's own corrections note says it was fixed. It is a one-cell change. Everything else in the fix is correct, and every new number reproduces when I run it myself."
+- **Defect:** R3 (line 220) still reads "3,667/3,829 vs 4,160", and the corrections note claims R3 was corrected. The fix is to replace "(3,667/3,829 vs 4,160)" with "(3,667/3,829 vs 3,937/4,104)". String check: `grep -n "vs 4,160"` returns rc 1.
+- **Advisories:**
+  - the 4,104 command matches a substring anywhere in the row; a `source_ids` form is sturdier;
+  - the 3,937 command uses set membership rather than a per-row match;
+  - "foreman-confirmed" is attribution.
+- **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
+- **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
+
 ### 🔁 Item 6 — **BOUNCE #1 (red-reviewer on `25899446`, 2026-10-09)**: in progress; specialist redispatched
 - **Defects:**
   1. **Wrong tombstone field.** The memo uses `source_status` (emission enum {active 15657, retained 9}) where retraction is `status` (retracted 29; DATA_DICTIONARY:17). Its "none retracted" command therefore could not fail (agreement 6a). It also omits that `status: retracted` is defined today only as CVE-REJECTED, so retiring AIRI rows needs schema and pipeline work.
