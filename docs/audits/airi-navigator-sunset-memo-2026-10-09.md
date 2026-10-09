@@ -24,50 +24,102 @@
 >    full set, and a CSV button and a ZIP link exist behind compiled-out
 >    flags (section 1; new option C in section 6).
 > 4. Advisories: ZIP check is one endpoint (apex 307 to www 404); the 274
->    non-October rows are all July; NOTICE-DATA 1,457 is the ingest-file
+>    July rows are 201 on 2026-07-18 and 73 on 2026-07-31, plus 2 September
+>    rows (the first wording, "the 274 non-October rows are all July", was
+>    wrong: there are 276 non-October rows; fixed at bounce #2, see below);
+>    NOTICE-DATA 1,457 is the ingest-file
 >    row count, accurate; CC BY no-termination clause is 6(c); no TAXII
 >    landmark collection exists; HF export dumps rows verbatim so no
 >    features list; hold lapsed 42 days; Terms of Use read; airisk
 >    robots.txt has no Disallow; eu-ai-act-* rows today are 1,382, all AIRI.
+>
+> ### Corrections at gate bounce #2 (2026-10-09, D54, fresh author)
+> Gate bounce #1's note above listed corrections that the body did not all
+> carry. A fresh author (license-auditor, no shell) re-read the whole memo and
+> made these changes in place (record not yet frozen). Line numbers are those
+> of the file at tip 3e8ed477 (before this pass); section numbers are stable.
+> 1. `tier: landmark` is not AIRI-derived (was lines ~171, 241-248, 446;
+>    now sections 2, 3, 6, 9 check 6, 10 item 2). `_derive_tier`
+>    (`scripts/merge_and_dedupe.py:163-187`) returns landmark iff
+>    `quality_tier == "curated"` OR `aiid_id` present OR `corpus == "ai-harm"`;
+>    all 1,382 AIRI rows carry `aiid_id` via `ingest/aiid_full.json`. B1 moves
+>    0 rows out of landmark (stays 1,915); the former "1,915 -> as low as 533"
+>    for B1 is deleted. B2 re-checked: 1,915 - 1,382 = 533 is correct because
+>    the rows are tombstoned, and is kept (arithmetic from the 1,382 landmark
+>    rows and the 1,915 corpus figure; reviewer to confirm with the section 2
+>    Python). The "is tier AIRI-derived?" user question is removed.
+> 2. Option C gap (was lines ~61, 67-70, 302, and section 9 check 4): the
+>    "~41 rows" is withdrawn. red-reviewer measured (curl + node, 2026-10-09):
+>    1,497 record objects, 1,496 distinct ids (id 1378 duplicated); 40 ids not
+>    among the 1,456 AIRI ingest keys; 39 of those already in the corpus via
+>    `ingest/aiid_full.json`; only AIID-1474 absent. C adds at most 1 row plus
+>    the AIRI overlay on 39 existing rows.
+> 3. Section 1 (was lines 52-55, 46, 35, 49): the "found none; the only
+>    adjacent public channel is AIID's snapshots" sentence is rewritten
+>    (consistent with the browse-page conclusion; the mirror search is marked
+>    absence-based and method-suspect); the Privacy & Terms row no longer says
+>    "not retrieved" (it is the Terms chunk quoted above it); the "NOT raw
+>    HTML" blanket statement now says which rows are rendered, which raw JS;
+>    the airisk robots row states it rests on the foreman's raw check.
+> 4. Attributions: "never hand-authored" is cited to DATA_DICTIONARY line 17
+>    and also schema line 216 (both carry the sentence; was schema only);
+>    the 0 / 1,382 split is credited to red-reviewer at gate #1, re-checked by
+>    the foreman (was "the foreman measured").
+> 5. Bounce #1 note item 4 itself corrected: "274 non-October rows are all
+>    July" was false (276 non-October rows: 274 July, 2 September).
 
 ## 1. Channel status (evidence)
 
-All fetches 2026-10-09, WebFetch (rendered/markdown, NOT raw HTML).
+All fetches 2026-10-09 via WebFetch, whose output is markdown-converted and
+possibly truncated. What that means per row is stated in the "Kind of source"
+column: HTML pages are rendered/markdown text (NOT raw HTML); the three
+`/_next/static/chunks/` rows are raw JS source; robots.txt is plain text; the
+ZIP row is a status line; the `/incidents/browse` row is not my fetch.
 
 | URL | What was seen | Kind of source |
 |---|---|---|
 | `https://airi-navigator.com/robots.txt` | `User-Agent: *`, `Allow: /`; `Disallow:` `/embed/`, `/admin`, `/login`, `/design-system`, `/api/`; `Sitemap: https://www.airi-navigator.com/sitemap.xml`. Identical to the rule set recorded in SOURCE_LICENSES 1.4 (2026-07-16). | text file, low truncation risk |
 | `https://airi-navigator.com/downloads/airi-data.zip` and `https://www.airi-navigator.com/downloads/airi-data.zip` (the `ZIP_URL` in `scripts/ingest_airi_navigator.py:34`) | HTTP 404. This is ONE endpoint, not two: the apex redirects (307) to www, which 404s. | status line |
 | `https://www.airi-navigator.com/datasets` | Lists "AI Incident Tracker: 1,497 incidents" (AIID-derived), v1.3.2; no download or licence text. | rendered fetch |
-| `https://www.airi-navigator.com/incidents/browse` (robots-allowed) | Foreman-reproduced, not re-fetched by me (5 MB, beyond my tool): HTTP 200, 5,262,949 bytes, embeds the full set (1,497 `euAiActRiskLevel` occurrences, latest date 2026-05-31). | raw HTML, foreman/red-reviewer measurement |
+| `https://www.airi-navigator.com/incidents/browse` (robots-allowed) | Not re-fetched by me (5 MB, beyond my tool). Foreman-reproduced and red-reviewer-measured (curl + node, 2026-10-09): HTTP 200, 5,262,949 bytes, embeds the full set (1,497 `euAiActRiskLevel` occurrences = 1,497 record objects, 1,496 distinct ids with id 1378 duplicated; latest date 2026-05-31). | raw HTML, foreman/red-reviewer measurement |
 | JS chunk `/_next/static/chunks/b5439732ff8b66e8.js` | Contains `DownloadResultsButton` ("Download results as CSV", client-side Blob, filename `airi-<key>-...csv`). **I read it: the component is gated by `u="FALSE".toUpperCase()!=="FALSE"` and returns null when false, so as shipped the CSV button renders nothing.** Changelog v1.2.9 (2026-04-29) introduced it (foreman). | raw JS via WebFetch |
 | JS chunk `/_next/static/chunks/906798798b22d561.js` | Footer "Download data" links to `/downloads/airi-data.zip`, wrapped in the same compiled-out `"FALSE".toUpperCase()!=="FALSE"` comparison (both mobile and desktop). The flag NAME `ALLOW_DOWNLOAD` did not appear in my fetch; the foreman reports it from the changelog (0.29.1). So the ZIP was switched off deliberately. | raw JS via WebFetch |
 | JS chunk `/_next/static/chunks/fdfcd250c3d32eb2.js` (Terms of Use) | "The data presented on this site is drawn from the MIT AI Risk Repository and related research datasets. It is provided as-is for informational and research purposes. While we strive for accuracy, we make no guarantees regarding completeness or timeliness." No licence clause. | raw JS via WebFetch |
-| `https://www.airi-navigator.com/` | "MIT AI Risk Navigator", described as a research prototype whose "data and analyses are preliminary and not yet validated"; v1.3.2; latest listed incident dated 2026-05-31; no download/export/API link, no GitHub/HF/Zenodo link; a "Privacy & Terms" link whose text I did not retrieve. | rendered fetch, absence-based |
+| `https://www.airi-navigator.com/` | "MIT AI Risk Navigator", described as a research prototype whose "data and analyses are preliminary and not yet validated"; v1.3.2; latest listed incident dated 2026-05-31; no download/export/API link, no GitHub/HF/Zenodo link; a "Privacy & Terms" link, whose content is the Terms chunk quoted in the row above. | rendered fetch, absence-based (method-suspect; the footer and browse-page findings above show a rendered fetch missed channels) |
 | `https://airisk.mit.edu/` | No data-download, Google Sheet, HF, Zenodo or GitHub link. Footer: "Data from the MIT AI Risk Initiative is licensed under CC BY 4.0" (link `creativecommons.org/licenses/by/4.0/`). | rendered fetch; the licence line matches the raw-HTML finding in SOURCE_LICENSES 1.4 |
 | `https://airisk.mit.edu/ai-incident-tracker` | Dashboards only ("classifies 1,600 real-world report incidents"); links to AIID; no download/export link. A path `/old-ai-incident-tracker/incident-view` also exists (search result; not fetched). | rendered fetch, absence-based |
-| `https://airisk.mit.edu/robots.txt` | Fetch summary reported only `Sitemap: https://airisk.mit.edu/sitemap.xml` (no Disallow). | rendered fetch |
+| `https://airisk.mit.edu/robots.txt` | My fetch summary reported only `Sitemap: https://airisk.mit.edu/sitemap.xml` (no Disallow). The no-Disallow finding was closed by the foreman's raw check (not mine), which matched. | my fetch: rendered summary; closing check: raw, foreman |
 | `https://www.airi-navigator.com/api/*` | **Not fetched: robots-disallowed.** Recorded as disallowed, per instruction. | -- |
 
-Web search for a mirror (HF / Zenodo / GitHub / Google Sheets) found none; the
-only adjacent public channel is AIID's own weekly snapshots
-(`incidentdatabase.ai/research/snapshots`, JSON/MongoDB/CSV), which carries the
-AIID fields, not AIRI's taxonomy overlay.
+Web search for a third-party mirror (HF / Zenodo / GitHub / Google Sheets)
+found none; this is search-engine based and absence-based, so it is
+method-suspect (section 9, check 3). It does NOT mean no channel exists: the
+Navigator's own `/incidents/browse` page embeds the data (row above;
+conclusion below), and the CSV button exists behind a compiled-out flag. AIID's
+own weekly snapshots (`incidentdatabase.ai/research/snapshots`,
+JSON/MongoDB/CSV) are a separate source that carries the AIID fields, not
+AIRI's taxonomy overlay.
 
 **Conclusion (corrected): the advertised ZIP is withdrawn and was switched off
 on purpose (404; the footer link and the CSV button are both compiled out by a
 build-time flag). It is NOT true that no other channel exists.** The
 Navigator's own robots-allowed page `/incidents/browse` ships the entire
-incident set embedded in its HTML/JS payload (5.26 MB; 1,497 records; latest
+incident set embedded in its HTML/JS payload (5.26 MB; 1,497 record objects,
+1,496 distinct ids; latest
 date 2026-05-31, so the dataset itself looks frozen at the same date as our
 `last_success`). My first version of this memo said "no replacement bulk
 channel" from rendered fetches; that was the absence-based false negative the
 standing rule warns about, and raw HTML refuted it.
 
-Gap: the page embeds 1,497 incidents; our committed ingest holds 1,456
-distinct AIID keys (1,457 rows), a difference of about 41 records. The site
-therefore has roughly 41 incidents we never ingested, all dated on or before
-2026-05-31. (Not derived by me; foreman figure. Reviewer: re-derive.)
+Gap (corrected at gate bounce #2): the page embeds 1,497 record objects
+(1,496 distinct ids; id 1378 appears twice); our committed ingest holds 1,456
+distinct AIID keys (1,457 rows). red-reviewer measured (curl + node over the
+embedded data, 2026-10-09): 40 ids are not among the ingest keys; 39 of those
+40 are already in the corpus via `ingest/aiid_full.json`; only AIID-1474 is
+absent from the corpus. The earlier "about 41 incidents we never ingested" was
+the raw 1,497 - 1,456 subtraction, which ignores the duplicate id and the
+AIID-sourced coverage, and is withdrawn. (Not derived by me; reviewer's
+figure. Reviewer: re-run by a different method.)
 
 What this channel is NOT: not a licensed, sanctioned bulk export. Whether
 reading data out of a page payload, or the (currently hidden) per-view CSV
@@ -130,8 +182,21 @@ whole-corpus landmark count 1,915). So the frozen AIRI rows are about 72% of
 the landmark tier (1,382 of 1,915). **Any landmark feed (`x_tier`, Pages
 landmark view; TAXII has a single collection, `export_taxii.py:48`, so no
 separate TAXII landmark feed exists) is therefore predominantly
-stale-source data.** This raises the stakes of either option. Reviewer must
-confirm with the Python above.
+stale-source data.** This raises the stakes of removing the rows (B2), not of
+stripping the overlay (B1). Reviewer must confirm with the Python above.
+
+**Why they are landmark (corrected at gate bounce #2): not because of AIRI.**
+`tier` is derived by `_derive_tier` (`scripts/merge_and_dedupe.py:163-187`,
+the definition of record; machine-readable twin in
+`schema/incident.schema.json` `tier` `x-derivation`, ~line 182): landmark iff
+`quality_tier == "curated"` OR `aiid_id` is present OR `corpus == "ai-harm"`.
+All 1,382 AIRI rows carry `aiid_id`, supplied by `ingest/aiid_full.json`
+(`aiid_id` on 1,548 of 1,548 rows); `ingest/airi_navigator_incidents.json`
+carries it on 0 of 1,457. The AIRI overlay therefore contributes nothing to
+the tier, and the AIRI rows are landmark for the same reason every AIID row
+is. Source of this finding: the code and ingest files read by this author
+(Read/Grep); the 0/1,457 and 1,548/1,548 counts are the foreman's
+confirmed figures, not re-run by me (no shell); reviewer: re-run.
 
 Retraction: none of the AIRI rows is retracted. The field to test is
 `status` (DATA_DICTIONARY line 17: "this is not `source_status`"), which is
@@ -154,7 +219,7 @@ could not fail; replaced.
   all AIRI; 1,380 by the older E18 measure), deployment-stage tag (1,380), `intentional` field (~667
   AIRI-unique), `severity` (798) -- E10 / E18 testimony, not re-measured here.
 - AIRI-sole vs AIID-shared (corrected): **0 AIRI-sole / 1,382 AIID-shared
-  today.** The foreman measured that all 1,456 distinct AIRI source_ids in
+  today.** red-reviewer measured at gate #1 (and the foreman re-checked) that all 1,456 distinct AIRI source_ids in
   `ingest/airi_navigator_incidents.json` (1,457 rows; ids are `AIID-n`) are
   present in `ingest/aiid_full.json` union `ingest/aiid_incidents.json`
   (`len(airi_keys - aiid_keys) == 0`). The earlier "~280 AIRI-sole / ~1,100
@@ -168,9 +233,9 @@ could not fail; replaced.
   logic is key coverage, **not a simulated build** -- a real dry-run of the
   merge without the AIRI file is the stronger check and should be run.
   Consequence: removing AIRI would remove the AIRI OVERLAY (`eu-ai-act-*` tags,
-  `tier: landmark`, deployment-stage, `intentional`, `severity` where
-  AIRI-supplied) from all 1,382 rows and tombstone none (subject to that dry
-  run).
+  deployment-stage, `intentional`, `severity` where AIRI-supplied) from all
+  1,382 rows and tombstone none (subject to that dry run). `tier: landmark` is
+  NOT part of the overlay (section 2).
 - Surfaces carrying them: `data/incidents.json`, the three min mirrors,
   `INCIDENTS.md` / `docs/incidents/*`, STIX bundle, TAXII static files, MISP
   feed, HF dataset, Pages site. HF already emits the per-row `source_freshness`
@@ -238,17 +303,24 @@ Sub-options (corrected: the population is 0 AIRI-sole / 1,382 AIID-shared, so
 the earlier "tombstone ~280, strip ~1,100" split does not exist):
 
 - **B1 (overlay strip):** remove the AIRI overlay only (`eu-ai-act-*` tags,
-  deployment-stage tag, `intentional`/`severity` where AIRI-supplied, and the
-  AIRI-derived `tier: landmark`) from all 1,382 rows; keep the rows, which the
-  AIID snapshot path still serves. **As defined this tombstones 0 rows**
-  (subject to the dry-run in section 3). The rows stay `active`, the count is
-  unchanged, and the cost is a field-level change on 1,382 rows. Note
-  landmark: if `tier` derives from the AIRI overlay, B1 also moves up to 1,382
-  rows out of the landmark tier (1,915 -> as low as 533); whether `tier` is
-  AIRI-derived must be confirmed (open question).
+  deployment-stage tag, `intentional`/`severity` where AIRI-supplied) from all
+  1,382 rows; keep the rows, which the AIID snapshot path still serves. **As
+  defined this tombstones 0 rows** (subject to the dry-run in section 3). The
+  rows stay `active`, the count is unchanged, and the cost is a field-level
+  change on 1,382 rows. **Landmark: B1 moves 0 rows out of the landmark tier
+  (stays 1,915).** `tier` is not AIRI-derived: `_derive_tier`
+  (`scripts/merge_and_dedupe.py:163-187`, the definition of record; schema
+  `tier` `x-derivation`, `schema/incident.schema.json` ~line 182) returns
+  landmark iff `quality_tier == "curated"` OR `aiid_id` present OR
+  `corpus == "ai-harm"`. All 1,382 AIRI rows carry `aiid_id` (supplied by
+  `ingest/aiid_full.json`, which has it on 1,548 of 1,548 rows;
+  `ingest/airi_navigator_incidents.json` has it on 0 of 1,457), so stripping
+  the AIRI overlay leaves the condition true on every row.
 - **B2 (full):** tombstone all 1,382 rows. Because every row is also an AIID
   row, B2 additionally discards AIID-served incidents; that goes beyond
-  "sunsetting AIRI" and is the harshest reading.
+  "sunsetting AIRI" and is the harshest reading. Landmark: unlike B1, B2 does
+  remove 1,382 rows from the active landmark tier (1,915 -> 533), because the
+  rows themselves are gone, not because their tier changed.
 - **C (re-ingest via the Navigator's embedded data):** see below.
 
 Consequences:
@@ -267,7 +339,8 @@ Consequences:
   forbids a third value). **Missing cost: `status: retracted` is defined today
   only as "every CVE the entry carries is REJECTED", derived from
   `ingest/cve_rejections.json` and "never hand-authored"
-  (schema line 216). Retiring AIRI rows needs a NEW retraction reason and a
+  (DATA_DICTIONARY line 17; the same sentence is at
+  `schema/incident.schema.json:216`). Retiring AIRI rows needs a NEW retraction reason and a
   new derivation (a `status_reason.code` value added together with its schema
   enum, DATA_DICTIONARY row and a `validate.py` rule, per the vocabulary rule
   at DATA_DICTIONARY line 18), plus the `incident_count`/`retracted_count`
@@ -294,13 +367,18 @@ Consequences:
 ### Option C: refresh from the Navigator's embedded data (sub-option; user's call)
 
 What it is: re-ingest from the data the robots-allowed `/incidents/browse`
-page embeds (1,497 records, latest 2026-05-31), or from the CSV button if it is
-ever re-enabled, instead of the dead ZIP. Effects: the ~41-record gap could be
-closed; nothing newer exists (the source looks frozen at 2026-05-31), so
-`last_success` would barely move and the rows would still be correctly
-`stale`-eligible; a new ingest script and a new test set are needed
-(pipeline-engineer), and the HF/STIX/MISP/TAXII outputs gain ~41 rows (count
-change, docs-warden sweep). Conduct and licence questions I cannot resolve and
+page embeds (1,497 record objects, 1,496 distinct ids, latest 2026-05-31), or
+from the CSV button if it is ever re-enabled, instead of the dead ZIP.
+Effects (red-reviewer measurement, curl + node over the page's embedded data,
+2026-10-09): 40 of the 1,496 ids are not among our 1,456 AIRI ingest keys; 39
+of those 40 are already in the corpus via `ingest/aiid_full.json`; only
+AIID-1474 is absent. So C would add **at most 1 new row**, plus the AIRI
+overlay (`eu-ai-act-*` tags and the like) on the 39 existing rows. Nothing
+newer exists (the source looks frozen at 2026-05-31), so `last_success` would
+barely move and the rows would still be correctly `stale`-eligible; a new
+ingest script and a new test set are needed (pipeline-engineer) for a gain of
+one row and 39 overlays, and the count change is at most 1 row (docs-warden
+sweep). Conduct and licence questions I cannot resolve and
 will not resolve in the project's favour:
 - Extracting a 5 MB page payload is not the sanctioned export the maintainers
   withdrew; they switched off both the ZIP link and the CSV button by build
@@ -424,16 +502,22 @@ trigger, "AIRI-sole count confirmed ~280", is withdrawn: the count is 0.)
 4. Re-confirm the Terms text in chunk `fdfcd250c3d32eb2.js` (no licence
    clause) and that both `"FALSE".toUpperCase()!=="FALSE"` gates are present in
    chunks `b5439732ff8b66e8.js` and `906798798b22d561.js` (CSV button and ZIP
-   link compiled out); count `euAiActRiskLevel` in `/incidents/browse` (1,497)
-   and derive the ~41-record gap against the ingest file's keys.
+   link compiled out); count `euAiActRiskLevel` in `/incidents/browse` (1,497
+   record objects, 1,496 distinct ids, id 1378 duplicated) and re-derive the
+   gap against the ingest file's keys: expected 40 ids not among the 1,456
+   AIRI ingest keys, 39 of those already in the corpus via
+   `ingest/aiid_full.json`, only AIID-1474 absent (red-reviewer's gate #1
+   measurement; this is a re-run of it, ideally by a different method).
 5. Confirm CC BY 4.0 irrevocability from the legalcode (section 6) and that
    the airisk footer sentence is still present in raw HTML.
 6. Re-derive the AIRI-sole vs AIID-shared split (expected 0 / 1,382) by set
    difference of `source_ids` between `ingest/airi_navigator_incidents.json`
    and `ingest/aiid_full.json` plus `ingest/aiid_incidents.json`; then the
    stronger check, a merge dry-run with the AIRI file removed, listing which
-   of the 1,382 ids survive and which fields change. Also confirm whether
-   `tier: landmark` is derived from the AIRI overlay.
+   of the 1,382 ids survive and which fields change. The expected result is
+   that `tier` does NOT change on any row (section 2: `_derive_tier` keys on
+   `aiid_id`, not on the AIRI overlay); a dry-run showing any `tier` change is
+   a surprise to report.
 7. Confirm `export_stix.py` / `export_misp.py` contain no freshness handling
    today (`grep -n freshness scripts/export_stix.py scripts/export_misp.py`).
 
@@ -442,8 +526,9 @@ trigger, "AIRI-sole count confirmed ~280", is withdrawn: the count is 0.)
 1. Option A (keep, stale-tagged, review_by), B1 (strip overlay, tombstone
    none), B2 (tombstone all 1,382; needs a new retraction reason), or C
    (re-ingest from the Navigator's embedded data)? Recommendation is A.
-2. If B: authorise the merge dry-run (section 9, check 6) first; and is
-   `tier: landmark` to be treated as AIRI-derived?
+2. If B: authorise the merge dry-run (section 9, check 6) first. (The earlier
+   open question "is `tier: landmark` AIRI-derived?" is removed: it is a code
+   fact, answered in section 2: no.)
 3. Which `review_by` date? (Suggestion 2027-01-07.)
 4. Did MIT reply to either outreach (2026-07-27 / 2026-07-29)? None found in
    the files read. The D8 hold lapsed 2026-08-28 with no recorded decision;
