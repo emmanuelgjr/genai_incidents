@@ -24,6 +24,35 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⛔ Item 7 — **BOUNCE #3 (fresh full gate on `9ad77d10`, under D53, 2026-10-09)**: ESCALATED to the user
+- **Verdict:** the gate says every figure corrected at bounces #1 and #2 now re-derives correctly; these 5 are new findings outside the cells earlier gates checked.
+- **Defects:**
+  1. R8 cites SOURCE_LICENSES 1.5 for a sentence that is in NOTICE-DATA:256-258.
+  2. "109 commits behind" should be **106** (`git rev-list --count 586f40c8..07f22c09`), with the command added to §8.
+  3. S1's breakdown of the 3,728 labelled rows omits verbatim/cve-cna-via-avid **125**; the listed groups sum to 3,603.
+  4. Option A calls merges 3 and 4 "do-not-approve", but the D42 review says "Unsure, lean no" and §3's table agrees with the review. It should read 2 do-not (6, 7) and 2 lean-no (3, 4).
+  5. Option B says the failures grow "2 -> 30 -> 42"; the runs show 29 / 30 / 42 / 42.
+- **Advisories:**
+  - A1: R7's 302 does not reproduce today (HEAD gives 405; GET -L gives 200 with no redirect), so it should be dated 2026-07-30. **New note → WS0:** re-check the live SOURCE_LICENSES 1.5 "Scrape-permitted" cell.
+  - A2: the +1,533 caveat can be resolved; the new IDs are OECD rows, and 38.9% is an upper bound for a different reason (merged rows can take AIID titles).
+  - A3: two cited line ranges are off by one.
+  - A4: the R6 grep is weak.
+  - A5: no refresh runs after 10-04.
+- **Gate evidence:** every §8 command was run verbatim and matches. Its own script confirms the OECD-template set equals the own-OECD-title set (3937/3937). The current titles of all 7 merge pairs and the 10 retitles match §3.
+- **Foreman [R]:**
+  - `rev-list --count 586f40c8..07f22c09` gives **106**;
+  - `grep not-yet-scoped` hits only NOTICE-DATA:258;
+  - python gives (verbatim, cve-cna-via-avid) = **125**;
+  - the D42 review §A table was read.
+  - Defects 1-3 are confirmed. Defects 4-5 rest on the gate's reading; the D42 recommendation column was truncated in the foreman's view.
+
+### 🔄 Item 6 — **⚖ D54, USER RULING 2026-10-09 (bounce #2): "Fresh author + fresh full re-gate".** A fresh license-auditor is fixing the 3 defects and running a whole-memo consistency pass (every corrections-note claim checked against the body); a fresh red-reviewer gates after.
+
+### 🔍 Item 3 — merged origin/main 0edb3eda + rebuilt, `5a96fd42` (pushed); **red-reviewer dispatched**
+- Re-derived delta vs 0edb3eda: 29 entries / 29 fields (`status_reason.as_of` only), ID set 15,666 identical, 15,637 byte-identical, 0 defects. Tests: 659 passed / 1 xfailed; validate, drift and lint are clean.
+- The only merge conflict was `scripts/validate.py`, where both sides were kept. Generated files were taken from main and rebuilt.
+- **Foreman [R]:** the tree is clean; the branch is 1 commit behind main, and that commit is board-only. The gate is asked to use its own per-entity route and to judge whether the weekly `as_of` churn on 29 entries is acceptable.
+
 ### ⛔ Item 6 — **BOUNCE #2 (full re-gate on `3e8ed477`, 2026-10-09)**: ESCALATED to the user (protocol step 6)
 - **Defects:**
   1. **`tier: landmark` is not AIRI-derived.** `_derive_tier` (merge_and_dedupe.py:163-187, the definition of record) gives landmark iff curated, `aiid_id`, or ai-harm. All 1,382 AIRI rows carry `aiid_id` from `aiid_full`. B1 therefore moves **0** rows out of landmark, not "1,915 → as low as 533", and the memo's open question about it is a code fact, not a user decision.
