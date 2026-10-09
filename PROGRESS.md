@@ -10,6 +10,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ⛔⁴ Item 1 — **BOUNCE #4 (red-reviewer scoped re-gate, 2026-10-09, on `6b43db5c`) — ESCALATED TO USER**
+The gate's verdict, in its own words: "The gate wrote the error, not the specialist."
+- **Defect 1:** the step-3 sentence dictated under D50, "step 4's drift check now fails on that, because it reads the **Version:** line", names the wrong mechanism (docs/VERSIONING.md:124-126). `render` writes both `stats.json` and `INCIDENTS.md`, so on a merge-only run they agree at the OLD version and the INCIDENTS check stays silent. Step 4 still fails, but only because the step-2 version files disagree with the stale stats.
+- **Foreman re-derivation [R]:**
+  - `git show 6b43db5c:scripts/render_markdown.py | grep -n stats.json` gives `:543 _write_lf(DATA / "stats.json"…`;
+  - `merge_and_dedupe.py` has 1 "stats" mention and no stats.json write;
+  - Makefile: `build: merge render render-docs-stats validate`;
+  - `check_other_version_literals` compares INCIDENTS against `stats["version"]`.
+- **Closed at `6b43db5c` (gate evidence):**
+  - bounce-3 defect 1: real CARD gives []; "v2.9.0." and "2.9.0." fire; 1.2.3.4, 10.0.0.1 and "VERIS 1.4.1." do not;
+  - advisories A and B;
+  - scope is exactly the four declared changes;
+  - pytest 595 passed, 1 xfailed; drift rc=0;
+  - data/ and PROGRESS.md 0 files on the branch.
+- **ADVISORY:** step 5's parenthetical lists 3 of the 7 version literals the checker reads.
+- **Process lesson:** wording that a gate dictated reached the repo verbatim and was false. Gate-dictated text must be checked against the code by a different route before it is applied (agreement 6(b)).
+
 ### 🧑‍⚖️ 2026-10-09 — USER DECISION D50 (item 1 after bounce #3): "Apply fixes + scoped re-gate"
 - A fresh specialist applies the gate's tested regex `(?<![\d.])\d+\.\d+\.\d+(?!\w|\.\d)` and the step-3 replacement sentence verbatim, adds a `v2.9.0.` plant, and fixes the two VERSIONING advisories (the :187 dangling step-5 reference; the step-5 "does not read English" sentence).
 - The re-gate is **limited to that diff**, plus a string check and pytest.
