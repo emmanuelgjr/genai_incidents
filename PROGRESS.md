@@ -24,6 +24,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔁 Item 3 — **BOUNCE #1 (red-reviewer on `5a96fd42`, 2026-10-09)**: in progress; a FRESH pipeline-engineer is on the fixes
+- **Verdict, in the gate's words:** "The data side is clean ... all of the specialist's data claims hold. The branch bounces on two defects."
+- **Defects:**
+  1. **The weekly sweep can push the refresh job past its limit.** The job limit is 60 min (auto-refresh.yml:27). The sweep is 1,200 requests with a 40-min step timeout, run after OECD. OECD step times were 30.9 / 27.7 / 25.6 / 50.9 / 50.9 / 50.9 min, so the job breaches 60 min on 3 of the last 6 runs. The cancel then loses the PR, the health counters and the sweep's own log.
+  2. **The disputed-entry figures (22; 17 + 5; 51 / 139) point to a recipe that is in no committed file.** The figures themselves are correct per the gate's own derivation.
+- **Advisories:**
+  - A1 (user call): the landmark / >10-retraction governance stop is not in the code; the only checkpoint is the human merge of the weekly PR. This predates the task.
+  - A2 (user call): weekly `status_reason.as_of` churn. `updated` moved on 0 entries and as_of is excluded from `_CONTENT_FIELDS`, so it is consistent with invariant 4.
+  - A3: the dispute gate is acceptable. The user's "DISPUTED → status_reason + lower confidence" is not in the data until schema-architect adds the enum value.
+  - A4 (user call): lowering confidence one level is a policy choice. ShadowRay CVE-2023-48022 is on landmark INC-01723 with other sources and is correctly unmarked.
+  - A5: same-day restart failure accounting, and the NVD feeder has no try/except (folded into this fix).
+  - A6: 8 NOT_IN_CVELIST ids are unflagged; 2 confirmed CVE_RECORD_DNE (candidate follow-up).
+  - A7: log size.
+  - A8: the merge base was e9f49d3b, which differs from 0edb3eda only in PROGRESS.md.
+- **Gate evidence:**
+  - own per-entity diff: 29 entries, `/status_reason/as_of` only; `updated` moved on 0; 15,637 byte-identical;
+  - the build in a scratch clone ran twice, deterministic, porcelain empty;
+  - 659 passed;
+  - mutations M1-M6 each fail tests;
+  - raw-text CVE scan: 9,169 / 6,998 / 2,171 = 2,150 + 21;
+  - live cveawg spot-checks match (3 disputed, 3 rejected, 2 DNE);
+  - HTTP only through `ingest.common.fetch_once`;
+  - CHANGELOG order is item 1, 2, 3.
+- **Foreman [R]:** `auto-refresh.yml` was read: `timeout-minutes: 60` at :27, the sweep step at :129-132 after OECD at :75. `grep -i recipe docs/audits/cve-sweep/*.md` finds only the dangling pointer. Both defects are confirmed.
+- **Replace, not re-prompt (agreement 3):** the original specialist ran about 3 h and 195k tokens, and the remaining scope is small and well defined.
+
 ### ✅ Item 7 (OECD/AIID memo) — **PASS (scoped re-gate under D55, on `3d481954`, 2026-10-09)**. The memo is ready for the user's A/B/C decision once 4 post-PASS advisories are applied.
 - **Verdict, in the gate's words:** "All 5 defects and both advisories A1 and A3 are fixed, and the fixes are true to their sources. The author's own change to §3 is correct. No new wrong figure was added, and the branch still changes one file."
 - **Gate evidence:**
