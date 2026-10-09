@@ -24,6 +24,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⚖ D57 + D58, USER RULINGS 2026-10-09 (items 6 and 7)
+- **D57, item 6 (AIRI): Option A.** Keep all 1,382 rows frozen and tag them stale in STIX (`x_source_freshness`), MISP and HF, with `review_by` 2027-01-07 (90 days). No tombstones and no count change.
+  - Implementation routing: `review_by` in `schema/source_freshness.schema.json` goes to **schema-architect**, together with the item-3 `cve-disputed` enum value once its policy calls are ruled. The exporter tagging goes to **distribution-engineer** within item 8 (export integrity), per memo §7.
+- **D58, item 7 (OECD/AIID): "C stage 1: deliberate freeze. Bring all I need to rule here."**
+  - Build the stage-1 branch: rebase `586f40c8`'s T12/T14 machinery onto main, with an EMPTY approval set and a label-only rebuild, per memo §7 S1-S9.
+  - Gate it, then bring the user a complete ruling package: the stage-1 branch for merge or decline, with its field-level delta; the label-only rebuild committed on main (memo open question 2); and the stage-2 prerequisites (the suppression capability, R1 title exposure, the OECD outreach status). The user rules on all of it in one place.
+  - **Sequencing:** stage 1 touches `merge_and_dedupe.py` and `auto-refresh.yml`, which item 3 also changes. It is dispatched **after item 3 merges**, to avoid a double rebuild.
+- **Both memos merged to main** as dated records: `--no-ff`, 2 files +1,113, 0 deletions, porcelain empty.
+
 ### ✅ Item 6 (AIRI sunset memo) — **PASS (scoped re-gate under D56, on `57c3c115`, 2026-10-09)**. The memo is final; it awaits the user's decision on A / B1 / B2 / R and the review_by date.
 - **Verdict, in the gate's words:** "Both defects and all eight advisories from my last gate are fixed accurately. Every new figure checks out against my own measurement, and the change touches one file."
 - **Gate evidence:**
