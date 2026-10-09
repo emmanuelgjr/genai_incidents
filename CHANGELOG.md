@@ -86,6 +86,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   requests measure about 21 minutes), because inside the refresh job, after a 26-51 minute OECD
   step, it could be cancelled with the job. The 8 weeks assumes up to 2.0 s per request
   (measured 1.07).
+  The refresh PR body now lists every entry the build newly retracts (retracted in this build,
+  not on `main`: entry, CVE ids, tier) and the PR is labelled `needs-ruling` when one is a
+  landmark entry or more than 10 are retracted; the refresh is flagged, never blocked. The
+  summary shows the sweep step's own outcome, so a failed sweep reads as failed.
   Never-checked ids, then records that predate dispute detection, then the stalest check, go
   first. Every run writes a dated log (`docs/audits/cve-sweep/<date>.md` and `.json`: ids
   checked, state changes, NVD disagreements, new REJECTED, new DISPUTED, failures, coverage)

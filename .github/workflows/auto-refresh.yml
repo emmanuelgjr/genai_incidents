@@ -46,6 +46,16 @@ jobs:
   cve-sweep:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # The sweep only reads the repo; the artifact upload uses the runner's
+    # ACTIONS_RUNTIME_TOKEN, not GITHUB_TOKEN, so no write scope is needed.
+    permissions:
+      contents: read
+    # The sweep step is continue-on-error (the PR must not be blocked), which
+    # makes this job's own `result` always `success`. Expose the STEP outcome
+    # so the refresh job's summary can show a >10% fail rate, a crash or the
+    # backstop as a failure.
+    outputs:
+      sweep_outcome: ${{ steps.ingest_cve_rejections.outcome }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -180,7 +190,7 @@ jobs:
           AIRI: ${{ steps.ingest_airi.outcome }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
-          CVE_SWEEP: ${{ needs.cve-sweep.result }}
+          CVE_SWEEP: ${{ needs.cve-sweep.outputs.sweep_outcome || needs.cve-sweep.result }}
         run: |
           {
             echo "### Source refresh results"
@@ -347,6 +357,40 @@ jobs:
           python -c "import json; d=json.load(open('data/incidents.json')); print('total:', d['incident_count']); print('generated:', d['generated'])"
           echo "::endgroup::"
 
+      # v2.13.0 item 3 / D60: flag, don't block. List every entry this build
+      # newly retracts (retracted here, not retracted on main) in the PR body,
+      # and label the PR `needs-ruling` when any of them is a landmark entry or
+      # more than 10 are retracted. See scripts/newly_retracted_report.py.
+      - name: Newly retracted entries report
+        id: retracted
+        run: |
+          python scripts/newly_retracted_report.py --before-ref HEAD             --out-md "$RUNNER_TEMP/newly-retracted.md" --github-output "$GITHUB_OUTPUT"
+          {
+            cat <<'BODY'
+          Automated weekly refresh of external sources:
+          AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
+
+          On each run this branch is recreated from the current `main`, so the
+          diff is always relative to the latest `main` *at run time*. **Merge
+          promptly** — if commits land on `main` after this PR opens, the open
+          branch goes stale and merging it can revert that newer work. If it
+          has sat open across other merges, close it and re-run this workflow
+          (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
+
+          Review the diff before merging — flag any unexpected mass deletions
+          or large taxonomy shifts. Schema validation and the full unit-test
+          suite both ran green in this workflow before the PR was opened.
+
+          BODY
+            cat "$RUNNER_TEMP/newly-retracted.md"
+          } > "$RUNNER_TEMP/pr-body.md"
+
+      - name: Ensure needs-ruling label exists
+        if: steps.retracted.outputs.needs_ruling == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh label create needs-ruling --color B60205 --description "Refresh retracts a landmark entry or more than 10 entries; needs a human ruling" || true
+
       - name: Open / update refresh PR
         # Pinned to a full commit SHA (v7) for supply-chain safety; bump
         # deliberately rather than tracking a mutable tag.
@@ -357,21 +401,8 @@ jobs:
           base: main
           delete-branch: true
           title: "Weekly data refresh"
-          labels: data-refresh, automated
-          body: |
-            Automated weekly refresh of external sources:
-            AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
-
-            On each run this branch is recreated from the current `main`, so the
-            diff is always relative to the latest `main` *at run time*. **Merge
-            promptly** — if commits land on `main` after this PR opens, the open
-            branch goes stale and merging it can revert that newer work. If it
-            has sat open across other merges, close it and re-run this workflow
-            (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
-
-            Review the diff before merging — flag any unexpected mass deletions
-            or large taxonomy shifts. Schema validation and the full unit-test
-            suite both ran green in this workflow before the PR was opened.
+          labels: ${{ steps.retracted.outputs.needs_ruling == 'true' && 'data-refresh, automated, needs-ruling' || 'data-refresh, automated' }}
+          body-path: ${{ runner.temp }}/pr-body.md
 
       # Runs LAST (after the PR is already opened, carrying whatever sources
       # did refresh — the source-health counter itself lives on

@@ -459,6 +459,7 @@ REGISTERED_PRODUCERS = {
     "migrate_owasp_llm_2026.py": "INTERNAL (one-shot migration over build inputs)",
     "lint_atlas_ids.py": "INTERNAL (CI lint: reads mitre_atlas/mitre_atlas_tactics only, writes nothing)",
     "atlas_entry_delta.py": "INTERNAL (refresh-PR audit report comparing two corpus files; writes a report, distributes no rows)",
+    "newly_retracted_report.py": "INTERNAL (refresh-PR body: lists newly retracted entry ids, CVE ids and tier for the reviewer; writes a markdown report, distributes no rows)",
 }
 
 # `incidents.core.json` / `detail/<year>.json` are in the pattern because the
