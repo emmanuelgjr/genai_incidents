@@ -1,0 +1,114 @@
+{
+  "_status": "PROPOSED by pipeline-engineer 2026-10-03. NOT an approval: this file is evidence input for the user's ruling (board D42(3)). The approval file the build reads is docs/audits/D42-approved-refresh-merges.json, which does not exist and must carry the user's authorization marker.",
+  "items": [
+    {
+      "kind": "merge",
+      "from": "INC-02381",
+      "into": "INC-01579",
+      "recommendation": "APPROVE",
+      "basis": "Same incident: AIID-1370 (California teen overdose, ChatGPT drug-use guidance) and the OECD row for the lawsuit over that death both cite AIID-1370."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-14310",
+      "into": "INC-01994",
+      "recommendation": "APPROVE",
+      "basis": "Same case: both OECD rows cite AIID-1686 and describe the $243M Tesla Autopilot (Benavides) verdict and its aftermath."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-01469",
+      "into": "INC-00699",
+      "recommendation": "UNSURE, lean DO NOT APPROVE",
+      "basis": "Both cite AIID-1657 (Anthropic song-lyrics training), but BMG v. Anthropic (2026-03-18) and the music publishers' suit (2026-03-24) are separate filings. Merging is defensible only if the project treats AIID-1657 as one incident."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-08148",
+      "into": "INC-01628",
+      "recommendation": "UNSURE, lean DO NOT APPROVE",
+      "basis": "Retired row is a follow-up on Pennsylvania chatbots posing as doctors; it cites AIID-1108 (digital-rights complaint about unlicensed therapy bots). The target already carries a Pennsylvania lawsuit row (05-05); the existing grouping is itself questionable."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-13241",
+      "into": "INC-01514",
+      "recommendation": "APPROVE (with retitle decision)",
+      "basis": "Both cite AIID-1677 (xAI data-center turbine pollution); NAACP/Memphis and the Mississippi lawsuit are the same AIID incident. Retitle is separate (see below)."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-14317",
+      "into": "INC-13066",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "Different people and events: Michael Lines (California, AIID-1569) vs Alice Carrier (Montreal, AIID-1535). Bridge is one new OECD row (2026-07-20-7ddf) citing AIID-1535, 1569 and 1609 (a third, Florida pastor)."
+    },
+    {
+      "kind": "merge",
+      "from": "INC-14902",
+      "into": "INC-00699",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "Suno hack/scraping story (cites AIID-1655) is not a lawsuit against Anthropic. INC-00699 becomes a 15-source music-copyright hub by bridging AIID-1655/1656/1657 through OECD rows that cite several."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-01579",
+      "recommendation": "APPROVE",
+      "basis": "New title is AIID-1370's own title; same incident as the merge above."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-13321",
+      "recommendation": "APPROVE",
+      "basis": "New title equals AIID-1644's title; same story, AIID's incident-level title replaces the OECD headline."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-14517",
+      "recommendation": "APPROVE",
+      "basis": "New title equals AIID-1671's title; same story."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-07910",
+      "recommendation": "APPROVE",
+      "basis": "New title equals AIID-1673's title; same story."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-07783",
+      "recommendation": "APPROVE",
+      "basis": "New title equals AIID-1679's title; same story."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-01514",
+      "recommendation": "APPROVE if the merge is approved",
+      "basis": "New title is the OECD 2026-02-12 row's headline; covers Mississippi and Tennessee."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-01994",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "Retitled to an earlier, different trial story (Florida) via OECD rows citing AIID-1686; the row is the $243M verdict."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-00699",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "Retitled from BMG v. Anthropic to a generic music-AI lawsuits hub."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-00813",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "A CVE-keyed Claude Code row (CVE-2025-59536 / CVE-2026-21852, 5 sources) would be retitled to an unrelated incident (Cline GitHub issue-triage exploit, AIID-1680) because an OECD row cites AIID-1680."
+    },
+    {
+      "kind": "retitle",
+      "id": "INC-03717",
+      "recommendation": "DO NOT APPROVE",
+      "basis": "Breeze Liu deepfake-porn row (AIID-660/687) would be retitled to 'Dozens of Dutch Women ...' (AIID-1684) via OECD-AIM-2024-03-22-e868."
+    }
+  ]
+}

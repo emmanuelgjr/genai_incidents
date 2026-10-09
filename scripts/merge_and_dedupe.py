@@ -1042,6 +1042,19 @@ def normalize_entry(raw: dict) -> dict | None:
         entry["description_provenance"] = raw["description_provenance"]
     if raw.get("description_source"):
         entry["description_source"] = raw["description_source"]
+    # WS4-T12 (D25(c), D42): every OECD AIM row's description is
+    # ingest_oecd_aim.build_description()'s own template. ingest_oecd_aim.py
+    # now stamps that on new rows; rows retained by its union-with-existing
+    # from earlier crawls predate the stamp, so backfill here from the
+    # source_id (the one fact that identifies the ingest path). Neither field
+    # is in _CONTENT_FIELDS, so this does not bump `updated`.
+    if (
+        str(raw.get("source_id") or "").startswith("OECD-AIM-")
+        and not raw.get("description_provenance")
+        and not raw.get("description_source")
+    ):
+        entry["description_provenance"] = "original"
+        entry["description_source"] = "oecd-aim"
     if raw.get("content_license"):
         entry["content_license"] = raw["content_license"]
     # E21/WS4 OECD-reduction corpus decoupling (2026-07-30): `corpus` IS a
@@ -1280,6 +1293,31 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
             "as_of": min(disputed[c].get("checked", "") for c in dhit),
         }
     return False
+
+
+def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -> int:
+    """Step 4d: apply durable curation overrides, keyed by ANY member
+    source_id. Returns the number of entries touched."""
+    applied = 0
+    for e in surviving:
+        hit = next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
+        if hit:
+            key_sid, ov = hit
+            for k, v in ov.items():
+                if k.startswith("_"):
+                    continue
+                # WS4-T12 (D42): a provenance label describes the shipped
+                # TEXT, so apply it only while the entry's description is
+                # still the text that source authored (the OECD template
+                # embeds its own source_id). Otherwise a later merge or
+                # snapshot change that moves the anchor (INC-00437, once
+                # AIID's snapshot gains aiid_id 1574) would stamp "oecd-aim"
+                # onto AIID-authored text.
+                if k in ("description_provenance", "description_source") and key_sid not in (e.get("description") or ""):
+                    continue
+                e[k] = v
+            applied += 1
+    return applied
 
 
 def _load_curation_overrides() -> dict[str, dict]:
@@ -1857,6 +1895,141 @@ def _load_split_retirements(path: Path) -> set[str]:
     }
 
 
+# WS4-T12/T14 follow-on, board decision D42 (2026-10-03): D25(a) STAYS in
+# force for OECD/AIID refresh merges. The 2026-10-03 diagnosis
+# (docs/audits/refresh-tripwire-2026-10-03.md section 5) found a refresh
+# would write 7 new `merged` deprecations and retitle 4 published stable
+# IDs through ONE mechanism that WS4-T10's URL fix does not cover: an OECD
+# row's AIID cross-reference acting as a dedup key across already-published
+# entries. Deprecations are append-only (invariant 9), so a wrong merge is
+# permanent; the user reviews each one first. This guard is the build-time,
+# fail-closed form of that rule: it aborts BEFORE any output write when a
+# build would (a) retire a previously-published ID into another through a
+# `merged`/`transitive-merge` record that touches an OECD-AIM-*/AIID-*
+# source id, or (b) retitle a published ID by absorbing OECD-AIM-*/AIID-*
+# source ids it did not hold before, unless the user-approved list below
+# names that exact change. Merges among rows that were never published
+# (new IDs) produce no deprecation and are not gated.
+REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-merges.json"
+_REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
+
+
+class RefreshMergeApprovalError(SystemExit):
+    """Raised (as a SystemExit, like SplitAuthorizationError) when a build
+    would write an OECD/AIID-driven merge or retitle the user has not
+    approved."""
+
+
+def _refresh_merge_entries_sha256(entries: list) -> str:
+    return hashlib.sha256(
+        json.dumps(entries, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
+    """Return the approved changes as a set of ("merge", from, into) /
+    ("retitle", id) tuples. A missing file approves NOTHING (that is the
+    state until the user rules). A present file approves nothing unless it
+    carries an `authorization` marker naming a decision id and an
+    `entries_sha256` that matches its own entries (tamper-evident; a
+    deliberate tamper-plus-recompute is the one shape this cannot see,
+    exactly as WS4-T21 documented for the D28 list, and is closed the same
+    way: pin the hash in code in the commit that records the ruling)."""
+    if not path.exists():
+        return set()
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        raise RefreshMergeApprovalError(
+            f"[FATAL] {path} exists but is unreadable ({exc}); refusing to build."
+        )
+    entries = doc.get("entries") if isinstance(doc, dict) else None
+    auth = doc.get("authorization") if isinstance(doc, dict) else None
+    if not entries:
+        return set()
+    if not (isinstance(auth, dict) and str(auth.get("decision") or "").strip()
+            and auth.get("ruled_by") == "user"):
+        raise RefreshMergeApprovalError(
+            f"[FATAL] {path} lists {len(entries)} approved change(s) but has no "
+            "`authorization` marker with a decision id and ruled_by == 'user'. "
+            "File presence authorizes nothing."
+        )
+    if auth.get("entries_sha256") != _refresh_merge_entries_sha256(entries):
+        raise RefreshMergeApprovalError(
+            f"[FATAL] {path}: authorization.entries_sha256 does not match its "
+            "entries -- the list was edited after it was ruled on."
+        )
+    out: set[tuple] = set()
+    for e in entries:
+        if e.get("kind") == "merge":
+            out.add(("merge", e["from"], e["into"]))
+        elif e.get("kind") == "retitle":
+            out.add(("retitle", e["id"]))
+    return out
+
+
+def _is_gated_source(s: str) -> bool:
+    return str(s).startswith(_REFRESH_GATED_PREFIXES)
+
+
+def _check_refresh_merge_authorization(
+    prev_incidents: list[dict],
+    deduped: list[dict],
+    fresh_deprecations: list[dict],
+    approval_path: Path | None = None,
+) -> None:
+    """D42 guard; see the block comment above REFRESH_MERGE_APPROVAL_PATH.
+    Call after id assignment and BEFORE any output write."""
+    approval_path = approval_path or REFRESH_MERGE_APPROVAL_PATH
+    approved = _load_refresh_merge_approvals(approval_path)
+    prev_by_id = {p["id"]: p for p in prev_incidents if p.get("id")}
+    cur_by_id = {e["id"]: e for e in deduped if e.get("id")}
+    problems: list[str] = []
+
+    for d in fresh_deprecations:
+        if d.get("reason") not in ("merged", "transitive-merge"):
+            continue
+        frm, into = d.get("from"), d.get("into")
+        prev_from = prev_by_id.get(frm)
+        if prev_from is None:
+            continue  # never published: nothing a citation could break
+        touched = set(d.get("retired_source_ids") or []) | set(
+            (cur_by_id.get(into) or {}).get("source_ids") or []
+        )
+        if not any(_is_gated_source(s) for s in touched):
+            continue
+        if ("merge", frm, into) not in approved:
+            problems.append(
+                f"merge {frm} -> {into} ({prev_from.get('title', '')[:70]!r}); "
+                f"retired source_ids {d.get('retired_source_ids')}"
+            )
+
+    for iid, cur in cur_by_id.items():
+        prev = prev_by_id.get(iid)
+        if prev is None or prev.get("title") == cur.get("title"):
+            continue
+        gained = set(cur.get("source_ids") or []) - set(prev.get("source_ids") or [])
+        if any(_is_gated_source(s) for s in gained) and ("retitle", iid) not in approved:
+            problems.append(
+                f"retitle {iid}: {prev.get('title', '')[:60]!r} -> "
+                f"{cur.get('title', '')[:60]!r} after absorbing "
+                f"{sorted(s for s in gained if _is_gated_source(s))[:4]}"
+            )
+
+    if problems:
+        nl = chr(10) + "  - "
+        raise RefreshMergeApprovalError(
+            "[FATAL] D42/D25(a): this build would write OECD/AIID-driven change(s) "
+            "to previously-published IDs that the user has not approved "
+            f"({len(problems)}):{nl}" + nl.join(problems[:25])
+            + (f"{nl}..." if len(problems) > 25 else "")
+            + chr(10) + "Nothing was written. This freeze is deliberate (D58, stage 1): a weekly "
+            "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
+            f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
+            "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
+        )
+
+
 def _check_split_authorization(
     prev_id_by_key: dict[str, str],
     deduped: list[dict],
@@ -2118,14 +2291,7 @@ def main():
     #     the snapshot and an override-set quality_tier is respected in step 5.
     curation = _load_curation_overrides()
     if curation:
-        applied = 0
-        for e in surviving:
-            ov = next((curation[s] for s in (e.get("source_ids") or []) if s in curation), None)
-            if ov:
-                for k, v in ov.items():
-                    if not k.startswith("_"):
-                        e[k] = v
-                applied += 1
+        applied = apply_curation_overrides(surviving, curation)
         print(f"[curation] applied {applied} override(s) from {CURATION_OVERRIDES_PATH.name}")
 
     # 4e) Flag CISA KEV (known-exploited) CVEs from the committed snapshot.
@@ -2558,6 +2724,10 @@ def main():
             seen_fresh_from.add(f)
             fresh.append(d)
     deprecations_all = list(prev_deprec) + fresh
+
+    # 8-pre) D42/D25(a) guard: no write has happened yet (the first one is
+    #        the id_deprecations.json write below).
+    _check_refresh_merge_authorization(_load_prev_incidents(), deduped, fresh)
 
     # 8a) WS4-T21 BOUNCE #1 defect 1: correct the pre-existing inbound
     #     `resplit_redirect` entries the D28-authorized list flags,

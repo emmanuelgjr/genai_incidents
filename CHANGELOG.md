@@ -7,6 +7,28 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
+
+- Agent-suggested; held for the user's merge ruling (the data change is user-visible
+  only through two non-content fields). Labels-only: `description_provenance =
+  "original"` and `description_source = "oecd-aim"` are now set on the 3,936
+  OECD-template rows that lacked them (3,937 now carry it with INC-00437), from the
+  WS4-T12 ingest stamp and a merge-time backfill keyed on the `OECD-AIM-` source id.
+  Neither field is a content field, so `updated`, `generated`, counts, titles, IDs
+  and `id_deprecations.json` are unchanged (0 rows, 0 deprecations). It is a
+  provenance label, not a licence marker. The labels reach `incidents.json` and the
+  Hugging Face JSONL export only; not `incidents.min.json`, STIX, MISP, TAXII,
+  `INCIDENTS.md`, `docs/incidents/*.md` or `stats.json`.
+- The OECD/AIID refresh freeze is now a deliberate gate. `merge_and_dedupe.py` aborts
+  with "Nothing was written" when a build would merge or retitle a previously
+  published ID through an OECD-AIM-/AIID- source id without a signed user approval
+  (`docs/audits/D42-approved-refresh-merges.json`, absent; a test asserts the set is
+  empty). The weekly refresh gains the AIID snapshot step (WS4-T14, continue-on-error,
+  output not committed) and therefore fails at "Re-merge + render + validate" while the
+  freeze holds, instead of at the unrelated E21 unit test. That test
+  (`test_oecd_aiid_content_disagreement_is_unique_to_inc00437`) is superseded by
+  `tests/test_aiid_signal_provenance.py`. See `docs/audits/oecd-stage1-build-2026-10-09.md`.
+
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 
 - `scripts/check_stats_drift.py` additionally fails CI when the README
