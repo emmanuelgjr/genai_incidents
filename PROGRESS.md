@@ -40,6 +40,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   2. option B wording "found 29/30/42/42 against expected 2";
   3. R7's curl attribution should be red-reviewer;
   4. bounce-#3 item 4 misdescribes its supersede treatment.
+- **Post-PASS advisories applied at `e45565ac`** (all 4, plus a 5th attribution fix at line 488). Foreman string check: `256-259` present ×3; "exceeded by" and "foreman curl" remain only inside the corrections log; NOTICE-DATA:256-259 read and it ends in "question.". **The memo is final and frozen; it awaits the user's A/B/C.**
 - **Item 7 caveat for the user:** the user asked to "prepare an unfreeze branch". The memo gives the S1-S9 build spec, and the rebased branch is built only if the user picks C or A (foreman decision A4).
 
 - **Item 7 D55 fixes at `3d481954` (pushed).** All 5 defects plus A1/A3 applied. The author also corrected §3's "Reading across" sentence (merges 3 and 4 had been overstated). Foreman grep: the stale tokens appear only inside the corrections logs. **The scoped re-gate has been sent to the bounce-#3 reviewer.**
