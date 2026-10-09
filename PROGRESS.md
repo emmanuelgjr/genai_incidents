@@ -10,6 +10,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🧑‍⚖️ 2026-10-09 — USER DECISIONS D48, D49 (the brief was re-issued; the queue resumes)
+- **D48 (item 1 escalation):** "Apply verbatim + re-gate". A **fresh** WS6 specialist applies exactly the bounce-#2 fixes and nothing else: lookbehind `(?<![\d.])` plus a `v2.9.0` plant test, and the VERSIONING step-4 bullet corrected in place. Then one red-reviewer pass and a string check.
+- **D49 (item 4 API shape):** **keep `resolve_id() -> str | None` unchanged** (non-breaking). Add `resolve_id_status(id, release=None)`, which returns a typed result: successor / group (with its set) / release-dependent / pre-tombstone. It covers all **17** silent IDs, not only the brief's 8. `valid_for_releases` arrives on *appended* deprecation records only (invariant 9).
+- Paths corrected: `INCLUSION.md` and `CORRECTIONS.md` are at the repo root, not under `docs/`.
+- **Item 2 has a branch** `ws4/v2130-atlas-refresh` @ `df61dcad` (ATLAS 2026.06→2026.09). It is unrecorded and ungated, and is queued for gating after item 1.
+
 ### ⛔⛔ Item 1 (latest-release drift) — **BOUNCE #2 (red-reviewer, 2026-10-06, on `0dca6321`) — ESCALATED TO USER**
 The gate's verdict, in its own words: "Neither remaining defect is in the mechanism: the drift check works and the documented cut order now passes. Both defects are the same two classes as last time, each narrower and each fixable in one line."
 1. **The HF-card check still overclaims.** The lookbehind `(?<![\w.])` lets a v-prefixed version (`Dataset v2.9.0`) pass, but the CHANGELOG says "any `X.Y.Z` version literal". Suggested fix: change it to `(?<![\d.])` and add a `v2.9.0` plant test.
