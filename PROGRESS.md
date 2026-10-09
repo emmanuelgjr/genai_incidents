@@ -10,6 +10,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ✅ Item 1 (latest-release drift) — **DONE: PASS (red-reviewer truth-only gate, 2026-10-09, on `e415624f`), MERGED to main**
+- **Verdict, in the gate's words:** "VERDICT: PASS. The new step-3 and step-5 text in docs/VERSIONING.md at e415624f matches the code. The diff 6b43db5c..e415624f touches only those two passages. DEFECTS: none."
+- **What the gate measured:**
+  - fresh `--no-local` clone; `numstat` shows 14/7 VERSIONING.md only, 2 hunks;
+  - every step-3 clause tied to file:line: render_markdown.py:543 is the sole stats.json writer, :40/:585-586 are the sole INCIDENTS.md writer, Makefile:6/11-13;
+  - **its own merge-only reproduction:** incidents.json 2.13.0, stats.json and INCIDENTS.md 2.12.0; drift rc=1 on stats-vs-CHANGELOG, pyproject, .zenodo, CITATION ×2 and USER_AGENT, with **no** INCIDENTS error. After render + render-docs-stats + validate, rc=0;
+  - step-5 list = step-4 list = what `check_stats_drift.main()` reads;
+  - pytest 595 passed, 1 xfailed; drift rc=0.
+- **The specialist refuted the gate's own suggested wording:** the README lead line is compared to the CHANGELOG, not to stats, and the stats-vs-CHANGELOG error was missing. The foreman confirmed this at check_stats_drift.py:131-160.
+- **Foreman [R] after the merge:**
+  - `--no-ff` merge onto main;
+  - `git diff --diff-filter=D --name-only HEAD^1 HEAD | wc -l` gives 0;
+  - `python scripts/check_stats_drift.py` rc=0;
+  - `pytest tests -q` gives 595 passed, 1 xfailed;
+  - stray check: `git status --porcelain` is empty in the main tree and the worktree.
+- **Branch diff:** CHANGELOG.md, docs/VERSIONING.md, scripts/check_stats_drift.py, tests/test_latest_release_drift.py (new), tests/test_stats_docs.py. data/ and PROGRESS.md untouched.
+- **ADVISORY (follow-ups, not blocking):**
+  - A1: under merge-only, whether README errors depends on whether the operator kept the `stats:version` marker;
+  - A2: step 3's pre-existing "incidents.min.json once the site deploy runs" is inaccurate, because render copies it during `make build`;
+  - bounce-2 advisories: the tomllib 3.11 dev floor vs `>=3.10`, and false positives on ungrouped numbers in arXiv/CVE/INC ids.
+- **Totals:** 4 bounces plus 1 PASS, with 3 user decisions (D48, D50, D51). Two of the four bounces traced to gate-dictated wording.
+
 ### 🧑‍⚖️ 2026-10-09 — USER DECISION D51 (item 1 after bounce #4): "Code-checked sentence, then merge"
 - The specialist verifies the gate's suggested step-3 wording **clause by clause against the code** (render_markdown.py:543, Makefile, check_stats_drift.py) before applying it, and completes the step-5 list of version literals.
 - The foreman confirms by an independent route. A final gate judges **only the truth of those sentences**. On PASS, merge.
