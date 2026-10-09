@@ -24,6 +24,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Item 3 (rejected-CVE sweep) — **DONE: advisory re-check PASS on `79ce7deb`, MERGED to main `81344e7b` (2026-10-09)**
+- **Advisory re-check, in the gate's words:** "Both fixes hold. When the report fails, the step still exits 0, the PR still opens, the body says the retraction state is UNKNOWN, and the PR gets `needs-ruling`. The stale label is removed only on an explicit clean result."
+- **Gate evidence:**
+  - the report step was run under bash -e for 4 cases (normal / raise / missing script / bad baseline ref): rc 0 every time, and every failure case gave needs_ruling=true and an UNKNOWN body;
+  - 7 mutations each fail a named test;
+  - the build reproduces byte-for-byte; 676 passed.
+- **Open:** A2, no live Actions run yet (foreman runs one `workflow_dispatch` next). A3, the CHANGELOG entry doesn't mention label removal (cosmetic; folded into the release CHANGELOG pass).
+- **Foreman [R] after merge:**
+  - `--no-ff`, no conflicts;
+  - `git diff --diff-filter=D --name-only HEAD^1 HEAD` gives 0;
+  - porcelain empty; CHANGELOG markers 0;
+  - validate rc 0; drift clean; lint_atlas OK (71, 2026.09);
+  - `pytest tests -q` gives **676 passed, 1 xfailed**.
+- **Item 3 against the user's brief:**
+  - the sweep runs on every refresh in its own job, never-checked first;
+  - the full re-check is done (9,169 CVEs, 0 new REJECTED, 26 DISPUTED);
+  - DISPUTED leads to `status_reason` + one-level confidence drop (D61), live once schema-architect adds the enum value (next);
+  - dated sweep log at `docs/audits/cve-sweep/2026-10-09.*`;
+  - retraction mechanics with D60 flagging;
+  - the "21" holds, so no CORRECTIONS entry.
+- **docs-warden** dispatched (the merge changes the sweep claims, the workflow and the CHANGELOG).
+
 ### ✅ Item 3 (rejected-CVE sweep) — **PASS (scoped re-gate under D59/D60, on `5360cef0`, 2026-10-09)**. Two advisories are being fixed before merge, per D52.
 - **Verdict, in the gate's words:** "All five scoped checks hold ... My bounce #2 defect is fixed, A1 is done, and D60's 'flag in the PR, don't block' works as specified."
 - **Gate evidence:**
