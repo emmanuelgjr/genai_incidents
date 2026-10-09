@@ -24,6 +24,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Item 6 (AIRI sunset memo) — **PASS (scoped re-gate under D56, on `57c3c115`, 2026-10-09)**. The memo is final; it awaits the user's decision on A / B1 / B2 / R and the review_by date.
+- **Verdict, in the gate's words:** "Both defects and all eight advisories from my last gate are fixed accurately. Every new figure checks out against my own measurement, and the change touches one file."
+- **Gate evidence:**
+  - the diff is 1 file, +93/-33, with 0 changes under data, src, schema or scripts;
+  - the §2 python with `eu-ai-act-` prints 1382 ×3, landmark 1382, and 1106/201/73/2;
+  - 1 row carries two stage tags, and 0 rows have an `intentional` key;
+  - the C→R rename is complete outside the corrections logs;
+  - line 329's "both" correctly refers to A-frozen vs R-refreshed.
+  The 672 / 0 / per-tag / INC-02549 figures are now independently re-derived by the gate as well as by the foreman.
+- **Advisory:** "the same under every option" is an optional clarity edit; it is not applied, since the gate rules the current text correct.
 - **Item 6 D56 fixes at `57c3c115` (pushed).** Foreman [R]: deployment-stage tag occurrences 1,348 + 26 + 9 = **1,383** across 1,382 rows (1 row carries two). The bare `eu-ai-act` tag is on INC-02549 only. Stale tokens now appear only inside the corrections logs, except line 329's "both options", which the gate will judge. **Scoped re-gate sent to the bounce-#3 reviewer.**
 - **⚖ D56, USER RULING 2026-10-09 (item 6 bounce #3): "Fix + scoped re-gate".** The D54 fresh author fixes the 2 defects and applies the advisories, including renaming the memo's option C to "Option R (re-ingest)" to avoid the D8 clash. The bounce-#3 reviewer then re-checks only the diff.
 
