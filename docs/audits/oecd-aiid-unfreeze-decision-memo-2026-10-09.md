@@ -71,10 +71,12 @@ deliberate one" shape the board recorded at PROGRESS.md:1513.
 | 36310267841 | 2026-09-27 | 42 | no |
 
 The diagnosis states all six runs listed (back to 2026-08-30) concluded `failure`.
-Runs after 2026-09-27 are not in any file I can read; **the 10-04 run is unaccounted
-for** (command in section 8). Last successful refresh with data: committed OECD
-ingest still holds the 4,160 rows crawled before the freeze (`"OECD-AIM-YYYY` source
-ids in `data/incidents.json`: 4,160 [G]); the AIRI download has been dead since
+**Dated note (2026-10-09, per gate bounce #1):** auto-refresh run 37195068024
+(2026-10-04) failed on the same tripwire test with 42 rows, same as 09-27; its AIRI 404
+is in a continue-on-error step. Runs after 10-04 are not in any file I can read
+(command in section 8). Last successful refresh with data: committed OECD
+ingest still holds the OECD rows crawled before the freeze (4,160 `OECD-AIM-` id
+occurrences in `data/incidents.json` [G], in 4,104 rows); the AIRI download has been dead since
 2026-05-31 (N8, unrelated to D25).
 
 **Rows held back (as measured 2026-10-03, against the then 13,361-row corpus).**
@@ -119,7 +121,7 @@ has not been measured. See spec requirement S1.
 | rows whose `description` starts "Tracked by the OECD AI Incidents and Hazards Monitor (AIM) as" (project template, no OECD narrative) | 3,937 | |
 | rows carrying `description_source: "oecd-aim"` | 1 (INC-00437) | the other 3,936 are unlabelled, which is what T12 labels |
 | OECD attribution references `"OECD (20yy), AI Incidents and Hazards Monitor` | 4,755 | matches `SOURCE_LICENSES` 1.5 "4,755 citation-shaped references" |
-| `OECD-AIM-` source-id lines | 4,160 | |
+| `OECD-AIM-` source-id occurrences (lines) | 4,160 | occurrences, not rows: 4,104 rows carry at least one (27 carry more than one) |
 
 So today the corpus ships, from OECD: a project-written template sentence, a link,
 an attribution string, structural facts, **and OECD's LLM-generated headline as
@@ -130,7 +132,7 @@ OECD title, OECD template description.
 
 Two published-claim figures will be wrong after an unfreeze and are live surfaces:
 `NOTICE-DATA:249-251` ("3,667 of 3,829 OECD-AIM-sourced rows") is already stale
-against the 4,160 above, and `SOURCE_LICENSES` 1.2a / `NOTICE-DATA:195-198`
+against the figures above (like-for-like replacement: 3,937 of 4,104), and `SOURCE_LICENSES` 1.2a / `NOTICE-DATA:195-198`
 ("0 of 1,466", "1,463-1,464 of 1,465", "the two exceptions") are measurements the
 refresh changes (section 4, R3).
 
@@ -139,7 +141,7 @@ refresh changes (section 4, R3).
 ## 3. What the first unfrozen run would change
 
 Source: the branch's own evidence, not re-run by me. Branch `ws4/refresh-tripwire-42`
-@ `586f40c8`, based on old main `9604752f`. Files: `docs/audits/refresh-tripwire-2026-10-03.md`,
+@ `586f40c8`, merge-base `a7343274` (2026-10-03; 109 commits behind main, 3 ahead); fork point `9604752f`. Files: `docs/audits/refresh-tripwire-2026-10-03.md`,
 `D42-refresh-merge-review-2026-10-03.md`, `D42-proposed-refresh-merges.json`,
 `D42-t12-t14-implementation-2026-10-03.md`.
 
@@ -213,12 +215,12 @@ favour.
 
 | # | Risk | Size | Status |
 |---|---|---|---|
-| R1 | **OECD `title` exposure grows.** Titles are LLM output from third-party news (E21 section 2.4), the OECD non-grant clause applies, and the question is open. Today ~4,160 rows carry one (4,160 `OECD-AIM-` ids [G]). The first run adds up to ~+1,533 rows (+37%) and retitles 4 published IDs to OECD headlines (`INC-01514`, `INC-01994`, `INC-00699`, plus merge-driven). The refresh did not create the question, but it scales it by a measurable factor and ships it on new stable IDs. | Medium, scaling | **Open, not resolved by any file I read.** UNKNOWN pending the OECD reply (R6). |
+| R1 | **OECD `title` exposure grows.** Titles are LLM output from third-party news (E21 section 2.4), the OECD non-grant clause applies, and the question is open. Today 3,937 rows ship a title exactly equal to a raw OECD title (the same set as the OECD-template descriptions), out of 4,104 rows carrying at least one `OECD-AIM-` id (4,160 is the id occurrences, 27 rows carry more than one; 4,104 foreman-confirmed). The first run adds up to ~+1,533 rows: 1533/4104 = 37.4% of OECD-id rows, 1533/3937 = 38.9% of the title-exposure base. It retitles 4 published IDs, 3 to OECD-origin headlines (`INC-01514`, `INC-01994`, `INC-00699`) and 1 to an AIID title (`INC-01579` = AIID-1370's title; tripwire audit table `:236-241`, D42 review section B). Commands in section 8 (row-count block). The refresh did not create the question, but it scales it by a measurable factor and ships it on new stable IDs. | Medium, scaling | **Open, not resolved by any file I read.** UNKNOWN pending the OECD reply (R6). |
 | R2 | **Description narrative leaks back.** Today's controls: `build_description()` only (`SOURCE_LICENSES` 1.5). The new branch test explains every `aiid_id` row by exact derivation and the 42/42 reconstruction passed; it covers `aiid_id` rows and the `title`, **not every OECD row** (`D42-t12-t14:83-97`, "Known limits"). New OECD rows with no `aiid_id` are covered only by the earlier E21 gate tests, which I did not re-read. | Low if the full-corpus reconstruction is added (S5) | Spec S5 |
 | R3 | **Published numbers go stale.** `SOURCE_LICENSES` 1.2a and `NOTICE-DATA:195-198` state "0 of 1,466", "1,463-1,464 of 1,465", "the two exceptions ship no AIID text". The tripwire diagnosis notes the refresh turns "two" into 42-43 (`refresh-tripwire:211-216`), though those rows ship OECD template text, not AIID text, so no AIID attribution is owed; the claim, not the compliance, breaks. `NOTICE-DATA:249-251` is already wrong (3,667/3,829 vs 4,160). | Misstatement risk | Live surfaces: correct in place after the data lands (S6) |
 | R4 | **AIID shipped population grows** by roughly the new snapshot rows (~+94 by subtraction, plus 6 retitles to AIID titles). E23's ruling is shape-based (bare title, U.S. situs) so it extends in kind, but its counts (1,463) and its "0 marker" measurement must be re-run, and its reopen tripwire must be re-checked: the AIRI/`aiid_incidents.json` population must still not reach `data/incidents.json`. | Low in kind | S5, S6 |
 | R5 | **E23 Layer-1 uncertainty is unchanged and unaffected.** It rests on E13's uncertified situs method; the E23 ruling says so itself. An unfreeze enlarges the dependency by ~100 rows, not its character. | Low | none |
-| R6 | **OECD terms question is still unanswered on this record.** Outreach to `ai@oecd.org` was sent 2026-07-31 with a 2026-08-21 follow-up (`docs/outreach/README.md:21`). I found no reply or follow-up logged on the board (grep of PROGRESS.md, local, absence). Primary terms pages still 403 to every tool. Ask the user. | UNKNOWN | Open question to user |
+| R6 | **OECD terms question is still unanswered on this record.** Outreach to `ai@oecd.org` was sent 2026-07-31; follow-up window 2026-08-21 (`docs/outreach/README.md:21`); no follow-up send recorded and no reply found (local grep of PROGRESS.md, outreach README, oecd-aim-terms.md, which shows absence only on this tree). Primary terms pages still 403 to every tool. Ask the user. | UNKNOWN | Open question to user |
 | R7 | **Sitemap redirect / robots gap**: the sitemap URL 302s to `incidents-server.oecdai.org`, whose robots.txt the shared limiter never checks (`SOURCE_LICENSES` 1.5, Scrape-permitted). Individual incident pages do not redirect (7/7, 2026-07-30). One fetch per run; unchanged by the unfreeze, but a resumed weekly crawl resumes it. | Low | Check in section 8 |
 | R8 | **Label wording.** T12's `description_provenance: original` / `description_source: oecd-aim` is a provenance label, not a content-licence marker. `SOURCE_LICENSES` 1.5 says no marker "is emitted for OECD-derived rows today; whether one is warranted is a separate, not-yet-scoped question". Shipping the label must not be described as that marker. | Low | S6 wording |
 
@@ -234,8 +236,9 @@ rows). The merges are an integrity risk (wrong permanent redirects), not a licen
 run the refresh. Consequence: the gate is all-or-nothing
 (`D42-refresh-merge-review:43-46`: "approving nothing for it keeps the build failing
 closed... The gate cannot 'reject and continue' by itself"). To publish, **every one
-of the 17 changes must be approved**, including at least 4 merges and 4-5 retitles
-the evidence marks wrong (4 merges, 4 retitles). Not recommended. Alternatively approve only the good ones,
+of the 17 changes must be approved**, including 4 merges (3, 4, 6, 7) and 4 retitles
+the evidence marks do-not-approve, plus 1 merge (5) and 1 retitle (`INC-01514`) that are
+conditional or contested. Not recommended. Alternatively approve only the good ones,
 in which case nothing publishes.
 
 **B. Decline: leave the branch unmerged, keep D25(a) as is.** Consequences, all
@@ -287,7 +290,7 @@ user's to send (`SOURCE_LICENSES` 1.5, Follow-up date).
 
 Binding on whichever option is chosen; S1-S6 are stage 1, S7-S9 are stage 2.
 The branch must be rebuilt on `main` @ `07f22c09` (or later); the old base
-`9604752f` predates wave 1-2, rejected-CVE retraction and the schema change, and
+`a7343274` (merge-base; fork point `9604752f`) predates wave 1-2, rejected-CVE retraction and the schema change, and
 `data/incidents.json` will conflict.
 
 **Stage 1 (machinery + label-only data)**
@@ -298,7 +301,7 @@ The branch must be rebuilt on `main` @ `07f22c09` (or later); the old base
   ID set identical, `id_deprecations.json` byte-identical (0 new records), per-field
   changed-row counts for **every** field. Expected and only expected: `description_provenance`
   and `description_source` on exactly the OECD-template rows not already labelled
-  (3,936 expected, to be re-derived). `updated`, `title`, `severity`, `aiid_id`, `tags`,
+  (3,936 expected, to be re-derived; this is OECD rows only: 3,728 rows on main already carry `description_provenance` (cvelistv5, aiaaic, 134 original/None, INC-00437), so the per-field count must be reported by source, not as one total). `updated`, `title`, `severity`, `aiid_id`, `tags`,
   `references`, `corpus` and all other fields: 0. Any other moved field is a defect
   (agreement 2).
 - **S2. Per-row label check, both directions** (agreement 6 form d): every row labelled
@@ -396,6 +399,21 @@ curl -sI https://oecd.ai/sitemaps/incident-monitor-sitemap.xml | grep -i locatio
 grep -n -i "oecd" PROGRESS.md | grep -i -E "repl|respon|answer"                            # R6 absence
 ```
 
+Row-count block (R1 figures; added at gate bounce #1):
+
+```
+python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
+print(sum(1 for e in I if 'OECD-AIM-' in json.dumps(e)))"                          # 4,104 rows with an OECD-AIM- id
+python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
+print(sum(1 for e in I if sum(s.startswith('OECD-AIM-') for s in e.get('source_ids',[]))>1))"  # 27 multi-id rows
+python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
+R={r['title'] for r in json.load(open('ingest/oecd_aim_full_incidents.json',encoding='utf-8'))};\
+print(sum(1 for e in I if e['title'] in R))"                                       # 3,937 titles equal to a raw OECD title
+python -c "print(1533/4104, 1533/3937)"                                             # 0.3735, 0.3894
+python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
+print(sum(1 for e in I if e.get('description_provenance')))"                       # A5: 3,728 already labelled on main
+```
+
 Premise-style checks on the 7 merges: for each `from`/`into` pair, open the raw
 `ingest/oecd_aim_full_incidents.json` rows and `ingest/aiid_full.json` rows named in
 `D42-refresh-merge-review-2026-10-03.md` section A and confirm the cited AIID ids; in
@@ -408,6 +426,25 @@ export other than `incidents.json` carries the new fields; any run after 2026-09
 whether OECD replied; the raw records behind the merge reads.
 
 ---
+
+## Corrections before freeze (2026-10-09, gate bounce #1)
+
+Corrected in place (memo not yet frozen). Figures from the gate/foreman are attributed
+and each has a command in section 8; I re-checked the cited files where I could.
+1. Section 1 and the section 2 table, R1, R3: 4,160 is `OECD-AIM-` id occurrences, not
+   rows. Rows: 4,104 (27 with more than one id). 3,937 titles equal a raw OECD title;
+   like-for-like replacement for NOTICE-DATA's "3,667 of 3,829" is 3,937 of 4,104.
+   Growth restated: 1533/4104 = 37.4%, 1533/3937 = 38.9% (previous "+37%" was
+   against the wrong base).
+2. R1: the retitles to OECD-origin headlines are 3 (INC-01514, -01994, -00699), not 4;
+   INC-01579 takes AIID-1370's title (tripwire audit `:236-241`, D42 review section B).
+3. R6: "follow-up" was ambiguous; only a follow-up window (2026-08-21) is recorded
+   (`docs/outreach/README.md:21`), no send.
+4. Advisories: base is merge-base `a7343274` (fork point `9604752f`); run 37195068024
+   (2026-10-04) noted in section 1; option A wording made consistent (4 do-not-approve
+   merges + 4 retitles, plus 1 conditional merge + 1 conditional retitle); S1 now notes
+   3,728 rows already carry `description_provenance`, so the 3,936 is OECD rows only.
+   A4 (spec vs branch) left to the foreman.
 
 *Agent-suggested; do not regenerate. Supersede by a dated addendum, not by rewriting
 (CLAUDE.md working agreement 4).*
