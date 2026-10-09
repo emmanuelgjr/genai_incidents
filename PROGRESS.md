@@ -10,6 +10,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### ✅ Item 2 (ATLAS refresh) — **PASS (red-reviewer re-gate, 2026-10-09, on `af4f7c31`) · merge AWAITING USER (5,841-entry relabel, D28 precedent)**
+The gate's verdict, in its own words: "VERDICT: PASS ... All four defects from bounce #1 are closed, and the fix introduced no regression."
+- **What the gate measured:**
+  - scope: fix diff of 9 files; data paths empty.
+  - **Defect 1, live:** `fetch_atlas.py` via common.py printed NO-OP with `git status` empty. A planted `#tamper` was rewritten (the guard fires). `atlas_pin --report` onto the existing audit gave rc=2. Every workflow step after "Detect change" is gated on `changed=='true'`.
+  - **Defect 2:** own per-entity script gives 2,532 (8 carry both T0019 and T0058); 2,532 + 3,309 = 5,841; the audit one-liner prints `2532 3309`; no other double-counted aggregate.
+  - **Defect 3:** the 4 phantom ids and T0015.001 have 0 id-lines in five upstream releases, and T0015 is present in each. INC-06842 moved only last_seen, mitre_atlas and updated. The CORRECTIONS date convention is the date of the change.
+  - **Defect 4:** §3.1 matches ingest_external.py:68, fetch_atlas.py, `.reuse/dep5` and the live upstream LICENSE.
+  - **Folded advisories:** match Makefile:6, auto-refresh.yml:275, atlas-refresh.yml:177 and validate.yml (a reopen triggers CI).
+  - **Invariant 5:** HTTP-only via common.py; the register covers non-HTTP egress only, so it is adequate.
+  - tip: pytest 614 passed, 1 xfailed; validate, lint and drift clean.
+  - trial merge onto f4d0e0b2: one CHANGELOG [Unreleased] conflict, both additive, keep both; merged tree 626 passed, 1 xfailed.
+  - specialist worktree: no strays.
+- **ADVISORY (follow-ups):**
+  1. delta audit :24 says "below"; it should say "above".
+  2. a same-version re-issue with changed bytes fails loudly at the pin step; document this in the workflow header.
+  3. `atlas_entry_delta.py` has no overwrite guard; it predates this fix.
+  4. §3.1 "three small requests" is really up to 4 with robots, plus an 840 KB file; its date-checked cell is stale.
+  5. the CORRECTIONS row cites a branch name; repoint it to the merge or release.
+  6. upstream 2026.07 and 2026.08 were skipped; one line in the release notes.
+
 ### ⛔ Item 2 (ATLAS refresh) — **BOUNCE #1 (red-reviewer, 2026-10-09, on `df61dcad`)** → redispatched to WS4
 The gate's verdict, in its own words: "The data operation itself held up under every independent check I ran ... The bounce is for the workflow and for records/disclosure: four defects, all fixable without touching data/incidents.json."
 1. **The monthly workflow is not a no-op on an unchanged release, and it overwrites the dated audit.**
