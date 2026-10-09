@@ -363,10 +363,14 @@ jobs:
       # more than 10 are retracted. See scripts/newly_retracted_report.py.
       - name: Newly retracted entries report
         id: retracted
+        # D60 "never block": a failure here must not skip the PR. The script
+        # below already has a fallback; continue-on-error is the belt to that
+        # braces. An unknown retraction state is flagged, not passed as clean:
+        # the fallback sets needs_ruling=true, and the label/removal steps treat
+        # anything other than an explicit 'false' as "needs a ruling".
+        continue-on-error: true
         run: |
-          python scripts/newly_retracted_report.py --before-ref HEAD             --out-md "$RUNNER_TEMP/newly-retracted.md" --github-output "$GITHUB_OUTPUT"
-          {
-            cat <<'BODY'
+          cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources:
           AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
 
@@ -382,16 +386,28 @@ jobs:
           suite both ran green in this workflow before the PR was opened.
 
           BODY
-            cat "$RUNNER_TEMP/newly-retracted.md"
-          } > "$RUNNER_TEMP/pr-body.md"
+          if python scripts/newly_retracted_report.py --before-ref HEAD \
+               --out-md "$RUNNER_TEMP/newly-retracted.md" --github-output "$GITHUB_OUTPUT"; then
+            cat "$RUNNER_TEMP/newly-retracted.md" >> "$RUNNER_TEMP/pr-body.md"
+          else
+            echo "::warning::newly_retracted_report.py failed; flagging the PR needs-ruling (unknown retraction state)."
+            {
+              echo "### Newly retracted entries (CVE rejection sweep)"
+              echo
+              echo "**The retraction report could not be produced** (see the workflow run). The retraction state of this refresh is UNKNOWN, so the PR is labelled \`needs-ruling\`; compare \`status: retracted\` against \`main\` by hand. The refresh was not blocked."
+            } >> "$RUNNER_TEMP/pr-body.md"
+            echo "count=unknown" >> "$GITHUB_OUTPUT"
+            echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Ensure needs-ruling label exists
-        if: steps.retracted.outputs.needs_ruling == 'true'
+        if: steps.retracted.outputs.needs_ruling != 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh label create needs-ruling --color B60205 --description "Refresh retracts a landmark entry or more than 10 entries; needs a human ruling" || true
 
       - name: Open / update refresh PR
+        id: cpr
         # Pinned to a full commit SHA (v7) for supply-chain safety; bump
         # deliberately rather than tracking a mutable tag.
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
@@ -401,8 +417,17 @@ jobs:
           base: main
           delete-branch: true
           title: "Weekly data refresh"
-          labels: ${{ steps.retracted.outputs.needs_ruling == 'true' && 'data-refresh, automated, needs-ruling' || 'data-refresh, automated' }}
+          labels: ${{ steps.retracted.outputs.needs_ruling != 'false' && 'data-refresh, automated, needs-ruling' || 'data-refresh, automated' }}
           body-path: ${{ runner.temp }}/pr-body.md
+
+      # A later CLEAN run updating the same open PR must not leave a stale
+      # needs-ruling label from an earlier run. Only on an explicit 'false'.
+      - name: Remove stale needs-ruling label
+        if: steps.retracted.outputs.needs_ruling == 'false' && steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.cpr.outputs.pull-request-number }}
+        run: gh pr edit "$PR" --remove-label needs-ruling || true
 
       # Runs LAST (after the PR is already opened, carrying whatever sources
       # did refresh — the source-health counter itself lives on

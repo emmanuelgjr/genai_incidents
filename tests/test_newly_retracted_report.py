@@ -128,3 +128,58 @@ def test_pr_step_uses_the_report_body_and_the_label_decision_and_is_not_blocked(
     assert lab["run"].rstrip().endswith("|| true") and "gh label create needs-ruling" in lab["run"]
     for s in (rep, lab):   # never blocks: no exit-1 path of its own
         assert "exit 1" not in s["run"]
+
+
+# ----- fail-safe (D60 "never block") and stale-label removal -----
+
+def _report_step() -> dict:
+    return next(s for s in _wf()["jobs"]["refresh"]["steps"] if s.get("id") == "retracted")
+
+
+def _run_report_step(cwd: Path, tmp: Path) -> tuple[int, dict, str]:
+    import shutil
+    import subprocess
+    bash = shutil.which("bash")
+    if not bash:
+        import pytest
+        pytest.skip("bash not available")
+    script = tmp / "step.sh"
+    script.write_text(_report_step()["run"], encoding="utf-8", newline="\n")
+    out = tmp / "gh_output"
+    out.write_text("", encoding="utf-8")
+    env = {**__import__("os").environ, "RUNNER_TEMP": str(tmp), "GITHUB_OUTPUT": str(out)}
+    r = subprocess.run([bash, str(script)], cwd=cwd, env=env, capture_output=True)
+    kv = dict(l.split("=", 1) for l in out.read_text(encoding="utf-8").splitlines() if "=" in l)
+    return r.returncode, kv, (tmp / "pr-body.md").read_text(encoding="utf-8")
+
+
+def test_report_step_is_non_blocking_and_a_failed_report_flags_needs_ruling(tmp_path):
+    assert _report_step().get("continue-on-error") is True
+    empty = tmp_path / "empty"      # no scripts/newly_retracted_report.py here: python exits non-zero
+    empty.mkdir()
+    rc, kv, body = _run_report_step(empty, tmp_path)
+    assert rc == 0, "the step itself must succeed even when the report script fails"
+    assert kv["needs_ruling"] == "true", "unknown retraction state is flagged, not passed as clean"
+    assert "could not be produced" in body and "Automated weekly refresh" in body, "static body plus a visible line"
+
+
+def test_report_step_success_path_reports_clean_with_the_static_body(tmp_path):
+    work = tmp_path / "w"
+    work.mkdir()
+    rc, kv, body = _run_report_step(ROOT, work)
+    assert rc == 0 and kv == {"count": "0", "needs_ruling": "false"}
+    assert "Automated weekly refresh" in body and "None: no entry is retracted" in body
+
+
+def test_unknown_state_gets_the_label_and_only_an_explicit_false_removes_it():
+    steps = _wf()["jobs"]["refresh"]["steps"]
+    by = {s.get("name"): s for s in steps}
+    assert "!= 'false'" in by["Open / update refresh PR"]["with"]["labels"]
+    assert "!= 'false'" in by["Ensure needs-ruling label exists"]["if"]
+    rm = by["Remove stale needs-ruling label"]
+    assert "needs_ruling == 'false'" in rm["if"] and "pull-request-number" in rm["if"]
+    assert "--remove-label needs-ruling" in rm["run"] and rm["run"].rstrip().endswith("|| true")
+    assert "steps.cpr.outputs.pull-request-number" in rm["env"]["PR"]
+    names = [s.get("name") for s in steps]
+    assert names.index("Remove stale needs-ruling label") > names.index("Open / update refresh PR")
+    assert by["Open / update refresh PR"]["id"] == "cpr"
