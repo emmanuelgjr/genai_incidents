@@ -24,6 +24,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 📝 docs-warden sweep after the item 3 merge (2026-10-09, @ `2254560a`): 0 stale cadence claims; F1 medium, F2/F3 low, F4 informational
+- **CHANGELOG item-3 figures all re-derived and matching:**
+  - 9,169 CVEs: 37 / 9,124 / 8; 26 DISPUTED (all cna-tag);
+  - the log shows 0 failures and 2,171 state changes;
+  - 29 retracted; 15,637 / 15,666;
+  - ceil 8 / 16; about 21 min.
+  - "22 sole-evidence" holds by `source_ids`. By `cve_ids` alone 24 entries touch a disputed CVE, but INC-02515 and INC-01723 have other evidence.
+- **Findings and routing:**
+  - **F1 (medium):** DATA_DICTIONARY:17-18 documents `status: disputed` and `cve-disputed` as live, while the schema enum on main is `["cve-rejected"]` and 0 entries are disputed. **Routed to schema-architect's in-flight branch**, where it becomes true when the enum lands. If that branch were declined, the dictionary must be reworded as "reserved".
+  - **F2 (low):** SOURCE_LICENSES §2.5 says "one lifecycle fact per CVE", but the snapshot now also records the `disputed` marker. **NEW BOARD NOTE → WS0 license-auditor:** confirm the CVE ToU covers the derived marker and update the cell.
+  - **F3 (low):** the schema's `status_reason.as_of` description says "earliest checked", while D62 means "last re-checked". **Routed to schema-architect** (same branch).
+  - **F4:** no surface describes the workflow as a single job; no fix needed.
+
 ### 🔄 2026-10-09 dispatches after the item 3 merge
 - **Live check (A2/A3):** `gh workflow run auto-refresh.yml --ref main` started run **37992134374** (workflow_dispatch). The foreman reads its jobs when it ends: does `cve-sweep` produce the artifact, does `refresh` download it, and is the summary cell the step outcome? The PR step is still expected to skip, because the E21 tripwire test fails (the item-7 accidental freeze); that is not item 3.
 - **schema-architect** on `ws3/v2130-schema-disputed-reviewby` (worktree `ws3-v2130-schema`, base `2254560a`):
