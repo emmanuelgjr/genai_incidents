@@ -10,6 +10,20 @@ name: Monthly ATLAS refresh
 # the committed provenance, so `git status` stays clean; atlas_pin.py refuses to
 # overwrite an existing dated audit).
 #
+# Same version, changed bytes: if upstream re-issues the SAME version with
+# different content, fetch_atlas.py overwrites ingest/atlas/ATLAS-<ver>.yaml and
+# the provenance (changed=true), but the dated diff report
+# docs/audits/atlas-refresh-<ver>-release-diff.md already exists, so the
+# "Re-derive pin" step fails (atlas_pin.py exits 2, refusing to overwrite a
+# dated record; that step deliberately has no continue-on-error). Nothing is
+# written past that point and no PR is opened; the failed run is the signal.
+# Human: read the upstream change, then either (a) move/rename the old report
+# deliberately and re-run the workflow, or (b) decide the re-issue is not worth
+# adopting and leave the pin as is. The per-entry delta step has the same
+# refuse-if-exists guard (atlas_entry_delta.py exits 2 when its dated file
+# exists, i.e. a second changed run on the same UTC date); it is
+# continue-on-error, so that is recorded in the PR body, not fatal.
+#
 # Network: ONLY scripts/fetch_atlas.py, which goes through ingest/common.py
 # (robots.txt, rate limit, identifying User-Agent). Everything after it is
 # offline and deterministic.

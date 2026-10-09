@@ -238,11 +238,11 @@ is committed as `ingest/atlas/ATLAS-<release>.yaml` (currently 2026.09) with
 | Field | Value |
 |---|---|
 | License | **Apache License 2.0**, confirmed via `mitre-atlas/atlas-data` LICENSE file (fetched 2026-07-15): *"Copyright 2021-2026 MITRE. Licensed under the Apache License, Version 2.0."* |
-| Scrape-permitted | Yes for the HTTP path: the file is a published release artifact of a public repo under Apache-2.0, fetched via `ingest/common.py` (robots.txt for `raw.githubusercontent.com` checked on every fetch, 1 s default spacing; three small requests per run: two ~20-byte pointers and the ~840 KB release, at most monthly). The case-study path (1) is a local clone: N/A. |
+| Scrape-permitted | Yes for the HTTP path: the file is a published release artifact of a public repo under Apache-2.0, fetched via `ingest/common.py` (robots.txt for `raw.githubusercontent.com` fetched once per process and cached by `ingest/common.py`, then checked before every request; 1 s default spacing; up to four requests per run: the robots.txt, two ~20-byte pointers and the ~840 KB (841,482-byte for 2026.09) release, at most monthly). The case-study path (1) is a local clone: N/A. |
 | Redistribute-verbatim | **YES** under Apache-2.0 terms (case-study titles/descriptions are reproduced from the dist YAML; the whole release YAML is also committed verbatim under `ingest/atlas/`, covered by the `.reuse/dep5` stanza `ingest/atlas/ATLAS-*.yaml`: Apache-2.0, copyright 2021-2026 The MITRE Corporation, with MITRE's notice carried in `NOTICE-DATA`). |
 | Relicense-compatible | **YES, with a carve-out.** Apache-2.0 does not require share-alike, but it does require preserving the copyright/license notice on the covered material — MITRE's Apache-2.0 notice must stay attached to ATLAS-derived case-study text specifically; it cannot be silently folded into a blanket "CC-BY-4.0, all rights reserved by us" claim. |
 | Action | **(a) compatible**, but the repo's licensing docs (LICENSE-DATA / this file) must state the ATLAS-derived carve-out explicitly — this is a direct input to WS0-T2. |
-| Date-checked | 2026-07-15 |
+| Date-checked | 2026-07-15 (case-study path); 2026-10-09 (HTTP path: upstream `LICENSE` re-fetched via `ingest/common.py`, still *"Copyright 2021-2026 MITRE ... Licensed under the Apache License, Version 2.0"*) |
 
 ### 3.2 CSET-AIID Harm Taxonomy
 *Ingested by:* `scripts/ingest_external.py::ingest_cset()` (checks for the

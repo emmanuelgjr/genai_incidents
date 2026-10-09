@@ -21,7 +21,7 @@ ATLAS pin 2026.06 -> 2026.09. Before = `origin/main:data/incidents.json (12f0a98
 (`ingest/atlas/ATLAS-2026.09.yaml`, sha256 in `ingest/atlas/ATLAS.provenance.json`).
 Two mechanisms change entry codes, and only these two:
 
-1. **Superseded technique ids (mechanical translation, 2,532 entries; corrected from 2,540, see the dated correction note below).**
+1. **Superseded technique ids (mechanical translation, 2,532 entries; corrected from 2,540, see the dated correction note above).**
    `AML.T0019` -> `AML.T0115.000` (41 entries), `AML.T0058` -> `AML.T0115.001`
    (2,498), `AML.T0104` -> `AML.T0115.002` (0 entries carried it),
    `AML.T0015.001` -> `AML.T0015` (1 entry, `INC-06842`; that id is undefined in 2026.06

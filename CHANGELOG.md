@@ -17,7 +17,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   techniques/subtechniques added, 3 retired (`AML.T0019`, `AML.T0058`, `AML.T0104`, folded
   into the new `AML.T0115` "Publish Poisoned AI Artifacts"), 4 renamed, 5 technique->tactic
   links changed, tactic `AML.TA0001` renamed "AI Attack Staging" -> "AI Attack Adaptation"
-  (`docs/audits/atlas-refresh-2026.09-release-diff.md`).
+  (`docs/audits/atlas-refresh-2026.09-release-diff.md`). Upstream also published 2026.07
+  and 2026.08 in between; the pin went straight from 2026.06 to 2026.09, so this diff
+  covers 2026.06 to 2026.09 directly and does not attribute changes to the intermediate releases.
 - **5,841 entries change `mitre_atlas` and/or `mitre_atlas_tactics`; no entry added,
   removed or re-IDed.** 2,532 have a superseded technique id mechanically translated
   (`AML.T0058` -> `AML.T0115.001` on 2,498 entries, `AML.T0019` -> `AML.T0115.000` on 41,

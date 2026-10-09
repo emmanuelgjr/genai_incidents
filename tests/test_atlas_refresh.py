@@ -370,3 +370,14 @@ def test_refresh_atlas_codes_updates_retained_priors_and_touches_only_atlas_fiel
     assert md.refresh_atlas_codes(e) is False                    # idempotent
     bare = {"owasp_llm": ["LLM07"]}                              # no atlas codes -> no backfill here
     assert md.refresh_atlas_codes(bare) is False and "mitre_atlas" not in bare
+
+
+def test_entry_delta_refuses_to_overwrite_existing_dated_audit(tmp_path, monkeypatch, capsys):
+    import atlas_entry_delta
+    out = tmp_path / "atlas-refresh-delta-2026-10-09.md"
+    out.write_text("EXISTING DATED RECORD\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["atlas_entry_delta.py", str(tmp_path / "nope-before.json"),
+                                      str(tmp_path / "nope-after.json"), str(out)])
+    assert atlas_entry_delta.main() == 2
+    assert "REFUSING to overwrite" in capsys.readouterr().err
+    assert out.read_text(encoding="utf-8") == "EXISTING DATED RECORD\n"

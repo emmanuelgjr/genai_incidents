@@ -206,6 +206,11 @@ def main() -> int:
     ap.add_argument("--after-label", default=None, help="display name of AFTER (default: file name)")
     ap.add_argument("--notes", type=Path, default=None, help="markdown text inserted after the header")
     a = ap.parse_args()
+    if a.out.exists():
+        # Dated audits are records, never regenerated (CLAUDE.md agreement 4).
+        print(f"[atlas-delta] REFUSING to overwrite existing {a.out}; a dated audit is "
+              "do-not-regenerate. Move/rename it deliberately or use another date.", file=sys.stderr)
+        return 2
     old_pin = atlas_pin.load_pin(a.old_pin) if a.old_pin else None
     r = compute(a.before, a.after, old_pin, atlas_pin.load_pin())
     a.out.parent.mkdir(parents=True, exist_ok=True)
