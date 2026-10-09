@@ -10,6 +10,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔁 Item 7 — **BOUNCE #1 (red-reviewer on `9646d00e`, 2026-10-09)**: in progress; specialist redispatched
+- **Verdict, in the gate's words:** "VERDICT: BOUNCE ... structure and nearly all of its claims hold up when checked by a different route. Three factual statements in this dated, do-not-regenerate record are wrong."
+- **Defects:**
+  1. R1 uses 4,160 OECD-AIM- id *occurrences* as a row count. The true counts are 4,104 rows, of which 3,937 ship an OECD title, so the like-for-like NOTICE-DATA figure is 3,937 of 4,104.
+  2. The "4 retitles to OECD headlines" are really 3 OECD (01514, 01994, 00699) plus 1 AIID title (INC-01579).
+  3. R6 says a follow-up was "sent", but only a follow-up *window* (2026-08-21) is recorded.
+- **Advisories:**
+  - A1: merge-base is a7343274 (109 behind / 3 ahead);
+  - A2: the 10-04 run failed on the same tripwire, 42 rows;
+  - A3: option A's counts contradict themselves;
+  - A4: the memo gives a spec, not a rebased branch (foreman's call);
+  - A5: 3,728 rows already carry `description_provenance`.
+- **Gate evidence:**
+  - `merge-base --is-ancestor 586f40c8 main` gives 1 (not merged);
+  - the 10-04 run log shows "FAILED tests/test_e21_partA_inc00437_provenance.py::test_oecd_aiid_content_disagreement_is_unique_to_inc00437 ... found 42";
+  - `merge_and_dedupe.py:1814-1870` on 586f40c8 aborts on any unapproved change;
+  - 3,936 OECD-template rows lack provenance.
+- **Foreman [R], by a different route:**
+  - entries whose JSON contains `OECD-AIM-`: **4,104**;
+  - `586f40c8:refresh-tripwire-2026-10-03.md:236-241` lists INC-01579;
+  - `docs/outreach/README.md:21` says "Follow-up window".
+  - All 3 defects are confirmed.
+- **A4 decision (foreman):** a rebased stage-1 branch would be built only after the user picks C, so the spec satisfies "prepare" for now. Building the branch before the ruling would spend a full rebuild on an option the user may decline.
+
 ### 🔍 Item 7 (OECD/AIID unfreeze memo) — **REVIEW: memo delivered `9646d00e` (pushed), red-reviewer dispatched 2026-10-09**
 - **Deliverable:** `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md` (413 lines). Agent recommendation: **C, staged**. Stage 1 rebases `ws4/refresh-tripwire-42` (T12/T14 machinery) and merges it with an EMPTY approval set plus the label-only rebuild. Stage 2, the real unfreeze, waits on the user and on a new suppression capability. **Agent-suggested; the decision is the user's.**
 - **Premise errors reported by the specialist:**
