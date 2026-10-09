@@ -24,6 +24,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⚖ D59-D62, USER RULINGS 2026-10-09 (item 3)
+- **D59 (bounce #2): fix + scoped re-gate.** The summary reads the step outcome through a job output, and a test is shown to fire. Least-privilege permissions for `cve-sweep`.
+- **D60 (retraction governance): "Flag in the PR, don't block."**
+  - The weekly PR lists each newly retracted entry with its CVE ids and tier.
+  - The PR is labelled `needs-ruling` when any is a landmark or more than 10 are newly retracted; the refresh is never held.
+  - Built in this item-3 branch (it is "retraction mechanics").
+- **D61 (disputed confidence): drop one level**, as built: 17 entries high→medium and 5 medium→low on the 22 sole-evidence entries. It takes effect when schema-architect adds `cve-disputed` to the `status_reason.code` enum, which is **now unblocked** and is batched with D57's `review_by`.
+- **D62 (`as_of`): keep "last re-checked"**, the v2.12.0 meaning, accepting a few one-line diffs a week.
+- Dispatched: D59 + D60 to the bounce-#1 fresh pipeline-engineer on `ws4/v2130-rejected-cve-sweep`.
+
 ### ⛔ Item 3 — **BOUNCE #2 (re-gate on `29e5d729`, 2026-10-09)**: ESCALATED to the user together with the item-3 policy package
 - **Verdict:** the gate checked D1's job split, the artifact hand-off, the wall-clock cap, D2's recipe and the A5 accounting itself, and all pass; every fire proof fires. One new regression, introduced by the fix commit.
 - **Defect (agreement 6a):**
