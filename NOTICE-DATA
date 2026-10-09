@@ -41,7 +41,10 @@ it:
     scripts/ingest_external.py, is Copyright 2021-2026 The MITRE
     Corporation, licensed under Apache License 2.0. See
     https://www.apache.org/licenses/LICENSE-2.0 and the ATLAS row of
-    docs/SOURCE_LICENSES.md.
+    docs/SOURCE_LICENSES.md. The same notice covers the verbatim ATLAS
+    release file committed as the pinned snapshot at ingest/atlas/
+    (mitre-atlas/atlas-data, dist/v6/), from which
+    mappings/mitre_atlas.json (technique/tactic ids and names) is derived.
 
   - garak probe-docstring text, concatenated verbatim by
     scripts/ingest_external.py, is Copyright 2023 Leon Derczynski and

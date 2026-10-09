@@ -1,0 +1,16 @@
+{
+  "source": "https://github.com/mitre-atlas/atlas-data",
+  "license": "Apache-2.0 (see docs/SOURCE_LICENSES.md section 3.1)",
+  "file": "ATLAS-2026.09.yaml",
+  "url": "https://raw.githubusercontent.com/mitre-atlas/atlas-data/main/dist/v6/ATLAS-2026.09.yaml",
+  "sha256": "935efa93e28294432d3e2f537eb94991ef8d1f8c58341cd360ea3321ddb66688",
+  "bytes": 841482,
+  "collection_version": "2026.09",
+  "collection_modified_date": "2026-09-15",
+  "format_version": "6.0.0",
+  "pointer_chain": [
+    "ATLAS-latest.yaml -> v6/ATLAS-latest.yaml",
+    "v6/ATLAS-latest.yaml -> ATLAS-2026.09.yaml"
+  ],
+  "fetched": "2026-10-06"
+}

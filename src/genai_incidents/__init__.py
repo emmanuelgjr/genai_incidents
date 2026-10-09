@@ -30,6 +30,7 @@ __all__ = [
     "load_incidents",
     "load_schema",
     "load_deprecations",
+    "taxonomy_versions",
     "query",
     "by_id",
     "by_cve",
@@ -103,6 +104,23 @@ def load_deprecations() -> dict[str, str | list[str]]:
     ``resolve_id`` / ``resolve_id_group`` rather than indexing the mapping.
     """
     return dict(_load_deprecations())
+
+
+def taxonomy_versions() -> dict[str, str | None]:
+    """Return the versions of the pinned taxonomies this release's framework
+    codes belong to, e.g. ``{"atlas": "2026.09", "owasp_llm": "2026",
+    "owasp_asi": "2025", "capec": None, "veris": "1.4.1"}``.
+
+    Same dict as ``taxonomy_versions`` in the repository's ``data/stats.json``
+    (derived from the pinned ``mappings/*.json`` at build time). A value of
+    ``None`` means that taxonomy's pin does not record a version (CAPEC today).
+    """
+    import json
+
+    text = files(__name__).joinpath("data/taxonomy_versions.json").read_text(
+        encoding="utf-8"
+    )
+    return dict(json.loads(text))
 
 
 def _matches(entry: dict, filters: dict) -> bool:

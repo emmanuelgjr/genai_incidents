@@ -93,6 +93,16 @@ Files: docs/*
 Copyright: 2026 Emmanuel G. Jr. and contributors
 License: CC-BY-4.0
 
+Files: ingest/atlas/ATLAS-*.yaml
+Copyright: 2021-2026 The MITRE Corporation
+License: Apache-2.0
+Comment: Verbatim copy of a MITRE ATLAS release (mitre-atlas/atlas-data,
+ dist/v6/), committed as the pinned snapshot that mappings/mitre_atlas.json
+ is derived from. Apache-2.0, NOT the CC-BY-4.0 grant; redistribution
+ verbatim is covered by docs/SOURCE_LICENSES.md section 3.1 and the
+ MITRE ATLAS notice in NOTICE-DATA. Provenance and sha256 are in
+ ingest/atlas/ATLAS.provenance.json.
+
 Files: LICENSE
 Copyright: 2026 Emmanuel G. Jr.
 License: MIT

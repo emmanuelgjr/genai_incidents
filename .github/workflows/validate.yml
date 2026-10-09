@@ -36,6 +36,12 @@ jobs:
       - name: Validate incidents.json against schema
         run: python scripts/validate.py
 
+      # v2.13.0 item 2: no AML.* id in the corpus or mappings/ may be absent
+      # from, or deprecated in, the pinned ATLAS release; the pin must also
+      # match the committed snapshot (ingest/atlas/) it is derived from.
+      - name: Lint ATLAS ids against the pinned release
+        run: python scripts/lint_atlas_ids.py
+
       - name: Re-render INCIDENTS.md + doc stats and ensure no drift
         run: |
           python scripts/render_markdown.py

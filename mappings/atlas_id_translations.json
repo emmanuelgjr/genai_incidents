@@ -1,0 +1,25 @@
+{
+  "$comment": "Mechanical id translation for ATLAS ids that no longer exist in the pinned release (mappings/mitre_atlas.json). Applied by scripts/merge_and_dedupe.py::fill_taxonomy to every entry's mitre_atlas, BEFORE tactics are derived. Curated by hand; scripts/lint_atlas_ids.py fails if a translation target is itself absent/deprecated, and the monthly refresh report lists every removed id that has no translation here (those need a human decision; do not guess). The mapping HEURISTICS that emit the old ids (LLM_TO_ATLAS etc.) are deliberately untouched (label-scientist territory); this table only keeps their output valid against the pinned release.",
+  "translations": {
+    "AML.T0019": {
+      "to": "AML.T0115.000",
+      "since": "2026.09",
+      "basis": "ATLAS 2026.07 (verified; also absent in 2026.08 and 2026.09) replaced 'Publish Poisoned Datasets' (AML.T0019) with AML.T0115 'Publish Poisoned AI Artifacts', subtechnique AML.T0115.000 'Datasets'. Same tactic (AML.TA0003) on both sides."
+    },
+    "AML.T0058": {
+      "to": "AML.T0115.001",
+      "since": "2026.09",
+      "basis": "ATLAS 2026.07 onward: 'Publish Poisoned Models' (AML.T0058) became AML.T0115.001 'Models' under AML.T0115 'Publish Poisoned AI Artifacts'. Same tactic (AML.TA0003) on both sides."
+    },
+    "AML.T0104": {
+      "to": "AML.T0115.002",
+      "since": "2026.09",
+      "basis": "ATLAS 2026.07 onward: 'Publish Poisoned AI Agent Tool' (AML.T0104) became AML.T0115.002 'AI Agent Tools' under AML.T0115. Same tactic (AML.TA0003) on both sides."
+    },
+    "AML.T0015.001": {
+      "to": "AML.T0015",
+      "since": "2026.09",
+      "basis": "AML.T0015.001 is not defined in ATLAS 2026.06 or 2026.09 (AML.T0015 'Evade AI Model' has no subtechniques); it entered the corpus via the AVID ingest. Mapped to its parent, the conservative choice. Pre-existing defect surfaced by the refresh lint, not caused by the 2026.09 release."
+    }
+  }
+}

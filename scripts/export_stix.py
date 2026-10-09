@@ -9,7 +9,10 @@ Modelling:
     taxonomy mapping as `x_*` properties + external_references;
   - each distinct MITRE ATLAS technique -> an `attack-pattern` SDO;
   - each distinct CVE -> a `vulnerability` SDO;
-  - `relationship` SDOs link incidents to the techniques/CVEs they involve.
+  - `relationship` SDOs link incidents to the techniques/CVEs they involve;
+  - one `identity` SDO ("genai_incidents") carries `x_taxonomy_versions`, the
+    pinned versions of the taxonomies (ATLAS, OWASP LLM/ASI, CAPEC, VERIS)
+    that the x_* mapping properties refer to.
 
 All STIX ids are derived deterministically (UUIDv5 over a fixed namespace),
 and object timestamps come from each incident's `added`/`updated` dates — so
@@ -21,6 +24,8 @@ from __future__ import annotations
 import json
 import uuid
 from pathlib import Path
+
+from taxonomy_versions import taxonomy_versions
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -129,6 +134,19 @@ def build_bundle(incidents: list[dict]) -> dict:
                  "url": f"https://www.cve.org/CVERecord?id={c}"},
             ],
         })
+
+    # 1b) Dataset metadata: one `identity` SDO (a standard STIX type that
+    #     permits custom x_ properties) carrying the versions of the pinned
+    #     taxonomies every x_* mapping on the incident SDOs refers to. Derived
+    #     from mappings/*.json (scripts/taxonomy_versions.py). One object, not a
+    #     property repeated on ~15k incident SDOs.
+    objects.append({
+        "type": "identity", "spec_version": "2.1",
+        "id": _sid("identity", "genai-incidents"),
+        "created": EPOCH, "modified": EPOCH,
+        "name": "genai_incidents", "identity_class": "system",
+        "x_taxonomy_versions": taxonomy_versions(),
+    })
 
     # 2) Incident SDOs + relationships.
     owasp_llm_src = _owasp_llm_source_name()

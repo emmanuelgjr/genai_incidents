@@ -457,6 +457,8 @@ REGISTERED_PRODUCERS = {
     "ingest_arxiv_oaipmh.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
     "migrate_oecd_description_reduction.py": "INTERNAL (one-shot migration over build inputs)",
     "migrate_owasp_llm_2026.py": "INTERNAL (one-shot migration over build inputs)",
+    "lint_atlas_ids.py": "INTERNAL (CI lint: reads mitre_atlas/mitre_atlas_tactics only, writes nothing)",
+    "atlas_entry_delta.py": "INTERNAL (refresh-PR audit report comparing two corpus files; writes a report, distributes no rows)",
 }
 
 # `incidents.core.json` / `detail/<year>.json` are in the pattern because the

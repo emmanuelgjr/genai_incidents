@@ -125,7 +125,7 @@ Key LLM-era techniques used heavily in this dataset:
 
 **Use it when:** you want to communicate the incident in adversarial-emulation terms — what an attacker is **doing**, not what is **broken**.
 
-See `mappings/mitre_atlas.json` (pinned at ATLAS v2026.06) for the full technique list used here.
+See `mappings/mitre_atlas.json` (pinned at ATLAS v2026.09; the machine-readable value is `taxonomy_versions.atlas` in `data/stats.json`) for the full technique list used here.
 
 ---
 

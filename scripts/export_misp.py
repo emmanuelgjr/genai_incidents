@@ -34,6 +34,8 @@ import uuid
 from collections import defaultdict
 from pathlib import Path
 
+from taxonomy_versions import taxonomy_versions
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = ROOT / "docs" / "misp"
@@ -132,6 +134,17 @@ def _incident_attributes(e: dict) -> list[dict]:
     return attrs
 
 
+def _taxonomy_version_tags() -> list[dict]:
+    """One `genai-incidents:taxonomy-<name>="<version>"` tag per pinned taxonomy
+    on every event (and so on every manifest entry, which copies the event's
+    Tag list). Derived from mappings/*.json via scripts/taxonomy_versions.py.
+    Tags rather than a new top-level manifest key: MISP's feed reader treats
+    every manifest key as an event uuid, so a non-uuid key could break pulls.
+    Unversioned taxonomies (None) are omitted rather than tagged with a guess."""
+    return [_tag(f'genai-incidents:taxonomy-{k.replace("_", "-")}="{v}"')
+            for k, v in taxonomy_versions().items() if v is not None]
+
+
 def _event_meta(year: int) -> dict:
     return {
         "info": f"GenAI / agentic-AI security incidents — {year}",
@@ -141,7 +154,8 @@ def _event_meta(year: int) -> dict:
         "timestamp": _year_epoch(year),
         "published": True,
         "Orgc": ORGC,
-        "Tag": [_tag("tlp:clear"), _tag('genai-incidents:feed="dataset"')],
+        "Tag": [_tag("tlp:clear"), _tag('genai-incidents:feed="dataset"')]
+               + _taxonomy_version_tags(),
     }
 
 
@@ -222,7 +236,10 @@ dataset, regenerated on every Pages deploy by `scripts/export_misp.py`.
 Incidents are grouped into **one Event per year** ({n_events} events); each
 incident's CVEs, reference links and title become tagged attributes
 (`genai-incidents:*`, `mitre-atlas:technique="…"`, and `veris:*` machinetags
-per the VERIS 1.4.1 crosswalk in `mappings/veris.json`).
+per the VERIS 1.4.1 crosswalk in `mappings/veris.json`). Every event (and its
+`manifest.json` entry) carries `genai-incidents:taxonomy-<name>="<version>"`
+tags (atlas, owasp-llm, owasp-asi, veris; capec once versioned) naming the
+pinned taxonomy releases the tags refer to.
 
 ## Subscribe (MISP)
 

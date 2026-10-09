@@ -20,6 +20,8 @@ import json
 import sys
 from pathlib import Path
 
+from taxonomy_versions import as_text, taxonomy_versions
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = ROOT / "dist" / "hf"
@@ -95,7 +97,8 @@ Key fields per record (full reference in the data dictionary):
 
 - `id`, `title`, `description`, `date`, `year`, `severity`
 - `attack_vector` — normalised exploit/harm class (e.g. `prompt-injection`, `deepfake`, `rce`)
-- `owasp_llm`, `owasp_asi`, `nist_ai_rmf`, `mitre_atlas`, `mitre_atlas_tactics` — framework mappings
+- `owasp_llm`, `owasp_asi`, `nist_ai_rmf`, `mitre_atlas`, `mitre_atlas_tactics` — framework mappings.
+  Pinned taxonomy versions for this release: {taxonomy_versions}
 - `cve_ids`, `cwe_ids`, `cvss_score` — where applicable
 - `references` — source URLs · `source_ids` — upstream provenance
 - `quality_tier` — `curated` / `reviewed` / `auto` (filter by vetting level)
@@ -215,7 +218,8 @@ def build(out_dir: Path) -> tuple[int, Path]:
     size_cat = ("n<1K" if n < 1_000 else "1K<n<10K" if n < 10_000
                 else "10K<n<100K" if n < 100_000 else "100K<n<1M")
     card = CARD.format(count=f"{n:,}", version=raw.get("version", "?"),
-                       size_cat=size_cat, repo="emmanuelgjr/genai-incidents")
+                       size_cat=size_cat, repo="emmanuelgjr/genai-incidents",
+                       taxonomy_versions=as_text(taxonomy_versions()))
     (out_dir / "README.md").write_text(card, encoding="utf-8", newline="\n")
     return len(incidents), jsonl
 
