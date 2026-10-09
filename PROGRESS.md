@@ -24,6 +24,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+- **Item 7 D55 fixes at `3d481954` (pushed).** All 5 defects plus A1/A3 applied. The author also corrected §3's "Reading across" sentence (merges 3 and 4 had been overstated). Foreman grep: the stale tokens appear only inside the corrections logs. **The scoped re-gate has been sent to the bounce-#3 reviewer.**
+- **Item 6 D54 fixes at `cac1724c` (pushed), by the fresh author.** The landmark derivation is corrected (B1 removes 0 rows from landmark), option C now adds at most 1 row (AIID-1474), and the §1 stale lines are fixed. The author also found and fixed a false claim in the bounce-#1 note: there are 276 non-October rows (274 July + 2 Sep), not "274 all July". Its consistency pass checked every corrections-note claim against the body. Foreman grep: the stale tokens appear only inside the corrections log. **A fresh red-reviewer has been dispatched for the full gate.**
 - **⚖ D55, USER RULING 2026-10-09 (item 7 bounce #3): "Fresh author fixes + scoped re-gate".** A fresh license-auditor applies the 5 defects plus A1 (date R7; replace the `curl -sI` Location check, which cannot fire) and A3. The bounce-#3 reviewer then re-checks only the diff and re-runs the commands.
 
 ### ⛔ Item 7 — **BOUNCE #3 (fresh full gate on `9ad77d10`, under D53, 2026-10-09)**: ESCALATED to the user
