@@ -30,6 +30,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - A1: under merge-only, whether README errors depends on whether the operator kept the `stats:version` marker;
   - A2: step 3's pre-existing "incidents.min.json once the site deploy runs" is inaccurate, because render copies it during `make build`;
   - bounce-2 advisories: the tomllib 3.11 dev floor vs `>=3.10`, and false positives on ungrouped numbers in arXiv/CVE/INC ids.
+- **docs-warden sweep after the merge (2026-10-09, at `97e6ee77`):** 2 Low findings, routed to **WS6 as notes** for the next item-1-adjacent touch:
+  - **N-a:** the module docstring at the top of `scripts/check_stats_drift.py` (lines 1-22) still says "Two independent failure modes", but the file now has 4 more checks.
+  - **N-b:** README.md:308 and :339 understate what the drift check covers. Not false.
+  - **Clean (warden evidence):**
+    - every version literal is 2.12.0 and every count is 15,637, matching stats.json;
+    - the PyPI long description is README.md (`pyproject.toml:9`) and is not stale;
+    - **the brief's "README reads 2.9.0 / 13,060" is false at the current tree:** README.md:142-144 reads 2.12.0, and "13,060" exists only in a historical CHANGELOG entry (:176).
+  - The warden ran the drift check only on the clean tree; the gate has already proven it fires.
 - **Totals:** 4 bounces plus 1 PASS, with 3 user decisions (D48, D50, D51). Two of the four bounces traced to gate-dictated wording.
 
 ### 🧑‍⚖️ 2026-10-09 — USER DECISION D51 (item 1 after bounce #4): "Code-checked sentence, then merge"
