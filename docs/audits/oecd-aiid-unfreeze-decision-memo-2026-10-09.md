@@ -141,7 +141,7 @@ refresh changes (section 4, R3).
 ## 3. What the first unfrozen run would change
 
 Source: the branch's own evidence, not re-run by me. Branch `ws4/refresh-tripwire-42`
-@ `586f40c8`, merge-base `a7343274` (2026-10-03; 109 commits behind main, 3 ahead); fork point `9604752f`. Files: `docs/audits/refresh-tripwire-2026-10-03.md`,
+@ `586f40c8`, merge-base `a7343274` (2026-10-03; 106 commits behind main @ `07f22c09` (the memo's base), 3 ahead); fork point `9604752f`. Files: `docs/audits/refresh-tripwire-2026-10-03.md`,
 `D42-refresh-merge-review-2026-10-03.md`, `D42-proposed-refresh-merges.json`,
 `D42-t12-t14-implementation-2026-10-03.md`.
 
@@ -198,9 +198,10 @@ same-incident review, which a human does.
 | 7 | INC-14902 -> INC-00699 | "Suno AI Exposed for Scraping Copyrighted Music and User Data Breach" -> "BMG Sues Anthropic..." | do not approve | no | Different subject. No. |
 
 Reading across the table: of 7, the evidence supports at most 2 clear (1, 2) and 1
-contested (5). Four (3, 4, 6, 7) are wrong or doubtful. **A fully approved list would
-therefore write at least 4 permanent deprecations that the board's own evidence says
-are wrong.** The 10 retitles split, per the D42 files: 5 approve (`INC-01579`, `-13321`, `-14517`,
+contested (5). Four (3, 4, 6, 7) are doubtful or wrong: 2 lean-no (3, 4) and 2
+do-not-approve (6, 7). **A fully approved list would
+therefore write at least 4 permanent deprecations that the board's own evidence marks
+lean-no (3, 4) or do-not-approve (6, 7).** The 10 retitles split, per the D42 files: 5 approve (`INC-01579`, `-13321`, `-14517`,
 `-07910`, `-07783`; each takes AIID's own title, which E23 covers), 1 conditional on
 merge 5 (`INC-01514`, an OECD headline), and 4 "do not approve" (`INC-01994`,
 `INC-00699`, `INC-00813`, `INC-03717`; the last two are retitles with no deprecation,
@@ -215,14 +216,14 @@ favour.
 
 | # | Risk | Size | Status |
 |---|---|---|---|
-| R1 | **OECD `title` exposure grows.** Titles are LLM output from third-party news (E21 section 2.4), the OECD non-grant clause applies, and the question is open. Today 3,937 rows ship a title exactly equal to a raw OECD title (the same set as the OECD-template descriptions), out of 4,104 rows carrying at least one `OECD-AIM-` id (4,160 is the id occurrences, 27 rows carry more than one; 4,104 foreman-confirmed). The first run adds up to ~+1,533 rows: 1533/4104 = 37.4% of OECD-id rows, 1533/3937 = 38.9% of the title-exposure base. It retitles 4 published IDs, 3 to OECD-origin headlines (`INC-01514`, `INC-01994`, `INC-00699`) and 1 to an AIID title (`INC-01579` = AIID-1370's title; tripwire audit table `:236-241`, D42 review section B). Commands in section 8 (row-count block). The refresh did not create the question, but it scales it by a measurable factor and ships it on new stable IDs. | Medium, scaling | **Open, not resolved by any file I read.** UNKNOWN pending the OECD reply (R6). |
+| R1 | **OECD `title` exposure grows.** Titles are LLM output from third-party news (E21 section 2.4), the OECD non-grant clause applies, and the question is open. Today 3,937 rows ship a title exactly equal to a raw OECD title (the same set as the OECD-template descriptions), out of 4,104 rows carrying at least one `OECD-AIM-` id (4,160 is the id occurrences, 27 rows carry more than one; 4,104 foreman-confirmed). The first run adds up to ~+1,533 rows: 1533/4104 = 37.4% of OECD-id rows, 1533/3937 = 38.9% of the title-exposure base. It retitles 4 published IDs, 3 to OECD-origin headlines (`INC-01514`, `INC-01994`, `INC-00699`) and 1 to an AIID title (`INC-01579` = AIID-1370's title; tripwire audit table `:236-242`, D42 review section B). Commands in section 8 (row-count block). The refresh did not create the question, but it scales it by a measurable factor and ships it on new stable IDs. | Medium, scaling | **Open, not resolved by any file I read.** UNKNOWN pending the OECD reply (R6). |
 | R2 | **Description narrative leaks back.** Today's controls: `build_description()` only (`SOURCE_LICENSES` 1.5). The new branch test explains every `aiid_id` row by exact derivation and the 42/42 reconstruction passed; it covers `aiid_id` rows and the `title`, **not every OECD row** (`D42-t12-t14:83-97`, "Known limits"). New OECD rows with no `aiid_id` are covered only by the earlier E21 gate tests, which I did not re-read. | Low if the full-corpus reconstruction is added (S5) | Spec S5 |
 | R3 | **Published numbers go stale.** `SOURCE_LICENSES` 1.2a and `NOTICE-DATA:195-198` state "0 of 1,466", "1,463-1,464 of 1,465", "the two exceptions ship no AIID text". The tripwire diagnosis notes the refresh turns "two" into 42-43 (`refresh-tripwire:211-216`), though those rows ship OECD template text, not AIID text, so no AIID attribution is owed; the claim, not the compliance, breaks. `NOTICE-DATA:249-251` is already wrong (3,667/3,829 vs 3,937/4,104). | Misstatement risk | Live surfaces: correct in place after the data lands (S6) |
 | R4 | **AIID shipped population grows** by roughly the new snapshot rows (~+94 by subtraction, plus 6 retitles to AIID titles). E23's ruling is shape-based (bare title, U.S. situs) so it extends in kind, but its counts (1,463) and its "0 marker" measurement must be re-run, and its reopen tripwire must be re-checked: the AIRI/`aiid_incidents.json` population must still not reach `data/incidents.json`. | Low in kind | S5, S6 |
 | R5 | **E23 Layer-1 uncertainty is unchanged and unaffected.** It rests on E13's uncertified situs method; the E23 ruling says so itself. An unfreeze enlarges the dependency by ~100 rows, not its character. | Low | none |
 | R6 | **OECD terms question is still unanswered on this record.** Outreach to `ai@oecd.org` was sent 2026-07-31; follow-up window 2026-08-21 (`docs/outreach/README.md:21`); no follow-up send recorded and no reply found (local grep of PROGRESS.md, outreach README, oecd-aim-terms.md, which shows absence only on this tree). Primary terms pages still 403 to every tool. Ask the user. | UNKNOWN | Open question to user |
-| R7 | **Sitemap redirect / robots gap**: the sitemap URL 302s to `incidents-server.oecdai.org`, whose robots.txt the shared limiter never checks (`SOURCE_LICENSES` 1.5, Scrape-permitted). Individual incident pages do not redirect (7/7, 2026-07-30). One fetch per run; unchanged by the unfreeze, but a resumed weekly crawl resumes it. | Low | Check in section 8 |
-| R8 | **Label wording.** T12's `description_provenance: original` / `description_source: oecd-aim` is a provenance label, not a content-licence marker. `SOURCE_LICENSES` 1.5 says no marker "is emitted for OECD-derived rows today; whether one is warranted is a separate, not-yet-scoped question". Shipping the label must not be described as that marker. | Low | S6 wording |
+| R7 | **Sitemap redirect / robots gap**: the sitemap URL 302s to `incidents-server.oecdai.org`, whose robots.txt the shared limiter never checks (`SOURCE_LICENSES:140`, a 2026-07-30 WebFetch observation). **Dated note (2026-10-09):** on 2026-10-09 a foreman curl HEAD returned 405 and GET -L returned 200 with no redirect, so the 302 is not reproduced today; treat R7 as unconfirmed as of 2026-10-09. Individual incident pages do not redirect (7/7, 2026-07-30). One fetch per run; unchanged by the unfreeze, but a resumed weekly crawl resumes it. | Low | Check in section 8 |
+| R8 | **Label wording.** T12's `description_provenance: original` / `description_source: oecd-aim` is a provenance label, not a content-licence marker. `NOTICE-DATA:256-258` says no marker "is emitted for OECD-derived rows today; whether one is warranted is a separate, not-yet-scoped question". Shipping the label must not be described as that marker. | Low | S6 wording |
 
 **Not a licence risk of the unfreeze, but a trap:** the board's D42 line treats the
 decision as "review 7 merges". The legal exposure is mainly R1 (titles on ~1,500 new
@@ -236,14 +237,14 @@ rows). The merges are an integrity risk (wrong permanent redirects), not a licen
 run the refresh. Consequence: the gate is all-or-nothing
 (`D42-refresh-merge-review:43-46`: "approving nothing for it keeps the build failing
 closed... The gate cannot 'reject and continue' by itself"). To publish, **every one
-of the 17 changes must be approved**, including 4 merges (3, 4, 6, 7) and 4 retitles
-the evidence marks do-not-approve, plus 1 merge (5) and 1 retitle (`INC-01514`) that are
-conditional or contested. Not recommended. Alternatively approve only the good ones,
+of the 17 changes must be approved**, including 2 do-not-approve merges (6, 7), 2
+lean-no merges (3, 4), 1 contested merge (5), and 4 retitles the evidence marks
+do-not-approve, plus 1 retitle (`INC-01514`) that is conditional on merge 5. Not recommended. Alternatively approve only the good ones,
 in which case nothing publishes.
 
 **B. Decline: leave the branch unmerged, keep D25(a) as is.** Consequences, all
 measured above: the weekly refresh stays red at the old tripwire; the tripwire's
-fixed expected list (2 rows) fails more every week (2 -> 30 -> 42); T12 labels never
+fixed expected list (2 rows) is exceeded by 29 (09-14), 30 (09-20), 42 (09-27) and 42 (10-04, run 37195068024); growth has stalled at 42 for the two most recent runs, but the count has not fallen; T12 labels never
 ship (3,936 rows unlabelled); the AIID snapshot stays at max id 1581 against 1714
 upstream; and the barrier remains accidental. Cheapest, but it keeps the "no
 deliberate guard" state and the work already built idle.
@@ -301,7 +302,7 @@ The branch must be rebuilt on `main` @ `07f22c09` (or later); the old base
   ID set identical, `id_deprecations.json` byte-identical (0 new records), per-field
   changed-row counts for **every** field. Expected and only expected: `description_provenance`
   and `description_source` on exactly the OECD-template rows not already labelled
-  (3,936 expected, to be re-derived; this is OECD rows only: 3,728 rows on main already carry `description_provenance` (cvelistv5, aiaaic, 134 original/None, INC-00437), so the per-field count must be reported by source, not as one total). `updated`, `title`, `severity`, `aiid_id`, `tags`,
+  (3,936 expected, to be re-derived; this is OECD rows only: 3,728 rows on main already carry `description_provenance` (foreman-measured, Counter over `(description_provenance, description_source)`: verbatim/cvelistv5 2,046; original/aiaaic 1,422; original/None 134; verbatim/cve-cna-via-avid 125; original/oecd-aim 1, INC-00437), so the per-field count must be reported by source, not as one total). `updated`, `title`, `severity`, `aiid_id`, `tags`,
   `references`, `corpus` and all other fields: 0. Any other moved field is a defect
   (agreement 2).
 - **S2. Per-row label check, both directions** (agreement 6 form d): every row labelled
@@ -395,7 +396,9 @@ git merge-base --is-ancestor 586f40c8 main; echo $?   # expect 1 (not merged)
 grep -n "D25" .github/workflows/auto-refresh.yml       # absence: expect empty
 gh run list --workflow auto-refresh.yml --limit 12 --json databaseId,conclusion,createdAt   # runs after 2026-09-27; confirm still all failure
 curl -sL https://oecd.ai/robots.txt | head -40
-curl -sI https://oecd.ai/sitemaps/incident-monitor-sitemap.xml | grep -i location          # R7
+curl -s -o /dev/null -w "%{http_code} %{num_redirects} %{url_effective}" -L https://oecd.ai/sitemaps/incident-monitor-sitemap.xml   # R7 (HEAD returns 405; do not grep a Location header)
+git rev-list --count 586f40c8..07f22c09   # 106
+git rev-list --count 07f22c09..586f40c8   # 3
 grep -n -i "oecd" PROGRESS.md | grep -i -E "repl|respon|answer"                            # R6 absence
 ```
 
@@ -437,12 +440,13 @@ and each has a command in section 8; I re-checked the cited files where I could.
    Growth restated: 1533/4104 = 37.4%, 1533/3937 = 38.9% (previous "+37%" was
    against the wrong base).
 2. R1: the retitles to OECD-origin headlines are 3 (INC-01514, -01994, -00699), not 4;
-   INC-01579 takes AIID-1370's title (tripwire audit `:236-241`, D42 review section B).
+   INC-01579 takes AIID-1370's title (tripwire audit `:236-242`, D42 review section B).
 3. R6: "follow-up" was ambiguous; only a follow-up window (2026-08-21) is recorded
    (`docs/outreach/README.md:21`), no send.
 4. Advisories: base is merge-base `a7343274` (fork point `9604752f`); run 37195068024
    (2026-10-04) noted in section 1; option A wording made consistent (4 do-not-approve
-   merges + 4 retitles, plus 1 conditional merge + 1 conditional retitle); S1 now notes
+   merges + 4 retitles, plus 1 conditional merge + 1 conditional retitle; the "4
+   do-not-approve merges" was wrong, see bounce #3); S1 now notes
    3,728 rows already carry `description_provenance`, so the 3,936 is OECD rows only.
    A4 (spec vs branch) left to the foreman.
 
@@ -460,6 +464,36 @@ and each has a command in section 8; I re-checked the cited files where I could.
   here: the +1,533 is the 2026-10-03 "new-only IDs" count on the 13,361 corpus and may
   include non-OECD IDs, so the 37.4% / 38.9% ratios are an upper-bound style estimate,
   not a measured OECD-row growth.
+
+## Corrections at gate bounce #3 (2026-10-09, D55, fresh author)
+
+Corrected in place (memo not yet frozen). Old -> new, by section:
+1. R8 (section 4): citation for "is emitted for OECD-derived rows today; whether one
+   is warranted is a separate, not-yet-scoped question" changed from `SOURCE_LICENSES`
+   1.5 to `NOTICE-DATA:256-258`.
+2. Section 3 header: "109 commits behind main, 3 ahead" -> "106 commits behind main @
+   `07f22c09` (the memo's base), 3 ahead" (foreman-measured). Section 8 gains
+   `git rev-list --count 586f40c8..07f22c09   # 106` and `07f22c09..586f40c8   # 3`.
+3. S1 (section 7): the 3,728 already-labelled rows now broken down in full: verbatim/
+   cvelistv5 2,046; original/aiaaic 1,422; original/None 134; verbatim/cve-cna-via-avid
+   125 (previously missing); original/oecd-aim 1 (INC-00437). Foreman-measured.
+4. Merge counts: the D42 review section A marks merges 3 and 4 "Unsure, lean no" and
+   6 and 7 "Do not approve"; 5 is "Approve" (contested by the tripwire audit, "doubtful").
+   Option A, the section 3 "Reading across the table" paragraph, and the bounce #1
+   item 4 above now read "2 do-not-approve merges (6, 7), 2 lean-no (3, 4), 1 contested
+   (5)", consistent with the section 3 table. The earlier "4 do-not-approve merges" was
+   wrong.
+5. Option B (section 5): "fails more every week (2 -> 30 -> 42)" -> 29 (09-14), 30
+   (09-20), 42 (09-27), 42 (10-04, run 37195068024); growth stalled at 42. Table checked
+   against `refresh-tripwire-2026-10-03.md:47-49`; the 10-04 figure is from the foreman
+   per the dated note in section 1.
+6. R7 (section 4): the sitemap 302 is dated as a 2026-07-30 WebFetch observation
+   (`SOURCE_LICENSES:140`); on 2026-10-09 foreman curl HEAD returned 405 and GET -L
+   returned 200 with no redirect, so R7 is unconfirmed today. Section 8's
+   `curl -sI ... | grep -i location` (which cannot fire on a 405) replaced by a GET-based
+   check: `curl -s -o /dev/null -w "%{http_code} %{num_redirects} %{url_effective}" -L <url>`.
+7. Cite range `refresh-tripwire:236-241` -> `236-242` (the INC-01994 row is at 242), in
+   R1 and in bounce #1 item 2.
 
 *Agent-suggested; do not regenerate. Supersede by a dated addendum, not by rewriting
 (CLAUDE.md working agreement 4).*
