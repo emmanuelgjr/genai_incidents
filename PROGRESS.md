@@ -24,6 +24,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+- **Item 3 D59/D60 fix at `5360cef0` (pushed; tree clean).** Foreman [R]: `git show HEAD:auto-refresh.yml` shows the job output `sweep_outcome` (:58), the summary reading it (:193), `contents: read` (:52), and the `needs-ruling` label create plus a conditional on the PR labels (:388-404). The specialist's written report did not arrive, so **the scoped re-gate verifies all claims from the tree.**
+
 ### ⚖ D59-D62, USER RULINGS 2026-10-09 (item 3)
 - **D59 (bounce #2): fix + scoped re-gate.** The summary reads the step outcome through a job output, and a test is shown to fire. Least-privilege permissions for `cve-sweep`.
 - **D60 (retraction governance): "Flag in the PR, don't block."**
