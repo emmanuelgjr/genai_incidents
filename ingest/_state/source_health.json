@@ -1,13 +1,14 @@
 {
   "aiaaic_sheet": {
-    "consecutive_failures": 0,
-    "last_outcome": "success",
+    "consecutive_failures": 1,
+    "last_attempt": "2026-10-09",
+    "last_outcome": "failure",
     "last_success": "2026-10-04",
-    "status": "ok"
+    "status": "degraded"
   },
   "airi_navigator": {
-    "consecutive_failures": 12,
-    "last_attempt": "2026-10-04",
+    "consecutive_failures": 13,
+    "last_attempt": "2026-10-09",
     "last_outcome": "failure",
     "last_success": "2026-05-31",
     "status": "stale"
@@ -15,13 +16,13 @@
   "cisa_kev": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-04",
+    "last_success": "2026-10-09",
     "status": "ok"
   },
   "oecd_aim": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-04",
+    "last_success": "2026-10-09",
     "status": "ok"
   }
 }
