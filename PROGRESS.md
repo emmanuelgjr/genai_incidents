@@ -24,6 +24,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔄 Item 7 stage 1 (D58) — **DISPATCHED: pipeline-engineer on `ws4/v2130-oecd-stage1` (worktree `ws4-v2130-oecd-stage1`, base `b8e5ed00`)**. It ports the T12/T14 + D42 gate from `586f40c8` (12 files, by hand or cherry-pick, not a wholesale merge), with an EMPTY approval set and a label-only rebuild, per memo §7 S1-S5. It must STOP if labelling bumps `updated`. The E21-tripwire replacement and the exact weekly fail-closed behaviour go in a dated build audit. S6 docs go to WS0 afterwards.
+
 ### ✅ Schema branch — **MERGED to main (2026-10-09), after user rulings D63/D64**
 - **⚖ D63 (D57 design): "Accept + queue overdue alert".** `hold.until` is the registry review date; `review_by` is on rows. **NEW BOARD NOTE → WS4:** a scheduled overdue-review check that alerts when a stale source's `hold.until` has passed. Not in the build (no wall-clock in `make build`).
 - **⚖ D64 (dispute rendering): "Add a DISPUTED card note + count".** **NEW BOARD NOTE → WS6, folded into item 8:** a DISPUTED card note parallel to the retracted banner (render_markdown.py:351), plus `disputed_count` in stats.json and every surface that quotes counts. It needs its own delta and gate.
