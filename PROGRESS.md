@@ -24,6 +24,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔍 Schema branch (D61 `cve-disputed` + D57 AIRI review date) — **REVIEW: `6689f12b` (pushed), red-reviewer dispatched**
+- **Delta** (`cve_sweep_delta.py --before-ref origin/main --dispute-emission on --freshness-registry ...`): 1,404 entries / 1,492 fields, 0 defects.
+  - `source_freshness` changes on 1,382 (adds `review_by` 2027-01-07);
+  - status, status_reason, confidence, updated and last_seen change on 22 each (17 high→medium, 5 medium→low, all feed);
+  - ID set identical; incident_count 15,637; header `generated` moves to 10-09.
+  - Recorded in `docs/audits/cve-sweep/v2130-schema-delta-2026-10-09.md`.
+- **D57 design (specialist):** no separate registry `review_by`. The lapsed D8 hold is replaced by `hold {D57, until 2027-01-07}`; `hold` is required on every stale source; rows carry `source_freshness.review_by` = the earliest hold.until. **The foreman's premise of a 1,382-row `updated` bump was false:** `source_freshness` is outside `_CONTENT_FIELDS`.
+- **Specialist premise correction:** `data/source_freshness.json` has no producer; it is a documented curated input (`_note`; b9e261fd), so editing it through review is its production path.
+- **Foreman [R]** (python per-entity, origin/main vs the branch): Counter {source_freshness 1382; updated/confidence/last_seen/status/status_reason 22 each}; ID sets equal (15,666). It matches. The `_note` read confirms "Curated INPUT ... hand-authored".
+- The gate is asked to check whether hold.until-as-review-date faithfully implements D57, and whether the delta tool's `--freshness-registry` expectation is independent.
+
 ### 📝 docs-warden sweep after the item 3 merge (2026-10-09, @ `2254560a`): 0 stale cadence claims; F1 medium, F2/F3 low, F4 informational
 - **CHANGELOG item-3 figures all re-derived and matching:**
   - 9,169 CVEs: 37 / 9,124 / 8; 26 DISPUTED (all cna-tag);
