@@ -24,6 +24,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Item 3 (rejected-CVE sweep) — **PASS (scoped re-gate under D59/D60, on `5360cef0`, 2026-10-09)**. Two advisories are being fixed before merge, per D52.
+- **Verdict, in the gate's words:** "All five scoped checks hold ... My bounce #2 defect is fixed, A1 is done, and D60's 'flag in the PR, don't block' works as specified."
+- **Gate evidence:**
+  - yaml: the job output `sweep_outcome` matches step id `ingest_cve_rejections`; reverting to `.result` fails the new test; removing `contents: read` fails `test_sweep_job_is_read_only`.
+  - "Newly retracted" is computed against HEAD, which is the checked-out main.
+  - The PR step was run under bash -e with simulated retractions:
+    - committed tree: count 0, no label;
+    - 1 landmark: label;
+    - 11 feed: label;
+    - 10 feed: no label;
+    - 1 feed: no label.
+  - 6 mutations each fail a named test.
+  - The build reproduces byte-for-byte; the per-entity diff is 29 entries / 29 `as_of`; 673 passed / 1 xfailed; drift clean; one CHANGELOG entry.
+- **Advisories:**
+  - A1: the report step itself can block the PR (no continue-on-error, no `if:` on the PR step). This contradicts D60's "never block", so **it is being fixed**.
+  - A2: `needs-ruling` is never removed on a later clean run, so **it is being fixed**.
+  - A3: no live Actions run yet. **Do one `workflow_dispatch` after merge, before Sunday's schedule.**
+  - A4: the schema enum edit (next), the 8 NOT_IN_CVELIST ids (candidate follow-up), and `cve-enrich.yml`'s concurrency group.
+  - A5: 1 pytest warning, not investigated.
 - **Item 3 D59/D60 fix at `5360cef0` (pushed; tree clean).** Foreman [R]: `git show HEAD:auto-refresh.yml` shows the job output `sweep_outcome` (:58), the summary reading it (:193), `contents: read` (:52), and the `needs-ruling` label create plus a conditional on the PR labels (:388-404). The specialist's written report did not arrive, so **the scoped re-gate verifies all claims from the tree.**
 
 ### ⚖ D59-D62, USER RULINGS 2026-10-09 (item 3)
