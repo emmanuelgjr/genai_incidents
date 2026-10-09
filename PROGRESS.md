@@ -10,6 +10,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🧑‍⚖️ 2026-10-09 — USER DECISION D51 (item 1 after bounce #4): "Code-checked sentence, then merge"
+- The specialist verifies the gate's suggested step-3 wording **clause by clause against the code** (render_markdown.py:543, Makefile, check_stats_drift.py) before applying it, and completes the step-5 list of version literals.
+- The foreman confirms by an independent route. A final gate judges **only the truth of those sentences**. On PASS, merge.
+
 ### ⛔⁴ Item 1 — **BOUNCE #4 (red-reviewer scoped re-gate, 2026-10-09, on `6b43db5c`) — ESCALATED TO USER**
 The gate's verdict, in its own words: "The gate wrote the error, not the specialist."
 - **Defect 1:** the step-3 sentence dictated under D50, "step 4's drift check now fails on that, because it reads the **Version:** line", names the wrong mechanism (docs/VERSIONING.md:124-126). `render` writes both `stats.json` and `INCIDENTS.md`, so on a merge-only run they agree at the OLD version and the INCIDENTS check stays silent. Step 4 still fails, but only because the step-2 version files disagree with the stale stats.
