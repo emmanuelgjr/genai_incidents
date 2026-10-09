@@ -217,7 +217,7 @@ favour.
 |---|---|---|---|
 | R1 | **OECD `title` exposure grows.** Titles are LLM output from third-party news (E21 section 2.4), the OECD non-grant clause applies, and the question is open. Today 3,937 rows ship a title exactly equal to a raw OECD title (the same set as the OECD-template descriptions), out of 4,104 rows carrying at least one `OECD-AIM-` id (4,160 is the id occurrences, 27 rows carry more than one; 4,104 foreman-confirmed). The first run adds up to ~+1,533 rows: 1533/4104 = 37.4% of OECD-id rows, 1533/3937 = 38.9% of the title-exposure base. It retitles 4 published IDs, 3 to OECD-origin headlines (`INC-01514`, `INC-01994`, `INC-00699`) and 1 to an AIID title (`INC-01579` = AIID-1370's title; tripwire audit table `:236-241`, D42 review section B). Commands in section 8 (row-count block). The refresh did not create the question, but it scales it by a measurable factor and ships it on new stable IDs. | Medium, scaling | **Open, not resolved by any file I read.** UNKNOWN pending the OECD reply (R6). |
 | R2 | **Description narrative leaks back.** Today's controls: `build_description()` only (`SOURCE_LICENSES` 1.5). The new branch test explains every `aiid_id` row by exact derivation and the 42/42 reconstruction passed; it covers `aiid_id` rows and the `title`, **not every OECD row** (`D42-t12-t14:83-97`, "Known limits"). New OECD rows with no `aiid_id` are covered only by the earlier E21 gate tests, which I did not re-read. | Low if the full-corpus reconstruction is added (S5) | Spec S5 |
-| R3 | **Published numbers go stale.** `SOURCE_LICENSES` 1.2a and `NOTICE-DATA:195-198` state "0 of 1,466", "1,463-1,464 of 1,465", "the two exceptions ship no AIID text". The tripwire diagnosis notes the refresh turns "two" into 42-43 (`refresh-tripwire:211-216`), though those rows ship OECD template text, not AIID text, so no AIID attribution is owed; the claim, not the compliance, breaks. `NOTICE-DATA:249-251` is already wrong (3,667/3,829 vs 4,160). | Misstatement risk | Live surfaces: correct in place after the data lands (S6) |
+| R3 | **Published numbers go stale.** `SOURCE_LICENSES` 1.2a and `NOTICE-DATA:195-198` state "0 of 1,466", "1,463-1,464 of 1,465", "the two exceptions ship no AIID text". The tripwire diagnosis notes the refresh turns "two" into 42-43 (`refresh-tripwire:211-216`), though those rows ship OECD template text, not AIID text, so no AIID attribution is owed; the claim, not the compliance, breaks. `NOTICE-DATA:249-251` is already wrong (3,667/3,829 vs 3,937/4,104). | Misstatement risk | Live surfaces: correct in place after the data lands (S6) |
 | R4 | **AIID shipped population grows** by roughly the new snapshot rows (~+94 by subtraction, plus 6 retitles to AIID titles). E23's ruling is shape-based (bare title, U.S. situs) so it extends in kind, but its counts (1,463) and its "0 marker" measurement must be re-run, and its reopen tripwire must be re-checked: the AIRI/`aiid_incidents.json` population must still not reach `data/incidents.json`. | Low in kind | S5, S6 |
 | R5 | **E23 Layer-1 uncertainty is unchanged and unaffected.** It rests on E13's uncertified situs method; the E23 ruling says so itself. An unfreeze enlarges the dependency by ~100 rows, not its character. | Low | none |
 | R6 | **OECD terms question is still unanswered on this record.** Outreach to `ai@oecd.org` was sent 2026-07-31; follow-up window 2026-08-21 (`docs/outreach/README.md:21`); no follow-up send recorded and no reply found (local grep of PROGRESS.md, outreach README, oecd-aim-terms.md, which shows absence only on this tree). Primary terms pages still 403 to every tool. Ask the user. | UNKNOWN | Open question to user |
@@ -386,7 +386,7 @@ import re;print(sum(1 for e in I if e.get('aiid_id') is not None),
  sum(1 for e in I if (e.get('description') or '').startswith('Tracked by the OECD AI Incidents and Hazards Monitor (AIM) as')),
  sum(1 for e in I if e.get('description_source')=='oecd-aim'),
  sum(1 for e in I if any(s.startswith('OECD-AIM-') for s in e.get('source_ids',[]))))"
-# expected from [G] counts: 15637 29 15666 / 1471 1468 3937 1 / (count of rows, not lines: reconcile with 4160 line count)
+# expected from [G] counts: 15637 29 15666 / 1471 1468 3937 1 / 4104 (rows; the 4,160 Grep figure is id occurrences, not rows)
 python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
 print([e['id'] for e in I if e.get('aiid_id') and not (e['description'] or '').startswith('AI Incident Database (AIID) entry #')])"   # expect INC-00437, INC-08183, 1575's row
 python -c "import json;D=json.load(open('data/id_deprecations.json',encoding='utf-8'));print(len(D) if isinstance(D,list) else {k:len(v) if hasattr(v,'__len__') else v for k,v in D.items()})"
@@ -403,12 +403,12 @@ Row-count block (R1 figures; added at gate bounce #1):
 
 ```
 python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
-print(sum(1 for e in I if 'OECD-AIM-' in json.dumps(e)))"                          # 4,104 rows with an OECD-AIM- id
+print(sum(1 for e in I if any(s.startswith('OECD-AIM-') for s in e.get('source_ids',[]))))"  # 4,104 rows with an OECD-AIM- source id
 python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
 print(sum(1 for e in I if sum(s.startswith('OECD-AIM-') for s in e.get('source_ids',[]))>1))"  # 27 multi-id rows
 python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
-R={r['title'] for r in json.load(open('ingest/oecd_aim_full_incidents.json',encoding='utf-8'))};\
-print(sum(1 for e in I if e['title'] in R))"                                       # 3,937 titles equal to a raw OECD title
+R={r['source_id']:r['title'] for r in json.load(open('ingest/oecd_aim_full_incidents.json',encoding='utf-8'))};\
+print(sum(1 for e in I if any(R.get(s)==e['title'] for s in e.get('source_ids',[]))))"  # 3,937: title equals the row's own OECD source title
 python -c "print(1533/4104, 1533/3937)"                                             # 0.3735, 0.3894
 python -c "import json;I=json.load(open('data/incidents.json',encoding='utf-8'))['incidents'];\
 print(sum(1 for e in I if e.get('description_provenance')))"                       # A5: 3,728 already labelled on main
@@ -445,6 +445,21 @@ and each has a command in section 8; I re-checked the cited files where I could.
    merges + 4 retitles, plus 1 conditional merge + 1 conditional retitle); S1 now notes
    3,728 rows already carry `description_provenance`, so the 3,936 is OECD rows only.
    A4 (spec vs branch) left to the foreman.
+
+## Corrections at gate bounce #2 (2026-10-09, D53)
+
+- R3 cell corrected at bounce #2 (it had been listed as corrected at bounce #1 but was
+  not): now "(3,667/3,829 vs 3,937/4,104)".
+- Section 8 comment "reconcile with 4160 line count" replaced: 4,104 rows, 4,160 is id
+  occurrences.
+- Section 8 commands made sturdier per the gate: the 4,104 count uses
+  `source_ids` `startswith('OECD-AIM-')` (not a `json.dumps` substring); the 3,937 count
+  matches each row against its own OECD source title by `source_id`. Not run by me.
+- Re-read of the whole memo for occurrence-as-row-count uses: lines 78-79, 124, 134-135,
+  218 and 220 now say rows or occurrences correctly; no other use found. Caveat added
+  here: the +1,533 is the 2026-10-03 "new-only IDs" count on the 13,361 corpus and may
+  include non-OECD IDs, so the 37.4% / 38.9% ratios are an upper-bound style estimate,
+  not a measured OECD-row growth.
 
 *Agent-suggested; do not regenerate. Supersede by a dated addendum, not by rewriting
 (CLAUDE.md working agreement 4).*
