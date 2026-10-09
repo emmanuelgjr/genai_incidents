@@ -33,7 +33,10 @@ def delta(before: dict, after: dict) -> dict:
     out = {"rows_before": len(b), "rows_after": len(a),
            "ids_added": sorted(set(a) - set(b)), "ids_removed": sorted(set(b) - set(a)),
            "fields": collections.defaultdict(collections.Counter), "changed_rows": 0}
+    out["key_order_changed"] = []
     for i in sorted(set(a) & set(b)):
+        if list(a[i]) != list(b[i]) and set(a[i]) == set(b[i]):
+            out["key_order_changed"].append(i)
         keys = set(a[i]) | set(b[i])
         ch = [k for k in keys if a[i].get(k, "<absent>") != b[i].get(k, "<absent>")]
         if ch:
@@ -58,6 +61,8 @@ def main(argv=None) -> int:
     print(f"id_deprecations.json byte-identical: {dep_same}")
     print(f"top-level keys changed: {d['top_level_changed']}")
     print(f"rows with any change: {d['changed_rows']}")
+    ko = d["key_order_changed"]
+    print(f"rows whose key ORDER changed with an identical key set (byte-level only): {len(ko)} {ko[:5]}")
     for k in sorted(d["fields"]):
         c = d["fields"][k]
         print(f"  field {k}: {sum(c.values())} rows  by source {dict(c)}")

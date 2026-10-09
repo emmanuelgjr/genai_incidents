@@ -91,6 +91,15 @@ It also fails an `oecd-aim` label on an AIID-template row. Input that fails each
 | edit text under a label | `test_s2_fires_on_a_label_over_edited_template_text` |
 | OECD-prefix text on an unlabelled non-OECD row | `test_s2_fires_on_a_prefix_spoof_without_label` |
 
+**Byte-level key-order change (declared 2026-10-09, gate advisory A1).** INC-00437's existing
+`description_provenance` / `description_source` keys moved position in `data/incidents.json`: they now sit
+after `aiid_id` instead of after `mitre_atlas_tactics`. Values are identical. Cause: on main the two labels
+reached INC-00437 only through the step-4d curation override (applied after normalisation, so appended late);
+the T12 backfill in `normalize_entry` now sets them at normalisation, immediately after `aiid_id`, and the
+override re-writes the same values in place. This is why the diff is 7,874 insertions and 2 deletions (3,936
+rows x 2 lines, plus the two moved lines). Value-level delta (above) cannot see it; `field_delta_vs_ref.py`
+now prints a key-order report. No data was changed to address it.
+
 ## S3: derived artifacts
 
 Measured by generating each artifact from this tree and from `git show b8e5ed00:data/incidents.json`
