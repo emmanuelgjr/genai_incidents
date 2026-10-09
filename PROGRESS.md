@@ -24,6 +24,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⛔ Item 6 — **BOUNCE #2 (full re-gate on `3e8ed477`, 2026-10-09)**: ESCALATED to the user (protocol step 6)
+- **Defects:**
+  1. **`tier: landmark` is not AIRI-derived.** `_derive_tier` (merge_and_dedupe.py:163-187, the definition of record) gives landmark iff curated, `aiid_id`, or ai-harm. All 1,382 AIRI rows carry `aiid_id` from `aiid_full`. B1 therefore moves **0** rows out of landmark, not "1,915 → as low as 533", and the memo's open question about it is a code fact, not a user decision.
+  2. **Option C's "~41 rows" is wrong.** The page has 1,497 objects / 1,496 distinct ids; 40 ids are not ingested and 39 of those are already in the corpus via aiid_full. C would add **at most 1 row (AIID-1474)** plus the AIRI overlay on 39 rows.
+  3. **The corrections note claims §1 was fixed, but lines 52-55 still say the only adjacent channel is AIID's snapshots.** Line 46 ("not retrieved") and line 35 ("NOT raw HTML") are also stale. This is the same shape as item 7's bounce #2.
+- **Advisories:** the "never hand-authored" citation belongs to DATA_DICTIONARY:17; "1,497" is objects, not distinct ids; attribution and "rendered fetch" wording is cosmetic.
+- **Gate evidence:**
+  - node/curl: split 0; 1,496 distinct live ids; missing = ['AIID-1474'];
+  - CC BY §6(c) verified;
+  - B2 arithmetic verified;
+  - the CSV and ZIP gates are textually identical;
+  - scope is one file.
+- **Foreman [R]:** `_derive_tier` was read at :163-187. Python gives AIRI rows with `aiid_id` = **1,382 / 1,382** (curated: 3). Memo lines 52-55 were read and still carry the stale sentence. Defects 1 and 3 are confirmed. Defect 2 rests on the gate's curl; the foreman reproduced the page size earlier but not the id diff.
+
 ### 🔄 Item 3 (rejected-CVE sweep) — **specialist reported `04fde40b` (pushed); held before the gate: the base is stale**
 - **Foreman [R]:** the tree is clean. `git rev-list --count 04fde40b..origin/main` gives **18**: the branch sits on 5546e058 and predates the item 2 merge, which the brief required the delta to follow. The specialist has been sent back to merge origin/main, rebuild, and re-derive the delta as a dated addendum, before the red-reviewer gate.
 - **Specialist's claims (testimony until gated):**
