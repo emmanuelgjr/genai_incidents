@@ -24,6 +24,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Item 7 (OECD/AIID memo) — **PASS (scoped re-gate under D55, on `3d481954`, 2026-10-09)**. The memo is ready for the user's A/B/C decision once 4 post-PASS advisories are applied.
+- **Verdict, in the gate's words:** "All 5 defects and both advisories A1 and A3 are fixed, and the fixes are true to their sources. The author's own change to §3 is correct. No new wrong figure was added, and the branch still changes one file."
+- **Gate evidence:**
+  - rev-list 106/3 re-run;
+  - the S1 breakdown matches its Counter (sum 3,728);
+  - merge counts match D42 review lines 37-41 and 57-61;
+  - 29/30/42/42 match tripwire audit lines 47-49 and the run log;
+  - SOURCE_LICENSES:140 is the 302 cell;
+  - the new GET curl returns `200 0 https://oecd.ai/sitemaps/incident-monitor-sitemap.xml`;
+  - the 236-242 cite is correct;
+  - the diff is one file, +49/-15.
+- **Advisories (being applied before freeze, following D52's "fix advisories first"):**
+  1. NOTICE-DATA:256-259, not 256-258;
+  2. option B wording "found 29/30/42/42 against expected 2";
+  3. R7's curl attribution should be red-reviewer;
+  4. bounce-#3 item 4 misdescribes its supersede treatment.
+- **Item 7 caveat for the user:** the user asked to "prepare an unfreeze branch". The memo gives the S1-S9 build spec, and the rebased branch is built only if the user picks C or A (foreman decision A4).
+
 - **Item 7 D55 fixes at `3d481954` (pushed).** All 5 defects plus A1/A3 applied. The author also corrected §3's "Reading across" sentence (merges 3 and 4 had been overstated). Foreman grep: the stale tokens appear only inside the corrections logs. **The scoped re-gate has been sent to the bounce-#3 reviewer.**
 - **Item 6 D54 fixes at `cac1724c` (pushed), by the fresh author.** The landmark derivation is corrected (B1 removes 0 rows from landmark), option C now adds at most 1 row (AIID-1474), and the §1 stale lines are fixed. The author also found and fixed a false claim in the bounce-#1 note: there are 276 non-October rows (274 July + 2 Sep), not "274 all July". Its consistency pass checked every corrections-note claim against the body. Foreman grep: the stale tokens appear only inside the corrections log. **A fresh red-reviewer has been dispatched for the full gate.**
 - **⚖ D55, USER RULING 2026-10-09 (item 7 bounce #3): "Fresh author fixes + scoped re-gate".** A fresh license-auditor applies the 5 defects plus A1 (date R7; replace the `curl -sI` Location check, which cannot fire) and A3. The bounce-#3 reviewer then re-checks only the diff and re-runs the commands.
