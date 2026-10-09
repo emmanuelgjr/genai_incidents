@@ -222,8 +222,8 @@ favour.
 | R4 | **AIID shipped population grows** by roughly the new snapshot rows (~+94 by subtraction, plus 6 retitles to AIID titles). E23's ruling is shape-based (bare title, U.S. situs) so it extends in kind, but its counts (1,463) and its "0 marker" measurement must be re-run, and its reopen tripwire must be re-checked: the AIRI/`aiid_incidents.json` population must still not reach `data/incidents.json`. | Low in kind | S5, S6 |
 | R5 | **E23 Layer-1 uncertainty is unchanged and unaffected.** It rests on E13's uncertified situs method; the E23 ruling says so itself. An unfreeze enlarges the dependency by ~100 rows, not its character. | Low | none |
 | R6 | **OECD terms question is still unanswered on this record.** Outreach to `ai@oecd.org` was sent 2026-07-31; follow-up window 2026-08-21 (`docs/outreach/README.md:21`); no follow-up send recorded and no reply found (local grep of PROGRESS.md, outreach README, oecd-aim-terms.md, which shows absence only on this tree). Primary terms pages still 403 to every tool. Ask the user. | UNKNOWN | Open question to user |
-| R7 | **Sitemap redirect / robots gap**: the sitemap URL 302s to `incidents-server.oecdai.org`, whose robots.txt the shared limiter never checks (`SOURCE_LICENSES:140`, a 2026-07-30 WebFetch observation). **Dated note (2026-10-09):** on 2026-10-09 a foreman curl HEAD returned 405 and GET -L returned 200 with no redirect, so the 302 is not reproduced today; treat R7 as unconfirmed as of 2026-10-09. Individual incident pages do not redirect (7/7, 2026-07-30). One fetch per run; unchanged by the unfreeze, but a resumed weekly crawl resumes it. | Low | Check in section 8 |
-| R8 | **Label wording.** T12's `description_provenance: original` / `description_source: oecd-aim` is a provenance label, not a content-licence marker. `NOTICE-DATA:256-258` says no marker "is emitted for OECD-derived rows today; whether one is warranted is a separate, not-yet-scoped question". Shipping the label must not be described as that marker. | Low | S6 wording |
+| R7 | **Sitemap redirect / robots gap**: the sitemap URL 302s to `incidents-server.oecdai.org`, whose robots.txt the shared limiter never checks (`SOURCE_LICENSES:140`, a 2026-07-30 WebFetch observation). **Dated note (2026-10-09):** on 2026-10-09 a red-reviewer curl HEAD returned 405 and GET -L returned 200 with no redirect, so the 302 is not reproduced today; treat R7 as unconfirmed as of 2026-10-09. Individual incident pages do not redirect (7/7, 2026-07-30). One fetch per run; unchanged by the unfreeze, but a resumed weekly crawl resumes it. | Low | Check in section 8 |
+| R8 | **Label wording.** T12's `description_provenance: original` / `description_source: oecd-aim` is a provenance label, not a content-licence marker. `NOTICE-DATA:256-259` says no marker "is emitted for OECD-derived rows today; whether one is warranted is a separate, not-yet-scoped question". Shipping the label must not be described as that marker. | Low | S6 wording |
 
 **Not a licence risk of the unfreeze, but a trap:** the board's D42 line treats the
 decision as "review 7 merges". The legal exposure is mainly R1 (titles on ~1,500 new
@@ -244,7 +244,7 @@ in which case nothing publishes.
 
 **B. Decline: leave the branch unmerged, keep D25(a) as is.** Consequences, all
 measured above: the weekly refresh stays red at the old tripwire; the tripwire's
-fixed expected list (2 rows) is exceeded by 29 (09-14), 30 (09-20), 42 (09-27) and 42 (10-04, run 37195068024); growth has stalled at 42 for the two most recent runs, but the count has not fallen; T12 labels never
+fixed expected list (2 rows) the test found 29 (09-14), 30 (09-20), 42 (09-27) and 42 (10-04, run 37195068024) rows against the fixed expected 2; growth has stalled at 42 for the two most recent runs, but the count has not fallen; T12 labels never
 ship (3,936 rows unlabelled); the AIID snapshot stays at max id 1581 against 1714
 upstream; and the barrier remains accidental. Cheapest, but it keeps the "no
 deliberate guard" state and the work already built idle.
@@ -470,7 +470,7 @@ and each has a command in section 8; I re-checked the cited files where I could.
 Corrected in place (memo not yet frozen). Old -> new, by section:
 1. R8 (section 4): citation for "is emitted for OECD-derived rows today; whether one
    is warranted is a separate, not-yet-scoped question" changed from `SOURCE_LICENSES`
-   1.5 to `NOTICE-DATA:256-258`.
+   1.5 to `NOTICE-DATA:256-259`.
 2. Section 3 header: "109 commits behind main, 3 ahead" -> "106 commits behind main @
    `07f22c09` (the memo's base), 3 ahead" (foreman-measured). Section 8 gains
    `git rev-list --count 586f40c8..07f22c09   # 106` and `07f22c09..586f40c8   # 3`.
@@ -479,21 +479,38 @@ Corrected in place (memo not yet frozen). Old -> new, by section:
    125 (previously missing); original/oecd-aim 1 (INC-00437). Foreman-measured.
 4. Merge counts: the D42 review section A marks merges 3 and 4 "Unsure, lean no" and
    6 and 7 "Do not approve"; 5 is "Approve" (contested by the tripwire audit, "doubtful").
-   Option A, the section 3 "Reading across the table" paragraph, and the bounce #1
-   item 4 above now read "2 do-not-approve merges (6, 7), 2 lean-no (3, 4), 1 contested
-   (5)", consistent with the section 3 table. The earlier "4 do-not-approve merges" was
-   wrong.
+   Option A and the section 3 "Reading across the table" paragraph now read "2
+   do-not-approve merges (6, 7), 2 lean-no (3, 4), 1 contested (5)", consistent with the
+   section 3 table. The bounce #1 item 4 text above keeps its original wording and gains
+   only a note that its "4 do-not-approve merges" was wrong, see bounce #3.
 5. Option B (section 5): "fails more every week (2 -> 30 -> 42)" -> 29 (09-14), 30
    (09-20), 42 (09-27), 42 (10-04, run 37195068024); growth stalled at 42. Table checked
-   against `refresh-tripwire-2026-10-03.md:47-49`; the 10-04 figure is from the foreman
-   per the dated note in section 1.
+   against `refresh-tripwire-2026-10-03.md:47-49`; the 10-04 figure is from red-reviewer
+   (read in the run 37195068024 log at the bounce #1 gate, advisory A2), per the dated
+   note in section 1.
 6. R7 (section 4): the sitemap 302 is dated as a 2026-07-30 WebFetch observation
-   (`SOURCE_LICENSES:140`); on 2026-10-09 foreman curl HEAD returned 405 and GET -L
+   (`SOURCE_LICENSES:140`); on 2026-10-09 red-reviewer curl HEAD returned 405 and GET -L
    returned 200 with no redirect, so R7 is unconfirmed today. Section 8's
    `curl -sI ... | grep -i location` (which cannot fire on a 405) replaced by a GET-based
    check: `curl -s -o /dev/null -w "%{http_code} %{num_redirects} %{url_effective}" -L <url>`.
 7. Cite range `refresh-tripwire:236-241` -> `236-242` (the INC-01994 row is at 242), in
    R1 and in bounce #1 item 2.
+
+### Post-PASS advisories (2026-10-09, after item 7 scoped re-gate PASS on 3d481954)
+
+1. R8 cite and bounce #3 item 1: `NOTICE-DATA:256-258` -> `NOTICE-DATA:256-259`
+   (confirmed by opening NOTICE-DATA: "question." ends on line 259).
+2. Option B: "is exceeded by 29 (09-14), 30 (09-20), 42 (09-27) and 42 (10-04, ...)" ->
+   "the test found 29 (09-14), 30 (09-20), 42 (09-27) and 42 (10-04, ...) rows against
+   the fixed expected 2" (the old wording could be misread as 2+29).
+3. R7 dated note and bounce #3 item 6: the 2026-10-09 curl is attributed to
+   red-reviewer, not the foreman.
+4. Bounce #3 item 4: no longer says the bounce #1 item 4 text "now reads" the new
+   counts; it states that text keeps its original wording plus a "was wrong, see bounce
+   #3" note.
+5. Bounce #3 item 5: the source of the 10-04 figure (42, run 37195068024) was
+   attributed to "the foreman"; it is red-reviewer, who read it in the run log at the
+   bounce #1 gate (advisory A2).
 
 *Agent-suggested; do not regenerate. Supersede by a dated addendum, not by rewriting
 (CLAUDE.md working agreement 4).*
