@@ -10,6 +10,9 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+- **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
+- **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
+
 ### ⛔ Item 7 — **BOUNCE #2 (scoped re-gate on `e00d54d4`, 2026-10-09)**: ESCALATED to the user (protocol step 6)
 - **Verdict, in the gate's words:** "One residual wrong figure is left, and the memo's own corrections note says it was fixed. It is a one-cell change. Everything else in the fix is correct, and every new number reproduces when I run it myself."
 - **Defect:** R3 (line 220) still reads "3,667/3,829 vs 4,160", and the corrections note claims R3 was corrected. The fix is to replace "(3,667/3,829 vs 4,160)" with "(3,667/3,829 vs 3,937/4,104)". String check: `grep -n "vs 4,160"` returns rc 1.
