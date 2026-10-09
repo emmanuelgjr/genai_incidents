@@ -222,14 +222,24 @@ against the `OSV_TARGETS` list of PyPI, npm, and Go-ecosystem packages).
 ## 3. Attack-capability / taxonomy sources
 
 ### 3.1 MITRE ATLAS
-*Ingested by:* `scripts/ingest_external.py::ingest_atlas()` (parses
-`_external/atlas-data/dist/v6/ATLAS-2026.06.yaml`, a git-cloned public repo).
+*Ingested by, two paths:* (1) `scripts/ingest_external.py::ingest_atlas()` (case
+studies; parses `_external/atlas-data/dist/v6/ATLAS-2026.06.yaml` from a git-cloned
+public repo; offline, unchanged). (2) **Since v2.13.0:** `scripts/fetch_atlas.py` does an
+HTTP fetch of the latest release from
+`raw.githubusercontent.com/mitre-atlas/atlas-data/main/dist/` (the `ATLAS-latest.yaml`
+text-pointer chain to `dist/v6/ATLAS-<release>.yaml`), through `ingest/common.py`
+(robots.txt check, per-host rate limit, identifying User-Agent). It is not in the
+deterministic build: `make build` only reads the committed copy. The verbatim release
+is committed as `ingest/atlas/ATLAS-<release>.yaml` (currently 2026.09) with
+`ingest/atlas/ATLAS.provenance.json` (sha256, URL, pointer chain, retrieval date);
+`scripts/atlas_pin.py` derives `mappings/mitre_atlas.json` from it. Run monthly by
+`.github/workflows/atlas-refresh.yml`; an unchanged release writes nothing.
 
 | Field | Value |
 |---|---|
 | License | **Apache License 2.0**, confirmed via `mitre-atlas/atlas-data` LICENSE file (fetched 2026-07-15): *"Copyright 2021-2026 MITRE. Licensed under the Apache License, Version 2.0."* |
-| Scrape-permitted | N/A — local clone of a public repo. |
-| Redistribute-verbatim | **YES** under Apache-2.0 terms (case-study titles/descriptions are reproduced from the dist YAML). |
+| Scrape-permitted | Yes for the HTTP path: the file is a published release artifact of a public repo under Apache-2.0, fetched via `ingest/common.py` (robots.txt for `raw.githubusercontent.com` checked on every fetch, 1 s default spacing; three small requests per run: two ~20-byte pointers and the ~840 KB release, at most monthly). The case-study path (1) is a local clone: N/A. |
+| Redistribute-verbatim | **YES** under Apache-2.0 terms (case-study titles/descriptions are reproduced from the dist YAML; the whole release YAML is also committed verbatim under `ingest/atlas/`, covered by the `.reuse/dep5` stanza `ingest/atlas/ATLAS-*.yaml`: Apache-2.0, copyright 2021-2026 The MITRE Corporation, with MITRE's notice carried in `NOTICE-DATA`). |
 | Relicense-compatible | **YES, with a carve-out.** Apache-2.0 does not require share-alike, but it does require preserving the copyright/license notice on the covered material — MITRE's Apache-2.0 notice must stay attached to ATLAS-derived case-study text specifically; it cannot be silently folded into a blanket "CC-BY-4.0, all rights reserved by us" claim. |
 | Action | **(a) compatible**, but the repo's licensing docs (LICENSE-DATA / this file) must state the ATLAS-derived carve-out explicitly — this is a direct input to WS0-T2. |
 | Date-checked | 2026-07-15 |

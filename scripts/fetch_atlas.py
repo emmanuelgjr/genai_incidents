@@ -73,6 +73,21 @@ def resolve_pointer(fetch=fetch_once) -> tuple[list[str], str]:
     raise RuntimeError(f"ATLAS pointer chain did not terminate: {chain}")
 
 
+def is_unchanged(sha: str, name: str, snapshot_dir: Path | None = None) -> bool:
+    """True when the committed provenance already records this exact release
+    (same file name, same sha256) AND the committed file still hashes to it."""
+    d = snapshot_dir or SNAPSHOT_DIR
+    prov_path = d / PROVENANCE.name
+    if not prov_path.is_file() or not (d / name).is_file():
+        return False
+    try:
+        prov = json.loads(prov_path.read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    on_disk = hashlib.sha256((d / name).read_bytes()).hexdigest()
+    return prov.get("file") == name and prov.get("sha256") == sha == on_disk
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="fetch and report; write nothing")
@@ -95,6 +110,13 @@ def main() -> int:
     print(f"[atlas-fetch] collection.version={version} modified={coll.get('modified-date')} "
           f"bytes={len(body):,} sha256={sha}")
     if args.check:
+        return 0
+
+    if is_unchanged(sha, name):
+        # Same release, same bytes as the committed snapshot: write NOTHING (not
+        # even a new `fetched` date) so the workflow's change detection sees a
+        # clean tree and opens no PR. Dated audits are never regenerated.
+        print(f"[atlas-fetch] NO-OP: {name} sha256 matches the committed snapshot; nothing written")
         return 0
 
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)

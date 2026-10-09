@@ -501,7 +501,8 @@ to the `refresh-state` branch — extracted out of that workflow step into
 this script 2026-09-14 so it is testable without a live GitHub repo; see
 `tests/test_persist_refresh_state.py`) and
 `peter-evans/create-pull-request`'s git operations opening the weekly
-refresh PR are **not** registered here. These are CI/CD operations on
+refresh PR (`auto-refresh.yml`) and the monthly ATLAS refresh PR
+(`atlas-refresh.yml`) are **not** registered here. These are CI/CD operations on
 this repository's *own* git history — GitHub talking to GitHub via
 `${{ github.token }}` — not ingestion of external corpus data from a
 third-party source, which is what this invariant and this register are
@@ -510,7 +511,7 @@ silent omission.
 
 `make build` never imports `ingest/common.py` at all. Ingest scripts are
 not in the deterministic build path (`Makefile`'s `build` target is
-`merge render render-docs-stats validate`, none of which touch the
+`merge render render-docs-stats validate lint-atlas`, none of which touch the
 network) — `ingest/common.py`'s own module docstring states this, and
 `WS4-T1`'s `make build` contract (no network, no model calls) enforces it
 independently of anything in this file.

@@ -197,6 +197,72 @@ def test_fetch_atlas_has_no_direct_network_calls():
     assert "urlopen" not in src and "requests" not in src and "from ingest.common import fetch_once" in src
 
 
+def _fake_upstream(monkeypatch, tmp_path, body: bytes):
+    """Point fetch_atlas at a scratch snapshot dir and a fake upstream serving `body`."""
+    snap = tmp_path / "atlas"
+    monkeypatch.setattr(fetch_atlas, "SNAPSHOT_DIR", snap)
+    monkeypatch.setattr(fetch_atlas, "PROVENANCE", snap / "ATLAS.provenance.json")
+    bodies = {
+        fetch_atlas.RAW_BASE + "ATLAS-latest.yaml": b"v6/ATLAS-latest.yaml",
+        fetch_atlas.RAW_BASE + "v6/ATLAS-latest.yaml": b"ATLAS-2026.09.yaml",
+        fetch_atlas.RAW_BASE + "v6/ATLAS-2026.09.yaml": body,
+    }
+    monkeypatch.setattr(fetch_atlas, "fetch_once", lambda url, timeout=60: (bodies[url], None))
+    monkeypatch.setattr(sys, "argv", ["fetch_atlas.py"])
+    return snap
+
+
+def _snapshot_state(snap: Path) -> dict:
+    return {p.name: p.read_bytes() for p in sorted(snap.iterdir())}
+
+
+def test_fetch_same_release_is_a_true_noop(tmp_path, monkeypatch, capsys):
+    """Unchanged upstream => nothing written, not even a fresh `fetched` date."""
+    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    snap = _fake_upstream(monkeypatch, tmp_path, body)
+    assert fetch_atlas.main() == 0                      # first pull writes
+    prov = json.loads((snap / "ATLAS.provenance.json").read_text(encoding="utf-8"))
+    prov["fetched"] = "2000-01-01"                       # a stale date a rewrite would clobber
+    (snap / "ATLAS.provenance.json").write_text(json.dumps(prov, indent=2) + "\n", encoding="utf-8")
+    before = _snapshot_state(snap)
+    assert fetch_atlas.main() == 0                      # same release again
+    assert _snapshot_state(snap) == before              # byte-identical: no rewrite
+    assert "NO-OP" in capsys.readouterr().out
+
+
+def test_fetch_changed_bytes_same_version_is_not_a_noop(tmp_path, monkeypatch):
+    """The no-op must fire only on a matching sha: a re-issued file is rewritten."""
+    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    snap = _fake_upstream(monkeypatch, tmp_path, body)
+    assert fetch_atlas.main() == 0
+    before = _snapshot_state(snap)
+    _fake_upstream(monkeypatch, tmp_path, body + b"\n# re-issued\n")
+    assert fetch_atlas.main() == 0
+    assert _snapshot_state(snap) != before
+
+
+def test_fetch_noop_requires_snapshot_file_intact(tmp_path, monkeypatch):
+    """Provenance sha matching is not enough if the committed file was altered."""
+    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    snap = _fake_upstream(monkeypatch, tmp_path, body)
+    assert fetch_atlas.main() == 0
+    (snap / "ATLAS-2026.09.yaml").write_bytes(body + b"#tamper\n")
+    assert fetch_atlas.main() == 0
+    assert (snap / "ATLAS-2026.09.yaml").read_bytes() == body   # restored from upstream
+
+
+def test_atlas_pin_refuses_to_overwrite_existing_report(tmp_path, monkeypatch, capsys):
+    """Dated audits are do-not-regenerate: --report onto an existing file fails."""
+    rep = tmp_path / "audit.md"
+    rep.write_text("COMMITTED AUDIT\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["atlas_pin.py", "build", "--report", str(rep)])
+    assert atlas_pin._main() == 2
+    assert rep.read_text(encoding="utf-8") == "COMMITTED AUDIT\n"
+    assert "REFUSING" in capsys.readouterr().err
+    rep.unlink()                                          # absent -> written
+    assert atlas_pin._main() == 0 and rep.is_file()
+
+
 # ------------------------------------------------------ taxonomy_versions ----
 
 def test_taxonomy_versions_derived_from_mappings_not_literals(tmp_path):

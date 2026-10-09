@@ -276,6 +276,12 @@ def _main() -> int:
         counts = scan_suspicious((a.yaml or snapshot_path()).read_text(encoding="utf-8"))
         print(json.dumps(counts))
         return 1 if any(counts.values()) else 0
+    if a.report and a.report.exists():
+        # Dated audits are records, never regenerated (CLAUDE.md agreement 4).
+        print(f"[atlas-pin] REFUSING to overwrite existing report {a.report}; "
+              "a dated audit is do-not-regenerate. Move/rename it deliberately if a "
+              "same-version re-issue needs a new one.", file=sys.stderr)
+        return 2
     release = load_release(a.yaml or snapshot_path())
     prior = load_pin(a.prior) if a.prior else load_pin()
     new = build_pin(release, prior)

@@ -6,7 +6,9 @@ name: Monthly ATLAS refresh
 # validate / test outcomes. It never pushes to main. ATLAS ships roughly
 # monthly (month-end), so the run is on the 3rd, after the previous month's
 # release; a run that finds the same release as the committed snapshot is a
-# no-op and opens nothing.
+# no-op and opens nothing (fetch_atlas.py writes nothing when the sha256 matches
+# the committed provenance, so `git status` stays clean; atlas_pin.py refuses to
+# overwrite an existing dated audit).
 #
 # Network: ONLY scripts/fetch_atlas.py, which goes through ingest/common.py
 # (robots.txt, rate limit, identifying User-Agent). Everything after it is
@@ -103,7 +105,12 @@ jobs:
       # Recorded, not fatal: the PR must open even when the lint fails (an id
       # removed upstream that mappings/atlas_id_translations.json does not yet
       # translate needs a HUMAN decision; the failing lint on the PR is the
-      # signal, and validate.yml re-runs it as a required check).
+      # signal). NOTE: a PR opened with the default GITHUB_TOKEN does NOT trigger
+      # pull_request workflows (GitHub's recursion guard), so validate.yml will
+      # not run on this PR by itself. That is why lint, validate.py and pytest
+      # all run in THIS workflow and their outcomes are tabulated in the PR
+      # body. A human reviewer who wants the full CI matrix closes and reopens
+      # the PR (or pushes a commit as themselves), which does trigger it.
       - name: Lint ATLAS ids against the new pin
         if: steps.changed.outputs.changed == 'true'
         id: lint
@@ -157,6 +164,7 @@ jobs:
             echo "- [ ] Every id removed upstream has an entry in \`mappings/atlas_id_translations.json\` (or the lint failure above is understood and resolved)."
             echo "- [ ] Untouched entries are reported byte-identical and only \`updated\`/\`last_seen\` moved on changed ones."
             echo "- [ ] The suspicious-content scan shows zero hits (or each hit is explained)."
+            echo "- [ ] The lint / validate / pytest outcomes in the table above are green (this PR was opened with GITHUB_TOKEN, so the validate.yml CI matrix did not run; close and reopen the PR to trigger it before merging)."
             echo
             echo "Recreated from current \`main\` on every run: **merge promptly**, or close it and re-run"
             echo "(Actions -> Monthly ATLAS refresh -> Run workflow) if \`main\` has moved."

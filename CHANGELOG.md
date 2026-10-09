@@ -19,16 +19,25 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   links changed, tactic `AML.TA0001` renamed "AI Attack Staging" -> "AI Attack Adaptation"
   (`docs/audits/atlas-refresh-2026.09-release-diff.md`).
 - **5,841 entries change `mitre_atlas` and/or `mitre_atlas_tactics`; no entry added,
-  removed or re-IDed.** 2,540 have a superseded technique id mechanically translated
-  (`AML.T0058` -> `AML.T0115.001` on 2,498, `AML.T0019` -> `AML.T0115.000` on 41,
-  `AML.T0015.001` -> `AML.T0015` on 1, an id that never existed in these releases); 3,309
+  removed or re-IDed.** 2,532 have a superseded technique id mechanically translated
+  (`AML.T0058` -> `AML.T0115.001` on 2,498 entries, `AML.T0019` -> `AML.T0115.000` on 41,
+  `AML.T0015.001` -> `AML.T0015` on 1, an id that never existed in these releases; those
+  per-id counts sum to 2,540 but 8 entries carry both `AML.T0019` and `AML.T0058`, so 2,532
+  distinct entries; re-derive with the command in the delta audit's correction note); 3,309
   change tactics only, through the new technique->tactic links. On those entries `updated`
   (and `last_seen`) move to the build date and nothing else does. Mapping heuristics are
-  unchanged. Every changed entry, with before/after and reason, and the per-entity proof
+  unchanged. 2,532 + 3,309 = 5,841. Every changed entry, with before/after and reason, and the per-entity proof
   that the other 9,825 are byte-identical:
   `docs/audits/atlas-refresh-delta-2026-10-06.md`. **Consumer impact:** anything filtering
   on `AML.T0058`/`AML.T0019` must use the `AML.T0115.*` ids; the old ids stay in the pin
   marked `deprecated`, never deleted.
+- **Two pre-existing pin errors corrected (also in `CORRECTIONS.md`).** (a) `INC-06842`
+  (AVID-2023-V012, `quality_tier: reviewed`) carried `AML.T0015.001`, an id absent from
+  ATLAS 2026.06 and 2026.09 alike; it is now `AML.T0015`. (b) The old
+  `mappings/mitre_atlas.json` listed `AML.T0009`, `AML.T0030`, `AML.T0038` and `AML.T0045`
+  as part of "2026.06", but ATLAS 2026.06 does not contain them (nor 2025.12 or 2026.01,
+  checked against the upstream releases); they are now marked `deprecated` in the pin
+  (retained, never deleted). No entry in the corpus carried them.
 - **`taxonomy_versions`** (`atlas`, `owasp_llm`, `owasp_asi`, `capec`, `veris`), derived
   from the pinned `mappings/*.json` and published in `data/stats.json`, as
   `x_taxonomy_versions` on a STIX `identity` object, as `genai-incidents:taxonomy-*` tags
