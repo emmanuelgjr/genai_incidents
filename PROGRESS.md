@@ -24,6 +24,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ✅ Schema branch (D61 + D57) — **PASS (red-reviewer on `6689f12b`, 2026-10-09)**. Merge waits on the user, because advisory 1 changes the D57 design.
+- **Verdict:** "PASS. DEFECTS: none."
+- **Gate evidence:**
+  - scratch clone built twice, byte-identical (incidents.json sha256 67b0c8c2…);
+  - its own per-entity delta: field-set shapes exactly {(source_freshness): 1382; (confidence, last_seen, status, status_reason, updated): 22}; `added` identical everywhere; 0 `updated` bumps outside the 22;
+  - the disputed set re-derived by set logic over the snapshot equals the built 22;
+  - the registry classification is genuine (no writers; 2 commits, both reviewed hand edits);
+  - fire proofs: enum removed → 22 invalid; rule 8 off → 2 tests fail; stale-requires-hold removed → 1 test fails; hold deleted → validate rc 1; 3 planted pairing errors are caught;
+  - delta-tool independence: the main registry gives 2,764 defects, no flag gives 1,382, a planted date gives 2;
+  - 684 passed; drift, validate and lint clean.
+- **Advisories:**
+  1. **The D57 design differs from memo §7 and the board routing.** The registry uses `hold.until` as the review date instead of a separate `review_by` field, which the memo had called "distinct from hold.until". The rows do carry `review_by`. The gate judges the ruling satisfied in substance. The overdue-date scheduled check (memo §7) is not built. **This is the user's call.**
+  2. **No rendered surface shows a dispute** (cards, INCIDENTS.md, stats). A follow-up (a DISPUTED card note, and maybe `disputed_count`) is **the user's call**.
+  3. The delta tool is independent of the build output but shares the min() algorithm. The gate's literal per-entity check found 0 mismatches.
+  4. The `generated` move is correct (merge_and_dedupe.py:2496).
+  5. The brief's base SHA was stale; the data is unaffected.
+  6. The item-3 CHANGELOG sentence goes out of date when this merges (release pass).
+  7. Item 8 owns STIX/MISP/HF.
+  8. Stray-check coverage note.
+
 ### 🔍 Schema branch (D61 `cve-disputed` + D57 AIRI review date) — **REVIEW: `6689f12b` (pushed), red-reviewer dispatched**
 - **Delta** (`cve_sweep_delta.py --before-ref origin/main --dispute-emission on --freshness-registry ...`): 1,404 entries / 1,492 fields, 0 defects.
   - `source_freshness` changes on 1,382 (adds `review_by` 2027-01-07);
