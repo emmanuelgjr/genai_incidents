@@ -84,7 +84,7 @@
         },
         "hold": {
           "type": "object",
-          "description": "An open decision about this source's future, with the date it must be resolved by. Present when the structural question (retire / replace / restore) is deliberately deferred rather than unexamined. The dated form matters: the Phase-1 exit criterion for dead sources is satisfied by a remediation OR a hold WITH a decision date, so an undated hold must not be expressible as one.",
+          "description": "An open decision about this source's future, with the date it must be resolved by. Present when the structural question (retire / replace / restore / keep frozen) is deliberately deferred rather than unexamined. REQUIRED on every `stale` source (v2.13.0, user ruling D57; enforced below): a source that has stopped refreshing must carry a dated commitment to re-decide it, so that no stale source can sit in the registry undated. The dated form matters: the Phase-1 exit criterion for dead sources is satisfied by a remediation OR a hold WITH a decision date, so an undated hold must not be expressible as one. This is also the source's REVIEW DATE: `until` is what rows inherit as `source_freshness.review_by` (earliest `until` among a row's stale sources), so there is deliberately no separate `review_by` field here — one date, one meaning, one place (design note docs/audits/ws3-v2130-review-by-design-2026-10-09.md). When a hold's date passes, the hold is REPLACED by the decision that resolved or re-deferred it (a new `decision` id and `until`), with the lapsed hold recorded in the new `note`; a lapsed hold is never silently extended.",
           "required": ["decision", "until", "note"],
           "additionalProperties": false,
           "properties": {
@@ -95,7 +95,7 @@
             "until": {
               "type": "string",
               "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
-              "description": "Date the deferred decision becomes live, whatever else happens."
+              "description": "Date the deferred decision becomes live, whatever else happens. Propagated to rows as `source_freshness.review_by`. DECLARATIVE: never compared with the wall clock by the build (the build path is deterministic); an overdue date is a matter for a scheduled check or a human, not for `make build`, so a lapsed `until` neither fails the build nor changes any row."
             },
             "note": {
               "type": "string",
@@ -145,6 +145,11 @@
           "$comment": "A null row_marker is a design decision, not an omission — it must say why.",
           "if": { "properties": { "row_marker": { "type": "null" } } },
           "then": { "required": ["row_marker_note"] }
+        },
+        {
+          "$comment": "v2.13.0 (user ruling D57): a stale source always carries a dated hold -- its review date. Remove this and an undated stale source validates again.",
+          "if": { "required": ["status"], "properties": { "status": { "const": "stale" } } },
+          "then": { "required": ["hold"] }
         }
       ]
     }

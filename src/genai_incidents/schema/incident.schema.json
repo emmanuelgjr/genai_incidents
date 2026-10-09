@@ -174,7 +174,7 @@
     },
     "confidence": {
       "type": "string",
-      "description": "Transparent, rule-derived confidence in the entry (see DATA_DICTIONARY.md). high = curated/reviewed OR 2+ distinct sources with a CVE; medium = 2+ sources OR has a CVE/CVSS; low = a single auto-tier source.",
+      "description": "Transparent, rule-derived confidence in the entry (see DATA_DICTIONARY.md). high = curated/reviewed OR 2+ distinct sources with a CVE; medium = 2+ sources OR has a CVE/CVSS; low = a single auto-tier source. An entry with `status: disputed` is then lowered one level (high to medium, medium to low; low stays low), user ruling D61.",
       "enum": ["high", "medium", "low"]
     },
     "tier": {
@@ -213,24 +213,24 @@
     },
     "status": {
       "type": "string",
-      "description": "Editorial/lifecycle status of the ENTRY (WS4-T2, invariant 3: entries are never deleted; they are marked and keep resolving). Emitted ONLY when not the default: ABSENCE means the entry stands as published (there is deliberately no `active` value, so the ~13k unaffected rows carry no new field, and so this cannot be confused with `source_status`, which is an emission status). `retracted`: the upstream identifier(s) this entry rests on were withdrawn, currently because every CVE the entry carries is REJECTED by the CVE Program AND the entry has no other evidence (every `source_ids` element is one of those CVEs; an entry corroborated by any other source stands, flagged only via `rejected_cve_ids`). See `status_reason`. The entry stays in the file and its ID stays resolvable, but it is not counted in `incident_count` and should not be cited as an incident. `disputed` is reserved for upstream-disputed records and is not emitted yet. Derived by scripts/merge_and_dedupe.py from the committed snapshot ingest/cve_rejections.json; never hand-authored.",
+      "description": "Editorial/lifecycle status of the ENTRY (WS4-T2, invariant 3: entries are never deleted; they are marked and keep resolving). Emitted ONLY when not the default: ABSENCE means the entry stands as published (there is deliberately no `active` value, so the ~13k unaffected rows carry no new field, and so this cannot be confused with `source_status`, which is an emission status). `retracted`: the upstream identifier(s) this entry rests on were withdrawn, currently because every CVE the entry carries is REJECTED by the CVE Program AND the entry has no other evidence (every `source_ids` element is one of those CVEs; an entry corroborated by any other source stands, flagged only via `rejected_cve_ids`). See `status_reason`. The entry stays in the file and its ID stays resolvable, but it is not counted in `incident_count` and should not be cited as an incident. `disputed` (emitted from v2.13.0, user ruling D61): at least one CVE on the entry is disputed upstream (a CNA or ADP `disputed` tag, or a `** DISPUTED **` description prefix, per ingest/cve_rejections.json), every CVE on it is disputed or REJECTED, and the entry has no other evidence (every `source_ids` element is one of those CVEs). Unlike `retracted`, a disputed entry STANDS: it stays counted in `incident_count` and may be cited, with the dispute stated; its entry-level `confidence` is one level lower than the rule would otherwise give (high to medium, medium to low). An entry corroborated by any other source is not status-marked for a disputed CVE. See `status_reason`. Derived by scripts/merge_and_dedupe.py from the committed snapshot ingest/cve_rejections.json; never hand-authored.",
       "enum": ["retracted", "disputed"]
     },
     "status_reason": {
       "type": "object",
-      "description": "Why `status` is set. Present exactly when `status` is present (both directions enforced below). `code` is a controlled, additive vocabulary: new codes are added only alongside a DATA_DICTIONARY entry and a validate.py rule (e.g. a `disputed` code when `disputed` is first emitted); consumers should treat an unrecognised code as opaque, not as an error.",
+      "description": "Why `status` is set. Present exactly when `status` is present (both directions enforced below). `code` is a controlled, additive vocabulary: new codes are added only alongside a DATA_DICTIONARY entry and a validate.py rule (as `cve-disputed` was, with `disputed`, in v2.13.0); `retracted` always carries `cve-rejected` and `disputed` always carries `cve-disputed`; consumers should treat an unrecognised code as opaque, not as an error.",
       "required": ["code", "as_of"],
       "additionalProperties": false,
       "properties": {
         "code": {
           "type": "string",
-          "enum": ["cve-rejected"],
-          "description": "`cve-rejected`: every CVE id on the entry has cveMetadata.state REJECTED in the CVE Program record (CVEProject/cvelistV5), per ingest/cve_rejections.json."
+          "enum": ["cve-rejected", "cve-disputed"],
+          "description": "`cve-rejected` (with `status: retracted`): every CVE id on the entry has cveMetadata.state REJECTED in the CVE Program record (CVEProject/cvelistV5), per ingest/cve_rejections.json. `cve-disputed` (with `status: disputed`, user ruling D61): at least one CVE on the entry is disputed (a CNA or ADP `disputed` tag, or a `** DISPUTED **` description prefix, per ingest/cve_rejections.json); every CVE is disputed or REJECTED; the entry has no other evidence (every `source_ids` element is one of those CVEs). The entry stands and stays counted in `incident_count`, and its entry-level `confidence` drops one level."
         },
         "as_of": {
           "type": "string",
           "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
-          "description": "Date the rejection was last checked against the CVE record (the earliest `checked` date among the rejected CVEs)."
+          "description": "Date the verdict was last re-checked against the CVE record: for `cve-rejected` the earliest `checked` date among the rejected CVEs, for `cve-disputed` the earliest `checked` date among the disputed CVEs. It means \"last re-checked\" (user ruling D62), so it moves when an unchanged verdict is re-confirmed; it is deliberately not a content field and does not bump `updated`."
         }
       }
     },
@@ -243,7 +243,7 @@
     },
     "source_freshness": {
       "type": "object",
-      "description": "Derived per-row projection of data/source_freshness.json: at least one source that contributed to this entry has stopped refreshing successfully, so part of this entry's content is current only up to `as_of`. Inherited BY REFERENCE, never authored per row — every value here is reconstructable from the registry plus the entry's source tags, and each `sources` element is a key into the registry's `sources` object where the full source-level record (label, stale_since, hold, notes) lives. Emitted ONLY on entries with at least one `stale` contributing source; its ABSENCE means no contributing source is currently registered stale — NOT that the entry is verified current, and NOT that its sources are tracked at all (data/source_freshness.json `coverage` names the ingests nothing measures). Independent of `source_status`, which is an emission status; see that field. Deliberately self-sufficient — status, date and source keys are all inline — so a consumer holding only incidents.min.json or the HuggingFace projection can read it without joining to the registry.",
+      "description": "Derived per-row projection of data/source_freshness.json: at least one source that contributed to this entry has stopped refreshing successfully, so part of this entry's content is current only up to `as_of`. Inherited BY REFERENCE, never authored per row — every value here is reconstructable from the registry plus the entry's source tags, and each `sources` element is a key into the registry's `sources` object where the full source-level record (label, stale_since, hold, notes) lives. Emitted ONLY on entries with at least one `stale` contributing source; its ABSENCE means no contributing source is currently registered stale — NOT that the entry is verified current, and NOT that its sources are tracked at all (data/source_freshness.json `coverage` names the ingests nothing measures). Independent of `source_status`, which is an emission status; see that field. Deliberately self-sufficient — status, as-of date, source keys and the review date (`review_by`, v2.13.0) are all inline — so a consumer holding only incidents.min.json or the HuggingFace projection can read it without joining to the registry.",
       "required": ["status", "as_of", "sources"],
       "additionalProperties": false,
       "properties": {
@@ -263,6 +263,11 @@
           "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "minItems": 1,
           "uniqueItems": true
+        },
+        "review_by": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "description": "Date by which a human has committed to re-decide the future (retire / replace / restore / keep) of the stale source(s) listed: the EARLIEST registry `hold.until` among them, parallel to `as_of` being the earliest `last_success`. Derived by reference, never authored per row; present whenever any listed source carries a `hold` (the registry requires one on every `stale` source, so in practice on every marked row). DECLARATIVE: it is a published commitment, not a computed state, and the build never compares it with the wall clock (the build path is deterministic), so a row whose `review_by` has passed is still emitted unchanged and simply reads as overdue to anyone who compares it with today. Added v2.13.0 (user ruling D57) so that consumers holding only rows (incidents.min.json, the HuggingFace projection, STIX/MISP exports) can see the review date without the registry. Not a content field: adding or moving it never bumps `updated`/`last_seen`."
         }
       }
     },
@@ -383,6 +388,21 @@
       "$comment": "WS4-T2: and a reason never appears without its status.",
       "if": { "required": ["status_reason"] },
       "then": { "required": ["status"] }
+    },
+    {
+      "$comment": "v2.13.0 (D61): each status carries its own reason code -- retracted pairs with cve-rejected only.",
+      "if": { "required": ["status"], "properties": { "status": { "const": "retracted" } } },
+      "then": { "properties": { "status_reason": { "properties": { "code": { "const": "cve-rejected" } } } } }
+    },
+    {
+      "$comment": "v2.13.0 (D61): disputed pairs with cve-disputed only, and a disputed entry is never `confidence: high` (it drops one level from whatever the rule gives, so it can never sit at the top).",
+      "if": { "required": ["status"], "properties": { "status": { "const": "disputed" } } },
+      "then": {
+        "properties": {
+          "status_reason": { "properties": { "code": { "const": "cve-disputed" } } },
+          "confidence": { "not": { "const": "high" } }
+        }
+      }
     },
     {
       "$comment": "Row-level license obligations are per-source. Every entry whose `description_source` is `aiaaic` must also carry `content_license` (enforced below) — that direction still holds. The converse does not: since E16/D18 (2026-07-29), the 95 hand-curated AIAAIC rows also carry `content_license` via their AIAAIC-sourced title/facts, even though their `description` is project-authored and carries no `description_source`. When another source acquires row-level obligations, extend the conditional per source — re-scope it, never drop it.",

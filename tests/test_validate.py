@@ -589,3 +589,84 @@ def test_provenance_printed_summaries_are_ascii(tmp_path):
         res.summary.encode("ascii")
         for p in res.problems:
             p.encode("ascii")
+
+
+
+# --- v2.13.0 (D57): review date = registry hold.until; hold required when stale ---
+
+_RB_REGISTRY = {
+    "sources": {
+        "airi_navigator": {
+            "status": "stale", "last_success": "2026-05-31",
+            "row_marker": {"kind": "tag", "value": "airi-navigator"},
+            "hold": {"decision": "D57", "until": "2027-01-07", "note": "n"},
+        },
+        "oecd_aim": {
+            "status": "stale", "last_success": "2026-06-30",
+            "row_marker": {"kind": "tag", "value": "oecd-aim"},
+            "hold": {"decision": "D99", "until": "2026-12-01", "note": "n"},
+        },
+    }
+}
+
+
+def _rb_row(**marker):
+    base = {"status": "stale", "as_of": "2026-05-31", "sources": ["airi_navigator"]}
+    base.update(marker)
+    return _data({"id": "INC-1", "tags": ["airi-navigator"], "source_freshness": base})
+
+
+def _rb_problems(data, registry=_RB_REGISTRY):
+    return [p for p in v.check_source_freshness(data, registry) if "review_by" in p]
+
+
+def test_review_by_equal_to_hold_until_passes():
+    assert _rb_problems(_rb_row(review_by="2027-01-07")) == []
+
+
+def test_review_by_wrong_missing_or_unbacked_each_fire():
+    assert _rb_problems(_rb_row(review_by="2027-01-08"))           # wrong date
+    assert _rb_problems(_rb_row())                                 # hold exists, row lacks it
+    no_hold = json.loads(json.dumps(_RB_REGISTRY))
+    del no_hold["sources"]["airi_navigator"]["hold"]
+    assert _rb_problems(_rb_row(review_by="2027-01-07"), no_hold)  # a date nothing backs
+    assert _rb_problems(_rb_row(), no_hold) == []
+
+
+def test_review_by_is_the_earliest_hold_until_across_sources():
+    data = _data({"id": "INC-1", "tags": ["airi-navigator", "oecd-aim"],
+                  "source_freshness": {"status": "stale", "as_of": "2026-05-31",
+                                       "sources": ["airi_navigator", "oecd_aim"],
+                                       "review_by": "2026-12-01"}})
+    assert _rb_problems(data) == []
+    data["incidents"][0]["source_freshness"]["review_by"] = "2027-01-07"  # the later one
+    assert _rb_problems(data)
+
+
+def _fresh_schema_validator():
+    import jsonschema
+    return jsonschema.Draft202012Validator(json.loads(
+        (ROOT / "schema" / "source_freshness.schema.json").read_text(encoding="utf-8")))
+
+
+def test_registry_schema_requires_hold_on_stale_source():
+    val = _fresh_schema_validator()
+    reg = json.loads((ROOT / "data" / "source_freshness.json").read_text(encoding="utf-8"))
+    assert not list(val.iter_errors(reg)), "the shipped registry is valid"
+    bad = json.loads(json.dumps(reg))
+    del bad["sources"]["airi_navigator"]["hold"]
+    errs = list(val.iter_errors(bad))
+    assert errs and any("hold" in e.message for e in errs), "stale without hold must fail"
+    flip = json.loads(json.dumps(reg))
+    assert flip["sources"]["oecd_aim"]["status"] == "ok" and "hold" not in flip["sources"]["oecd_aim"]
+    flip["sources"]["oecd_aim"]["status"] = "stale"
+    assert list(val.iter_errors(flip)), "flipping a source to stale without a hold must fail"
+
+
+def test_shipped_rows_carry_the_d57_review_date():
+    reg = json.loads((ROOT / "data" / "source_freshness.json").read_text(encoding="utf-8"))
+    assert reg["sources"]["airi_navigator"]["hold"]["decision"] == "D57"
+    assert reg["sources"]["airi_navigator"]["hold"]["until"] == "2027-01-07"
+    rows = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    marked = [e for e in rows if e.get("source_freshness")]
+    assert marked and {e["source_freshness"].get("review_by") for e in marked} == {"2027-01-07"}

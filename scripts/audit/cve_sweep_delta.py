@@ -53,7 +53,32 @@ def _marker(e: dict) -> tuple:
             tuple(e.get("rejected_cve_ids") or ()))
 
 
-def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -> dict:
+def expected_review_by_marker(e: dict, registry_sources: dict) -> dict | None:
+    """Expected AFTER ``source_freshness`` for a BEFORE entry when the only
+    intended freshness change is the v2.13.0 (D57) ``review_by`` addition: the
+    BEFORE marker unchanged, plus ``review_by`` = earliest ``hold.until`` of its
+    listed sources in the given registry. Set logic over the BEFORE row and the
+    registry file, not the merge code path."""
+    m = e.get("source_freshness")
+    if not m:
+        return None
+    m = {k: v for k, v in m.items() if k != "review_by"}
+    untils = [((registry_sources.get(k) or {}).get("hold") or {}).get("until") for k in m.get("sources") or []]
+    untils = [u for u in untils if u]
+    if untils:
+        m["review_by"] = min(untils)
+    return m
+
+
+def compute(before: dict, after: dict, rejected: set[str], disputed: set[str],
+            freshness_registry: dict | None = None) -> dict:
+    """``freshness_registry`` (optional, the ``sources`` object of
+    data/source_freshness.json): declares the D57 ``review_by`` propagation an
+    intended delta. A ``source_freshness`` change equal to
+    :func:`expected_review_by_marker` is then classed ``freshness_review_by``
+    and allowed on any entry; any other ``source_freshness`` change, or an
+    expected one that did not happen, is a defect. Omitted: any
+    ``source_freshness`` change is a defect, as before."""
     b = {e["id"]: e for e in before["incidents"]}
     a = {e["id"]: e for e in after["incidents"]}
     out: dict = {"defects": [], "entries": {}, "id_set": {}, "header": {}, "classes": {}}
@@ -67,7 +92,7 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
             if k not in HEADER_ALLOWED:
                 out["defects"].append(f"header field {k!r} changed unexpectedly")
 
-    transitions, steady_asof = [], []
+    transitions, steady_asof, fresh_rb = [], [], []
     newly = {"retracted": [], "disputed": [], "flag_only": [], "cleared": []}
     for i in sorted(set(b) & set(a)):
         exp = expected_marker(b[i], rejected, disputed)
@@ -75,6 +100,15 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
         is_transition = _marker(b[i]) != want
         changed = {f: {"before": b[i].get(f), "after": a[i].get(f)}
                    for f in sorted(set(b[i]) | set(a[i])) if b[i].get(f) != a[i].get(f)}
+        judged = dict(changed)  # the fields the sweep rules below must account for
+        if freshness_registry is not None:
+            want_fm = expected_review_by_marker(b[i], freshness_registry)
+            if a[i].get("source_freshness") != want_fm:
+                out["defects"].append(f"{i}: source_freshness {a[i].get('source_freshness')!r} "
+                                      f"!= expected {want_fm!r}")
+            elif "source_freshness" in changed:
+                fresh_rb.append(i)
+                judged.pop("source_freshness")
         if is_transition:
             transitions.append(i)
             if exp["status"] == "retracted":
@@ -87,7 +121,7 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
                 newly["cleared"].append(i)
             if _marker(a[i]) != want:
                 out["defects"].append(f"{i}: marker after build {_marker(a[i])} != expected {want}")
-            extra = set(changed) - TRANSITION_ALLOWED
+            extra = set(judged) - TRANSITION_ALLOWED
             if extra:
                 out["defects"].append(f"{i}: unexpected field(s) changed {sorted(extra)}")
             conf_b, conf_a = b[i].get("confidence"), a[i].get("confidence")
@@ -100,11 +134,11 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
                 sr = a[i].get("status_reason") or {}
                 if sr.get("code") != exp["code"]:
                     out["defects"].append(f"{i}: status_reason.code {sr.get('code')!r}, expected {exp['code']!r}")
-            if not changed:
+            if not judged:
                 out["defects"].append(f"{i}: expected to change but did not")
         else:
             # steady: already in the expected state. Only the re-check date may move.
-            extra = {f for f in changed if f != "status_reason"}
+            extra = {f for f in judged if f != "status_reason"}
             if extra:
                 out["defects"].append(f"{i}: steady entry changed {sorted(extra)}")
             if "status_reason" in changed:
@@ -114,7 +148,8 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
                 steady_asof.append(i)
         if changed:
             out["entries"][i] = changed
-    out["classes"] = {"transitions": transitions, "newly": newly, "steady_as_of_moved": steady_asof}
+    out["classes"] = {"transitions": transitions, "newly": newly, "steady_as_of_moved": steady_asof,
+                      "freshness_review_by_added": fresh_rb}
 
     n_ret = sum(1 for e in a.values() if e.get("status") == "retracted")
     n_dis = sum(1 for e in a.values() if e.get("status") == "disputed")
@@ -123,6 +158,7 @@ def compute(before: dict, after: dict, rejected: set[str], disputed: set[str]) -
         "newly_retracted": len(newly["retracted"]), "newly_disputed": len(newly["disputed"]),
         "newly_flag_only": len(newly["flag_only"]), "markers_cleared": len(newly["cleared"]),
         "steady_as_of_moved": len(steady_asof),
+        "freshness_review_by_added": len(fresh_rb),
         "retracted_after": n_ret, "disputed_after": n_dis,
         "incident_count_before": before.get("incident_count"), "incident_count_after": after.get("incident_count"),
         "retracted_count_after": after.get("retracted_count"),
@@ -158,6 +194,8 @@ def render_md(res: dict, date: str) -> str:
          f"- Newly retracted: {c['newly_retracted']}; newly disputed: {c['newly_disputed']}; "
          f"newly flagged-only: {c['newly_flag_only']}; markers cleared: {c['markers_cleared']}",
          f"- Steady entries whose `status_reason.as_of` moved with the re-check: {c['steady_as_of_moved']}",
+         f"- Entries whose `source_freshness` gained the registry-derived `review_by` (D57; judged only "
+         f"when `--freshness-registry` is given): {c['freshness_review_by_added']}",
          f"- incident_count {c['incident_count_before']} -> {c['incident_count_after']}; "
          f"retracted_count after {c['retracted_count_after']}; disputed after {c['disputed_after']}",
          f"- Defects: {len(res['defects'])}", ""]
@@ -170,6 +208,19 @@ def render_md(res: dict, date: str) -> str:
                 for f, v in res["entries"].get(i, {}).items():
                     L.append(f"| {i} | {f} | `{json.dumps(v['before'], ensure_ascii=False)}` | "
                              f"`{json.dumps(v['after'], ensure_ascii=False)}` |")
+    fr = res["classes"].get("freshness_review_by_added") or []
+    if fr:
+        pairs: dict[tuple, list] = {}
+        for i in fr:
+            v = res["entries"][i]["source_freshness"]
+            pairs.setdefault((json.dumps(v["before"], sort_keys=True),
+                              json.dumps(v["after"], sort_keys=True)), []).append(i)
+        L += ["", "## `source_freshness` gained `review_by` (D57)", "",
+              "Every distinct before/after value pair, with its entry count and first/last id "
+              "(the twin JSON lists every entry).", "",
+              "| entries | first | last | before | after |", "|---|---|---|---|---|"]
+        for (bv, av), ids in sorted(pairs.items()):
+            L.append(f"| {len(ids)} | {ids[0]} | {ids[-1]} | `{bv}` | `{av}` |")
     return "\n".join(L) + "\n"
 
 
@@ -181,6 +232,9 @@ def main() -> int:
     ap.add_argument("--date", default="")
     ap.add_argument("--after-json", help="data/incidents.json to judge (default: the working tree's); "
                     "used for a scratch build made with the proposed schema edit")
+    ap.add_argument("--freshness-registry", help="data/source_freshness.json whose hold.until dates are the "
+                    "intended source_freshness.review_by (v2.13.0 D57); omit and any source_freshness change "
+                    "is a defect")
     ap.add_argument("--dispute-emission", choices=["auto", "on", "off"], default="auto",
                     help="auto: on iff schema/incident.schema.json lists status_reason code cve-disputed")
     args = ap.parse_args()
@@ -195,7 +249,10 @@ def main() -> int:
     before = _git_show(args.before_ref, "data/incidents.json")
     after_path = Path(args.after_json) if args.after_json else ROOT / "data" / "incidents.json"
     after = json.loads(after_path.read_text(encoding="utf-8"))
-    res = compute(before, after, rejected, disputed)
+    fr = None
+    if args.freshness_registry:
+        fr = json.loads(Path(args.freshness_registry).read_text(encoding="utf-8"))["sources"]
+    res = compute(before, after, rejected, disputed, fr)
     res["dispute_emission_expected"] = emission
     res["after_source"] = str(after_path.relative_to(ROOT)) if after_path.is_relative_to(ROOT) else "scratch build"
 

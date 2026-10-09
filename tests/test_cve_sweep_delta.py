@@ -119,3 +119,32 @@ def test_entry_hashes_see_a_single_byte_change():
     b = _before(); b["incidents"][2]["severity"] = "Hig"
     h2 = d.entry_hashes(b)
     assert [i for i in h1 if h1[i] != h2[i]] == ["INC-3"]
+
+
+
+# --- v2.13.0 (D57): review_by propagation declared as an intended delta ---
+
+_FR = {"airi_navigator": {"status": "stale", "last_success": "2026-05-31",
+                          "hold": {"decision": "D57", "until": "2027-01-07", "note": "n"}}}
+
+
+def _with_marker(doc, review_by=None):
+    doc = copy.deepcopy(doc)
+    m = {"status": "stale", "as_of": "2026-05-31", "sources": ["airi_navigator"]}
+    if review_by:
+        m["review_by"] = review_by
+    {e["id"]: e for e in doc["incidents"]}["INC-3"]["source_freshness"] = m
+    return doc
+
+
+def test_review_by_addition_is_classified_not_a_defect_when_declared():
+    r = d.compute(_with_marker(_before()), _with_marker(_after(), "2027-01-07"), REJ, DISP, _FR)
+    assert r["defects"] == []
+    assert r["classes"]["freshness_review_by_added"] == ["INC-3"]
+
+
+def test_review_by_change_fires_when_undeclared_wrong_or_missing():
+    before = _with_marker(_before())
+    assert d.compute(before, _with_marker(_after(), "2027-01-07"), REJ, DISP)["defects"]       # undeclared
+    assert d.compute(before, _with_marker(_after(), "2027-02-01"), REJ, DISP, _FR)["defects"]  # wrong date
+    assert d.compute(before, _with_marker(_after()), REJ, DISP, _FR)["defects"]                # not added
