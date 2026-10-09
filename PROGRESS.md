@@ -10,6 +10,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🧑‍⚖️ 2026-10-09 — USER DECISION D52 (item 2 merge): **"Fix advisories, then merge"**
+- The user approved the 5,841-entry ATLAS relabel for merge, **conditional on** WS4 first fixing the 6 re-gate advisories on the branch.
+- A short scoped re-check (advisory diff only, data paths must stay empty) follows; then the merge.
+- The foreman's recommendation was "merge now, fix after"; **the user chose the stricter order.**
+
 ### ✅ Item 2 (ATLAS refresh) — **PASS (red-reviewer re-gate, 2026-10-09, on `af4f7c31`) · merge AWAITING USER (5,841-entry relabel, D28 precedent)**
 The gate's verdict, in its own words: "VERDICT: PASS ... All four defects from bounce #1 are closed, and the fix introduced no regression."
 - **What the gate measured:**
