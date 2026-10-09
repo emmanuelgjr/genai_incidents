@@ -119,11 +119,17 @@ caught at gate review, not by this file. Run both checks as part of step
    `Makefile` target is `build: merge render render-docs-stats validate` —
    `merge` alone (`parse_existing.py` + `merge_and_dedupe.py`) is **not**
    equivalent to `make build` and must not be treated as such: `render`
-   (`scripts/render_markdown.py`) is what writes `INCIDENTS.md`'s own
-   `**Version:**`/`**Generated:**` lines, and `validate` is the schema/ID
-   gate. Running only `merge` ships `INCIDENTS.md` at the old version; step
-   4's drift check now fails on that, because it reads the **Version:**
-   line, but run `make build` in full.
+   (`scripts/render_markdown.py`) is what writes both `data/stats.json` and
+   `INCIDENTS.md`'s own `**Version:**`/`**Generated:**` lines, and `validate`
+   is the schema/ID gate. Running only `merge` writes the new version into
+   `data/incidents.json` but leaves both `data/stats.json` and `INCIDENTS.md`
+   at the old version (`render` writes both). Step 4's drift check still
+   fails, but not on `INCIDENTS.md`: that file agrees with the stale
+   `stats.json`, so its **Version:** check stays silent. It fails because
+   the step-2 edits (`pyproject.toml`, `.zenodo.json`, both `CITATION.cff`
+   versions, the `USER_AGENT`) disagree with the stale `stats.json`, and
+   because `stats.json` disagrees with the top released `CHANGELOG.md`
+   heading. Run `make build` in full.
 
    **Verify the rebuild changed no corpus row**, at the field level, not
    just a line count (`git diff --stat` reports lines changed in the
@@ -210,8 +216,9 @@ caught at gate review, not by this file. Run both checks as part of step
 
 5. **Sweep live surfaces for prose the bump just made false.** The
    drift check in step 4 catches stale *numbers* inside markers, plus the version literals it
-   is told to read (the README Latest-release lead line, the `INCIDENTS.md`
-   **Version:** line and the HF card template's version literals); it does
+   is told to read (the full list is in step 4: the README Latest-release lead
+   line, `pyproject.toml`, `.zenodo.json`, `CITATION.cff`, the `USER_AGENT`,
+   the `INCIDENTS.md` **Version:** line and the HF card template); it does
    not read English prose. The `v2.9.0` cut hit exactly this: after the version
    marker updated to read `2.9.0`, an adjacent paragraph still claimed *no
    version had been bumped or tagged yet* — true when it was written, false
