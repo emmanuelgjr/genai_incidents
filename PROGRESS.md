@@ -10,6 +10,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **item 4:** `resolve_id_group()` exists, and 17 IDs, not 8, return `None`;
 - **item 6:** 1,382 AIRI rows, not 1,380.
 
+### 🔁 Item 6 — **BOUNCE #1 (red-reviewer on `25899446`, 2026-10-09)**: in progress; specialist redispatched
+- **Defects:**
+  1. **Wrong tombstone field.** The memo uses `source_status` (emission enum {active 15657, retained 9}) where retraction is `status` (retracted 29; DATA_DICTIONARY:17). Its "none retracted" command therefore could not fail (agreement 6a). It also omits that `status: retracted` is defined today only as CVE-REJECTED, so retiring AIRI rows needs schema and pipeline work.
+  2. **AIRI-sole/AIID-shared split is 0 / 1,382, not ~280 / ~1,100.** The ~280 dates from before the 2026-07-18 official AIID snapshot (8e624ba7). B1 as defined would tombstone 0 rows and only strip the AIRI overlay.
+  3. **A replacement channel exists.** `airi-navigator.com/incidents/browse` (robots-allowed) embeds 1,497 incidents (latest 2026-05-31). A JS chunk ships a "Download results as CSV" button (runtime visibility unconfirmed). The ZIP is switched off by an `ALLOW_DOWNLOAD` flag rather than broken.
+- **Advisories:**
+  - the ZIP check is one endpoint (307 → 404);
+  - the 274 non-October `last_seen` rows are all July;
+  - NOTICE-DATA's 1,457 is the ingest-file row count and is accurate;
+  - CC BY no-termination is §6(c);
+  - there is no TAXII landmark collection;
+  - the HF export dumps rows verbatim;
+  - the hold lapsed 42 days ago;
+  - the ToU has no licence clause;
+  - airisk robots.txt has no Disallow.
+- **Foreman [R], by a different route:**
+  - python gives source_status {active 15657, retained 9} and status {None 15637, retracted 29};
+  - `len(airi_keys − (aiid_full ∪ aiid_incidents keys))` = **0** of 1,456;
+  - `curl` on `/incidents/browse` gives **200, 5,262,949 B**.
+  - All 3 defects are confirmed.
+- **Note for the user's decision:** defect 3 adds a re-ingest option (page or CSV channel). Its conduct and licence questions are the user's call, and the memo will present them without recommending scraping.
+
+### 🔍 Item 7 — bounce #1 fixes at `e00d54d4` (pushed). Foreman grep finds the 4,104 / 3,937-of-4,104 / INC-01579 / a7343274 / corrections note present. Scoped re-gate dispatched; a second bounce goes to the user.
+
 ### 🔁 Item 7 — **BOUNCE #1 (red-reviewer on `9646d00e`, 2026-10-09)**: in progress; specialist redispatched
 - **Verdict, in the gate's words:** "VERDICT: BOUNCE ... structure and nearly all of its claims hold up when checked by a different route. Three factual statements in this dated, do-not-regenerate record are wrong."
 - **Defects:**
