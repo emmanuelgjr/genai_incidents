@@ -141,8 +141,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - **17 deprecation records appended**, and no existing record changed (byte-prefix checked).
   `INC-03128` -> `INC-14909` and `INC-08185` -> `INC-14742` (`successor-identified`), so
   **`resolve_id()` now returns these two instead of `None`**, and `resolve_id_group()` returns
-  one ID for them instead of 11 and 100. No other `resolve_id()` answer changed across the
-  1,065 IDs in the file (golden comparison against `main`). `INC-00497` and `INC-08139` gain
+  one ID for them instead of 11 and 100. No other `resolve_id()` or `resolve_id_group()`
+  answer changed for any of the 1,065 distinct `from` IDs in `data/id_deprecations.json` after
+  this change (golden comparison against `main`'s own package), nor across the 16,731 IDs that
+  were live in any release tag, are live now, or appear as a `from`. `INC-00497` and `INC-08139` gain
   `release-scoped` records carrying the new `valid_for_releases` field, which give their
   successor per cited release (for example, `INC-00497` cited from v2.1.0 -> `INC-14789`, cited
   from v2.5.0 -> `INC-14907`). Each is followed by an unscoped restatement, so "last record

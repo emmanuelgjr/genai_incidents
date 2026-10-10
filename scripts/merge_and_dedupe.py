@@ -1291,6 +1291,9 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
 
 
 _RULED_RECORD_KEYS = {"from", "into", "reason", "date", "valid_for_releases"}
+# Ruled-record reasons that replace an id's release-independent answer and
+# therefore supersede a D28 `resplit_redirect` approval (step 8a skip).
+_D28_SUPERSEDING_REASONS = frozenset({"successor-identified"})
 
 
 def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
@@ -1323,6 +1326,16 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
             raise SystemExit(f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r}")
         out.append(dict(rec))
     return out
+
+
+def _d28_superseded_froms(ruled: list[dict]) -> set[str]:
+    """Ids whose ruled record replaces the release-independent answer
+    (unscoped, reason in `_D28_SUPERSEDING_REASONS`): step 8a skips D28's
+    re-assertion for these and only these."""
+    return {
+        r["from"] for r in ruled
+        if r.get("reason") in _D28_SUPERSEDING_REASONS and "valid_for_releases" not in r
+    }
 
 
 def _append_ruled_records(deprecations_all: list[dict], ruled: list[dict]) -> int:
@@ -2655,7 +2668,12 @@ def main():
     #     this module (import direction) and what invariant the two call
     #     sites must jointly preserve.
     _ruled_appends = _load_ruled_deprecation_appends(RULED_DEPRECATION_APPENDS_PATH)
-    _ruled_froms = {r["from"] for r in _ruled_appends}
+    # Only ruled records that REPLACE the release-independent answer (an
+    # unscoped `successor-identified` record) supersede D28's fan-out. The
+    # release-scoped records and their unscoped `release-dependent`
+    # restatements leave the authoritative answer as it was, so D28's
+    # re-assertion must keep running for those ids (INC-00497, INC-08139).
+    _ruled_froms = _d28_superseded_froms(_ruled_appends)
     _resplit_auth = _load_verified_split_authorization_data(SPLIT_AUTHORIZATION_PATH)
     if _resplit_auth:
         _live_ids_now = {e["id"] for e in deduped if e.get("id")}
@@ -2671,11 +2689,14 @@ def main():
             if entry.get("decision") != "resplit_redirect":
                 continue
             frm = entry.get("from")
-            # v2.13.0 item 4: a later ruling (step 8b's input) supersedes
-            # D28's fan-out for this id (INC-03128, INC-08185). Without this
-            # skip, every rebuild would see the narrowed record "disagree"
-            # with D28's approved set and append a corrective record undoing
-            # the ruling -- a new record on every build, flip-flopping.
+            # v2.13.0 item 4: an unscoped `successor-identified` ruling
+            # (step 8b's input) supersedes D28's fan-out for this id. Today
+            # that is exactly INC-03128 and INC-08185. Without this skip,
+            # every rebuild would see the narrowed record "disagree" with
+            # D28's approved set and append a corrective record undoing the
+            # ruling -- a new record on every build, flip-flopping. Ids with
+            # only release-scoped rulings (INC-00497, INC-08139) are NOT
+            # skipped: D28's re-assertion still guards their answer.
             if frm in _ruled_froms:
                 continue
             approved = entry.get("new_targets") or []

@@ -2445,3 +2445,59 @@ def test_ruled_successor_is_not_reverted_by_d28_resplit_correction(tmp_path, mon
     mine = [d for d in deps if d["from"] == inbound_id]
     assert mine[-1] == ruled, mine
     assert len(mine) == 2, mine
+
+
+def test_d28_reassertion_still_runs_for_release_scoped_only_rulings(tmp_path, monkeypatch):
+    """Gate advisory A2 (item 4): step 8a's skip covers only ids whose ruling
+    REPLACES the release-independent answer (unscoped `successor-identified`).
+    An id with only release-scoped records plus a `release-dependent`
+    restatement (the INC-00497 / INC-08139 shape) must still get D28's
+    re-assertion. Input: the restatement disagrees with D28's approved set;
+    8a must append its corrective record. Fails if the skip is widened back
+    to every ruled `from`."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+    inbound_id = "INC-80004"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+    m.main()  # phase 1: the ordinary split
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    fresh_id = next(e["id"] for e in out["incidents"] if e["source_ids"] == ["OECD-AIM-Y"])
+    scoped = {"from": inbound_id, "into": old_id, "reason": "release-scoped",
+              "date": "2026-10-09", "valid_for_releases": ["v2.0.0"]}
+    restate = {"from": inbound_id, "into": old_id, "reason": "release-dependent",
+               "date": "2026-10-09"}
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))
+    deps["deprecations"] += [scoped, restate]
+    (data / "id_deprecations.json").write_text(_json.dumps(deps), encoding="utf-8")
+    _write_ruled(data / "ruled_appends.json", [scoped, restate])
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [fresh_id]},
+        ],
+        monkeypatch=monkeypatch,
+    )
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    mine = [d for d in deps if d["from"] == inbound_id]
+    assert mine[-1]["reason"] == "resplit" and mine[-1]["into"] == [fresh_id], mine
+    assert mine.count(scoped) == 1 and mine.count(restate) == 1, mine  # 8b did not re-append
+
+
+def test_real_d28_skip_set_is_exactly_the_two_successor_rulings():
+    """The real input: only INC-03128 and INC-08185 supersede D28. INC-00497
+    and INC-08139 have D28 resplit_redirect entries too and must stay guarded."""
+    ruled = m._load_ruled_deprecation_appends(m.RULED_DEPRECATION_APPENDS_PATH)
+    skip = m._d28_superseded_froms(ruled)
+    assert skip == {"INC-03128", "INC-08185"}
+    assert {"INC-00497", "INC-08139"} <= {r["from"] for r in ruled}

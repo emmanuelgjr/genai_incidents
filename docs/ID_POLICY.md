@@ -512,7 +512,11 @@ own package on its own data. Two `resolve_id()` answers changed:
 `resolve_id("INC-03128")` went from `None` to `INC-14909`, and
 `resolve_id("INC-08185")` went from `None` to `INC-14742`.
 `resolve_id_group()` for the same two went from 11 and 100 IDs to one. No
-other answer changed for any of the 1,065 IDs in the file.
+other answer of either function changed for any of the 1,065 distinct `from`
+IDs in `data/id_deprecations.json` after item 4 (the golden's scope), nor
+across a wider sweep of 16,731 IDs: every ID live in any `v*` release tag,
+live now, or present as a `from`. The gate's own independent check covered
+16,733 IDs and found the same two changes.
 
 ### 8.5 Verification recipe
 
@@ -527,6 +531,16 @@ PYTHONPATH=src python -c "import genai_incidents as g; [print(i, g.resolve_id_st
 
 # Field-level data delta vs the base (only id_deprecations.json and its package copy move):
 python scripts/audit/silent_ids.py delta --base 816b9271
+
+# Regenerate the golden fixture: runs main 816b9271's OWN package (code and
+# bundled data, from a `git archive 816b9271 src/genai_incidents` extract,
+# isolated interpreter) over every `from` in this tree's data/id_deprecations.json.
+# Expect a byte-identical file (`git diff --exit-code` clean):
+python scripts/audit/silent_ids.py golden --base 816b9271 --out tests/fixtures/resolve_id_golden_816b9271.json
+git diff --exit-code tests/fixtures/resolve_id_golden_816b9271.json
+
+# The wider sweep (base package vs this tree's package over 16,731 IDs):
+python scripts/audit/silent_ids.py sweep --base 816b9271   # only INC-03128 and INC-08185 change
 
 # Shape, cross-record rules, golden comparison, byte prefix:
 python scripts/validate.py
