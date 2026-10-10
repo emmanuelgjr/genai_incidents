@@ -1965,6 +1965,8 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
             out.add(("merge", e["from"], e["into"]))
         elif e.get("kind") == "retitle":
             out.add(("retitle", e["id"]))
+        elif e.get("kind") == "add":
+            out.add(("add", e["source_id"]))
     return out
 
 
@@ -1977,8 +1979,9 @@ def _check_refresh_merge_authorization(
     deduped: list[dict],
     fresh_deprecations: list[dict],
     approval_path: Path | None = None,
+    curation: dict | None = None,
 ) -> None:
-    """D42 guard; see the block comment above REFRESH_MERGE_APPROVAL_PATH.
+    """D42 guard (+ D67 hold on OECD row additions and upstream title edits); see the block comment above REFRESH_MERGE_APPROVAL_PATH.
     Call after id assignment and BEFORE any output write."""
     approval_path = approval_path or REFRESH_MERGE_APPROVAL_PATH
     approved = _load_refresh_merge_approvals(approval_path)
@@ -2004,26 +2007,61 @@ def _check_refresh_merge_authorization(
                 f"retired source_ids {d.get('retired_source_ids')}"
             )
 
+    # Titles a committed curation override sets are the project's own decision,
+    # not an upstream edit: never held.
+    curated_titles = {
+        ov["title"] for ov in (curation or {}).values() if isinstance(ov, dict) and ov.get("title")
+    }
     for iid, cur in cur_by_id.items():
         prev = prev_by_id.get(iid)
         if prev is None or prev.get("title") == cur.get("title"):
             continue
+        if ("retitle", iid) in approved:
+            continue
         gained = set(cur.get("source_ids") or []) - set(prev.get("source_ids") or [])
-        if any(_is_gated_source(s) for s in gained) and ("retitle", iid) not in approved:
+        if any(_is_gated_source(s) for s in gained):
             problems.append(
                 f"retitle {iid}: {prev.get('title', '')[:60]!r} -> "
                 f"{cur.get('title', '')[:60]!r} after absorbing "
                 f"{sorted(s for s in gained if _is_gated_source(s))[:4]}"
             )
+        elif cur.get("title") not in curated_titles and any(
+            _is_gated_source(s) for s in (cur.get("source_ids") or [])
+        ):
+            # D67(b): an upstream title edit (AIID or OECD revised a headline)
+            # on a published row. Same exposure as the 24 in review section C.
+            problems.append(
+                f"title edit {iid} (D67): {prev.get('title', '')[:60]!r} -> "
+                f"{cur.get('title', '')[:60]!r}; no source id absorbed"
+            )
+
+    # D67: hold OECD row ADDITIONS. The unit is the OECD source row: any
+    # OECD-AIM- source id in this build that no previously published entry
+    # carried. That covers a new ID, a mixed new row (OECD + AIID), and a new
+    # OECD row absorbed into a published ID (a published ID gaining an OECD
+    # source id). Skipped when there is no baseline at all (no previous build).
+    if prev_by_id:
+        prev_sids = {s for p in prev_by_id.values() for s in (p.get("source_ids") or [])}
+        for iid, cur in cur_by_id.items():
+            new_oecd = sorted(
+                s for s in (cur.get("source_ids") or [])
+                if str(s).startswith("OECD-AIM-") and s not in prev_sids and ("add", s) not in approved
+            )
+            if new_oecd:
+                kind = "new row" if iid not in prev_by_id else "absorbed into published row"
+                problems.append(
+                    f"add OECD row(s) {new_oecd[:3]}{'...' if len(new_oecd) > 3 else ''} ({kind}) "
+                    f"as {iid}: {cur.get('title', '')[:60]!r}"
+                )
 
     if problems:
         nl = chr(10) + "  - "
         raise RefreshMergeApprovalError(
-            "[FATAL] D42/D25(a): this build would write OECD/AIID-driven change(s) "
-            "to previously-published IDs that the user has not approved "
+            "[FATAL] D42/D25(a)+D67: this build would write OECD/AIID-driven change(s) "
+            "(merges/retitles/title edits of published IDs, or added OECD rows) that the user has not approved "
             f"({len(problems)}):{nl}" + nl.join(problems[:25])
             + (f"{nl}..." if len(problems) > 25 else "")
-            + chr(10) + "Nothing was written. This freeze is deliberate (D58, stage 1): a weekly "
+            + chr(10) + "Nothing was written. This freeze is deliberate (D58/D67, stage 1): a weekly "
             "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
             f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
             "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
@@ -2727,7 +2765,7 @@ def main():
 
     # 8-pre) D42/D25(a) guard: no write has happened yet (the first one is
     #        the id_deprecations.json write below).
-    _check_refresh_merge_authorization(_load_prev_incidents(), deduped, fresh)
+    _check_refresh_merge_authorization(_load_prev_incidents(), deduped, fresh, curation=curation)
 
     # 8a) WS4-T21 BOUNCE #1 defect 1: correct the pre-existing inbound
     #     `resplit_redirect` entries the D28-authorized list flags,

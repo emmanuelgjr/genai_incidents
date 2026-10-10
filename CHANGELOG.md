@@ -19,9 +19,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   provenance label, not a licence marker. The labels reach `incidents.json` and the
   Hugging Face JSONL export only; not `incidents.min.json`, STIX, MISP, TAXII,
   `INCIDENTS.md`, `docs/incidents/*.md` or `stats.json`.
-- The OECD/AIID refresh freeze is now a deliberate gate. `merge_and_dedupe.py` aborts
-  with "Nothing was written" when a build would merge or retitle a previously
-  published ID through an OECD-AIM-/AIID- source id without a signed user approval
+- The OECD/AIID refresh freeze is now a deliberate gate (D58, extended by D67 to hold
+  OECD row additions and upstream title edits of published OECD/AIID rows).
+  `merge_and_dedupe.py` aborts with "Nothing was written" when a build would merge or
+  retitle a previously published ID through an OECD-AIM-/AIID- source id, edit the
+  title of a published OECD/AIID row, or add an OECD-AIM- source row not already
+  published, without a signed user approval
   (`docs/audits/D42-approved-refresh-merges.json`, absent; a test asserts the set is
   empty). The weekly refresh gains the AIID snapshot step (WS4-T14, continue-on-error,
   output not committed) and therefore fails at "Re-merge + render + validate" while the

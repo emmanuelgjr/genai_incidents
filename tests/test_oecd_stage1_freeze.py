@@ -271,41 +271,95 @@ def _run_merge(root: Path) -> subprocess.CompletedProcess:
                           cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
-def test_gate_aborts_on_fresh_bridging_input_and_not_on_committed_inputs(tmp_path):
-    """Scratch copy of the repo. Control: committed inputs build clean. Fresh
-    input: ONE new OECD row cross-referencing two already-published AIID
-    entries (the mechanism of the 2026-10-03 diagnosis, constructed because a
-    live crawl is out of scope here) must abort with "Nothing was written"
-    and leave every data file and both ingest files byte-identical."""
+@pytest.fixture(scope="module")
+def scratch(tmp_path_factory):
+    """Scratch copy of the repo after a CONTROL build on committed inputs."""
+    root = tmp_path_factory.mktemp("scratch_repo")
     for d in ("scripts", "data", "ingest", "mappings", "schema"):
-        shutil.copytree(ROOT / d, tmp_path / d, ignore=shutil.ignore_patterns("__pycache__", "_cache"))
-    (tmp_path / "docs" / "audits").mkdir(parents=True)
-    shutil.copy(ROOT / "docs/audits/WS4-T19-authorized-splits-2026-09-18.json", tmp_path / "docs/audits")
-
-    control = _run_merge(tmp_path)
+        shutil.copytree(ROOT / d, root / d, ignore=shutil.ignore_patterns("__pycache__", "_cache"))
+    (root / "docs" / "audits").mkdir(parents=True)
+    shutil.copy(ROOT / "docs/audits/WS4-T19-authorized-splits-2026-09-18.json", root / "docs/audits")
+    control = _run_merge(root)
     assert control.returncode == 0, control.stdout[-800:] + control.stderr[-800:]
     assert "Nothing was written" not in control.stdout + control.stderr
+    return root
 
-    inc = json.loads((tmp_path / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
-    pub = [e for e in inc if e.get("status") != "retracted" and e.get("aiid_id")
-           and not _oecd_ids(e) and len(e["source_ids"]) == 1 and e["source_ids"][0].startswith("AIID-")]
-    a, b = pub[0], pub[1]
-    raw_path = tmp_path / "ingest" / "oecd_aim_full_incidents.json"
-    rows = json.loads(raw_path.read_text(encoding="utf-8"))
+
+def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> str:
+    """Apply `mutate` to an ingest file's rows, run the real merge, require an
+    abort that wrote nothing, then restore the file."""
+    path = root / "ingest" / ingest_name
+    original = path.read_text(encoding="utf-8")
+    try:
+        rows = json.loads(original)
+        mutate(rows)
+        path.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+        before = _tree_hash(root)
+        before[f"ingest/{ingest_name}"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        res = _run_merge(root)
+        out = res.stdout + res.stderr
+        assert res.returncode != 0, out[-600:]
+        assert "D42/D25(a)" in out and "Nothing was written" in out and "D58/D67" in out
+        assert expect in out, out[-1200:]
+        assert _tree_hash(root) == before, "gate aborted but the data tree changed"
+        return out
+    finally:
+        path.write_text(original, encoding="utf-8")
+
+
+def _published_aiid_only(root: Path) -> list[dict]:
+    inc = json.loads((root / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
+    return [e for e in inc if e.get("status") != "retracted" and e.get("aiid_id")
+            and not _oecd_ids(e) and len(e["source_ids"]) == 1 and e["source_ids"][0].startswith("AIID-")]
+
+
+def _synthetic_oecd_row(rows: list[dict], sid: str, extra: list[str]) -> dict:
     row = copy.deepcopy(rows[0])
-    row.update(source_id="OECD-AIM-2026-10-01-zz01", title="Synthetic bridge row (test)",
-               extra_source_ids=[a["source_ids"][0], b["source_ids"][0]],
-               references=[{"title": "x", "url": "https://oecd.ai/en/incidents/2026-10-01-zz01", "type": "report"}])
+    row.update(source_id=sid, title="Synthetic row (test)", extra_source_ids=extra,
+               references=[{"title": "x", "url": f"https://oecd.ai/en/incidents/{sid[len('OECD-AIM-'):]}", "type": "report"}])
     row["description"] = rebuild_template(row)
-    rows.append(row)
-    raw_path.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+    return row
 
-    before = _tree_hash(tmp_path)
-    fresh = _run_merge(tmp_path)
-    out = fresh.stdout + fresh.stderr
-    assert fresh.returncode != 0
-    assert "D42/D25(a)" in out and "Nothing was written" in out
-    assert _tree_hash(tmp_path) == before, "gate aborted but the data tree changed"
+
+def test_committed_inputs_do_not_abort(scratch):
+    """The control build in the fixture exited 0 on the committed inputs; the
+    committed data tree is also unchanged by it (rebuild is a fixed point)."""
+    for rel in ("data/incidents.json", "data/id_deprecations.json"):
+        assert (scratch / rel).read_bytes() == (ROOT / rel).read_bytes(), rel
+
+
+def test_gate_aborts_on_fresh_bridging_input(scratch):
+    """ONE new OECD row cross-referencing two already-published AIID entries
+    (the 2026-10-03 mechanism, constructed: a live crawl is out of scope)."""
+    a, b = _published_aiid_only(scratch)[:2]
+    _fresh_input_aborts(
+        scratch, "oecd_aim_full_incidents.json",
+        lambda rows: rows.append(_synthetic_oecd_row(
+            rows, "OECD-AIM-2026-10-01-zz01", [a["source_ids"][0], b["source_ids"][0]])),
+        "merge INC-",
+    )
+
+
+def test_d67_gate_aborts_on_a_new_oecd_row(scratch):
+    """D67: a purely ADDED OECD row (no AIID cross-reference, no merge)."""
+    out = _fresh_input_aborts(
+        scratch, "oecd_aim_full_incidents.json",
+        lambda rows: rows.append(_synthetic_oecd_row(rows, "OECD-AIM-2026-10-02-zz02", [])),
+        "add OECD row(s) ['OECD-AIM-2026-10-02-zz02'] (new row)",
+    )
+    assert "merge INC-" not in out and "title edit INC-" not in out  # only the addition fired
+
+
+def test_d67_gate_aborts_on_an_upstream_aiid_title_edit(scratch):
+    """D67(b): AIID edits the title of an already-published, AIID-only row."""
+    victim = _published_aiid_only(scratch)[0]["source_ids"][0]
+
+    def edit(rows):
+        row = next(r for r in rows if r.get("source_id") == victim)
+        row["title"] = row["title"] + " (edited upstream)"
+
+    out = _fresh_input_aborts(scratch, "aiid_full.json", edit, "title edit INC-")
+    assert "add OECD row" not in out and "merge INC-" not in out
 
 
 # ---- S5: weekly workflow fails closed at the merge step --------------------

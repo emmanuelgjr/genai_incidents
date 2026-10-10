@@ -433,6 +433,12 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     # docs/audits/WS4-T19-authorized-splits-*.json -- a test that WANTS a
     # populated allowlist writes to this path itself.
     monkeypatch.setattr(m, "SPLIT_AUTHORIZATION_PATH", data / "split_authorization.json")
+    # D67: these from-scratch fixtures use OECD-AIM-* ids and edit titles to
+    # exercise deprecation persistence and the split guard, which the refresh
+    # gate (correctly) holds. The gate has its own tests (test_d42_refresh_merge_gate.py,
+    # test_oecd_stage1_freeze.py, incl. a real subprocess build); here it is
+    # stubbed so these tests stay about what they name.
+    monkeypatch.setattr(m, "_check_refresh_merge_authorization", lambda *a, **k: None)
     return data, ingest
 
 

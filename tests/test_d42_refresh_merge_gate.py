@@ -91,9 +91,58 @@ def test_retitle_after_absorbing_oecd_aiid_ids_aborts(tmp_path):
     assert "retitle INC-1" in str(ei.value)
 
 
-def test_retitle_without_absorbing_gated_ids_is_not_gated(tmp_path):
+def test_curated_retitle_without_absorbing_gated_ids_is_not_gated(tmp_path):
     cur = [{"id": "INC-1", "title": "Curated title", "source_ids": ["OECD-AIM-2026-01-01-aaaa"]}]
+    m._check_refresh_merge_authorization(
+        PREV, cur, [], tmp_path / NOFILE, curation={"OECD-AIM-2026-01-01-aaaa": {"title": "Curated title"}}
+    )
+
+
+def test_upstream_title_edit_on_gated_row_aborts(tmp_path):
+    """D67(b): same title change, but no curation override sets it: held."""
+    cur = [{"id": "INC-1", "title": "Curated title", "source_ids": ["OECD-AIM-2026-01-01-aaaa"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
+    assert "title edit INC-1" in str(ei.value)
+
+
+def test_title_edit_on_non_oecd_aiid_row_is_not_gated(tmp_path):
+    cur = [{"id": "INC-3", "title": "CVE thing, reworded", "source_ids": ["CVE-2025-0001"]}]
     m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
+
+
+def test_new_oecd_row_aborts_and_unchanged_set_does_not(tmp_path):
+    """D67: a new row carrying an OECD-AIM- id absent from every published row."""
+    same = [{"id": "INC-1", "title": "Old title", "source_ids": ["OECD-AIM-2026-01-01-aaaa"]}]
+    m._check_refresh_merge_authorization(PREV, same, [], tmp_path / NOFILE)
+    new = same + [{"id": "INC-9", "title": "Brand new", "source_ids": ["OECD-AIM-2026-09-09-zzzz"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, new, [], tmp_path / NOFILE)
+    assert "add OECD row" in str(ei.value) and "INC-9" in str(ei.value) and "D67" in str(ei.value)
+
+
+def test_mixed_new_row_and_absorbed_new_oecd_id_abort(tmp_path):
+    mixed = [{"id": "INC-9", "title": "Mixed", "source_ids": ["AIID-5", "OECD-AIM-2026-09-09-zzzz"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, mixed, [], tmp_path / NOFILE)
+    assert "new row" in str(ei.value)
+    absorbed = [{"id": "INC-3", "title": "CVE thing", "source_ids": ["CVE-2025-0001", "OECD-AIM-2026-09-09-zzzz"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, absorbed, [], tmp_path / NOFILE)
+    assert "absorbed into published row" in str(ei.value)
+
+
+def test_new_aiid_only_row_is_not_held(tmp_path):
+    """Scope boundary (D67 says OECD additions): a new AIID-only row is not held."""
+    cur = [{"id": "INC-9", "title": "AIID only", "source_ids": ["AIID-1700"]}]
+    m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
+
+
+def test_approved_add_is_allowed(tmp_path):
+    entries = [{"kind": "add", "source_id": "OECD-AIM-2026-09-09-zzzz"}]
+    p = _approval(tmp_path, entries)
+    new = [{"id": "INC-9", "title": "Brand new", "source_ids": ["OECD-AIM-2026-09-09-zzzz"]}]
+    m._check_refresh_merge_authorization(PREV, new, [], p)
 
 
 def test_valid_user_approval_allows_exactly_the_listed_changes(tmp_path):

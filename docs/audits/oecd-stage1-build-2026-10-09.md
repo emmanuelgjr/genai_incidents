@@ -229,3 +229,67 @@ through an OECD-AIM-/AIID- source id:
 
 `pytest tests -q`: 728 passed, 1 xfailed. `scripts/validate.py`, `scripts/check_stats_drift.py`,
 `scripts/lint_atlas_ids.py`: clean. `git status --porcelain` empty at commit.
+
+## Addendum 2026-10-10: D67, the gate also holds OECD row additions and upstream title edits
+
+User ruling D67: "Also hold OECD row additions." Without it, a week with no merge or retitle of a published
+ID would open a normal PR carrying the whole unfrozen crawl (about 1,500 new OECD rows with LLM titles, per
+the foreman; not re-measured here, no live crawl) plus upstream AIID title edits. Data is unchanged versus
+9591ca0f (rebuild byte-exact, `git diff 9591ca0f -- data ingest INCIDENTS.md docs/incidents` empty).
+
+**(a) What counts as an OECD-driven addition.** The unit is the OECD source row, not the entry ID: any
+`OECD-AIM-` source id present in the build that no previously published entry carried in its `source_ids`.
+This covers (i) a new ID built from a new OECD row, (ii) a mixed new row (OECD + AIID), and (iii) a new OECD
+row absorbed into an already-published ID (the published ID gains an OECD source id, references and possibly
+tags, with no title change and no deprecation, which the D42 gate alone never saw). Defining it by "new ID"
+would have let (iii) through. Not held: a new AIID-only row (D67 names OECD additions; the fresh AIID
+snapshot adds roughly 94 such rows with AIID-authored titles, which is a separate exposure the user has not
+ruled on, see below). The check is skipped only when there is no previous build at all (empty baseline);
+the weekly job checks out `data/incidents.json` from git, so that is not reachable there.
+
+**(b) Upstream title edits: included.** A published entry whose title changes, whose current `source_ids`
+include an `OECD-AIM-` or `AIID-` id, and whose new title is not set by a committed curation override, is held
+as `title edit <id> (D67)`. This is the review's section C population (24 AIID/OECD rows edited upstream, for
+example "Reportedly"/"Allegedly" insertions) and the user named it as exposure. The one reason found to
+exempt something: the project's own curation-override titles, which are decisions, not upstream edits, so a
+title equal to a `data/curation_overrides.json` title is not held (that is what the old
+"retitle without absorbing is not gated" test protected). Cost: a future commit that changes an OECD/AIID row
+title by any other route must carry a `retitle` approval; with the committed inputs nothing changes. Titles
+of rows with no OECD/AIID source id (CVE, AVID, etc.) are not held.
+
+**(c) Abort message.** One gate, one message: `[FATAL] D42/D25(a)+D67: this build would write
+OECD/AIID-driven change(s) (merges/retitles/title edits of published IDs, or added OECD rows) that the user
+has not approved (N):`, one line each (`merge`, `retitle`, `title edit`, `add OECD row(s) [...] (new row |
+absorbed into published row) as <id>`), first 25 listed, then `Nothing was written. This freeze is deliberate
+(D58/D67, stage 1): ...`. It runs before the first output write. Approvals use the same signed file; a new
+approval kind `{"kind": "add", "source_id": "OECD-AIM-..."}` exists for stage 2. The committed set is still
+empty and tested as such.
+
+**(d) Committed inputs do not abort.** Real build on this tree: exit 0, `data/`, INCIDENTS.md and
+docs/incidents unchanged. All 4,160 OECD source ids in `ingest/oecd_aim_full_incidents.json` are already
+carried by published entries, and no published title differs.
+
+**Tests and fire proofs.**
+- Real-build subprocess tests in a scratch repo (`tests/test_oecd_stage1_freeze.py`): committed inputs build
+  and reproduce `data/incidents.json` and `id_deprecations.json` byte-for-byte
+  (`test_committed_inputs_do_not_abort`); a constructed pure OECD addition aborts with only the `add` line
+  (`test_d67_gate_aborts_on_a_new_oecd_row`); a constructed AIID title edit on a published AIID-only row
+  aborts with only the `title edit` line (`test_d67_gate_aborts_on_an_upstream_aiid_title_edit`); the D42
+  bridging case still aborts. Each leaves every `data/*` file and both ingest files byte-identical.
+- Unit tests (`tests/test_d42_refresh_merge_gate.py`): new row, mixed new row, absorbed new OECD id, upstream
+  title edit, curated title not held, non-OECD title edit not held, new AIID-only row not held, approved `add`
+  allowed.
+- Fire proofs (gate part disabled, tests run, restored): with the addition check disabled
+  (`if prev_by_id:` -> `if False:`) `test_d67_gate_aborts_on_a_new_oecd_row`,
+  `test_new_oecd_row_aborts_and_unchanged_set_does_not` and `test_mixed_new_row_and_absorbed_new_oecd_id_abort`
+  fail; with the title-edit branch disabled `test_d67_gate_aborts_on_an_upstream_aiid_title_edit` and
+  `test_upstream_title_edit_on_gated_row_aborts` fail.
+- `tests/test_merge_and_dedupe.py`: its from-scratch fixtures use `OECD-AIM-*` ids and edit titles to test
+  deprecation persistence and the split guard, which the extended gate now holds; `_setup_tmp_repo` stubs the
+  gate there (the gate has its own tests above, including real builds). The old test
+  `test_retitle_without_absorbing_gated_ids_is_not_gated` is replaced by a curated-title version plus its
+  uncurated counterpart.
+
+**Open for the user (not decided here).** New AIID-only rows from the weekly snapshot (AIID-authored titles)
+still flow into a PR; D67 as worded does not hold them. One-line change if wanted: extend the addition check
+to `AIID-` source ids.
