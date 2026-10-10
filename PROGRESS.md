@@ -40,6 +40,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 4 (silent IDs) — **PASS (red-reviewer on `2c5cce83`, 2026-10-10)**. A2 and A6 are being fixed before merge (per D52); the user has three questions to rule on.
+- **Verdict:** "PASS. DEFECTS: none."
+- **Gate evidence:**
+  - Own route over the union of IDs across 14 v2* tags (16,572), run against main's package and data: 690 None = 8 ambiguous + 9 no-record + 673 withdrawn. On the branch, published IDs that are neither live nor recorded = 0.
+  - Mappings confirmed from `git show <tag>:data/incidents.json`. INC-03128 (v2.0.0–2.1.0, Momoa deepfake) has sole holder INC-14909. INC-08185 (v2.2.0–2.5.0, Wolf Robots) has sole holder INC-14742.
+  - Append-only: parsed `A[:1060]==B[:1060]`; only the closing bracket moves. A scratch rebuild from main's file regenerates the committed bytes, so nothing was hand-edited.
+  - Main's package over 16,733 IDs, base data vs branch data: `resolve_id` and `resolve_id_group` differ ONLY for INC-03128 and INC-08185.
+  - Schema and validate fire proofs (10 schema rejections, 3 validate violations). The 8a-skip fire proof fails the ruled test.
+  - Build deterministic twice; 731 passed; diff is 20 files with 0 deletions.
+- **Advisories:**
+  - A1: the D49 tension, for the user.
+  - A2: the 8a skip also disables D28 re-assertion for INC-00497 and INC-08139. **Being fixed.**
+  - A3: **14 other withdrawn IDs carried different incidents in different releases**, and 575 live IDs have more than one historic title. DATA_DICTIONARY's "never reused" is contradicted. A follow-up ID-reuse audit is proposed.
+  - A4: the 4 group IDs, for the user.
+  - A5: README:144 and paper:76 describe the v2.12.0 exceptions; this is for docs-warden at the cut.
+  - A6: the golden recipe is missing. **Being fixed.**
+  - A7: §4 corrected in place is acceptable.
+  - A8: conflict with `ws3/headroom-remeasure`.
+  - A9: the reviewer's `merge-tree` wrote unreachable objects (no refs moved).
+
 ### 🔍 Item 4 — specialist reported `2c5cce83` (pushed); **red-reviewer dispatched**
 - **Claims (testimony):**
   - 17 silent IDs (8 ambiguous + 9 unrecorded);
