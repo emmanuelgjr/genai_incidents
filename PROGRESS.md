@@ -24,6 +24,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔍 Item 7 stage 1, D67 extension — `c8d7b48e` (pushed); **scoped re-gate sent to the stage-1 reviewer**
+- **Design:**
+  - any OECD-AIM- id not carried by a published entry is held: a new row, a mixed row, or one absorbed into a published ID;
+  - upstream title edits on published OECD/AIID rows are held, with curated-override titles exempt;
+  - one gate and one "[FATAL] D42/D25(a)+D67" message; a new signed approval kind `add`, with the set still empty;
+  - committed inputs reproduce the data byte-for-byte.
+- **Evidence:** data unchanged vs 9591ca0f; 737 passed; fire proofs 3 + 2 tests.
+- **Test-harness change:** `_setup_tmp_repo` stubs the gate for 5 fixture tests. The gate is asked whether this weakens anything.
+- **Open for the user:** new AIID-only rows (about 94 per the memo's estimate) still reach a weekly PR, because D67 names OECD only. Holding them is a one-line extension.
+
 ### ⚖ D65-D67, USER RULINGS 2026-10-10 (item 7 stage 1 package)
 - **D65: Merge stage 1**, after the D67 change is re-gated.
 - **D66: decouple the other sources (Recommended).** A follow-up task, queued after the v2.13.0 items: the weekly PR carries AIRI/AIAAIC/KEV/cve-sweep/D60 while OECD/AIID-driven changes are held. **NEW BOARD NOTE → WS4.**
