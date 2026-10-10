@@ -40,6 +40,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 4 (silent IDs) — **DONE: advisory re-check PASS on `25b1ad5d`, MERGED to main (2026-10-10)**
+- **Advisory re-check:**
+  - A2 closed: the skip set is {INC-03128, INC-08185}; D28 re-assertion runs for INC-00497 and INC-08139 with 0 appends.
+  - Fire proofs in both directions.
+  - A6 closed: the golden regenerates byte-identically; generating against the branch package gives a diff, so the check can fail.
+  - The 16,731 vs 16,733 gap is exactly the gate's 2 junk IDs ('FOO', 'INC-99999').
+- **Foreman [R] after merge:**
+  - porcelain empty; 0 deletions; validate rc 0; drift clean; lint OK;
+  - **733 passed, 1 xfailed**;
+  - `resolve_id('INC-03128')` gives INC-14909;
+  - `resolve_id_status('INC-00522').status` gives pre-tombstone;
+  - `resolve_id_status('INC-00497', release='v2.0.0').successor` gives INC-14789.
+- **To the user (combined ask):** the D49 reading (answers change for 2 IDs); narrowing the 4 group IDs (D31); a follow-up ID-reuse audit (14 withdrawn IDs re-meant; "never reused" is false); AIID-only additions (from the stage-1 D67 work).
+- **docs-warden at the cut:** README:144, paper:76. `ws3/headroom-remeasure` will conflict in ID_POLICY.
+
 ### ✅ Item 4 (silent IDs) — **PASS (red-reviewer on `2c5cce83`, 2026-10-10)**. A2 and A6 are being fixed before merge (per D52); the user has three questions to rule on.
 - **Verdict:** "PASS. DEFECTS: none."
 - **Gate evidence:**
