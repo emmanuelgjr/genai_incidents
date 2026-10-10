@@ -6672,6 +6672,133 @@
       ],
       "reason": "resplit",
       "date": "2026-09-18"
+    },
+    {
+      "from": "INC-03128",
+      "into": "INC-14909",
+      "reason": "successor-identified",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-08185",
+      "into": "INC-14742",
+      "reason": "successor-identified",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00497",
+      "into": "INC-14789",
+      "reason": "release-scoped",
+      "date": "2026-10-09",
+      "valid_for_releases": [
+        "v2.0.0",
+        "v2.1.0"
+      ]
+    },
+    {
+      "from": "INC-00497",
+      "into": "INC-14907",
+      "reason": "release-scoped",
+      "date": "2026-10-09",
+      "valid_for_releases": [
+        "v2.2.0",
+        "v2.3.0",
+        "v2.3.1",
+        "v2.4.0",
+        "v2.5.0",
+        "v2.6.0",
+        "v2.7.0",
+        "v2.8.0"
+      ]
+    },
+    {
+      "from": "INC-00497",
+      "into": "INC-00311",
+      "reason": "release-dependent",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-08139",
+      "into": "INC-14852",
+      "reason": "release-scoped",
+      "date": "2026-10-09",
+      "valid_for_releases": [
+        "v2.2.0",
+        "v2.3.0",
+        "v2.3.1",
+        "v2.4.0",
+        "v2.5.0"
+      ]
+    },
+    {
+      "from": "INC-08139",
+      "into": "INC-14742",
+      "reason": "release-scoped",
+      "date": "2026-10-09",
+      "valid_for_releases": [
+        "v2.6.0",
+        "v2.7.0"
+      ]
+    },
+    {
+      "from": "INC-08139",
+      "into": "INC-00554",
+      "reason": "release-dependent",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00522",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00609",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00951",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00952",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00955",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00956",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-00957",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-01355",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
+    },
+    {
+      "from": "INC-01660",
+      "into": null,
+      "reason": "unrecorded-drop-v2.1.0",
+      "date": "2026-10-09"
     }
   ]
 }

@@ -6,7 +6,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 ## Identity & provenance
 | Field | Type | Notes |
 |---|---|---|
-| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; merged-away and retired ids are recorded in [`data/id_deprecations.json`](../data/id_deprecations.json), with two scoped exceptions: **9 ids are unrecorded** (published in v2.0.0, no tombstone; [`ID_POLICY.md`](ID_POLICY.md) §1.4(a)), and **8 recorded ids return `None` from `resolve_id()`** because they have no single successor (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897` are retirements split into groups of 12/100/11/8; `INC-03128` and `INC-08185` have an identified successor, `INC-14909` and `INC-14742`, not written as a record; `INC-00497` and `INC-08139` named different incidents in different releases). For those eight use `resolve_id_group()` or read the file; see the [v2.11.0 notes](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/releases/v2.11.0.md). |
+| `id` **R** | string | Stable incident id, `INC-#####`. Never reused; every retired id this project has ever published has a record in [`data/id_deprecations.json`](../data/id_deprecations.json) (shape: [`schema/id_deprecations.schema.json`](../schema/id_deprecations.schema.json); fields: [ID deprecation records](#id-deprecation-records) below). `resolve_id()` returns one current id or `None`; `resolve_id_status(id, release=None)` says why, for every id, and never answers with silence. Since v2.13.0 (2026-10-09) no published id is unrecorded: the 9 ids [`ID_POLICY.md`](ID_POLICY.md) §1.4(a) found without a tombstone carry one (`unrecorded-drop-v2.1.0`), `INC-03128` and `INC-08185` resolve to their identified successors `INC-14909` and `INC-14742`, and `INC-00497`/`INC-08139` resolve per cited release. Four split retirements (`INC-00311`, `INC-00554`, `INC-00754`, `INC-01897`) still have no single successor: `resolve_id()` returns `None`, `resolve_id_status()` returns `group` with the set. See [`ID_POLICY.md`](ID_POLICY.md) §8. |
 | `source_ids` | string[] | Upstream ids this entry was consolidated from (e.g. `AIID-1234`, `CVE-2026-…`, `ATLAS-AML.CS0001`, `AIAAIC2257`). |
 | `quality_tier` | enum | Vetting level: `curated` (hand-written/maintainer), `reviewed` (maintained catalogue, NVD-scored CVE, hand-picked, or human/assisted review), `auto` (bulk-ingested). Filter on this to control trust. |
 | `tier` | enum | **landmark** (the notable headline set) vs **feed** (the comprehensive CVE/GHSA/OSV stream). **Derived, recomputed every build** by `scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of record: `landmark` iff `quality_tier == "curated"` **OR** `aiid_id` is present **OR** `corpus == "ai-harm"`; everything else is `feed`. **Not a function of `quality_tier`** — they are different axes, and most landmark rows qualify only via `aiid_id`, so you cannot reconstruct this field from `quality_tier` (see [Reproducing the landmark count](#reproducing-the-landmark-count)). Cite the landmark count for headlines. *Corrected 2026-09-18 (WS6-T9): the previous wording also listed `category == "real-world"`, a criterion dropped from the code before #68 merged because it also tags exploited CVEs — read literally it described ~3.6x the rows the code marks. The old cross-reference to INCLUSION.md §5 was dropped for the same reason: §5 defines the split on `quality_tier`, a different and much larger set; reconciling §5 is an open maintainer item.* |
@@ -202,8 +202,39 @@ former strict-xfail marker was already removed when the freeze lifted, and
 the gate confirmed each fired correctly before its own deletion. See
 [`docs/specs/WS6-T9-landmark-distribution-2026-09-18.md`](specs/WS6-T9-landmark-distribution-2026-09-18.md).
 
+## ID deprecation records
+
+`data/id_deprecations.json` is `{"deprecations": [record, ...]}`, **append-only**:
+a record is never edited or removed, and file order is decision order. Shape:
+[`schema/id_deprecations.schema.json`](../schema/id_deprecations.schema.json),
+enforced by `scripts/validate.py` together with the cross-record rules below.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `from` **R** | string | The retired id. May appear in more than one record. |
+| `into` **R** | null \| string \| string[] | `null`: no successor (terminal). A string: one successor, which may itself be retired (follow the chain). An array: every successor of a split. |
+| `reason` **R** | enum | `merged`, `transitive-merge`, `out-of-scope`, `orphaned-ingest-source-retired`, `split`, `resplit`; since v2.13.0 also `successor-identified` (one successor identified for a previously fanned-out id), `release-scoped` (only with `valid_for_releases`), `release-dependent` (the unscoped record of an id whose meaning depended on the release), `unrecorded-drop-v2.1.0` (published in v2.0.0, dropped in v2.1.0 before tombstones existed; `into` must be `null`). |
+| `date` **R** | `YYYY-MM-DD` | When the record was decided (appended), not the incident date. |
+| `retired_source_ids` | string[] | Source keys the retired row held, persisted at retirement (WS4-T15); feeds the coverage check. |
+| `retired_cve_ids` | string[] | CVE ids the retired row held, same provenance. |
+| `valid_for_releases` | string[] (`vX.Y.Z`) | **Release-scoped record (v2.13.0, D49).** `into` (a single id) is this id's successor only for a citation taken from one of these releases. Only ever on appended records. |
+
+**Which record answers.** For a given `from`, the **last record without
+`valid_for_releases`** is authoritative. Cross-record rules (`validate.py`):
+every `into` chain reaches a live entry or an `into: null` record; an id that
+has release-scoped records has an **unscoped record after them** (so a reader
+applying "last record wins" to every record still gets the release-independent
+answer); one id's release-scoped records cover disjoint releases.
+
+Verify:
+
+```bash
+python scripts/validate.py   # shape + cross-record rules; "integrity: ... all deprecations resolve."
+python -m pytest -q tests/test_resolve_id_status.py
+```
+
 ## Access
-- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`).
+- **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`), `resolve_id_status(id, release=None)` (a typed `IdStatus`: `live`, `successor`, `group`, `release-dependent`, `pre-tombstone`, `withdrawn` or `unknown`; v2.13.0).
 - **Hugging Face:** `load_dataset("emmanuelgjr/genai-incidents")` (JSONL projection).
 - **STIX 2.1:** `…github.io/genai_incidents/data/incidents.stix.json`. The OWASP LLM `external_references` `source_name` is edition-qualified and currently `owasp-llm-top10-2026` (it was `owasp-llm-top10-2025` until 2026-10-01 13:43 UTC, the Pages deploy of `7dc80602`); the edition is derived from the crosswalk `mappings/owasp_llm_2025_to_2026.json` (`to_version`).
 - **CSV / min JSON / per-year markdown:** see the [site](https://emmanuelgjr.github.io/genai_incidents/) and [`docs/`](.).

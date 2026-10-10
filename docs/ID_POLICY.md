@@ -9,6 +9,15 @@
 >
 > Owner: schema-architect (WS3). Related: WS6-T8 (v3.0 migration guide),
 > WS1-T2 (corpus split), WS6-T3 (STIX).
+>
+> **UPDATE 2026-10-09 (v2.13.0 item 4; user ruling D49).** §1.4(a)'s nine
+> unrecorded IDs now carry records, `INC-03128`/`INC-08185` carry successor
+> records, `resolve_id_status()` and release-scoped records exist, and §4
+> rule 3 is reconciled with the API. What changed is in §8; §1.4(a) carries
+> a dated note. **§§1–3, 5 and 6 remain a record of 2026-07-27: do not
+> regenerate them from current data.** §4 is live policy and is corrected
+> in place. (§7 is left free for the headroom addendum on the unmerged
+> `ws3/headroom-remeasure` branch.)
 
 ---
 
@@ -115,6 +124,12 @@ the "merged IDs redirect forever" rule the policy below states — the rule
 predates the tombstone machinery, which landed 2026-05-16. Fix: append nine
 records with an honest reason (`unrecorded-drop-v2.1.0`), pointing at a
 successor where one can be identified and `into: null` where it cannot.
+
+> **Dated update, 2026-10-09 (v2.13.0 item 4).** Repaired as prescribed:
+> nine records appended with reason `unrecorded-drop-v2.1.0` and
+> `into: null`. No successor could be identified for any of the nine (no
+> live entry holds their `source_ids` or any of their reference URLs). The
+> paragraph above is kept as written; it was true when measured. See §8.
 
 **(b) 484 numbers were issued but never published.** The remaining silent burn
 never appeared in any committed `incidents.json`, so no citation can exist for
@@ -267,11 +282,17 @@ append-only") and with plan invariants 3 and 4.
 3. **Merged IDs redirect forever.** When two entries merge, the surviving entry
    keeps the lower-numbered ID and every absorbed ID gains a record pointing at
    the survivor. Those redirects are permanent and transitively resolvable:
-   `resolve_id()` follows a chain of any length and terminates. A citation of
-   any ID this project has ever published must always resolve to either the
-   current canonical entry or an explicit withdrawal — never to silence.
-   *(Current compliance: 9 known exceptions — see §1.4(a) — to be repaired in
-   Phase 2.)*
+   every chain terminates (cycle-safe). A citation of any ID this project has
+   ever published must always resolve to an answer, never to silence:
+   `resolve_id_status()` returns the current canonical entry, the full set
+   of successors of a split, the successor for the release the citation came
+   from, or an explicit withdrawal, and says which (§8). `resolve_id()`
+   returns one ID or `None`; its `None` means "no *single* answer", and
+   `resolve_id_status()` says why.
+   *(Current compliance, corrected in place 2026-10-09: every ID published in
+   any release tag has a live entry or a record in `data/id_deprecations.json`;
+   0 unrecorded (re-derive: §8.5). The 9 exceptions this line used to cite
+   were repaired in v2.13.0, §1.4(a).)*
 
 ---
 
@@ -352,3 +373,176 @@ Corpus totals quoted in this document are as of 2026-07-27 and are stated with
 their measurement date rather than templated, because this file is a
 point-in-time decision record and is not on the `stats_docs_lib.DOC_SURFACES`
 list.
+
+---
+
+## 8. Resolution status and the 17 silent IDs (added 2026-10-09, v2.13.0 item 4)
+
+Owner: schema-architect. Authority: the user's v2.13.0 item 4 and ruling
+**D49** (PROGRESS.md, 2026-10-09): keep `resolve_id() -> str | None`
+unchanged; add `resolve_id_status(id, release=None)`; `valid_for_releases`
+only on appended records.
+
+### 8.1 The deviation this closes
+
+The v2.11.0 CHANGELOG disclosed it in these words:
+
+> These eight remain an **open, disclosed deviation** from
+> `docs/ID_POLICY.md` section 3 ("never to silence"), owned by the
+> ID-policy workstream; this release does not resolve it.
+
+`docs/releases/v2.11.0.md` says the same, and PROGRESS.md's D31 rider says
+*"the policy sentence or the API owes a reconciliation."* The sentence is
+§4 rule 3 of this file; the CHANGELOG's "section 3" refers to that rule.
+
+The premise check for item 4 found **17** silent IDs, not 8: the eight above
+plus §1.4(a)'s nine. All 17 are now closed:
+
+| IDs | Before (main `816b9271`) | Now | How |
+|---|---|---|---|
+| `INC-03128`, `INC-08185` | `resolve_id` → `None` | `successor`: `INC-14909`, `INC-14742` | appended `successor-identified` records |
+| `INC-00497`, `INC-08139` | `None` | `release-dependent`; `successor` with `release=` | appended `release-scoped` records, then an unscoped restatement |
+| `INC-00311`, `INC-00554`, `INC-00754`, `INC-01897` | `None` | `group` (12 / 100 / 11 / 8) | no data change; the status names the set |
+| the 9 IDs of §1.4(a) | `None`, no record | `pre-tombstone` | appended `unrecorded-drop-v2.1.0` records, `into: null` |
+
+`resolve_id()` still returns `None` for the four `group` IDs, the two
+`release-dependent` ones and the nine `pre-tombstone` ones. That is no longer
+silence: §4 rule 3 now names `resolve_id_status()` as the answer, and it
+returns a named status for every ID. **The deviation is closed by the API
+plus the policy wording. `resolve_id()` does not pick an answer.**
+
+### 8.2 `resolve_id_status(id, release=None) -> IdStatus`
+
+`IdStatus` is a frozen dataclass with these fields: `id`, `status`,
+`successor` (one live ID or `None`), `group` (every live successor, as a
+tuple), `by_release` (`{release: successor}`, only for IDs with
+release-scoped records), `reason` (the deciding record's `reason`) and
+`release` (the normalised argument). `status` is one of:
+
+| status | meaning | `successor` |
+|---|---|---|
+| `live` | a current entry | the ID |
+| `successor` | retired, with exactly one live successor (or, with a covered `release=`, that release's successor) | one ID |
+| `group` | retired and split, with no single successor | `None`; see `group` |
+| `release-dependent` | meant different incidents in different releases, and no `release=` was given | `None`; see `by_release` |
+| `pre-tombstone` | published in v2.0.0 and dropped in v2.1.0, before tombstones existed | `None` |
+| `withdrawn` | retired with no successor (e.g. out of scope) | `None` |
+| `unknown` | no record of this ID | `None` |
+
+**`release=`** is the release the citation came from (`"v2.3.0"` or
+`"2.3.0"`; a malformed value raises `ValueError`). `None` means "current",
+the release-independent answer. The argument only changes the answer for an
+ID with release-scoped records, and only when the release is listed on one
+of them. A release that is not listed (for example, one in which the ID was
+already a tombstone) gets the release-independent answer. For a live ID
+`release=` is ignored, because this API does not re-check a live ID's meaning
+against old releases.
+
+`resolve_id()`, `resolve_id_group()` and `load_deprecations()` keep their
+signatures. Their answers changed for exactly two IDs (§8.4).
+
+### 8.3 Record types added
+
+Every one of these is an appended record (invariant 9: an existing record is
+never edited). Shape: `schema/id_deprecations.schema.json`. Field reference:
+`docs/DATA_DICTIONARY.md`, "ID deprecation records".
+
+- **`successor-identified`**: `into` is one ID. It is used where an earlier
+  record fanned out (D28's authorized fan-out for `INC-03128`/`INC-08185`)
+  and the single incident the published ID named has since been identified.
+- **`release-scoped`** with `valid_for_releases`: `into` is the successor for
+  a citation taken from one of the listed releases. **Rule: the last record
+  for the `from` must be unscoped**, and `validate.py` enforces it. That keeps
+  every reader that applies "last record wins" to all records on exactly the
+  answer it had before. Such readers include the v2.11.0 and v2.12.0
+  packages and anyone following the reading rule the v2.11.0 notes
+  published.
+- **`release-dependent`**: that unscoped closing record. Its `into` restates
+  the previous authoritative `into`, unchanged.
+- **`unrecorded-drop-v2.1.0`**: `into: null`, for §1.4(a)'s nine.
+
+**Where they come from.** `data/id_deprecations.json` is generated. The build
+copies every existing record verbatim and only appends. The records above are
+appended by `scripts/merge_and_dedupe.py` step 8b from a curated input,
+`docs/audits/ID-silent-ids-appends-2026-10-09.json`, which gives each record
+with its evidence. A record is appended only if an identical one is not
+already present, so a rebuild appends nothing. Step 8a re-asserts D28's
+approved fan-out for its eight inbound redirects, and it now skips any `from`
+that a ruled record supersedes. Without that skip, every rebuild would
+"correct" `INC-03128`/`INC-08185` back to the fan-out. This was verified: with
+the skip disabled, the first rebuild appended two corrective records.
+
+### 8.4 The successor and release evidence
+
+The same criterion applies to all six non-trivial answers. For each release
+tag in which the ID was live, take its title. The successor is the **single
+current live entry carrying that exact title**. For `INC-03128` and
+`INC-08185`, that entry is also the only live holder of the row's headline
+source.
+
+| ID | releases | title then | successor |
+|---|---|---|---|
+| `INC-03128` | v2.0.0–v2.1.0 | Purportedly AI-Generated Jason Momoa Deepfake Used in Romance Scam … | `INC-14909` (holds AIID-1285 + OECD-AIM-2025-11-29-1cd0) |
+| `INC-08185` | v2.2.0–v2.5.0 | China Deploys Armed AI 'Wolf Robots' in Urban Combat Training | `INC-14742` (holds OECD-AIM-2026-03-27-2510) |
+| `INC-00497` | v2.0.0–v2.1.0 | AI-Generated Saint Paisios Scam Defrauds Greek Faithful | `INC-14789` |
+| `INC-00497` | v2.2.0–v2.8.0 | Greek Tax Authority Plans AI System to Combat Tax Evasion | `INC-14907` |
+| `INC-08139` | v2.2.0–v2.5.0 | South Korea Launches AI-Powered Robotic Endoscope Development Project | `INC-14852` |
+| `INC-08139` | v2.6.0–v2.7.0 | China Deploys Armed AI 'Wolf Robots' in Urban Combat Training | `INC-14742` |
+
+**Limit.** `INC-03128` and `INC-08185` were over-merged rows when they were
+published, with 10 and 65 `source_ids`. The successor is the incident the
+row *named* (by title, date, description and headline source), not every
+source it held. Of their other sources, 8 (`INC-03128`) and 64 (`INC-08185`)
+live in other entries. The D28 fan-out records stay in the file, and a
+consumer who joins on source keys rather than on the cited incident should
+read them.
+
+**Not applied: the same evidence for the four `group` IDs.** By the same
+title test, `INC-00311` (every release) → `INC-14726` and `INC-01897` (every
+release) → `INC-14612`. `INC-00554` named three incidents: `INC-14756` in
+v2.0.0–v2.7.0, `INC-14742` in v2.8.0 and `INC-14609` in v2.9.0–v2.10.0.
+`INC-00754`'s v2.9.0–v2.10.0 title is held by `INC-14608`, and its
+v2.0.0–v2.8.0 title has no exact holder. D31 ruled these four "no single
+successor" and item 4 did not reopen that ruling, so they stay `group`. The
+question is open for a user ruling.
+
+**Declared answer changes vs main `816b9271`.** The golden is
+`tests/fixtures/resolve_id_golden_816b9271.json`, produced by running main's
+own package on its own data. Two `resolve_id()` answers changed:
+`resolve_id("INC-03128")` went from `None` to `INC-14909`, and
+`resolve_id("INC-08185")` went from `None` to `INC-14742`.
+`resolve_id_group()` for the same two went from 11 and 100 IDs to one. No
+other answer of either function changed for any of the 1,065 distinct `from`
+IDs in `data/id_deprecations.json` after item 4 (the golden's scope), nor
+across a wider sweep of 16,731 IDs: every ID live in any `v*` release tag,
+live now, or present as a `from`. The gate's own independent check covered
+16,733 IDs and found the same two changes.
+
+### 8.5 Verification recipe
+
+```bash
+# The 17 silent IDs at the base, and what each meant per release
+# (an independent walk over raw JSON, not the package):
+python scripts/audit/silent_ids.py silent --ref 816b9271   # 17 silent (8 ambiguous, 9 unrecorded)
+python scripts/audit/silent_ids.py silent --ref WORKTREE   # 6 by the single-ID walk (4 group + 2 release-dependent), 0 unrecorded
+
+# Each of the 17 now has a named status:
+PYTHONPATH=src python -c "import genai_incidents as g; [print(i, g.resolve_id_status(i).status, g.resolve_id_status(i).successor) for i in 'INC-03128 INC-08185 INC-00311 INC-00554 INC-00754 INC-01897 INC-00497 INC-08139 INC-00522 INC-00609 INC-00951 INC-00952 INC-00955 INC-00956 INC-00957 INC-01355 INC-01660'.split()]"
+
+# Field-level data delta vs the base (only id_deprecations.json and its package copy move):
+python scripts/audit/silent_ids.py delta --base 816b9271
+
+# Regenerate the golden fixture: runs main 816b9271's OWN package (code and
+# bundled data, from a `git archive 816b9271 src/genai_incidents` extract,
+# isolated interpreter) over every `from` in this tree's data/id_deprecations.json.
+# Expect a byte-identical file (`git diff --exit-code` clean):
+python scripts/audit/silent_ids.py golden --base 816b9271 --out tests/fixtures/resolve_id_golden_816b9271.json
+git diff --exit-code tests/fixtures/resolve_id_golden_816b9271.json
+
+# The wider sweep (base package vs this tree's package over 16,731 IDs):
+python scripts/audit/silent_ids.py sweep --base 816b9271   # only INC-03128 and INC-08185 change
+
+# Shape, cross-record rules, golden comparison, byte prefix:
+python scripts/validate.py
+python -m pytest -q tests/test_resolve_id_status.py
+```

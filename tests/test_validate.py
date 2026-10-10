@@ -190,7 +190,19 @@ def test_deprecation_coverage_resolves_a_real_committed_chain():
     # the same 8 inbound redirects, confirmed still genuinely multi-hop
     # post-fix (D28 approved it the full fan-out, matching what this
     # chain already produces -- see docs/audits/WS4-T19-authorized-splits-2026-09-18.json).
+    #
+    # [UPDATE 2026-10-09, v2.13.0 item 4] The fixture assumption above went
+    # stale exactly as its own assertion said it would: the user's item 4
+    # appended a single-successor record INC-08185 -> INC-14742
+    # (docs/audits/ID-silent-ids-appends-2026-10-09.json), so INC-08185 no
+    # longer chains to multiple live ids. The fixture moves one hop down
+    # the same chain to INC-08139 (INC-08139 -> INC-00554 -> [100 live
+    # successors]), whose authoritative record is still that multi-hop
+    # redirect (its item-4 records are release-scoped plus an unscoped
+    # restatement of the same `merged -> INC-00554`). The text above is
+    # kept as the record of why INC-08185 was chosen.
     # Read-only: this test never writes to data/.
+    fixture_id = "INC-08139"
     data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
     real_deps = json.loads(
         (ROOT / "data" / "id_deprecations.json").read_text(encoding="utf-8")
@@ -198,9 +210,10 @@ def test_deprecation_coverage_resolves_a_real_committed_chain():
     live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
     latest = v._latest_by_from(real_deps)
     into_map = {f: r.get("into") for f, r in latest.items()}
-    assert "INC-08185" in latest, "fixture assumption (INC-08185 is a recorded redirect) is stale -- update it"
-    resolved = v._resolve_live_targets(latest["INC-08185"].get("into"), into_map, live_ids)
-    assert len(resolved) > 1, "fixture assumption (INC-08185 chains to MULTIPLE live ids) is stale -- update it"
+    assert fixture_id in latest, f"fixture assumption ({fixture_id} is a recorded redirect) is stale -- update it"
+    assert latest[fixture_id].get("into") == "INC-00554", "fixture assumption (INC-08139 -> INC-00554) is stale"
+    resolved = v._resolve_live_targets(latest[fixture_id].get("into"), into_map, live_ids)
+    assert len(resolved) > 1, f"fixture assumption ({fixture_id} chains to MULTIPLE live ids) is stale -- update it"
     id_to_sources = {e["id"]: e.get("source_ids") or [] for e in data["incidents"]}
     a_real_source_a_chain_end_holds = next(
         s for t in sorted(resolved) for s in id_to_sources.get(t, []) if s
@@ -208,13 +221,13 @@ def test_deprecation_coverage_resolves_a_real_committed_chain():
     deps = [dict(d) for d in real_deps]
     found = False
     for d in deps:
-        if d.get("from") == "INC-08185":
+        if d.get("from") == fixture_id and "valid_for_releases" not in d:
             d["retired_source_ids"] = [a_real_source_a_chain_end_holds]
             found = True
-    assert found, "fixture assumption (INC-08185 chains to INC-08139) is stale -- update it"
+    assert found, f"fixture assumption ({fixture_id} has an unscoped record) is stale -- update it"
     problems = v.check_deprecation_coverage(data, deps)
     assert problems == [], (
-        f"the real INC-08185 -> INC-08139 -> INC-00554 -> [...] chain must resolve: {problems}"
+        f"the real {fixture_id} -> INC-00554 -> [...] chain must resolve: {problems}"
     )
 
 
@@ -293,6 +306,19 @@ def test_real_resplit_redirects_match_d28_approved_targets():
         f"list, found {len(resplit_entries)} -- fixture/list assumption is stale"
     )
 
+    # [UPDATE 2026-10-09, v2.13.0 item 4] Two of the eight (INC-03128,
+    # INC-08185) were narrowed by a LATER user ruling from D28's approved
+    # fan-out to one identified successor each
+    # (docs/audits/ID-silent-ids-appends-2026-10-09.json). For those, the
+    # current record must equal the ruled record, and the ruled successor
+    # must lie INSIDE D28's approved set: the narrowing picks a member of
+    # what D28 approved, it never points outside it.
+    ruled_path = ROOT / "docs" / "audits" / "ID-silent-ids-appends-2026-10-09.json"
+    ruled_last = {}
+    for e in json.loads(ruled_path.read_text(encoding="utf-8"))["entries"]:
+        ruled_last[e["record"]["from"]] = e["record"]
+    superseded = {"INC-03128": "INC-14909", "INC-08185": "INC-14742"}
+
     checked = 0
     mismatches = []
     for entry in resplit_entries:
@@ -302,6 +328,11 @@ def test_real_resplit_redirects_match_d28_approved_targets():
         current_resolved = resolve(latest[frm].get("into"))
         approved_resolved = resolve(approved)
         checked += 1
+        if frm in superseded:
+            assert latest[frm] == ruled_last[frm], (frm, latest[frm])
+            assert current_resolved == {superseded[frm]}, (frm, current_resolved)
+            assert current_resolved <= approved_resolved, (frm, "outside D28's set")
+            continue
         if current_resolved != approved_resolved:
             mismatches.append((frm, sorted(current_resolved), sorted(approved_resolved)))
 
