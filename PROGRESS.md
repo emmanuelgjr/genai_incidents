@@ -24,6 +24,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### ⚖ D65-D67, USER RULINGS 2026-10-10 (item 7 stage 1 package)
+- **D65: Merge stage 1**, after the D67 change is re-gated.
+- **D66: decouple the other sources (Recommended).** A follow-up task, queued after the v2.13.0 items: the weekly PR carries AIRI/AIAAIC/KEV/cve-sweep/D60 while OECD/AIID-driven changes are held. **NEW BOARD NOTE → WS4.**
+- **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
+- A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
+
+### 🔍 Item 4 — specialist reported `2c5cce83` (pushed); **red-reviewer dispatched**
+- **Claims (testimony):**
+  - 17 silent IDs (8 ambiguous + 9 unrecorded);
+  - both user mappings verified from the released data;
+  - 17 records appended via a new merge step 8b from a curated input;
+  - step 8a skips ruled IDs;
+  - INC-00497 and INC-08139 get release-scoped records plus a restatement;
+  - `resolve_id_status()` added;
+  - ID_POLICY §8 closes the v2.11.0 "open, disclosed deviation";
+  - id_deprecations.json goes from 1,060 to 1,077 records, all other data byte-identical;
+  - 731 passed.
+- **For the user, after the gate:**
+  1. The 4 `group` IDs have identifiable successors by the same evidence (D31 had ruled "no single successor"). Narrow them?
+  2. `resolve_id()` answers change for INC-03128 and INC-08185 (None → successor). D49 was read as covering the signature only.
+  3. `ws3/headroom-remeasure` will conflict in ID_POLICY.
+
 ### ✅ Item 7 stage 1 — **PASS (red-reviewer on `7f03c352`, 2026-10-09)**. RULING PACKAGE for the user (D58: "bring all I need to rule here")
 - **Verdict, in the gate's words:** "The branch does what D58 stage 1 asked for. Exactly 3,936 rows gain two label fields and nothing else moves. The approval set is empty. The gate aborts on a bridging input I built myself ... and it does not abort on the committed inputs. The rebuild reproduces the committed tree byte for byte, twice."
 - **Gate evidence:**
