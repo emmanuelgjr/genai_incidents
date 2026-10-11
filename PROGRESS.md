@@ -40,6 +40,42 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ D69/D70 branch — **PASS (red-reviewer on `5e64cee1`), MERGED to main under D72 (2026-10-11)**
+- **⚖ D72 (user): "Merge, flag as a behaviour change".** The `load_deprecations()` raw values flip shape for INC-00311, INC-01897 and INC-00497 (the type `str | list[str]` is unchanged). **The release-notes cut must carry a "Behaviour changes" line naming the 3 keys and pointing consumers to `resolve_id_status()`.**
+- **Gate evidence:**
+  - mappings re-derived across 14 tags, each with a unique holder (exact and normalised);
+  - prefix of 1,077 records equal, appended records 1078-1084 equal the input, both restatements verbatim;
+  - a scratch rebuild from main's file regenerates the committed bytes, and is idempotent;
+  - `content_into_map` vs the old map: 0 mismatches over the 8 D28 resplit entries at base, exactly 1 (INC-00497) at the tip;
+  - its own sweep with main's code over 16,731 IDs: resolve_id/group change only for INC-00311 and INC-01897; v2.11.0 and v2.12.0 package code on branch data keep INC-00497, INC-00554, INC-08139 and INC-00754 unchanged;
+  - fire proofs: FP2, protective record removed (12 failures), wrong successor (10 failures);
+  - 744 passed.
+- **Advisories:**
+  1. load_deprecations is public (resolved by D72).
+  2. "Stable IDs" wording at README:31, the schema id description, paper:18/:73 and ingest/README:26. **Note → docs-warden at the cut.** MASTER_IMPROVEMENT_PLAN:49 and :183 say "never reused" (foreman-owned; dated note below).
+  3. **CORRECTION to this board:** "14 withdrawn" (in the item-4 entries above) is wrong. Two methods give **12** withdrawn multi-meaning IDs: INC-00004, -00010, -00014, -01134, -01338, -01551, -01559, -01714, -02443, -03345, -05477, -09555. The 14 was likely 12 + 2 release-dependent. The earlier entries are left as written (agreement 4) and superseded here.
+  4. The unique-holder test hard-codes its answers (the golden covers it).
+  5. INC-00554's status changes group → release-dependent (stated in the CHANGELOG).
+- **Foreman [R] after merge:**
+  - 0 deletions; validate rc 0; drift clean; **744 passed, 1 xfailed**;
+  - resolve_id: INC-00311 → INC-14726, INC-00497 → None, INC-00554 → None;
+  - resolve_id_status('INC-00554', release='v2.8.0') → INC-14742.
+- **MASTER_IMPROVEMENT_PLAN invariant 9 "never reused":** a dated foreman note follows in its own commit.
+
+### ✅ Item 7 stage 1 D71 + A1-A3 — **PASS (scoped re-gate on `1b20ffca`)**. Three advisories are being fixed before merge.
+- **Gate evidence:**
+  - data identical, rebuild byte-exact;
+  - its own inputs abort: AIID-99999 add; AIID-1574/INC-00437 now rc 1 with "content change ... 15 field(s)"; the unrelated-key title bypass now rc 1;
+  - a depth-1 clone gives baseline 15,666, not first-build;
+  - the autouse stub covers only `_run_refresh_gate`, with 1 `real_gate` test; with the gate removed, 6 real-build tests fail;
+  - fire proofs (b) 3, (c) 7, (d) 3;
+  - 764 passed.
+- **Advisories being fixed:**
+  - **A1:** AIRI (1,457 AIID-n ids) is outside `_PAIR_INPUT_FILES`. An AIRI edit moved severity, tags and references on INC-01706 and INC-01702 with rc 0. **Foreman reading of D71: AIID-keyed AIRI rows are "the pair"** (E23 uncleared population; AIRI is frozen under D57). It holds more, never less, so it was applied without a new ask.
+  - **A2:** a shallow clone with the data file deleted reads as first build. Fail closed.
+  - **A4:** order-dependent scratch tests.
+- **A3 (noted):** the baseline is the checked-out HEAD. The weekly job checks out main, so the gate guards builds, not commits.
+
 ### 🔍 D69/D70 branch — `5e64cee1` (pushed); **red-reviewer dispatched**
 - **Mappings:** all 5 user mappings verified from tag data; 7 records appended from the new dated input `ID-group-ids-appends-2026-10-10.json` (1,077 → 1,084).
 - **Answer changes:** only INC-00311 → INC-14726 and INC-01897 → INC-14612 (resolve_id), with group sizes 12→1 and 8→1. INC-00554 stays None/100, with resolve_id_status release-dependent.
