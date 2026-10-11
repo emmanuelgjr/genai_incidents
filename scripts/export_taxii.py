@@ -153,6 +153,25 @@ wrong edition for these codes). The edition is derived from the crosswalk
 without changing `id` or `modified`, so consumers that treat an unchanged
 (`id`, `modified`) as an already-seen object version, as STIX 2.1 versioning
 permits, may not pick up the corrected label; prefer delete-then-import.
+That gap is closed from v2.13.0 (next section), which also re-versions every
+object once, so an ordinary re-import picks the label up.
+
+## Object versions (`modified`)
+
+From v2.13.0 an object's `modified` is derived, not fixed: an incident SDO (and
+its relationships) carries the entry's `updated` date with the exporter version
+in the millisecond field, e.g. `2026-01-04T00:00:00.001Z`. `updated` moves
+exactly when the entry's content changes, so an unchanged entry keeps a
+byte-identical object and a changed one gets a later `modified`; a change to the
+exporter itself moves every object by one millisecond. `manifest.json`'s
+`version` is that `modified`, so a client can detect changed objects from the
+manifest alone. Rule and bump policy: `docs/VERSIONING.md`.
+
+## Integrity
+
+`SHA256SUMS` (verify with `sha256sum -c SHA256SUMS` in this directory) lists every
+file here, and `build_manifest.json` names the commit, build time and counts this
+copy was built from.
 
 ## Caveat: media type & pagination
 

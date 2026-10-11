@@ -321,6 +321,7 @@ Then *Fetch and store all feed data*. MISP reads `manifest.json`, pulls each
 | `manifest.json` | event-uuid → event metadata (MISP reads this first) |
 | `<event-uuid>.json` | one `{{"Event": …}}` per year |
 | `hashes.csv` | `value-md5,event-uuid` for pull-time dedup |
+| `build_manifest.json`, `SHA256SUMS` | build provenance and `sha256sum -c` checksums for every file here (MISP ignores them) |
 
 TLP: clear. The dataset is CC-BY-4.0; attributes are catalogue references to
 public disclosures, not active-campaign IOCs (threat level: low).
