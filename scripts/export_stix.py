@@ -17,6 +17,19 @@ Modelling:
 All STIX ids are derived deterministically (UUIDv5 over a fixed namespace),
 and object timestamps come from each incident's `added`/`updated` dates — so
 the bundle is byte-stable across rebuilds and safe for the CI drift check.
+
+`modified` rule (v2.13.0 item 8; docs/audits/ws6-v2130-export-integrity-2026-10-11.md):
+
+    modified = <updated date> T00:00:00.<EXPORTER_VERSION as 3 digits>Z
+
+`updated` is bumped by the merge exactly when an entry's content fields change
+(scripts/merge_and_dedupe.py `_CONTENT_FIELDS`), so an unchanged entry keeps a
+byte-identical SDO and a changed one moves forward by >= 1 day. The millisecond
+field carries `EXPORTER_VERSION`: bump it whenever the SDO shape or the
+mapping from entry to SDO changes (a new `x_` property, a relabelled
+`source_name`), and every object moves forward by 1 ms per bump -- a STIX
+consumer that dedupes on (id, modified) then re-imports exactly the objects the
+exporter changed. `modified >= created` always holds (clamped).
 """
 
 from __future__ import annotations
@@ -36,6 +49,14 @@ MAPPINGS = ROOT / "mappings"
 NS = uuid.UUID("6f1a9c4e-9b2d-5e7a-8c3f-0a1b2c3d4e5f")
 # Constant timestamp for taxonomy objects (techniques/CVEs) that have no own date.
 EPOCH = "2024-01-01T00:00:00.000Z"
+
+# STIX `modified` rule (see module docstring). Bump on ANY change to the SDO
+# shape or to how an entry maps onto it. History:
+#   0 -- (implicit, up to v2.12.0) modified == updated date, ms field .000;
+#        exporter changes did not move `modified`.
+#   1 -- v2.13.0 item 8: x_source_freshness added (D57); version in the ms field.
+# Range 0..999 (it is the millisecond field of an RFC 3339 timestamp).
+EXPORTER_VERSION = 1
 
 ATLAS_URL = "https://atlas.mitre.org/techniques/"
 OWASP_LLM_URL = "https://genai.owasp.org/llmrisk/"
@@ -87,6 +108,48 @@ def _ts(date_str: str) -> str:
     return f"{s}T00:00:00.000Z"
 
 
+def _ts_v(date_str: str) -> str:
+    """`_ts` with the exporter version in the millisecond field: the `modified`
+    timestamp for a given `updated` date."""
+    if not 0 <= EXPORTER_VERSION <= 999:
+        raise ValueError(f"EXPORTER_VERSION {EXPORTER_VERSION} does not fit in 3 ms digits")
+    return _ts(date_str)[:-4] + f"{EXPORTER_VERSION:03d}Z"
+
+
+def _modified(created: str, *date_strs: str) -> str:
+    """Latest versioned timestamp among ``date_strs``, never earlier than
+    ``created`` (STIX 2.1: modified >= created). RFC 3339 UTC strings of fixed
+    width compare lexicographically."""
+    return max([created] + [_ts_v(d) for d in date_strs if d])
+
+
+def _taxonomy_dates() -> list[str]:
+    """Release dates recorded in the pinned mapping files. A re-pin of a dated
+    taxonomy moves the shared taxonomy objects' `modified` forward."""
+    out = []
+    for fname, field in (("mitre_atlas.json", "release_date"),
+                         ("owasp_llm_2025_to_2026.json", "published")):
+        try:
+            v = json.loads((MAPPINGS / fname).read_text(encoding="utf-8")).get(field)
+        except (OSError, json.JSONDecodeError):
+            v = None
+        if v:
+            out.append(str(v))
+    return out
+
+
+def _source_freshness(i: dict) -> dict | None:
+    """`x_source_freshness` payload (D57): the entry's own `source_freshness`
+    marker, keys {status, as_of, sources, review_by}, verbatim. Keys with a
+    null value are dropped (never emit null); None when the row is unmarked.
+    Same pattern as `_content_license` -- derived from the row, never authored
+    here, and deliberately NOT pushed into `labels`."""
+    sf = i.get("source_freshness")
+    if not sf:
+        return None
+    return {k: v for k, v in sf.items() if v is not None}
+
+
 def _atlas_names() -> dict[str, str]:
     try:
         m = json.loads((MAPPINGS / "mitre_atlas.json").read_text(encoding="utf-8"))
@@ -108,6 +171,11 @@ def build_bundle(incidents: list[dict]) -> dict:
     cve_ids: dict[str, str] = {}
 
     # 1) Shared taxonomy SDOs: ATLAS techniques + CVEs.
+    tax_dates = _taxonomy_dates()
+    # attack-pattern content (name) follows the pinned ATLAS release; CVE
+    # vulnerability content (the id) never changes; both fall back to EPOCH.
+    ap_modified = _modified(EPOCH, *[d for d in tax_dates[:1]])
+    vuln_modified = _modified(EPOCH, EPOCH[:10])
     techniques = sorted({t for i in incidents for t in (i.get("mitre_atlas") or [])})
     for t in techniques:
         oid = _sid("attack-pattern", t)
@@ -115,7 +183,7 @@ def build_bundle(incidents: list[dict]) -> dict:
         base = t.split(".")[0]  # AML.T0051.000 -> AML.T0051 for the URL
         objects.append({
             "type": "attack-pattern", "spec_version": "2.1", "id": oid,
-            "created": EPOCH, "modified": EPOCH,
+            "created": EPOCH, "modified": ap_modified,
             "name": atlas_names.get(t) or atlas_names.get(base) or t,
             "external_references": [
                 {"source_name": "mitre-atlas", "external_id": t,
@@ -128,7 +196,7 @@ def build_bundle(incidents: list[dict]) -> dict:
         cve_ids[c] = oid
         objects.append({
             "type": "vulnerability", "spec_version": "2.1", "id": oid,
-            "created": EPOCH, "modified": EPOCH, "name": c,
+            "created": EPOCH, "modified": vuln_modified, "name": c,
             "external_references": [
                 {"source_name": "cve", "external_id": c,
                  "url": f"https://www.cve.org/CVERecord?id={c}"},
@@ -143,7 +211,13 @@ def build_bundle(incidents: list[dict]) -> dict:
     objects.append({
         "type": "identity", "spec_version": "2.1",
         "id": _sid("identity", "genai-incidents"),
-        "created": EPOCH, "modified": EPOCH,
+        "created": EPOCH,
+        # Dataset-level object: moves whenever any incident or pinned taxonomy
+        # date moves (over-bumping one object is the safe direction; the ASI /
+        # VERIS / CAPEC pins carry no date of their own).
+        "modified": _modified(EPOCH, *tax_dates,
+                              *[i.get("updated") or i.get("added") or i.get("date") or ""
+                                for i in incidents]),
         "name": "genai_incidents", "identity_class": "system",
         "x_taxonomy_versions": taxonomy_versions(),
     })
@@ -154,7 +228,7 @@ def build_bundle(incidents: list[dict]) -> dict:
         iid = i["id"]
         oid = _sid("x-genai-incident", iid)
         created = _ts(i.get("added") or i.get("date"))
-        modified = _ts(i.get("updated") or i.get("added") or i.get("date"))
+        modified = _modified(created, i.get("updated") or i.get("added") or i.get("date"))
         ext = [{"source_name": "genai-incidents", "external_id": iid}]
         for r in i.get("references") or []:
             if r.get("url"):
@@ -205,6 +279,11 @@ def build_bundle(incidents: list[dict]) -> dict:
         cl = _content_license(i)
         if cl:
             sdo["x_content_license"] = cl
+        # Upstream-freshness marker (D57): only on rows whose source has stopped
+        # refreshing; absent otherwise, never null.
+        sf = _source_freshness(i)
+        if sf:
+            sdo["x_source_freshness"] = sf
         objects.append(sdo)
         for t in i.get("mitre_atlas") or []:
             rid = _sid("relationship", iid, "uses", t)

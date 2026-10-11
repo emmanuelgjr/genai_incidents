@@ -109,10 +109,14 @@ Key fields per record (full reference in the data dictionary):
   when you mean "notable incidents"
 - `corpus` — `security` or `ai-harm`
 - `source_freshness` — present only on rows whose upstream source has stopped refreshing (see below)
+- `status` — present only on a row that is not standing as published (absence means it stands).
+  {disputed} of the rows above carry `status: disputed`: every CVE record they rest on is
+  listed by the CVE Program as published but disputed. They are **counted** in the {count}
+  and carry a lowered `confidence`; retracted rows are omitted from this export
 
 ### Source freshness
 
-Some rows carry a `source_freshness` object (`{{status, as_of, sources}}`). It says that
+Some rows carry a `source_freshness` object (`{{status, as_of, sources, review_by}}`). It says that
 the **upstream source that supplied the row has stopped refreshing** — not that the row
 was withdrawn, superseded, or is wrong. The two are independent facts, and the field
 exists because conflating them is how a dataset comes to mislead without any single
@@ -124,7 +128,9 @@ repository's published freshness registry (`data/source_freshness.json`), and `a
 the earliest `last_success` date recorded there for those sources — a date taken from the
 registry, **not** the build date. Everything that source contributed to the row,
 including any taxonomy or risk-tier tags it supplied, is current through `as_of` and no
-further. Absence of the field means no *tracked* source feeding the row is known to be
+further. `review_by` is the date a human is due to re-decide whether that source is
+refreshed or retired (the `until` of the registry hold); it is a declared date that
+nothing evaluates, not a claim that anything happens then. Absence of the field means no *tracked* source feeding the row is known to be
 stale — not that the row has been verified current. Full definition, the registry's own
 fields, and what the registry does and does not cover:
 [`docs/DATA_DICTIONARY.md` → Source freshness](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATA_DICTIONARY.md#source-freshness),
@@ -215,9 +221,20 @@ def build(out_dir: Path) -> tuple[int, Path]:
         for inc in incidents:
             fh.write(json.dumps(inc, ensure_ascii=False, sort_keys=True) + "\n")
     n = len(incidents)
+    disputed = sum(1 for e in incidents if e.get("status") == "disputed")
+    # Invariant 6: the card's counts come from data/stats.json; the rows just
+    # written are the independent path that must agree with it.
+    stats_path = DATA / "stats.json"
+    if stats_path.exists():
+        st = json.loads(stats_path.read_text(encoding="utf-8"))
+        if (st.get("incident_count"), st.get("disputed_count")) != (n, disputed):
+            raise SystemExit(
+                f"[hf] data/stats.json says incident_count={st.get('incident_count')} "
+                f"disputed_count={st.get('disputed_count')} but the exported rows give "
+                f"{n}/{disputed} -- run scripts/render_markdown.py")
     size_cat = ("n<1K" if n < 1_000 else "1K<n<10K" if n < 10_000
                 else "10K<n<100K" if n < 100_000 else "100K<n<1M")
-    card = CARD.format(count=f"{n:,}", version=raw.get("version", "?"),
+    card = CARD.format(count=f"{n:,}", disputed=f"{disputed:,}", version=raw.get("version", "?"),
                        size_cat=size_cat, repo="emmanuelgjr/genai-incidents",
                        taxonomy_versions=as_text(taxonomy_versions()))
     (out_dir / "README.md").write_text(card, encoding="utf-8", newline="\n")

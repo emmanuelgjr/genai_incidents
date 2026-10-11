@@ -9,6 +9,7 @@ with no marker at all" shapes of drift).
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -109,7 +110,8 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
     """
     stats_path = tmp_path / "stats.json"
     stats_path.write_text(
-        '{"incident_count": 12986, "landmark_count": 1865, "version": "2.8.0", '
+        '{"incident_count": 12986, "retracted_count": 0, "disputed_count": 0, '
+        '"landmark_count": 1865, "version": "2.8.0", '
         '"generated": "2026-07-12", "year_min": 1983, "year_max": 2026}',
         encoding="utf-8",
     )
@@ -130,6 +132,16 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
     (tmp_path / "CITATION.cff").write_text(
         'version: "2.8.0"\ndate-released: "2026-07-12"\npreferred-citation:\n  version: "2.8.0"\n',
         encoding="utf-8")
+    # Corpus fixtures for the stats-vs-corpus check (v2.13.0 item 8): 12,986
+    # standing rows, 1,865 landmark, 0 retracted/disputed, in both file shapes.
+    rows = [{"id": f"INC-{n:05d}", "tier": "landmark" if n < 1865 else "feed"}
+            for n in range(12986)]
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "incidents.json").write_text(
+        json.dumps({"incidents": rows}), encoding="utf-8")
+    (tmp_path / "src" / "genai_incidents" / "data").mkdir(parents=True)
+    (tmp_path / "src" / "genai_incidents" / "data" / "incidents.min.json").write_text(
+        json.dumps({"incidents": rows}), encoding="utf-8")
     monkeypatch.setattr(lib, "STATS_PATH", stats_path)
     monkeypatch.setattr(lib, "DOC_SURFACES", [surface])
     monkeypatch.setattr(checker, "DOC_SURFACES", [surface])
@@ -145,3 +157,49 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
     assert "12,986" in surface.read_text(encoding="utf-8")
 
     assert checker.main() == 0  # fixed: passes now
+
+
+# --- v2.13.0 item 8 / D64: disputed_count is a SUBSET of incident_count -----
+
+
+def _rows():
+    return [
+        {"id": "INC-1", "tier": "landmark"},
+        {"id": "INC-2", "status": "disputed", "status_reason": {"code": "cve-disputed"}},
+        {"id": "INC-3", "status": "retracted", "status_reason": {"code": "cve-rejected"}},
+        {"id": "INC-4"},
+    ]
+
+
+def test_derive_counts_keeps_disputed_inside_incident_count():
+    c = checker.derive_counts(_rows())
+    assert c == {"incident_count": 3, "retracted_count": 1,
+                 "disputed_count": 1, "landmark_count": 1}
+    # invariant 1: no combined headline -- the three are never summed anywhere
+    assert "standing_count" not in c and "total_count" not in c
+
+
+def test_stats_vs_corpus_clean_when_equal():
+    stats = checker.derive_counts(_rows())
+    assert checker.check_stats_vs_corpus(stats, _rows(), _rows()) == []
+
+
+def test_stats_vs_corpus_fires_on_wrong_disputed_count():
+    stats = checker.derive_counts(_rows())
+    stats["disputed_count"] = 0
+    errs = checker.check_stats_vs_corpus(stats, _rows(), _rows())
+    assert len(errs) == 2 and all("disputed_count" in e for e in errs)
+
+
+def test_stats_vs_corpus_fires_when_only_the_slim_mirror_disagrees():
+    stats = checker.derive_counts(_rows())
+    slim = [r for r in _rows() if r["id"] != "INC-2"]  # mirror lost a disputed row
+    errs = checker.check_stats_vs_corpus(stats, _rows(), slim)
+    assert errs and all("incidents.min.json" in e for e in errs)
+
+
+def test_disputed_and_retracted_markers_are_templated():
+    stats = {**STATS, "disputed_count": 22, "retracted_count": 29}
+    text = "<!-- stats:disputed_count -->1<!-- /stats:disputed_count -->"
+    new, changes = lib.render_text(text, stats)
+    assert "22" in new and changes

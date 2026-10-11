@@ -20,8 +20,23 @@ LLM/ASI, corpus, tier), ``mitre-atlas:technique="…"``, and ``veris:*``
 machinetags (VERIS 1.4.1 enum paths derived from ``attack_vector`` via the
 hand-curated ``mappings/veris.json``) on the title attribute.
 
+Rows whose upstream source has stopped refreshing (`source_freshness`, D57)
+carry three more machinetags on every attribute of the row:
+``genai-incidents:source-freshness``, ``genai-incidents:source-as-of`` and
+``genai-incidents:source-review-by`` (omitted when the row has no review date).
+Attribute-level because events are per-year: an event-level tag would mark ~15
+unrelated incidents per row.
+
 Determinism: event/attribute UUIDs are UUIDv5 and every ``timestamp`` is derived
-from the year (fixed epoch), so the feed is byte-stable across rebuilds.
+from the data -- an event's timestamp is the newest `updated` date among its
+incidents (UTC midnight, unix seconds) plus ``EXPORTER_VERSION`` seconds -- so
+the feed is byte-stable across rebuilds. MISP decides whether to re-pull an
+event by comparing the manifest timestamp with its stored copy, so the stamp
+MUST move when an event's content moves: it does, because `updated` moves
+exactly when an entry's content fields change (merge_and_dedupe.py
+`_CONTENT_FIELDS`), and EXPORTER_VERSION covers exporter-side changes (a new
+machinetag). Before v2.13.0 the stamp was the fixed Jan 1 of the event's year,
+which meant no content change ever reached a subscribed instance.
 Generated at Pages build time and git-ignored — never committed.
 """
 
@@ -50,6 +65,13 @@ try:
 except (OSError, json.JSONDecodeError):
     _VERIS_MAP = {}
 
+# Bump when the event/attribute shape or the entry -> attribute mapping changes
+# (a new machinetag, a changed comment). Added, in seconds, to every event
+# timestamp so a subscribed MISP re-pulls. History: 0 = implicit up to v2.12.0
+# (fixed Jan-1-of-year stamps); 1 = v2.13.0 item 8 (source-freshness machinetags;
+# stamps derived from `updated`).
+EXPORTER_VERSION = 1
+
 # Fixed namespace (shared scheme with the STIX export) so ids are stable.
 NS = uuid.UUID("6f1a9c4e-9b2d-5e7a-8c3f-0a1b2c3d4e5f")
 ORG_UUID = str(uuid.uuid5(NS, "misp-orgc|genai-incidents"))
@@ -67,6 +89,37 @@ def _year_epoch(year: int) -> str:
         return str(calendar.timegm((int(year), 1, 1, 0, 0, 0, 0, 0, 0)))
     except (TypeError, ValueError):
         return "1704067200"  # 2024-01-01
+
+
+def _event_timestamp(year: int, incidents: list[dict]) -> str:
+    """Unix-seconds stamp (string): newest `updated` among the event's incidents
+    (falling back to `added`, then the year's Jan 1) + EXPORTER_VERSION seconds."""
+    best = 0
+    for e in incidents:
+        d = (e.get("updated") or e.get("added") or "").strip()
+        try:
+            y, m, dd = (int(x) for x in d[:10].split("-"))
+            best = max(best, calendar.timegm((y, m, dd, 0, 0, 0, 0, 0, 0)))
+        except (ValueError, TypeError):
+            continue
+    if not best:
+        best = int(_year_epoch(year))
+    return str(best + EXPORTER_VERSION)
+
+
+def _freshness_tags(e: dict) -> list[dict]:
+    """D57 machinetags for a row whose upstream source has stopped refreshing:
+    from the row's own `source_freshness` marker, only on marked rows, with
+    `source-review-by` only when the marker carries a review date."""
+    sf = e.get("source_freshness")
+    if not sf:
+        return []
+    tags = []
+    for pred, key in (("source-freshness", "status"), ("source-as-of", "as_of"),
+                      ("source-review-by", "review_by")):
+        if sf.get(key):
+            tags.append(_tag(f'genai-incidents:{pred}="{sf[key]}"'))
+    return tags
 
 
 def _tag(name: str) -> dict:
@@ -92,7 +145,7 @@ def _incident_tags(e: dict) -> list[dict]:
     for mt in _VERIS_MAP.get(e.get("attack_vector") or "", []):
         pred, _, val = mt.partition("=")
         tags.append(_tag(f'veris:{pred}="{val}"'))
-    return tags
+    return tags + _freshness_tags(e)
 
 
 def _attr(e: dict, atype: str, category: str, value: str,
@@ -122,14 +175,16 @@ def _incident_attributes(e: dict) -> list[dict]:
         if c in rejected:
             continue
         attrs.append(_attr(e, "vulnerability", "External analysis", c, False,
-                           [_tag(f'genai-incidents:incident-id="{e["id"]}"')]))
+                           [_tag(f'genai-incidents:incident-id="{e["id"]}"')]
+                           + _freshness_tags(e)))
     seen_urls: set[str] = set()
     for r in e.get("references") or []:
         url = (r.get("url") or "").strip()
         if url.startswith("http") and url not in seen_urls:
             seen_urls.add(url)
             attrs.append(_attr(e, "link", "External analysis", url, False,
-                               [_tag(f'genai-incidents:incident-id="{e["id"]}"')],
+                               [_tag(f'genai-incidents:incident-id="{e["id"]}"')]
+                               + _freshness_tags(e),
                                seq=f"link{len(seen_urls)}"))
     return attrs
 
@@ -145,13 +200,13 @@ def _taxonomy_version_tags() -> list[dict]:
             for k, v in taxonomy_versions().items() if v is not None]
 
 
-def _event_meta(year: int) -> dict:
+def _event_meta(year: int, incidents: list[dict] | None = None) -> dict:
     return {
         "info": f"GenAI / agentic-AI security incidents — {year}",
         "date": f"{year}-01-01",
         "analysis": "2",          # completed
         "threat_level_id": "3",   # low (catalogue, not active campaign)
-        "timestamp": _year_epoch(year),
+        "timestamp": _event_timestamp(year, incidents or []),
         "published": True,
         "Orgc": ORGC,
         "Tag": [_tag("tlp:clear"), _tag('genai-incidents:feed="dataset"')]
@@ -175,7 +230,7 @@ def build(incidents: list[dict]) -> tuple[int, int]:
 
     for year in sorted(by_year):
         ev_uuid = _uuid("event", str(year))
-        meta = _event_meta(year)
+        meta = _event_meta(year, by_year[year])
         attributes: list[dict] = []
         for e in sorted(by_year[year], key=lambda x: x["id"]):
             for a in _incident_attributes(e):
@@ -239,7 +294,13 @@ incident's CVEs, reference links and title become tagged attributes
 per the VERIS 1.4.1 crosswalk in `mappings/veris.json`). Every event (and its
 `manifest.json` entry) carries `genai-incidents:taxonomy-<name>="<version>"`
 tags (atlas, owasp-llm, owasp-asi, veris; capec once versioned) naming the
-pinned taxonomy releases the tags refer to.
+pinned taxonomy releases the tags refer to. Attributes of rows whose upstream
+source has stopped refreshing additionally carry
+`genai-incidents:source-freshness="stale"`, `genai-incidents:source-as-of="<date>"`
+and `genai-incidents:source-review-by="<date>"` (the row's own `source_freshness`
+marker; absent on every other row). Each event's `timestamp` is the newest
+`updated` date among its incidents, so MISP re-pulls an event exactly when its
+content changed.
 
 ## Subscribe (MISP)
 
