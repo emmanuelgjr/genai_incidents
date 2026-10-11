@@ -61,6 +61,56 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - No row in `data/incidents.json` or `incidents.min.json` changed. Field-level delta:
   `docs/audits/ws6-v2130-export-integrity-2026-10-11.md`.
 
+### Added - N9 precision audit: seeded stratified sample, review sheet, Wilson script, DATASHEET section and validate gate (agent-suggested; measurement pending)
+
+- `scripts/precision_sample.py` draws a seeded (`20261011`), stratified sample.
+  It takes 100 rows from the `feed` tier and 50 from the `landmark` tier. The
+  strata are tier x source family, and allocation is proportional within each
+  tier. Inside a stratum, the draw is systematic over (quality_tier, year, id).
+  Retracted rows are excluded. The output goes to
+  `docs/audits/precision/2026-10-11/`: the frame with population per stratum,
+  the sample, and the review sheet. `--check` reproduces every generated file
+  byte-for-byte; a different seed does not reproduce them. The frame is `tier`,
+  not `quality_tier == "auto"`. The two overlap, and most of the CVE/GHSA rows
+  behind board note N9 are `quality_tier: reviewed` (see the audit README).
+- `review_sheet.csv` comes pre-filled with **agent-suggested** labels and
+  reasons (`suggested_by: agent`). The `human_label`/`human_by` columns are
+  empty. No row has been human-reviewed. The suggestions are not a
+  measurement and are not quoted as one; `agent_suggested_precision.json`
+  holds them, marked as such.
+- `scripts/wilson_ci.py` computes Wilson 95% intervals per tier, per stratum
+  and overall from **human labels only**. It uses a stratified estimator
+  weighted to stratum populations, at Kish effective n, and reports both
+  `unsure` treatments. Labels without a reviewer, or with a reviewer that names
+  an agent or model, are refused. With only suggestions filled, it reports
+  "no human labels". It is unit-tested against Newcombe (1998), Table I. It
+  also gives per-`quality_tier` domain estimates within each tier, flagged
+  when n < 30. The sheet loader tolerates a spreadsheet's byte-order mark,
+  CRLF line endings and re-quoting.
+- `docs/DATASHEET.md` has a new "Measured precision" section. The figure block
+  is generated from `results.json` (`wilson_ci.py --render-datasheet`) and
+  currently reads "measurement pending", with the method, sample size and date.
+- `scripts/validate.py` has a new precision gate. In every status (pending,
+  partial and measured) it checks that:
+  - the audit directory is the pinned one, with no other dated directory
+    beside it;
+  - the sample's entries match their own declared hash and a hash pinned in
+    code;
+  - the whole `frame.json` (stratum populations, which are the estimator's
+    weights) matches a second hash pinned in code;
+  - the sheet ids match the sample;
+  - `results.json` and the DATASHEET block equal a fresh computation.
+
+  While the measurement is pending or partial, it also requires a D28-form
+  marker (`pending_authorization.json`). The marker's decision id is a
+  placeholder for the user. While it is unratified, the gate passes with a
+  warning through dataset version 2.13.x and fails from 2.14.0.
+- `scripts/evaluate_ai_relevance.py` scores `ai_relevance.assess()` against the
+  human labels with a confusion matrix. It does not run until the sheet
+  returns: today it prints "no human labels".
+- `.gitattributes`: `docs/audits/precision/**` is kept LF, so the
+  byte-for-byte check holds on every OS. No `data/*.json` change.
+
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 
 - `scripts/check_stats_drift.py` additionally fails CI when the README

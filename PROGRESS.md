@@ -40,6 +40,169 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 8 (export integrity + D57 + D64) — **PASS (re-gate on `38b231c8`, 2026-10-11)**. Before merge: the A2 JS-panel disputed figure, plus merging main into the branch.
+- **Verdict:** "The fix at 38b231c8 closes the D64 defect from bounce #1, and everything else holds."
+- **Gate evidence:**
+  - the markers are rendered: stats=21 rewrites all three surfaces;
+  - drift fires on each surface (23), and render restores byte-exact;
+  - no combined headline count;
+  - the surface sweep finds only og/twitter outside markers (acceptable);
+  - full chain: 65,141 STIX objects / 31 MISP events; sums 35/8/35/3 pass `sha256sum -c`; the STIX bundle and jsonl are byte-identical to the 09fcc03f export;
+  - 793 passed alone, 850 in a scratch merge with main.
+- **Advisories:**
+  - A1: CHANGELOG conflict with main (trivial);
+  - **A2: the docs/app.js stats panel has no disputed figure** (being fixed);
+  - A3: og/twitter is acceptable;
+  - A4: the specialist's "3 files" was a partial local tree; docs/data is gitignored.
+- **Rulings pending to the user:** R1-R5 (the gate recommends accepting R1-R4; R5 as a follow-up).
+
+### ✅ Item 5 (N9 precision audit) — **DONE: MERGED to main (2026-10-11)** after the advisory fix `1f5a0ef8` (validate.yml `fetch-depth: 0`, which also lets the v2.10.0-tag test run in CI).
+- **Foreman [R] after merge:**
+  - 0 deletions; porcelain empty;
+  - validate gives "15666/15666 entries valid" and "precision: pending -- WARNING: pending state UNRATIFIED (... passes only through 2.13.x)";
+  - drift clean;
+  - **801 passed, 1 xfailed**.
+- **User actions outstanding:** label the 150-row sheet, or ratify the pending state before 2.14.0. Deviations A1 (feed ≠ auto; INCLUSION §5 false), A3 and A4 come to the user in the next combined ask. **Notes → docs-warden:** INCLUSION §4/§5.
+
+### ✅ Item 7 stage 1 — **advisory re-check PASS on `80ec9009` (2026-10-11)**
+- **Gate evidence:**
+  - its own AIRI edit now gives rc 1, "content change INC-01702/INC-01706 (D71)";
+  - a depth-1 clone with the file deleted at HEAD fails closed, and with the file present builds (15,666, not first build);
+  - gate removed: 6 abort tests fail and the A2 counter-test passes (no cascade);
+  - AIRI dropped from the list: 2 fail, including the real-build test;
+  - the helper hash change does not weaken anything;
+  - 768 passed; data identical.
+- **Advisories:**
+  - the AIRI reading is the foreman's (a revived AIRI turns the weekly run red);
+  - the gate's stray wait-loop task was stopped by the foreman (TaskStop b833cg32i);
+  - the baseline is the checked-out HEAD.
+- **Merge:** `git merge-tree` vs main shows conflicts in CHANGELOG.md and scripts/merge_and_dedupe.py (main gained items 4, D69 and 5). **A FRESH pipeline-engineer is merging origin/main into the branch.** It resolves the conflicts keeping both behaviours, rebuilds, and re-derives the delta vs main (expected: 3,936 rows × 2 label fields only). A scoped re-check follows before the merge to main.
+
+### 🔁 Item 8 — **BOUNCE #1 (red-reviewer on `09fcc03f`, 2026-10-11)**: a FRESH distribution-engineer is on it (the original specialist ran about 274k tokens)
+- **Defect:** D64 is partly delivered. `disputed_count` is missing from the count-quoting doc surfaces: README:48, DATASHEET:20, the site hero at index.html:116, and og/twitter. There is no `stats:disputed_count` marker anywhere, so drift never guards it. **Foreman's own contribution:** my dispatch line (above) shortened the ruling to "`disputed_count` in stats"; the brief itself said "every surface".
+- **Advisories:**
+  - **A1:** the gate's own stray `C:\proc\self\fd\1\build_manifest.json` (Git Bash /dev/stdout translation). **Foreman inspected it** (the only file was its manifest) **and removed `C:\proc`.**
+  - A2: DATA_DICTIONARY and the TAXII README overclaim "exactly" (being fixed).
+  - A3: a removal-only change doesn't move the MISP timestamp; STIX has no `revoked` for retractions. **Follow-up note → WS6.**
+  - A4: the R1 test probes only one entry's fields.
+  - A5: `VERSION = "2.0.0"` (pre-existing, → WS6-T1).
+  - A6: no stix2 validator.
+  - A7: a missing full stop.
+- **Gate's view on the user rulings:**
+  - R1: accept adding tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS` (not a defect of item 8).
+  - R2: low risk; verify on the first real release.
+  - R3: needed.
+  - R4: benign.
+  - R5: follow-up `x_status` plus a MISP tag.
+- **Gate evidence:**
+  - byte-exact builds;
+  - its own STIX per-object diff: 65,141 objects, moved only `modified` plus 1,382 `x_source_freshness`, 0 invalid timestamps;
+  - live STIX sha = base sha 693975e6;
+  - MISP: only 6,002 tag appends plus 31 timestamps, re-derived;
+  - D57 set = 1,382, review_by 2027-01-07;
+  - all trees pass `sha256sum -c`; two runs give identical sums;
+  - manifest built_at = committer date;
+  - 7 hand-made fire proofs;
+  - 792 passed;
+  - merge-tree vs main is clean.
+
+### ✅ Item 5 (N9 precision audit) — **PASS (re-gate on `fdabdd78`, 2026-10-11)**. `fetch-depth: 0` is being added before merge.
+- **Verdict, in the gate's words:** "All three bypasses I found last time now fail validation in the measured state, and nothing new is wrong."
+- **Gate evidence:**
+  - Its own probes in the measured state (control []): swapped id → sample-pin failure; feed/oecd 3810→10 → frame-pin failure (`canonical_sha256`, CRLF-proof); extra dated dir → failure.
+  - The Hajek domain estimator was re-derived by hand (0.8).
+  - The shallow fallback skips loudly and never passes silently.
+  - read_sheet refusals fire.
+  - 801 passed; the CI build path leaves porcelain empty; no data change.
+- **Advisories:**
+  - A5: CI is shallow, so the pinned-blob test skips after data moves. **`fetch-depth: 0` is being added.**
+  - A `2026-10-11b`-style dir is not flagged (harmless).
+  - The wilson CLI uses the newest dir (the gate fails if extras exist).
+  - **Carried to the user:**
+    - A1: feed ≠ auto, and INCLUSION §5 is false.
+    - A3: the 2.14.0 tripwire.
+    - A4: INCLUSION §4 claims a per-ingest sample-audit gate.
+    - A2: memo `ruled_by` should be `decided_by`.
+    - A6: a hand-typed figure outside the block.
+
+### 🔁 Item 5 — **BOUNCE #1 (red-reviewer on `072115cc`, 2026-10-11)**: specialist redispatched
+- **Defect (agreement 6):** the code pin and the sampling frame are checked only while pending. `validate.py:840` returns early on `measured`, before the pin.
+  - Demonstrated in measured state:
+    - a swapped sample id plus a recomputed hash gives [];
+    - frame.json feed/oecd 3810→10 moves published feed precision 53.1%→63.4%, still [];
+    - a newer dated dir would bypass the pin.
+  - The CHANGELOG claims an unqualified pin.
+  - **Fix:**
+    - pin the sample and frame in every status;
+    - pin the dir;
+    - add measured-state fire tests.
+- **Advisories:**
+  - A1: "100 auto" = tier feed is a **faithful reading.** INCLUSION.md §5 itself calls the feed `quality_tier: auto`, yet 69% of the feed is `reviewed`, so **§5 is false**. → docs-warden; a CORRECTIONS row is the user's call. Per-quality_tier figures are claimed but not produced (being fixed).
+  - A2: the D28 field `decided_by` is confirmed. The OECD memo:342 says `ruled_by`, which is wrong (record; note).
+  - A3: the version-keyed grace is not a can't-fail check. Tripwire: CI goes red at the 2.14.0 bump unless the user rules.
+  - A4: INCLUSION §4 claims a per-ingest-change sample-audit CI gate that doesn't exist. → docs-warden.
+  - A5: the reproduction tests skip after data moves (being fixed).
+  - A6: a hand-typed figure outside the block is undetectable.
+  - A7: spot-check of the agent suggestions: 10/10 agree.
+  - A8: invariant 7 is clean.
+  - A9: merge-tree is clean vs main; expect a trivial conflict with item 8 in test_landmark_distribution.
+  - A10: Excel BOM risk (being fixed).
+- **Foreman [R]:** `scripts/validate.py:839-841` read: `if status == "measured": return problems, ...` precedes the `fresh_sha != required_sha` check at :858. Confirmed.
+
+### 🔍 Item 8 (export integrity + D57 + D64) — specialist reported `09fcc03f` (pushed); **red-reviewer dispatched**
+- **Premise corrections:**
+  - STIX `modified` was already `_ts(updated)`; the exporter-version half was missing.
+  - SHA256SUMS covered docs/data only, ran BEFORE the STIX export in pages.yml, and never listed the STIX bundle.
+  - TAXII and MISP had no sums.
+  - GitHub Releases carry no assets.
+  - The MISP event timestamp was fixed at Jan 1 (so no change ever reached subscribers).
+- **Delivered:**
+  - modified = `<updated>T00:00:00.<EXPORTER_VERSION>Z`;
+  - sums plus build_manifest.json on site/data, taxii2, misp, a new release-assets.yml, HF and PyPI;
+  - built_at = committer date or SOURCE_DATE_EPOCH, written only by the export and release steps;
+  - D57: x_source_freshness on 1,382 SDOs and MISP tags on 6,002 attributes;
+  - D64: disputed_count 22, DISPUTED notes on 22 cards; check_stats_drift re-derives the counts;
+  - 792 passed.
+- **One-time consumer effect:** every STIX/TAXII `modified` and all 31 MISP event timestamps move once.
+- **For the user, after the gate:**
+  - R1: `updated` ignores tier, quality_tier, corpus and content_license. Recommendation: add them to `_CONTENT_FIELDS` (pipeline-engineer's file).
+  - R2: new write-capable release-assets.yml and a Pages `_site` check, neither run on GitHub yet.
+  - R3: MISP timestamp change (needed for D57 to propagate).
+  - R4: identity over-bump.
+  - R5: disputed status isn't in STIX or MISP.
+
+### 🔍 Item 5 (N9 precision audit) — specialist reported `072115cc` (pushed); **red-reviewer dispatched**
+- **Delivered:**
+  - a seeded (20261011), stratified sample of 150 rows: 9 strata, proportional allocation, feed 100 / landmark 50;
+  - a review sheet with agent suggestions and empty human columns;
+  - `wilson_ci.py`, which uses human labels only;
+  - a DATASHEET "Measured precision" block rendered from results.json;
+  - `check_precision_audit` in validate.py, with a D28-style marker;
+  - `evaluate_ai_relevance.py`, which waits for human labels;
+  - 791 passed; no data change.
+- **Deviations from the brief (the user must hear these):**
+  1. **"100 auto" became 100 from tier=feed.** 185 landmark rows are quality_tier auto, and 5,015 of 7,968 CVE/GHSA feed rows are `reviewed`, so an auto-only sample would miss most of N9.
+  2. The marker field is `decided_by`, as in the real D28 files.
+  3. An unratified pending state passes with a warning through 2.13.x and fails from 2.14.0.
+- **Agent-suggested precision (NOT measured):** feed 53.1% (unsure excluded) / 47.2% (strict); landmark 100% / 81.7%; CVE/GHSA 54.5%. **A new finding to confirm:** OECD feed rows look weaker (5/19).
+- **User action:** label 150 rows (human_label + human_by), then run `wilson_ci.py --render-datasheet` and `evaluate_ai_relevance.py`; or ratify the pending state before 2.14.0.
+
+### 🔄 Items 8 + 5 — **DISPATCHED in parallel (2026-10-11)**
+- **Item 8:** distribution-engineer on `ws6/v2130-export-integrity` (worktree `ws6-v2130-export`, base `6da13032`). Scope:
+  - STIX `modified` derived from `updated` plus the exporter version;
+  - SHA256SUMS over STIX, TAXII and MISP;
+  - build_manifest.json on every channel, kept deterministic;
+  - **D57** STIX `x_source_freshness` + MISP freshness tags + the HF card line;
+  - **D64** DISPUTED card note + `disputed_count` in stats.
+- **Item 5:** label-scientist on `ws2/v2130-precision-audit` (worktree `ws2-v2130-precision`, base `6da13032`). Scope:
+  - a seeded, stratified 100 auto + 50 landmark sample under `docs/audits/precision/2026-10-11/`;
+  - a review sheet with `suggested_by: agent` and empty human columns;
+  - a Wilson 95% script that uses human labels only;
+  - a DATASHEET "Measured precision" section, pending until results;
+  - a validate gate with a D28-style override, whose decision id is left for the user;
+  - the ai_relevance.py evaluation waits for the user's returned sheet.
+- **Item 9** (OWASP ASI 2026) waits for the stage-1 merge, because it changes data.
+
 - **Foreman note on MASTER_IMPROVEMENT_PLAN invariant 9 (:49, :183), 2026-10-11:** the plan text was read. "IDs ... never reused" is a forward-looking RULE, not a factual claim about history, so it is left unchanged: invariant and policy wording belongs to the user (CLAUDE.md). The historical violations (12 withdrawn + 3 release-dependent IDs that changed meaning across v2.0.0–v2.10.0) are recorded in CORRECTIONS and in ID_POLICY §8.6, and are scoped by the queued ID-reuse audit (D70). This supersedes the line above that said "a dated foreman note follows in its own commit".
 ### ✅ D69/D70 branch — **PASS (red-reviewer on `5e64cee1`), MERGED to main under D72 (2026-10-11)**
 - **⚖ D72 (user): "Merge, flag as a behaviour change".** The `load_deprecations()` raw values flip shape for INC-00311, INC-01897 and INC-00497 (the type `str | list[str]` is unchanged). **The release-notes cut must carry a "Behaviour changes" line naming the 3 keys and pointing consumers to `resolve_id_status()`.**

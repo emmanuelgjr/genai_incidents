@@ -1,0 +1,307 @@
+{
+  "$warning": "AGENT-SUGGESTED, NOT MEASURED. Derived from agent_suggestions.json (suggested_by: agent). It is the agent's reading, not a human measurement; do not quote it as the dataset's precision. The measured figure comes only from human labels via scripts/wilson_ci.py.",
+  "suggested_by": "agent",
+  "label_counts": {
+    "in-scope": 88,
+    "out-of-scope": 39,
+    "unsure": 23
+  },
+  "estimates": {
+    "excluding_unsure": {
+      "overall": {
+        "n": 127,
+        "in_scope": 88,
+        "unweighted_precision": 0.692913,
+        "precision": 0.588848,
+        "n_eff": 104.89,
+        "ci95": [
+          0.493172,
+          0.678246
+        ],
+        "unrepresented_population": 0
+      },
+      "feed": {
+        "n": 86,
+        "in_scope": 47,
+        "unweighted_precision": 0.546512,
+        "precision": 0.531469,
+        "n_eff": 84.3,
+        "ci95": [
+          0.425913,
+          0.634281
+        ],
+        "unrepresented_population": 0
+      },
+      "landmark": {
+        "n": 41,
+        "in_scope": 41,
+        "unweighted_precision": 1.0,
+        "precision": 1.0,
+        "n_eff": 37.6,
+        "ci95": [
+          0.907312,
+          1.0
+        ],
+        "unrepresented_population": 0
+      },
+      "per_stratum": {
+        "feed/aiaaic": {
+          "n": 8,
+          "in_scope": 8,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 8.0,
+          "ci95": [
+            0.675592,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/cve-ghsa": {
+          "n": 55,
+          "in_scope": 30,
+          "unweighted_precision": 0.545455,
+          "precision": 0.545455,
+          "n_eff": 55.0,
+          "ci95": [
+            0.415227,
+            0.669747
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/oecd": {
+          "n": 19,
+          "in_scope": 5,
+          "unweighted_precision": 0.263158,
+          "precision": 0.263158,
+          "n_eff": 19.0,
+          "ci95": [
+            0.118064,
+            0.487916
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/other": {
+          "n": 4,
+          "in_scope": 4,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 4.0,
+          "ci95": [
+            0.510109,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/aiaaic": {
+          "n": 3,
+          "in_scope": 3,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 3.0,
+          "ci95": [
+            0.438503,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/aiid": {
+          "n": 34,
+          "in_scope": 34,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 34.0,
+          "ci95": [
+            0.898485,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/legacy-curated": {
+          "n": 2,
+          "in_scope": 2,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 2.0,
+          "ci95": [
+            0.34238,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/oecd": {
+          "n": 1,
+          "in_scope": 1,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 1.0,
+          "ci95": [
+            0.206549,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/other": {
+          "n": 1,
+          "in_scope": 1,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 1.0,
+          "ci95": [
+            0.206549,
+            1.0
+          ],
+          "unrepresented_population": 0
+        }
+      }
+    },
+    "strict": {
+      "overall": {
+        "n": 150,
+        "in_scope": 88,
+        "unweighted_precision": 0.586667,
+        "precision": 0.514473,
+        "n_eff": 124.88,
+        "ci95": [
+          0.427702,
+          0.60038
+        ],
+        "unrepresented_population": 0
+      },
+      "feed": {
+        "n": 100,
+        "in_scope": 47,
+        "unweighted_precision": 0.47,
+        "precision": 0.472303,
+        "n_eff": 99.92,
+        "ci95": [
+          0.377264,
+          0.569392
+        ],
+        "unrepresented_population": 0
+      },
+      "landmark": {
+        "n": 50,
+        "in_scope": 41,
+        "unweighted_precision": 0.82,
+        "precision": 0.816646,
+        "n_eff": 49.91,
+        "ci95": [
+          0.688126,
+          0.899908
+        ],
+        "unrepresented_population": 0
+      },
+      "per_stratum": {
+        "feed/aiaaic": {
+          "n": 10,
+          "in_scope": 8,
+          "unweighted_precision": 0.8,
+          "precision": 0.8,
+          "n_eff": 10.0,
+          "ci95": [
+            0.490162,
+            0.943318
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/cve-ghsa": {
+          "n": 58,
+          "in_scope": 30,
+          "unweighted_precision": 0.517241,
+          "precision": 0.517241,
+          "n_eff": 58.0,
+          "ci95": [
+            0.391623,
+            0.640718
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/oecd": {
+          "n": 28,
+          "in_scope": 5,
+          "unweighted_precision": 0.178571,
+          "precision": 0.178571,
+          "n_eff": 28.0,
+          "ci95": [
+            0.078785,
+            0.355914
+          ],
+          "unrepresented_population": 0
+        },
+        "feed/other": {
+          "n": 4,
+          "in_scope": 4,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 4.0,
+          "ci95": [
+            0.510109,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/aiaaic": {
+          "n": 5,
+          "in_scope": 3,
+          "unweighted_precision": 0.6,
+          "precision": 0.6,
+          "n_eff": 5.0,
+          "ci95": [
+            0.230724,
+            0.882379
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/aiid": {
+          "n": 39,
+          "in_scope": 34,
+          "unweighted_precision": 0.871795,
+          "precision": 0.871795,
+          "n_eff": 39.0,
+          "ci95": [
+            0.732943,
+            0.943972
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/legacy-curated": {
+          "n": 2,
+          "in_scope": 2,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 2.0,
+          "ci95": [
+            0.34238,
+            1.0
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/oecd": {
+          "n": 3,
+          "in_scope": 1,
+          "unweighted_precision": 0.333333,
+          "precision": 0.333333,
+          "n_eff": 3.0,
+          "ci95": [
+            0.061492,
+            0.79234
+          ],
+          "unrepresented_population": 0
+        },
+        "landmark/other": {
+          "n": 1,
+          "in_scope": 1,
+          "unweighted_precision": 1.0,
+          "precision": 1.0,
+          "n_eff": 1.0,
+          "ci95": [
+            0.206549,
+            1.0
+          ],
+          "unrepresented_population": 0
+        }
+      }
+    }
+  }
+}

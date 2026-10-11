@@ -1,0 +1,233 @@
+{
+  "unit": "one row of data/incidents.json",
+  "exclusions": {
+    "status == retracted": 29
+  },
+  "frame_population": 15637,
+  "tier_population": {
+    "feed": 13722,
+    "landmark": 1915
+  },
+  "tier_allocation": {
+    "feed": 100,
+    "landmark": 50
+  },
+  "explicit_strata": "tier x source_family (families < 2% of their tier pooled into <tier>/other)",
+  "implicit_strata": "within a stratum: sorted by (quality_tier, year, id), seeded systematic draw",
+  "allocation_rule": "proportional to stratum population within tier, largest-remainder rounding",
+  "source_family_priority": [
+    [
+      "cve-ghsa",
+      [
+        "CVE",
+        "GHSA",
+        "MAL"
+      ]
+    ],
+    [
+      "aiid",
+      [
+        "AIID"
+      ]
+    ],
+    [
+      "oecd",
+      [
+        "OECD"
+      ]
+    ],
+    [
+      "aiaaic",
+      [
+        "AIAAIC"
+      ]
+    ],
+    [
+      "avid",
+      [
+        "AVID"
+      ]
+    ],
+    [
+      "arxiv",
+      [
+        "ARXIV"
+      ]
+    ],
+    [
+      "legacy-curated",
+      [
+        "INC",
+        "LEGACY"
+      ]
+    ],
+    [
+      "other",
+      []
+    ]
+  ],
+  "pool_below_share_of_tier": 0.02,
+  "strata": [
+    {
+      "stratum": "feed/aiaaic",
+      "tier": "feed",
+      "population": 1324,
+      "allocated": 10,
+      "population_by_quality_tier": {
+        "auto": 1117,
+        "reviewed": 207
+      },
+      "population_by_year_band": {
+        "2023": 293,
+        "2024": 307,
+        "2025": 217,
+        "2026": 45,
+        "<=2022": 462
+      },
+      "drawn": 10
+    },
+    {
+      "stratum": "feed/cve-ghsa",
+      "tier": "feed",
+      "population": 7968,
+      "allocated": 58,
+      "population_by_quality_tier": {
+        "auto": 2953,
+        "reviewed": 5015
+      },
+      "population_by_year_band": {
+        "2023": 426,
+        "2024": 900,
+        "2025": 1194,
+        "2026": 4303,
+        "<=2022": 1145
+      },
+      "drawn": 58
+    },
+    {
+      "stratum": "feed/oecd",
+      "tier": "feed",
+      "population": 3810,
+      "allocated": 28,
+      "population_by_quality_tier": {
+        "reviewed": 3810
+      },
+      "population_by_year_band": {
+        "2025": 2,
+        "2026": 2709,
+        "<=2022": 1099
+      },
+      "drawn": 28
+    },
+    {
+      "stratum": "feed/other",
+      "tier": "feed",
+      "population": 620,
+      "allocated": 4,
+      "population_by_quality_tier": {
+        "auto": 157,
+        "reviewed": 463
+      },
+      "population_by_year_band": {
+        "2023": 80,
+        "2024": 157,
+        "2025": 178,
+        "2026": 133,
+        "<=2022": 72
+      },
+      "drawn": 4
+    },
+    {
+      "stratum": "landmark/aiaaic",
+      "tier": "landmark",
+      "population": 193,
+      "allocated": 5,
+      "population_by_quality_tier": {
+        "auto": 185,
+        "reviewed": 8
+      },
+      "population_by_year_band": {
+        "2023": 27,
+        "2024": 18,
+        "2025": 28,
+        "2026": 3,
+        "<=2022": 117
+      },
+      "drawn": 5
+    },
+    {
+      "stratum": "landmark/aiid",
+      "tier": "landmark",
+      "population": 1471,
+      "allocated": 39,
+      "population_by_quality_tier": {
+        "curated": 3,
+        "reviewed": 1468
+      },
+      "population_by_year_band": {
+        "2023": 158,
+        "2024": 273,
+        "2025": 412,
+        "2026": 124,
+        "<=2022": 504
+      },
+      "drawn": 39
+    },
+    {
+      "stratum": "landmark/legacy-curated",
+      "tier": "landmark",
+      "population": 77,
+      "allocated": 2,
+      "population_by_quality_tier": {
+        "curated": 76,
+        "reviewed": 1
+      },
+      "population_by_year_band": {
+        "2023": 1,
+        "2024": 5,
+        "2025": 46,
+        "2026": 24,
+        "<=2022": 1
+      },
+      "drawn": 2
+    },
+    {
+      "stratum": "landmark/oecd",
+      "tier": "landmark",
+      "population": 128,
+      "allocated": 3,
+      "population_by_quality_tier": {
+        "curated": 1,
+        "reviewed": 127
+      },
+      "population_by_year_band": {
+        "2026": 42,
+        "<=2022": 86
+      },
+      "drawn": 3
+    },
+    {
+      "stratum": "landmark/other",
+      "tier": "landmark",
+      "population": 46,
+      "allocated": 1,
+      "population_by_quality_tier": {
+        "curated": 39,
+        "reviewed": 7
+      },
+      "population_by_year_band": {
+        "2023": 3,
+        "2024": 6,
+        "2025": 19,
+        "2026": 13,
+        "<=2022": 5
+      },
+      "drawn": 1
+    }
+  ],
+  "seed": 20261011,
+  "rng": "random.Random(f'{seed}|{stratum}') per stratum; systematic draw (random start in [0, N/n))",
+  "data_incidents_sha256": "513ac8322a429d5a1d21a1a6bd99db5fbc5420cdde9e0188ad0f2baf8249b19c",
+  "data_hash_recipe": "sha256 of json.dumps(data['incidents'], sort_keys=True, separators=(',',':'), ensure_ascii=False).encode('utf-8')",
+  "audit_date": "2026-10-11"
+}

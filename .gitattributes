@@ -32,3 +32,7 @@ docs/data/*.json            text eol=lf linguist-generated=true
 docs/charts/*.svg           text eol=lf linguist-generated=true
 src/genai_incidents/data/*.json text eol=lf linguist-generated=true
 ingest/*.json               text eol=lf linguist-generated=true
+
+# N9 precision audit: the review sheet (CSV) and its siblings are compared
+# byte-for-byte by scripts/precision_sample.py --check; keep LF on every OS.
+docs/audits/precision/** text eol=lf

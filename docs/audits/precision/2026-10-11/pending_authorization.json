@@ -1,0 +1,10 @@
+{
+  "$note": "N9 precision audit, pending-measurement authorisation in the D28 marker form (decision id, decided_by user, entries_sha256 pinned in code: scripts/validate.py REQUIRED_PRECISION_SAMPLE_ENTRIES_SHA256). Written 2026-10-11 by label-scientist (agent). NO USER RULING EXISTS YET: `decision` and `decided` are placeholders for the user to fill. Until the user fills them AND sets REQUIRED_PRECISION_PENDING_DECISION in scripts/validate.py to the same id, the pending state is UNRATIFIED: validate.py passes it with a warning only through dataset version 2.13.x and fails it from 2.14.0. When the human-labelled sheet is committed and every row is labelled, status becomes `measured` and this marker is no longer consulted.",
+  "authorization": {
+    "decision": "<USER-DECISION-ID>",
+    "decided": "<YYYY-MM-DD>",
+    "decided_by": "user",
+    "approved": "Publishing docs/DATASHEET.md with the 'Measured precision' section in its pending state (method, sample size and date; no precision figure) while the human review of the 150-row sample in review_sheet.csv is outstanding. Covers exactly the sample whose entries hash is below.",
+    "entries_sha256": "4fb93c0581a40de290799d9a5b36fe894ee6ccad67089c970813c9f9190cc189"
+  }
+}
