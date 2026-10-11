@@ -40,10 +40,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 5 (N9 precision audit) — **DONE: MERGED to main (2026-10-11)** after the advisory fix `1f5a0ef8` (validate.yml `fetch-depth: 0`, which also lets the v2.10.0-tag test run in CI).
+- **Foreman [R] after merge:**
+  - 0 deletions; porcelain empty;
+  - validate gives "15666/15666 entries valid" and "precision: pending -- WARNING: pending state UNRATIFIED (... passes only through 2.13.x)";
+  - drift clean;
+  - **801 passed, 1 xfailed**.
+- **User actions outstanding:** label the 150-row sheet, or ratify the pending state before 2.14.0. Deviations A1 (feed ≠ auto; INCLUSION §5 false), A3 and A4 come to the user in the next combined ask. **Notes → docs-warden:** INCLUSION §4/§5.
+
+### ✅ Item 7 stage 1 — **advisory re-check PASS on `80ec9009` (2026-10-11)**
+- **Gate evidence:**
+  - its own AIRI edit now gives rc 1, "content change INC-01702/INC-01706 (D71)";
+  - a depth-1 clone with the file deleted at HEAD fails closed, and with the file present builds (15,666, not first build);
+  - gate removed: 6 abort tests fail and the A2 counter-test passes (no cascade);
+  - AIRI dropped from the list: 2 fail, including the real-build test;
+  - the helper hash change does not weaken anything;
+  - 768 passed; data identical.
+- **Advisories:**
+  - the AIRI reading is the foreman's (a revived AIRI turns the weekly run red);
+  - the gate's stray wait-loop task was stopped by the foreman (TaskStop b833cg32i);
+  - the baseline is the checked-out HEAD.
+- **Merge:** `git merge-tree` vs main shows conflicts in CHANGELOG.md and scripts/merge_and_dedupe.py (main gained items 4, D69 and 5). **A FRESH pipeline-engineer is merging origin/main into the branch.** It resolves the conflicts keeping both behaviours, rebuilds, and re-derives the delta vs main (expected: 3,936 rows × 2 label fields only). A scoped re-check follows before the merge to main.
+
 ### 🔁 Item 8 — **BOUNCE #1 (red-reviewer on `09fcc03f`, 2026-10-11)**: a FRESH distribution-engineer is on it (the original specialist ran about 274k tokens)
 - **Defect:** D64 is partly delivered. `disputed_count` is missing from the count-quoting doc surfaces: README:48, DATASHEET:20, the site hero at index.html:116, and og/twitter. There is no `stats:disputed_count` marker anywhere, so drift never guards it. **Foreman's own contribution:** my dispatch line (above) shortened the ruling to "`disputed_count` in stats"; the brief itself said "every surface".
 - **Advisories:**
-  - **A1:** the gate's own stray `C:\proc\selfduild_manifest.json` (Git Bash /dev/stdout translation). **Foreman inspected it** (the only file was its manifest) **and removed `C:\proc`.**
+  - **A1:** the gate's own stray `C:\proc\self\fd\1\build_manifest.json` (Git Bash /dev/stdout translation). **Foreman inspected it** (the only file was its manifest) **and removed `C:\proc`.**
   - A2: DATA_DICTIONARY and the TAXII README overclaim "exactly" (being fixed).
   - A3: a removal-only change doesn't move the MISP timestamp; STIX has no `revoked` for retractions. **Follow-up note → WS6.**
   - A4: the R1 test probes only one entry's fields.
