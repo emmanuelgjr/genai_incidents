@@ -754,33 +754,44 @@ def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# N9 precision-audit gate (v2.13.0 item 5). What it enforces:
-#   (a) the committed sample is untampered: sample.json's entries hash to its
-#       own declared entries_sha256, and the review sheet lists exactly the
-#       sampled ids in order (no swapped or dropped rows);
-#   (b) results.json equals a fresh computation from the sheet's HUMAN columns
-#       (scripts/wilson_ci.py), so a precision figure cannot be hand-typed
-#       into the results file;
-#   (c) the DATASHEET "Measured precision" block equals the rendering of those
-#       results, so it cannot be hand-typed there either;
-#   (d) while the measurement is not complete (status pending/partial), the
-#       pending state must be AUTHORISED by a D28-form marker
+# N9 precision-audit gate (v2.13.0 item 5). What it enforces, in EVERY status
+# (pending, partial and measured alike -- the measured state is the one that
+# publishes a figure, so it is the one the pins matter most for; BOUNCE #1):
+#   (a) the audit directory is the pinned one, and no other dated directory
+#       exists under docs/audits/precision/ (a newer self-consistent
+#       directory cannot quietly take over);
+#   (b) the sample is untampered: sample.json's entries hash to its own
+#       declared entries_sha256 AND to the value pinned in code, and the
+#       review sheet lists exactly the sampled ids in order;
+#   (c) the sampling frame is untampered: the canonical hash of frame.json
+#       (strata, populations, allocation, seed, data hash) equals the value
+#       pinned in code -- the populations are the estimator's weights, so an
+#       edited population moves the published figure;
+#   (d) results.json equals a fresh computation from the sheet's HUMAN
+#       columns (scripts/wilson_ci.py), and the DATASHEET "Measured
+#       precision" block equals the rendering of those results, so a figure
+#       cannot be hand-typed into either;
+#   (e) while the measurement is not complete (pending/partial), the pending
+#       state must be AUTHORISED by a D28-form marker
 #       (pending_authorization.json: decision id, decided_by "user", and an
-#       entries_sha256 that matches both the sample and the value pinned below
-#       in code, so tampering the sample and recomputing its hash is caught).
+#       entries_sha256 matching the sample).
 # The user's decision id is a PLACEHOLDER until the user rules. In that state
 # ("unratified") the gate passes with a warning only through dataset version
 # 2.13.x (PRECISION_UNRATIFIED_GRACE_THROUGH); from 2.14.0 it fails until the
 # user either ratifies the pending state or the human labels land. No ruling
 # is recorded or implied by this code.
-# Re-derive the pinned hash:
-#   python -c "import json,hashlib; d=json.load(open('docs/audits/precision/2026-10-11/sample.json',encoding='utf-8')); print(hashlib.sha256(json.dumps(d['entries'],sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest())"
-# Changing either constant is itself a change that needs the user's dated
-# board decision -- it is not something a routine PR should touch.
+# Re-derive the pinned hashes (canonical JSON, sort_keys, no whitespace):
+#   python -c "import sys,json; sys.path.insert(0,'scripts'); import precision_sample as p; d='docs/audits/precision/2026-10-11/'; print(p.canonical_sha256(json.load(open(d+'sample.json',encoding='utf-8'))['entries'])); print(p.canonical_sha256(json.load(open(d+'frame.json',encoding='utf-8'))))"
+# Changing any of these constants is itself a change that needs the user's
+# dated board decision -- it is not something a routine PR should touch.
 PRECISION_PENDING_PLACEHOLDER = "<USER-DECISION-ID>"
 REQUIRED_PRECISION_PENDING_DECISION: str | None = None  # placeholder: the user fills e.g. "D7x"
+PRECISION_AUDIT_DIR_REL = "docs/audits/precision/2026-10-11"
 REQUIRED_PRECISION_SAMPLE_ENTRIES_SHA256 = (
     "4fb93c0581a40de290799d9a5b36fe894ee6ccad67089c970813c9f9190cc189"
+)
+REQUIRED_PRECISION_FRAME_SHA256 = (
+    "190855d7fbfb654293a16a0655d51c92849dc503b9844a164a572ff9805bf6e4"
 )
 PRECISION_UNRATIFIED_GRACE_THROUGH = (2, 13)
 PRECISION_AUTH_FILE = "pending_authorization.json"
@@ -793,28 +804,48 @@ def _version_tuple(version: str | None) -> tuple[int, int]:
 
 def check_precision_audit(version: str | None, root: Path = ROOT,
                           required_decision: str | None = None,
-                          required_sha: str | None = None) -> tuple[list[str], str]:
+                          required_sha: str | None = None,
+                          required_frame_sha: str | None = None,
+                          audit_rel: str | None = None) -> tuple[list[str], str]:
     """-> (problems, one-line status). Never raises on bad inputs; every
-    failure is a problem string. `required_*` default to the pinned
-    module constants (overridable for tests only)."""
+    failure is a problem string. `required_*` / `audit_rel` default to the
+    pinned module constants (overridable for tests only)."""
     import wilson_ci as w
     from precision_sample import canonical_sha256
 
     required_decision = REQUIRED_PRECISION_PENDING_DECISION if required_decision is None else required_decision
     required_sha = REQUIRED_PRECISION_SAMPLE_ENTRIES_SHA256 if required_sha is None else required_sha
+    required_frame_sha = REQUIRED_PRECISION_FRAME_SHA256 if required_frame_sha is None else required_frame_sha
+    rel = PRECISION_AUDIT_DIR_REL if audit_rel is None else audit_rel
     problems: list[str] = []
-    audit_dir = w.latest_audit_dir(root / "docs" / "audits" / "precision")
-    if audit_dir is None:
-        return ["precision: no docs/audits/precision/<date>/ audit directory"], "precision: MISSING"
-    rel = audit_dir.relative_to(root).as_posix()
+    audit_dir = root / rel
+    if not audit_dir.is_dir():
+        return [f"precision: pinned audit directory {rel}/ is missing"], "precision: MISSING"
+    others = sorted(
+        p.relative_to(root).as_posix()
+        for p in (root / "docs" / "audits" / "precision").glob("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+        if p.is_dir() and p.resolve() != audit_dir.resolve()
+    )
+    if others:
+        problems.append(f"precision: dated audit director(ies) {others} exist besides the pinned {rel}/ -- a new "
+                        "audit needs its own user decision and new pins in scripts/validate.py")
     try:
         sample = json.loads((audit_dir / w.SAMPLE_FILE).read_text(encoding="utf-8"))
+        frame = json.loads((audit_dir / w.FRAME_FILE).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        return [f"precision: {rel}/{w.SAMPLE_FILE} unreadable: {exc}"], "precision: BROKEN"
+        return problems + [f"precision: {rel} sample/frame unreadable: {exc}"], "precision: BROKEN"
     fresh_sha = canonical_sha256(sample.get("entries", []))
     if sample.get("entries_sha256") != fresh_sha:
         problems.append(f"precision: {rel}/{w.SAMPLE_FILE} entries do not hash to its declared "
                         f"entries_sha256 ({sample.get('entries_sha256')!r} vs {fresh_sha!r}) -- sample edited")
+    if fresh_sha != required_sha:
+        problems.append(f"precision: the sample's entries hash ({fresh_sha!r}) does not match the value pinned "
+                        f"in code ({required_sha!r}) -- a re-drawn or edited sample needs a new user decision")
+    frame_sha = canonical_sha256(frame)
+    if frame_sha != required_frame_sha:
+        problems.append(f"precision: {rel}/{w.FRAME_FILE} hashes to {frame_sha!r}, not the value pinned in code "
+                        f"({required_frame_sha!r}) -- the sampling frame (stratum populations = estimator "
+                        "weights) was edited")
     try:
         ids = w.sheet_ids(audit_dir / w.SHEET_FILE)
     except OSError as exc:
@@ -840,7 +871,8 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
     if status == "measured":
         return problems, f"precision: measured ({res['human_labelled']} human-labelled rows, {rel})"
 
-    # Pending/partial: the D28-form authorisation is required.
+    # Pending/partial: the D28-form authorisation is required (on top of the
+    # unconditional pins above).
     apath = audit_dir / PRECISION_AUTH_FILE
     try:
         auth = json.loads(apath.read_text(encoding="utf-8")).get("authorization")
@@ -855,9 +887,6 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
     if auth.get("entries_sha256") != fresh_sha:
         problems.append(f"precision: {PRECISION_AUTH_FILE} entries_sha256 ({auth.get('entries_sha256')!r}) "
                         f"does not match the sample on disk ({fresh_sha!r})")
-    if fresh_sha != required_sha:
-        problems.append(f"precision: the sample's entries hash ({fresh_sha!r}) does not match the value pinned "
-                        f"in code ({required_sha!r}) -- a re-drawn or edited sample needs a new user decision")
     decision = auth.get("decision")
     if decision == PRECISION_PENDING_PLACEHOLDER and not required_decision:
         if _version_tuple(version) > PRECISION_UNRATIFIED_GRACE_THROUGH:
@@ -873,7 +902,6 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
         problems.append(f"precision: {PRECISION_AUTH_FILE} names decision {decision!r} but the decision pinned "
                         f"in code is {required_decision!r}")
     return problems, f"precision: {status}, authorised by {decision}"
-
 
 def main():
     schema = json.loads((ROOT / "schema" / "incident.schema.json").read_text(encoding="utf-8"))

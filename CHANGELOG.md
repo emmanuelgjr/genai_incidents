@@ -29,17 +29,28 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   weighted to stratum populations, at Kish effective n, and reports both
   `unsure` treatments. Labels without a reviewer, or with a reviewer that names
   an agent or model, are refused. With only suggestions filled, it reports
-  "no human labels". It is unit-tested against Newcombe (1998), Table I.
+  "no human labels". It is unit-tested against Newcombe (1998), Table I. It
+  also gives per-`quality_tier` domain estimates within each tier, flagged
+  when n < 30. The sheet loader tolerates a spreadsheet's byte-order mark,
+  CRLF line endings and re-quoting.
 - `docs/DATASHEET.md` has a new "Measured precision" section. The figure block
   is generated from `results.json` (`wilson_ci.py --render-datasheet`) and
   currently reads "measurement pending", with the method, sample size and date.
-- `scripts/validate.py` has a new precision gate. It checks four things: the
-  sample is untampered (its own hash, plus a hash pinned in code); the sheet
-  ids match the sample; `results.json` and the DATASHEET block equal a fresh
-  computation; and a pending measurement is authorised by a D28-form marker
-  (`pending_authorization.json`). The marker's decision id is a placeholder
-  for the user. While it is unratified, the gate passes with a warning
-  through dataset version 2.13.x and fails from 2.14.0.
+- `scripts/validate.py` has a new precision gate. In every status (pending,
+  partial and measured) it checks that:
+  - the audit directory is the pinned one, with no other dated directory
+    beside it;
+  - the sample's entries match their own declared hash and a hash pinned in
+    code;
+  - the whole `frame.json` (stratum populations, which are the estimator's
+    weights) matches a second hash pinned in code;
+  - the sheet ids match the sample;
+  - `results.json` and the DATASHEET block equal a fresh computation.
+
+  While the measurement is pending or partial, it also requires a D28-form
+  marker (`pending_authorization.json`). The marker's decision id is a
+  placeholder for the user. While it is unratified, the gate passes with a
+  warning through dataset version 2.13.x and fails from 2.14.0.
 - `scripts/evaluate_ai_relevance.py` scores `ai_relevance.assess()` against the
   human labels with a confusion matrix. It does not run until the sheet
   returns: today it prints "no human labels".

@@ -320,7 +320,7 @@ def build_sheet(sample: dict, suggestions: dict | None) -> str:
 def sheet_has_human_labels(path: Path) -> bool:
     if not path.exists():
         return False
-    with path.open(encoding="utf-8", newline="") as f:
+    with path.open(encoding="utf-8-sig", newline="") as f:
         return any((row.get("human_label") or "").strip() or (row.get("human_by") or "").strip()
                    for row in csv.DictReader(f))
 

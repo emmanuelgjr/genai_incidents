@@ -392,3 +392,169 @@ def test_evaluation_confusion_matrix(tmp_path):
     pos = sum(1 for x in truth.values() if x == "in-scope")
     assert cm == {"TP": pos, "FP": len(cve) - 1 - pos, "FN": 0, "TN": 0}
     assert out["unsure_excluded"] == 1 and out["recall"]["value"] == 1.0
+
+
+# --------------------------------------------------------------------------- BOUNCE #1: pins in EVERY status
+def _rerender(root: Path) -> None:
+    assert w.main(["--audit-dir", str(_audit(root)), "--datasheet", str(root / "docs" / "DATASHEET.md"),
+                   "--render-datasheet"]) == 0
+
+
+def _measured_copy(tmp_path) -> Path:
+    root = _copy_root(tmp_path)
+    _fill_human(root, lambda i, r: r.update(human_label="in-scope" if i % 3 else "out-of-scope",
+                                            human_by="Jane Reviewer"))
+    _rerender(root)
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert problems == [] and line.startswith("precision: measured")
+    return root
+
+
+def test_measured_bypass_b_swapped_sample_id_is_caught(tmp_path):
+    """Reviewer's bypass B, in the MEASURED state: swap a sampled id in the
+    sample AND the sheet, recompute entries_sha256, re-render. Only the code
+    pin can catch it."""
+    root = _measured_copy(tmp_path)
+    sp = _audit(root) / "sample.json"
+    s = json.loads(sp.read_text(encoding="utf-8"))
+    old_id = s["entries"][0]["id"]
+    s["entries"][0]["id"] = "INC-99999"
+    s["entries_sha256"] = ps.canonical_sha256(s["entries"])
+    sp.write_text(ps.dump_json(s), encoding="utf-8")
+    _fill_human(root, lambda i, r: r.update(id="INC-99999") if r["id"] == old_id else None)
+    _rerender(root)
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert line.startswith("precision: measured")
+    assert len(problems) == 1 and "sample's entries hash" in problems[0] and "pinned in code" in problems[0]
+
+
+def test_measured_bypass_c_edited_population_is_caught(tmp_path):
+    """Reviewer's bypass C, in the MEASURED state: shrink a stratum's
+    population (an estimator weight) and re-render. The figure moves; the
+    frame pin must catch it."""
+    root = _measured_copy(tmp_path)
+    before = w.compute(_audit(root), root)["estimates"]["excluding_unsure"]["feed"]["precision"]
+    fp = _audit(root) / "frame.json"
+    f = json.loads(fp.read_text(encoding="utf-8"))
+    for s in f["strata"]:
+        if s["stratum"] == "feed/oecd":
+            s["population"] = 10
+    fp.write_text(ps.dump_json(f), encoding="utf-8")
+    _rerender(root)
+    after = w.compute(_audit(root), root)["estimates"]["excluding_unsure"]["feed"]["precision"]
+    assert after != before  # the edit really moves the published figure
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert line.startswith("precision: measured")
+    assert len(problems) == 1 and "frame.json" in problems[0] and "pinned in code" in problems[0]
+
+
+def test_extra_dated_audit_dir_is_caught(tmp_path):
+    """A newer, fully self-consistent dated directory must not take over."""
+    root = _measured_copy(tmp_path)
+    shutil.copytree(_audit(root), root / "docs" / "audits" / "precision" / "2026-12-01")
+    problems = v.check_precision_audit("2.14.0", root)[0]
+    assert len(problems) == 1 and "2026-12-01" in problems[0]
+    # wilson_ci follows the newest directory; the gate keeps checking the pinned one
+    assert w.latest_audit_dir(root / "docs" / "audits" / "precision").name == "2026-12-01"
+
+
+def test_missing_pinned_dir_is_caught(tmp_path):
+    root = _copy_root(tmp_path)
+    shutil.move(str(_audit(root)), str(root / "docs" / "audits" / "precision" / "2026-12-01"))
+    problems = v.check_precision_audit("2.13.0", root)[0]
+    assert problems and "pinned audit directory" in problems[0]
+
+
+# --------------------------------------------------------------------------- A1: quality_tier domains
+def test_domain_estimate_by_quality_tier():
+    # stratum a (N=300): 2 auto rows both in, 2 reviewed rows both out; stratum b (N=100): 2 auto, 1 in
+    rows = [("a", "auto", "in-scope"), ("a", "auto", "in-scope"), ("a", "reviewed", "out-of-scope"),
+            ("a", "reviewed", "out-of-scope"), ("b", "auto", "in-scope"), ("b", "auto", "out-of-scope")]
+    pops = {"a": 300, "b": 100}
+    est = w._domain_estimate(rows, pops, "auto", strict=False)
+    # weights: a rows 75 each, b rows 50 each -> (75+75+50)/(75+75+50+50) = 0.8
+    assert est["precision"] == 0.8 and est["n"] == 4 and est["small_n"] is True
+    assert w._domain_estimate(rows, pops, "reviewed", strict=False)["precision"] == 0.0
+    assert w._domain_estimate(rows, pops, "curated", strict=False)["n"] == 0
+
+
+def test_measured_results_carry_quality_tier_domains(tmp_path):
+    root = _measured_copy(tmp_path)
+    res = w.compute(_audit(root), root)
+    dom = res["estimates"]["strict"]["by_quality_tier"]
+    assert {"feed/auto", "feed/reviewed", "landmark/reviewed"} <= set(dom)
+    assert sum(d["n"] for k, d in dom.items() if k.startswith("feed/")) == 100
+
+
+# --------------------------------------------------------------------------- A10: Excel round-trip
+def test_sheet_saved_by_excel_bom_crlf_quoted_is_read(tmp_path):
+    root = _copy_root(tmp_path)
+    sheet = _audit(root) / "review_sheet.csv"
+    rows = list(csv.DictReader(sheet.open(encoding="utf-8", newline="")))
+    for r in rows:
+        r.update(human_label="in-scope", human_by="Jane Reviewer")
+    buf = io.StringIO()
+    wr = csv.DictWriter(buf, fieldnames=ps.SHEET_COLUMNS, quoting=csv.QUOTE_ALL, lineterminator="\r\n")
+    wr.writeheader()
+    wr.writerows(rows)
+    sheet.write_bytes(b"\xef\xbb\xbf" + buf.getvalue().encode("utf-8"))
+    assert w.read_sheet(sheet)[0][0] == "sheet_row"  # BOM not glued onto the first header
+    assert w.sheet_ids(sheet)[0] == rows[0]["id"]
+    assert len(w.read_human_labels(sheet)) == 150
+    _rerender(root)
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert problems == [] and line.startswith("precision: measured")
+
+
+def test_bom_would_break_a_plain_utf8_reader(tmp_path):
+    """Control for the test above: without utf-8-sig the first header gains a
+    BOM -- proves the BOM case is a real input, not a no-op."""
+    p = tmp_path / "s.csv"
+    p.write_bytes(b"\xef\xbb\xbfid,human_label\r\nINC-1,in-scope\r\n")
+    assert list(csv.DictReader(p.open(encoding="utf-8", newline="")))[0].get("id") is None
+    assert list(csv.DictReader(p.open(encoding="utf-8-sig", newline="")))[0]["id"] == "INC-1"
+
+
+# --------------------------------------------------------------------------- A5: reproduce against the pinned blob
+PINNED_COMMIT = "6da13032"
+
+
+def _pinned_data(tmp_path) -> Path | None:
+    import subprocess
+
+    out = tmp_path / "pinned_incidents.json"
+    try:
+        blob = subprocess.run(["git", "show", f"{PINNED_COMMIT}:data/incidents.json"], cwd=ROOT,
+                              capture_output=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        blob = None
+    if blob:
+        out.write_bytes(blob)
+        return out
+    # shallow CI clones lack the commit; the working copy serves while its content still matches the pin
+    frame = json.loads((AUDIT / "frame.json").read_text(encoding="utf-8"))
+    cur = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
+    if ps.canonical_sha256(cur["incidents"]) == frame["data_incidents_sha256"]:
+        return ROOT / "data" / "incidents.json"
+    return None
+
+
+def test_reproduces_from_pinned_blob(tmp_path):
+    data = _pinned_data(tmp_path)
+    if data is None:
+        pytest.skip(f"neither {PINNED_COMMIT} (shallow clone?) nor matching working data is available")
+    frame = json.loads((AUDIT / "frame.json").read_text(encoding="utf-8"))
+    inc = json.loads(data.read_text(encoding="utf-8"))["incidents"]
+    assert ps.canonical_sha256(inc) == frame["data_incidents_sha256"]
+    assert ps.main(["--check", "--data", str(data)]) == 0
+    assert ps.main(["--check", "--data", str(data), "--seed", "7"]) == 1
+
+
+def test_double_bom_or_missing_column_is_refused(tmp_path):
+    p = tmp_path / "review_sheet.csv"
+    p.write_bytes(b"\xef\xbb\xbf\xef\xbb\xbfid,human_label,human_by\r\nINC-1,in-scope,Jane\r\n")
+    with pytest.raises(w.LabelError, match="byte-order mark"):
+        w.read_human_labels(p)
+    p.write_bytes(b"id,label,human_by\nINC-1,in-scope,Jane\n")
+    with pytest.raises(w.LabelError, match="required column"):
+        w.read_human_labels(p)

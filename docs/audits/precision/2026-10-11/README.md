@@ -160,6 +160,8 @@ records.
 
 ## The validate.py gate
 
+*Superseded in part by the BOUNCE #1 update below; this list is kept as originally written.*
+
 `scripts/validate.py::check_precision_audit` checks five things:
 
 - **(a)** the sample is untampered: the entries hash to their declared hash,
@@ -174,3 +176,35 @@ records.
 
 There is no precision floor. Whether to impose one, and at what level, is a
 policy decision for the user once a measured figure exists.
+
+## Update 2026-10-11 (BOUNCE #1): what changed
+
+A red-reviewer gate found that the code pin in item **(d)** above ran only
+while the audit was pending. In the measured state, the only state that
+publishes a figure, three bypasses passed: a swapped sample id with its hash
+recomputed, an edited `frame.json` population (an estimator weight), and a
+newer self-consistent dated directory. The gate now enforces these in
+**every** status:
+
+- the audit directory is pinned (`PRECISION_AUDIT_DIR_REL`), and any other
+  dated directory under `docs/audits/precision/` fails;
+- the sample's entries hash must equal `REQUIRED_PRECISION_SAMPLE_ENTRIES_SHA256`;
+- the canonical hash of the whole `frame.json` must equal
+  `REQUIRED_PRECISION_FRAME_SHA256`.
+
+The pending-state marker check is otherwise unchanged. Fire tests for each
+bypass run in the measured state (`tests/test_precision_audit.py`).
+
+Two other changes:
+
+- **Per-`quality_tier` figures** (the claim above) are now produced:
+  `results.json` carries `by_quality_tier` for each tier. These are domain
+  estimates in ratio form, flagged `small_n` below 30 rows, and should be read
+  as indicative.
+- **Editing the sheet in Excel or another spreadsheet.** Saving can add a
+  byte-order mark, switch to CRLF line endings, re-quote every field, or (in
+  some locales) change the delimiter to a semicolon. The loader tolerates the
+  first three. It refuses a sheet whose `id`/`human_label`/`human_by` columns
+  it cannot find, rather than miscounting. Safest: edit in a plain-text
+  editor, or save as "CSV UTF-8 (comma delimited)" and keep the header
+  unchanged.

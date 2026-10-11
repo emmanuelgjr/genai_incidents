@@ -43,6 +43,10 @@ Wilson score interval evaluated at p with Kish's effective sample size
 standard way to carry a design weight into a binomial interval. With equal
 weights this reduces exactly to the textbook Wilson interval on x/n (tested).
 Per-stratum figures are unweighted (one stratum = one weight).
+Per-``quality_tier`` figures (``by_quality_tier``, within each tier) are
+domain estimates in ratio form (``_domain_estimate``): quality_tier is an
+implicit stratifier only, so domain sizes are random within a stratum; each
+is flagged ``small_n`` below 30 rows and should be read as indicative.
 
 Usage
 -----
@@ -100,35 +104,54 @@ def latest_audit_dir(root: Path = PRECISION_ROOT) -> Path | None:
     return dated[-1] if dated else None
 
 
+REQUIRED_SHEET_COLUMNS = ("id", "human_label", "human_by")
+
+
+def read_sheet(sheet: Path) -> tuple[list[str], list[dict]]:
+    """(header, rows) of the review sheet. Tolerates what a spreadsheet
+    round-trip does to a CSV: a UTF-8 byte-order mark (read as utf-8-sig, so
+    it is not glued onto the first header), CRLF line endings and re-quoted
+    fields (the csv module parses both). Raises LabelError if a required
+    column is missing or a header still carries a BOM (e.g. a double BOM)."""
+    with sheet.open(encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        header = list(reader.fieldnames or [])
+    if any(h.startswith("\ufeff") for h in header):
+        raise LabelError(f"{sheet.name}: header carries a byte-order mark after decoding: {header[:1]!r}")
+    missing = [c for c in REQUIRED_SHEET_COLUMNS if c not in header]
+    if missing:
+        raise LabelError(f"{sheet.name}: required column(s) {missing} missing from the header")
+    return header, rows
+
+
 def read_human_labels(sheet: Path) -> dict[str, str]:
     """id -> human label, from the human columns ONLY. Raises LabelError on a
     label without a (non-agent) reviewer, a reviewer without a label, or an
     unknown label."""
     labels: dict[str, str] = {}
-    with sheet.open(encoding="utf-8", newline="") as f:
-        for i, row in enumerate(csv.DictReader(f), 2):
-            rid = (row.get("id") or "").strip()
-            label = (row.get("human_label") or "").strip().lower()
-            by = (row.get("human_by") or "").strip()
-            if not label and not by:
-                continue
-            if not label:
-                raise LabelError(f"{sheet.name}:{i} ({rid}): human_by is set but human_label is empty")
-            if label not in LABELS:
-                raise LabelError(f"{sheet.name}:{i} ({rid}): human_label {label!r} not one of {LABELS}")
-            if not by:
-                raise LabelError(f"{sheet.name}:{i} ({rid}): human_label without human_by -- "
-                                 "a label is counted only with the reviewer's name")
-            if AGENT_LIKE.search(by):
-                raise LabelError(f"{sheet.name}:{i} ({rid}): human_by {by!r} names an agent/model; "
-                                 "agent suggestions are never counted as human labels")
-            labels[rid] = label
+    for i, row in enumerate(read_sheet(sheet)[1], 2):
+        rid = (row.get("id") or "").strip()
+        label = (row.get("human_label") or "").strip().lower()
+        by = (row.get("human_by") or "").strip()
+        if not label and not by:
+            continue
+        if not label:
+            raise LabelError(f"{sheet.name}:{i} ({rid}): human_by is set but human_label is empty")
+        if label not in LABELS:
+            raise LabelError(f"{sheet.name}:{i} ({rid}): human_label {label!r} not one of {LABELS}")
+        if not by:
+            raise LabelError(f"{sheet.name}:{i} ({rid}): human_label without human_by -- "
+                             "a label is counted only with the reviewer's name")
+        if AGENT_LIKE.search(by):
+            raise LabelError(f"{sheet.name}:{i} ({rid}): human_by {by!r} names an agent/model; "
+                             "agent suggestions are never counted as human labels")
+        labels[rid] = label
     return labels
 
 
 def sheet_ids(sheet: Path) -> list[str]:
-    with sheet.open(encoding="utf-8", newline="") as f:
-        return [(r.get("id") or "").strip() for r in csv.DictReader(f)]
+    return [(r.get("id") or "").strip() for r in read_sheet(sheet)[1]]
 
 
 def _estimate(rows: list[tuple[str, str]], pops: dict[str, int], strict: bool) -> dict:
@@ -158,11 +181,38 @@ def _estimate(rows: list[tuple[str, str]], pops: dict[str, int], strict: bool) -
     }
 
 
+SMALL_N = 30
+
+
+def _domain_estimate(rows: list[tuple[str, str, str]], pops: dict[str, int], domain: str,
+                     strict: bool) -> dict:
+    """Domain (e.g. quality_tier) estimate, ratio form: every counted row
+    carries its stratum's design weight w = N_h / n_h (n_h = ALL counted rows
+    in stratum h, any domain); p_d = sum(w*y over d) / sum(w over d), Wilson at
+    Kish n_eff over the domain's weights. Domain sizes inside a stratum are
+    random, so this is a post-stratified/ratio estimate, not a stratum figure;
+    n < SMALL_N is flagged."""
+    counted = [(h, d, lab) for h, d, lab in rows if strict or lab != "unsure"]
+    n_h: dict[str, int] = {}
+    for h, _, _ in counted:
+        n_h[h] = n_h.get(h, 0) + 1
+    dom = [(pops[h] / n_h[h], 1 if lab == "in-scope" else 0) for h, d, lab in counted if d == domain]
+    if not dom:
+        return {"n": 0, "in_scope": 0, "precision": None, "ci95": None, "n_eff": None, "small_n": True}
+    sw = sum(wt for wt, _ in dom)
+    p = sum(wt * y for wt, y in dom) / sw
+    n_eff = sw ** 2 / sum(wt * wt for wt, _ in dom)
+    lo, hi = wilson(p * n_eff, n_eff)
+    return {"n": len(dom), "in_scope": sum(y for _, y in dom), "precision": round(p, 6),
+            "n_eff": round(n_eff, 2), "ci95": [round(lo, 6), round(hi, 6)], "small_n": len(dom) < SMALL_N}
+
+
 def compute(audit_dir: Path, root: Path = ROOT) -> dict:
     frame = json.loads((audit_dir / FRAME_FILE).read_text(encoding="utf-8"))
     sample = json.loads((audit_dir / SAMPLE_FILE).read_text(encoding="utf-8"))
     labels = read_human_labels(audit_dir / SHEET_FILE)
     stratum_of = {e["id"]: e["stratum"] for e in sample["entries"]}
+    qt_of = {e["id"]: str(e.get("quality_tier")) for e in sample["entries"]}
     unknown = sorted(set(labels) - set(stratum_of))
     if unknown:
         raise LabelError(f"human labels for ids not in the sample: {unknown[:5]}")
@@ -195,6 +245,12 @@ def compute(audit_dir: Path, root: Path = ROOT) -> dict:
         t["per_stratum"] = {
             h: _estimate([r for r in rows if r[0] == h], {h: pops[h]}, strict) for h in sorted(pops)
         }
+        t["by_quality_tier"] = {}
+        for tier in sorted({s["tier"] for s in frame["strata"]}):
+            tp = {h: p for h, p in pops.items() if h.split("/")[0] == tier}
+            trows = [(stratum_of[i], qt_of[i], lab) for i, lab in sorted(labels.items()) if stratum_of[i] in tp]
+            for qt in sorted({d for _, d, _ in trows}):
+                t["by_quality_tier"][f"{tier}/{qt}"] = _domain_estimate(trows, tp, qt, strict)
         out[treatment] = t
     res["estimates"] = out
     return res
