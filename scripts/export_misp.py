@@ -299,8 +299,9 @@ source has stopped refreshing additionally carry
 `genai-incidents:source-freshness="stale"`, `genai-incidents:source-as-of="<date>"`
 and `genai-incidents:source-review-by="<date>"` (the row's own `source_freshness`
 marker; absent on every other row). Each event's `timestamp` is the newest
-`updated` date among its incidents, so MISP re-pulls an event exactly when its
-content changed.
+`updated` date among its incidents, so MISP re-pulls an event when its
+content fields changed (changes to `tier`, `quality_tier`, `corpus`, `content_license`
+or `source_freshness` alone surface only via an `EXPORTER_VERSION` bump).
 
 ## Subscribe (MISP)
 

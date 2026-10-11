@@ -113,7 +113,7 @@ Key fields per record (full reference in the data dictionary):
 - `status` — present only on a row that is not standing as published (absence means it stands).
   {disputed} of the rows above carry `status: disputed`: every CVE record they rest on is
   listed by the CVE Program as published but disputed. They are **counted** in the {count}
-  and carry a lowered `confidence`; retracted rows are omitted from this export
+  and carry a lowered `confidence`; retracted rows are omitted from this export.
 
 ### Source freshness
 

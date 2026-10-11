@@ -203,3 +203,14 @@ def test_disputed_and_retracted_markers_are_templated():
     text = "<!-- stats:disputed_count -->1<!-- /stats:disputed_count -->"
     new, changes = lib.render_text(text, stats)
     assert "22" in new and changes
+
+
+def test_disputed_count_marker_is_present_on_every_headline_surface():
+    """D64: README headline, DATASHEET Instances line and the site hero each carry a
+    templated disputed subset figure, so check_stats_drift guards it on a doc surface."""
+    import re
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    for rel in ("README.md", "docs/DATASHEET.md", "docs/index.html"):
+        text = (root / rel).read_text(encoding="utf-8")
+        assert re.search(r"<!--\s*stats:disputed_count\s*-->", text), rel

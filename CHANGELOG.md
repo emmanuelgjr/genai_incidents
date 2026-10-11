@@ -49,10 +49,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - **D64 on the counts.** `data/stats.json` gains `disputed_count` (22). Disputed entries
   **stay counted**: they are inside `incident_count` (15,637), not beside it, and
   `retracted_count` (29) is outside it; no combined headline count exists. Year-shard cards of
-  the 22 gain a **DISPUTED** note, `INCIDENTS.md` shows both sub-counts, the Hugging Face card
+  the 22 gain a **DISPUTED** note, `INCIDENTS.md` shows both sub-counts, the README headline row, the
+  DATASHEET Instances line and the site hero carry a templated `stats:disputed_count` subset figure
+  (the og/twitter meta descriptions quote neither sub-count, as with `retracted_count`), the Hugging Face card
   states the disputed count, and `check_stats_drift.py` now re-derives `incident_count`,
   `retracted_count`, `disputed_count` and `landmark_count` from the full and slim corpus and fails
   on any difference.
+- Wording fix: `modified` / `updated` are documented as moving on content-field changes only;
+  `tier`, `quality_tier`, `corpus`, `content_license`, `source_freshness` reach `modified` via an
+  `EXPORTER_VERSION` bump (DATA_DICTIONARY, TAXII and MISP READMEs).
 - No row in `data/incidents.json` or `incidents.min.json` changed. Field-level delta:
   `docs/audits/ws6-v2130-export-integrity-2026-10-11.md`.
 
