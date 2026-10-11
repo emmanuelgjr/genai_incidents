@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/emmanuelgjr/genai_incidents/schema/build_manifest.schema.json",
+  "title": "build_manifest.json",
+  "description": "Provenance stamp shipped beside every distribution of the dataset (GitHub release assets, the Hugging Face dataset, the PyPI package data, the Pages site's docs/data, and the STIX/TAXII/MISP directories). Every count and `taxonomy_versions` is copied from data/stats.json (invariant 6); only `commit`, `built_at`, `built_at_basis` and `dirty` come from the build. Written only in export/release steps, never by `make build`. `built_at` is NOT the wall-clock time of the build: it is the committer date of `commit` (or SOURCE_DATE_EPOCH), so rebuilding a commit is byte-reproducible. Counts: `disputed_count` is a SUBSET of `incident_count` (disputed entries stay counted); `retracted_count` is OUTSIDE it. Never sum them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["commit", "built_at", "built_at_basis", "dirty", "version", "incident_count", "retracted_count", "disputed_count", "landmark_count", "taxonomy_versions"],
+  "properties": {
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$", "description": "Full git SHA of the source commit."},
+    "built_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$", "description": "RFC 3339 UTC. See `built_at_basis`."},
+    "built_at_basis": {"enum": ["commit-date", "source-date-epoch"], "description": "What `built_at` was taken from. Never the wall clock."},
+    "dirty": {"type": "boolean", "description": "True when a tracked file differed from `commit` at build time (a local build). Release builds are false."},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "Dataset version (stats.json `version`)."},
+    "incident_count": {"type": "integer", "minimum": 0, "description": "Entries that stand (retracted excluded; disputed included)."},
+    "retracted_count": {"type": "integer", "minimum": 0, "description": "Retracted entries: not in incident_count."},
+    "disputed_count": {"type": "integer", "minimum": 0, "description": "Entries with status disputed: a subset of incident_count."},
+    "landmark_count": {"type": "integer", "minimum": 0},
+    "taxonomy_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atlas", "owasp_llm", "owasp_asi", "capec", "veris"],
+      "properties": {
+        "atlas": {"type": ["string", "null"]},
+        "owasp_llm": {"type": ["string", "null"]},
+        "owasp_asi": {"type": ["string", "null"]},
+        "capec": {"type": ["string", "null"]},
+        "veris": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

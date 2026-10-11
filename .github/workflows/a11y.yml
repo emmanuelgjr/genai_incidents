@@ -22,6 +22,8 @@ on:
       - "data/incidents.min.json"
       - "scripts/gen_docs_core_data.py"
       - "scripts/gen_data_integrity.py"
+      - "scripts/export_integrity.py"
+      - "schema/build_manifest.schema.json"
       - "scripts/check_dead_filters.py"
       - "tests/a11y/**"
       - ".github/workflows/a11y.yml"
@@ -31,6 +33,8 @@ on:
       - "data/incidents.min.json"
       - "scripts/gen_docs_core_data.py"
       - "scripts/gen_data_integrity.py"
+      - "scripts/export_integrity.py"
+      - "schema/build_manifest.schema.json"
       - "scripts/check_dead_filters.py"
       - "tests/a11y/**"
       - ".github/workflows/a11y.yml"
@@ -54,6 +58,9 @@ jobs:
           node-version: "24"
           cache: npm
           cache-dependency-path: tests/a11y/package-lock.json
+
+      - name: Install jsonschema (build_manifest.json is schema-checked)
+        run: pip install "jsonschema>=4.21,<5"
 
       - name: Build docs/data/ (mirror + core split + integrity manifest)
         run: |

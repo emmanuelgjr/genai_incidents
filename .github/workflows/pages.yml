@@ -12,6 +12,9 @@ on:
       - "scripts/export_misp.py"
       - "scripts/gen_docs_core_data.py"
       - "scripts/gen_data_integrity.py"
+      - "scripts/export_integrity.py"
+      - "schema/build_manifest.schema.json"
+      - "data/stats.json"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -38,14 +41,23 @@ jobs:
           cp data/incidents.min.json docs/data/incidents.min.json
       - name: Split into a trimmed core payload + lazy per-year detail shards (WS6-T5, scale)
         run: python scripts/gen_docs_core_data.py
-      - name: Publish SHA-256 checksums for every served data file (WS6-T5, integrity)
-        run: python scripts/gen_data_integrity.py
       - name: Generate STIX 2.1 bundle for download
         run: python scripts/export_stix.py
       - name: Generate static TAXII-compatible discovery document
         run: python scripts/export_taxii.py
       - name: Generate MISP feed
         run: python scripts/export_misp.py
+      # v2.13.0 item 8. MUST run after the three exports above: SHA256SUMS
+      # covers docs/data (incl. the STIX bundle), docs/taxii2 and docs/misp, and
+      # build_manifest.json (commit, built_at, counts from data/stats.json) is
+      # written into each tree first so the sums cover it too. Before this
+      # reorder the sums ran before export_stix.py and never listed the bundle.
+      - name: Publish build_manifest.json + SHA-256 checksums for every served tree
+        run: |
+          pip install --quiet "jsonschema>=4.21,<5"
+          python scripts/gen_data_integrity.py
+      - name: Verify the checksums and manifests against what is about to be deployed
+        run: python scripts/verify_data_integrity.py
       - name: Generate Open Graph social card
         run: |
           pip install --quiet pillow
@@ -69,6 +81,16 @@ jobs:
         env:
           JEKYLL_ENV: production
           BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile
+      # The strongest form of the integrity claim: the sums are checked against
+      # the Jekyll OUTPUT, i.e. the bytes Pages will serve, not the pre-build
+      # tree. Jekyll copies these directories verbatim (no front matter); this
+      # step is what turns "verbatim" from an assumption into a gate.
+      - name: Verify SHA256SUMS against the built site (_site)
+        run: |
+          for d in data taxii2 misp; do
+            (cd "_site/$d" && sha256sum -c --quiet SHA256SUMS)
+          done
+          echo "built site matches SHA256SUMS in data/, taxii2/ and misp/"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site

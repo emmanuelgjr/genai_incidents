@@ -3,6 +3,7 @@ Build a Hugging Face Datasets package for the incident corpus:
 
   dist/hf/incidents.jsonl   one incident per line (load_dataset-friendly)
   dist/hf/README.md         dataset card (YAML front matter + usage)
+  dist/hf/build_manifest.json, dist/hf/SHA256SUMS   provenance + integrity
 
 Then optionally push to the Hub:
 
@@ -187,6 +188,7 @@ source repository.
 - **Code & issues:** <https://github.com/emmanuelgjr/genai_incidents>
 - **Field reference:** [`docs/DATA_DICTIONARY.md`](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATA_DICTIONARY.md)
 - **Provenance, scope & limitations:** [`docs/DATASHEET.md`](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATASHEET.md)
+- **Build provenance:** `build_manifest.json` (commit, build time, counts, taxonomy versions) and `SHA256SUMS` (`sha256sum -c`) ship beside `incidents.jsonl` in this repository
 - **Citation:** [`CITATION.cff`](https://github.com/emmanuelgjr/genai_incidents/blob/main/CITATION.cff) · DOI [10.5281/zenodo.20248675](https://doi.org/10.5281/zenodo.20248675) (Zenodo concept DOI, always resolves to the latest release)
 
 **Licence:** data **CC-BY-4.0** (see Licensing above for row-level AIAAIC obligations), code MIT.
@@ -238,6 +240,11 @@ def build(out_dir: Path) -> tuple[int, Path]:
                        size_cat=size_cat, repo="emmanuelgjr/genai-incidents",
                        taxonomy_versions=as_text(taxonomy_versions()))
     (out_dir / "README.md").write_text(card, encoding="utf-8", newline="\n")
+    # v2.13.0 item 8: provenance + integrity ride with the upload (the whole
+    # folder is pushed). Manifest first so the sums cover it.
+    import export_integrity as ei
+    ei.write_manifest(out_dir)
+    ei.write_sums(out_dir, "*")
     return len(incidents), jsonl
 
 

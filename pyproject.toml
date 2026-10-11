@@ -44,6 +44,11 @@ Changelog = "https://github.com/emmanuelgjr/genai_incidents/blob/main/CHANGELOG.
 include = [
   "src/genai_incidents/**",
 ]
+# build_manifest.json is gitignored (written by the release step, never
+# committed); hatch skips VCS-ignored files unless they are listed here.
+artifacts = [
+  "src/genai_incidents/data/build_manifest.json",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/genai_incidents"]
