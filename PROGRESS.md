@@ -40,6 +40,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔁 Item 8 — **BOUNCE #1 (red-reviewer on `09fcc03f`, 2026-10-11)**: a FRESH distribution-engineer is on it (the original specialist ran about 274k tokens)
+- **Defect:** D64 is partly delivered. `disputed_count` is missing from the count-quoting doc surfaces: README:48, DATASHEET:20, the site hero at index.html:116, and og/twitter. There is no `stats:disputed_count` marker anywhere, so drift never guards it. **Foreman's own contribution:** my dispatch line (above) shortened the ruling to "`disputed_count` in stats"; the brief itself said "every surface".
+- **Advisories:**
+  - **A1:** the gate's own stray `C:\proc\selfduild_manifest.json` (Git Bash /dev/stdout translation). **Foreman inspected it** (the only file was its manifest) **and removed `C:\proc`.**
+  - A2: DATA_DICTIONARY and the TAXII README overclaim "exactly" (being fixed).
+  - A3: a removal-only change doesn't move the MISP timestamp; STIX has no `revoked` for retractions. **Follow-up note → WS6.**
+  - A4: the R1 test probes only one entry's fields.
+  - A5: `VERSION = "2.0.0"` (pre-existing, → WS6-T1).
+  - A6: no stix2 validator.
+  - A7: a missing full stop.
+- **Gate's view on the user rulings:**
+  - R1: accept adding tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS` (not a defect of item 8).
+  - R2: low risk; verify on the first real release.
+  - R3: needed.
+  - R4: benign.
+  - R5: follow-up `x_status` plus a MISP tag.
+- **Gate evidence:**
+  - byte-exact builds;
+  - its own STIX per-object diff: 65,141 objects, moved only `modified` plus 1,382 `x_source_freshness`, 0 invalid timestamps;
+  - live STIX sha = base sha 693975e6;
+  - MISP: only 6,002 tag appends plus 31 timestamps, re-derived;
+  - D57 set = 1,382, review_by 2027-01-07;
+  - all trees pass `sha256sum -c`; two runs give identical sums;
+  - manifest built_at = committer date;
+  - 7 hand-made fire proofs;
+  - 792 passed;
+  - merge-tree vs main is clean.
+
 ### ✅ Item 5 (N9 precision audit) — **PASS (re-gate on `fdabdd78`, 2026-10-11)**. `fetch-depth: 0` is being added before merge.
 - **Verdict, in the gate's words:** "All three bypasses I found last time now fail validation in the measured state, and nothing new is wrong."
 - **Gate evidence:**
