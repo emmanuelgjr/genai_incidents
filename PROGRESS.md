@@ -40,6 +40,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 Item 7 stage 1, D71 + A1-A3 — `1b20ffca` (pushed); **scoped re-gate sent to the stage-1 reviewer**
+- **D71:** AIID- additions are held.
+- **A2:** if any OECD/AIID ingest input differs from HEAD, content-field changes on pair-linked rows are held; a signed `content` approval releases them. Counter-test: a CVE-only change with the pair at HEAD passes.
+- **A1:** the curated-title exemption is keyed to the row's own source_ids.
+- **A3:** the gate reads `git show HEAD:data/incidents.json` and fails closed when missing or unparseable. First-ever build means no git history; without .git it needs MERGE_ALLOW_FIRST_BUILD=1.
+- **Test harness:** an autouse conftest stub of `_run_refresh_gate`, with a `real_gate` opt-out. **The gate is asked to check this for weakening, and to check whether a shallow CI checkout could fake a "first build".**
+- Data unchanged; 764 passed.
+
 ### ⚖ D68-D71, USER RULINGS 2026-10-10
 - **D68 (D49 reading): keep as merged.** `resolve_id()` now returns successors for INC-03128 and INC-08185.
 - **D69 (D31 group IDs): narrow where the evidence is complete.** Successor records INC-00311→INC-14726 and INC-01897→INC-14612; release-scoped records for INC-00554 (INC-14756 v2.0.0–2.7.0; INC-14742 v2.8.0; INC-14609 v2.9.0–2.10.0) plus a restatement; INC-00754 stays a group. **Dispatched:** fresh schema-architect on `ws3/v2130-group-ids` (base `28d97a5a`), which verifies each mapping from tag data first.
