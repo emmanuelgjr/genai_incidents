@@ -40,6 +40,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ⚖ D68-D71, USER RULINGS 2026-10-10
+- **D68 (D49 reading): keep as merged.** `resolve_id()` now returns successors for INC-03128 and INC-08185.
+- **D69 (D31 group IDs): narrow where the evidence is complete.** Successor records INC-00311→INC-14726 and INC-01897→INC-14612; release-scoped records for INC-00554 (INC-14756 v2.0.0–2.7.0; INC-14742 v2.8.0; INC-14609 v2.9.0–2.10.0) plus a restatement; INC-00754 stays a group. **Dispatched:** fresh schema-architect on `ws3/v2130-group-ids` (base `28d97a5a`), which verifies each mapping from tag data first.
+- **D70 (ID reuse): queue an ID-reuse audit.** On the same branch, now: correct DATA_DICTIONARY's false "Never reused" in place, add a CORRECTIONS row, fix other live surfaces, and write a dated audit task spec. **NEW BOARD NOTE → WS3:** the ID-reuse audit itself (14 withdrawn IDs with changed meanings; 575 live IDs with more than one historic title), after v2.13.0.
+- **D71 (stage 1): hold AIID-only additions too.** "Nothing from the frozen OECD/AIID pair reaches main until stage 2."
+
+### ✅ Item 7 stage 1 D67 extension — **PASS (scoped re-gate on `c8d7b48e`)**. Before merge: D71 plus advisories A1-A3 are being fixed.
+- **Gate evidence:**
+  - data byte-identical to 7f03c352, and the rebuild is byte-exact twice;
+  - fire proofs: 3 / 2 / 3; stub removed → exactly 5 tests fail, all on the gate;
+  - an independent absorbed-OECD-row input gives rc 1 with a sha over data/docs/ingest unchanged;
+  - all writes in main() come after the gate (:2768);
+  - 737 passed.
+- **Advisories:**
+  - **A1:** the curated-title exemption is a global set. Bypass demonstrated with an unrelated-key override; not live (0 title overrides). **Fix.**
+  - **A2:** snapshot-driven NON-title changes to published rows are ungated. Demonstrated: AIID-1574 changed 18 fields on INC-00437 with rc 0. **Fix under D71.**
+  - **A3:** the baseline is the working tree, and the gate fails OPEN when it is missing or unparseable. **Fix.**
+  - A4: the stub covers 28 tests; harmless.
+  - A5: the replaced test is a deliberate D67 reversal.
+
 ### ✅ Item 4 (silent IDs) — **DONE: advisory re-check PASS on `25b1ad5d`, MERGED to main (2026-10-10)**
 - **Advisory re-check:**
   - A2 closed: the skip set is {INC-03128, INC-08185}; D28 re-assertion runs for INC-00497 and INC-08139 with 0 appends.
