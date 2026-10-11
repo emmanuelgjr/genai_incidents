@@ -187,7 +187,19 @@ def test_verify_fires_on_a_manifest_that_fails_its_schema(site):
     p.write_text(json.dumps(m), encoding="utf-8")
     ei.write_sums(site / "docs" / "misp")        # sums now agree; the SCHEMA must still fire
     errs = ei.verify_all(site)
-    assert len(errs) == 1 and "build_manifest.json" in errs[0] and "disputed_count" in errs[0]
+    assert any("build_manifest.json: disputed_count" in e and "not of type" in e for e in errs), errs
+
+
+def test_verify_fires_on_a_manifest_whose_counts_disagree_with_stats_json(site):
+    """Sums regenerated over a tampered manifest still agree with themselves;
+    only the stats.json comparison can see this."""
+    p = site / "docs" / "taxii2" / ei.MANIFEST_NAME
+    m = json.loads(p.read_text(encoding="utf-8"))
+    m["incident_count"] += 1
+    p.write_text(json.dumps(m), encoding="utf-8")
+    ei.write_sums(site / "docs" / "taxii2")
+    errs = ei.verify_all(site)
+    assert len(errs) == 1 and "incident_count" in errs[0] and "stats.json" in errs[0]
 
 
 def test_every_served_tree_gets_a_manifest(site):

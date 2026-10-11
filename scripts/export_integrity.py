@@ -225,9 +225,19 @@ def verify_all(root: Path = ROOT) -> list[str]:
         if not mp.exists():
             errors.append(f"{tree.name}/{MANIFEST_NAME} does not exist")
         else:
-            errors.extend(f"{tree.name}/{MANIFEST_NAME}: {e}"
-                          for e in validate_manifest(json.loads(mp.read_text(encoding="utf-8"))))
+            m = json.loads(mp.read_text(encoding="utf-8"))
+            errors.extend(f"{tree.name}/{MANIFEST_NAME}: {e}" for e in validate_manifest(m))
+            errors.extend(f"{tree.name}/{MANIFEST_NAME}: {e}" for e in manifest_vs_stats(m))
     return errors
+
+
+def manifest_vs_stats(m: dict, stats: dict | None = None) -> list[str]:
+    """A shipped manifest's counts and taxonomy versions must equal data/stats.json
+    (invariant 6). Sums prove the file is the one that was generated; this proves
+    what was generated still says what stats.json says."""
+    stats = stats if stats is not None else json.loads(STATS_PATH.read_text(encoding="utf-8"))
+    return [f"{k} is {m.get(k)!r} but data/stats.json says {stats.get(k)!r}"
+            for k in STATS_KEYS if m.get(k) != stats.get(k)]
 
 
 def summary(root: Path = ROOT) -> str:
