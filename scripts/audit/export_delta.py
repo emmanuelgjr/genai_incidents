@@ -82,7 +82,7 @@ def misp(b: Path, a: Path) -> dict:
     def load(d: Path):
         ev, attrs = {}, {}
         for p in sorted(d.glob("*.json")):
-            if p.name == "manifest.json":
+            if p.name in ("manifest.json", "build_manifest.json"):
                 continue
             e = json.loads(p.read_text("utf-8"))["Event"]
             ev[e["uuid"]] = {k: v for k, v in e.items() if k != "Attribute"}
@@ -131,7 +131,7 @@ def misp(b: Path, a: Path) -> dict:
 
 
 def jsonl(b: Path, a: Path) -> dict:
-    rows = lambda p: [json.loads(l) for l in p.read_text("utf-8").splitlines() if l]
+    rows = lambda p: [json.loads(l) for l in p.read_text("utf-8").split(chr(10)) if l]
     return diff_objects(rows(b), rows(a), kind=lambda o: "row")
 
 
