@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 from pathlib import Path
 from datetime import date, datetime, timezone
 from collections import defaultdict
@@ -1967,11 +1968,104 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
             out.add(("retitle", e["id"]))
         elif e.get("kind") == "add":
             out.add(("add", e["source_id"]))
+        elif e.get("kind") == "content":
+            out.add(("content", e["id"]))
     return out
 
 
 def _is_gated_source(s: str) -> bool:
     return str(s).startswith(_REFRESH_GATED_PREFIXES)
+
+
+# D71/A3: the gate's baseline is what is PUBLISHED (the committed
+# data/incidents.json at git HEAD), not whatever the working tree holds. The
+# working-tree file can be dirty, hand-edited or already overwritten by an
+# earlier step, and `_load_prev_incidents()` (used elsewhere) quietly returns []
+# when it is missing or unparseable, which would make every check below pass
+# vacuously. Fail CLOSED instead. "Genuinely first-ever build" = a git repo in
+# which data/incidents.json has no history at all, or (no git metadata, e.g. a
+# source archive) an explicit MERGE_ALLOW_FIRST_BUILD=1, the same opt-in shape as
+# MERGE_ALLOW_MISSING_LEGACY.
+class RefreshBaselineError(RefreshMergeApprovalError):
+    """The published baseline could not be read; the gate cannot run."""
+
+
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True)
+
+
+def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
+    """Return ``(published_incidents, first_build)``; raise RefreshBaselineError
+    when the baseline is missing or unparseable and this is not a first build."""
+    root = root or ROOT
+    rel = "data/incidents.json"
+
+    def parse(raw: bytes, where: str) -> list[dict]:
+        try:
+            doc = json.loads(raw.decode("utf-8"))
+            inc = doc["incidents"]
+            assert isinstance(inc, list) and inc
+        except Exception as exc:  # noqa: BLE001 - any failure is the same fail-closed outcome
+            raise RefreshBaselineError(
+                f"[FATAL] D42/D25(a)+D71: the published baseline ({where}) is missing, empty or "
+                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. Nothing was written."
+            )
+        return inc
+
+    if (root / ".git").exists():
+        shown = _git(root, "show", f"HEAD:{rel}")
+        if shown.returncode == 0:
+            return parse(shown.stdout, f"git HEAD:{rel}"), False
+        hist = _git(root, "log", "--oneline", "-1", "--all", "--", rel)
+        if hist.returncode == 0 and not hist.stdout.strip():
+            return [], True  # git repo, file never committed: first-ever build
+        raise RefreshBaselineError(
+            f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} although it has history "
+            f"(rc={shown.returncode}); the refresh gate cannot run. Nothing was written."
+        )
+    path = root / rel
+    if path.exists():
+        return parse(path.read_bytes(), str(path)), False
+    if os.environ.get("MERGE_ALLOW_FIRST_BUILD") == "1":
+        return [], True
+    raise RefreshBaselineError(
+        f"[FATAL] D42/D25(a)+D71: {path} is missing and there is no git history to say whether this "
+        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. Nothing was written."
+    )
+
+
+# Files whose content is OECD- or AIID-derived. When none differs from the
+# committed version, no OECD/AIID input can have driven a change (D71/A2).
+_PAIR_INPUT_FILES = (
+    "aiid_full.json", "aiid_incidents.json", "aiid_oecd_relationships.json",
+    "oecd_aim_full_incidents.json",
+)
+
+
+def _pair_inputs_changed(root: Path | None = None) -> bool:
+    """True if any OECD/AIID ingest file differs from its git HEAD version, or
+    if that cannot be determined (no git, unreadable): conservative = True."""
+    root = root or ROOT
+    if not (root / ".git").exists():
+        return True
+    for name in _PAIR_INPUT_FILES:
+        rel = f"ingest/{name}"
+        shown = _git(root, "show", f"HEAD:{rel}")
+        path = root / rel
+        if shown.returncode != 0:
+            if path.exists():
+                return True  # new file, or HEAD unreadable
+            continue
+        if not path.exists() or path.read_bytes() != shown.stdout:
+            return True
+    return False
+
+
+def _gate_snapshot(e: dict) -> dict:
+    snap = _content_snapshot(e)
+    snap["description_provenance"] = e.get("description_provenance")
+    snap["description_source"] = e.get("description_source")
+    return snap
 
 
 def _check_refresh_merge_authorization(
@@ -1980,9 +2074,21 @@ def _check_refresh_merge_authorization(
     fresh_deprecations: list[dict],
     approval_path: Path | None = None,
     curation: dict | None = None,
+    pair_inputs_changed: bool = True,
+    first_build: bool = False,
 ) -> None:
-    """D42 guard (+ D67 hold on OECD row additions and upstream title edits); see the block comment above REFRESH_MERGE_APPROVAL_PATH.
+    """D42 guard + D67/D71 holds: nothing driven by the frozen OECD/AIID pair
+    reaches a build until the user rules. Held (each needs a signed approval):
+      merge     a published ID retired into another through an OECD-AIM-/AIID- id
+      retitle   a published ID retitled after absorbing such ids
+      title edit / content change   a published OECD/AIID row whose title (D67) or
+                any other content field (D71/A2) differs, while an OECD/AIID
+                ingest input differs from its committed version
+      add       an OECD-AIM- or AIID- source id no published entry carried (D67/D71),
+                whether it becomes a new row or is absorbed into a published one
     Call after id assignment and BEFORE any output write."""
+    if first_build:
+        return
     approval_path = approval_path or REFRESH_MERGE_APPROVAL_PATH
     approved = _load_refresh_merge_approvals(approval_path)
     prev_by_id = {p["id"]: p for p in prev_incidents if p.get("id")}
@@ -2007,65 +2113,83 @@ def _check_refresh_merge_authorization(
                 f"retired source_ids {d.get('retired_source_ids')}"
             )
 
-    # Titles a committed curation override sets are the project's own decision,
-    # not an upstream edit: never held.
-    curated_titles = {
-        ov["title"] for ov in (curation or {}).values() if isinstance(ov, dict) and ov.get("title")
-    }
+    curation = curation or {}
     for iid, cur in cur_by_id.items():
         prev = prev_by_id.get(iid)
-        if prev is None or prev.get("title") == cur.get("title"):
+        if prev is None:
             continue
-        if ("retitle", iid) in approved:
-            continue
-        gained = set(cur.get("source_ids") or []) - set(prev.get("source_ids") or [])
-        if any(_is_gated_source(s) for s in gained):
-            problems.append(
-                f"retitle {iid}: {prev.get('title', '')[:60]!r} -> "
-                f"{cur.get('title', '')[:60]!r} after absorbing "
-                f"{sorted(s for s in gained if _is_gated_source(s))[:4]}"
+        sids_cur = set(cur.get("source_ids") or [])
+        gated_row = any(_is_gated_source(s) for s in sids_cur | set(prev.get("source_ids") or []))
+        title_changed = prev.get("title") != cur.get("title")
+        if title_changed and ("retitle", iid) not in approved:
+            gained = sids_cur - set(prev.get("source_ids") or [])
+            # D67(b)/A1: exempt only when an override keyed to one of THIS
+            # row's own source_ids sets exactly this title.
+            curated = any(
+                isinstance(curation.get(s), dict) and curation[s].get("title") == cur.get("title")
+                for s in sids_cur
             )
-        elif cur.get("title") not in curated_titles and any(
-            _is_gated_source(s) for s in (cur.get("source_ids") or [])
-        ):
-            # D67(b): an upstream title edit (AIID or OECD revised a headline)
-            # on a published row. Same exposure as the 24 in review section C.
-            problems.append(
-                f"title edit {iid} (D67): {prev.get('title', '')[:60]!r} -> "
-                f"{cur.get('title', '')[:60]!r}; no source id absorbed"
-            )
-
-    # D67: hold OECD row ADDITIONS. The unit is the OECD source row: any
-    # OECD-AIM- source id in this build that no previously published entry
-    # carried. That covers a new ID, a mixed new row (OECD + AIID), and a new
-    # OECD row absorbed into a published ID (a published ID gaining an OECD
-    # source id). Skipped when there is no baseline at all (no previous build).
-    if prev_by_id:
-        prev_sids = {s for p in prev_by_id.values() for s in (p.get("source_ids") or [])}
-        for iid, cur in cur_by_id.items():
-            new_oecd = sorted(
-                s for s in (cur.get("source_ids") or [])
-                if str(s).startswith("OECD-AIM-") and s not in prev_sids and ("add", s) not in approved
-            )
-            if new_oecd:
-                kind = "new row" if iid not in prev_by_id else "absorbed into published row"
+            if any(_is_gated_source(s) for s in gained):
                 problems.append(
-                    f"add OECD row(s) {new_oecd[:3]}{'...' if len(new_oecd) > 3 else ''} ({kind}) "
-                    f"as {iid}: {cur.get('title', '')[:60]!r}"
+                    f"retitle {iid}: {prev.get('title', '')[:60]!r} -> "
+                    f"{cur.get('title', '')[:60]!r} after absorbing "
+                    f"{sorted(s for s in gained if _is_gated_source(s))[:4]}"
                 )
+            elif gated_row and not curated:
+                problems.append(
+                    f"title edit {iid} (D67): {prev.get('title', '')[:60]!r} -> "
+                    f"{cur.get('title', '')[:60]!r}; no source id absorbed"
+                )
+        # D71/A2: any other content change on a published OECD/AIID row, when an
+        # OECD/AIID ingest input differs from its committed version.
+        if gated_row and pair_inputs_changed and ("content", iid) not in approved:
+            a, b = _gate_snapshot(prev), _gate_snapshot(cur)
+            fields = sorted(k for k in set(a) | set(b) if k != "title" and a.get(k) != b.get(k))
+            if fields:
+                problems.append(
+                    f"content change {iid} (D71): {len(fields)} field(s) {fields[:8]}"
+                    f"{'...' if len(fields) > 8 else ''} on {cur.get('title', '')[:50]!r}"
+                )
+
+    # D67/D71: hold OECD and AIID source-row ADDITIONS. The unit is the source
+    # row, not the entry ID: any OECD-AIM-/AIID- source id in this build that no
+    # published entry carried. Covers a new ID, a mixed new row, and a new source
+    # row absorbed into a published ID.
+    prev_sids = {s for p in prev_by_id.values() for s in (p.get("source_ids") or [])}
+    for iid, cur in cur_by_id.items():
+        new_src = sorted(
+            s for s in (cur.get("source_ids") or [])
+            if _is_gated_source(s) and s not in prev_sids and ("add", s) not in approved
+        )
+        if new_src:
+            kind = "new row" if iid not in prev_by_id else "absorbed into published row"
+            problems.append(
+                f"add OECD/AIID source(s) {new_src[:3]}{'...' if len(new_src) > 3 else ''} ({kind}) "
+                f"as {iid}: {cur.get('title', '')[:60]!r}"
+            )
 
     if problems:
         nl = chr(10) + "  - "
         raise RefreshMergeApprovalError(
-            "[FATAL] D42/D25(a)+D67: this build would write OECD/AIID-driven change(s) "
-            "(merges/retitles/title edits of published IDs, or added OECD rows) that the user has not approved "
+            "[FATAL] D42/D25(a)+D67+D71: this build would write OECD/AIID-driven change(s) "
+            "(merges/retitles/title edits/content changes of published IDs, or added OECD/AIID rows) "
+            "that the user has not approved "
             f"({len(problems)}):{nl}" + nl.join(problems[:25])
             + (f"{nl}..." if len(problems) > 25 else "")
-            + chr(10) + "Nothing was written. This freeze is deliberate (D58/D67, stage 1): a weekly "
+            + chr(10) + "Nothing was written. This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
             "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
             f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
             "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
         )
+
+
+def _run_refresh_gate(deduped: list[dict], fresh: list[dict], curation: dict) -> None:
+    """main()'s single entry point to the gate (stubbed by fixture-based tests)."""
+    prev, first_build = _load_gate_baseline()
+    _check_refresh_merge_authorization(
+        prev, deduped, fresh, curation=curation,
+        pair_inputs_changed=_pair_inputs_changed(), first_build=first_build,
+    )
 
 
 def _check_split_authorization(
@@ -2765,7 +2889,7 @@ def main():
 
     # 8-pre) D42/D25(a) guard: no write has happened yet (the first one is
     #        the id_deprecations.json write below).
-    _check_refresh_merge_authorization(_load_prev_incidents(), deduped, fresh, curation=curation)
+    _run_refresh_gate(deduped, fresh, curation)
 
     # 8a) WS4-T21 BOUNCE #1 defect 1: correct the pre-existing inbound
     #     `resplit_redirect` entries the D28-authorized list flags,

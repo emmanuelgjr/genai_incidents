@@ -279,6 +279,12 @@ def scratch(tmp_path_factory):
         shutil.copytree(ROOT / d, root / d, ignore=shutil.ignore_patterns("__pycache__", "_cache"))
     (root / "docs" / "audits").mkdir(parents=True)
     shutil.copy(ROOT / "docs/audits/WS4-T19-authorized-splits-2026-09-18.json", root / "docs/audits")
+    # D71: the gate reads its baseline and the "OECD/AIID inputs changed" signal
+    # from git HEAD, so the scratch repo is a real one with the committed tree.
+    for args in (("init", "-q"), ("add", "-A"),
+                 ("-c", "user.email=t@e.x", "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                  "commit", "-q", "-m", "baseline")):
+        subprocess.run(["git", *args], cwd=root, check=True, capture_output=True)
     control = _run_merge(root)
     assert control.returncode == 0, control.stdout[-800:] + control.stderr[-800:]
     assert "Nothing was written" not in control.stdout + control.stderr
@@ -299,7 +305,7 @@ def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> st
         res = _run_merge(root)
         out = res.stdout + res.stderr
         assert res.returncode != 0, out[-600:]
-        assert "D42/D25(a)" in out and "Nothing was written" in out and "D58/D67" in out
+        assert "D42/D25(a)" in out and "Nothing was written" in out and "D58/D67/D71" in out
         assert expect in out, out[-1200:]
         assert _tree_hash(root) == before, "gate aborted but the data tree changed"
         return out
@@ -345,7 +351,7 @@ def test_d67_gate_aborts_on_a_new_oecd_row(scratch):
     out = _fresh_input_aborts(
         scratch, "oecd_aim_full_incidents.json",
         lambda rows: rows.append(_synthetic_oecd_row(rows, "OECD-AIM-2026-10-02-zz02", [])),
-        "add OECD row(s) ['OECD-AIM-2026-10-02-zz02'] (new row)",
+        "add OECD/AIID source(s) ['OECD-AIM-2026-10-02-zz02'] (new row)",
     )
     assert "merge INC-" not in out and "title edit INC-" not in out  # only the addition fired
 
@@ -359,7 +365,7 @@ def test_d67_gate_aborts_on_an_upstream_aiid_title_edit(scratch):
         row["title"] = row["title"] + " (edited upstream)"
 
     out = _fresh_input_aborts(scratch, "aiid_full.json", edit, "title edit INC-")
-    assert "add OECD row" not in out and "merge INC-" not in out
+    assert "add OECD/AIID" not in out and "merge INC-" not in out
 
 
 # ---- S5: weekly workflow fails closed at the merge step --------------------
@@ -400,3 +406,58 @@ def test_fail_closed_check_fires():
     assert check_fail_closed(text.replace(merge, merge.rstrip("\n") + "\n        continue-on-error: true\n"))
     cpr = next(s for s in steps if "uses: peter-evans/create-pull-request" in s)
     assert check_fail_closed(text.replace(cpr, cpr.replace("        uses:", "        if: always()\n        uses:", 1)))
+
+
+def test_d71_gate_aborts_on_a_new_aiid_only_row(scratch):
+    """D71: a purely ADDED AIID row (the weekly snapshot gains new incidents)."""
+    def add(rows):
+        row = copy.deepcopy(rows[0])
+        row.update(source_id="AIID-99999", aiid_id=99999, title="Synthetic AIID row (test)")
+        row["references"] = [{"title": "AIID incident #99999", "url": "https://incidentdatabase.ai/cite/99999/",
+                              "type": "report"}]
+        row["description"] = "AI Incident Database (AIID) entry #99999: Synthetic AIID row (test)."
+        rows.append(row)
+
+    out = _fresh_input_aborts(scratch, "aiid_full.json", add,
+                              "add OECD/AIID source(s) ['AIID-99999'] (new row)")
+    assert "content change INC-" not in out and "merge INC-" not in out
+
+
+def test_a2_gate_aborts_when_the_snapshot_gains_an_id_a_published_row_cites(scratch):
+    """A2/D71: the gate review's observed case. INC-00437 cites AIID-1574, which
+    the committed snapshot lacks; a snapshot that gains it rewrites INC-00437's
+    content (description, provenance, severity, date, references, taxonomy ...)
+    with no title change and no new source id, which D42/D67 alone did not hold."""
+    def add(rows):
+        base = copy.deepcopy(rows[0])
+        base.update(source_id="AIID-1574", aiid_id=1574, title="Snapshot title for 1574", severity="Critical",
+                    date="2026-04-03", year=2026,
+                    references=[{"title": "AIID incident #1574", "url": "https://incidentdatabase.ai/cite/1574/",
+                                 "type": "report"}])
+        base["description"] = "AI Incident Database (AIID) entry #1574: Snapshot title for 1574."
+        rows.append(base)
+
+    out = _fresh_input_aborts(scratch, "aiid_full.json", add, "content change INC-00437 (D71)")
+    assert "add OECD/AIID" not in out
+
+
+def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
+    """Counterpart: a content change driven by a NON-pair input (here a CVE-only
+    row's severity edited in the CVE ingest file) is not held, because no
+    OECD/AIID input differs from HEAD. Proves the rule does not over-hold."""
+    path = scratch / "ingest" / "cve_incidents.json"
+    original = path.read_text(encoding="utf-8")
+    rows = json.loads(original)
+    inc = json.loads((scratch / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
+    cve_only = {e["source_ids"][0]: e for e in inc if len(e["source_ids"]) == 1 and e["source_ids"][0].startswith("CVE-")}
+    victim = next(r for r in rows if r.get("source_id") in cve_only and r.get("severity") != "Critical")
+    victim["severity"] = "Critical"
+    try:
+        path.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+        res = _run_merge(scratch)
+        assert res.returncode == 0, (res.stdout + res.stderr)[-800:]
+        new = json.loads((scratch / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
+        assert next(e for e in new if e["source_ids"] == [victim["source_id"]])["severity"] == "Critical"
+    finally:
+        path.write_text(original, encoding="utf-8")
+        _run_merge(scratch)  # restore the scratch data tree for later tests

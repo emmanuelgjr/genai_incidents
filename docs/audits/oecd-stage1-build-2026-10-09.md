@@ -293,3 +293,71 @@ carried by published entries, and no published title differs.
 **Open for the user (not decided here).** New AIID-only rows from the weekly snapshot (AIID-authored titles)
 still flow into a PR; D67 as worded does not hold them. One-line change if wanted: extend the addition check
 to `AIID-` source ids.
+
+## Addendum 2026-10-10 (2): D71 and the three gate advisories (A1, A2, A3)
+
+User ruling D71: "Hold AIID-only additions too": nothing from the frozen OECD/AIID pair reaches main until
+stage 2. Data is unchanged versus c8d7b48e (rebuild byte-exact; `git diff c8d7b48e -- data ingest
+INCIDENTS.md docs/incidents` empty). Wording correction: the D67 addendum above says "(b)" exempts a title
+"equal to a `data/curation_overrides.json` title"; that was a global set of override titles and is
+superseded by A1 below (original text kept as the record).
+
+**D71 additions.** The addition check now covers `OECD-AIM-` and `AIID-` source ids alike: any such id in the
+build that no published entry carried is held, whether it makes a new row, a mixed row, or is absorbed into a
+published ID. The earlier "new AIID-only row is not held" boundary test is replaced by one that aborts.
+
+**A1 (curated-title exemption keyed to the row).** A title change on a published OECD/AIID row is exempt only
+when a `curation_overrides` entry keyed to one of THAT row's own current `source_ids` sets exactly that title.
+The old global set of override titles would have let an unrelated override with a coincident title excuse an
+upstream edit. Fire test: an override keyed `CVE-2025-9999` with the same title does not exempt.
+
+**A2 (content changes driven by the pair): rule and justification.** Rule: when any OECD/AIID ingest input
+(`ingest/aiid_full.json`, `aiid_incidents.json`, `aiid_oecd_relationships.json`,
+`oecd_aim_full_incidents.json`) differs byte-for-byte from its git HEAD version, any change to a published
+row's content fields (`_CONTENT_FIELDS` except `title`, plus `description_provenance` and
+`description_source`) on a row that carries (now or before) an OECD-AIM-/AIID- source id is held as
+`content change <id> (D71)`, unless a signed `{"kind":"content","id":...}` approval names it. This includes the
+2026-10-03 classes (aiid_id gains, severity changes; both are fire-tested as unit cases) and the observed
+case: a snapshot that gains AIID-1574 rewrites INC-00437 (18 fields per the gate; no title change, no new
+source id) with exit 0 before this rule.
+Alternatives considered: (i) a counterfactual second build with the committed OECD/AIID inputs and a per-row
+diff of the two outputs is the most precise attribution but doubles the merge (about 40 s here) and adds a
+second code path to keep deterministic; (ii) holding every content change on OECD/AIID-linked rows
+unconditionally is simple but would force an approval for every future migration or rescore that touches the
+roughly 5,600 linked rows. The chosen rule is the narrow middle: it is sound (if no pair input differs from the
+commit, the pair cannot have driven a change, and if one does, every content change on a pair-linked row is
+held) and it over-holds only in a week where the pair inputs already differ, which is a week the additions
+hold already turns red. Known over-hold: in such a week a CVE rescore or AIAAIC change on a pair-linked row is
+held too; the user can approve it by id. If git metadata is absent the signal is treated as "changed"
+(conservative). Committed inputs: nothing differs, nothing is held, build unchanged. Counter-test: a CVE-only
+severity edit with pair inputs equal to HEAD builds (exit 0) and is not held.
+
+**A3 (fail-open baseline).** `_load_prev_incidents()` returns [] when `data/incidents.json` is missing or
+unparseable, so every check passed vacuously. The gate now has its own loader, `_load_gate_baseline()`: it
+reads `git show HEAD:data/incidents.json` and raises (build aborts, "Nothing was written") when that is missing,
+empty or unparseable. A genuine first-ever build is: a git repo in which `data/incidents.json` has no history
+at all (`git log --all -- data/incidents.json` empty), or, with no `.git` (source archive), the explicit
+opt-in `MERGE_ALLOW_FIRST_BUILD=1` (same shape as `MERGE_ALLOW_MISSING_LEGACY`); a file with history that is
+absent at HEAD fails closed. Reason for HEAD rather than the working tree: HEAD is what was published and
+reviewed; the working-tree file can be dirty, hand-edited, deleted or already overwritten by an earlier step,
+and any of those would silently move the baseline. In the weekly job the two are identical. Without `.git` the
+working-tree file is the only baseline available and must parse. The rest of the merge still uses
+`_load_prev_incidents()` (ids, retention, history); only the gate changed.
+
+**Message and approvals.** `[FATAL] D42/D25(a)+D67+D71: ...` with `merge`, `retitle`, `title edit`,
+`content change` and `add OECD/AIID source(s)` lines (first 25), then `Nothing was written. ... (D58/D67/D71,
+stage 1)`. Approval kinds: merge, retitle, add (`source_id`), content (`id`).
+
+**Fire proofs** (a part of the gate disabled, tests run, restored; `cmp` against the good file confirms):
+- A2 rule disabled: 5 unit cases fail (aiid_id gain, severity change, description, provenance label,
+  references) and the real-build 1574 test fails (exit 0).
+- AIID additions disabled (check reverts to OECD-only): the unit tests for a new AIID-only row and an
+  absorbed AIID id fail, and the real-build `AIID-99999` test fails.
+- A1 global exemption restored: `test_curated_title_exemption_is_keyed_to_the_row` and
+  `test_upstream_title_edit_on_gated_row_aborts` fail.
+- A3: parse failure returning [] fails the corrupt, empty and no-git-unparseable baseline tests; the
+  history-with-missing-HEAD branch made permissive fails its test; reading the working tree instead of HEAD
+  fails `test_baseline_is_read_from_head_not_the_working_tree`.
+Real-build tests run in a scratch git repo (`git init` plus a baseline commit of the copied tree, because the
+gate reads HEAD); committed inputs build with exit 0 and reproduce `data/incidents.json` and
+`id_deprecations.json` byte-for-byte.

@@ -118,7 +118,7 @@ def test_new_oecd_row_aborts_and_unchanged_set_does_not(tmp_path):
     new = same + [{"id": "INC-9", "title": "Brand new", "source_ids": ["OECD-AIM-2026-09-09-zzzz"]}]
     with pytest.raises(m.RefreshMergeApprovalError) as ei:
         m._check_refresh_merge_authorization(PREV, new, [], tmp_path / NOFILE)
-    assert "add OECD row" in str(ei.value) and "INC-9" in str(ei.value) and "D67" in str(ei.value)
+    assert "add OECD/AIID source" in str(ei.value) and "INC-9" in str(ei.value) and "D67" in str(ei.value)
 
 
 def test_mixed_new_row_and_absorbed_new_oecd_id_abort(tmp_path):
@@ -132,12 +132,6 @@ def test_mixed_new_row_and_absorbed_new_oecd_id_abort(tmp_path):
     assert "absorbed into published row" in str(ei.value)
 
 
-def test_new_aiid_only_row_is_not_held(tmp_path):
-    """Scope boundary (D67 says OECD additions): a new AIID-only row is not held."""
-    cur = [{"id": "INC-9", "title": "AIID only", "source_ids": ["AIID-1700"]}]
-    m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
-
-
 def test_approved_add_is_allowed(tmp_path):
     entries = [{"kind": "add", "source_id": "OECD-AIM-2026-09-09-zzzz"}]
     p = _approval(tmp_path, entries)
@@ -146,7 +140,8 @@ def test_approved_add_is_allowed(tmp_path):
 
 
 def test_valid_user_approval_allows_exactly_the_listed_changes(tmp_path):
-    entries = [{"kind": "merge", "from": "INC-2", "into": "INC-1"}, {"kind": "retitle", "id": "INC-1"}]
+    entries = [{"kind": "merge", "from": "INC-2", "into": "INC-1"}, {"kind": "retitle", "id": "INC-1"},
+               {"kind": "add", "source_id": "AIID-5"}]
     path = _approval(tmp_path, entries)
     cur = [{"id": "INC-1", "title": "New title", "source_ids": ["AIID-5", "OECD-AIM-2026-01-01-aaaa", "OECD-AIM-2026-02-02-bbbb"]}]
     m._check_refresh_merge_authorization(
@@ -254,3 +249,205 @@ def test_override_label_is_skipped_when_anchor_moved_to_aiid_text():
          "description": "AI Incident Database (AIID) entry #1574: Some title. Alleged deployer/developer: X."}
     m.apply_curation_overrides([e], _OV)
     assert "description_source" not in e and "description_provenance" not in e
+
+
+# ---- D71: AIID additions held; A1 row-keyed curation; A2 content changes; A3 baseline ----
+
+
+def test_new_aiid_only_row_aborts(tmp_path):
+    """D71 (supersedes the D67 scope boundary): a new AIID-only row is held too."""
+    cur = [{"id": "INC-9", "title": "AIID only", "source_ids": ["AIID-1700"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
+    assert "AIID-1700" in str(ei.value) and "(new row)" in str(ei.value)
+
+
+def test_new_aiid_id_absorbed_into_published_row_aborts(tmp_path):
+    cur = [{"id": "INC-3", "title": "CVE thing", "source_ids": ["CVE-2025-0001", "AIID-1700"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV, cur, [], tmp_path / NOFILE)
+    assert "absorbed into published row" in str(ei.value)
+
+
+def test_already_published_aiid_id_is_not_an_addition(tmp_path):
+    prev = PREV + [_prev("INC-5", "AIID row", ["AIID-5"])]
+    cur = [{"id": "INC-5", "title": "AIID row", "source_ids": ["AIID-5"]}]
+    m._check_refresh_merge_authorization(prev, cur, [], tmp_path / NOFILE)
+
+
+def test_curated_title_exemption_is_keyed_to_the_row(tmp_path):
+    """A1: an override keyed to an UNRELATED source id that happens to set the same
+    title must not exempt this row's upstream title edit."""
+    cur = [{"id": "INC-1", "title": "Curated title", "source_ids": ["OECD-AIM-2026-01-01-aaaa"]}]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(
+            PREV, cur, [], tmp_path / NOFILE, curation={"CVE-2025-9999": {"title": "Curated title"}}
+        )
+    assert "title edit INC-1" in str(ei.value)
+
+
+def _row(**kw):
+    base = {"id": "INC-5", "title": "AIID row", "source_ids": ["AIID-5"], "aiid_id": 5,
+            "severity": "Medium", "description": "d", "references": [], "tags": []}
+    base.update(kw)
+    return base
+
+
+PREV_A2 = PREV + [_row(), _prev("INC-6", "CVE only", ["CVE-2025-0006"]) | {"severity": "Low"}]
+
+
+@pytest.mark.parametrize("change", [
+    {"aiid_id": 1574},                      # the 2026-10-03 aiid_id-gain class
+    {"severity": "High"},                   # the 2026-10-03 severity-change class
+    {"description": "different"},
+    {"description_provenance": "original"},
+    {"references": [{"url": "https://x.example/", "title": "t", "type": "report"}]},
+])
+def test_content_change_on_oecd_aiid_row_aborts_when_inputs_changed(tmp_path, change):
+    cur = [_row(**change)]
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._check_refresh_merge_authorization(PREV_A2, cur, [], tmp_path / NOFILE, pair_inputs_changed=True)
+    assert "content change INC-5 (D71)" in str(ei.value)
+
+
+def test_content_change_is_not_held_when_pair_inputs_are_committed(tmp_path):
+    cur = [_row(severity="High")]
+    m._check_refresh_merge_authorization(PREV_A2, cur, [], tmp_path / NOFILE, pair_inputs_changed=False)
+
+
+def test_content_change_on_non_oecd_aiid_row_is_not_held(tmp_path):
+    cur = [{"id": "INC-6", "title": "CVE only", "source_ids": ["CVE-2025-0006"], "severity": "Critical"}]
+    m._check_refresh_merge_authorization(PREV_A2, cur, [], tmp_path / NOFILE, pair_inputs_changed=True)
+
+
+def test_unchanged_row_is_not_a_content_change(tmp_path):
+    m._check_refresh_merge_authorization(PREV_A2, [_row()], [], tmp_path / NOFILE, pair_inputs_changed=True)
+
+
+def test_approved_content_change_is_allowed(tmp_path):
+    p = _approval(tmp_path, [{"kind": "content", "id": "INC-5"}])
+    m._check_refresh_merge_authorization(PREV_A2, [_row(severity="High")], [], p, pair_inputs_changed=True)
+
+
+# A3: the baseline is read from git HEAD and fails closed.
+
+import subprocess
+
+
+def _git(root, *args):
+    return subprocess.run(
+        ["git", "-c", "user.email=t@e.x", "-c", "user.name=t", "-c", "commit.gpgsign=false", *args],
+        cwd=root, check=True, capture_output=True,
+    )
+
+
+def _repo(tmp_path, committed: str | None, working: str | None = None, ingest=None):
+    _git(tmp_path, "init", "-q")
+    (tmp_path / "data").mkdir()
+    (tmp_path / "ingest").mkdir()
+    (tmp_path / "README").write_text("x")
+    if committed is not None:
+        (tmp_path / "data" / "incidents.json").write_text(committed, encoding="utf-8")
+    for name, body in (ingest or {}).items():
+        (tmp_path / "ingest" / name).write_text(body, encoding="utf-8")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "c")
+    if working is None:
+        (tmp_path / "data" / "incidents.json").unlink(missing_ok=True)
+    else:
+        (tmp_path / "data" / "incidents.json").write_text(working, encoding="utf-8")
+    return tmp_path
+
+
+GOOD = json.dumps({"incidents": [{"id": "INC-1", "title": "t", "source_ids": ["CVE-1"]}]})
+
+
+def test_baseline_is_read_from_head_not_the_working_tree(tmp_path):
+    r = _repo(tmp_path, GOOD, working="{ not json")
+    inc, first = m._load_gate_baseline(r)
+    assert first is False and inc[0]["id"] == "INC-1"
+
+
+def test_baseline_survives_a_deleted_working_file(tmp_path):
+    r = _repo(tmp_path, GOOD, working=None)
+    assert m._load_gate_baseline(r)[0][0]["id"] == "INC-1"
+
+
+def test_corrupt_committed_baseline_fails_closed(tmp_path):
+    r = _repo(tmp_path, "{ not json", working=GOOD)
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(r)
+
+
+def test_empty_committed_baseline_fails_closed(tmp_path):
+    r = _repo(tmp_path, json.dumps({"incidents": []}))
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(r)
+
+
+def test_file_deleted_in_head_but_with_history_fails_closed(tmp_path):
+    r = _repo(tmp_path, GOOD, working=None)
+    _git(r, "add", "-A")
+    _git(r, "commit", "-q", "-m", "delete it")
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(r)
+
+
+def test_genuine_first_build_in_a_git_repo_is_allowed(tmp_path):
+    r = _repo(tmp_path, None)
+    assert m._load_gate_baseline(r) == ([], True)
+
+
+def test_no_git_missing_baseline_fails_closed_unless_opted_in(tmp_path, monkeypatch):
+    monkeypatch.delenv("MERGE_ALLOW_FIRST_BUILD", raising=False)
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(tmp_path)
+    monkeypatch.setenv("MERGE_ALLOW_FIRST_BUILD", "1")
+    assert m._load_gate_baseline(tmp_path) == ([], True)
+
+
+def test_no_git_unparseable_baseline_fails_closed(tmp_path):
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "incidents.json").write_text("{ not json", encoding="utf-8")
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(tmp_path)
+
+
+def test_first_build_skips_the_checks(tmp_path):
+    new = [{"id": "INC-9", "title": "x", "source_ids": ["OECD-AIM-2026-09-09-zzzz"]}]
+    m._check_refresh_merge_authorization([], new, [], tmp_path / NOFILE, first_build=True)
+    with pytest.raises(m.RefreshMergeApprovalError):
+        m._check_refresh_merge_authorization([], new, [], tmp_path / NOFILE, first_build=False)
+
+
+def test_pair_inputs_changed_detects_each_input(tmp_path):
+    files = {n: "[]" for n in m._PAIR_INPUT_FILES}
+    r = _repo(tmp_path, GOOD, ingest=files)
+    assert m._pair_inputs_changed(r) is False
+    for n in m._PAIR_INPUT_FILES:
+        (r / "ingest" / n).write_text("[1]", encoding="utf-8")
+        assert m._pair_inputs_changed(r) is True, n
+        (r / "ingest" / n).write_text("[]", encoding="utf-8")
+    assert m._pair_inputs_changed(r) is False
+    (r / "ingest" / m._PAIR_INPUT_FILES[0]).unlink()
+    assert m._pair_inputs_changed(r) is True
+
+
+def test_pair_inputs_changed_is_conservative_without_git(tmp_path):
+    assert m._pair_inputs_changed(tmp_path) is True
+
+
+@pytest.mark.real_gate
+def test_run_refresh_gate_wires_baseline_pair_signal_and_curation(monkeypatch):
+    """main() calls _run_refresh_gate; it must feed the HEAD baseline, the pair-input
+    signal and the curation map into the checker (the autouse stub is off here)."""
+    row = {"id": "INC-5", "title": "AIID row", "source_ids": ["AIID-5"], "severity": "Medium"}
+    monkeypatch.setattr(m, "_load_gate_baseline", lambda *a, **k: ([row], False))
+    monkeypatch.setattr(m, "_pair_inputs_changed", lambda *a, **k: True)
+    with pytest.raises(m.RefreshMergeApprovalError) as ei:
+        m._run_refresh_gate([{**row, "severity": "High"}], [], {})
+    assert "content change INC-5 (D71)" in str(ei.value)
+    monkeypatch.setattr(m, "_pair_inputs_changed", lambda *a, **k: False)
+    m._run_refresh_gate([{**row, "severity": "High"}], [], {})  # inputs committed: not held
+    monkeypatch.setattr(m, "_load_gate_baseline", lambda *a, **k: ([], True))
+    m._run_refresh_gate([{**row, "id": "INC-9"}], [], {})  # first build: skipped

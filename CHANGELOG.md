@@ -19,8 +19,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   provenance label, not a licence marker. The labels reach `incidents.json` and the
   Hugging Face JSONL export only; not `incidents.min.json`, STIX, MISP, TAXII,
   `INCIDENTS.md`, `docs/incidents/*.md` or `stats.json`.
-- The OECD/AIID refresh freeze is now a deliberate gate (D58, extended by D67 to hold
-  OECD row additions and upstream title edits of published OECD/AIID rows).
+- The OECD/AIID refresh freeze is now a deliberate gate (D58, extended by D67 and D71: nothing
+  from the OECD/AIID pair reaches main until stage 2. It holds added OECD-AIM- and AIID- source rows, upstream
+  title edits and, while an OECD/AIID ingest input differs from its commit, any content change to a published
+  OECD/AIID row; the baseline is read from git HEAD and the gate fails closed if it is unreadable).
   `merge_and_dedupe.py` aborts with "Nothing was written" when a build would merge or
   retitle a previously published ID through an OECD-AIM-/AIID- source id, edit the
   title of a published OECD/AIID row, or add an OECD-AIM- source row not already
