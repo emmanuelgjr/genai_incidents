@@ -40,6 +40,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 Item 5 (N9 precision audit) — specialist reported `072115cc` (pushed); **red-reviewer dispatched**
+- **Delivered:**
+  - a seeded (20261011), stratified sample of 150 rows: 9 strata, proportional allocation, feed 100 / landmark 50;
+  - a review sheet with agent suggestions and empty human columns;
+  - `wilson_ci.py`, which uses human labels only;
+  - a DATASHEET "Measured precision" block rendered from results.json;
+  - `check_precision_audit` in validate.py, with a D28-style marker;
+  - `evaluate_ai_relevance.py`, which waits for human labels;
+  - 791 passed; no data change.
+- **Deviations from the brief (the user must hear these):**
+  1. **"100 auto" became 100 from tier=feed.** 185 landmark rows are quality_tier auto, and 5,015 of 7,968 CVE/GHSA feed rows are `reviewed`, so an auto-only sample would miss most of N9.
+  2. The marker field is `decided_by`, as in the real D28 files.
+  3. An unratified pending state passes with a warning through 2.13.x and fails from 2.14.0.
+- **Agent-suggested precision (NOT measured):** feed 53.1% (unsure excluded) / 47.2% (strict); landmark 100% / 81.7%; CVE/GHSA 54.5%. **A new finding to confirm:** OECD feed rows look weaker (5/19).
+- **User action:** label 150 rows (human_label + human_by), then run `wilson_ci.py --render-datasheet` and `evaluate_ai_relevance.py`; or ratify the pending state before 2.14.0.
+
 ### 🔄 Items 8 + 5 — **DISPATCHED in parallel (2026-10-11)**
 - **Item 8:** distribution-engineer on `ws6/v2130-export-integrity` (worktree `ws6-v2130-export`, base `6da13032`). Scope:
   - STIX `modified` derived from `updated` plus the exporter version;
