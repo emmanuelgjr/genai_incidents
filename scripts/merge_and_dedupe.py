@@ -1106,8 +1106,14 @@ SOURCE_FRESHNESS_PATH = DATA / "source_freshness.json"
 # and pre-tombstone records for the 17 published IDs that answered with
 # silence. A docs/-side input like SPLIT_AUTHORIZATION_PATH: the build reads
 # it, never writes it. See `_load_ruled_deprecation_appends` and step 8b.
-RULED_DEPRECATION_APPENDS_PATH = (
-    ROOT / "docs" / "audits" / "ID-silent-ids-appends-2026-10-09.json"
+#
+# v2.13.0 / user ruling D69 (2026-10-10): a TUPLE of dated inputs, read in
+# order. Each dated input is a record of one ruling and is not rewritten
+# once its records have been appended; a later ruling adds a new dated file
+# here rather than editing an earlier one.
+RULED_DEPRECATION_APPENDS_PATHS: tuple[Path, ...] = (
+    ROOT / "docs" / "audits" / "ID-silent-ids-appends-2026-10-09.json",
+    ROOT / "docs" / "audits" / "ID-group-ids-appends-2026-10-10.json",
 )
 # WS4-T19: the pre-authorization guard's input. A committed, docs/-only
 # list (never data/, never schema/) of which previously-single published
@@ -1325,6 +1331,40 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
         ):
             raise SystemExit(f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r}")
         out.append(dict(rec))
+    return out
+
+
+def _load_all_ruled_deprecation_appends(paths) -> list[dict]:
+    """Every ruled record from every dated input in ``paths``, in order
+    (file order, then entry order). D69: one file per ruling."""
+    out: list[dict] = []
+    for p in paths:
+        out.extend(_load_ruled_deprecation_appends(Path(p)))
+    return out
+
+
+def content_into_map(deprecations: list[dict]) -> dict:
+    """``{from: into}`` from each `from`'s latest UNSCOPED record whose
+    reason is not a naming ruling (`_D28_SUPERSEDING_REASONS`).
+
+    Why (user ruling D69, 2026-10-10): a `successor-identified` record says
+    which incident a published ID *named*. It does not say where the
+    content that other rows merged INTO that ID went. D28 approved content
+    fan-outs, and some approved sets name a since-retired ID as a target
+    (INC-00497's names INC-00311). Expanding that target through its newest
+    record would read INC-00311's naming ruling (-> INC-14726) as if it
+    were INC-00311's content (12 successors), and step 8a would then
+    "correct" INC-00497 to an 8-way set on every rebuild. Step 8a expands
+    through this map instead. With no naming rulings present it equals the
+    plain last-record-wins map over unscoped records."""
+    out: dict = {}
+    for d in deprecations:
+        f = d.get("from")
+        if not f or "valid_for_releases" in d:
+            continue
+        if d.get("reason") in _D28_SUPERSEDING_REASONS:
+            continue
+        out[f] = d.get("into")
     return out
 
 
@@ -2667,7 +2707,7 @@ def main():
     #     that function's docstring for why the canonical copy lives in
     #     this module (import direction) and what invariant the two call
     #     sites must jointly preserve.
-    _ruled_appends = _load_ruled_deprecation_appends(RULED_DEPRECATION_APPENDS_PATH)
+    _ruled_appends = _load_all_ruled_deprecation_appends(RULED_DEPRECATION_APPENDS_PATHS)
     # Only ruled records that REPLACE the release-independent answer (an
     # unscoped `successor-identified` record) supersede D28's fan-out. The
     # release-scoped records and their unscoped `release-dependent`
@@ -2682,7 +2722,9 @@ def main():
             _f = _d.get("from")
             if _f:
                 _latest_deprec_map[_f] = _d
-        _into_map = {f: r.get("into") for f, r in _latest_deprec_map.items()}
+        # D69: expand through the CONTENT view (naming rulings excluded),
+        # not the plain latest-record map; see `content_into_map`.
+        _into_map = content_into_map(deprecations_all)
 
         _resplit_corrected = 0
         for entry in _resplit_auth.get("entries", []):
@@ -2729,11 +2771,14 @@ def main():
     #     INC-03128/INC-08185, release-scoped records for INC-00497/
     #     INC-08139 each followed by an unscoped restatement, and the nine
     #     pre-tombstone records) unless already present. Append-only and
-    #     idempotent; see `_append_ruled_records`.
+    #     idempotent; see `_append_ruled_records`. D69 (2026-10-10) adds a
+    #     second dated input: successors for INC-00311/INC-01897, release-
+    #     scoped records + restatement for INC-00554, and a restatement
+    #     pinning INC-00497's fan-out (it chained through INC-00311).
     _ruled_n = _append_ruled_records(deprecations_all, _ruled_appends)
     if _ruled_n:
         print(f"[ruled-appends] appended {_ruled_n} ruled deprecation record(s) "
-              f"from {RULED_DEPRECATION_APPENDS_PATH.name}")
+              f"from {', '.join(Path(p).name for p in RULED_DEPRECATION_APPENDS_PATHS)}")
 
     # Issue #88: an EXCLUDE bucket leaves the dataset, so any historical
     # deprecation whose CURRENTLY AUTHORITATIVE `into` was that bucket (or

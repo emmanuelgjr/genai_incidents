@@ -18,6 +18,12 @@
 > regenerate them from current data.** §4 is live policy and is corrected
 > in place. (§7 is left free for the headroom addendum on the unmerged
 > `ws3/headroom-remeasure` branch.)
+>
+> **UPDATE 2026-10-10 (user rulings D69 and D70).** D69 narrowed three of
+> §8's four `group` IDs (§8.6). D70 found §4 rule 1 ("IDs are never
+> reused") false as a statement about published history; rule 1 carries a
+> dated compliance note, and an ID-reuse audit is queued
+> (`docs/audits/ID-reuse-audit-spec-2026-10-10.md`).
 
 ---
 
@@ -272,6 +278,25 @@ append-only") and with plan invariants 3 and 4.
    every ID recorded in `data/id_deprecations.json`, so a retired number can
    never be handed to a different incident, even if the original entry is
    removed from the corpus entirely.
+   *(Current compliance, added 2026-10-10, user ruling D70: **this rule is
+   not met by the published history.** What it guarantees is narrower than
+   its title: the allocator does not hand a retired number to a new entry.
+   It does not stop a live ID from being re-pointed at a different incident
+   between releases, and that has happened. Across the 14 release tags
+   v2.0.0 to v2.12.0, 591 published IDs carried more than one title: 575
+   are live today, 12 are withdrawn and 4 are retired with a
+   `release-dependent` or `group` answer. A title change is not always a
+   different incident (some are retitles), but some are: `INC-00004` was an
+   MLflow command injection in v2.0.0–v2.1.0, an MLflow path traversal in
+   v2.2.0–v2.5.0 and a Dex XML-encoding issue in v2.6.0–v2.7.0. How many of
+   the 591 are different incidents is what the queued audit measures
+   (`docs/audits/ID-reuse-audit-spec-2026-10-10.md`). For the retired IDs
+   with release-scoped records, `resolve_id_status(id, release=...)` gives
+   the per-release successor (§8). For a live ID `release=` is ignored, so
+   the API does not yet answer "what did this ID mean in release X"; that
+   release's `data/incidents.json` does. Re-derive the counts: §8.6. The rule
+   text above is kept as written: it states the commitment, and this note
+   states where the record falls short of it.)*
 
 2. **Tombstones are append-only.** A record in `data/id_deprecations.json` is
    never edited to change its meaning and never deleted. Corrections are made
@@ -411,6 +436,12 @@ silence: §4 rule 3 now names `resolve_id_status()` as the answer, and it
 returns a named status for every ID. **The deviation is closed by the API
 plus the policy wording. `resolve_id()` does not pick an answer.**
 
+> **Dated update, 2026-10-10 (user ruling D69).** Of the four `group` IDs in
+> the table above, three were narrowed: `INC-00311` → `INC-14726` and
+> `INC-01897` → `INC-14612` are now `successor`, and `INC-00554` is now
+> `release-dependent` (three per-release successors). `INC-00754` stays
+> `group`. The table is kept as written; it was true on 2026-10-09. See §8.6.
+
 ### 8.2 `resolve_id_status(id, release=None) -> IdStatus`
 
 `IdStatus` is a frozen dataclass with these fields: `id`, `status`,
@@ -440,6 +471,8 @@ against old releases.
 
 `resolve_id()`, `resolve_id_group()` and `load_deprecations()` keep their
 signatures. Their answers changed for exactly two IDs (§8.4).
+*(2026-10-10: D69 changed `resolve_id()`/`resolve_id_group()` for two more,
+`INC-00311` and `INC-01897`; §8.6.)*
 
 ### 8.3 Record types added
 
@@ -506,6 +539,11 @@ v2.0.0–v2.8.0 title has no exact holder. D31 ruled these four "no single
 successor" and item 4 did not reopen that ruling, so they stay `group`. The
 question is open for a user ruling.
 
+> **Dated update, 2026-10-10.** The user ruled (D69): narrow `INC-00311`,
+> `INC-01897` and `INC-00554` as described in the paragraph above; keep
+> `INC-00754` a group. Applied in §8.6. The paragraph above is kept as
+> written.
+
 **Declared answer changes vs main `816b9271`.** The golden is
 `tests/fixtures/resolve_id_golden_816b9271.json`, produced by running main's
 own package on its own data. Two `resolve_id()` answers changed:
@@ -525,6 +563,7 @@ live now, or present as a `from`. The gate's own independent check covered
 # (an independent walk over raw JSON, not the package):
 python scripts/audit/silent_ids.py silent --ref 816b9271   # 17 silent (8 ambiguous, 9 unrecorded)
 python scripts/audit/silent_ids.py silent --ref WORKTREE   # 6 by the single-ID walk (4 group + 2 release-dependent), 0 unrecorded
+#   (2026-10-10, after D69: 4 -- INC-00497, INC-00554, INC-00754, INC-08139; see section 8.6)
 
 # Each of the 17 now has a named status:
 PYTHONPATH=src python -c "import genai_incidents as g; [print(i, g.resolve_id_status(i).status, g.resolve_id_status(i).successor) for i in 'INC-03128 INC-08185 INC-00311 INC-00554 INC-00754 INC-01897 INC-00497 INC-08139 INC-00522 INC-00609 INC-00951 INC-00952 INC-00955 INC-00956 INC-00957 INC-01355 INC-01660'.split()]"
@@ -546,3 +585,110 @@ python scripts/audit/silent_ids.py sweep --base 816b9271   # only INC-03128 and 
 python scripts/validate.py
 python -m pytest -q tests/test_resolve_id_status.py
 ```
+
+### 8.6 D69: three of the four `group` IDs narrowed (added 2026-10-10)
+
+Authority: user ruling **D69** (PROGRESS.md, 2026-10-10): narrow the D31
+group IDs "where the evidence is complete". `INC-00754` stays a group: its
+v2.0.0–v2.8.0 title, "ChatGPT Used to Plan and Execute Florida State
+University Shooting", has no live holder.
+
+**The input.** `docs/audits/ID-group-ids-appends-2026-10-10.json`, a new
+dated file read by `merge_and_dedupe.py` step 8b after
+`ID-silent-ids-appends-2026-10-09.json` (`RULED_DEPRECATION_APPENDS_PATHS`).
+D69 got a new file rather than new entries in the 2026-10-09 one, because
+that file is a dated record of item 4 (its `generated`, `item` and
+`authority` describe that ruling). Adding 2026-10-10 decisions to it would
+rewrite a dated record. Seven records were appended, in this order:
+
+| # | from | into | reason | valid_for_releases |
+|---|---|---|---|---|
+| 1 | `INC-00497` | the 12 IDs of `INC-00311`'s split record, verbatim | `release-dependent` | |
+| 2 | `INC-00311` | `INC-14726` | `successor-identified` | |
+| 3 | `INC-01897` | `INC-14612` | `successor-identified` | |
+| 4 | `INC-00554` | `INC-14756` | `release-scoped` | v2.0.0 … v2.7.0 (9 tags) |
+| 5 | `INC-00554` | `INC-14742` | `release-scoped` | v2.8.0 |
+| 6 | `INC-00554` | `INC-14609` | `release-scoped` | v2.9.0, v2.10.0 |
+| 7 | `INC-00554` | its 100-ID split `into`, verbatim | `release-dependent` | |
+
+**Evidence** (each successor is the only live entry with the exact title,
+also after case and punctuation normalisation, and was cross-checked on date,
+description and headline source; per-record text in the input file):
+
+| ID | releases | title then | successor |
+|---|---|---|---|
+| `INC-00311` | v2.0.0–v2.10.0 | AI-Driven Military Targeting Causes Mass Casualties in Middle East Conflicts | `INC-14726`: date 2026-03-13, only holder of OECD-AIM-2026-03-13-f240, which was the row's only source in v2.0.0–v2.5.0 |
+| `INC-01897` | v2.0.0–v2.10.0 | The Tag, Category, and Taxonomy Manager – AI Autotagger with OpenAI plugin … missing capability check on … | `INC-14612`: date 2026-01, same description (`taxopress_ai_add_post_term`, ≤ 3.41.0), holds 5 of the row's 14 CVEs |
+| `INC-00554` | v2.0.0–v2.7.0 | AI-Powered Smart Glasses Enable Widespread Exam Cheating in China and Japan | `INC-14756`: only holder of OECD-AIM-2026-04-05-d4c0 |
+| `INC-00554` | v2.8.0 | China Deploys Armed AI 'Wolf Robots' in Urban Combat Training | `INC-14742`: only holder of OECD-AIM-2026-03-27-2510 |
+| `INC-00554` | v2.9.0–v2.10.0 | Tesla Driver Reportedly Said Driver-Assistance Mode Was Engaged During Fatal Texas Home Crash | `INC-14609`: only holder of AIID-1552 |
+
+The §8.4 limit applies to `INC-00311` and `INC-01897` too. Both rows were
+over-merged when published (up to 12 `source_ids` and 14 CVEs). The successor
+is the incident the row *named*; the other sources live in the entries the
+split records list, and those records stay in the file.
+
+**Record 1 was not in the ruling, but the ruling needs it.** `INC-00497`'s
+authoritative record (2026-10-09, `release-dependent` → `INC-00311`) reached
+its 12 successors *through* `INC-00311`'s split record. A record that narrows
+`INC-00311` changes every walk that passes through it, so with records 2–3
+alone `resolve_id("INC-00497")` became `INC-14726`, an incident `INC-00497`
+never named. This was measured: without record 1 the golden tests fail on `INC-00497`. Record
+1 writes the same 12 IDs as one hop and is the last record for `INC-00497`,
+so every reader keeps its old answer. `INC-00497`'s per-release answers are
+unchanged. At main, `INC-00497` was the only ID whose chain passed through
+`INC-00311` or `INC-01897`; after record 1, none does.
+
+**Step 8a, the D28 re-assertion.** D28's approved set for `INC-00497` names
+`INC-00311` as a target. Step 8a expands such targets to live IDs. Through the
+plain last-record map, `INC-00311` would now expand to `INC-14726` alone, the
+approved set would shrink from 12 to 8, and every rebuild would append a
+corrective record for `INC-00497`. A `successor-identified` record says which
+incident an ID *named*, not where the content merged into it went, and D28
+approved content sets. So step 8a now expands through
+`merge_and_dedupe.content_into_map()`, which leaves out `successor-identified`
+(and scoped) records. Before D69 the two maps agreed on every target D28 names.
+`INC-00311` and `INC-01897` have D28 `retire` entries, not
+`resplit_redirect` ones, so `_d28_superseded_froms()` now also returns them
+but skips nothing new. `tests/test_validate.py`'s D28 check uses the same
+content view.
+
+**Declared answer changes against main `28d97a5a`.**
+`resolve_id("INC-00311")` went from `None` to `INC-14726`, and
+`resolve_id("INC-01897")` went from `None` to `INC-14612`. `resolve_id_group()`
+for those two went from 12 and 8 IDs to one. No other answer of either
+function changed, over the 1,065 `from` IDs (golden
+`tests/fixtures/resolve_id_golden_28d97a5a.json`) and over the 16,731-ID
+sweep. `INC-00554` keeps `None` and its 100, and `INC-00497` keeps `None` and
+its 12. The raw `load_deprecations()` mapping changed for three keys:
+`INC-00311` and `INC-01897` (list → one ID) and `INC-00497` (`"INC-00311"` →
+the same 12 IDs as a list). `resolve_id_status()`: `INC-00311` and
+`INC-01897` are `successor`. `INC-00554` is `release-dependent`, and with
+`release=` it gives `INC-14756` (v2.0.0–v2.7.0), `INC-14742` (v2.8.0) or
+`INC-14609` (v2.9.0, v2.10.0).
+
+```bash
+# The evidence, from the release tags (independent of the records):
+python scripts/audit/silent_ids.py silent --ref 28d97a5a   # 6 ambiguous, with each title's live holder(s)
+python scripts/audit/silent_ids.py silent --ref WORKTREE   # 4: INC-00497, INC-00554, INC-00754, INC-08139
+
+# Only id_deprecations.json and its package copy move; the 1,077 existing records are unchanged:
+python scripts/audit/silent_ids.py delta --base 28d97a5a
+
+# Answer changes, base package vs this tree (expect only INC-00311 and INC-01897):
+python scripts/audit/silent_ids.py sweep --base 28d97a5a
+
+# Golden (regenerate; expect no diff):
+python scripts/audit/silent_ids.py golden --base 28d97a5a --label "v2.13.0 D69" --out tests/fixtures/resolve_id_golden_28d97a5a.json
+git diff --exit-code tests/fixtures/resolve_id_golden_28d97a5a.json
+
+python -m pytest -q tests/test_resolve_id_status.py tests/test_validate.py tests/test_package.py tests/test_merge_and_dedupe.py
+```
+
+**The §4 rule 1 counts (D70).** For every ID in every `v*` tag's
+`data/incidents.json`, count the distinct titles. If it has more than one,
+classify it by `resolve_id_status(id).status` on this tree. Result: 16,572
+published IDs; 591 with more than one title (575 `live`, 12 `withdrawn`, 3
+`release-dependent`, 1 `group`). The item-4 gate reported "14 withdrawn". Its
+classification is not recorded, so the two figures may be counting different
+sets. The audit spec asks for a single, published method.

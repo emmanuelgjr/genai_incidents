@@ -74,9 +74,15 @@ def test_resolve_id_unknown_returns_none():
 def test_load_deprecations_dict_shape():
     d = gi.load_deprecations()
     assert isinstance(d, dict)
-    for k, v in list(d.items())[:5]:
+    # [UPDATE 2026-10-10, D69] This checked only the first 5 values and
+    # assumed each was a string. The documented type is `str | list[str]`
+    # (load_deprecations' docstring); D69's restatement made INC-00497 (the
+    # 1st key in file order) a list. Every value is now checked against the
+    # documented type instead.
+    for k, v in d.items():
         assert k.startswith("INC-")
-        assert v.startswith("INC-")
+        vals = v if isinstance(v, list) else [v]
+        assert vals and all(isinstance(x, str) and x.startswith("INC-") for x in vals), (k, v)
 
 
 def _conforms(value, tp) -> bool:
@@ -161,10 +167,16 @@ _WS4T22_TWELVE = {
     "INC-08146": "INC-14853",
     # genuinely ambiguous multi-successor `split` records (or records
     # that chain into one) -- correct behaviour is None, not a bug.
-    "INC-00311": None,
+    # [UPDATE 2026-10-10, user ruling D69] INC-00311 and INC-01897 were None
+    # here until D69 appended `successor-identified` records for them
+    # (docs/audits/ID-group-ids-appends-2026-10-10.json). Pinned to the new
+    # answers, not deleted, as for INC-03128/INC-08185 below. INC-00554
+    # stays None (its last record restates its 100-way split); INC-00754
+    # stays None (D69: no holder for its early meaning).
+    "INC-00311": "INC-14726",
     "INC-00554": None,
     "INC-00754": None,
-    "INC-01897": None,
+    "INC-01897": "INC-14612",
     "INC-00497": None,
     # [UPDATE 2026-10-09, v2.13.0 item 4] INC-03128 and INC-08185 were None
     # here when WS4-T22 landed (D28's fan-out, no single successor written).

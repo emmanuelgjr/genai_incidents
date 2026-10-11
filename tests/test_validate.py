@@ -295,7 +295,15 @@ def test_real_resplit_redirects_match_d28_approved_targets():
     )["deprecations"]
     live_ids = {e["id"] for e in data["incidents"] if e.get("id")}
     latest = v._latest_by_from(deps)
-    into_map = {f: r.get("into") for f, r in latest.items()}
+    # [UPDATE 2026-10-10, user ruling D69] Expand through the CONTENT view
+    # (`m.content_into_map`: naming rulings excluded), exactly as step 8a
+    # does. D28's approved set for INC-00497 names INC-00311, which now
+    # carries a `successor-identified` record (-> INC-14726). That record
+    # says which incident INC-00311 NAMED, not where INC-00311's content
+    # went; expanding through it shrank D28's approved set to 8 and made
+    # this test report INC-00497 (still on its 12) as a mismatch. Before
+    # D69 the two maps were identical on every target D28 names.
+    into_map = m.content_into_map(deps)
 
     def resolve(node):
         return v._resolve_live_targets(node, into_map, live_ids)

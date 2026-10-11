@@ -228,7 +228,7 @@ See [`schema/incident.schema.json`](schema/incident.schema.json) for the canonic
 
 ```jsonc
 {
-  "id": "INC-00001",                 // stable, never-reused ID — see docs/ID_POLICY.md for the padding-width policy
+  "id": "INC-00001",                 // incident ID; a past release may have used it for a different incident (CORRECTIONS.md, 2026-10-10) — see docs/ID_POLICY.md §4 and §8
   "source_ids": ["AIID-123", "CVE-2025-..."],
   "cve_ids": ["CVE-2025-..."],
   "cwe_ids": ["CWE-918"],
