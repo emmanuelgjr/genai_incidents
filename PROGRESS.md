@@ -40,6 +40,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 8 (export integrity + D57 + D64) — **PASS (re-gate on `38b231c8`, 2026-10-11)**. Before merge: the A2 JS-panel disputed figure, plus merging main into the branch.
+- **Verdict:** "The fix at 38b231c8 closes the D64 defect from bounce #1, and everything else holds."
+- **Gate evidence:**
+  - the markers are rendered: stats=21 rewrites all three surfaces;
+  - drift fires on each surface (23), and render restores byte-exact;
+  - no combined headline count;
+  - the surface sweep finds only og/twitter outside markers (acceptable);
+  - full chain: 65,141 STIX objects / 31 MISP events; sums 35/8/35/3 pass `sha256sum -c`; the STIX bundle and jsonl are byte-identical to the 09fcc03f export;
+  - 793 passed alone, 850 in a scratch merge with main.
+- **Advisories:**
+  - A1: CHANGELOG conflict with main (trivial);
+  - **A2: the docs/app.js stats panel has no disputed figure** (being fixed);
+  - A3: og/twitter is acceptable;
+  - A4: the specialist's "3 files" was a partial local tree; docs/data is gitignored.
+- **Rulings pending to the user:** R1-R5 (the gate recommends accepting R1-R4; R5 as a follow-up).
+
 ### ✅ Item 5 (N9 precision audit) — **DONE: MERGED to main (2026-10-11)** after the advisory fix `1f5a0ef8` (validate.yml `fetch-depth: 0`, which also lets the v2.10.0-tag test run in CI).
 - **Foreman [R] after merge:**
   - 0 deletions; porcelain empty;
