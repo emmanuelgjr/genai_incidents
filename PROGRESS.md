@@ -40,6 +40,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 D69/D70 branch — `5e64cee1` (pushed); **red-reviewer dispatched**
+- **Mappings:** all 5 user mappings verified from tag data; 7 records appended from the new dated input `ID-group-ids-appends-2026-10-10.json` (1,077 → 1,084).
+- **Answer changes:** only INC-00311 → INC-14726 and INC-01897 → INC-14612 (resolve_id), with group sizes 12→1 and 8→1. INC-00554 stays None/100, with resolve_id_status release-dependent.
+- **Two changes the ruling didn't name (specialist premise correction):**
+  1. A protective restatement for INC-00497. Without it, resolve_id('INC-00497') would flip None → INC-14726, which it never named.
+  2. Step 8a expands D28 targets through `content_into_map()`, to stop a spurious corrective record.
+- **Consumer-visible:** `load_deprecations()` raw values change for 3 keys. The gate is asked whether that is public API.
+- **D70:**
+  - DATA_DICTIONARY and README:231 corrected; ID_POLICY dated notes plus §8.6; 2 CORRECTIONS rows; audit spec written.
+  - Figures: 591 multi-title IDs (575 live, 12 withdrawn) against the earlier gate's "14 withdrawn". Re-deriving it is part of the gate.
+  - **Foreman-owned:** MASTER_IMPROVEMENT_PLAN.md:49 invariant 9 says "never reused". **The foreman will amend it after the gate**, as a dated note.
+
 ### 🔍 Item 7 stage 1, D71 + A1-A3 — `1b20ffca` (pushed); **scoped re-gate sent to the stage-1 reviewer**
 - **D71:** AIID- additions are held.
 - **A2:** if any OECD/AIID ingest input differs from HEAD, content-field changes on pair-linked rows are held; a signed `content` approval releases them. Counter-test: a CVE-only change with the pair at HEAD passes.
