@@ -361,3 +361,34 @@ stage 1)`. Approval kinds: merge, retitle, add (`source_id`), content (`id`).
 Real-build tests run in a scratch git repo (`git init` plus a baseline commit of the copied tree, because the
 gate reads HEAD); committed inputs build with exit 0 and reproduce `data/incidents.json` and
 `id_deprecations.json` byte-for-byte.
+
+## Addendum 2026-10-11: gate advisories A1 (AIRI), A2 (shallow clone), A4 (test isolation)
+
+Data unchanged versus 1b20ffca (rebuild byte-exact). Numbering is the re-gate's, not the addendum above's.
+
+**A1: AIRI counts as the pair.** `ingest/airi_navigator_incidents.json` is added to `_PAIR_INPUT_FILES`. Its
+1,457 rows are keyed by `AIID-<n>` ids and all sit on published rows; with only the four earlier pair files at
+HEAD, an AIRI edit moved severity, tags and references on INC-01706 and INC-01702 (the latter also OECD-linked)
+with exit 0. **This is the foreman's reading of D71, recorded on the board, not a separate user ruling:** under
+D71 ("nothing from the frozen OECD/AIID pair reaches main until stage 2") AIID-keyed AIRI rows count as the
+pair, E23 treats them as uncleared, and AIRI is frozen under D57 anyway. Consequence: an AIRI refresh that
+changes the file now turns the weekly merge red whenever it changes a published OECD/AIID-linked row's content
+(and holds only those rows, not AIRI-only rows). The user can narrow this reading by ruling.
+
+**A2: shallow checkouts.** On a depth-1 clone where `data/incidents.json` is deleted at HEAD,
+`git log --all -- <path>` is empty, so the build read as a first build and skipped the gate. The loader now
+treats `git rev-parse --is-shallow-repository` != "false" (shallow, or unreadable) as "not a first build" and
+fails closed. A shallow clone whose HEAD has the file still builds (baseline read from HEAD).
+
+**A4: test isolation.** The module-scoped scratch repo kept whatever a wrongly-succeeding build had written,
+so one failing test could cascade into others (with the gate removed the A2 counter-test also failed). The
+fixture now stores a pristine copy of the post-control `data/` and `_fresh_input_aborts` restores it in its
+`finally`; the counter-test restores it before and after.
+
+**Fire proofs.**
+- AIRI removed from `_PAIR_INPUT_FILES`: `test_pair_inputs_include_airi_navigator` fails; with the gate removed
+  entirely the real-build AIRI test also fails (exit 0).
+- Shallow check disabled: `test_shallow_clone_with_file_deleted_at_head_fails_closed` fails (the test first
+  asserts the trap, that `git log --all` really is empty in the shallow clone).
+- A4: with the gate removed from `_run_refresh_gate`, the A2 counter-test (CVE-only change, pair inputs at HEAD)
+  still passes; see the run recorded in the commit message.

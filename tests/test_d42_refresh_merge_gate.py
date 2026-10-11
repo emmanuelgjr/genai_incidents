@@ -451,3 +451,32 @@ def test_run_refresh_gate_wires_baseline_pair_signal_and_curation(monkeypatch):
     m._run_refresh_gate([{**row, "severity": "High"}], [], {})  # inputs committed: not held
     monkeypatch.setattr(m, "_load_gate_baseline", lambda *a, **k: ([], True))
     m._run_refresh_gate([{**row, "id": "INC-9"}], [], {})  # first build: skipped
+
+
+def test_pair_inputs_include_airi_navigator():
+    """AIRI rows are keyed by AIID-<n> ids; under D71 they count as the pair."""
+    assert "airi_navigator_incidents.json" in m._PAIR_INPUT_FILES
+
+
+def test_shallow_clone_with_file_deleted_at_head_fails_closed(tmp_path):
+    """A2: git log --all is empty in a depth-1 clone, which must not read as a first build."""
+    src = _repo(tmp_path / "src", GOOD, working=GOOD) if (tmp_path / "src").mkdir() is None else None
+    _git(src, "add", "-A")
+    _git(src, "commit", "-q", "--allow-empty", "-m", "keep")
+    (src / "data" / "incidents.json").unlink()
+    _git(src, "add", "-A")
+    _git(src, "commit", "-q", "-m", "delete it")
+    shallow = tmp_path / "shallow"
+    subprocess.run(["git", "clone", "-q", "--depth", "1", src.as_uri(), str(shallow)], check=True, capture_output=True)
+    assert subprocess.run(["git", "log", "--oneline", "-1", "--all", "--", "data/incidents.json"], cwd=shallow,
+                          capture_output=True, text=True).stdout.strip() == ""  # the trap: looks like no history
+    with pytest.raises(m.RefreshBaselineError):
+        m._load_gate_baseline(shallow)
+
+
+def test_shallow_clone_with_the_file_present_still_builds(tmp_path):
+    (tmp_path / "src").mkdir()
+    src = _repo(tmp_path / "src", GOOD, working=GOOD)
+    shallow = tmp_path / "shallow"
+    subprocess.run(["git", "clone", "-q", "--depth", "1", src.as_uri(), str(shallow)], check=True, capture_output=True)
+    assert m._load_gate_baseline(shallow)[1] is False

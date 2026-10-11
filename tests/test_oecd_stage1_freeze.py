@@ -288,7 +288,16 @@ def scratch(tmp_path_factory):
     control = _run_merge(root)
     assert control.returncode == 0, control.stdout[-800:] + control.stderr[-800:]
     assert "Nothing was written" not in control.stdout + control.stderr
+    # A4: pristine copy of the post-control data tree, so every test can restore
+    # it and stand alone (a build that wrongly succeeds writes data/).
+    shutil.copytree(root / "data", root.parent / (root.name + "_pristine_data"))
     return root
+
+
+def _restore_data(root: Path) -> None:
+    pristine = root.parent / (root.name + "_pristine_data")
+    shutil.rmtree(root / "data")
+    shutil.copytree(pristine, root / "data")
 
 
 def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> str:
@@ -307,10 +316,13 @@ def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> st
         assert res.returncode != 0, out[-600:]
         assert "D42/D25(a)" in out and "Nothing was written" in out and "D58/D67/D71" in out
         assert expect in out, out[-1200:]
-        assert _tree_hash(root) == before, "gate aborted but the data tree changed"
+        after = _tree_hash(root)
+        after[f"ingest/{ingest_name}"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        assert after == before, "gate aborted but the data tree changed"
         return out
     finally:
         path.write_text(original, encoding="utf-8")
+        _restore_data(root)
 
 
 def _published_aiid_only(root: Path) -> list[dict]:
@@ -445,6 +457,7 @@ def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
     """Counterpart: a content change driven by a NON-pair input (here a CVE-only
     row's severity edited in the CVE ingest file) is not held, because no
     OECD/AIID input differs from HEAD. Proves the rule does not over-hold."""
+    _restore_data(scratch)
     path = scratch / "ingest" / "cve_incidents.json"
     original = path.read_text(encoding="utf-8")
     rows = json.loads(original)
@@ -460,4 +473,24 @@ def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
         assert next(e for e in new if e["source_ids"] == [victim["source_id"]])["severity"] == "Critical"
     finally:
         path.write_text(original, encoding="utf-8")
-        _run_merge(scratch)  # restore the scratch data tree for later tests
+        _restore_data(scratch)
+
+
+def test_a1_gate_aborts_on_an_airi_only_change_to_an_aiid_linked_row(scratch):
+    """AIRI rows are keyed AIID-<n>; an AIRI-only edit (tags here) of a row that
+    is published under that AIID id moves the published row. With airi_navigator
+    in the pair inputs and the four other pair files at HEAD, it must abort."""
+    airi = json.loads((scratch / "ingest/airi_navigator_incidents.json").read_text(encoding="utf-8"))
+    inc = json.loads((scratch / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
+    by_sid = {s: e for e in inc for s in e["source_ids"]}
+    victim = next(r["source_id"] for r in airi
+                  if r["source_id"].startswith("AIID-") and r["source_id"] in by_sid
+                  and not _oecd_ids(by_sid[r["source_id"]]))
+
+    def edit(rows):
+        row = next(r for r in rows if r.get("source_id") == victim)
+        row["tags"] = list(row.get("tags") or []) + ["airi-edit-test"]
+
+    out = _fresh_input_aborts(scratch, "airi_navigator_incidents.json", edit,
+                              f"content change {by_sid[victim]['id']} (D71)")
+    assert "add OECD/AIID" not in out

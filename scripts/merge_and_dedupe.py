@@ -2016,6 +2016,15 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         shown = _git(root, "show", f"HEAD:{rel}")
         if shown.returncode == 0:
             return parse(shown.stdout, f"git HEAD:{rel}"), False
+        # A shallow clone has truncated history, so "no history" proves nothing:
+        # a file deleted at a depth-1 HEAD would read as a first build.
+        shallow = _git(root, "rev-parse", "--is-shallow-repository")
+        if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
+            raise RefreshBaselineError(
+                f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} in a shallow (or unreadable) "
+                "repository, so a first build cannot be told from a deleted file; the refresh gate "
+                "cannot run. Nothing was written."
+            )
         hist = _git(root, "log", "--oneline", "-1", "--all", "--", rel)
         if hist.returncode == 0 and not hist.stdout.strip():
             return [], True  # git repo, file never committed: first-ever build
@@ -2039,6 +2048,11 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
 _PAIR_INPUT_FILES = (
     "aiid_full.json", "aiid_incidents.json", "aiid_oecd_relationships.json",
     "oecd_aim_full_incidents.json",
+    # AIRI Navigator rows are keyed by AIID-<n> ids (1,457 of them, all on
+    # published rows). Reading of D71, recorded on the board: AIID-keyed AIRI
+    # rows count as the frozen pair (E23 treats them as uncleared; AIRI is
+    # frozen under D57 as well).
+    "airi_navigator_incidents.json",
 )
 
 
