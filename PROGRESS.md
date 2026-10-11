@@ -40,6 +40,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔁 Item 5 — **BOUNCE #1 (red-reviewer on `072115cc`, 2026-10-11)**: specialist redispatched
+- **Defect (agreement 6):** the code pin and the sampling frame are checked only while pending. `validate.py:840` returns early on `measured`, before the pin.
+  - Demonstrated in measured state:
+    - a swapped sample id plus a recomputed hash gives [];
+    - frame.json feed/oecd 3810→10 moves published feed precision 53.1%→63.4%, still [];
+    - a newer dated dir would bypass the pin.
+  - The CHANGELOG claims an unqualified pin.
+  - **Fix:**
+    - pin the sample and frame in every status;
+    - pin the dir;
+    - add measured-state fire tests.
+- **Advisories:**
+  - A1: "100 auto" = tier feed is a **faithful reading.** INCLUSION.md §5 itself calls the feed `quality_tier: auto`, yet 69% of the feed is `reviewed`, so **§5 is false**. → docs-warden; a CORRECTIONS row is the user's call. Per-quality_tier figures are claimed but not produced (being fixed).
+  - A2: the D28 field `decided_by` is confirmed. The OECD memo:342 says `ruled_by`, which is wrong (record; note).
+  - A3: the version-keyed grace is not a can't-fail check. Tripwire: CI goes red at the 2.14.0 bump unless the user rules.
+  - A4: INCLUSION §4 claims a per-ingest-change sample-audit CI gate that doesn't exist. → docs-warden.
+  - A5: the reproduction tests skip after data moves (being fixed).
+  - A6: a hand-typed figure outside the block is undetectable.
+  - A7: spot-check of the agent suggestions: 10/10 agree.
+  - A8: invariant 7 is clean.
+  - A9: merge-tree is clean vs main; expect a trivial conflict with item 8 in test_landmark_distribution.
+  - A10: Excel BOM risk (being fixed).
+- **Foreman [R]:** `scripts/validate.py:839-841` read: `if status == "measured": return problems, ...` precedes the `fresh_sha != required_sha` check at :858. Confirmed.
+
 ### 🔍 Item 8 (export integrity + D57 + D64) — specialist reported `09fcc03f` (pushed); **red-reviewer dispatched**
 - **Premise corrections:**
   - STIX `modified` was already `_ts(updated)`; the exporter-version half was missing.
