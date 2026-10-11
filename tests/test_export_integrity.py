@@ -241,6 +241,15 @@ def test_release_assets_package_is_complete_verifiable_and_reproducible(site, tm
         assert all(i.date_time == (1980, 1, 1, 0, 0, 0) for i in z.infolist())
 
 
+def test_release_assets_min_json_is_a_byte_copy_so_it_carries_tier():
+    """The release's incidents.min.json is `data/incidents.min.json` verbatim (WS6-T9:
+    `tier` must survive into every distributed variant), asserted on the real asset list."""
+    src = dict(pra.ASSETS)["incidents.min.json"]
+    assert src == ROOT / "data" / "incidents.min.json"
+    rows = json.loads(src.read_text(encoding="utf-8"))["incidents"]
+    assert any(r.get("tier") == "landmark" for r in rows)
+
+
 def test_huggingface_build_ships_manifest_and_sums(tmp_path):
     import export_huggingface as hf
     n, jsonl = hf.build(tmp_path)
