@@ -1,111 +1,111 @@
 {
   "coverage_ledger": {
-    "coverage_fraction": 0.08195429472025216,
-    "current_population_size": 1269,
-    "observed_of_current_population": 104
+    "coverage_fraction": 0.09831932773109243,
+    "current_population_size": 1190,
+    "observed_of_current_population": 117
   },
-  "cursor": 8260,
+  "cursor": 15834,
   "last_fetch_failed": [],
   "last_findings": [
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/5892"
+      "url": "https://oecd.ai/en/incidents/8263"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6082"
+      "url": "https://oecd.ai/en/incidents/8290"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6087"
+      "url": "https://oecd.ai/en/incidents/8317"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6142"
+      "url": "https://oecd.ai/en/incidents/8328"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6164"
+      "url": "https://oecd.ai/en/incidents/8333"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6167"
+      "url": "https://oecd.ai/en/incidents/8345"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6188"
+      "url": "https://oecd.ai/en/incidents/15614"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6195"
+      "url": "https://oecd.ai/en/incidents/15718"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6225"
+      "url": "https://oecd.ai/en/incidents/15728"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6234"
+      "url": "https://oecd.ai/en/incidents/15730"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6240"
+      "url": "https://oecd.ai/en/incidents/15744"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6268"
+      "url": "https://oecd.ai/en/incidents/15758"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6295"
+      "url": "https://oecd.ai/en/incidents/15771"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6303"
+      "url": "https://oecd.ai/en/incidents/15775"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6312"
+      "url": "https://oecd.ai/en/incidents/15784"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6317"
+      "url": "https://oecd.ai/en/incidents/15789"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6340"
+      "url": "https://oecd.ai/en/incidents/15793"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6368"
+      "url": "https://oecd.ai/en/incidents/15797"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6370"
+      "url": "https://oecd.ai/en/incidents/15801"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/6382"
+      "url": "https://oecd.ai/en/incidents/15805"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/8105"
+      "url": "https://oecd.ai/en/incidents/15807"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/8214"
+      "url": "https://oecd.ai/en/incidents/15812"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/8246"
+      "url": "https://oecd.ai/en/incidents/15830"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/8258"
+      "url": "https://oecd.ai/en/incidents/15832"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/8260"
+      "url": "https://oecd.ai/en/incidents/15834"
     },
     {
       "reason": "no_incident_body_shape",
@@ -157,86 +157,86 @@
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15614"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15771"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15730"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15784"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15718"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15797"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15728"
-    },
-    {
-      "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15793"
-    },
-    {
-      "reason": "no_incident_body_shape",
       "url": "https://oecd.ai/en/incidents/15856"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15834"
+      "url": "https://oecd.ai/en/incidents/15844"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15758"
+      "url": "https://oecd.ai/en/incidents/15879"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15832"
+      "url": "https://oecd.ai/en/incidents/15877"
     },
     {
       "reason": "no_incident_body_shape",
-      "url": "https://oecd.ai/en/incidents/15744"
+      "url": "https://oecd.ai/en/incidents/15867"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15880"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15883"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15927"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15960"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15905"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15948"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15909"
+    },
+    {
+      "reason": "no_incident_body_shape",
+      "url": "https://oecd.ai/en/incidents/15934"
     }
   ],
   "last_observed_count": 50,
-  "last_run_id": "37992134374",
-  "last_run_utc": "2026-10-09T21:50:48.616136+00:00",
+  "last_run_id": "38132129147",
+  "last_run_utc": "2026-10-11T11:25:30.559571+00:00",
   "last_sample": [
-    "https://oecd.ai/en/incidents/5892",
-    "https://oecd.ai/en/incidents/6082",
-    "https://oecd.ai/en/incidents/6087",
-    "https://oecd.ai/en/incidents/6142",
-    "https://oecd.ai/en/incidents/6164",
-    "https://oecd.ai/en/incidents/6167",
-    "https://oecd.ai/en/incidents/6188",
-    "https://oecd.ai/en/incidents/6195",
-    "https://oecd.ai/en/incidents/6225",
-    "https://oecd.ai/en/incidents/6234",
-    "https://oecd.ai/en/incidents/6240",
-    "https://oecd.ai/en/incidents/6268",
-    "https://oecd.ai/en/incidents/6295",
-    "https://oecd.ai/en/incidents/6303",
-    "https://oecd.ai/en/incidents/6312",
-    "https://oecd.ai/en/incidents/6317",
-    "https://oecd.ai/en/incidents/6340",
-    "https://oecd.ai/en/incidents/6368",
-    "https://oecd.ai/en/incidents/6370",
-    "https://oecd.ai/en/incidents/6382",
-    "https://oecd.ai/en/incidents/8105",
-    "https://oecd.ai/en/incidents/8214",
-    "https://oecd.ai/en/incidents/8246",
-    "https://oecd.ai/en/incidents/8258",
-    "https://oecd.ai/en/incidents/8260",
+    "https://oecd.ai/en/incidents/8263",
+    "https://oecd.ai/en/incidents/8290",
+    "https://oecd.ai/en/incidents/8317",
+    "https://oecd.ai/en/incidents/8328",
+    "https://oecd.ai/en/incidents/8333",
+    "https://oecd.ai/en/incidents/8345",
+    "https://oecd.ai/en/incidents/15614",
+    "https://oecd.ai/en/incidents/15718",
+    "https://oecd.ai/en/incidents/15728",
+    "https://oecd.ai/en/incidents/15730",
+    "https://oecd.ai/en/incidents/15744",
+    "https://oecd.ai/en/incidents/15758",
+    "https://oecd.ai/en/incidents/15771",
+    "https://oecd.ai/en/incidents/15775",
+    "https://oecd.ai/en/incidents/15784",
+    "https://oecd.ai/en/incidents/15789",
+    "https://oecd.ai/en/incidents/15793",
+    "https://oecd.ai/en/incidents/15797",
+    "https://oecd.ai/en/incidents/15801",
+    "https://oecd.ai/en/incidents/15805",
+    "https://oecd.ai/en/incidents/15807",
+    "https://oecd.ai/en/incidents/15812",
+    "https://oecd.ai/en/incidents/15830",
+    "https://oecd.ai/en/incidents/15832",
+    "https://oecd.ai/en/incidents/15834",
     "https://oecd.ai/en/incidents/256",
     "https://oecd.ai/en/incidents/321",
     "https://oecd.ai/en/incidents/281",
@@ -249,19 +249,19 @@
     "https://oecd.ai/en/incidents/382",
     "https://oecd.ai/en/incidents/466",
     "https://oecd.ai/en/incidents/583",
-    "https://oecd.ai/en/incidents/15614",
-    "https://oecd.ai/en/incidents/15771",
-    "https://oecd.ai/en/incidents/15730",
-    "https://oecd.ai/en/incidents/15784",
-    "https://oecd.ai/en/incidents/15718",
-    "https://oecd.ai/en/incidents/15797",
-    "https://oecd.ai/en/incidents/15728",
-    "https://oecd.ai/en/incidents/15793",
     "https://oecd.ai/en/incidents/15856",
-    "https://oecd.ai/en/incidents/15834",
-    "https://oecd.ai/en/incidents/15758",
-    "https://oecd.ai/en/incidents/15832",
-    "https://oecd.ai/en/incidents/15744"
+    "https://oecd.ai/en/incidents/15844",
+    "https://oecd.ai/en/incidents/15879",
+    "https://oecd.ai/en/incidents/15877",
+    "https://oecd.ai/en/incidents/15867",
+    "https://oecd.ai/en/incidents/15880",
+    "https://oecd.ai/en/incidents/15883",
+    "https://oecd.ai/en/incidents/15927",
+    "https://oecd.ai/en/incidents/15960",
+    "https://oecd.ai/en/incidents/15905",
+    "https://oecd.ai/en/incidents/15948",
+    "https://oecd.ai/en/incidents/15909",
+    "https://oecd.ai/en/incidents/15934"
   ],
   "last_soft_anomalies": [],
   "last_violations": [],
@@ -366,6 +366,12 @@
     8246,
     8258,
     8260,
+    8263,
+    8290,
+    8317,
+    8328,
+    8333,
+    8345,
     15614,
     15718,
     15728,
@@ -390,9 +396,16 @@
     15867,
     15877,
     15879,
-    15880
+    15880,
+    15883,
+    15905,
+    15909,
+    15927,
+    15934,
+    15948,
+    15960
   ],
-  "population_size_last_run": 1269,
-  "total_observed_lifetime": 200,
-  "total_sampled_lifetime": 200
+  "population_size_last_run": 1190,
+  "total_observed_lifetime": 250,
+  "total_sampled_lifetime": 250
 }
