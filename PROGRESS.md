@@ -40,6 +40,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 Item 8 (export integrity + D57 + D64) — specialist reported `09fcc03f` (pushed); **red-reviewer dispatched**
+- **Premise corrections:**
+  - STIX `modified` was already `_ts(updated)`; the exporter-version half was missing.
+  - SHA256SUMS covered docs/data only, ran BEFORE the STIX export in pages.yml, and never listed the STIX bundle.
+  - TAXII and MISP had no sums.
+  - GitHub Releases carry no assets.
+  - The MISP event timestamp was fixed at Jan 1 (so no change ever reached subscribers).
+- **Delivered:**
+  - modified = `<updated>T00:00:00.<EXPORTER_VERSION>Z`;
+  - sums plus build_manifest.json on site/data, taxii2, misp, a new release-assets.yml, HF and PyPI;
+  - built_at = committer date or SOURCE_DATE_EPOCH, written only by the export and release steps;
+  - D57: x_source_freshness on 1,382 SDOs and MISP tags on 6,002 attributes;
+  - D64: disputed_count 22, DISPUTED notes on 22 cards; check_stats_drift re-derives the counts;
+  - 792 passed.
+- **One-time consumer effect:** every STIX/TAXII `modified` and all 31 MISP event timestamps move once.
+- **For the user, after the gate:**
+  - R1: `updated` ignores tier, quality_tier, corpus and content_license. Recommendation: add them to `_CONTENT_FIELDS` (pipeline-engineer's file).
+  - R2: new write-capable release-assets.yml and a Pages `_site` check, neither run on GitHub yet.
+  - R3: MISP timestamp change (needed for D57 to propagate).
+  - R4: identity over-bump.
+  - R5: disputed status isn't in STIX or MISP.
+
 ### 🔍 Item 5 (N9 precision audit) — specialist reported `072115cc` (pushed); **red-reviewer dispatched**
 - **Delivered:**
   - a seeded (20261011), stratified sample of 150 rows: 9 strata, proportional allocation, feed 100 / landmark 50;
