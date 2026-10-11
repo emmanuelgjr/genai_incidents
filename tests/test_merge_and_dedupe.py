@@ -423,7 +423,7 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
     # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
-    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     # WS4-T10 build guard: this harness deliberately builds from a
     # from-scratch tmp corpus with no legacy_consolidated.json, which is
     # exactly the shape main() otherwise refuses to build from silently
@@ -1887,7 +1887,7 @@ def test_missing_legacy_consolidated_fails_loudly(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
     # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
-    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
     # No legacy_consolidated.json written into `data` -- the real-world
     # mistake of running merge_and_dedupe.py standalone (skipping
@@ -1923,7 +1923,7 @@ def test_missing_legacy_consolidated_opt_out_still_builds(tmp_path, monkeypatch)
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
     # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
-    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATH", data / "ruled_appends.json")
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
     (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
     m.main()
@@ -2494,10 +2494,47 @@ def test_d28_reassertion_still_runs_for_release_scoped_only_rulings(tmp_path, mo
     assert mine.count(scoped) == 1 and mine.count(restate) == 1, mine  # 8b did not re-append
 
 
-def test_real_d28_skip_set_is_exactly_the_two_successor_rulings():
-    """The real input: only INC-03128 and INC-08185 supersede D28. INC-00497
-    and INC-08139 have D28 resplit_redirect entries too and must stay guarded."""
-    ruled = m._load_ruled_deprecation_appends(m.RULED_DEPRECATION_APPENDS_PATH)
+def test_real_d28_skip_set_is_exactly_the_successor_rulings():
+    """The real inputs: INC-03128 and INC-08185 (item 4) plus INC-00311 and
+    INC-01897 (D69, 2026-10-10) are the unscoped `successor-identified`
+    rulings. Only the first two have D28 resplit_redirect entries, so only
+    they are actually skipped by step 8a; INC-00311/INC-01897 are D28
+    `retire` entries. INC-00497 and INC-08139 have D28 resplit_redirect
+    entries too and must stay guarded (not in the skip set)."""
+    ruled = m._load_all_ruled_deprecation_appends(m.RULED_DEPRECATION_APPENDS_PATHS)
     skip = m._d28_superseded_froms(ruled)
-    assert skip == {"INC-03128", "INC-08185"}
-    assert {"INC-00497", "INC-08139"} <= {r["from"] for r in ruled}
+    assert skip == {"INC-03128", "INC-08185", "INC-00311", "INC-01897"}
+    assert {"INC-00497", "INC-08139", "INC-00554"} <= {r["from"] for r in ruled}
+    assert not ({"INC-00497", "INC-08139", "INC-00554"} & skip)
+    auth = _json.loads(m.SPLIT_AUTHORIZATION_PATH.read_text(encoding="utf-8"))
+    resplit = {e["from"] for e in auth["entries"] if e.get("decision") == "resplit_redirect"}
+    assert skip & resplit == {"INC-03128", "INC-08185"}
+
+
+def test_ruled_inputs_are_two_dated_files_in_order():
+    # D69: one dated input per ruling, read in date order. Fails if the
+    # 2026-10-10 input is dropped from the tuple (its records would then
+    # never be appended) or the order is reversed.
+    names = [p.name for p in m.RULED_DEPRECATION_APPENDS_PATHS]
+    assert names == ["ID-silent-ids-appends-2026-10-09.json",
+                     "ID-group-ids-appends-2026-10-10.json"]
+    assert all(p.exists() for p in m.RULED_DEPRECATION_APPENDS_PATHS)
+
+
+def test_content_into_map_ignores_naming_rulings():
+    # D69: step 8a expands D28-approved targets through the CONTENT view.
+    # Fails if a `successor-identified` record (or a scoped record) leaks
+    # into that view: INC-00497's D28 set names INC-00311, whose content is
+    # its 12-way split, not the single incident its title named.
+    recs = [
+        {"from": "INC-00311", "into": ["INC-14726", "INC-14907"], "reason": "split", "date": "2026-09-18"},
+        {"from": "INC-00311", "into": "INC-14726", "reason": "successor-identified", "date": "2026-10-10"},
+        {"from": "INC-00497", "into": "INC-00311", "reason": "merged", "date": "2026-05-16"},
+        {"from": "INC-00497", "into": "INC-14907", "reason": "release-scoped", "date": "2026-10-09",
+         "valid_for_releases": ["v2.2.0"]},
+        {"from": "INC-00497", "into": "INC-00311", "reason": "release-dependent", "date": "2026-10-09"},
+    ]
+    cmap = m.content_into_map(recs)
+    assert cmap == {"INC-00311": ["INC-14726", "INC-14907"], "INC-00497": "INC-00311"}
+    live = {"INC-14726", "INC-14907"}
+    assert m.resolve_live_targets("INC-00497", cmap, live) == live

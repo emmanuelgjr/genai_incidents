@@ -125,6 +125,35 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - Field-level delta: `docs/audits/cve-sweep/v2130-schema-delta-2026-10-09.md` and `.json`.
   It covers 1,404 entries and 1,492 fields, with 0 defects.
 
+### Changed - three split IDs narrowed to their identified incidents; "never reused" claim corrected (agent-suggested, draft)
+
+- **`resolve_id("INC-00311")` now returns `INC-14726` and `resolve_id("INC-01897")` returns
+  `INC-14612`** instead of `None` (user ruling D69). `resolve_id_group()` returns one ID for
+  each instead of 12 and 8. Each is the only live entry carrying the title the published row
+  had in every release, cross-checked on date, description and headline source.
+  `INC-00554` gets release-scoped records: `resolve_id_status("INC-00554", release=...)` gives
+  `INC-14756` (v2.0.0-v2.7.0), `INC-14742` (v2.8.0) or `INC-14609` (v2.9.0-v2.10.0).
+  Its `resolve_id()` stays `None` and `resolve_id_group()` stays the 100 IDs.
+  `INC-00754` stays a group. This updates the entry below: of its four split retirements,
+  only `INC-00754` still reports `group`.
+- **7 deprecation records appended**, none edited (the 1,077 existing records are a byte
+  prefix of the new file). The records include an unscoped restatement for `INC-00497`, which
+  used to reach its 12 successors through `INC-00311`. Without it, `INC-00497` would have
+  moved to `INC-14726`, an incident it never named. No other `resolve_id()` or
+  `resolve_id_group()` answer changed, over a sweep of 16,731 IDs against `main`'s own
+  package. The raw `load_deprecations()` mapping changed for `INC-00311`, `INC-01897` and
+  `INC-00497`. Input: `docs/audits/ID-group-ids-appends-2026-10-10.json`, a new dated file
+  read by the build after the 2026-10-09 one. Step 8a's D28 check now expands approved
+  targets through `content_into_map()`, so a `successor-identified` record is not read as
+  where a split's content went. `data/incidents.json` and every other data file are
+  byte-identical.
+- **Corrected: incident IDs are not "never reused"** (user ruling D70). Across release tags
+  v2.0.0-v2.12.0, 591 IDs carried more than one title, some of them a different incident
+  (e.g. `INC-00004`). The claim was corrected in place in `docs/DATA_DICTIONARY.md` and
+  `README.md`. `docs/ID_POLICY.md` §4 rule 1 gets a dated compliance note, and
+  `CORRECTIONS.md` gets a row. An audit to classify the 591 is queued:
+  `docs/audits/ID-reuse-audit-spec-2026-10-10.md`. See `docs/ID_POLICY.md` §8.6.
+
 ### Added - `resolve_id_status()`: no published ID answers with silence (agent-suggested, draft)
 
 - **17 published IDs answered with silence, not the 8 the v2.11.0 notes named.** The other
