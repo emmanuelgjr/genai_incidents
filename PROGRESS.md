@@ -40,6 +40,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Item 5 (N9 precision audit) — **PASS (re-gate on `fdabdd78`, 2026-10-11)**. `fetch-depth: 0` is being added before merge.
+- **Verdict, in the gate's words:** "All three bypasses I found last time now fail validation in the measured state, and nothing new is wrong."
+- **Gate evidence:**
+  - Its own probes in the measured state (control []): swapped id → sample-pin failure; feed/oecd 3810→10 → frame-pin failure (`canonical_sha256`, CRLF-proof); extra dated dir → failure.
+  - The Hajek domain estimator was re-derived by hand (0.8).
+  - The shallow fallback skips loudly and never passes silently.
+  - read_sheet refusals fire.
+  - 801 passed; the CI build path leaves porcelain empty; no data change.
+- **Advisories:**
+  - A5: CI is shallow, so the pinned-blob test skips after data moves. **`fetch-depth: 0` is being added.**
+  - A `2026-10-11b`-style dir is not flagged (harmless).
+  - The wilson CLI uses the newest dir (the gate fails if extras exist).
+  - **Carried to the user:**
+    - A1: feed ≠ auto, and INCLUSION §5 is false.
+    - A3: the 2.14.0 tripwire.
+    - A4: INCLUSION §4 claims a per-ingest sample-audit gate.
+    - A2: memo `ruled_by` should be `decided_by`.
+    - A6: a hand-typed figure outside the block.
+
 ### 🔁 Item 5 — **BOUNCE #1 (red-reviewer on `072115cc`, 2026-10-11)**: specialist redispatched
 - **Defect (agreement 6):** the code pin and the sampling frame are checked only while pending. `validate.py:840` returns early on `measured`, before the pin.
   - Demonstrated in measured state:
