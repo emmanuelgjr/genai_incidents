@@ -40,6 +40,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+- **Foreman note on MASTER_IMPROVEMENT_PLAN invariant 9 (:49, :183), 2026-10-11:** the plan text was read. "IDs ... never reused" is a forward-looking RULE, not a factual claim about history, so it is left unchanged: invariant and policy wording belongs to the user (CLAUDE.md). The historical violations (12 withdrawn + 3 release-dependent IDs that changed meaning across v2.0.0–v2.10.0) are recorded in CORRECTIONS and in ID_POLICY §8.6, and are scoped by the queued ID-reuse audit (D70). This supersedes the line above that said "a dated foreman note follows in its own commit".
 ### ✅ D69/D70 branch — **PASS (red-reviewer on `5e64cee1`), MERGED to main under D72 (2026-10-11)**
 - **⚖ D72 (user): "Merge, flag as a behaviour change".** The `load_deprecations()` raw values flip shape for INC-00311, INC-01897 and INC-00497 (the type `str | list[str]` is unchanged). **The release-notes cut must carry a "Behaviour changes" line naming the 3 keys and pointing consumers to `resolve_id_status()`.**
 - **Gate evidence:**
