@@ -279,6 +279,11 @@ def scratch(tmp_path_factory):
         shutil.copytree(ROOT / d, root / d, ignore=shutil.ignore_patterns("__pycache__", "_cache"))
     (root / "docs" / "audits").mkdir(parents=True)
     shutil.copy(ROOT / "docs/audits/WS4-T19-authorized-splits-2026-09-18.json", root / "docs/audits")
+    # v2.13.0 item 4 / D69: step 8b reads the ruled deprecation appends from
+    # docs/audits; without them the control build would not reproduce the
+    # committed id_deprecations.json (it would drop the ruled records).
+    for rel in ("ID-silent-ids-appends-2026-10-09.json", "ID-group-ids-appends-2026-10-10.json"):
+        shutil.copy(ROOT / "docs/audits" / rel, root / "docs/audits")
     # D71: the gate reads its baseline and the "OECD/AIID inputs changed" signal
     # from git HEAD, so the scratch repo is a real one with the committed tree.
     for args in (("init", "-q"), ("add", "-A"),

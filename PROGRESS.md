@@ -24,6 +24,337 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Gate evidence:** it ran every section-8 command verbatim and got 4104, 27, 3937, 0.3735, 0.3894 and 3728, all matching. The diff is the single memo file. Bounce #1's defects 2 and 3 and advisories A1/A2/A3/A5 are fixed truthfully.
 - **Foreman [R]:** `grep -n "vs 4,160"` hits line 220. Confirmed.
 
+### 🔍 Item 7 stage 1, D67 extension — `c8d7b48e` (pushed); **scoped re-gate sent to the stage-1 reviewer**
+- **Design:**
+  - any OECD-AIM- id not carried by a published entry is held: a new row, a mixed row, or one absorbed into a published ID;
+  - upstream title edits on published OECD/AIID rows are held, with curated-override titles exempt;
+  - one gate and one "[FATAL] D42/D25(a)+D67" message; a new signed approval kind `add`, with the set still empty;
+  - committed inputs reproduce the data byte-for-byte.
+- **Evidence:** data unchanged vs 9591ca0f; 737 passed; fire proofs 3 + 2 tests.
+- **Test-harness change:** `_setup_tmp_repo` stubs the gate for 5 fixture tests. The gate is asked whether this weakens anything.
+- **Open for the user:** new AIID-only rows (about 94 per the memo's estimate) still reach a weekly PR, because D67 names OECD only. Holding them is a one-line extension.
+
+### ⚖ D65-D67, USER RULINGS 2026-10-10 (item 7 stage 1 package)
+- **D65: Merge stage 1**, after the D67 change is re-gated.
+- **D66: decouple the other sources (Recommended).** A follow-up task, queued after the v2.13.0 items: the weekly PR carries AIRI/AIAAIC/KEV/cve-sweep/D60 while OECD/AIID-driven changes are held. **NEW BOARD NOTE → WS4.**
+- **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
+- A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
+
+### 🔁 Item 8 — **BOUNCE #1 (red-reviewer on `09fcc03f`, 2026-10-11)**: a FRESH distribution-engineer is on it (the original specialist ran about 274k tokens)
+- **Defect:** D64 is partly delivered. `disputed_count` is missing from the count-quoting doc surfaces: README:48, DATASHEET:20, the site hero at index.html:116, and og/twitter. There is no `stats:disputed_count` marker anywhere, so drift never guards it. **Foreman's own contribution:** my dispatch line (above) shortened the ruling to "`disputed_count` in stats"; the brief itself said "every surface".
+- **Advisories:**
+  - **A1:** the gate's own stray `C:\proc\selfduild_manifest.json` (Git Bash /dev/stdout translation). **Foreman inspected it** (the only file was its manifest) **and removed `C:\proc`.**
+  - A2: DATA_DICTIONARY and the TAXII README overclaim "exactly" (being fixed).
+  - A3: a removal-only change doesn't move the MISP timestamp; STIX has no `revoked` for retractions. **Follow-up note → WS6.**
+  - A4: the R1 test probes only one entry's fields.
+  - A5: `VERSION = "2.0.0"` (pre-existing, → WS6-T1).
+  - A6: no stix2 validator.
+  - A7: a missing full stop.
+- **Gate's view on the user rulings:**
+  - R1: accept adding tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS` (not a defect of item 8).
+  - R2: low risk; verify on the first real release.
+  - R3: needed.
+  - R4: benign.
+  - R5: follow-up `x_status` plus a MISP tag.
+- **Gate evidence:**
+  - byte-exact builds;
+  - its own STIX per-object diff: 65,141 objects, moved only `modified` plus 1,382 `x_source_freshness`, 0 invalid timestamps;
+  - live STIX sha = base sha 693975e6;
+  - MISP: only 6,002 tag appends plus 31 timestamps, re-derived;
+  - D57 set = 1,382, review_by 2027-01-07;
+  - all trees pass `sha256sum -c`; two runs give identical sums;
+  - manifest built_at = committer date;
+  - 7 hand-made fire proofs;
+  - 792 passed;
+  - merge-tree vs main is clean.
+
+### ✅ Item 5 (N9 precision audit) — **PASS (re-gate on `fdabdd78`, 2026-10-11)**. `fetch-depth: 0` is being added before merge.
+- **Verdict, in the gate's words:** "All three bypasses I found last time now fail validation in the measured state, and nothing new is wrong."
+- **Gate evidence:**
+  - Its own probes in the measured state (control []): swapped id → sample-pin failure; feed/oecd 3810→10 → frame-pin failure (`canonical_sha256`, CRLF-proof); extra dated dir → failure.
+  - The Hajek domain estimator was re-derived by hand (0.8).
+  - The shallow fallback skips loudly and never passes silently.
+  - read_sheet refusals fire.
+  - 801 passed; the CI build path leaves porcelain empty; no data change.
+- **Advisories:**
+  - A5: CI is shallow, so the pinned-blob test skips after data moves. **`fetch-depth: 0` is being added.**
+  - A `2026-10-11b`-style dir is not flagged (harmless).
+  - The wilson CLI uses the newest dir (the gate fails if extras exist).
+  - **Carried to the user:**
+    - A1: feed ≠ auto, and INCLUSION §5 is false.
+    - A3: the 2.14.0 tripwire.
+    - A4: INCLUSION §4 claims a per-ingest sample-audit gate.
+    - A2: memo `ruled_by` should be `decided_by`.
+    - A6: a hand-typed figure outside the block.
+
+### 🔁 Item 5 — **BOUNCE #1 (red-reviewer on `072115cc`, 2026-10-11)**: specialist redispatched
+- **Defect (agreement 6):** the code pin and the sampling frame are checked only while pending. `validate.py:840` returns early on `measured`, before the pin.
+  - Demonstrated in measured state:
+    - a swapped sample id plus a recomputed hash gives [];
+    - frame.json feed/oecd 3810→10 moves published feed precision 53.1%→63.4%, still [];
+    - a newer dated dir would bypass the pin.
+  - The CHANGELOG claims an unqualified pin.
+  - **Fix:**
+    - pin the sample and frame in every status;
+    - pin the dir;
+    - add measured-state fire tests.
+- **Advisories:**
+  - A1: "100 auto" = tier feed is a **faithful reading.** INCLUSION.md §5 itself calls the feed `quality_tier: auto`, yet 69% of the feed is `reviewed`, so **§5 is false**. → docs-warden; a CORRECTIONS row is the user's call. Per-quality_tier figures are claimed but not produced (being fixed).
+  - A2: the D28 field `decided_by` is confirmed. The OECD memo:342 says `ruled_by`, which is wrong (record; note).
+  - A3: the version-keyed grace is not a can't-fail check. Tripwire: CI goes red at the 2.14.0 bump unless the user rules.
+  - A4: INCLUSION §4 claims a per-ingest-change sample-audit CI gate that doesn't exist. → docs-warden.
+  - A5: the reproduction tests skip after data moves (being fixed).
+  - A6: a hand-typed figure outside the block is undetectable.
+  - A7: spot-check of the agent suggestions: 10/10 agree.
+  - A8: invariant 7 is clean.
+  - A9: merge-tree is clean vs main; expect a trivial conflict with item 8 in test_landmark_distribution.
+  - A10: Excel BOM risk (being fixed).
+- **Foreman [R]:** `scripts/validate.py:839-841` read: `if status == "measured": return problems, ...` precedes the `fresh_sha != required_sha` check at :858. Confirmed.
+
+### 🔍 Item 8 (export integrity + D57 + D64) — specialist reported `09fcc03f` (pushed); **red-reviewer dispatched**
+- **Premise corrections:**
+  - STIX `modified` was already `_ts(updated)`; the exporter-version half was missing.
+  - SHA256SUMS covered docs/data only, ran BEFORE the STIX export in pages.yml, and never listed the STIX bundle.
+  - TAXII and MISP had no sums.
+  - GitHub Releases carry no assets.
+  - The MISP event timestamp was fixed at Jan 1 (so no change ever reached subscribers).
+- **Delivered:**
+  - modified = `<updated>T00:00:00.<EXPORTER_VERSION>Z`;
+  - sums plus build_manifest.json on site/data, taxii2, misp, a new release-assets.yml, HF and PyPI;
+  - built_at = committer date or SOURCE_DATE_EPOCH, written only by the export and release steps;
+  - D57: x_source_freshness on 1,382 SDOs and MISP tags on 6,002 attributes;
+  - D64: disputed_count 22, DISPUTED notes on 22 cards; check_stats_drift re-derives the counts;
+  - 792 passed.
+- **One-time consumer effect:** every STIX/TAXII `modified` and all 31 MISP event timestamps move once.
+- **For the user, after the gate:**
+  - R1: `updated` ignores tier, quality_tier, corpus and content_license. Recommendation: add them to `_CONTENT_FIELDS` (pipeline-engineer's file).
+  - R2: new write-capable release-assets.yml and a Pages `_site` check, neither run on GitHub yet.
+  - R3: MISP timestamp change (needed for D57 to propagate).
+  - R4: identity over-bump.
+  - R5: disputed status isn't in STIX or MISP.
+
+### 🔍 Item 5 (N9 precision audit) — specialist reported `072115cc` (pushed); **red-reviewer dispatched**
+- **Delivered:**
+  - a seeded (20261011), stratified sample of 150 rows: 9 strata, proportional allocation, feed 100 / landmark 50;
+  - a review sheet with agent suggestions and empty human columns;
+  - `wilson_ci.py`, which uses human labels only;
+  - a DATASHEET "Measured precision" block rendered from results.json;
+  - `check_precision_audit` in validate.py, with a D28-style marker;
+  - `evaluate_ai_relevance.py`, which waits for human labels;
+  - 791 passed; no data change.
+- **Deviations from the brief (the user must hear these):**
+  1. **"100 auto" became 100 from tier=feed.** 185 landmark rows are quality_tier auto, and 5,015 of 7,968 CVE/GHSA feed rows are `reviewed`, so an auto-only sample would miss most of N9.
+  2. The marker field is `decided_by`, as in the real D28 files.
+  3. An unratified pending state passes with a warning through 2.13.x and fails from 2.14.0.
+- **Agent-suggested precision (NOT measured):** feed 53.1% (unsure excluded) / 47.2% (strict); landmark 100% / 81.7%; CVE/GHSA 54.5%. **A new finding to confirm:** OECD feed rows look weaker (5/19).
+- **User action:** label 150 rows (human_label + human_by), then run `wilson_ci.py --render-datasheet` and `evaluate_ai_relevance.py`; or ratify the pending state before 2.14.0.
+
+### 🔄 Items 8 + 5 — **DISPATCHED in parallel (2026-10-11)**
+- **Item 8:** distribution-engineer on `ws6/v2130-export-integrity` (worktree `ws6-v2130-export`, base `6da13032`). Scope:
+  - STIX `modified` derived from `updated` plus the exporter version;
+  - SHA256SUMS over STIX, TAXII and MISP;
+  - build_manifest.json on every channel, kept deterministic;
+  - **D57** STIX `x_source_freshness` + MISP freshness tags + the HF card line;
+  - **D64** DISPUTED card note + `disputed_count` in stats.
+- **Item 5:** label-scientist on `ws2/v2130-precision-audit` (worktree `ws2-v2130-precision`, base `6da13032`). Scope:
+  - a seeded, stratified 100 auto + 50 landmark sample under `docs/audits/precision/2026-10-11/`;
+  - a review sheet with `suggested_by: agent` and empty human columns;
+  - a Wilson 95% script that uses human labels only;
+  - a DATASHEET "Measured precision" section, pending until results;
+  - a validate gate with a D28-style override, whose decision id is left for the user;
+  - the ai_relevance.py evaluation waits for the user's returned sheet.
+- **Item 9** (OWASP ASI 2026) waits for the stage-1 merge, because it changes data.
+
+- **Foreman note on MASTER_IMPROVEMENT_PLAN invariant 9 (:49, :183), 2026-10-11:** the plan text was read. "IDs ... never reused" is a forward-looking RULE, not a factual claim about history, so it is left unchanged: invariant and policy wording belongs to the user (CLAUDE.md). The historical violations (12 withdrawn + 3 release-dependent IDs that changed meaning across v2.0.0–v2.10.0) are recorded in CORRECTIONS and in ID_POLICY §8.6, and are scoped by the queued ID-reuse audit (D70). This supersedes the line above that said "a dated foreman note follows in its own commit".
+### ✅ D69/D70 branch — **PASS (red-reviewer on `5e64cee1`), MERGED to main under D72 (2026-10-11)**
+- **⚖ D72 (user): "Merge, flag as a behaviour change".** The `load_deprecations()` raw values flip shape for INC-00311, INC-01897 and INC-00497 (the type `str | list[str]` is unchanged). **The release-notes cut must carry a "Behaviour changes" line naming the 3 keys and pointing consumers to `resolve_id_status()`.**
+- **Gate evidence:**
+  - mappings re-derived across 14 tags, each with a unique holder (exact and normalised);
+  - prefix of 1,077 records equal, appended records 1078-1084 equal the input, both restatements verbatim;
+  - a scratch rebuild from main's file regenerates the committed bytes, and is idempotent;
+  - `content_into_map` vs the old map: 0 mismatches over the 8 D28 resplit entries at base, exactly 1 (INC-00497) at the tip;
+  - its own sweep with main's code over 16,731 IDs: resolve_id/group change only for INC-00311 and INC-01897; v2.11.0 and v2.12.0 package code on branch data keep INC-00497, INC-00554, INC-08139 and INC-00754 unchanged;
+  - fire proofs: FP2, protective record removed (12 failures), wrong successor (10 failures);
+  - 744 passed.
+- **Advisories:**
+  1. load_deprecations is public (resolved by D72).
+  2. "Stable IDs" wording at README:31, the schema id description, paper:18/:73 and ingest/README:26. **Note → docs-warden at the cut.** MASTER_IMPROVEMENT_PLAN:49 and :183 say "never reused" (foreman-owned; dated note below).
+  3. **CORRECTION to this board:** "14 withdrawn" (in the item-4 entries above) is wrong. Two methods give **12** withdrawn multi-meaning IDs: INC-00004, -00010, -00014, -01134, -01338, -01551, -01559, -01714, -02443, -03345, -05477, -09555. The 14 was likely 12 + 2 release-dependent. The earlier entries are left as written (agreement 4) and superseded here.
+  4. The unique-holder test hard-codes its answers (the golden covers it).
+  5. INC-00554's status changes group → release-dependent (stated in the CHANGELOG).
+- **Foreman [R] after merge:**
+  - 0 deletions; validate rc 0; drift clean; **744 passed, 1 xfailed**;
+  - resolve_id: INC-00311 → INC-14726, INC-00497 → None, INC-00554 → None;
+  - resolve_id_status('INC-00554', release='v2.8.0') → INC-14742.
+- **MASTER_IMPROVEMENT_PLAN invariant 9 "never reused":** a dated foreman note follows in its own commit.
+
+### ✅ Item 7 stage 1 D71 + A1-A3 — **PASS (scoped re-gate on `1b20ffca`)**. Three advisories are being fixed before merge.
+- **Gate evidence:**
+  - data identical, rebuild byte-exact;
+  - its own inputs abort: AIID-99999 add; AIID-1574/INC-00437 now rc 1 with "content change ... 15 field(s)"; the unrelated-key title bypass now rc 1;
+  - a depth-1 clone gives baseline 15,666, not first-build;
+  - the autouse stub covers only `_run_refresh_gate`, with 1 `real_gate` test; with the gate removed, 6 real-build tests fail;
+  - fire proofs (b) 3, (c) 7, (d) 3;
+  - 764 passed.
+- **Advisories being fixed:**
+  - **A1:** AIRI (1,457 AIID-n ids) is outside `_PAIR_INPUT_FILES`. An AIRI edit moved severity, tags and references on INC-01706 and INC-01702 with rc 0. **Foreman reading of D71: AIID-keyed AIRI rows are "the pair"** (E23 uncleared population; AIRI is frozen under D57). It holds more, never less, so it was applied without a new ask.
+  - **A2:** a shallow clone with the data file deleted reads as first build. Fail closed.
+  - **A4:** order-dependent scratch tests.
+- **A3 (noted):** the baseline is the checked-out HEAD. The weekly job checks out main, so the gate guards builds, not commits.
+
+### 🔍 D69/D70 branch — `5e64cee1` (pushed); **red-reviewer dispatched**
+- **Mappings:** all 5 user mappings verified from tag data; 7 records appended from the new dated input `ID-group-ids-appends-2026-10-10.json` (1,077 → 1,084).
+- **Answer changes:** only INC-00311 → INC-14726 and INC-01897 → INC-14612 (resolve_id), with group sizes 12→1 and 8→1. INC-00554 stays None/100, with resolve_id_status release-dependent.
+- **Two changes the ruling didn't name (specialist premise correction):**
+  1. A protective restatement for INC-00497. Without it, resolve_id('INC-00497') would flip None → INC-14726, which it never named.
+  2. Step 8a expands D28 targets through `content_into_map()`, to stop a spurious corrective record.
+- **Consumer-visible:** `load_deprecations()` raw values change for 3 keys. The gate is asked whether that is public API.
+- **D70:**
+  - DATA_DICTIONARY and README:231 corrected; ID_POLICY dated notes plus §8.6; 2 CORRECTIONS rows; audit spec written.
+  - Figures: 591 multi-title IDs (575 live, 12 withdrawn) against the earlier gate's "14 withdrawn". Re-deriving it is part of the gate.
+  - **Foreman-owned:** MASTER_IMPROVEMENT_PLAN.md:49 invariant 9 says "never reused". **The foreman will amend it after the gate**, as a dated note.
+
+### 🔍 Item 7 stage 1, D71 + A1-A3 — `1b20ffca` (pushed); **scoped re-gate sent to the stage-1 reviewer**
+- **D71:** AIID- additions are held.
+- **A2:** if any OECD/AIID ingest input differs from HEAD, content-field changes on pair-linked rows are held; a signed `content` approval releases them. Counter-test: a CVE-only change with the pair at HEAD passes.
+- **A1:** the curated-title exemption is keyed to the row's own source_ids.
+- **A3:** the gate reads `git show HEAD:data/incidents.json` and fails closed when missing or unparseable. First-ever build means no git history; without .git it needs MERGE_ALLOW_FIRST_BUILD=1.
+- **Test harness:** an autouse conftest stub of `_run_refresh_gate`, with a `real_gate` opt-out. **The gate is asked to check this for weakening, and to check whether a shallow CI checkout could fake a "first build".**
+- Data unchanged; 764 passed.
+
+### ⚖ D68-D71, USER RULINGS 2026-10-10
+- **D68 (D49 reading): keep as merged.** `resolve_id()` now returns successors for INC-03128 and INC-08185.
+- **D69 (D31 group IDs): narrow where the evidence is complete.** Successor records INC-00311→INC-14726 and INC-01897→INC-14612; release-scoped records for INC-00554 (INC-14756 v2.0.0–2.7.0; INC-14742 v2.8.0; INC-14609 v2.9.0–2.10.0) plus a restatement; INC-00754 stays a group. **Dispatched:** fresh schema-architect on `ws3/v2130-group-ids` (base `28d97a5a`), which verifies each mapping from tag data first.
+- **D70 (ID reuse): queue an ID-reuse audit.** On the same branch, now: correct DATA_DICTIONARY's false "Never reused" in place, add a CORRECTIONS row, fix other live surfaces, and write a dated audit task spec. **NEW BOARD NOTE → WS3:** the ID-reuse audit itself (14 withdrawn IDs with changed meanings; 575 live IDs with more than one historic title), after v2.13.0.
+- **D71 (stage 1): hold AIID-only additions too.** "Nothing from the frozen OECD/AIID pair reaches main until stage 2."
+
+### ✅ Item 7 stage 1 D67 extension — **PASS (scoped re-gate on `c8d7b48e`)**. Before merge: D71 plus advisories A1-A3 are being fixed.
+- **Gate evidence:**
+  - data byte-identical to 7f03c352, and the rebuild is byte-exact twice;
+  - fire proofs: 3 / 2 / 3; stub removed → exactly 5 tests fail, all on the gate;
+  - an independent absorbed-OECD-row input gives rc 1 with a sha over data/docs/ingest unchanged;
+  - all writes in main() come after the gate (:2768);
+  - 737 passed.
+- **Advisories:**
+  - **A1:** the curated-title exemption is a global set. Bypass demonstrated with an unrelated-key override; not live (0 title overrides). **Fix.**
+  - **A2:** snapshot-driven NON-title changes to published rows are ungated. Demonstrated: AIID-1574 changed 18 fields on INC-00437 with rc 0. **Fix under D71.**
+  - **A3:** the baseline is the working tree, and the gate fails OPEN when it is missing or unparseable. **Fix.**
+  - A4: the stub covers 28 tests; harmless.
+  - A5: the replaced test is a deliberate D67 reversal.
+
+### ✅ Item 4 (silent IDs) — **DONE: advisory re-check PASS on `25b1ad5d`, MERGED to main (2026-10-10)**
+- **Advisory re-check:**
+  - A2 closed: the skip set is {INC-03128, INC-08185}; D28 re-assertion runs for INC-00497 and INC-08139 with 0 appends.
+  - Fire proofs in both directions.
+  - A6 closed: the golden regenerates byte-identically; generating against the branch package gives a diff, so the check can fail.
+  - The 16,731 vs 16,733 gap is exactly the gate's 2 junk IDs ('FOO', 'INC-99999').
+- **Foreman [R] after merge:**
+  - porcelain empty; 0 deletions; validate rc 0; drift clean; lint OK;
+  - **733 passed, 1 xfailed**;
+  - `resolve_id('INC-03128')` gives INC-14909;
+  - `resolve_id_status('INC-00522').status` gives pre-tombstone;
+  - `resolve_id_status('INC-00497', release='v2.0.0').successor` gives INC-14789.
+- **To the user (combined ask):** the D49 reading (answers change for 2 IDs); narrowing the 4 group IDs (D31); a follow-up ID-reuse audit (14 withdrawn IDs re-meant; "never reused" is false); AIID-only additions (from the stage-1 D67 work).
+- **docs-warden at the cut:** README:144, paper:76. `ws3/headroom-remeasure` will conflict in ID_POLICY.
+
+### ✅ Item 4 (silent IDs) — **PASS (red-reviewer on `2c5cce83`, 2026-10-10)**. A2 and A6 are being fixed before merge (per D52); the user has three questions to rule on.
+- **Verdict:** "PASS. DEFECTS: none."
+- **Gate evidence:**
+  - Own route over the union of IDs across 14 v2* tags (16,572), run against main's package and data: 690 None = 8 ambiguous + 9 no-record + 673 withdrawn. On the branch, published IDs that are neither live nor recorded = 0.
+  - Mappings confirmed from `git show <tag>:data/incidents.json`. INC-03128 (v2.0.0–2.1.0, Momoa deepfake) has sole holder INC-14909. INC-08185 (v2.2.0–2.5.0, Wolf Robots) has sole holder INC-14742.
+  - Append-only: parsed `A[:1060]==B[:1060]`; only the closing bracket moves. A scratch rebuild from main's file regenerates the committed bytes, so nothing was hand-edited.
+  - Main's package over 16,733 IDs, base data vs branch data: `resolve_id` and `resolve_id_group` differ ONLY for INC-03128 and INC-08185.
+  - Schema and validate fire proofs (10 schema rejections, 3 validate violations). The 8a-skip fire proof fails the ruled test.
+  - Build deterministic twice; 731 passed; diff is 20 files with 0 deletions.
+- **Advisories:**
+  - A1: the D49 tension, for the user.
+  - A2: the 8a skip also disables D28 re-assertion for INC-00497 and INC-08139. **Being fixed.**
+  - A3: **14 other withdrawn IDs carried different incidents in different releases**, and 575 live IDs have more than one historic title. DATA_DICTIONARY's "never reused" is contradicted. A follow-up ID-reuse audit is proposed.
+  - A4: the 4 group IDs, for the user.
+  - A5: README:144 and paper:76 describe the v2.12.0 exceptions; this is for docs-warden at the cut.
+  - A6: the golden recipe is missing. **Being fixed.**
+  - A7: §4 corrected in place is acceptable.
+  - A8: conflict with `ws3/headroom-remeasure`.
+  - A9: the reviewer's `merge-tree` wrote unreachable objects (no refs moved).
+
+### 🔍 Item 4 — specialist reported `2c5cce83` (pushed); **red-reviewer dispatched**
+- **Claims (testimony):**
+  - 17 silent IDs (8 ambiguous + 9 unrecorded);
+  - both user mappings verified from the released data;
+  - 17 records appended via a new merge step 8b from a curated input;
+  - step 8a skips ruled IDs;
+  - INC-00497 and INC-08139 get release-scoped records plus a restatement;
+  - `resolve_id_status()` added;
+  - ID_POLICY §8 closes the v2.11.0 "open, disclosed deviation";
+  - id_deprecations.json goes from 1,060 to 1,077 records, all other data byte-identical;
+  - 731 passed.
+- **For the user, after the gate:**
+  1. The 4 `group` IDs have identifiable successors by the same evidence (D31 had ruled "no single successor"). Narrow them?
+  2. `resolve_id()` answers change for INC-03128 and INC-08185 (None → successor). D49 was read as covering the signature only.
+  3. `ws3/headroom-remeasure` will conflict in ID_POLICY.
+
+### ✅ Item 7 stage 1 — **PASS (red-reviewer on `7f03c352`, 2026-10-09)**. RULING PACKAGE for the user (D58: "bring all I need to rule here")
+- **Verdict, in the gate's words:** "The branch does what D58 stage 1 asked for. Exactly 3,936 rows gain two label fields and nothing else moves. The approval set is empty. The gate aborts on a bridging input I built myself ... and it does not abort on the committed inputs. The rebuild reproduces the committed tree byte for byte, twice."
+- **Gate evidence:**
+  - its own per-entity delta: Counter {description_source 3936, description_provenance 3936}, all absent→oecd-aim/original, all OECD-sourced, ID order identical;
+  - removing the backfill reverts all 7,876 diff lines and fails the label test;
+  - partition via raw stored descriptions: 3,937 / 162 / 5, with 4,104/4,104 attributed;
+  - STIX, MISP and TAXII identical (cmp/diff); HF jsonl differs on exactly 3,936 lines;
+  - an independent bridging input (AIID-1577 + AIID-1525) gives rc 1, "[FATAL] D42/D25(a) ... (3) ... Nothing was written", data sha unchanged;
+  - gate replaced by `pass` makes the gate test fail;
+  - 728 passed;
+  - D42 audit files and ported tests are blob-identical to 586f40c8;
+  - all of main's item-3 workflow steps are present.
+- **Advisories:**
+  - A1: INC-00437's two label keys changed order (bytes, not values), undeclared. **Being declared** in the build record.
+  - A2: the gate is proven only on constructed inputs; the live weekly counts on current main are unmeasured, and 11/17 is 2026-10-03 history.
+  - A3: a week where the gate does NOT fire opens an ordinary refresh PR carrying the full first-run unfreeze (~1,500 OECD rows with LLM titles, 24 upstream AIID title edits) with no S8/S9 licence assertions. Merging that PR by hand is the only defence. The same was true under the accidental tripwire.
+  - A4: while the gate fires, NO weekly PR opens, which starves AIRI, AIAAIC, KEV, cve-sweep and D60. The Enforce steps are skipped, and ~108 MB of AIID snapshot is downloaded weekly for nothing.
+  - A5: S6 docs for WS0: INGESTION_CONDUCT:122 should add AIID to the weekly run; SOURCE_LICENSES §1.2a; HF card; NOTICE-DATA 3,667/3,829 → 3,937/4,104. No new egress register entry is owed.
+  - A6: the E21 replacement is a real replacement. Residual hole: titles are matched against any ingest file; E23's tripwire still covers it.
+  - A7: tamper-plus-recompute of the approval file is undetectable until S7 pins the hash; the gate's wiring is covered by a single test.
+
+**THE RULING PACKAGE (what the user decides now):**
+1. **Merge or decline `ws4/v2130-oecd-stage1`.**
+   - Effect of merging: 3,936 OECD rows gain `description_provenance: original` and `description_source: oecd-aim` in `data/incidents.json` and the HF export. Nothing else changes.
+   - The accidental E21 tripwire is replaced by a deliberate D42 gate: an empty approval set, fail-closed, "Nothing was written".
+   - Declining keeps today's state: the weekly run is red on an accidental test, and the labels don't ship.
+2. **Starvation trade-off (A4).** Either side, no weekly PR reaches main while OECD/AIID bridges exist. The difference is that merge makes this explicit. Options:
+   - (a) accept it;
+   - (b) a follow-up decouples the other sources, letting the weekly PR carry AIRI/AIAAIC/KEV/cve-sweep while OECD/AIID changes are held. That needs design work.
+3. **Unfired-week exposure (A3).** Without stage 2, a week with no bridging change would open a PR containing the whole unfrozen OECD crawl. Options:
+   - (a) rely on not merging such PRs;
+   - (b) also hold OECD row additions behind the gate until stage 2.
+4. **Stage 2 prerequisites, for later rulings, not now:**
+   - S7 suppression list or heuristic change;
+   - S8 delta from a pinned crawl, re-deriving the 7 merges + 10 retitles on current main;
+   - S9 licence assertions;
+   - R1: OECD LLM-title exposure grows by ~1,533 rows (37.4% of 4,104; an estimate, not measured);
+   - R6: OECD outreach (sent 2026-07-31; follow-up window 2026-08-21; no reply recorded).
+5. **S6 docs** (WS0) follow a merge.
+
+### 🔍 Item 7 stage 1 — **REVIEW: `7f03c352` (pushed), red-reviewer dispatched**
+- **Specialist:**
+  - ported via `git apply --3way` of a7343274..586f40c8, with hand-resolved merge_and_dedupe.py and auto-refresh.yml; item-3 machinery kept;
+  - delta 3,936 rows × {description_provenance, description_source}, 0 `updated`, ID set and deprecations identical;
+  - E21 tripwire test removed (tombstone comment) and replaced by `test_aiid_signal_provenance.py`;
+  - the weekly run now fails at "Re-merge + render + validate" with "[FATAL] D42/D25(a) ... Nothing was written. This freeze is deliberate (D58, stage 1)"; the PR is skipped;
+  - 728 passed.
+- **Premise corrections:**
+  - memo S5's "every OECD row's description is the template" is false for 167 of 4,104 (162 AIID template, 5 other-source; asserted as a partition);
+  - there is no pinned prior crawl, so the gate abort is shown on a constructed input (2 changes), not the live 11/17;
+  - `ingest_aiid_snapshot.py` pre-existed on main.
+- **For the user's ruling package:**
+  1. While the gate fires, NOTHING else in the weekly refresh reaches a PR (AIRI, AIAAIC, KEV, the cve-sweep results, D60 flagging). Item 3's path is starved until stage 2.
+  2. Option: keep the Enforce steps running on abort (`!cancelled()`).
+  3. A ~108 MB AIID snapshot download is added weekly.
+  4. Red every week is not guaranteed; that depends on the week's inputs.
+- **Foreman [R]** (python per-entity vs `git show b8e5ed00:data/incidents.json`): ID sets equal (15,666); Counter {description_provenance 3936, description_source 3936}; the new value is `oecd-aim` on all 3,936; `git diff b8e5ed00 -- ingest data/id_deprecations.json` empty.
+
+### 🔄 Item 4 (silent IDs) — **DISPATCHED: schema-architect on `ws3/v2130-silent-ids` (worktree `ws3-v2130-silent-ids`, base `816b9271`)**, under D49: `resolve_id()` unchanged; new `resolve_id_status(id, release=None)` covering all 17 silent IDs; `valid_for_releases` only on appended records. The specialist verifies the user's two successor mappings (INC-03128→INC-14909, INC-08185→INC-14742) from evidence before applying them, and identifies and closes the disclosed deviation in ID_POLICY. It runs in parallel with item 7 stage 1; the two overlap only on appending to `id_deprecations.json`.
+
+### 🔄 Item 7 stage 1 (D58) — **DISPATCHED: pipeline-engineer on `ws4/v2130-oecd-stage1` (worktree `ws4-v2130-oecd-stage1`, base `b8e5ed00`)**. It ports the T12/T14 + D42 gate from `586f40c8` (12 files, by hand or cherry-pick, not a wholesale merge), with an EMPTY approval set and a label-only rebuild, per memo §7 S1-S5. It must STOP if labelling bumps `updated`. The E21-tripwire replacement and the exact weekly fail-closed behaviour go in a dated build audit. S6 docs go to WS0 afterwards.
+
 ### ✅ Schema branch — **MERGED to main (2026-10-09), after user rulings D63/D64**
 - **⚖ D63 (D57 design): "Accept + queue overdue alert".** `hold.until` is the registry review date; `review_by` is on rows. **NEW BOARD NOTE → WS4:** a scheduled overdue-review check that alerts when a stale source's `hold.until` has passed. Not in the build (no wall-clock in `make build`).
 - **⚖ D64 (dispute rendering): "Add a DISPUTED card note + count".** **NEW BOARD NOTE → WS6, folded into item 8:** a DISPUTED card note parallel to the retracted banner (render_markdown.py:351), plus `disputed_count` in stats.json and every surface that quotes counts. It needs its own delta and gate.

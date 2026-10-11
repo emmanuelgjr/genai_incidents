@@ -1,0 +1,81 @@
+{
+  "$note": "Curated INPUT, not a generated artifact. scripts/merge_and_dedupe.py (step 8b) appends each entry's `record` to data/id_deprecations.json, verbatim and in this order, unless an identical record is already present (idempotent). It never edits or removes an existing record (invariant 9). Editing a `record` here after it has been appended does NOT change the appended copy; it appends a second, different record. Supersede by appending a new entry, never by rewriting one. Owner: schema-architect (WS3). Policy: docs/ID_POLICY.md section 8.",
+  "generated": "2026-10-09",
+  "item": "v2.13.0 item 4: the 17 published IDs that answered with silence",
+  "authority": {
+    "successors": "User's v2.13.0 item 4, verbatim: 'Eight ids resolving to None: successor records INC-03128->INC-14909 and INC-08185->INC-14742; resolve_id_group; valid_for_releases; ID_POLICY + tests; close the disclosed deviation.' The v2.11.0 CHANGELOG had already published both successors as identified-but-not-written ('narrowing the records is a follow-up').",
+    "api_and_valid_for_releases": "User ruling D49 (PROGRESS.md, 2026-10-09): resolve_id() unchanged; resolve_id_status(id, release=None) added; valid_for_releases only on APPENDED records.",
+    "pre_tombstone": "docs/ID_POLICY.md section 1.4(a) (2026-07-27) prescribed this exact repair: append nine records with reason unrecorded-drop-v2.1.0, into null where no successor can be identified."
+  },
+  "derivation": "Every release list and every successor below is re-derivable: for each tag v2.0.0..v2.12.0, read `git show <tag>:data/incidents.json`, group the tags in which the ID was live by its title, and find the single current live entry carrying that exact title and the headline source_id. Command in docs/ID_POLICY.md section 8.5.",
+  "entries": [
+    {
+      "record": {"from": "INC-03128", "into": "INC-14909", "reason": "successor-identified", "date": "2026-10-09"},
+      "evidence": "Published v2.0.0-v2.1.0 only, always titled 'Purportedly AI-Generated Jason Momoa Deepfake Used in Romance Scam Reportedly Defrauding British Widow of $600,000', date 2025-11-29, description the Momoa romance scam. INC-14909 is the only live entry with that title and the only live entry holding both headline sources (AIID-1285, OECD-AIM-2025-11-29-1cd0). Caveat: the published row was over-merged and carried 10 source_ids; the other 8 live in 8 other entries, all inside the D28 group record (index 186 -> INC-00754 -> 11-way split), which stays in the file. Supersedes, for resolution, the D28 fan-out (docs/audits/WS4-T19-authorized-splits-2026-09-18.json, entry INC-03128)."
+    },
+    {
+      "record": {"from": "INC-08185", "into": "INC-14742", "reason": "successor-identified", "date": "2026-10-09"},
+      "evidence": "Published v2.2.0-v2.5.0 only, always titled \"China Deploys Armed AI 'Wolf Robots' in Urban Combat Training\", date 2026-03-27. INC-14742 is the only live entry with that title and the only holder of the headline source OECD-AIM-2026-03-27-2510. Caveat: the published row was over-merged and carried 65 source_ids; the other 64 live in other entries inside the 100-way INC-00554 split, which stays in the file. Supersedes, for resolution, the D28 fan-out (entry INC-08185)."
+    },
+    {
+      "record": {"from": "INC-00497", "into": "INC-14789", "reason": "release-scoped", "date": "2026-10-09", "valid_for_releases": ["v2.0.0", "v2.1.0"]},
+      "evidence": "In v2.0.0-v2.1.0 INC-00497 was 'AI-Generated Saint Paisios Scam Defrauds Greek Faithful'; INC-14789 is the only live entry with that title and holds OECD-AIM-2026-05-04-53b4."
+    },
+    {
+      "record": {"from": "INC-00497", "into": "INC-14907", "reason": "release-scoped", "date": "2026-10-09", "valid_for_releases": ["v2.2.0", "v2.3.0", "v2.3.1", "v2.4.0", "v2.5.0", "v2.6.0", "v2.7.0", "v2.8.0"]},
+      "evidence": "In v2.2.0-v2.8.0 INC-00497 was 'Greek Tax Authority Plans AI System to Combat Tax Evasion'; INC-14907 is the only live entry with that title and holds OECD-AIM-2020-11-26-f2d2."
+    },
+    {
+      "record": {"from": "INC-00497", "into": "INC-00311", "reason": "release-dependent", "date": "2026-10-09"},
+      "evidence": "Unscoped restatement of the record that was authoritative before this item (index 12, merged -> INC-00311). It is LAST for this `from` on purpose: every last-record-wins reader (the v2.11.0/v2.12.0 packages, validate.py, a direct JSON reader following the published rule) gets exactly the answer it got before. Its reason tells resolve_id_status() that the scoped records above apply."
+    },
+    {
+      "record": {"from": "INC-08139", "into": "INC-14852", "reason": "release-scoped", "date": "2026-10-09", "valid_for_releases": ["v2.2.0", "v2.3.0", "v2.3.1", "v2.4.0", "v2.5.0"]},
+      "evidence": "In v2.2.0-v2.5.0 INC-08139 was 'South Korea Launches AI-Powered Robotic Endoscope Development Project'; INC-14852 is the only live entry with that title and holds OECD-AIM-2026-06-07-88f7 (the row's only source_id then)."
+    },
+    {
+      "record": {"from": "INC-08139", "into": "INC-14742", "reason": "release-scoped", "date": "2026-10-09", "valid_for_releases": ["v2.6.0", "v2.7.0"]},
+      "evidence": "In v2.6.0-v2.7.0 INC-08139 was \"China Deploys Armed AI 'Wolf Robots' in Urban Combat Training\"; INC-14742 is the only live entry with that title and holds OECD-AIM-2026-03-27-2510."
+    },
+    {
+      "record": {"from": "INC-08139", "into": "INC-00554", "reason": "release-dependent", "date": "2026-10-09"},
+      "evidence": "Unscoped restatement of the record that was authoritative before this item (index 439, merged -> INC-00554); last for this `from` on purpose, as for INC-00497."
+    },
+    {
+      "record": {"from": "INC-00522", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('AI-Induced Cognitive Overload and Academic Integrity Failures', OECD-AIM-2026-05-14-d531). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00609", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('Anthropic Warns of AI Risks in US-China Competition', OECD-AIM-2026-05-15-2dfd). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00951", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('EU Investigates X and Grok AI Over Generation of Sexualized Deepfake Images', OECD-AIM-2026-01-26-94f2). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00952", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('EU Investigates X and Grok AI Over Millions of Harmful Deepfake Sexual Images', OECD-AIM-2026-01-26-b4ae). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00955", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('EU Investigates X Over AI-Generated Deepfake Sexual Content', OECD-AIM-2026-01-26-a6e4). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00956", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('EU Investigates X Platform Over AI-Generated Sexual Deepfakes Involving Minors', OECD-AIM-2026-01-26-ad73). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-00957", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('EU Investigates X's AI Grok for Generating Non-Consensual Sexual Images', OECD-AIM-2026-01-26-4119). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-01355", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('London Police to Deploy AI Surveillance at Protests', OECD-AIM-2026-05-11-5fd6). No live entry holds that source_id or any of its reference URLs."
+    },
+    {
+      "record": {"from": "INC-01660", "into": null, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+      "evidence": "Live in v2.0.0 only ('Pope Leo XIV Warns Against AI-Directed Warfare and Calls for Ethical Oversight', OECD-AIM-2026-05-14-2f24). No live entry holds that source_id or any of its reference URLs."
+    }
+  ]
+}

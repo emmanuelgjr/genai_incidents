@@ -17,13 +17,18 @@ Example::
 
     # Resolve an old / merged-away ID
     print(resolve_id("INC-00139"))   # -> current canonical INC-* or None
+
+    # Why an ID resolves the way it does (never silence)
+    print(resolve_id_status("INC-00497", release="v2.1.0"))
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from importlib.resources import files
 from functools import lru_cache
-from typing import Any, Iterable, Iterator
+import re
+from typing import Any, Iterable, Iterator, Literal
 
 __all__ = [
     "VERSION",
@@ -35,6 +40,9 @@ __all__ = [
     "by_id",
     "by_cve",
     "resolve_id",
+    "resolve_id_group",
+    "resolve_id_status",
+    "IdStatus",
 ]
 
 VERSION = "2.0.0"
@@ -70,11 +78,35 @@ def _load_deprecations() -> dict[str, str | list[str]]:
     # can be absent or out of order, and a package that disagrees with the
     # validator returns a live-but-wrong ID. tests/test_package.py
     # cross-checks this loader against `_latest_by_from`.
+    #
+    # Release-scoped records (carrying `valid_for_releases`, v2.13.0 / D49)
+    # answer "what did this ID mean in release X" and are NOT part of this
+    # unscoped view; only `resolve_id_status(..., release=)` reads them.
+    # The data never makes this skip load-bearing: every scoped record is
+    # followed by an unscoped record for the same `from`
+    # (scripts/validate.py enforces it), so last-in-file-wins over ALL
+    # records gives the same answer. The skip is defence in depth.
     for entry in data.get("deprecations", []):
+        if "valid_for_releases" in entry:
+            continue
         f, t = entry.get("from"), entry.get("into")
         if f and t:
             out[f] = t
     return out
+
+
+@lru_cache(maxsize=1)
+def _load_deprecation_records() -> tuple[dict[str, Any], ...]:
+    """Every record in ``data/id_deprecations.json``, in file order."""
+    import json
+
+    try:
+        text = files(__name__).joinpath("data/id_deprecations.json").read_text(
+            encoding="utf-8"
+        )
+    except FileNotFoundError:
+        return ()
+    return tuple(json.loads(text).get("deprecations", []))
 
 
 def load_incidents() -> list[dict[str, Any]]:
@@ -102,8 +134,22 @@ def load_deprecations() -> dict[str, str | list[str]]:
     written against ``dict[str, str]`` (including v2.10.0's own
     ``resolve_id``) can raise ``TypeError`` on v2.11.0 data. Use
     ``resolve_id`` / ``resolve_id_group`` rather than indexing the mapping.
+
+    Release-scoped records (``valid_for_releases``, v2.13.0) are not in this
+    mapping; it is the release-independent view. Use
+    ``resolve_id_status(id, release=...)`` for a per-release answer.
     """
     return dict(_load_deprecations())
+
+
+def _canonical_release(release: str) -> str:
+    """``"2.3.0"`` or ``"v2.3.0"`` -> ``"v2.3.0"``; anything else raises."""
+    r = release.strip()
+    if not r.startswith("v"):
+        r = "v" + r
+    if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", r):
+        raise ValueError(f"release must look like 'v2.3.0', got {release!r}")
+    return r
 
 
 def taxonomy_versions() -> dict[str, str | None]:
@@ -243,7 +289,9 @@ def resolve_id(inc_id: str) -> str | None:
 
     Callers that need every successor of a multi-target (two-or-more)
     record — i.e. the case this function still returns ``None`` for —
-    should use :func:`resolve_id_group`, not this function."""
+    should use :func:`resolve_id_group`, not this function. To learn WHY
+    this function returned ``None`` (a split group, a release-dependent ID,
+    a pre-tombstone drop, a withdrawal), use :func:`resolve_id_status`."""
     if by_id(inc_id) is not None:
         return inc_id
     deprec = _load_deprecations()
@@ -289,3 +337,131 @@ def resolve_id_group(inc_id: str) -> list[str]:
 
     # dict.fromkeys preserves first-seen order while de-duplicating.
     return list(dict.fromkeys(_walk(inc_id, set())))
+
+
+# --- v2.13.0 / user ruling D49: resolve_id_status ----------------------
+
+IdStatusKind = Literal[
+    "live",
+    "successor",
+    "group",
+    "release-dependent",
+    "pre-tombstone",
+    "withdrawn",
+    "unknown",
+]
+
+# Deprecation `reason` values that mark an ID published before the
+# tombstone machinery existed (2026-05-16) and dropped without a record;
+# the record was appended later (docs/ID_POLICY.md section 1.4(a)).
+_PRE_TOMBSTONE_REASONS = frozenset({"unrecorded-drop-v2.1.0"})
+
+
+@dataclass(frozen=True)
+class IdStatus:
+    """Typed answer from :func:`resolve_id_status`. Never silence: every
+    input gets a ``status`` naming why it resolves the way it does.
+
+    ``status`` is one of:
+
+    - ``"live"``: the ID is a current entry; ``successor`` is the ID.
+    - ``"successor"``: retired, with exactly one live successor
+      (``successor``). With ``release=``, also the answer for an ID whose
+      meaning depended on the release, when that release is covered.
+    - ``"group"``: retired and split; no single successor exists.
+      ``successor`` is ``None``; ``group`` holds every live successor.
+    - ``"release-dependent"``: the ID named different incidents in
+      different releases and no ``release=`` was given, so no single
+      answer exists; ``by_release`` maps each release to its successor.
+      Pass ``release=`` to get one.
+    - ``"pre-tombstone"``: published in v2.0.0, dropped in v2.1.0 before
+      tombstones existed; no successor exists in the corpus.
+    - ``"withdrawn"``: retired with no successor (e.g. out of scope).
+    - ``"unknown"``: this project has no record of the ID.
+
+    ``group`` is :func:`resolve_id_group` for the same input (for a
+    covered ``release=``, for that release's successor), empty when
+    nothing live is reachable. ``by_release`` is filled only for IDs that
+    carry release-scoped records (``valid_for_releases``). ``reason`` is
+    the deciding deprecation record's ``reason`` (``None`` for live and
+    unknown IDs). ``release`` echoes the normalised ``release=``."""
+
+    id: str
+    status: IdStatusKind
+    successor: str | None = None
+    group: tuple[str, ...] = ()
+    by_release: dict[str, str] = field(default_factory=dict, hash=False)
+    reason: str | None = None
+    release: str | None = None
+
+
+def _scoped_records(inc_id: str) -> list[dict[str, Any]]:
+    return [
+        r for r in _load_deprecation_records()
+        if r.get("from") == inc_id and "valid_for_releases" in r
+    ]
+
+
+def _latest_unscoped_record(inc_id: str) -> dict[str, Any] | None:
+    latest = None
+    for r in _load_deprecation_records():
+        if r.get("from") == inc_id and "valid_for_releases" not in r:
+            latest = r
+    return latest
+
+
+def resolve_id_status(inc_id: str, release: str | None = None) -> IdStatus:
+    """Explain how ``inc_id`` resolves, as a typed :class:`IdStatus`.
+
+    Unlike :func:`resolve_id` (unchanged, ``str | None``), this never
+    answers with silence: a split ID is ``"group"`` with its set, an ID
+    whose meaning changed between releases is ``"release-dependent"``, an
+    ID dropped before tombstones existed is ``"pre-tombstone"``.
+
+    ``release`` (``"v2.3.0"`` or ``"2.3.0"``) is the release the citation
+    came from. ``None`` means "current": the release-independent answer.
+    It only matters for an ID that carries release-scoped deprecation
+    records (``valid_for_releases``, e.g. ``INC-00497``, ``INC-08139``):
+    when the release is listed on one of them, that record's successor is
+    the answer (status ``"successor"``). A release not listed on any of
+    them (including one in which the ID was already a tombstone) gets the
+    release-independent answer. For every other ID ``release`` is ignored:
+    a live ID's meaning is not re-checked against old releases.
+    Raises ``ValueError`` for a malformed ``release``."""
+    rel = _canonical_release(release) if release is not None else None
+    if by_id(inc_id) is not None:
+        return IdStatus(inc_id, "live", inc_id, (inc_id,), release=rel)
+
+    scoped = _scoped_records(inc_id)
+    by_release: dict[str, str] = {}
+    for r in scoped:
+        for v in r.get("valid_for_releases") or []:
+            by_release[v] = r.get("into")
+    if rel is not None and rel in by_release:
+        rec = [r for r in scoped if rel in (r.get("valid_for_releases") or [])][-1]
+        target = rec.get("into")
+        live = resolve_id(target)
+        tgroup = tuple(resolve_id_group(target))
+        if live is not None:
+            kind: IdStatusKind = "successor"
+        else:
+            kind = "group" if tgroup else "withdrawn"
+        return IdStatus(inc_id, kind, live, tgroup, by_release, rec.get("reason"), rel)
+
+    group = tuple(resolve_id_group(inc_id))
+    latest = _latest_unscoped_record(inc_id)
+    reason = latest.get("reason") if latest else None
+    if scoped and rel is None:
+        return IdStatus(inc_id, "release-dependent", None, group, by_release, reason, rel)
+    if reason in _PRE_TOMBSTONE_REASONS:
+        return IdStatus(inc_id, "pre-tombstone", None, group, by_release, reason, rel)
+    single = resolve_id(inc_id)
+    if single is not None:
+        return IdStatus(inc_id, "successor", single, group, by_release, reason, rel)
+    if group:
+        return IdStatus(inc_id, "group", None, group, by_release, reason, rel)
+    if latest is None:
+        return IdStatus(inc_id, "unknown", None, (), by_release, None, rel)
+    # A record exists but nothing live is reachable: scripts/validate.py
+    # guarantees such a chain ends at an explicit `into: null` record.
+    return IdStatus(inc_id, "withdrawn", None, (), by_release, reason, rel)

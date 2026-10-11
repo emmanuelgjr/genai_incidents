@@ -422,6 +422,8 @@ def _setup_tmp_repo(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     # WS4-T10 build guard: this harness deliberately builds from a
     # from-scratch tmp corpus with no legacy_consolidated.json, which is
     # exactly the shape main() otherwise refuses to build from silently
@@ -1902,6 +1904,8 @@ def test_missing_legacy_consolidated_fails_loudly(tmp_path, monkeypatch):
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
     # No legacy_consolidated.json written into `data` -- the real-world
     # mistake of running merge_and_dedupe.py standalone (skipping
@@ -1936,6 +1940,8 @@ def test_missing_legacy_consolidated_opt_out_still_builds(tmp_path, monkeypatch)
     monkeypatch.setattr(m, "DEPRECATIONS_PATH", data / "id_deprecations.json")
     monkeypatch.setattr(m, "CURATION_OVERRIDES_PATH", data / "curation_overrides.json")
     monkeypatch.setattr(m, "SOURCE_FRESHNESS_PATH", data / "source_freshness.json")
+    # v2.13.0 item 4: never read the real ruled-appends input in a tmp build.
+    monkeypatch.setattr(m, "RULED_DEPRECATION_APPENDS_PATHS", (data / "ruled_appends.json",))
     monkeypatch.setenv("MERGE_ALLOW_MISSING_LEGACY", "1")
     (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
     m.main()
@@ -2381,3 +2387,172 @@ def test_keep_id_decision_does_not_trigger_retirement(tmp_path, monkeypatch):
     )
     assert not any(d["from"] == old_id and d["reason"] == "split" for d in deps), \
         "a keep_id decision must not write a retirement 'split' record"
+
+
+# --- v2.13.0 item 4 / D49: ruled deprecation appends (step 8b) -----------
+
+def _write_ruled(path, records):
+    path.write_text(_json.dumps({"entries": [{"record": r} for r in records]}),
+                    encoding="utf-8")
+
+
+def test_ruled_appends_land_once_and_never_edit(tmp_path, monkeypatch):
+    """Append-only and idempotent. Fails if 8b re-appends on a second build
+    (records grow every refresh), or touches the pre-existing record."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    prior = {"from": "INC-09999", "into": None, "reason": "out-of-scope", "date": "2026-01-01"}
+    (data / "id_deprecations.json").write_text(
+        _json.dumps({"deprecations": [prior]}), encoding="utf-8")
+    ruled = [
+        {"from": "INC-09999", "into": None, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+        {"from": "INC-09998", "into": None, "reason": "unrecorded-drop-v2.1.0", "date": "2026-10-09"},
+    ]
+    _write_ruled(data / "ruled_appends.json", ruled)
+    (ingest / "src.json").write_text(_json.dumps([_oecd_entry("OECD-AIM-A", "A")]), encoding="utf-8")
+    m.main()
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    assert deps == [prior] + ruled
+
+
+def test_malformed_ruled_appends_fail_loudly(tmp_path, monkeypatch):
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    _write_ruled(data / "ruled_appends.json", [{"from": "INC-09999", "reason": "merged"}])
+    (ingest / "src.json").write_text(_json.dumps([]), encoding="utf-8")
+    with pytest.raises(SystemExit, match="ruled-appends"):
+        m.main()
+
+
+def test_ruled_successor_is_not_reverted_by_d28_resplit_correction(tmp_path, monkeypatch):
+    """The real interaction: INC-03128/INC-08185 carry a D28
+    `resplit_redirect` entry whose approved set is the fan-out. Step 8a
+    appends a corrective record whenever the current chain disagrees with
+    that set -- so without 8a's skip for ruled `from`s, the narrowed record
+    would be "corrected" back on the very next build (verified live on the
+    real data: 2 corrective records appended). Fails if the skip is removed."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+    inbound_id = "INC-80003"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+    m.main()  # phase 1: the ordinary split; old_id keeps X
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    fresh_id = next(e["id"] for e in out["incidents"] if e["source_ids"] == ["OECD-AIM-Y"])
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [old_id]},  # D28-style approval: the old answer
+        ],
+        monkeypatch=monkeypatch,
+    )
+    ruled = {"from": inbound_id, "into": fresh_id, "reason": "successor-identified",
+             "date": "2026-10-09"}
+    _write_ruled(data / "ruled_appends.json", [ruled])
+    m.main()
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    mine = [d for d in deps if d["from"] == inbound_id]
+    assert mine[-1] == ruled, mine
+    assert len(mine) == 2, mine
+
+
+def test_d28_reassertion_still_runs_for_release_scoped_only_rulings(tmp_path, monkeypatch):
+    """Gate advisory A2 (item 4): step 8a's skip covers only ids whose ruling
+    REPLACES the release-independent answer (unscoped `successor-identified`).
+    An id with only release-scoped records plus a `release-dependent`
+    restatement (the INC-00497 / INC-08139 shape) must still get D28's
+    re-assertion. Input: the restatement disagrees with D28's approved set;
+    8a must append its corrective record. Fails if the skip is widened back
+    to every ruled `from`."""
+    data, old_id = _induce_a_split(tmp_path, monkeypatch)
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [{"from": old_id, "reason": "test-keep", "decision": "keep_id"}],
+        monkeypatch=monkeypatch,
+    )
+    inbound_id = "INC-80004"
+    (data / "id_deprecations.json").write_text(_json.dumps({
+        "deprecations": [
+            {"from": inbound_id, "into": old_id, "reason": "merged", "date": "2020-01-01"}
+        ]
+    }), encoding="utf-8")
+    m.main()  # phase 1: the ordinary split
+    out = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    fresh_id = next(e["id"] for e in out["incidents"] if e["source_ids"] == ["OECD-AIM-Y"])
+    scoped = {"from": inbound_id, "into": old_id, "reason": "release-scoped",
+              "date": "2026-10-09", "valid_for_releases": ["v2.0.0"]}
+    restate = {"from": inbound_id, "into": old_id, "reason": "release-dependent",
+               "date": "2026-10-09"}
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))
+    deps["deprecations"] += [scoped, restate]
+    (data / "id_deprecations.json").write_text(_json.dumps(deps), encoding="utf-8")
+    _write_ruled(data / "ruled_appends.json", [scoped, restate])
+    _write_authorized_split_file(
+        data / "split_authorization.json",
+        [
+            {"from": old_id, "reason": "test-keep", "decision": "keep_id"},
+            {"from": inbound_id, "reason": "test-resplit", "decision": "resplit_redirect",
+             "new_targets": [fresh_id]},
+        ],
+        monkeypatch=monkeypatch,
+    )
+    m.main()
+    deps = _json.loads((data / "id_deprecations.json").read_text(encoding="utf-8"))["deprecations"]
+    mine = [d for d in deps if d["from"] == inbound_id]
+    assert mine[-1]["reason"] == "resplit" and mine[-1]["into"] == [fresh_id], mine
+    assert mine.count(scoped) == 1 and mine.count(restate) == 1, mine  # 8b did not re-append
+
+
+def test_real_d28_skip_set_is_exactly_the_successor_rulings():
+    """The real inputs: INC-03128 and INC-08185 (item 4) plus INC-00311 and
+    INC-01897 (D69, 2026-10-10) are the unscoped `successor-identified`
+    rulings. Only the first two have D28 resplit_redirect entries, so only
+    they are actually skipped by step 8a; INC-00311/INC-01897 are D28
+    `retire` entries. INC-00497 and INC-08139 have D28 resplit_redirect
+    entries too and must stay guarded (not in the skip set)."""
+    ruled = m._load_all_ruled_deprecation_appends(m.RULED_DEPRECATION_APPENDS_PATHS)
+    skip = m._d28_superseded_froms(ruled)
+    assert skip == {"INC-03128", "INC-08185", "INC-00311", "INC-01897"}
+    assert {"INC-00497", "INC-08139", "INC-00554"} <= {r["from"] for r in ruled}
+    assert not ({"INC-00497", "INC-08139", "INC-00554"} & skip)
+    auth = _json.loads(m.SPLIT_AUTHORIZATION_PATH.read_text(encoding="utf-8"))
+    resplit = {e["from"] for e in auth["entries"] if e.get("decision") == "resplit_redirect"}
+    assert skip & resplit == {"INC-03128", "INC-08185"}
+
+
+def test_ruled_inputs_are_two_dated_files_in_order():
+    # D69: one dated input per ruling, read in date order. Fails if the
+    # 2026-10-10 input is dropped from the tuple (its records would then
+    # never be appended) or the order is reversed.
+    names = [p.name for p in m.RULED_DEPRECATION_APPENDS_PATHS]
+    assert names == ["ID-silent-ids-appends-2026-10-09.json",
+                     "ID-group-ids-appends-2026-10-10.json"]
+    assert all(p.exists() for p in m.RULED_DEPRECATION_APPENDS_PATHS)
+
+
+def test_content_into_map_ignores_naming_rulings():
+    # D69: step 8a expands D28-approved targets through the CONTENT view.
+    # Fails if a `successor-identified` record (or a scoped record) leaks
+    # into that view: INC-00497's D28 set names INC-00311, whose content is
+    # its 12-way split, not the single incident its title named.
+    recs = [
+        {"from": "INC-00311", "into": ["INC-14726", "INC-14907"], "reason": "split", "date": "2026-09-18"},
+        {"from": "INC-00311", "into": "INC-14726", "reason": "successor-identified", "date": "2026-10-10"},
+        {"from": "INC-00497", "into": "INC-00311", "reason": "merged", "date": "2026-05-16"},
+        {"from": "INC-00497", "into": "INC-14907", "reason": "release-scoped", "date": "2026-10-09",
+         "valid_for_releases": ["v2.2.0"]},
+        {"from": "INC-00497", "into": "INC-00311", "reason": "release-dependent", "date": "2026-10-09"},
+    ]
+    cmap = m.content_into_map(recs)
+    assert cmap == {"INC-00311": ["INC-14726", "INC-14907"], "INC-00497": "INC-00311"}
+    live = {"INC-14726", "INC-14907"}
+    assert m.resolve_live_targets("INC-00497", cmap, live) == live
