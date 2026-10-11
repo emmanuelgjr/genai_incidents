@@ -1,0 +1,608 @@
+{
+  "$note": "AGENT-SUGGESTED labels, NOT a measurement. Written by the label-scientist agent (WS2) on 2026-10-11 by reading each sampled row (title, affected, description, references in data/incidents.json) against INCLUSION.md sections 1-3 and 6. These are suggestions for the human reviewer; scripts/wilson_ci.py never reads this file or the suggested_* columns. 's1'..'s6' cite INCLUSION.md sections.",
+  "suggested_by": "agent",
+  "written": "2026-10-11",
+  "rubric": "INCLUSION.md (status active, v2.3.1+)",
+  "suggestions": {
+    "INC-07644": {
+      "label": "in-scope",
+      "reason": "Biased automated decision (DUO risk-profiling) ruled discriminatory: real-world algorithmic harm (INCLUSION s2 real-world AI harms; s6 pre-LLM harms)."
+    },
+    "INC-06218": {
+      "label": "unsure",
+      "reason": "Critique that AI medical-imaging benefits are exaggerated; no specific harm event in the row (s3 policy/opinion vs s2 harm)."
+    },
+    "INC-05784": {
+      "label": "in-scope",
+      "reason": "Fatal crash involving a driver-assistance system (NIO NOP): AI system a material enabler of physical harm (s1, s6)."
+    },
+    "INC-04441": {
+      "label": "in-scope",
+      "reason": "Facial-recognition deployment without legally required notice: AI system causing a privacy/legal harm (s2)."
+    },
+    "INC-04751": {
+      "label": "in-scope",
+      "reason": "Copilot gave wrong election information: model-driven misinformation (s2)."
+    },
+    "INC-03644": {
+      "label": "in-scope",
+      "reason": "ChatGPT voice mode imitated users' voices unprompted: generative-model safety failure (s2)."
+    },
+    "INC-04093": {
+      "label": "in-scope",
+      "reason": "Deepfake romance scam with arrests: deepfake fraud (s2)."
+    },
+    "INC-02458": {
+      "label": "unsure",
+      "reason": "Copyright/trademark accusation against an LLM vendor: AI-nexus clear, but whether an IP dispute is a security or safety harm (s1 gate 2) is a policy call."
+    },
+    "INC-03392": {
+      "label": "in-scope",
+      "reason": "Self-driving robotaxi collision: AI system a material enabler of physical harm (s1)."
+    },
+    "INC-04549": {
+      "label": "in-scope",
+      "reason": "LLM-generated insecure code leading to data exposure: AI as the vector (s2)."
+    },
+    "INC-12415": {
+      "label": "out-of-scope",
+      "reason": "Apache Jackrabbit XSS (2009): generic software CVE, no AI nexus (s3)."
+    },
+    "INC-15182": {
+      "label": "in-scope",
+      "reason": "Command injection in PaddlePaddle, an ML framework: AI/ML supply-chain CVE (s2)."
+    },
+    "INC-15383": {
+      "label": "in-scope",
+      "reason": "CORS flaw in lollms-webui, an LLM web UI: AI-relevant CVE (s2)."
+    },
+    "INC-10248": {
+      "label": "out-of-scope",
+      "reason": "Vite dev-server file exposure: generic web tooling, no AI nexus (s3)."
+    },
+    "INC-15149": {
+      "label": "in-scope",
+      "reason": "Arbitrary file overwrite in H2O-3, an ML platform: AI/ML infrastructure CVE (s2)."
+    },
+    "INC-15457": {
+      "label": "in-scope",
+      "reason": "Access-control flaw in EmbedAI, an AI chatbot product: AI-relevant CVE (s2)."
+    },
+    "INC-08383": {
+      "label": "out-of-scope",
+      "reason": "Capsule Kubernetes multi-tenancy controller: generic software, no AI nexus (s3)."
+    },
+    "INC-09243": {
+      "label": "out-of-scope",
+      "reason": "Craft Commerce stored XSS: generic e-commerce CMS, no AI nexus (s3)."
+    },
+    "INC-13675": {
+      "label": "out-of-scope",
+      "reason": "Twig template sandbox bypass: generic PHP library, no AI nexus (s3)."
+    },
+    "INC-15631": {
+      "label": "in-scope",
+      "reason": "OpenClaw agent tool-policy bypass: agentic-AI exploit (s2)."
+    },
+    "INC-15768": {
+      "label": "in-scope",
+      "reason": "Langflow (LLM workflow builder) cache pollution / code execution: AI supply-chain CVE (s2)."
+    },
+    "INC-15905": {
+      "label": "in-scope",
+      "reason": "AstrBot (LLM chatbot/agent framework) subagent tool authorization flaw: agentic-AI exploit (s2)."
+    },
+    "INC-16043": {
+      "label": "in-scope",
+      "reason": "NVIDIA TensorRT-LLM unsafe deserialization: AI inference infrastructure CVE (s2)."
+    },
+    "INC-16180": {
+      "label": "in-scope",
+      "reason": "wandb OpenUI (LLM-driven UI generator) information exposure: AI-relevant CVE (s2)."
+    },
+    "INC-16317": {
+      "label": "in-scope",
+      "reason": "mcp-shell MCP server lets a connected LLM run any command: MCP-server vuln (s2)."
+    },
+    "INC-16455": {
+      "label": "in-scope",
+      "reason": "PraisonAI (multi-agent framework) code injection: agentic-AI CVE (s2)."
+    },
+    "INC-16592": {
+      "label": "in-scope",
+      "reason": "Office-Word-MCP-Server path traversal: MCP-server vuln (s2)."
+    },
+    "INC-16730": {
+      "label": "unsure",
+      "reason": "n8n credential-authorization bypass in the HTTP Request node: n8n is workflow automation with AI-agent features (corpus practice admits it) but this bug is not AI-specific; s6 dual-use judgement."
+    },
+    "INC-16867": {
+      "label": "in-scope",
+      "reason": "mcp-rtfm MCP interface path traversal: MCP-server vuln (s2)."
+    },
+    "INC-17004": {
+      "label": "in-scope",
+      "reason": "Langflow RCE via shared MCP project endpoints: AI supply-chain CVE (s2)."
+    },
+    "INC-17142": {
+      "label": "in-scope",
+      "reason": "crawl4ai (LLM-oriented crawler) arbitrary file write: AI-ecosystem tool CVE (s2)."
+    },
+    "INC-07161": {
+      "label": "out-of-scope",
+      "reason": "Tidal Workload Automation Agent on AIX: matches only 'Agent'/'AIX', no AI nexus (s3; s4 weak tokens)."
+    },
+    "INC-05978": {
+      "label": "in-scope",
+      "reason": "TensorFlow TFLite operator flaw triggered by a crafted model: ML framework CVE (s2)."
+    },
+    "INC-05266": {
+      "label": "in-scope",
+      "reason": "TensorFlow FractionalMaxPool crash: ML framework CVE (s2)."
+    },
+    "INC-11826": {
+      "label": "out-of-scope",
+      "reason": "PostgreSQL JDBC SQL injection: generic library, no AI nexus (s3)."
+    },
+    "INC-12040": {
+      "label": "out-of-scope",
+      "reason": "ElasticBox Jenkins Kubernetes plugin RCE: generic CI plugin, no AI nexus (s3)."
+    },
+    "INC-12265": {
+      "label": "out-of-scope",
+      "reason": "Apache Drill XSS: generic query engine, no AI nexus (s3)."
+    },
+    "INC-12470": {
+      "label": "out-of-scope",
+      "reason": "Valinor PHP mapper constructor discovery: generic library, no AI nexus (s3)."
+    },
+    "INC-07295": {
+      "label": "out-of-scope",
+      "reason": "Elastic APM Java Agent privilege escalation: an APM agent, no AI nexus (s3; s4 weak tokens)."
+    },
+    "INC-11452": {
+      "label": "out-of-scope",
+      "reason": "Apache Ivy XXE: generic build tool, no AI nexus (s3)."
+    },
+    "INC-11599": {
+      "label": "out-of-scope",
+      "reason": "Cilium debug-mode secret logging: generic networking, no AI nexus (s3)."
+    },
+    "INC-03690": {
+      "label": "unsure",
+      "reason": "CSRF in a WordPress 'AI Power ... GPT-4' content plugin: the product is GPT-based (s2 AI-relevant CVE) but the bug is generic web CSRF; the 2026-10-03 gate counted this shape as a false positive."
+    },
+    "INC-10788": {
+      "label": "in-scope",
+      "reason": "Lollms (LLM web UI) XSS: AI-relevant CVE (s2)."
+    },
+    "INC-10946": {
+      "label": "out-of-scope",
+      "reason": "Woodpecker CI plugin entrypoint overwrite: a CI 'agent', no AI nexus (s3)."
+    },
+    "INC-11099": {
+      "label": "out-of-scope",
+      "reason": "eZ Platform executable-access rule: generic CMS, no AI nexus (s3)."
+    },
+    "INC-11242": {
+      "label": "out-of-scope",
+      "reason": "Liferay Portal reflected XSS: generic portal, no AI nexus (s3)."
+    },
+    "INC-02485": {
+      "label": "unsure",
+      "reason": "dedupe is an ML-based entity-resolution library, but the flaw is in its GitHub Actions benchmark workflow: ML-library supply chain vs incidental ML (s1 gate 1)."
+    },
+    "INC-02987": {
+      "label": "in-scope",
+      "reason": "Open WebUI (self-hosted LLM platform) stored XSS to RCE: AI-relevant CVE (s2)."
+    },
+    "INC-10092": {
+      "label": "in-scope",
+      "reason": "Malicious npm package presenting as an MCP server: AI-ecosystem malicious package (s2); the mcp-server segment names the agent ecosystem, not an incidental substring."
+    },
+    "INC-10371": {
+      "label": "out-of-scope",
+      "reason": "Babylon blockchain chain halt: no AI nexus (s3)."
+    },
+    "INC-10596": {
+      "label": "out-of-scope",
+      "reason": "LF Edge eKuiper stored XSS: generic stream processing, no AI nexus (s3)."
+    },
+    "INC-00843": {
+      "label": "in-scope",
+      "reason": "ComfyUI (diffusion-model UI) path traversal in model preview: AI-relevant CVE (s2)."
+    },
+    "INC-01382": {
+      "label": "in-scope",
+      "reason": "MCP Ruby SDK session hijacking: MCP infrastructure vuln (s2)."
+    },
+    "INC-01804": {
+      "label": "in-scope",
+      "reason": "SQLBot stored prompt injection into an LLM/RAG pipeline (s2)."
+    },
+    "INC-08289": {
+      "label": "in-scope",
+      "reason": "Roslyn CodeLens MCP Server executes analyzer assemblies: MCP-server vuln (s2)."
+    },
+    "INC-08481": {
+      "label": "out-of-scope",
+      "reason": ".NET desktop runtime elevation of privilege: generic platform, no AI nexus (s3)."
+    },
+    "INC-08634": {
+      "label": "out-of-scope",
+      "reason": "GitPython config newline injection: generic library, no AI nexus (s3)."
+    },
+    "INC-08796": {
+      "label": "out-of-scope",
+      "reason": "Nginx-UI cross-site WebSocket hijacking: generic admin UI, no AI nexus in the row (s3)."
+    },
+    "INC-08946": {
+      "label": "in-scope",
+      "reason": "OpenClaw (AI agent) remote workspace directory deletion: agentic-AI CVE (s2)."
+    },
+    "INC-09106": {
+      "label": "out-of-scope",
+      "reason": "Scriban template recursion crash: generic .NET library, no AI nexus (s3)."
+    },
+    "INC-09292": {
+      "label": "in-scope",
+      "reason": "OpenClaw Zalo allowlist bypass reaching agent dispatch: agentic-AI exploit (s2)."
+    },
+    "INC-09492": {
+      "label": "out-of-scope",
+      "reason": "fast-xml-parser DoS: generic library, no AI nexus (s3)."
+    },
+    "INC-13432": {
+      "label": "in-scope",
+      "reason": "OpenClaw MCP SSE redirects forward Authorization headers: agentic-AI/MCP vuln (s2)."
+    },
+    "INC-13588": {
+      "label": "in-scope",
+      "reason": "Langflow unauthenticated code execution: AI supply-chain CVE (s2)."
+    },
+    "INC-13743": {
+      "label": "out-of-scope",
+      "reason": "Budibase webhook mass assignment: generic low-code platform, no AI nexus in the row (s3)."
+    },
+    "INC-13905": {
+      "label": "out-of-scope",
+      "reason": "Astro spread-props XSS: generic web framework, no AI nexus (s3)."
+    },
+    "INC-14065": {
+      "label": "in-scope",
+      "reason": "OpenClaw Telegram callback authorization bypass: agentic-AI CVE (s2)."
+    },
+    "INC-14205": {
+      "label": "in-scope",
+      "reason": "Compromised npm publish of the Cline (AI coding agent) CLI: AI supply-chain incident (s2)."
+    },
+    "INC-06309": {
+      "label": "out-of-scope",
+      "reason": "AI genome analysis speeds COVID diagnosis: beneficial use, no attack, misuse or harm (s1 gate 2; s3)."
+    },
+    "INC-06493": {
+      "label": "in-scope",
+      "reason": "Dataminr AI used to surveil protesters: real-world AI misuse with civil-rights harm (s2)."
+    },
+    "INC-06667": {
+      "label": "unsure",
+      "reason": "Allegation (single partisan source) that Google algorithms shift votes: AI-nexus plausible, harm event unverified (s1 gate 3; s3 opinion)."
+    },
+    "INC-06885": {
+      "label": "out-of-scope",
+      "reason": "Behavioural study on robots and risk-taking: research finding, no incident or attack (s3)."
+    },
+    "INC-07072": {
+      "label": "out-of-scope",
+      "reason": "Planned human-vs-AI dogfight: capability demonstration plan, no harm (s3)."
+    },
+    "INC-05421": {
+      "label": "unsure",
+      "reason": "Drone attacks on a Saudi base described as AI-enabled: real attack, but whether AI was a material enabler is unclear from the row (s1 gate 1)."
+    },
+    "INC-05681": {
+      "label": "out-of-scope",
+      "reason": "Google AI tools help fight CSAM: beneficial deployment, no harm (s3)."
+    },
+    "INC-06133": {
+      "label": "out-of-scope",
+      "reason": "Turkey shifts to AI combat drones after a jet project: procurement news, no incident (s3)."
+    },
+    "INC-00123": {
+      "label": "in-scope",
+      "reason": "AI chatbots gave harmful diet plans to teenagers: harmful generated content (s2)."
+    },
+    "INC-00271": {
+      "label": "unsure",
+      "reason": "Autonomous truck testing raises safety concerns: hazard, not a described harm event (s1 vs s3)."
+    },
+    "INC-00412": {
+      "label": "in-scope",
+      "reason": "AI-generated deepfake X-rays deceive radiologists and AI systems: documented attack technique (s1)."
+    },
+    "INC-00555": {
+      "label": "out-of-scope",
+      "reason": "AI alert helps police prevent a suicide: beneficial use, no harm (s3)."
+    },
+    "INC-00748": {
+      "label": "unsure",
+      "reason": "ChatGPT flagged one party's fundraising links as unsafe (vendor says a glitch): model malfunction with alleged bias; harm thin (s2 vs s3)."
+    },
+    "INC-00962": {
+      "label": "out-of-scope",
+      "reason": "EU legal deadlock reduces AI CSAM detection: policy dispute, no AI-caused incident (s3)."
+    },
+    "INC-01221": {
+      "label": "out-of-scope",
+      "reason": "India-Israel AI missile-defence collaboration: defence cooperation news, no incident (s3)."
+    },
+    "INC-01514": {
+      "label": "unsure",
+      "reason": "Lawsuit over gas turbines powering an AI data center: the harm is pollution from power generation, not from an AI system's behaviour (s1 gate 1 judgement)."
+    },
+    "INC-01809": {
+      "label": "out-of-scope",
+      "reason": "Startup AI cap converts thoughts to text, future privacy concerns: capability news, no incident (s3)."
+    },
+    "INC-01993": {
+      "label": "unsure",
+      "reason": "Court blocks Perplexity's AI shopping agent on Amazon: agentic-AI access dispute; security relevance depends on the unauthorised-access claims (s1 gate 2)."
+    },
+    "INC-07782": {
+      "label": "out-of-scope",
+      "reason": "Calls for mandatory government AI testing: policy, no incident (s3)."
+    },
+    "INC-07923": {
+      "label": "out-of-scope",
+      "reason": "AI drone intercepts a target in a military test: capability demonstration, no incident (s3)."
+    },
+    "INC-08062": {
+      "label": "out-of-scope",
+      "reason": "Human-rights concerns about Palantir AI in Europe/UK: advocacy/opinion, no specific incident in the row (s3)."
+    },
+    "INC-13023": {
+      "label": "unsure",
+      "reason": "AI-generated reality show criticised as sexist/vulgar: generated-content harm vs taste criticism (s2 vs s3)."
+    },
+    "INC-13170": {
+      "label": "unsure",
+      "reason": "AI-enabled cheating and surveillance in education: diffuse misuse trend, no single incident (s2 vs s3)."
+    },
+    "INC-13311": {
+      "label": "in-scope",
+      "reason": "Moderation AI wrongly flagged a person's photos as AI-generated: misclassification harming an individual (s2)."
+    },
+    "INC-14321": {
+      "label": "in-scope",
+      "reason": "Retail facial recognition misidentified a shopper: erroneous automated decision causing harm (s2)."
+    },
+    "INC-14501": {
+      "label": "unsure",
+      "reason": "Robotaxi rollout sparks safety and labor concerns: hazard/controversy, no specific harm event in the row (s1 vs s3)."
+    },
+    "INC-14722": {
+      "label": "out-of-scope",
+      "reason": "Plan for AI-driven military information sharing: policy/defence plan, no incident (s3)."
+    },
+    "INC-14859": {
+      "label": "out-of-scope",
+      "reason": "Bank deploys AI fraud detection: routine deployment, no harm (s3)."
+    },
+    "INC-14978": {
+      "label": "in-scope",
+      "reason": "Jailbreak of multiple LLM guardrails (AVID/0din): attack on LLMs (s2)."
+    },
+    "INC-04643": {
+      "label": "in-scope",
+      "reason": "Prompt-injection attack/defence benchmark paper: documented attack technique (s1)."
+    },
+    "INC-04147": {
+      "label": "in-scope",
+      "reason": "State-linked AI-generated influence campaigns targeting elections: model-driven disinformation (s2)."
+    },
+    "INC-03037": {
+      "label": "in-scope",
+      "reason": "LLM pre-training poisoning with a near-constant number of samples: documented attack technique (s2 poisoning)."
+    },
+    "INC-07487": {
+      "label": "unsure",
+      "reason": "Game AI update made NPC ships build superweapons: AI malfunction, but no real-world harm (s1 gate 2)."
+    },
+    "INC-06818": {
+      "label": "in-scope",
+      "reason": "Facial-recognition wrongful arrest: AI decision causing harm (s2)."
+    },
+    "INC-06167": {
+      "label": "in-scope",
+      "reason": "Mortgage algorithm more likely to reject people of colour: biased automated decision (s2)."
+    },
+    "INC-04906": {
+      "label": "unsure",
+      "reason": "Study finds a dynamic-pricing algorithm raises fares and lowers earnings: economic algorithmic harm; security/safety relevance is a policy call (s1 gate 2)."
+    },
+    "INC-02665": {
+      "label": "in-scope",
+      "reason": "Grok generated racist images of real people: harmful generated content (s2)."
+    },
+    "INC-07668": {
+      "label": "in-scope",
+      "reason": "Algorithmic teacher evaluation alleged to harm teachers: automated-decision harm (s2; s6 pre-LLM)."
+    },
+    "INC-07557": {
+      "label": "in-scope",
+      "reason": "Facebook friend suggestions exposed psychiatric patients to each other: privacy harm from a recommender (s2)."
+    },
+    "INC-07499": {
+      "label": "in-scope",
+      "reason": "Self-driving vehicle collided with a bus: AI material enabler of physical harm (s1)."
+    },
+    "INC-07391": {
+      "label": "in-scope",
+      "reason": "FaceApp racial filters: discriminatory generated content (s2)."
+    },
+    "INC-07271": {
+      "label": "in-scope",
+      "reason": "Rekognition falsely matched members of Congress to mugshots: biased misidentification (s2)."
+    },
+    "INC-07355": {
+      "label": "unsure",
+      "reason": "Navigation app routed a car into a lake: harm is real; whether route planning counts as an AI system is the s1 gate-1 judgement."
+    },
+    "INC-07260": {
+      "label": "in-scope",
+      "reason": "YouTube moderation algorithms failed to remove self-harm content: AI system failure enabling harm (s2)."
+    },
+    "INC-06609": {
+      "label": "in-scope",
+      "reason": "GAN-generated faces in a propaganda campaign: generative-AI misuse for disinformation (s2)."
+    },
+    "INC-07002": {
+      "label": "in-scope",
+      "reason": "TikTok moderation failed on eating-disorder content: AI moderation failure enabling harm (s2)."
+    },
+    "INC-05556": {
+      "label": "unsure",
+      "reason": "Search algorithm allegedly tweaked to self-preference: competition/consumer harm; security/safety relevance is a policy call (s1 gate 2)."
+    },
+    "INC-06079": {
+      "label": "in-scope",
+      "reason": "Autopilot misread the Moon as a yellow light: AI perception safety failure (s1)."
+    },
+    "INC-05037": {
+      "label": "in-scope",
+      "reason": "Facial-recognition error led to wrongful arrest and assault: AI decision causing harm (s2)."
+    },
+    "INC-05148": {
+      "label": "in-scope",
+      "reason": "Advocate deepfaked in image-based abuse: deepfake harm (s2)."
+    },
+    "INC-04380": {
+      "label": "in-scope",
+      "reason": "Cruise robotaxi dragged a pedestrian: AI material enabler of physical harm (s1)."
+    },
+    "INC-04469": {
+      "label": "in-scope",
+      "reason": "Terrorism prediction tool disparately impacts autistic people: biased automated decision (s2)."
+    },
+    "INC-04649": {
+      "label": "unsure",
+      "reason": "AI-generated sports articles withdrawn after errors: generative failure with reputational rather than safety harm (s2 vs s3)."
+    },
+    "INC-04817": {
+      "label": "unsure",
+      "reason": "Political party's AI-generated ad depicting a hypothetical future: disclosed synthetic political content; whether that is misuse/disinformation is a judgement (s2)."
+    },
+    "INC-08164": {
+      "label": "in-scope",
+      "reason": "ChatGPT-powered Bing factual errors on controversial topics: model-driven misinformation (s2)."
+    },
+    "INC-03513": {
+      "label": "in-scope",
+      "reason": "NHTSA probe into Autopilot after fatal crashes: AI material enabler of physical harm (s1)."
+    },
+    "INC-03614": {
+      "label": "in-scope",
+      "reason": "Insurance cancelled after an automated aerial-imagery roof assessment: automated-decision harm (s2)."
+    },
+    "INC-03730": {
+      "label": "in-scope",
+      "reason": "DWP AI systems allegedly discriminate against single mothers: biased automated decision (s2)."
+    },
+    "INC-03904": {
+      "label": "in-scope",
+      "reason": "Facebook AI moderation flagged news sites as spam: AI moderation failure causing harm (s2)."
+    },
+    "INC-04112": {
+      "label": "in-scope",
+      "reason": "AI-generated content in the Sudan conflict information space: disinformation (s2)."
+    },
+    "INC-04184": {
+      "label": "in-scope",
+      "reason": "Deepfake impersonation of a royal in a fraud scheme: deepfake fraud (s2)."
+    },
+    "INC-04345": {
+      "label": "in-scope",
+      "reason": "Driverless taxi stalled during a harassment incident: AI system safety failure (s1)."
+    },
+    "INC-02239": {
+      "label": "in-scope",
+      "reason": "Voice actor's voice used for AI voice without consent: generative-AI misuse harming an individual (s2)."
+    },
+    "INC-02282": {
+      "label": "in-scope",
+      "reason": "Harmful outputs and data exposure in children's AI products (s2)."
+    },
+    "INC-02394": {
+      "label": "in-scope",
+      "reason": "ChatGPT allegedly encouraged a user's suicide: harmful generated content (s2)."
+    },
+    "INC-02621": {
+      "label": "in-scope",
+      "reason": "Google AI Overview misstated the manufacturer in a crash: model-driven misinformation (s2)."
+    },
+    "INC-02846": {
+      "label": "in-scope",
+      "reason": "Teen arrested for selling deepfake images of schoolmates: deepfake abuse (s2)."
+    },
+    "INC-02982": {
+      "label": "in-scope",
+      "reason": "AI weapon detection triggered a false gun alert at a school: AI system failure causing harm (s2)."
+    },
+    "INC-03076": {
+      "label": "in-scope",
+      "reason": "Deepfake depicting a political altercation: disinformation (s2)."
+    },
+    "INC-03114": {
+      "label": "in-scope",
+      "reason": "AI-enhanced phishing impersonating government services: AI-enabled fraud (s2)."
+    },
+    "INC-03166": {
+      "label": "unsure",
+      "reason": "Dating-app breach exposing ID-verification images: AI-supported checks are mentioned but the breach may be incidental to AI (s1 gate 1)."
+    },
+    "INC-03308": {
+      "label": "in-scope",
+      "reason": "Students generated nonconsensual deepfake pornography of classmates (s2)."
+    },
+    "INC-14471": {
+      "label": "in-scope",
+      "reason": "Fake AI-generated video using a politician's likeness: deepfake disinformation (s2)."
+    },
+    "INC-01150": {
+      "label": "in-scope",
+      "reason": "Grok disclosed a person's legal name and birthdate, contributing to doxxing: model privacy harm (s2)."
+    },
+    "INC-01708": {
+      "label": "in-scope",
+      "reason": "AI-generated image circulated before an election: disinformation (s2)."
+    },
+    "INC-13073": {
+      "label": "in-scope",
+      "reason": "Gemini used to build phishing sites for SMS scams: LLM misuse (s2)."
+    },
+    "INC-02191": {
+      "label": "in-scope",
+      "reason": "AgentSmith prompt-hub proxy attack: attack on/through LLM agents (s2)."
+    },
+    "INC-03208": {
+      "label": "in-scope",
+      "reason": "ServiceNow Now Assist AI agent hijacking via a hardcoded key (CVE-2025-12420): agentic-AI exploit (s2)."
+    },
+    "INC-06348": {
+      "label": "unsure",
+      "reason": "Ring doorbell partnerships with police raise surveillance concerns: AI-nexus unclear (camera network, not a described AI system) and no specific harm event (s1 gate 1)."
+    },
+    "INC-05475": {
+      "label": "unsure",
+      "reason": "Amnesty condemns police facial-recognition use: concerns a real deployment, but the row is an advocacy statement, not a specific event (s2 vs s3)."
+    },
+    "INC-00943": {
+      "label": "in-scope",
+      "reason": "Police live facial recognition suspended over racial bias: biased automated decision (s2)."
+    },
+    "INC-00627": {
+      "label": "in-scope",
+      "reason": "AnythingLLM (LLM application) multiple CVEs: AI-relevant CVEs (s2)."
+    }
+  }
+}

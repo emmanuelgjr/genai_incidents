@@ -1,0 +1,14 @@
+{
+  "audit_dir": "docs/audits/precision/2026-10-11",
+  "audit_date": "2026-10-11",
+  "seed": 20261011,
+  "sample_size": 150,
+  "tier_allocation": {
+    "feed": 100,
+    "landmark": 50
+  },
+  "sample_entries_sha256": "4fb93c0581a40de290799d9a5b36fe894ee6ccad67089c970813c9f9190cc189",
+  "method": "Stratified sample (tier x source family, proportional within tier, seeded systematic draw); precision = share labelled in-scope against INCLUSION.md; stratified estimator weighted to stratum populations; Wilson score 95% interval at Kish effective n. Human labels only.",
+  "human_labelled": 0,
+  "status": "pending"
+}
