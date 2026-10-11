@@ -214,3 +214,17 @@ def test_disputed_count_marker_is_present_on_every_headline_surface():
     for rel in ("README.md", "docs/DATASHEET.md", "docs/index.html"):
         text = (root / rel).read_text(encoding="utf-8")
         assert re.search(r"<!--\s*stats:disputed_count\s*-->", text), rel
+
+
+def test_stats_panel_shows_disputed_figure_computed_from_rows():
+    """D64: the live panel in docs/app.js carries 'of which N disputed (still counted)',
+    computed from rows' status == "disputed", and the core payload carries `status`."""
+    import sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    js = (root / "docs" / "app.js").read_text(encoding="utf-8")
+    assert "r.status === 'disputed'" in js
+    assert "of which ${fmtNum(disputed)} disputed (still counted)" in js
+    sys.path.insert(0, str(root / "scripts"))
+    import gen_docs_core_data as core
+    assert "status" in core.CORE_FIELDS

@@ -277,6 +277,9 @@ function renderStats(allRows) {
   // Replace the static "12,500+" hero fallback with the exact live count.
   const heroCount = document.getElementById('hero-count');
   if (heroCount) heroCount.textContent = fmtNum(total);
+  const heroDisputed = document.getElementById('hero-disputed');
+  const disputed = allRows.filter(r => r.status === 'disputed').length;
+  if (heroDisputed) heroDisputed.textContent = fmtNum(disputed);
   const crit = allRows.filter(r => r.severity === 'Critical').length;
   const withCve = allRows.filter(r => (r.cve_ids || []).length).length;
   const curated = allRows.filter(r => r.quality_tier === 'curated').length;
@@ -286,7 +289,7 @@ function renderStats(allRows) {
   const earliest = years[0];
 
   els.stats.innerHTML = `
-    <div class="stat"><span class="num">${fmtNum(total)}</span><span class="label">Incidents</span><span class="sub">${earliest}–${latest}</span></div>
+    <div class="stat"><span class="num">${fmtNum(total)}</span><span class="label">Incidents</span><span class="sub">${earliest}–${latest}; of which ${fmtNum(disputed)} disputed (still counted)</span></div>
     <div class="stat"><span class="num sev-Critical" style="color: var(--critical)">${fmtNum(crit)}</span><span class="label">Critical</span><span class="sub">${(100*crit/total).toFixed(1)}% of total</span></div>
     <div class="stat"><span class="num">${fmtNum(withCve)}</span><span class="label">With CVE</span><span class="sub">${(100*withCve/total).toFixed(1)}% of total</span></div>
     <div class="stat"><span class="num">${fmtNum(curated + reviewed)}</span><span class="label">Curated + Reviewed</span><span class="sub">${fmtNum(curated)} curated</span></div>
