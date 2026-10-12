@@ -40,6 +40,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ▶ RESUMED 2026-10-12: item 8 MERGED; D75/D76 WIP rescued; stage-1 final gate + D75/D76 finish dispatched
+- **Item 8: DONE, MERGED to main** with `--no-ff` as `b8c2c6c2` (merge of `763a041e`; final gate PASS recorded at `7599b51e`). The merge was clean, with no conflict.
+  - **Foreman [R] after merge:**
+    - `git diff --diff-filter=D` (merge-base..763a041e) is empty; porcelain is empty.
+    - `validate.py` gives "15666/15666 entries valid; 0 with errors", and precision is still pending UNRATIFIED (D76 not yet on main).
+    - `check_stats_drift.py` gives "clean: 5 doc surfaces match data/stats.json", rc 0.
+    - **pytest: 851 passed, 1 xfailed.**
+  - The push was verified: `7599b51e..b8c2c6c2`, and ls-remote = local.
+  - Advisory A1 (release notes must say core gains `status`, +440 B) is carried to the cut.
+- **D75/D76 rescue.** The `ws2-v2130-ratify` worktree held **9 modified, uncommitted files**: CHANGELOG, CORRECTIONS, INCLUSION, DATA_DICTIONARY, the precision README and pending_authorization.json, merge_and_dedupe.py, validate.py and the precision tests. The previous specialist died with the session. The foreman committed them **as WIP `11abfa43`, unverified and ungated**, and pushed (ls-remote confirmed).
+  - A **fresh label-scientist** has been dispatched to verify the WIP against D75/D76, re-derive every figure, add D76 fire tests, merge main in and push.
+- **Item 7 stage 1:** a **fresh red-reviewer** has been dispatched for the final scoped gate on `52b0dcce`. It covers:
+  - full pytest;
+  - the per-entity delta vs main (expected 3,936 rows × 2 label fields);
+  - the merge-resolution review and the deletion/PROGRESS check;
+  - a fire proof;
+  - `merge-tree` vs the new main `b8c2c6c2`.
+
 ### ⏸ RESUME CHECKPOINT (user exited, 2026-10-11): v2.13.0 queue 5/9 done
 **Done and merged:** items 1, 2, 3, 4, 5; the schema branch (D61 + D57); D69/D70; the item 6/7 memos. **Ruled:** items 6 (A) and 7 (C stage 1).
 
