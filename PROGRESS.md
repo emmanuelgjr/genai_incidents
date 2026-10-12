@@ -63,6 +63,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ▶ v2.13.0 cut STEP 2 started on `release/v2.13.0-cut` (created on origin at main `f0b2e42b`)
+- **Release date: 2026-10-13. Foreman's convention call.**
+  - Prior tags are consistent with the UTC date: v2.11.0 was tagged 2026-10-01 06:17 UTC (date-released 2026-10-01); v2.12.0 was tagged 2026-10-04 20:08 UTC (date-released 2026-10-04).
+  - At dispatch it was already 2026-10-13 23:49 UTC... no: it was 2026-10-12 23:49 UTC, so the tag will land on 2026-10-13 UTC.
+  - **Correction, measured:** `date -u` gave "Mon Oct 12 23:49:47 UTC 2026". The cut WILL tag on or after 2026-10-13 UTC, because the steps take more than 11 minutes. If the tag somehow lands earlier, the date gets revisited.
+  - CITATION `date-released`, the CHANGELOG `[2.13.0]` heading and the README lead line all use **2026-10-13**.
+- **pipeline-engineer dispatched:** USER_AGENT in ingest/common.py plus both INGESTION_CONDUCT.md literals (:40 and :75; the v2.12.0 cut missed the second). The other 4 version strings come next, from distribution-engineer.
+
 ### ✅ v2.13.0 cut STEP 1 DONE: notes + CHANGELOG STIX **re-gate PASS on `9e85357d`; MERGED to main 2026-10-12 as `84be7033` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS. The v2.13.0 notes and the CHANGELOG STIX fix pass the re-gate at 9e85357d. DEFECTS: none."
 
