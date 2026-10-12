@@ -780,12 +780,18 @@ def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
 # 2.13.x (PRECISION_UNRATIFIED_GRACE_THROUGH); from 2.14.0 it fails until the
 # user either ratifies the pending state or the human labels land. No ruling
 # is recorded or implied by this code.
+# Update 2026-10-11: the user ratified the pending state by ruling D76
+# (decided 2026-10-11, recorded on the board), accepting that the "100 auto"
+# frame was drawn from tier=feed. REQUIRED_PRECISION_PENDING_DECISION is set
+# to "D76" below and the marker carries the same id, so the UNRATIFIED grace
+# path no longer applies: a placeholder or any other id now fails at every
+# version. The measurement itself stays pending until the sheet is labelled.
 # Re-derive the pinned hashes (canonical JSON, sort_keys, no whitespace):
 #   python -c "import sys,json; sys.path.insert(0,'scripts'); import precision_sample as p; d='docs/audits/precision/2026-10-11/'; print(p.canonical_sha256(json.load(open(d+'sample.json',encoding='utf-8'))['entries'])); print(p.canonical_sha256(json.load(open(d+'frame.json',encoding='utf-8'))))"
 # Changing any of these constants is itself a change that needs the user's
 # dated board decision -- it is not something a routine PR should touch.
 PRECISION_PENDING_PLACEHOLDER = "<USER-DECISION-ID>"
-REQUIRED_PRECISION_PENDING_DECISION: str | None = None  # placeholder: the user fills e.g. "D7x"
+REQUIRED_PRECISION_PENDING_DECISION: str | None = "D76"  # user ruling D76, decided 2026-10-11 (board)
 PRECISION_AUDIT_DIR_REL = "docs/audits/precision/2026-10-11"
 REQUIRED_PRECISION_SAMPLE_ENTRIES_SHA256 = (
     "4fb93c0581a40de290799d9a5b36fe894ee6ccad67089c970813c9f9190cc189"
@@ -901,6 +907,7 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
     if not required_decision or decision != required_decision:
         problems.append(f"precision: {PRECISION_AUTH_FILE} names decision {decision!r} but the decision pinned "
                         f"in code is {required_decision!r}")
+        return problems, f"precision: {status}, NOT authorised (marker {decision!r} vs code {required_decision!r})"
     return problems, f"precision: {status}, authorised by {decision}"
 
 def main():

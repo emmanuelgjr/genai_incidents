@@ -249,10 +249,17 @@ def test_human_labels_are_counted(tmp_path):
 
 
 # --------------------------------------------------------------------------- validate gate
-def test_gate_passes_on_committed_tree_with_unratified_warning():
-    problems, line = v.check_precision_audit("2.12.0")
-    assert problems == []
-    assert "UNRATIFIED" in line
+def test_gate_passes_on_committed_tree_ratified_by_d76():
+    """User ruling D76 (2026-10-11) ratified the pending state: marker and code
+    agree, so the gate passes WITHOUT the UNRATIFIED warning at any version."""
+    assert v.REQUIRED_PRECISION_PENDING_DECISION == "D76"
+    auth = json.loads((v.ROOT / v.PRECISION_AUDIT_DIR_REL / v.PRECISION_AUTH_FILE)
+                      .read_text(encoding="utf-8"))["authorization"]
+    assert (auth["decision"], auth["decided"], auth["decided_by"]) == ("D76", "2026-10-11", "user")
+    for version in ("2.12.0", "2.13.0", "2.13.9", "2.14.0", "3.0.0"):
+        problems, line = v.check_precision_audit(version)
+        assert problems == [], (version, problems)
+        assert "UNRATIFIED" not in line and "authorised by D76" in line, (version, line)
 
 
 def test_gate_passes_on_copy(tmp_path):
@@ -329,16 +336,50 @@ def test_gate_fires_on_non_user_marker(tmp_path):
     assert any("decided_by" in p for p in v.check_precision_audit("2.13.0", root)[0])
 
 
+def _set_marker_decision(root: Path, decision: str) -> None:
+    ap = _audit(root) / "pending_authorization.json"
+    m = json.loads(ap.read_text(encoding="utf-8"))
+    m["authorization"]["decision"] = decision
+    ap.write_text(json.dumps(m), encoding="utf-8")
+
+
 def test_gate_fires_on_unratified_past_grace(tmp_path):
+    """The grace path as it stood before D76: placeholder marker AND no id pinned
+    in code (required_decision="" simulates the pre-D76 constant)."""
     root = _copy_root(tmp_path)
-    assert v.check_precision_audit("2.13.9", root)[0] == []
-    assert any("UNRATIFIED" in p for p in v.check_precision_audit("2.14.0", root)[0])
-    assert any("UNRATIFIED" in p for p in v.check_precision_audit("3.0.0", root)[0])
+    _set_marker_decision(root, v.PRECISION_PENDING_PLACEHOLDER)
+    problems, line = v.check_precision_audit("2.13.9", root, required_decision="")
+    assert problems == [] and "UNRATIFIED" in line
+    assert any("UNRATIFIED" in p for p in v.check_precision_audit("2.14.0", root, required_decision="")[0])
+    assert any("UNRATIFIED" in p for p in v.check_precision_audit("3.0.0", root, required_decision="")[0])
+
+
+def test_gate_fires_on_placeholder_marker_once_code_pins_d76(tmp_path):
+    """D76 fire proof: with the code constant set, a placeholder marker is no
+    longer tolerated -- not even inside the old 2.13.x grace."""
+    root = _copy_root(tmp_path)
+    _set_marker_decision(root, v.PRECISION_PENDING_PLACEHOLDER)
+    for version in ("2.12.0", "2.13.0", "2.14.0"):
+        problems = v.check_precision_audit(version, root)[0]
+        assert any("pinned in code is 'D76'" in p for p in problems), (version, problems)
+
+
+def test_gate_fires_on_wrong_decision_id(tmp_path):
+    """D76 fire proof: a marker naming any other id fails against the D76 pin."""
+    root = _copy_root(tmp_path)
+    _set_marker_decision(root, "D77")
+    for version in ("2.13.0", "2.14.0"):
+        problems, line = v.check_precision_audit(version, root)
+        assert any("names decision 'D77'" in p for p in problems), (version, problems)
+        assert "NOT authorised" in line and "authorised by" not in line
 
 
 def test_gate_ratified_marker(tmp_path):
     root = _copy_root(tmp_path)
-    _edit(_audit(root) / "pending_authorization.json", '"<USER-DECISION-ID>"', '"D99"')
+    # committed copy: marker D76 and code D76 agree
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert problems == [] and "authorised by D76" in line
+    _set_marker_decision(root, "D99")
     # a filled marker without the matching pin in code is NOT a ruling
     assert any("pinned in code" in p for p in v.check_precision_audit("2.14.0", root)[0])
     problems, line = v.check_precision_audit("2.14.0", root, required_decision="D99")

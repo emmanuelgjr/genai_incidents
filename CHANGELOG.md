@@ -110,6 +110,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   returns: today it prints "no human labels".
 - `.gitattributes`: `docs/audits/precision/**` is kept LF, so the
   byte-for-byte check holds on every OS. No `data/*.json` change.
+- **Ratified and corrected (2026-10-11).** User ruling D76 ratified the
+  pending state and accepted that the "100 auto" frame is the feed tier:
+  `pending_authorization.json` and `REQUIRED_PRECISION_PENDING_DECISION`
+  both carry `D76`, so validate passes without the UNRATIFIED warning at any
+  version, and a placeholder or other id now fails. Precision is still
+  unmeasured. Under ruling D75, `INCLUSION.md` §5 (the feed is not
+  `quality_tier: auto`; 69% of it is `reviewed`) and §4 (no CI gate
+  sample-audits ingest changes) were corrected in place, with two
+  `CORRECTIONS.md` rows.
 
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 

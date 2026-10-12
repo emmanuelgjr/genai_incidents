@@ -6,6 +6,13 @@ human-reviewed until the user fills the `human_*` columns. This is a dated
 record (agreement 4): later changes are added as dated updates; do not
 regenerate this text.*
 
+*Superseded in part by the **Update 2026-10-11 (D76)** section at the end:
+the pending state is now ratified and the feed-frame reading is accepted. The
+passages below that call the decision id a placeholder are kept as originally
+written, as is the *Premise correction*'s pointer to INCLUSION.md §5's
+"comprehensive feed" layer, which §5 at the time mislabelled as
+`quality_tier: auto` (corrected under D75; see the same section).*
+
 ## What is being measured
 
 **Precision** = the share of published rows that are in scope under
@@ -208,3 +215,37 @@ Two other changes:
   it cannot find, rather than miscounting. Safest: edit in a plain-text
   editor, or save as "CSV UTF-8 (comma delimited)" and keep the header
   unchanged.
+
+## Update 2026-10-11 (D76): pending state ratified, feed reading accepted
+
+*Added after user ruling **D76** ("Accept feed reading; ratify pending now"),
+decided 2026-10-11 by the user and recorded on the board (PROGRESS.md). The
+text above is not edited; this section records what changed.*
+
+- **The feed reading is accepted.** The brief asked for "100 auto + 50
+  landmark". The sample's first frame is **`tier: feed`**, not
+  `quality_tier: auto`, for the reasons in the *Premise correction* above. The
+  user accepts that reading: "100 auto" in the brief and on the board means
+  the 100 feed-tier rows of this sample.
+- **The pending state is ratified.** `pending_authorization.json` now carries
+  `decision: "D76"`, `decided: "2026-10-11"`, `decided_by: "user"`, and
+  `scripts/validate.py` pins `REQUIRED_PRECISION_PENDING_DECISION = "D76"`.
+  The gate (item (e) above) no longer takes the placeholder/grace path.
+  `validate.py` reports `precision: pending, authorised by D76` with no
+  UNRATIFIED warning, at every dataset version. A placeholder marker or any
+  other decision id now fails at every version, including 2.13.x
+  (`tests/test_precision_audit.py`:
+  `test_gate_fires_on_placeholder_marker_once_code_pins_d76`,
+  `test_gate_fires_on_wrong_decision_id`).
+- **What did not change.** The sample, frame, sheet, pins and estimator are
+  unchanged (the entries and frame hashes are unchanged). **There is still no
+  measured precision figure.** The measurement stays `pending` until the user
+  fills `human_label`/`human_by` on all 150 rows of `review_sheet.csv`.
+  D76 authorises publishing the *pending* DATASHEET block; it is not a
+  measurement and does not stand in for one.
+- **Related correction (D75).** The *Premise correction* above says "The feed
+  tier is the 'comprehensive feed' layer of INCLUSION.md §5". At the time,
+  §5 called that layer `quality_tier: auto`, which was false. INCLUSION.md §5
+  (and §4) were corrected in place under ruling D75, with CORRECTIONS.md
+  rows. Re-derive the split:
+  `python -c "import json,collections; d=json.load(open('data/incidents.json',encoding='utf-8'))['incidents']; c=collections.Counter((e.get('tier'),e.get('quality_tier')) for e in d if e.get('status')!='retracted'); print(sorted(c.items(), key=str))"`
