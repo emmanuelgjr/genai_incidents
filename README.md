@@ -28,7 +28,7 @@
 |---|---|
 | 🧯 **AppSec / threat-intel** | triage AI-related CVEs and vendor advisories, and pull the corpus into OpenCTI or MISP |
 | 🎯 **A red-teamer** | scope attack classes against the OWASP Top 10 for LLM Applications, the OWASP Top 10 for Agentic Applications and MITRE ATLAS |
-| 🔬 **A researcher** | track incident trends with stable IDs, a DOI, and a published evidence trail |
+| 🔬 **A researcher** | track incident trends with IDs that are never reissued once retired and resolve after a merge, a DOI, and a published evidence trail |
 
 <p align="center">
 <picture>
