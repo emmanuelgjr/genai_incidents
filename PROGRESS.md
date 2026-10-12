@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9 bounce #1 fix: `073b2c39` (pushed). **Re-gate sent to the reviewer who bounced it.**
+- **Defect 1:** tax.py wraps the card titles ("OWASP Top 10 for Agentic" / "Applications (ASI)"), changing 3 elements per SVG. **Rendered in headless Chrome with DejaVu, Arial and Segoe forced; every PNG viewed.** Line 1 in DejaVu ends at 279.8 vs the badge at 315.2.
+- **Defect 2:** the CHANGELOG is corrected and covers D83-D88.
+- **Defect 3:** `reuse download` gives license-list-data text, 18,375 B, sha256 cde7883b...4966 (foreman verified). Cross-checked against a direct curl. Not compared against the spdx.org copy.
+- **D87:** README:8/:30 use the official names.
+- **D88:** "(ASI)" now appears on the chart title, figcaption, banner chip, card, CONTRIBUTING, DATA_DICTIONARY, the TAXONOMIES chooser and README:367. It also reaches the **NOTICE-DATA attribution lead and the SOURCE_LICENSES §3.6 heading**. The foreman judges both inside D88, since they introduce the codes; the user was told.
+- **A3:** 7 forms plus 29 plants and 12 controls. Two documented limits remain.
+- **A4:** banner chips are now in 2 rows. The LLM chip is widened, fixing its pre-existing overflow.
+- **A6:** the NOTICE count is re-derived as **eight**.
+- **A7:** the svg is added.
+- **Delta and checks:** 0 entries changed; data/ byte-identical to bba71064. pytest **997 passed, 1 xfailed**; validate, drift and lint rc 0.
+- **Foreman [R]:** origin = 073b2c39; licence blob sha256 = cde7883b...4966; merge-tree vs main clean; 17 files, +328/-424 vs bba71064.
+
 ### ⚖ D87-D88, USER RULINGS 2026-10-12 (item 9 bounce #1 advisories)
 - **D87: rewrite the README headline with the official names (Recommended).** README.md:8 ("normalized onto OWASP LLM/ASI Top 10") and :30 ("OWASP LLM/ASI") get the official titles, and the guard catches the "LLM/ASI Top 10" / "ASI Top 10" shorthand.
 - **D88: "(ASI)" on every code-introducing label (Recommended).** This extends D85 to the chart title, the index.html:138 figcaption, the taxonomy card, CONTRIBUTING:14, DATA_DICTIONARY:45 and the TAXONOMIES chooser, with the guard enforcing it everywhere. The `framework` value stays the bare title.
