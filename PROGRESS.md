@@ -63,6 +63,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D87-D88, USER RULINGS 2026-10-12 (item 9 bounce #1 advisories)
+- **D87: rewrite the README headline with the official names (Recommended).** README.md:8 ("normalized onto OWASP LLM/ASI Top 10") and :30 ("OWASP LLM/ASI") get the official titles, and the guard catches the "LLM/ASI Top 10" / "ASI Top 10" shorthand.
+- **D88: "(ASI)" on every code-introducing label (Recommended).** This extends D85 to the chart title, the index.html:138 figcaption, the taxonomy card, CONTRIBUTING:14, DATA_DICTIONARY:45 and the TAXONOMIES chooser, with the guard enforcing it everywhere. The `framework` value stays the bare title.
+- **Fix dispatched to a FRESH label-scientist** (agreement 3: the prior instance was at ~228k tokens). The brief is self-sufficient. It covers:
+  - defects 1-3 and D87/D88;
+  - advisories A3 (guard false-passes), A4 (banner chip under DejaVu), A6 (the NOTICE count) and A7 (the svg in the reproduction list);
+  - **render every changed image and measure in real DejaVu and Arial;**
+  - `reuse download` for the licence text, stopping if there is no network.
+- **Out of scope (pre-existing):** the og URL-line clip, the runner font, reuse lint's other texts, the ASI07 chart clip.
+- A re-gate follows (fix + re-gate, per the user's bounce preference).
+
 ### 🔁 Item 9 implementation: **BOUNCE #1 (full gate on `bba71064`, 2026-10-12)**
 **Verdict, in the gate's words:** "VERDICT: BOUNCE. The data and licensing work at `bba71064` checks out on my own measurements. It bounces on three defects: the README taxonomy map now has a broken layout, one sentence in the release notes is false, and the licence file is not the SPDX text that D84 named."
 
