@@ -74,6 +74,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - STIX 65,141 objects; MISP 31 events; SHA256SUMS 35/8/35;
   - pytest 997 passed, 1 xfailed.
   - It lists the trusted figures explicitly.
+- **CORRECTED SAME DAY: the "refutation" below was half wrong (foreman).** The 21 is correct as a count of **`OWASP-*` ids: 18 `OWASP-GENAI-*` + 3 `OWASP-AIX-*`, in 6 dataset rows**. Only the prefix label "OWASP-GENAI-*" was wrong. The license-auditor caught this from 109+21=130. The text below is kept as written.
 - **Refuted by the drafter: "21 OWASP-GENAI-* rows".** Foreman [R]: **18 distinct ids in 3 rows**; the ingest has the same 18. The figure came from SOURCE_LICENSES.md:320 (a live surface) and was carried onto the board and into the cut package unmeasured. The cut package gains a dated §7 correction. **NOTE → WS0:** fix SOURCE_LICENSES:320 in place.
 - **Other drafter flags:**
   - "minor release" is its own call;
