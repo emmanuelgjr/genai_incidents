@@ -317,9 +317,10 @@ Evidence: `docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md`
 Mitigations" document (v1.1, December 2025) is not a source of any text in
 this repository (record C2.3: our descriptions share no 5-gram with either
 edition, and a side-by-side read found own paraphrase). This row does **not**
-cover the 21 `OWASP-*` source ids (18 `OWASP-GENAI-*` and 3 `OWASP-AIX-*`), folded
-into 6 dataset rows in `data/incidents.json`; measured 2026-10-12, in `ingest/avid_owasp_incidents.json`
-(a different upstream; still OPEN, see §6.1).
+cover the 21 `OWASP-*` source ids in `ingest/avid_owasp_incidents.json`
+(18 `OWASP-GENAI-*` and 3 `OWASP-AIX-*`), folded into 6 dataset rows in
+`data/incidents.json` (measured 2026-10-12), a different upstream; still
+OPEN, see §6.1.
 
 | Field | Value |
 |---|---|
