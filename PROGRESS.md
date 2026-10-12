@@ -63,6 +63,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 v2.13.0 cut-docs integration COMPLETE at `b99533b7` (pushed; 21 files, +268/-69). **Single red-reviewer gate dispatched.**
+- **Contents (beyond wave 1):**
+  - wave 2: WS2 `0da32597` plus `985bbc1c`, the foreman's option (a) for the CORRECTIONS row;
+  - WS0 follow-ups `1bf78b9d` and `c8d39d27` (OWASP-* 21 = 18 GENAI + 3 AIX, 6 rows; NOTICE-DATA:141);
+  - WS3 schema wording `e1b0ee61` and `caa6466d` (tier "headline-citation set" plus D75 closure note; description-only).
+- **Wave-2 refutations recorded:**
+  - The guard was already red at 9587519e on the wave-1 CORRECTIONS row. Resolved as option (a): the row label gets the official name plus "(ASI)", and the quoted retired name is allowed in CORRECTIONS.md only.
+  - A 4th bare "OWASP LLM/ASI" was line-wrapped at export_misp.py:18-19, so grep missed it.
+  - docs/outreach/ (sent mail) is exempt from D90 only.
+- **Foreman [R] on b99533b7:**
+  - pytest **1020 passed, 1 xfailed**;
+  - validate rc 0; drift clean;
+  - schema/src copies byte-identical (cmp);
+  - merge-tree vs origin/main clean.
+
 ### 🔍 v2.13.0 cut, step 1: notes drafted `d565c22a` on `release/v2.13.0-notes` (pushed; 1 file, +524). The notes gate waits for the cut-docs merge.
 - **Content:** a "Read this first: behaviour changes" section (5 load_deprecations keys in a table; the D81 semantics; core `status` +440 B; new values), the licence exception (D89), 4 headlines, "also in this release", known limitations, and a Verification block. Absolute links only; link hygiene clean.
 - **Drafter's measurements:**
