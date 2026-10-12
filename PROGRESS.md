@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ▶ v2.13.0 CUT STARTED (user: "keep going", the standing go-ahead incl. publish steps): VERSIONING step 1 dispatched
+- **distribution-engineer** is drafting `docs/releases/v2.13.0.md` on `release/v2.13.0-notes`. It changes no version strings: step 1 only, and the notes are gated before any bump.
+  - Scope: cut-package §1/§2/§4R/§5.
+  - MUST include the "Behaviour changes" section (5 load_deprecations keys), the D81 semantics change, core `status`, the D89 licence exception and the known limitations.
+  - Absolute links only, no anchors. A Verification section with re-derived expected values.
+- **This runs in parallel with cut-docs wave 2** (the label-scientist on `release/v2.13.0-cut-docs`); the notes touch no data.
+- **Order from here:**
+  1. the gate on the cut-docs integration branch, then merge;
+  2. the gate on the notes, then merge;
+  3. steps 2-5 (version bump incl. the USER_AGENT via the ingest owner, CHANGELOG promotion, README:144 / Latest-release rewrite, make build, drift, prose sweep), with a pre-publish gate;
+  4. steps 6-9 (tag the merge commit, Release plus byte-verify, the Zenodo DOI plus 8b, registries).
+
 ### 🔧 v2.13.0 cut-docs: wave 1 DONE, integrated on `release/v2.13.0-cut-docs` @ `9587519e` (pushed; 14 files, +116/-49; all 5 merges clean). Wave 2 dispatched.
 **Wave 1 branches:**
 - **WS5 `e692270b`** (foreman-committed): C8 prose (README:56, DATA_DICTIONARY:12, paper:49-54); N5 §6 clause; N6 CORRECTIONS row for item 9.
