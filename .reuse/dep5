@@ -53,13 +53,14 @@ Comment: This dataset aggregates entries from many upstream sources, each
  framing, and docs/audits/E23-aiid-marking-ruling-2026-07-30.md for
  the full reasoning.
  The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
- eight sources above. With AIAAIC and AIID, it is one of the three
+ eight sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
  whose row text this project could not simply carry under the source's
  own licence grant. For each of the three, the text was either reduced
  to structural facts and a link, or its retained title was analysed as
  a separate copyright question (open for AIAAIC and AIM; resolved for
- AIID). For the other five, the grant covers the material reproduced,
- and the obligation is attribution or a notice that accompanies copies
+ AIID). For the other five named there (MITRE ATLAS, garak, the CVE
+ Program, AVID and the OWASP Top 10 for Agentic Applications), the
+ grant covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
  (CVE- and AVID-derived rows also carry a row-level content_license
  marker).
  .
