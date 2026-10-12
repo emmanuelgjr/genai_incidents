@@ -40,6 +40,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 D75/D76 — specialist reported `51b88c31` (pushed; contains main b8c2c6c2); **red-reviewer dispatched**
+- **WIP check:** the specialist verified WIP `11abfa43` against D75/D76 and edited one item: the false supersession note in the precision audit README. It then merged main (`0edaa542`, no conflict) and committed `51b88c31`.
+- **Scope:** 9 files vs main; no data/ change; R5/A3 not implemented.
+- **Figures re-measured by the specialist** (not taken on trust):
+  - feed 13,722 = 9,495 reviewed (0.692) + 4,227 auto, excluding the 29 retracted rows;
+  - 185 landmark rows are auto; curated 119; landmark 1,915 (= stats.json);
+  - these counts are identical at v2.12.0, main and HEAD;
+  - v2.3.1: 5,145 rows = 4,356 reviewed / 740 auto / 49 curated.
+- **Checks:**
+  - pytest: **853 passed, 1 xfailed**;
+  - validate gives "precision: pending, authorised by D76" with no UNRATIFIED warning;
+  - drift is clean.
+- **Fire proofs:**
+  - marker set to a placeholder or to D77 → "NOT authorised", rc 1;
+  - code pin set to None → 5 failed / 54 passed.
+- **Deletion check:**
+  - the deletion diff is empty;
+  - the PROGRESS.md diff is 0 lines;
+  - ls-remote = `51b88c31`.
+- **Foreman [R]:**
+  - `origin/ws2/v2130-precision-ratify-inclusion` = `51b88c31`;
+  - validate.py:794 pins "D76";
+  - origin/main is an ancestor of the branch;
+  - 9 files changed vs main.
+- The gate was asked to re-derive these figures by its own route.
+
 ### ▶ RESUMED 2026-10-12: item 8 MERGED; D75/D76 WIP rescued; stage-1 final gate + D75/D76 finish dispatched
 - **Item 8: DONE, MERGED to main** with `--no-ff` as `b8c2c6c2` (merge of `763a041e`; final gate PASS recorded at `7599b51e`). The merge was clean, with no conflict.
   - **Foreman [R] after merge:**
