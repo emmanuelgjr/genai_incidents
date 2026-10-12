@@ -36,6 +36,7 @@ __all__ = [
     "load_schema",
     "load_deprecations",
     "taxonomy_versions",
+    "build_manifest",
     "query",
     "by_id",
     "by_cve",
@@ -166,6 +167,30 @@ def taxonomy_versions() -> dict[str, str | None]:
     text = files(__name__).joinpath("data/taxonomy_versions.json").read_text(
         encoding="utf-8"
     )
+    return dict(json.loads(text))
+
+
+def build_manifest() -> dict[str, Any] | None:
+    """Return the ``build_manifest.json`` stamped into this distribution, or
+    ``None`` when the package was not built by the release pipeline.
+
+    Keys: ``commit``, ``built_at``, ``built_at_basis``, ``dirty``, ``version``,
+    ``incident_count``, ``retracted_count``, ``disputed_count``,
+    ``landmark_count``, ``taxonomy_versions`` (schema:
+    ``schema/build_manifest.schema.json`` in the repository). Wheels and sdists
+    published to PyPI carry it; a source checkout or editable install does not
+    (the file is written only by the release step, never committed), so treat
+    ``None`` as "unstamped", not as an error. ``built_at`` is the committer date
+    of ``commit``, not the wall-clock time of the build.
+    """
+    import json
+
+    try:
+        text = files(__name__).joinpath("data/build_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    except FileNotFoundError:
+        return None
     return dict(json.loads(text))
 
 

@@ -34,6 +34,119 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   (`test_oecd_aiid_content_disagreement_is_unique_to_inc00437`) is superseded by
   `tests/test_aiid_signal_provenance.py`. See `docs/audits/oecd-stage1-build-2026-10-09.md`.
 
+### Changed - export integrity: STIX `modified`, SHA256SUMS over STIX/TAXII/MISP, `build_manifest.json` on every channel, D57/D64 surfaces (agent-suggested, draft)
+
+- **STIX `modified` now changes when content changes.** It is the entry's `updated` date with
+  the exporter version (`EXPORTER_VERSION`, currently 1) in the millisecond field, never earlier
+  than `created`: an entry with no content change keeps a byte-identical SDO across builds, a
+  changed entry moves forward, and an exporter change moves every object by 1 ms. Before this,
+  `modified` was the bare `updated` date, so a change to the exporter (the 2026-10-01 OWASP
+  `source_name` relabel) changed object content without changing `modified`. **Every STIX and
+  TAXII object's `modified` moves once in this release** (+1 ms for incidents, relationships and
+  CVE objects; the 55 ATLAS `attack-pattern` objects move to the 2026-09-15 pin date; the
+  `identity` object to the newest incident date), so a client that dedupes on (`id`, `modified`)
+  re-imports the lot, which also delivers the earlier label fix. TAXII `manifest.json` `version`
+  follows. What bumps what: `docs/VERSIONING.md`.
+- **MISP event `timestamp` is derived from the data** (newest `updated` among the event's
+  incidents, plus the exporter version in seconds) instead of the fixed Jan 1 of the event's year.
+  A subscribed MISP decides whether to re-pull an event from that stamp, so no content change had
+  ever reached a subscriber.
+- **`SHA256SUMS` now covers the STIX bundle, the TAXII collection and the MISP feed.** The Pages
+  workflow ran `gen_data_integrity.py` before `export_stix.py`, so the live `data/SHA256SUMS`
+  listed only `incidents.core.json`, `incidents.min.json` and the `detail/` shards; it never
+  listed the STIX bundle. The step now runs after the exports, writes one `SHA256SUMS` per
+  served tree (`data/`, `taxii2/`, `misp/`), and the workflow re-verifies them against the built
+  `_site/`. `scripts/verify_data_integrity.py` also checks every manifest against its schema and
+  against `data/stats.json`.
+- **`build_manifest.json` on every channel** (`commit`, `built_at`, `built_at_basis`, `dirty`,
+  `version`, `incident_count`, `retracted_count`, `disputed_count`, `landmark_count`,
+  `taxonomy_versions`; schema `schema/build_manifest.schema.json`; counts copied from
+  `data/stats.json`): the Pages `data/`, `taxii2/` and `misp/` trees, the Hugging Face dataset,
+  the PyPI package (`genai_incidents.build_manifest()`, `None` for an unstamped source checkout)
+  and, new, the GitHub Release: a Release carried no assets before; `release-assets.yml` now
+  attaches the STIX bundle, `incidents.min.json`, `taxii2.zip`, `misp-feed.zip`,
+  `build_manifest.json` and `SHA256SUMS`. `built_at` is the committer date of `commit` (or
+  `SOURCE_DATE_EPOCH`), not the wall clock, and the manifest is written only in export/release
+  steps, never by `make build`, so builds stay byte-reproducible.
+- **D57 on the exports.** STIX incident SDOs of rows carrying a `source_freshness` marker (1,382,
+  all AIRI Navigator) gain `x_source_freshness {status, as_of, sources, review_by}` (absent
+  elsewhere, never null, not in `labels`); their MISP attributes (6,002) gain the machinetags
+  `genai-incidents:source-freshness`, `source-as-of` and `source-review-by`; the Hugging Face
+  card now defines `review_by`. The rows themselves are unchanged.
+- **D64 on the counts.** `data/stats.json` gains `disputed_count` (22). Disputed entries
+  **stay counted**: they are inside `incident_count` (15,637), not beside it, and
+  `retracted_count` (29) is outside it; no combined headline count exists. Year-shard cards of
+  the 22 gain a **DISPUTED** note, `INCIDENTS.md` shows both sub-counts, the README headline row, the
+  DATASHEET Instances line and the site hero carry a templated `stats:disputed_count` subset figure
+  (the og/twitter meta descriptions quote neither sub-count, as with `retracted_count`), the Hugging Face card
+  states the disputed count, and `check_stats_drift.py` now re-derives `incident_count`,
+  `retracted_count`, `disputed_count` and `landmark_count` from the full and slim corpus and fails
+  on any difference.
+- Wording fix: `modified` / `updated` are documented as moving on content-field changes only;
+  `tier`, `quality_tier`, `corpus`, `content_license`, `source_freshness` reach `modified` via an
+  `EXPORTER_VERSION` bump (DATA_DICTIONARY, TAXII and MISP READMEs).
+- No row in `data/incidents.json` or `incidents.min.json` changed. Field-level delta:
+  `docs/audits/ws6-v2130-export-integrity-2026-10-11.md`.
+
+### Added - N9 precision audit: seeded stratified sample, review sheet, Wilson script, DATASHEET section and validate gate (agent-suggested; measurement pending)
+
+- `scripts/precision_sample.py` draws a seeded (`20261011`), stratified sample.
+  It takes 100 rows from the `feed` tier and 50 from the `landmark` tier. The
+  strata are tier x source family, and allocation is proportional within each
+  tier. Inside a stratum, the draw is systematic over (quality_tier, year, id).
+  Retracted rows are excluded. The output goes to
+  `docs/audits/precision/2026-10-11/`: the frame with population per stratum,
+  the sample, and the review sheet. `--check` reproduces every generated file
+  byte-for-byte; a different seed does not reproduce them. The frame is `tier`,
+  not `quality_tier == "auto"`. The two overlap, and most of the CVE/GHSA rows
+  behind board note N9 are `quality_tier: reviewed` (see the audit README).
+- `review_sheet.csv` comes pre-filled with **agent-suggested** labels and
+  reasons (`suggested_by: agent`). The `human_label`/`human_by` columns are
+  empty. No row has been human-reviewed. The suggestions are not a
+  measurement and are not quoted as one; `agent_suggested_precision.json`
+  holds them, marked as such.
+- `scripts/wilson_ci.py` computes Wilson 95% intervals per tier, per stratum
+  and overall from **human labels only**. It uses a stratified estimator
+  weighted to stratum populations, at Kish effective n, and reports both
+  `unsure` treatments. Labels without a reviewer, or with a reviewer that names
+  an agent or model, are refused. With only suggestions filled, it reports
+  "no human labels". It is unit-tested against Newcombe (1998), Table I. It
+  also gives per-`quality_tier` domain estimates within each tier, flagged
+  when n < 30. The sheet loader tolerates a spreadsheet's byte-order mark,
+  CRLF line endings and re-quoting.
+- `docs/DATASHEET.md` has a new "Measured precision" section. The figure block
+  is generated from `results.json` (`wilson_ci.py --render-datasheet`) and
+  currently reads "measurement pending", with the method, sample size and date.
+- `scripts/validate.py` has a new precision gate. In every status (pending,
+  partial and measured) it checks that:
+  - the audit directory is the pinned one, with no other dated directory
+    beside it;
+  - the sample's entries match their own declared hash and a hash pinned in
+    code;
+  - the whole `frame.json` (stratum populations, which are the estimator's
+    weights) matches a second hash pinned in code;
+  - the sheet ids match the sample;
+  - `results.json` and the DATASHEET block equal a fresh computation.
+
+  While the measurement is pending or partial, it also requires a D28-form
+  marker (`pending_authorization.json`). The marker's decision id is a
+  placeholder for the user. While it is unratified, the gate passes with a
+  warning through dataset version 2.13.x and fails from 2.14.0.
+- `scripts/evaluate_ai_relevance.py` scores `ai_relevance.assess()` against the
+  human labels with a confusion matrix. It does not run until the sheet
+  returns: today it prints "no human labels".
+- `.gitattributes`: `docs/audits/precision/**` is kept LF, so the
+  byte-for-byte check holds on every OS. No `data/*.json` change.
+- **Ratified and corrected (2026-10-11).** User ruling D76 ratified the
+  pending state and accepted that the "100 auto" frame is the feed tier:
+  `pending_authorization.json` and `REQUIRED_PRECISION_PENDING_DECISION`
+  both carry `D76`, so validate passes without the UNRATIFIED warning at any
+  version, and a placeholder or other id now fails. Precision is still
+  unmeasured. Under ruling D75, `INCLUSION.md` §5 (the feed is not
+  `quality_tier: auto`; 69% of it is `reviewed`) and §4 (no CI gate
+  sample-audits ingest changes) were corrected in place, with two
+  `CORRECTIONS.md` rows.
+
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 
 - `scripts/check_stats_drift.py` additionally fails CI when the README

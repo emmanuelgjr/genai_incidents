@@ -1,0 +1,55 @@
+name: Release assets (STIX / TAXII / MISP / manifest / SHA256SUMS)
+
+# v2.13.0 item 8: before this workflow a GitHub Release carried NO assets
+# (`gh release view v2.12.0 --json assets` -> []), so the "GitHub release" channel
+# had no build_manifest.json and no checksums at all. On each published release
+# this builds the export set from the tagged commit and attaches:
+#   incidents.stix.json  incidents.min.json  taxii2.zip  misp-feed.zip
+#   build_manifest.json  SHA256SUMS
+# See scripts/package_release_assets.py. It adds assets only: it never edits the
+# release body, so the byte-verified notes (docs/VERSIONING.md step 7) are untouched.
+# Does not interact with the auto-refresh workflows (no data/ writes, no PRs).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to (re)attach assets to, e.g. v2.13.0"
+        required: true
+
+permissions:
+  contents: write   # gh release upload
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Export STIX, TAXII, MISP
+        run: |
+          mkdir -p docs/data
+          python scripts/export_stix.py
+          python scripts/export_taxii.py
+          python scripts/export_misp.py
+      - name: Manifest + SHA256SUMS for each tree, then verify
+        run: |
+          python scripts/gen_data_integrity.py
+          python scripts/verify_data_integrity.py
+      - name: Package the release assets
+        run: python scripts/package_release_assets.py
+      - name: Verify the packaged SHA256SUMS
+        run: (cd dist/release && sha256sum -c SHA256SUMS)
+      - name: Upload to the release
+        run: gh release upload "$TAG" dist/release/* --clobber

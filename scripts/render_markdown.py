@@ -356,6 +356,25 @@ def render_incident_block(e: dict) -> list[str]:
             f"Program (checked {reason.get('as_of', 'n/a')}). Kept so this ID keeps "
             "resolving; not counted as an incident."
         )
+    elif e.get("status") == "disputed":
+        # D64 (v2.13.0 item 8): the CVE records this entry rests on are
+        # PUBLISHED but disputed (CNA/ADP `disputed` tag or `** DISPUTED **`
+        # prefix). Unlike the retracted banner, the entry STAYS counted.
+        reason = e.get("status_reason") or {}
+        lines.append("")
+        lines.append(
+            "**DISPUTED** -- every CVE record this entry rests on is listed by the "
+            "CVE Program as PUBLISHED but disputed by its CNA or an ADP "
+            f"(checked {reason.get('as_of', 'n/a')}). Not withdrawn: the entry "
+            "stays counted as an incident, with its confidence lowered one level."
+        )
+        if e.get("rejected_cve_ids"):
+            lines.append("")
+            lines.append(
+                "**Note:** the CVE Program also marks "
+                + ", ".join(f"`{c}`" for c in e["rejected_cve_ids"])
+                + " as REJECTED."
+            )
     elif e.get("rejected_cve_ids"):
         lines.append("")
         lines.append(
@@ -536,6 +555,10 @@ def render():
     stats = {
         "incident_count": len(entries),
         "retracted_count": n_retracted,
+        # D64: CVE-disputed entries STAY in incident_count (they are standing
+        # incidents with lowered confidence); this is a subset count of
+        # incident_count, never added to or subtracted from it.
+        "disputed_count": sum(1 for e in entries if e.get("status") == "disputed"),
         "landmark_count": sum(1 for e in entries if e.get("tier") == "landmark"),
         "version": raw.get("version", ""),
         "generated": raw.get("generated", ""),
@@ -590,6 +613,12 @@ def render():
     lines.append(f"- **Version:** {raw.get('version','1.0.0')}")
     lines.append(f"- **Generated:** {raw.get('generated', str(utc_today()))}")
     lines.append(f"- **Total incidents:** **{len(entries):,}**")
+    lines.append(
+        f"  - of which CVE-disputed (counted; confidence lowered): {stats['disputed_count']:,}"
+    )
+    lines.append(
+        f"  - retracted (NOT counted; every CVE REJECTED): {stats['retracted_count']:,}"
+    )
     if year_counts:
         latest = max(year_counts)
         earliest = min(year_counts)

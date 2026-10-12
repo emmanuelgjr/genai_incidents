@@ -226,9 +226,49 @@ def check_other_version_literals(stats: dict, common_src: str, incidents_md: str
     return errors
 
 
+def derive_counts(entries: list[dict]) -> dict:
+    """Counts re-derived from a row list, independently of render_markdown.py.
+
+    ``incident_count`` = rows that stand (not retracted); ``disputed_count`` is
+    the subset of those with ``status: disputed`` (D64: still counted)."""
+    standing = [e for e in entries if e.get("status") != "retracted"]
+    return {
+        "incident_count": len(standing),
+        "retracted_count": len(entries) - len(standing),
+        "disputed_count": sum(1 for e in standing if e.get("status") == "disputed"),
+        "landmark_count": sum(1 for e in standing if e.get("tier") == "landmark"),
+    }
+
+
+def check_stats_vs_corpus(stats: dict, full_entries: list[dict],
+                          slim_entries: list[dict] | None = None) -> list[str]:
+    """data/stats.json must equal the counts derived from the corpus rows, via
+    two paths: the full ``data/incidents.json`` and (when given) the slim
+    ``incidents.min.json`` that ships in the package. A stats.json that was not
+    re-rendered after a merge, or a disputed_count that disagrees with the rows'
+    ``status``, fails here by key name."""
+    errors = []
+    for label, rows in (("data/incidents.json", full_entries),
+                        ("incidents.min.json", slim_entries)):
+        if rows is None:
+            continue
+        for key, want in derive_counts(rows).items():
+            if stats.get(key) != want:
+                errors.append(
+                    f"data/stats.json {key} is {stats.get(key)!r} but the rows of "
+                    f"{label} give {want!r} -- run `python scripts/render_markdown.py`")
+    return errors
+
+
 def main() -> int:
     stats = load_stats()
     all_errors: list[str] = []
+    all_errors.extend(check_stats_vs_corpus(
+        stats,
+        json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"],
+        json.loads((ROOT / "src" / "genai_incidents" / "data" / "incidents.min.json")
+                   .read_text(encoding="utf-8"))["incidents"],
+    ))
 
     for path in DOC_SURFACES:
         if not path.exists():
