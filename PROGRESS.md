@@ -49,7 +49,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
    - per-entity delta vs main = 3,936 rows × 2 label fields only;
    - fire proof.
    Then `--no-ff` merge to main.
-2. **Item 8:** `ws6/v2130-export-integrity` @ `763a041e` (A2 panel + `status` added to CORE_FIELDS + main merged in). The final scoped gate was running. NEXT: gate the CORE_FIELDS payload change and the full chain, then merge. That merge conflicts with stage 1 only in CHANGELOG (keep both).
+2. **Item 8:** `ws6/v2130-export-integrity` @ `763a041e`. **FINAL GATE PASS arrived at the checkpoint.** Verdict: "Item 8 at 763a041e is ready to merge. The A2 change moves exactly one field on 22 rows of one served file, nothing else changed, and every gate is green."
+   - **Evidence:**
+     - core payload row-by-row: only `status` added, on the 22 disputed rows; retracted rows in core = 0; +440 B (6,687,566 → 6,688,006);
+     - detail shards, min.json and STIX are byte-identical;
+     - integrity 35/8/35 is clean;
+     - the fire proofs ran with isolated pyc caches;
+     - the merge-resolution diff touches CHANGELOG only, with 0 markers;
+     - `git merge-tree main 763a041e` gives rc 0 against 1be493c1;
+     - byte-exact build twice; 851 passed; validate, drift and lint green.
+   - **Advisory A1:** the release notes must mention that the served `data/incidents.core.json` gains `status` (+440 B).
+   - **NEXT: `--no-ff` merge to main** and re-run validate, drift and pytest. If stage 1 merges first, expect a CHANGELOG-only conflict (keep both).
 3. **D75/D76:** `ws2/v2130-precision-ratify-inclusion` (worktree `ws2-v2130-ratify`, from `ebd7f7b3`). A fresh label-scientist was working; the branch may be empty or partial. CHECK `git log` and porcelain in that worktree. If unstarted, redispatch from the D73-D76 entry below. NEXT: gate it, then merge.
 
 **Queued, not started:**
