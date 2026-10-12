@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ cut-docs integration: **BOUNCE #2 (scoped re-gate on `df72392a`, 2026-10-12). ESCALATED to the user** (protocol step 6)
+**Verdict, in the gate's words:** "VERDICT: BOUNCE (bounce #2 on this gate, so per protocol this escalates to the user). Both defects are one-line wording fixes. I give the exact replacement text for each, so I recommend 'apply verbatim + string check' rather than a third full gate."
+
+**Defects:**
+1. **dep5:55-63:** "the last of the eight sources above" and "For the other five" refer to a list that dep5 does not contain. **The gate's own error:** it supplied NOTICE-DATA wording for dep5 without adapting it. NOTICE-DATA is correct.
+   Replacement text: "is the last of the eight sources NOTICE-DATA names as carrying an obligation." and "For the other five named there (MITRE ATLAS, garak, the CVE Program, AVID and the OWASP Top 10 for Agentic Applications), the grant covers...".
+2. **flow.py:28 and the SVGs:** "tombstoned IDs resolve" overclaims. `resolve_id()` returns None for 776 of 1,065 (73%).
+   - Replacement: "retired IDs never reissued · every retired ID keeps a record".
+   - Also fix paper §4 step 5, "so a citation of a tombstoned ID resolves", to "so every retired ID has a record that resolve_id_status() reports".
+   - **The bounce-1 fix introduced this label. The foreman's WS3 brief suggested "tombstoned IDs resolve" (my C5 wording: "citations of tombstoned IDs resolve"). Foreman's brief error.**
+
+**Adjudications and advisories:**
+- **3,810 vs 3,811: both are right.** 3,811 feed rows are OECD-sourced. INC-01434 also carries a CVE, so the disjoint split is 7,989 + 3,810 + 1,923 = 13,722. The gate presented overlapping figures. No live text states either number, and the cut package's "3,811 feed" is correct.
+- **README:203 old AIM name:** out of this cut. The former name is widespread (README:203/:302, DATASHEET:38, paper:60, flow.py:17, auto-refresh.yml, Makefile). → **a separate rename-sweep task (WS6/WS4).** Warning: ingest_external.py:233/:241 write the name into row data, so that part is a data change needing a delta.
+- **The flow label "OWASP LLM · ASI · NIST · ATLAS" is CONFIRMED exempt** (compact UI label).
+- CHANGELOG "(was the older short names)" is inaccurate. It should read '(was the unofficial "OWASP LLM/ASI" shorthand)'. Low priority; can ride along.
+- Guard residual passes are documented and acceptable.
+
+**Gate evidence:**
+- data/ and PROGRESS diffs empty; merge-tree clean; schema identical.
+- pytest 1072 passed, 1 xfailed; validate, drift and reuse spdx rc 0.
+- dep5 parses with debian.copyright; the carve-out resolves.
+- The guard fires on every plant it tried, including a backslash continuation, and passes the legitimate forms; the live scan is empty.
+- The paper §4 order is confirmed against the code.
+- DD:76 3,767 re-measured; SL:320 and CHANGELOG:75 correct; HF and Zenodo fixed.
+
 ### 🔍 cut-docs bounce #1 fixes integrated at `df72392a` (pushed). **Scoped re-gate sent to the same reviewer.**
 - **Fixes:**
   - **WS0 `b797ee8e`:** D1 applied the gate's wording verbatim. **The parenthetical was confirmed against E21 §5.1 and E23 before applying.** D2; SL:320; DD:76 now names 3 sources.
