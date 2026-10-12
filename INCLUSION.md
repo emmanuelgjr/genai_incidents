@@ -110,7 +110,7 @@ layer is the **`tier`** field. It is derived on every build by
 `scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of
 record:
 
-- **Landmark** (`tier: landmark`) is the notable headline set. A row is
+- **Landmark** (`tier: landmark`) is the headline-citation set. A row is
   landmark if it is hand-curated (`quality_tier: curated`), **or** is
   catalogued in the AI Incident Database (`aiid_id` present), **or** is an
   AI-harm case (`corpus: ai-harm`).

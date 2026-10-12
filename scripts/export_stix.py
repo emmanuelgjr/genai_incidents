@@ -11,7 +11,7 @@ Modelling:
   - each distinct CVE -> a `vulnerability` SDO;
   - `relationship` SDOs link incidents to the techniques/CVEs they involve;
   - one `identity` SDO ("genai_incidents") carries `x_taxonomy_versions`, the
-    pinned versions of the taxonomies (ATLAS, OWASP LLM/ASI, CAPEC, VERIS)
+    pinned versions of the taxonomies (ATLAS, OWASP Top 10 for LLM Applications, OWASP Top 10 for Agentic Applications, CAPEC, VERIS)
     that the x_* mapping properties refer to.
 
 All STIX ids are derived deterministically (UUIDv5 over a fixed namespace),
@@ -253,7 +253,7 @@ def build_bundle(incidents: list[dict]) -> dict:
             "x_quality_tier": i.get("quality_tier"),
             # WS6-T9: x_tier is the landmark/feed selector. x_quality_tier is
             # a different axis (vetting level) and cannot stand in for it --
-            # a consumer filtering the bundle for the notable subset needs
+            # a consumer filtering the bundle for the headline-citation (landmark) set needs
             # this one. Emitted unconditionally, like x_quality_tier and
             # unlike the optional landmark-only labels below.
             "x_tier": i.get("tier"),

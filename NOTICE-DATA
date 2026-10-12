@@ -31,10 +31,12 @@ the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
 for its codes and risk names), the AIAAIC Repository, the AI Incident
 Database (AIID), and the OECD AI Incidents and Hazards Monitor (AIM).
 This list is maintained by hand and is added to as new sources
-resolve; if a source you are looking for is not named here,
-docs/SOURCE_LICENSES.md's own summary-of-outcomes table is the
-authoritative, always-current enumeration and takes precedence over
-this file falling behind it.
+resolve; if a source you are looking for is not named here, the
+per-source sections of docs/SOURCE_LICENSES.md are the authoritative
+account and take precedence over this file falling behind it. (Its
+"Summary of outcomes requiring escalation" table lists only the
+sources with an escalation, not every source with an obligation, and
+is not an enumeration of the eight above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -136,8 +138,8 @@ scripts/render_markdown.py), docs/TAXONOMIES.md and docs/app.js.
 mappings/owasp_asi_top10.json is carved out of the CC BY
 4.0 grant for this material (CC BY-SA 4.0; see .reuse/dep5 and the
 OWASP row, section 3.6, of docs/SOURCE_LICENSES.md). This does not cover
-the OWASP-GENAI-* rows of ingest/avid_owasp_incidents.json, which are a
-different upstream.
+the OWASP-* rows (OWASP-GENAI-* and OWASP-AIX-*) of
+ingest/avid_owasp_incidents.json, which are a different upstream.
 
 The AIAAIC Repository is a CC BY-SA 4.0 source (share-alike). Per
 project decision D2, AIAAIC's own narrative/descriptive cell text is
@@ -231,9 +233,18 @@ before it ships. See docs/SOURCE_LICENSES.md section 1.2a and
 docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
-The OECD AI Incidents and Hazards Monitor (AIM) is a third upstream
-source carrying an active content obligation, alongside AIAAIC and
-AIID above. AIM's own terms self-incorporate OECD's general
+The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
+eight sources above. With AIAAIC and AIID, it is one of the three
+whose row text this project could not simply carry under the source's
+own licence grant. For each of the three, the text was either reduced
+to structural facts and a link, or its retained title was analysed as
+a separate copyright question (open for AIAAIC and AIM; resolved for
+AIID). For the other five, the grant covers the material reproduced,
+and the obligation is attribution or a notice that accompanies copies
+(CVE- and AVID-derived rows also carry a row-level content_license
+marker).
+
+AIM's own terms self-incorporate OECD's general
 Data-reuse conditions -- "Your use of the OECD AI incidents and
 hazards monitor (previously AI Incidents Monitor) ("AIM") is subject
 to the terms and conditions found at www.oecd.org/termsandconditions"
@@ -270,10 +281,17 @@ an AIID entry during merge but which still carry an oecd.ai page
 reference via the AIID-OECD bridge path.
 
 The title field is NOT resolved by this reduction, and this is not
-silent: it still ships the same LLM-generated text verbatim on 3,667
-of 3,829 OECD-AIM-sourced rows -- the other 162 were merged into an
-entry whose own title, from a different upstream source, took
-precedence instead. This is tracked as a separate, open question at
+silent: it still ships the same LLM-generated text verbatim on 3,937
+of 4,104 non-retracted OECD-AIM-sourced rows -- the other 167 were
+merged into an entry whose own text, from a different upstream
+source, took precedence instead. (Measured directly on the title
+field 2026-10-12 by the foreman: among non-retracted entries a, those
+whose title equals the ingest title, in
+ingest/oecd_aim_full_incidents.json, of one of their OECD-AIM source
+ids; the same set as description_source == "oecd-aim". Denominator:
+sum(any(s.startswith('OECD-AIM') for s in e['source_ids']) for e in a).
+See
+docs/audits/v2.13.0-cut-package-2026-10-12.md section 4R, row C3.) This is tracked as a separate, open question at
 the same posture as AIAAIC's retained-headline question above
 (E15/D17) -- a shorter label, not a multi-sentence digest, but not
 dispositive of the underlying copyright question. Unlike AIAAIC, no
