@@ -40,6 +40,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ⛔ D73: **STOPPED, per the brief's stop condition. Goes back to the user as a ruling.** Branch `ws4/v2130-d73-content-fields` @ `6b1f1118` (pushed, no data change). A red-reviewer is assembling the ruling package.
+- **Literal D73 (tuple change only):** the rebuild bumps `updated`, and `last_seen` with it, on **15,657 of 15,666** rows. `added` changes on 0 rows. **The stop condition fired.**
+- **Cause, per the engineer:** `_apply_history` snapshots each entry at step 5. That is BEFORE `tier` is derived (6g) and before `quality_tier`/`corpus` are assigned, so every rebuild would bump, not only the first.
+- **Variant pushed on the branch, NOT authorised:** step 5 assigns the three fields before `_apply_history`. The engineer measured 0 `updated` bumps, 0 moves and empty porcelain.
+- **The engineer also inverted `test_content_license_excluded_from_content_fields`.** It came from WS0-T3 (`6ca1c296`, AIAAIC facts-reduction), so the variant reverses an earlier recorded design choice.
+- **Fire proofs:**
+  - reverting the tuple fails 3 tests;
+  - reverting the reorder fails 2, including the pre-existing OECD attribution test;
+  - adding source_freshness fails 2.
+- **Checks:** pytest 938 passed / 2 skipped / 1 xfailed; validate and drift rc 0.
+- **Foreman [R]:** origin = `6b1f1118`; the diff vs main touches 4 files (CHANGELOG, merge_and_dedupe.py, two tests), 89+/10-; `git log -S` traces the test to `6ca1c296` WS0-T3.
+- **Red-reviewer dispatched to build the ruling package:**
+  - (a) reproduce 15,657 and explain the 9 rows that do not bump;
+  - (b) check that the reorder preserves behaviour;
+  - (c) whether the WS0-T3 inversion conflicts with a recorded user ruling, and the licence-relabel hazard;
+  - (d) the options.
+  - **No merge until the user rules.**
+
 ### ✅ Item 7 stage 1: **DONE. Re-gate PASS on `47277756`; MERGED to main 2026-10-12 as `77fc8ed0` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS (v2.13.0 item 7 stage 1 @ 47277756). Bounce #1 is closed. DEFECTS: none."
 
