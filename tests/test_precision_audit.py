@@ -415,6 +415,18 @@ def test_gate_fires_on_non_iso_decided(tmp_path, decided):
     assert any("decided is" in p and "ISO YYYY-MM-DD" in p for p in problems), problems
 
 
+def test_unratified_grace_path_still_accepts_placeholder_date(tmp_path):
+    """The date check applies to a RULING only: the pre-ruling marker shape
+    (both placeholders, no id pinned in code) keeps its 2.13.x grace."""
+    root = _copy_root(tmp_path)
+    ap = _audit(root) / "pending_authorization.json"
+    m = json.loads(ap.read_text(encoding="utf-8"))
+    m["authorization"].update(decision=v.PRECISION_PENDING_PLACEHOLDER, decided="<YYYY-MM-DD>")
+    ap.write_text(json.dumps(m), encoding="utf-8")
+    problems, line = v.check_precision_audit("2.13.0", root, required_decision="")
+    assert problems == [] and "UNRATIFIED" in line
+
+
 def test_committed_d76_decided_date_passes():
     """Control for the test above: the committed D76 marker's date is valid."""
     auth = json.loads((AUDIT / "pending_authorization.json").read_text(encoding="utf-8"))["authorization"]
