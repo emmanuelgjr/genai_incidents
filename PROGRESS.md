@@ -63,6 +63,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 cut-docs bounce #1 fixes integrated at `df72392a` (pushed). **Scoped re-gate sent to the same reviewer.**
+- **Fixes:**
+  - **WS0 `b797ee8e`:** D1 applied the gate's wording verbatim. **The parenthetical was confirmed against E21 §5.1 and E23 before applying.** D2; SL:320; DD:76 now names 3 sources.
+  - **WS4 `9c09c548`:** `_derive_tier` docstring and the STIX comment. Comments only; the rebuild has an empty diff.
+  - **WS6 `ff139563`:** HF AIM name at :108/:143; .zenodo backticks; CHANGELOG D89/TAXII. **README:203 still has the old AIM name, routed to the gate.**
+  - **WS2 `7994635d`:** guard joins adjacent/+/f-string literals via tokenize, LLM_AND_ASI with field-noun exemptions, emphasis and Unicode slashes, and a correction-language rule in CORRECTIONS. **Control: the pre-fix guard passed all 5 of the gate's plants; the new guard fails each.** pytest 1072 passed.
+  - **WS3 `f855a3e3`:**
+    - schema feed wording, description-only;
+    - paper §4 renumbered into execution order;
+    - flow.py "stable IDs" replaced, with SVGs regenerated and rendered in DejaVu and Arial (no overlap).
+    - **It refuted the gate's feed split: 3,810 OECD-sourced feed rows, not 3,811.** The gate's sum is 13,723 vs 13,722. A second route agrees. The text carries no counts. **The cut package §4R and the notes may quote 3,811, so the notes gate will check.**
+- **Foreman judgment, sent to the gate to confirm:** the flow-diagram label "OWASP LLM · ASI · NIST · ATLAS" is a compact UI label, exempt under D90.
+- **Foreman [R] at df72392a:** pytest **1072 passed, 1 xfailed**; validate rc 0; drift clean; schema copies identical; merge-tree vs main clean.
+
 ### 🔁 v2.13.0 cut-docs integration: **BOUNCE #1 (red-reviewer on `b99533b7`, 2026-10-12)**. Fixes routed to 5 owners; scoped re-gate by the same reviewer follows.
 **Verdict, in the gate's words:** "VERDICT: BOUNCE. This is the first bounce I know of on the `release/v2.13.0-cut-docs` integration gate, at `b99533b7`."
 
