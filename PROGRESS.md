@@ -40,6 +40,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ⚖ D73-D76, USER RULINGS 2026-10-11 (items 5 and 8)
+- **D73 (R1): add tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS`.** source_freshness stays out. **Queued → pipeline-engineer after the stage-1 merge** (same file). The first rebuild must be shown to bump no `updated`; otherwise the change comes back to the user with a delta.
+- **D74 (R2-R4): accept all three.** release-assets.yml and the Pages `_site` check are verified on the first real release (v2.13.0) with the VERSIONING checklist. The MISP timestamp change and the identity over-bump are accepted.
+- **D75 (follow-ups): fix INCLUSION §4/§5 now.** R5 (disputed status in STIX/MISP) and A3 (MISP removal-only / STIX revoked) were **not** selected, so they are not queued.
+- **D76 (item 5): accept the feed reading; ratify pending now**, with decision id D76.
+- **Dispatched:** a fresh label-scientist on `ws2/v2130-precision-ratify-inclusion` (D76 marker + code constant; D75 INCLUSION corrections + CORRECTIONS rows).
+- **Final checks before merge:**
+  - **stage 1** (`52b0dcce`, main merged in; the specialist did not re-run the full suite after a fixture fix) → stage-1 reviewer;
+  - **item 8** (`763a041e`: A2 panel + `status` added to CORE_FIELDS + main merged) → item-8 reviewer.
+
 ### ✅ Item 8 (export integrity + D57 + D64) — **PASS (re-gate on `38b231c8`, 2026-10-11)**. Before merge: the A2 JS-panel disputed figure, plus merging main into the branch.
 - **Verdict:** "The fix at 38b231c8 closes the D64 defect from bounce #1, and everything else holds."
 - **Gate evidence:**
