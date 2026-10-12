@@ -24,8 +24,11 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, three upstream sources carry a content obligation
-detailed in full below: the AIAAIC Repository, the AI Incident
+As of this writing, eight upstream sources carry an obligation
+detailed in full below: MITRE ATLAS and garak (Apache License 2.0
+text), the CVE Program and AVID (notices that must accompany copies),
+the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
+for its codes and risk names), the AIAAIC Repository, the AI Incident
 Database (AIID), and the OECD AI Incidents and Hazards Monitor (AIM).
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here,
@@ -116,8 +119,8 @@ AVID record summarises. See the AVID row of docs/SOURCE_LICENSES.md
 (section 6.1), including which rows of ingest/avid_owasp_incidents.json
 it does and does not cover.
 
-OWASP Top 10 for Agentic Applications. The risk codes ASI01-ASI10 and
-the ten risk names are from "OWASP Top 10 For Agentic Applications
+OWASP Top 10 for Agentic Applications (ASI). The risk codes ASI01-ASI10
+and the ten risk names are from "OWASP Top 10 For Agentic Applications
 2026" (Version 2026 / December 2025) by the OWASP Gen AI Security
 Project - Agentic Security Initiative,
 https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/,
@@ -128,8 +131,9 @@ displays abbreviated forms of five names (e.g. "Unexpected RCE");
 OWASP's risk descriptions are not reproduced, and the descriptions in
 mappings/owasp_asi_top10.json are this project's own paraphrase. This attribution covers the codes and
 names wherever they are reproduced: mappings/owasp_asi_top10.json,
-INCIDENTS.md (via scripts/render_markdown.py), docs/TAXONOMIES.md and
-docs/app.js. mappings/owasp_asi_top10.json is carved out of the CC BY
+INCIDENTS.md and docs/charts/owasp_asi.svg (both via
+scripts/render_markdown.py), docs/TAXONOMIES.md and docs/app.js.
+mappings/owasp_asi_top10.json is carved out of the CC BY
 4.0 grant for this material (CC BY-SA 4.0; see .reuse/dep5 and the
 OWASP row, section 3.6, of docs/SOURCE_LICENSES.md). This does not cover
 the OWASP-GENAI-* rows of ingest/avid_owasp_incidents.json, which are a

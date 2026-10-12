@@ -672,7 +672,7 @@ def render():
         CHART_DIR / "owasp_llm.svg",
     )
     render_owasp_bar_chart(
-        asi_counts, asi_names, "OWASP Top 10 for Agentic Applications — incident coverage",
+        asi_counts, asi_names, "OWASP Top 10 for Agentic Applications (ASI) — incident coverage",
         CHART_DIR / "owasp_asi.svg",
     )
 

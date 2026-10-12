@@ -5,7 +5,7 @@
   <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/assets/readme/banner-light.svg" alt="GenAI & Agentic AI Security Incidents" width="100%">
 </picture>
 
-**One queryable index of AI security incidents, vulnerabilities, and red-team findings,<br>normalized onto OWASP LLM/ASI Top 10, NIST AI RMF, and MITRE ATLAS.**
+**One queryable index of AI security incidents, vulnerabilities, and red-team findings,<br>normalized onto the OWASP Top 10 for LLM Applications, the OWASP Top 10 for Agentic Applications, NIST AI RMF, and MITRE ATLAS.**
 
 [![Incidents](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Femmanuelgjr%2Fgenai_incidents%2Fmain%2Fdata%2Fstats.json&query=%24.incident_count&label=incidents&color=9a3412&logo=databricks&logoColor=white)](https://emmanuelgjr.github.io/genai_incidents/)
 [![Validate dataset](https://github.com/emmanuelgjr/genai_incidents/actions/workflows/validate.yml/badge.svg)](https://github.com/emmanuelgjr/genai_incidents/actions/workflows/validate.yml)
@@ -27,7 +27,7 @@
 | If you are… | …use it to |
 |---|---|
 | 🧯 **AppSec / threat-intel** | triage AI-related CVEs and vendor advisories, and pull the corpus into OpenCTI or MISP |
-| 🎯 **A red-teamer** | scope attack classes against OWASP LLM/ASI and MITRE ATLAS |
+| 🎯 **A red-teamer** | scope attack classes against the OWASP Top 10 for LLM Applications, the OWASP Top 10 for Agentic Applications and MITRE ATLAS |
 | 🔬 **A researcher** | track incident trends with stable IDs, a DOI, and a published evidence trail |
 
 <p align="center">
@@ -364,7 +364,7 @@ Always run `scripts/validate.py` before committing.
 The mapping files in `mappings/` document the controlled vocabulary used in this dataset. They are derived from the original sources:
 
 - OWASP LLM Top 10 (2026): <https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/>
-- OWASP Top 10 for Agentic Applications ("OWASP Top 10 For Agentic Applications 2026", Version 2026 / December 2025; the `ASI01`–`ASI10` codes): <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>
+- OWASP Top 10 for Agentic Applications (ASI), the `ASI01`–`ASI10` codes ("OWASP Top 10 For Agentic Applications 2026", Version 2026 / December 2025): <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>
 - OWASP "Agentic AI – Threats and Mitigations" v1.1 (December 2025), the separate foundational taxonomy the Top 10 relies upon: <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>
 - NIST AI Risk Management Framework (AI 100-1): <https://www.nist.gov/itl/ai-risk-management-framework>
 - NIST AI 600-1 Generative AI Profile: <https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf>

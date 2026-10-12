@@ -7,7 +7,7 @@ This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026,
 | Question | Use |
 |---|---|
 | What kind of failure is this at the LLM layer? | **OWASP LLM Top 10** |
-| What kind of failure is this at the agent layer? | **OWASP Top 10 for Agentic Applications** |
+| What kind of failure is this at the agent layer? | **OWASP Top 10 for Agentic Applications (ASI)** |
 | What organizational risk function should respond? | **NIST AI RMF** |
 | What adversary tactic/technique was used? | **MITRE ATLAS** |
 | Where in the architecture did it originate / impact? | **MAESTRO** (companion) |

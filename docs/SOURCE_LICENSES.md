@@ -302,13 +302,13 @@ fields into our schema).
 | Action | **(a) compatible.** No change required. |
 | Date-checked | 2026-07-15 |
 
-### 3.6 OWASP Top 10 for Agentic Applications (OWASP Gen AI Security Project) — added 2026-10-12 (v2.13.0 item 9, D80)
+### 3.6 OWASP Top 10 for Agentic Applications (ASI), OWASP Gen AI Security Project — added 2026-10-12 (v2.13.0 item 9, D80)
 *Used by:* `mappings/owasp_asi_top10.json` (the controlled vocabulary for the
 per-entry `owasp_asi` field). Not ingested by any script: no incident records
 come from this source. The material used is the ten codes `ASI01`–`ASI10` and
 the ten risk names, reproduced in the mapping file and wherever the names are
-displayed (`scripts/render_markdown.py` → `INCIDENTS.md`, `docs/app.js`,
-`docs/TAXONOMIES.md`). Publication: "OWASP Top 10 For Agentic Applications 2026"
+displayed (`scripts/render_markdown.py` → `INCIDENTS.md` and
+`docs/charts/owasp_asi.svg`, `docs/app.js`, `docs/TAXONOMIES.md`). Publication: "OWASP Top 10 For Agentic Applications 2026"
 (PDF cover title), OWASP Gen AI Security Project - Agentic Security Initiative,
 Version 2026 / December 2025,
 <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>.
