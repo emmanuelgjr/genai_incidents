@@ -63,6 +63,45 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ Item 9 step 1: **BOUNCE #2 on the source record (scoped re-check of `45718736`, 2026-10-12). ESCALATED to the user** (protocol step 6)
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. The ASI record correction (45718736) carries my own wrong page numbers, and its §6 blast radius is incomplete... The fixes are mechanical text edits."
+
+**Defects, condensed from the gate:**
+1. **Page references are wrong, and the error is the gate's own, transcribed faithfully.** Printed label = physical page - 1.
+   - The **licence text is on physical p.2 (printed "Page 1"), not the cover.**
+   - TOC p.3; headings p.13/16/22; infographic p.9; appendix p.40; "foundational taxonomy" sentence p.7.
+   - **Fix:** state the numbering basis once and restate every reference. All quoted strings are exact.
+2. **The §6 blast radius for the framework display name is incomplete:** "OWASP Agentic Top 10" appears on ~31 lines in 17 files outside legacy:
+   - .zenodo.json, CITATION.cff, CONTRIBUTING, DATASHEET:10, index.html:32/86/138, pyproject:8;
+   - export_huggingface.py:69, readme_assets/tax.py:11 plus its SVGs;
+   - render_markdown.py:608/675/725, INCIDENTS, README:167, TAXONOMIES:10/59.
+3. **A third T&M mis-citation was missed:** docs/index.html:86.
+4. **§7(a)'s cost figure is misapplied.** "~30 mentions" counts the framework string. An "and" rename of ASI02/ASI03 touches ~6 live files.
+5. **§3 overstates the description check.**
+   - The paraphrase control scored 0/12, so the 5-gram check cannot detect near-verbatim text; the verdict rests on the side-by-side read.
+   - The descriptions were NOT compared against the T&M doc, which our file predates the Top 10 for and cites.
+   - Should read: "share-alike does not attach as against the Top 10 PDF; T&M not checked".
+
+**Confirmed by the gate:**
+- the change is additive only (+88/-0);
+- the names, version and title strings, the NOTICE/SOURCE_LICENSES line refs and the T&M quotes match its measurements;
+- the §6 field deltas are correct;
+- §7(c)/(d) are supported.
+
+**Advisories:**
+- **dep5:9 `Files: data/* INCIDENTS.md mappings/*` → CC-BY-4.0**, so owasp_asi_top10.json would need a carve-out stanza if the codes and names are ruled CC BY-SA. This is "the sharpest licensing point for the user".
+- §7(b) should list all three attested title forms and say which goes in `framework` and which in citations.
+- §7(a) is missing a hybrid option: "&" in labels plus the "and" form as an alias.
+- The app.js abbreviations are not any official form.
+
+**Foreman [R]:**
+- `.reuse/dep5` line 9 = `Files: data/* INCIDENTS.md mappings/*`, License CC-BY-4.0;
+- `git grep -l -F "OWASP Agentic Top 10"` (excluding data json, legacy and audits) = **17 files**;
+- the T&M URL appears at index.html:86, README.md:367 and TAXONOMIES.md:61.
+- All confirmed.
+
+**Note:** both bounces trace partly to the gate's own testimony: the first pass's page numbers, and its name-strings-only blast radius. The record transcribed them faithfully. The record's core conclusion (a metadata relabel; codes and order unchanged; descriptions are own paraphrase vs the Top 10) has held through both passes.
+
 ### 🔍 Item 9 step 1: correction committed `45718736` (pushed). **Scoped re-check sent to the same raw-text reviewer.**
 - **Correction section** "## Correction 2026-10-12 (raw-text gate)": §1 names, §2 version/title, §3 licence and descriptions, §4 repo coverage, §5 T&M, §6 implementation consequence, §7 user questions. The original text is preserved, with a do-not-regenerate marker and SUPERSEDED pointers (agreement 4).
 - **The auditor's recommendations for the user:**
