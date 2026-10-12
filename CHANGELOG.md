@@ -7,6 +7,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - tier, quality_tier, corpus and content_license now bump `updated` (agent-suggested, D73)
+
+- `scripts/merge_and_dedupe.py` `_CONTENT_FIELDS` gains `tier`, `quality_tier`, `corpus` and
+  `content_license` (`source_freshness` stays out). A change to any of them now bumps `updated`,
+  so STIX `modified` and MISP timestamps move with it. `tier`/`quality_tier`/`corpus` are now
+  derived before the `updated` comparison rather than after it; without that reorder the first
+  rebuild would bump `updated` on 15,657 of 15,666 rows. Measured on the committed corpus: the
+  rebuild changes 0 rows (no `updated`, `added` or other field moves). Code and tests only.
+
 ### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
 
 - Agent-suggested; held for the user's merge ruling (the data change is user-visible

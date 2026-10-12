@@ -1602,6 +1602,11 @@ _CONTENT_FIELDS = (
     # of an unchanged verdict and must not churn `updated`.
     "status", "rejected_cve_ids",
     "mitigations", "references", "tags",
+    # D73 (2026-10-11): these four are exported (STIX x_ properties, MISP tags,
+    # HF/min.json) and a change to one must be visible to a consumer keyed on
+    # `updated`/STIX `modified`. `source_freshness` stays OUT: it describes
+    # content that has not changed (see the pop/re-derive in main()).
+    "tier", "quality_tier", "corpus", "content_license",
 )
 
 
@@ -2629,13 +2634,16 @@ def main():
 
     # 5) Apply stable timestamps + classifiers (quality_tier, corpus).
     for e in surviving:
-        _apply_history(e, prev_ts)
-        # Respect any explicit value the source carried; only classify
-        # when the entry doesn't already declare one.
+        # D73: tier/quality_tier/corpus are content fields, so they must be FINAL
+        # before _apply_history snapshots the entry. Derived after it (as before),
+        # the entry lacks them while the previous build carries them, and every
+        # row bumps `updated`. Respect any explicit value the source carried.
         if not e.get("quality_tier"):
             e["quality_tier"] = _classify_quality_tier(e)
         if not e.get("corpus"):
             e["corpus"] = _classify_corpus(e)
+        e["tier"] = _derive_tier(e)
+        _apply_history(e, prev_ts)
 
     # 6) Assign stable INC-* IDs. Reuse the previous ID for any entry whose
     #    CVE / source_id appeared before; otherwise allocate from the
