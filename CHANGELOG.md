@@ -7,7 +7,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
-### Changed - OWASP ASI re-pinned to the 2026 Top 10 for Agentic Applications; citation fixed; OWASP attribution added (v2.13.0 item 9, D78-D80, D83-D85)
+### Changed - OWASP ASI re-pinned to the 2026 Top 10 for Agentic Applications; citation fixed; OWASP attribution added (v2.13.0 item 9, D78-D80, D83-D86)
 
 - **Metadata relabel only: 0 entries change.** The codes `ASI01`-`ASI10`, their order, all
   ten risk names (D78 keeps the "&" form of ASI02/ASI03) and all ten descriptions are
@@ -35,9 +35,20 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   taxonomy map). Headings that introduce the codes keep "(ASI)" (D85). Four
   Threats-and-Mitigations mis-citations for the ASI codes are corrected (the mapping
   `url`, README, `docs/TAXONOMIES.md`, the site subtitle link); T&M is now cited
-  separately. Some older variants of the name ("OWASP Agentic (ASI)", "OWASP Agentic
-  ASI Top 10") remain in the schema, the `data/incidents.json` description, the
-  per-incident pages, the banner and the social image, pending a ruling.
+  separately.
+- **Older variants of the name renamed too (D86).** "OWASP Agentic ASI Top 10" /
+  "OWASP Agentic (ASI)" / "OWASP Agentic" are replaced in: the dataset-level
+  `description` of `data/incidents.json` (the only key that moves in that file: 0
+  entries change, `updated` moves on 0 rows; it reaches no export, and
+  `incidents.min.json` does not carry it); the per-incident label in
+  `docs/incidents/*.md` ("**OWASP Top 10 for Agentic Applications (ASI):**",
+  13,586 lines in 30 files, one line per entry with ASI codes, nothing else
+  changed); the README banner chip (hand-authored SVG, chip widened and the
+  following chips shifted); the social-card image (the taxonomy line is now set at
+  26 px and wraps at its separators, because the full name does not fit one line at
+  28 px); and the methods paper. The dated 2026-05-25 per-incident-pages plan is a
+  record and is left as written. The schema descriptions are renamed separately by
+  the schema owner.
 - **Attribution (D80, D83, D84):** OWASP's CC BY-SA 4.0 licence is verified from the
   PDF. New `docs/SOURCE_LICENSES.md` section 3.6; an OWASP attribution paragraph in
   `NOTICE-DATA` that covers the codes and names wherever they are reproduced; a
@@ -47,9 +58,11 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   upstream and stay OPEN.
 - **New guard** `tests/test_owasp_asi_naming.py`. Before it, `validate.py` and
   `check_stats_drift.py` caught a stale `owasp_asi` only in `data/stats.json`. The guard
-  fails on the retired name, unlisted name variants, an `owasp_asi` version literal or
-  title edition that disagrees with the pin, a T&M URL cited for the ASI codes, and a
-  missing "(ASI)" heading. Planted-input tests prove each rule fires.
+  fails on the retired name, any other "OWASP Agentic ..." variant (only the schema
+  pair is still listed, pending its owner's commit), an `owasp_asi` version literal or
+  title edition that disagrees with the pin, a T&M URL cited for the ASI codes, a
+  missing "(ASI)" heading, and an old name in the dataset description or the
+  per-incident pages. Planted-input tests prove each rule fires.
 
 ### Changed - tier, quality_tier, corpus and content_license are now content fields (user-ruled, D81/D82)
 

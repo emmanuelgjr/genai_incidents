@@ -422,7 +422,7 @@ def render_incident_block(e: dict) -> list[str]:
         )
     if e.get("owasp_asi"):
         lines.append(
-            f"**OWASP Agentic (ASI):** {', '.join(f'`{c}`' for c in e['owasp_asi'])}  "
+            f"**OWASP Top 10 for Agentic Applications (ASI):** {', '.join(f'`{c}`' for c in e['owasp_asi'])}  "
         )
     if e.get("nist_ai_rmf"):
         lines.append(

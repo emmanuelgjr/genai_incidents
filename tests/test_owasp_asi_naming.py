@@ -25,11 +25,14 @@ ROOT = Path(__file__).resolve().parents[1]
 MAPPING = "mappings/owasp_asi_top10.json"
 TM_URL = "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
 
-# Records and history, never rewritten (CLAUDE.md agreement 4), and bulk data.
-# docs/incidents/ is render output of scripts/render_markdown.py (scanned at
-# its source); data/ is build output except data/stats.json (scanned).
+# Records and history, never rewritten (CLAUDE.md agreement 4: audits, dated
+# plans), and bulk data. docs/incidents/ is render output of
+# scripts/render_markdown.py (scanned at its source, and by
+# test_dataset_description_and_pages_renamed below); data/ is build output
+# except data/stats.json (scanned).
 EXCLUDE_PREFIXES = (
-    "legacy/", "docs/audits/", "docs/incidents/", "docs/data/", "data/",
+    "legacy/", "docs/audits/", "docs/superpowers/plans/",
+    "docs/incidents/", "docs/data/", "data/",
     "ingest/", "src/genai_incidents/data/incidents.min.json",
     "CHANGELOG.md", "PROGRESS.md", "tests/test_owasp_asi_naming.py",
 )
@@ -40,19 +43,13 @@ RETIRED_NAME = re.compile(r"OWASP\s+Agentic\s+Top\s*10", re.I)
 # Any other "OWASP Agentic ..." display-name variant (not the Agentic Security
 # Initiative, which is the OWASP team's real name).
 VARIANT = re.compile(r"OWASP\s+Agentic\b(?!\s+Security\s+Initiative)", re.I)
-# Variants NOT renamed by item 9 because C2.6 did not list them; each needs a
-# ruling (data/schema/layout consequences). Exact counts, so a new occurrence
-# fails, and fixing one fails too until it is removed from this table.
+# Variants still awaiting their writer. D86 (2026-10-12) renamed every other
+# held site; the schema pair is schema-architect's (sole writer of schema/)
+# and is cleared in its own commit. Exact counts, so a new occurrence fails,
+# and fixing one fails too until it is removed from this table.
 PENDING_VARIANTS = {
-    "schema/incident.schema.json": 2,                   # schema-architect's file
+    "schema/incident.schema.json": 2,
     "src/genai_incidents/schema/incident.schema.json": 2,
-    "scripts/merge_and_dedupe.py": 1,                   # -> data/incidents.json `description`
-    "scripts/render_markdown.py": 1,                    # per-incident label -> docs/incidents/*.md
-    "scripts/make_og_image.py": 1,                      # fixed-width image text
-    "docs/assets/readme/banner-dark.svg": 1,            # hand-authored, fixed-width chip
-    "docs/assets/readme/banner-light.svg": 1,
-    "docs/paper/genai-incidents-methods.md": 1,
-    "docs/superpowers/plans/2026-05-25-per-incident-pages.md": 1,
 }
 VERSION_LITERAL = re.compile(r"""["']?owasp_asi["']?\s*[:=]\s*["'](\d{4}(?:\.\d+)?)["']""")
 EDITION_IN_NAME = re.compile(r"Agentic\s+Applications\W{0,3}(?:for\s+)?(20\d\d)", re.I)
@@ -113,6 +110,17 @@ def scan(root: Path, files: list[str]) -> list[str]:
 def test_live_surfaces_clean():
     problems = scan(ROOT, _live_files(ROOT))
     assert problems == [], "\n".join(problems)
+
+
+def test_dataset_description_and_pages_renamed():
+    """The two build outputs the scan skips for size (D86)."""
+    raw = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
+    desc = raw["description"]
+    assert not VARIANT.search(desc), desc
+    assert _mapping(ROOT)["framework"] in desc
+    for p in sorted((ROOT / "docs" / "incidents").glob("*.md")):
+        text = p.read_text(encoding="utf-8")
+        assert not VARIANT.search(text), p.name
 
 
 def test_mapping_pin_is_the_2026_top10():
