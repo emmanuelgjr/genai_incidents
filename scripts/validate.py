@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from datetime import date
 from pathlib import Path
 from typing import NamedTuple
 
@@ -808,6 +809,17 @@ def _version_tuple(version: str | None) -> tuple[int, int]:
     return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
 
 
+def _is_iso_date(value: object) -> bool:
+    """True for a real calendar date written exactly YYYY-MM-DD."""
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def check_precision_audit(version: str | None, root: Path = ROOT,
                           required_decision: str | None = None,
                           required_sha: str | None = None,
@@ -904,6 +916,12 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
         line = (f"precision: {status} -- WARNING: pending state UNRATIFIED (decision id is a placeholder; "
                 f"passes only through {'.'.join(map(str, PRECISION_UNRATIFIED_GRACE_THROUGH))}.x)")
         return problems, line
+    # A ruling carries a real ISO date (D75/D76 gate advisory 3): the
+    # "<YYYY-MM-DD>" placeholder, or any non-date, is not a decision date.
+    # Only the UNRATIFIED grace path above may still carry the placeholder.
+    if not _is_iso_date(auth.get("decided")):
+        problems.append(f"precision: {PRECISION_AUTH_FILE} decided is {auth.get('decided')!r}, "
+                        "not an ISO YYYY-MM-DD date")
     if not required_decision or decision != required_decision:
         problems.append(f"precision: {PRECISION_AUTH_FILE} names decision {decision!r} but the decision pinned "
                         f"in code is {required_decision!r}")
