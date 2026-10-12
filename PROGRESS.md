@@ -63,6 +63,43 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 📦 D73 RULING PACKAGE: red-reviewer **PASS on `6b1f1118`** as "technically sound to merge IF the user picks it". No defects. Going to the user.
+**Verdict, in the gate's words:** "VERDICT: PASS. PASS here means the variant at `6b1f1118` is technically sound to merge if the user chooses it. It does not recommend a ruling. One condition comes with it (advisory 1): two live docs become false the moment it merges."
+
+**Corrections to the board, in the gate's words:**
+- "The literal D73 bump is not one-time. It repeats on every rebuild on a new calendar day."
+- "Reverting the reorder fails **4** tests, not 2. Adding `source_freshness` fails **3**, not 2."
+- "The WS0-T3 exclusion was a gate ruling, not a user ruling."
+
+**(a) 15,657 reproduced.**
+- Method: a scratch clone of 10c07b8e with only the tuple change, compared per entity.
+- Only `updated`/`last_seen` move, on 15,657 rows; `added` on 0.
+- **The 9 rows that do not bump are exactly the 9 `source_status: "retained"` rows**, which skip `_apply_history`.
+- A day-2 rebuild (2026-10-13) bumps all 15,657 again. So it breaks invariant 4 daily, breaks the CI drift check and fails the real-corpus fixed-point test.
+- `content_license` alone gives 0 bumps.
+
+**(b) The reorder changes no output.** Data and docs are byte-identical on day 1 and day 2, and the final quality_tier/corpus/tier are identical on every row. The only reader between step 5 and 6g is the new snapshot. **The D71 freeze gate gets stricter:** it now holds tier/quality_tier/corpus changes on published OECD/AIID rows.
+
+**(c) WS0-T3.** The exclusion was a red-reviewer gate ruling (2026-07-27, PROGRESS line ~2922, "DECIDED"). Its source is the WS0-T3 marker-shape spec §4.2, "the shape owner's reasoning, not a ruling". **There is no earlier user ruling, but this is still a reversal.**
+- **Licence-relabel effect:** 3,767 rows carry `content_license` today (CVE-TOU 2,171, AIAAIC 1,517, AVID 79). A relabel would bump each affected row's `updated`, STIX `modified` and MISP timestamp.
+- Classifier changes would bump every reclassified row. That matches existing practice for attack_vector and OWASP.
+
+**(d) The gate's options:**
+1. literal: not viable, it bumps daily;
+2. variant (tuple + reorder): 0 bumps, reverses WS0-T3 for content_license;
+3. tier/quality_tier/corpus + reorder, with content_license OUT: necessarily 0 bumps; keeps WS0-T3;
+4. content_license only: 0 bumps;
+5. defer.
+- The gate's own read of the evidence: anything that includes tier, quality_tier or corpus needs the reorder. **2 vs 3 is purely a policy call.**
+
+**Advisories:**
+1. **MUST be fixed in the same merge:** DATA_DICTIONARY.md:240 and VERSIONING.md:418-419 list the four as non-content.
+2. The 6g comment at merge_and_dedupe.py:2880-2883 goes stale.
+3. **The CHANGELOG entry presents the unauthorised reorder as settled** and doesn't tell consumers about the licence and classifier bump semantics. Rewrite it after the ruling.
+4. Declare the freeze-gate widening.
+5. Retained rows bypass `_apply_history`, so a classifier change on them would not bump.
+6. The later-day test is thin (a single fixture). The real day-2 run was done by hand.
+
 ### ⚖ D77-D80, USER RULINGS 2026-10-12 (item 9 package)
 - **D77, bounce #2 route: "Apply verbatim + string check".** The user chose this over the foreman's recommended "fix + scoped re-gate".
   - The raw-text reviewer drafts the exact text of a second dated correction section, including the T&M comparison that D80 needs.
