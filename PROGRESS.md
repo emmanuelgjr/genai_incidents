@@ -40,6 +40,38 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ Precision tamper-test fix + `decided` check: **DONE. Gate PASS on `4ac1beb5`; MERGED to main 2026-10-12 as `17529a53` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none." The evidence section was truncated, so the remainder was requested and received; it is recorded below.
+
+**Advisories, in the gate's words:**
+1. "The status line can say 'authorised' while the gate fails... `validate.py` still exits 1 because it reads the problems list... Predates the branch." → **NOTE → WS2:** say NOT authorised whenever there are problems.
+2. "The decided-check placement is not a hole... the grace path can only be reached through the test override `required_decision=\"\"`."
+3. The gate's own `NUL` file was created in its throwaway clone only. The shared repo was untouched.
+4. Premise: origin/main had moved to 1bd2944a (board commits). The three-dot diff is exactly 3 files.
+
+**Gate evidence:**
+- Fresh clone: **949 passed, 1 xfailed, 0 skipped**. The precision file went from 57 passed / 2 skipped to 71 passed / 0 skipped.
+- The replaced :153 test lost no coverage.
+- **Item-9 simulation (data moved):** all 71 tests pass; sabotaging tamper detection still FAILS the tamper test; disabling the pin guard fails 2 tests.
+- **Same-length tamper proofs of its own, against the pinned blob:** a year flip on INC-08796 → rc 1 "NOT reproduced: sample.json"; one digit in agent_suggested_precision.json → rc 1; frame population 1324→1325 → rc 1 "NOT reproduced: frame.json".
+- **`decided` probes:** placeholder, trailing space, absent key, and placeholder+placeholder (no grace under the D76 pin) all report a problem; 2026-10-11 passes; `_is_iso_date` rejects full-width and Arabic-Indic digits, a newline and 0000-01-01.
+- merge-tree rc 0; scope 3 files; no deletions; pins unchanged.
+
+**Foreman [R] after merge:**
+- validate rc 0, "15666/15666 entries valid", "precision: pending, authorised by D76";
+- drift clean;
+- **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
+- Pushed `e5b04eb7..17529a53`; ls-remote = local.
+
+### ▶ Item 9 (OWASP ASI 2026), STEP 1 dispatched: license-auditor primary-source record
+The label-scientist has no web tools, so the license-auditor first writes `docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md`. It covers:
+- the official 2026 Top 10 for Agentic Applications: title, date, URL and version label, quoted;
+- the code/name diff vs mappings/owasp_asi_top10.json. The diff decides between a metadata relabel and a per-entry re-mapping;
+- how the 2026 list relates to the 2025 T&M doc;
+- the OWASP licence, and whether our descriptions are verbatim, which carries attribution and share-alike obligations.
+
+STEP 2 follows: the label-scientist implements from that record, with a field-level delta. The merge of any data relabel comes to the user (D28/D52 precedent).
+
 ### 🔍 Precision tamper-test fix + `decided` check: specialist reported `4ac1beb5` (pushed; branch `ws2/v2130-precision-tamper-blob`). **red-reviewer dispatched.**
 - **Tamper test:** it now runs against the pinned blob (6da13032) via `--data`. The untampered copy passes; the tampered copy fails "NOT reproduced: sample.json".
 - **Old :153 test:** replaced by `test_default_check_on_working_data_never_passes_moved_data`, which never skips.
