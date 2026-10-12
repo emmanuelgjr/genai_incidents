@@ -63,6 +63,38 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ v2.13.0 cut STEP 1 DONE: notes + CHANGELOG STIX **re-gate PASS on `9e85357d`; MERGED to main 2026-10-12 as `84be7033` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS. The v2.13.0 notes and the CHANGELOG STIX fix pass the re-gate at 9e85357d. DEFECTS: none."
+
+**Advisories:**
+1. The Verification preamble ":388-389 'this file is the only difference'" is now false: CHANGELOG and PROGRESS also differ. Suggested wording: "the data and code it measures are identical to `main` @ `0191e814`". → **Fix during the cut-step edits to the notes.**
+2. The reuse figures are a 449-file snapshot. → **Re-run the `Files with` line at the cut.**
+3. The dated audit `docs/audits/ws6-v2130-export-integrity-2026-10-11.md:177-178` still says "moves once". → **Follow-up: a dated supersession note (agreement 4). Not a blocker.**
+
+**Gate evidence:**
+- The full Verification block was run verbatim, and every expected value printed.
+- The figures match the gate's own first-gate derivations (a different route).
+- **Fire proofs:**
+  - a revoked object plus a deleted attack-pattern → `65141 65140 revoked 1` / `new attack-pattern 1`;
+  - a MISP timestamp moved +86400 → `30 31`.
+- Links are clean; merge-tree is clean; the CHANGELOG reads coherently.
+
+**Foreman [R] after the merge at 84be7033:**
+- deletion diff empty;
+- validate rc 0; drift clean;
+- **pytest 1072 passed, 1 xfailed** (read before the push).
+
+**NEXT: cut steps 2-5 on the new branch `release/v2.13.0-cut`.**
+- **The User-Agent goes first:** pipeline-engineer changes ingest/common.py and the two INGESTION_CONDUCT.md literals.
+- **Then distribution-engineer** does the rest:
+  - the other 4 version strings (merge_and_dedupe "version", pyproject, CITATION ×3 including date-released, .zenodo);
+  - CHANGELOG [Unreleased] → [2.13.0];
+  - the README Latest-release lead and the C10 paragraph rewrite;
+  - make build; drift; the step-5 prose sweep;
+  - the notes re-tense and the advisory 1/2 fixes;
+  - the paper backticks.
+- **Then a pre-publish gate.**
+
 ### 🔍 v2.13.0 notes bounce #1 fixed: `9e85357d` on `release/v2.13.0-notes` (notes `9f587b54` + CHANGELOG STIX `ed16f544` merged in; pushed). **Re-gate sent to the same reviewer.**
 - **Notes:** parts (A) and (B) applied. **All STIX figures were re-derived independently by the author** (both bundles built from git archive, diffed by id and type). They equal the gate's: retired 3 AP + 2,540 rel; new 2 AP + 2,540 rel + 1 identity; revoked 0; total 65,141 both.
   - The reuse line is now 109/449 without licence info.
