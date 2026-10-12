@@ -374,6 +374,26 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - Field-level delta: `docs/audits/cve-sweep/v2130-schema-delta-2026-10-09.md` and `.json`.
   It covers 1,404 entries and 1,492 fields, with 0 defects.
 
+### Behaviour changes - `load_deprecations()` returns a different shape for three keys (user ruling D72)
+
+- **If you read `load_deprecations()` directly, three values change shape** compared with
+  v2.12.0. The return type is still `dict[str, str | list[str]]`, but code that branches on
+  `isinstance(value, list)` takes a different branch for these keys:
+  - `INC-00311`: a list of 12 IDs -> the string `"INC-14726"`.
+  - `INC-01897`: a list of 8 IDs -> the string `"INC-14612"`.
+  - `INC-00497`: the string `"INC-00311"` -> a list of the same 12 IDs (`INC-14660` ...
+    `INC-14907`) it used to reach through `INC-00311`.
+
+  Two more values change but keep their shape (string -> string, item 4): `INC-03128`
+  `"INC-00754"` -> `"INC-14909"` and `INC-08185` `"INC-08139"` -> `"INC-14742"`. No other key
+  of the mapping changes (293 keys in both, of which 7 lists now and 8 in v2.12.0).
+  **Use `resolve_id_status()`** rather than indexing the mapping; it names the reason for
+  every ID. Re-derive: run `load_deprecations()` from the v2.12.0 tag's package
+  (`src/genai_incidents` plus that tag's `data/id_deprecations.json` and
+  `data/incidents.min.json`) and from this tree's, and diff the two mappings.
+  The `resolve_id()` and `resolve_id_group()` answers that change are listed in the two
+  entries below.
+
 ### Changed - three split IDs narrowed to their identified incidents; "never reused" claim corrected (agent-suggested, draft)
 
 - **`resolve_id("INC-00311")` now returns `INC-14726` and `resolve_id("INC-01897")` returns

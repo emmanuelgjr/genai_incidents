@@ -60,6 +60,8 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 | `cvss_vector` | string | Full CVSS vector string. |
 | `aiid_id` | integer | AI Incident Database numeric id where cross-listed. |
 | `disclosure_date` | string | Public disclosure date when distinct from `date`. |
+| `exploited_in_wild` | boolean | `true` when one of the entry's `cve_ids` appears in the CISA Known Exploited Vulnerabilities (KEV) catalog. Set by `scripts/merge_and_dedupe.py` (step 4e) from the committed snapshot `ingest/cisa_kev.json`, never the live CISA feed. **Present only when true**: absence means no listed CVE is in the snapshot, not that the entry was checked and found unexploited, and entries without a CVE never carry it. Content field (a change bumps `updated`). |
+| `kev_date_added` | string | `YYYY-MM-DD`. The earliest KEV `dateAdded` among the entry's CVEs that are in the catalog. Set in the same step as `exploited_in_wild`, and present only alongside it. Content field. |
 
 ## Evidence
 | Field | Type | Notes |
