@@ -63,6 +63,41 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 Item 9 implementation: **BOUNCE #1 (full gate on `bba71064`, 2026-10-12)**
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. The data and licensing work at `bba71064` checks out on my own measurements. It bounces on three defects: the README taxonomy map now has a broken layout, one sentence in the release notes is false, and the licence file is not the SPDX text that D84 named."
+
+**Counting:** the foreman counts this as bounce #1 on the implementation. Source-record bounces #1 and #2 were on a separate deliverable (the record, which D77 closed). The gate flagged that counting them together would make this #3. The user was told.
+
+**Defects:**
+1. **The taxonomy-map card is broken by the rename** (docs/assets/readme/taxonomy-map-{light,dark}.svg, via scripts/readme_assets/tax.py:11,:30).
+   - The title starts at x=58 and the "core" badge at x=315; the card edge is 380.
+   - Rendered in headless Chrome, it reads "OWASP Top 10 for Agentic Applicati", cut off under the badge.
+   - The 15px bold title's right edge measures 340 (Arial) and 392 (DejaVu). The old title measured 263/301.
+   - The fix belongs in tax.py. **The specialist's "bare name fits" claim was never rasterised.**
+2. **CHANGELOG.md:64-65 is false:** "only the schema pair is still listed, pending its owner's commit". PENDING_VARIANTS = {} at bba71064.
+3. **LICENSES/CC-BY-SA-4.0.txt is not the SPDX text that D84 named.**
+   - It is CC's legalcode.txt with 3 line changes (2 tab indents, "More_considerations").
+   - It has 41 word-level differences vs spdx.org and vs license-list-data.
+   - Same terms. Fix: `reuse download CC-BY-SA-4.0`, or a user ruling to accept the CC text.
+
+**Advisories:**
+- **A1:** README.md:8 and :30 say "OWASP LLM/ASI Top 10", which is our own coinage and not caught by the guard. Does D79 reach it? → **USER**
+- **A2, D85 scope:** "(ASI)" was dropped in the chart title (render_markdown.py:675 → owasp_asi.svg:3), the index.html:138 figcaption and the taxonomy card, all of which had it. It is also absent at CONTRIBUTING:14, DATA_DICTIONARY:45 and the TAXONOMIES quick chooser. The guard enforces D85 in only 3 files. → **USER**
+- **A3:** 8 planted inputs pass the guard: possessive/hyphen, &nbsp;, `<br>`, "LLM/ASI Top 10", "Agentic ASI Top 10", the MISP `taxonomy-owasp-asi="2025"`, prose "owasp_asi 2025", and a T&M URL on a line naming T&M. Controls fire.
+- **A4:** under a DejaVu fallback the banner chip label is 315px in a 300px chip. "OWASP LLM Top 10" already overflows that way (pre-existing).
+- **A5:** pre-existing og issues: the DejaVu URL line is clipped; the pages.yml runner font is unverified.
+- **A6:** NOTICE-DATA:27-29 "three upstream sources" is stale (live).
+- **A7:** NOTICE-DATA:131-133 and SOURCE_LICENSES §3.6 omit docs/charts/owasp_asi.svg as a site reproducing the names.
+- **A8:** dep5 `AND` is correct. Order was proven effective (the carve-out moved before data/* gives CC-BY only).
+- **A9:** pre-existing: reuse lint fails on main (no CC-BY-4.0, MIT or Apache texts); the chart's ASI07 label is clipped.
+
+**Gate evidence:**
+- (a) Per-entity delta: 0 entries changed; only top-level `description`; min.json 0; stats and taxonomy_versions 1 leaf each; no mapping `entries.*` change. The tool fires.
+- The fresh-clone rebuild reproduces.
+- (b) The label swap applied to main's pages is byte-identical to the branch: 0 mismatches, **13,586** replacements, matching the 13,586 entries that carry ASI codes. The check fires.
+- (c) og: **measured with real DejaVu Sans** (matplotlib wheel): 2 lines, widest 953.8/1072px. **It fits, and the "estimated" caveat is cleared.** The banners render clean in Chrome/Windows.
+- (i) Fresh clone: 965 passed, 1 xfailed; validate, drift and lint 0.
+
 ### 🔍 Item 9: COMPLETE at `bba71064` (pushed). **Full red-reviewer gate dispatched.**
 - **schema-architect (D86 schema part):**
   - Both schema files changed at L5 (top-level description) and L300 (`owasp_asi` description) → "OWASP Top 10 for Agentic Applications (ASI)".
