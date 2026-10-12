@@ -63,6 +63,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔧 v2.13.0 cut-docs: wave 1 DONE, integrated on `release/v2.13.0-cut-docs` @ `9587519e` (pushed; 14 files, +116/-49; all 5 merges clean). Wave 2 dispatched.
+**Wave 1 branches:**
+- **WS5 `e692270b`** (foreman-committed): C8 prose (README:56, DATA_DICTIONARY:12, paper:49-54); N5 §6 clause; N6 CORRECTIONS row for item 9.
+- **WS0 `ac153bac`** (foreman-committed): D89 README licence bullet and site-strip "exceptions" link; C2 OECD wording ("terms bear on row-level text"); C3; C11 pointer.
+  - **C3 verified by the foreman by direct measurement:** 3,937 of 4,104 OECD-AIM-sourced rows have `title` == their ingest title. This is the identical set to `description_source == "oecd-aim"` (overlap 3,937), so the proxy holds.
+  - The `reuse spdx` carve-out still resolves after the dep5 edit (CC-BY-4.0 + CC-BY-SA-4.0, OWASP copyright line). The tool's cp1252 crash is pre-existing on main and needs PYTHONIOENCODING=utf-8.
+- **WS4 `0227d8c6`:** N1 ("every new-day rebuild"); N2 content_license (0 OECD/AIID rows carry it). The foreman confirmed `_CONTENT_FIELDS` has content_license at merge_and_dedupe.py:1609.
+- **WS6 `310e6080`:** D89 Zenodo/CITATION exception sentence (single licence values kept); C8 HF template; C9 official names in export_taxii, README:150 and the export_stix docstring; N3 core `status`. **+440 B re-measured independently** (6,687,566 → 6,688,006, 22 rows).
+- **WS3 `913d0403`:** C4, C5, C6, the N4 "Behaviour changes" subsection, and the DATA_DICTIONARY rows for exploited_in_wild and kev_date_added (14 rows).
+  - **Foreman's brief refuted:** `load_deprecations()` changes for **5** keys vs v2.12.0, not 3. 3 change shape (D72: INC-00311, INC-01897, INC-00497); 2 change value with the same shape (INC-03128, INC-08185, from item 4). All 5 are named.
+  - **Measured `resolve_id() is None`: 776 of 1,065** deprecated keys: 763 withdrawn, 9 pre-tombstone, 3 release-dependent, 1 group. Cross-checked by silent_ids.py (4 ambiguous).
+  - 591 multi-title IDs confirmed (582 with case and punctuation folded). "Never reissued once retired" holds by a separate route (0 reissues).
+- **Wave 2** (label-scientist on the integration branch): C7 paper ATLAS pin; D90 guard learns the bare "OWASP LLM/ASI" form while exempting the "OWASP ASI" UI label; the taxonomy-card "(ASI)" assertion; one consistent landmark wording, retiring "notable" (README, DATA_DICTIONARY, HF template, INCLUSION:113, paper).
+- **Then:** ONE red-reviewer gate on the integration branch, then the merge to main.
+
 ### 📦 v2.13.0 CUT PACKAGE: `docs/audits/v2.13.0-cut-package-2026-10-12.md` (`915693e6` + §4R `1a088732`)
 - **The package contains:**
   - the item status table, 9/9 merged;
