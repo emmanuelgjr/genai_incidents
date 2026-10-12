@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 v2.13.0 notes bounce #1 fixed: `9e85357d` on `release/v2.13.0-notes` (notes `9f587b54` + CHANGELOG STIX `ed16f544` merged in; pushed). **Re-gate sent to the same reviewer.**
+- **Notes:** parts (A) and (B) applied. **All STIX figures were re-derived independently by the author** (both bundles built from git archive, diffed by id and type). They equal the gate's: retired 3 AP + 2,540 rel; new 2 AP + 2,540 rel + 1 identity; revoked 0; total 65,141 both.
+  - The reuse line is now 109/449 without licence info.
+  - The opening is scoped; the trusted figures the gate confirmed moved to measured, with commands.
+  - All advisories applied. The `as_of` change was re-measured: 29 rows; `updated` moved on 7, all of them ATLAS.
+  - pytest 1072 passed, 1 xfailed.
+- **CHANGELOG STIX (WS6 `ed16f544`):** part (C) verbatim. **Figures independently re-derived, a third route, all matching.** Zero unmoved persisting objects.
+- **Foreman merged both onto the notes branch** so one re-gate covers them. The three-dot diff vs main is 2 files.
+
 ### 🔁 v2.13.0 notes: **BOUNCE #1 (red-reviewer on `9f42fdb0`, 2026-10-12)**
 **Verdict:** "VERDICT: BOUNCE". This is the first bounce on the notes.
 
