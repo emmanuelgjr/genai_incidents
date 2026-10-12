@@ -63,6 +63,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D86, USER RULING 2026-10-12 (item 9 held sites): **change ALL four groups in v2.13.0** (multi-select; all four chosen)
+1. The schema descriptions (schema/incident.schema.json and its src copy) → **schema-architect**, as a commit on the item 9 branch after the label-scientist.
+2. The dataset `description` field (merge_and_dedupe.py:3215). This is a declared one-key top-level delta in incidents.json, with 0 per-entry change.
+3. The per-incident pages (render_markdown.py:425): about 13,586 generated lines, docs only.
+4. The og image, the README banner SVGs and methods paper:20. The dated superpowers plan stays a historical record.
+- The item 9 specialist merged main (D73) in at `5fc9fecf`: CHANGELOG conflict only, kept both. Rebuild porcelain is empty. The delta vs 0afe52ec is 0 entries and 0 `updated`; stats has 1 leaf. pytest 964 passed, 1 xfailed; guard 12 passed; validate, drift and lint green.
+- **D86 routed:** items 2-4 + guard + CHANGELOG → the same label-scientist. Item 1 → schema-architect next. **ONE gate covers all of item 9 after both.**
+
 ### 🔍 Item 9 (OWASP ASI 2026): specialist reported `22172d59` (pushed). It is now merging main (D73) in; the gate follows.
 - **Scope:** 30 files, +1064/-44, no deletions. The record file was brought in from 17995bc2.
 - **Field-level delta, per the specialist:**
