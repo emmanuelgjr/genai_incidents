@@ -87,7 +87,7 @@ ds.filter(lambda r: "LLM01" in (r["owasp_llm"] or []))
 # only maintainer-reviewed entries
 ds.filter(lambda r: r["quality_tier"] in ("reviewed", "curated"))
 
-# the landmark subset -- the "notable incidents" figure this project asks
+# the landmark tier -- the headline-citation set this project asks
 # you to cite, rather than the full corpus (which is mostly CVE/advisory bulk)
 ds.filter(lambda r: r["tier"] == "landmark")
 ```
@@ -103,12 +103,12 @@ Key fields per record (full reference in the data dictionary):
 - `cve_ids`, `cwe_ids`, `cvss_score` — where applicable
 - `references` — source URLs · `source_ids` — upstream provenance
 - `quality_tier` — `curated` / `reviewed` / `auto` (filter by vetting level)
-- `tier` — `landmark` (the notable headline set: hand-curated rows, rows catalogued in the
-  AI Incident Database, and every `ai-harm` row) or `feed` (everything else: mostly
+- `tier` — `landmark` (the headline-citation set: rows that are hand-curated, catalogued
+  in the AI Incident Database, or AI-harm cases) or `feed` (everything else: mostly
   CVE/GHSA/OSV advisories, plus OECD AI Incidents Monitor incident reports). A **different axis** from `quality_tier`, not a rename of it:
   most landmark rows qualify by being catalogued in the AI Incident Database, which
   says nothing about vetting level. Cite the landmark count, not the corpus total,
-  when you mean "notable incidents"
+  when you mean "headline incidents"
 - `corpus` — `security` or `ai-harm`
 - `source_freshness` — present only on rows whose upstream source has stopped refreshing (see below)
 - `status` — present only on a row that is not standing as published (absence means it stands).

@@ -47,10 +47,10 @@ involves a generative/agentic AI system or its supporting ML infrastructure;
 **(ii) security/safety relevance** — a vulnerability, exploit, misuse, or
 real-world harm; and **(iii) evidence** — at least one resolvable primary
 source. Records failing any gate are excluded regardless of keyword matches.
-Two tiers are surfaced explicitly. The **landmark** set holds rows that are
-hand-curated, catalogued in the AI Incident Database, or AI-harm cases; the
-**feed** is every other row, mainly the CVE/GHSA/OSV vulnerability and advisory
-stream plus OECD-sourced rows. The tier is derived and is a different axis from
+Two tiers are surfaced explicitly. The **landmark** tier is the
+headline-citation set: rows that are hand-curated, catalogued in the AI
+Incident Database, or AI-harm cases; the **feed** is every other row, mainly
+the CVE/GHSA/OSV vulnerability and advisory stream plus OECD-sourced rows. The tier is derived and is a different axis from
 the vetting level `quality_tier`. Headline claims cite the landmark count
 rather than the raw total.
 
@@ -109,7 +109,7 @@ fails on any drift. This is what makes the dataset reproducible and auditable.
 Mappings are produced by a combination of source-provided labels and
 heuristics seeded from the finalised attack vector, then cascaded
 (OWASP → ATLAS/NIST) via an authoritative technique→tactic map
-(`mappings/mitre_atlas.json`, ATLAS v2026.06). Mapping decisions are content
+(`mappings/mitre_atlas.json`, ATLAS v2026.09). Mapping decisions are content
 fields under the determinism contract and are disputable via the corrections
 process. We make no claim that heuristic mappings are expert-reviewed for every
 entry; the `quality_tier` and `confidence` fields expose how vetted each record

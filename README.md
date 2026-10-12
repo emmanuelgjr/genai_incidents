@@ -53,7 +53,7 @@
 </tr>
 </table>
 
-The landmark tier is the headline-citation subset: rows that are hand-curated, catalogued in the AI Incident Database, or AI-harm cases. Every other row is the feed, mainly the CVE/GHSA/OSV advisory stream plus OECD-sourced rows. It is a derived field and is not the same axis as `quality_tier` (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition). Cite the landmark count, not the full corpus, when you mean "headline incidents."
+The landmark tier is the headline-citation set: rows that are hand-curated, catalogued in the AI Incident Database, or AI-harm cases. Every other row is the feed, mainly the CVE/GHSA/OSV advisory stream plus OECD-sourced rows. It is a derived field and is not the same axis as `quality_tier` (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition). Cite the landmark count, not the full corpus, when you mean "headline incidents."
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/charts/year_bar.svg" alt="Entries per year" width="760">

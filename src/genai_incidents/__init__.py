@@ -228,9 +228,10 @@ def query(
     entry's list. ``text`` does a case-insensitive substring match
     against ``id`` + ``title`` + ``cve_ids`` + ``primary_reference``.
 
-    ``tier`` (``"landmark"`` / ``"feed"``) selects the notable subset the
-    project's README asks consumers to cite, and is a different axis from
-    ``quality_tier`` (vetting level) — neither substitutes for the other.
+    ``tier`` (``"landmark"`` / ``"feed"``) selects the layer; ``"landmark"`` is
+    the headline-citation set the project's README asks consumers to cite.
+    It is a different axis from ``quality_tier`` (vetting level) — neither
+    substitutes for the other.
 
     **Carry-in caveat (WS6-T9, 2026-09-18; corrected 2026-10-01):** this
     note originally said ``tier=`` matched nothing until the dataset was

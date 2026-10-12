@@ -13,8 +13,9 @@ proves it fires.
 
 Known limits (each would need a parser, not a pattern, to close):
 - The D88 rule reads one line at a time, so a label whose name is split over
-  two lines or two SVG <text> elements (the README taxonomy-map card wraps
-  its title) is checked only where the full name sits on one line.
+  two lines or two SVG <text> elements is checked only where the full name
+  sits on one line. The one known split label, the README taxonomy-map card,
+  has its own check (test_taxonomy_map_asi_card_carries_asi_label).
 - A bare T&M URL is attributed to the text just before it on its line, back
   to the nearest framework name, ASI code or other URL; a sentence that names
   Threats and Mitigations and then cites its URL for the ASI codes without
@@ -64,6 +65,15 @@ RETIRED_NAME = re.compile(rf"(?:OWASP{_POSS}{SEP})?Agentic{SEP}Top{SEP}?10\b", r
 VARIANT = re.compile(rf"OWASP{_POSS}{SEP}Agentic\b(?!{SEP}Security{SEP}Initiative)", re.I)
 # "ASI Top 10", "LLM/ASI Top 10" (D87): shorthand for a title OWASP never used.
 SHORTHAND = re.compile(rf"\bASI{SEP}Top{SEP}?10\b", re.I)
+# D90: the bare "OWASP LLM/ASI" used as a name for the two frameworks (the
+# "... Top 10" form is SHORTHAND's). D90 keeps the short label "OWASP ASI"
+# next to the codes (app.js, the filter, the INCIDENTS.md column header, an
+# image alt, TAXONOMIES), so only the slash pair is matched.
+_SLASH = r"(?:\s|&nbsp;|&#160;|&#xa0;)*/(?:\s|&nbsp;|&#160;|&#xa0;)*"
+BARE_LLM_ASI = re.compile(rf"\bOWASP{_POSS}{SEP}LLM{_SLASH}ASI\b(?!{SEP}Top{SEP}?10\b)", re.I)
+# Sent correspondence quotes what the recipient was told (each file says "do
+# not edit the message body"), so D90 does not apply there.
+D90_EXEMPT = ("docs/outreach/",)
 # Variants still awaiting their writer. D86 (2026-10-12) renamed every held
 # site, the schema pair (schema-architect, sole writer of schema/) last, so
 # the table is empty and any live variant fails. Exact counts: should a site
@@ -170,6 +180,9 @@ def scan(root: Path, files: list[str]) -> list[str]:
             problems.append(f"{rel}: retired name {hit.group(0)!r}")
         for hit in SHORTHAND.finditer(text):
             problems.append(f"{rel}: shorthand {hit.group(0)!r} (D87: use the official names)")
+        if not rel.startswith(D90_EXEMPT):
+            for hit in BARE_LLM_ASI.finditer(text):
+                problems.append(f"{rel}: bare {hit.group(0)!r} (D90: use the official names)")
         n = len(VARIANT.findall(text))
         if n:
             variants[rel] = n
@@ -225,6 +238,65 @@ def test_mapping_pin_is_the_2026_top10():
     assert m["citation"]["edition"] == "Version 2026 / December 2025"
 
 
+TAX_PY = "scripts/readme_assets/tax.py"
+TAX_SVGS = ("docs/assets/readme/taxonomy-map-dark.svg", "docs/assets/readme/taxonomy-map-light.svg")
+# A card title: tax.py wraps it over consecutive 15 px bold <text> lines, 19 px apart.
+CARD_TITLE_LINE = re.compile(r'<text x="([\d.]+)" y="([\d.]+)" font-size="15" font-weight="700"[^>]*>([^<]*)</text>')
+
+
+def _tax_labels(source: str) -> list[str]:
+    """The card titles in tax.py's `T` tuple list (read, not run: tax.py writes files)."""
+    import ast
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "T" for t in node.targets):
+            return [elt.elts[0].value for elt in node.value.elts]
+    return []
+
+
+def _svg_card_titles(svg: str) -> list[str]:
+    """Each card's title, its wrapped <text> lines joined with a space."""
+    titles: list[tuple[str, float, str]] = []
+    for x, y, words in CARD_TITLE_LINE.findall(svg):
+        if titles and titles[-1][0] == x and float(y) - titles[-1][1] == 19:
+            titles[-1] = (x, float(y), titles[-1][2] + " " + words)
+        else:
+            titles.append((x, float(y), words))
+    return [t[2] for t in titles]
+
+
+def _asi_card_problems(labels: list[str], where: str, framework: str) -> list[str]:
+    cards = [label for label in labels if framework in label]
+    if len(cards) != 1:
+        return [f"{where}: {len(cards)} card(s) titled {framework!r}, expected 1: {labels}"]
+    if f"{framework} (ASI)" not in cards[0]:
+        return [f"{where}: ASI card title {cards[0]!r} lacks '(ASI)' (D88)"]
+    return []
+
+
+def test_taxonomy_map_asi_card_carries_asi_label():
+    """Item 9 re-gate A1: the card title is split over two <text> elements, which
+    the line-based D88 rule cannot see, so the source tuple and both generated
+    SVGs are checked on the joined title."""
+    framework = _mapping(ROOT)["framework"]
+    problems = _asi_card_problems(_tax_labels((ROOT / TAX_PY).read_text(encoding="utf-8")), TAX_PY, framework)
+    for rel in TAX_SVGS:
+        problems += _asi_card_problems(_svg_card_titles((ROOT / rel).read_text(encoding="utf-8")), rel, framework)
+    assert problems == [], "\n".join(problems)
+
+
+def test_taxonomy_map_check_fires():
+    framework = "OWASP Top 10 for Agentic Applications"
+    source = (ROOT / TAX_PY).read_text(encoding="utf-8")
+    assert _asi_card_problems(_tax_labels(source), "tax", framework) == []
+    planted = source.replace(f"'{framework} (ASI)'", f"'{framework}'")
+    assert planted != source
+    assert "lacks '(ASI)'" in _asi_card_problems(_tax_labels(planted), "tax", framework)[0]
+    svg = ('<text x="58" y="280" font-size="15" font-weight="700" fill="#000">OWASP Top 10 for Agentic</text>'
+           '<text x="58" y="299" font-size="15" font-weight="700" fill="#000">Applications</text>')
+    assert "lacks '(ASI)'" in _asi_card_problems(_svg_card_titles(svg), "svg", framework)[0]
+    assert _asi_card_problems(_svg_card_titles(svg.replace("Applications<", "Applications (ASI)<")), "svg", framework) == []
+
+
 # ------------------------------------------------- the guard can fail ----
 
 def _scratch(tmp_path: Path) -> Path:
@@ -252,6 +324,14 @@ NBSP = chr(0xA0)
     ("OWASP Agentic ASI Top 10", "variant"),
     ("OWASP LLM/ASI Top 10", "shorthand"),                                 # D87
     ("the Agentic ASI Top 10", "shorthand"),
+    ("all entries mapped to OWASP LLM/ASI", "D90"),                        # D90
+    ("(OWASP LLM/ASI, NIST AI RMF, MITRE ATLAS)", "D90"),
+    ("OWASP LLM / ASI codes", "D90"),
+    ("owasp llm/asi", "D90"),
+    ("OWASP's LLM/ASI mappings", "D90"),
+    ("OWASP&nbsp;LLM/ASI", "D90"),
+    ("frameworks (OWASP\n  LLM/ASI, NIST AI RMF)", "D90"),                 # line-wrapped
+    ('description="Incidents mapped to OWASP LLM/ASI."', "D90"),           # served text
     ('{"owasp_asi": "2025"}', "version literal"),
     ("'owasp_asi': '2025'", "version literal"),
     ('genai-incidents:taxonomy-owasp-asi="2025"', "version literal"),      # MISP tag
@@ -292,11 +372,26 @@ def test_guard_fires_on_planted_input(tmp_path, planted, expect):
     "| **OWASP Top 10 for Agentic Applications (ASI)** | `ASI01`–`ASI10` | core |",
     "- `owasp_asi`: OWASP Top 10 for Agentic Applications (ASI) — `ASI01`–`ASI10`",
     "the OWASP Top 10 for LLM Applications and the OWASP Top 10 for Agentic Applications",
+    "OWASP ASI",                                                           # D90 keeps the UI label
+    '<label for="f-asi">OWASP ASI</label>',
+    "| Date | ID | Title | Severity | OWASP LLM | OWASP ASI | CVE |",
+    "OWASP LLM and ASI codes",
+    "the LLM/ASI/CVE columns",
+    "dynamically-populated selects (year/llm/asi/vector)",
 ])
 def test_guard_allows_legitimate_text(tmp_path, legit):
     root = _scratch(tmp_path)
     (root / "docs" / "ok.md").write_text(legit, encoding="utf-8")
     assert scan(root, BASE + ["docs/ok.md"]) == []
+
+
+def test_d90_exempts_sent_correspondence_only(tmp_path):
+    root = _scratch(tmp_path)
+    for rel in ("docs/outreach/sent.md", "docs/live.md"):
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text("frameworks (OWASP LLM/ASI, NIST AI RMF)", encoding="utf-8")
+    problems = scan(root, BASE + ["docs/outreach/sent.md", "docs/live.md"])
+    assert [p.split(":")[0] for p in problems] == ["docs/live.md"], problems
 
 
 def test_guard_fires_on_mapping_url_and_missing_heading(tmp_path):
