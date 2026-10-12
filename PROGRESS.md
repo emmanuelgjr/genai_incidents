@@ -358,7 +358,7 @@ STEP 2 follows: the label-scientist implements from that record, with a field-le
 
 ### 🔍 Item 7 stage 1: bounce #1 fix reported at `47277756` (pushed; contains main a792c422). **Full re-gate sent to the reviewer who found the defect.**
 - **Fixture change:** the `scratch` fixture now copies only `git ls-files -z` paths, adds `legacy/`, then runs parse_existing.py in the scratch repo and asserts rc 0.
-- **Self-reported slip:** 8a8790b3 shipped a literal NUL byte; 47277756 replaced it with `" "`.
+- **Self-reported slip:** 8a8790b3 shipped a literal NUL byte; 47277756 replaced it with `"\x00"`.
 - **Fresh clone, legacy file absent:** **935 passed, 2 skipped, 1 xfailed, 0 errors**. The worktree gives the same counts.
 - **Merging main** conflicted in CHANGELOG only (both kept). Rebuild porcelain is empty; validate and drift are green.
 - **Delta vs main:**
