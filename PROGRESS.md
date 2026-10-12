@@ -40,6 +40,40 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔁 Item 7 stage 1: **BOUNCE #1 of the final gate (red-reviewer on `52b0dcce`, 2026-10-12)**. Fresh pipeline-engineer dispatched.
+**Verdict, in the gate's words:** "VERDICT: BOUNCE (v2.13.0 item 7 stage 1 @ 52b0dcce). This is bounce #1 of this final gate."
+
+**Defect 1, in the gate's words:** "On a fresh checkout the test suite breaks, so merging this will turn main's CI red. In a fresh clone of 52b0dcce, `pytest tests -q` gave 820 passed, 1 xfailed, 8 errors. All 8 errors are in tests/test_oecd_stage1_freeze.py. They come from the `scratch` fixture at tests/test_oecd_stage1_freeze.py:274-294..." The fixture copies `data/` from ROOT, but `data/legacy_consolidated.json` is gitignored (.gitignore:50). After running parse_existing.py the file gives 23 passed. validate.yml runs pytest before parse_existing. Earlier green runs depended on that leftover generated file, which is the agreement-6 shape.
+
+**Foreman [R]:**
+- .gitignore:50 = `data/legacy_consolidated.json`.
+- `git ls-files` for it is empty.
+- The fixture at 52b0dcce does `copytree(ROOT/"data")` and runs the control build without parse_existing.
+- Confirmed. **Foreman's own contribution:** the checkpoint said the specialist had "not re-run the full suite after a fixture fix". The foreman recorded that as a gap and did not run the suite itself before resuming.
+
+**Advisories, all non-blocking:**
+- A1: main is now d4b836d2+, with PROGRESS-only commits in between.
+- A2: the stage-1 test file takes about 412s → follow-up, slow marker?
+- A3: the merge commit's own fixture change (copying the D69 appends) is justified; it is the change whose suite run was skipped.
+- A4: the invariant-8 benchmark was not run. That is reasonable: the change is an abort-only gate plus a label backfill.
+- A5: 2 skips in the simulated merge, not identified.
+- A6: no egress or model calls.
+
+**Everything else is CONFIRMED by the gate's own route:**
+- **per-entity delta vs main:** 15,666 ids, same order; exactly **3,936 rows × {description_provenance, description_source}** (absent → 'original'/'oecd-aim'; 3,933 OECD-only + 3 mixed); `added`/`updated` untouched; INC-00437 key order only (declared); other data files byte-identical (stats.json differs only by item 8's disputed_count); item 8 confirmed data-neutral; id_deprecations has 1,084 entries at base and tip.
+- **merge resolution:** keeps both behaviours; the gate sits before 8a/8b; no deletions; PROGRESS unchanged.
+- **fire proof:** V1, a synthetic new OECD row → "[FATAL] D42/D25(a)+D67+D71 ... Nothing was written"; V2, an upstream title edit → fatal.
+- **checks:** validate and drift green.
+- **merge-tree vs main:** CHANGELOG.md is the only conflict. A simulated merge plus rebuild gives empty porcelain and 933 passed / 2 skipped / 1 xfailed.
+
+**Redispatch:** a fresh pipeline-engineer will:
+- build the fixture from TRACKED files only and run parse_existing in the scratch repo;
+- prove the fix with a full suite in a fresh clone where the legacy file is absent;
+- merge origin/main (6dbf3327) into the branch;
+- re-measure the delta and push.
+
+A full re-gate follows.
+
 ### ✅ D75/D76: **DONE. Gate PASS on `51b88c31`; MERGED to main 2026-10-12 as `25c00a46` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS (D75/D76, branch ws2/v2130-precision-ratify-inclusion @ 51b88c31). DEFECTS: none." Not a second bounce.
 
