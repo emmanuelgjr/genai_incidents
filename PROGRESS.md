@@ -63,6 +63,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 v2.13.0 cut step 1: notes refreshed at `9f42fdb0` (pushed; contains main 0191e814). **Notes gate dispatched.**
+- **The new item 9 guard caught the notes themselves.** Main's full suite failed 1 test after the merge, because the notes' title said "OWASP agentic framework" and Headline 3 quoted the retired name. The author fixed both, so the guard works on release notes too.
+- **After the fix:** 1072 passed, 1 xfailed. Every Verification value is unchanged from pre-merge except the test count (997→1072).
+- **Added to the notes:**
+  - a pointer to CHANGELOG "Behaviour changes";
+  - the landmark/feed wording;
+  - "retired IDs never reissued, every retired ID keeps a record; not the same as resolving".
+- **The author's trusted list is unchanged.** It now also includes 776/1,065, taken from the foreman.
+- **The gate is asked to:** re-derive every figure by its own route, prove the Verification block can fail, audit the trusted list, check link hygiene and confirm the "minor release" call.
+
 ### ✅ v2.13.0 cut-docs: **DONE. D91 scoped re-check PASS on `0856810f`; MERGED to main 2026-10-12 as `00be3a4a` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS (D91 scoped re-check, release/v2.13.0-cut-docs @ 0856810f). DEFECTS: none."
 
