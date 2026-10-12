@@ -253,7 +253,7 @@ def build_bundle(incidents: list[dict]) -> dict:
             "x_quality_tier": i.get("quality_tier"),
             # WS6-T9: x_tier is the landmark/feed selector. x_quality_tier is
             # a different axis (vetting level) and cannot stand in for it --
-            # a consumer filtering the bundle for the notable subset needs
+            # a consumer filtering the bundle for the headline-citation (landmark) set needs
             # this one. Emitted unconditionally, like x_quality_tier and
             # unlike the optional landmark-only labels below.
             "x_tier": i.get("tier"),
