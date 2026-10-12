@@ -63,6 +63,41 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Item 9 (OWASP ASI 2026 edition): **DONE. Re-gate PASS on `073b2c39`; MERGED to main 2026-10-12 as `4284b127` (`--no-ff`). v2.13.0 QUEUE 9/9 MERGED.**
+**Verdict, in the gate's words:** "VERDICT: PASS. Item 9 at 073b2c39 closes bounce #1 (all 3 defects), and D87/D88 are applied. DEFECTS: none."
+
+**Advisories and routing:**
+- **A1:** the taxonomy card's "(ASI)" is unguarded. The title is split across two `<text>` elements, a documented limit; removing it from the tax.py tuple leaves the guard at 45 passed. → **NOTE → WS2:** a one-line assertion on the tax.py tuple.
+- **A2:** the documented T&M false pass (T&M named earlier on the line). There is no such line in the tree.
+- **A3:** short "OWASP ASI" labels without the name (app.js:82/:535/:876, the index.html:183 filter, the INCIDENTS.md:131 column header, the :28 alt text) are not D88 violations as worded. → **USER question in the final package.**
+- **A4:** NOTICE-DATA:233-234 "a third upstream source" reads consistently only by its narrower count. → **docs-warden.**
+- **A5:** the gate agrees D88 covers the NOTICE lead and the §3.6 heading.
+- **A6:** cosmetic banner padding at Arial/Segoe.
+
+**Gate evidence:**
+- The card and banners were rendered in DejaVu (forced via @font-face), Arial and Segoe; all clean. tax.py reproduces the committed SVG.
+- **The licence file is byte-identical (cmp) to the gate's own license-list-data download.** It differs from spdx.org only by the `<<beginOptional>>`/`<<endOptional>>` template markers plus whitespace, so it is canonical.
+- Guard: 10/11 old plants fire (the 1 that passes is A2); 11/11 new should-fire plants fire; 10/10 legitimate controls pass; the real-tree figcaption revert fails it.
+- NOTICE "eight" was enumerated and is correct.
+- 0 entries changed. The fresh-clone rebuild is clean. Full suite 997 passed, 1 xfailed.
+
+**Foreman [R]:**
+- **Viewed the gate's DejaVu renders myself:** the card title wraps "OWASP Top 10 for Agentic / Applications (ASI)" clear of the badge, and the banner chips sit in 2 rows with no overlap. Observation for docs-warden: the banner tagline says "CC-BY-4.0 data", while the mapping file is now partly CC BY-SA.
+- **After merge at 4284b127:**
+  - deletion diff empty;
+  - parse_existing, merge_and_dedupe and render_markdown all rc 0, with porcelain **empty**;
+  - validate rc 0, "15666/15666 entries valid", "precision: pending, authorised by D76";
+  - drift clean;
+  - **pytest 997 passed, 1 xfailed** (read BEFORE the push).
+- Pushed; ls-remote = local.
+
+**NEXT:** a docs-warden full sweep for the v2.13.0 cut. The cut-time items queued for it:
+- README:144, paper:73-77, "stable IDs" wording, INCLUSION;
+- the D73 advisories (paper:78-81 tier, two CHANGELOG sentences);
+- D75/D76 advisories 1 and 4;
+- item 9 A4 and the banner tagline;
+- NOTICE-DATA wording.
+
 ### 🔍 Item 9 bounce #1 fix: `073b2c39` (pushed). **Re-gate sent to the reviewer who bounced it.**
 - **Defect 1:** tax.py wraps the card titles ("OWASP Top 10 for Agentic" / "Applications (ASI)"), changing 3 elements per SVG. **Rendered in headless Chrome with DejaVu, Arial and Segoe forced; every PNG viewed.** Line 1 in DejaVu ends at 279.8 vs the badge at 315.2.
 - **Defect 2:** the CHANGELOG is corrected and covers D83-D88.
