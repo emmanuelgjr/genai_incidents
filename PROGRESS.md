@@ -63,6 +63,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9 D86 (label-scientist part): `521cd73b` (pushed). **schema-architect dispatched for the schema pair;** one gate follows.
+- **Dataset `description`:** the delta is exactly 1 top-level leaf ("OWASP Agentic ASI Top 10" → "OWASP Top 10 for Agentic Applications"). 0 entries changed; 0 `updated` moves. min.json doesn't carry it, and the exports are identical apart from the HF build_manifest commit/built_at.
+- **Per-incident pages:** 30 files, +13,586/-13,586 lines. A pairwise check found 0 changed lines other than the exact label swap. The label keeps "(ASI)" per D85.
+- **Images:**
+  - **og image:** the full name doesn't fit at 28px (1,342 vs 1,072 px). It now uses 26px with a wrap at " · " separators, and the build fails if more than 2 lines are needed. It was viewed locally. The CI font DejaVu width is **estimated, not measured**.
+  - **Banner SVGs:** no generator, so they were hand-edited. The chip was widened from 172 to 300 and the next chips shifted; the row ends at x=774.8. **Not rasterised or viewed.**
+- **Paper:** paper:20 fixed in place. The dated superpowers plan was left with no note, and the guard skips plans/.
+- **Guard:** only the schema pair remains pinned. A new pages/description test was added, and the guard fires on each reverted site.
+- **Checks:** pytest 965 passed, 1 xfailed; validate and drift rc 0.
+- **For the gate:** the og wrap under the CI font, and the banner rendering.
+
 ### ⚖ D86, USER RULING 2026-10-12 (item 9 held sites): **change ALL four groups in v2.13.0** (multi-select; all four chosen)
 1. The schema descriptions (schema/incident.schema.json and its src copy) → **schema-architect**, as a commit on the item 9 branch after the label-scientist.
 2. The dataset `description` field (merge_and_dedupe.py:3215). This is a declared one-key top-level delta in incidents.json, with 0 per-entry change.
