@@ -86,8 +86,9 @@ The build is a deterministic, idempotent pipeline
    keyed on CVE and source ids, not on `INC-#####` ids, so it runs before
    step 5 assigns them.
 5. **Assign `INC-#####` ids.** The allocator never reissues a retired number,
-   and retired ids are recorded in `id_deprecations.json`, so a citation of a
-   tombstoned ID resolves. An ID is not a permanent pointer to one incident:
+   and retired ids are recorded in `id_deprecations.json`, so every retired ID
+   has a record that resolve_id_status() reports. An ID is not a permanent
+   pointer to one incident:
    across release tags v2.0.0–v2.12.0, 591 published IDs carried more than one
    title, some of them a different incident (`docs/ID_POLICY.md` §4 rule 1 and
    §8.6). Every ID published in any release tag now has a live entry or a
