@@ -63,6 +63,43 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 v2.13.0 cut-docs integration: **BOUNCE #1 (red-reviewer on `b99533b7`, 2026-10-12)**. Fixes routed to 5 owners; scoped re-gate by the same reviewer follows.
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. This is the first bounce I know of on the `release/v2.13.0-cut-docs` integration gate, at `b99533b7`."
+
+**Defects:**
+1. **The C2 rewording adds a NEW false claim** (NOTICE-DATA:236-239, README:419, dep5:55-58): "one of the three whose terms bear on row-level text".
+   - In fact `cve` (2,171 rows) and `avid` (79) carry row-level content_license markers.
+   - ATLAS and garak text is verbatim in rows (Apache-2.0).
+   - AIID has 0 markers.
+   - **The gate's true statement:** the distinction is whether the row text could be carried under the source's own licence grant. For AIAAIC, AIID and AIM it could not (reduced, or the title analysed separately). The gate supplied replacement wording, saved verbatim, to be applied by WS0 after confirming the AIID/AIM parenthetical against E21/E23. **This is the 2nd wrong wording of this sentence. The foreman's C2 brief framed it ("third" holds narrowly), and the specialist followed that framing. Foreman's brief error.**
+2. **CHANGELOG:75** still says "The 21 `OWASP-GENAI-*` rows". It should say 21 OWASP-* = 18 GENAI + 3 AIX, in 6 rows. The §7 correction missed the CHANGELOG.
+3. **C8 survives in the definition-of-record surfaces.**
+   - The schema tier description: "`feed` is the comprehensive vulnerability/advisory stream". Measured: 7,989 of 13,722 feed rows are CVE/GHSA/OSV/PYSEC, 3,811 are OECD and 1,923 are other, so about 42% are not vulns or advisories.
+   - The `_derive_tier` docstring (merge_and_dedupe.py:165-168): "the curated/notable LANDMARK set", "feed = the CVE/GHSA/OSV bulk".
+
+**Advisories:**
+- **Guard false-passes:**
+  - **adjacent Python string literals** (exactly how the TAXII description is written);
+  - "OWASP LLM & ASI" / "and ASI";
+  - Markdown bold;
+  - U+2044;
+  - anything in CHANGELOG (excluded);
+  - a quoted retired name used as current in CORRECTIONS.
+- The CHANGELOG guard bullet omits D90. [Unreleased] doesn't record the D89 Zenodo/CITATION notes or the TAXII description change.
+- **Paper §4:** the step order is still not execution order. Stamping is step 7, step 5 says "after stamping", and ID assignment runs after stamping.
+- **SOURCE_LICENSES:320-321:** garbled word order.
+- **HF card:** says "OECD AI Incidents Monitor". The current name is "OECD AI Incidents and Hazards Monitor".
+- **C5 residue:** the README flow SVGs say "stable IDs" (scripts/readme_assets/flow.py:28). Separately, export_stix.py:256 has a "notable subset" comment.
+- **DATA_DICTIONARY:76** (content_license) describes AIAAIC presence only; it omits the cve and avid markers. Pre-existing.
+- **.zenodo.json:** the description uses Markdown backticks, which Zenodo renders literally.
+
+**Routing (all as fix + scoped re-gate by the same reviewer):**
+- **WS0:** D1 (apply the gate's wording verbatim), D2 (CHANGELOG:75), the SL:320 garble, DD:76.
+- **WS3:** schema feed wording, paper §4 execution order, flow.py "stable IDs" and SVG regeneration.
+- **WS4:** the `_derive_tier` docstring and the export_stix:256 comment.
+- **WS6:** HF card AIM name, .zenodo backticks, CHANGELOG entries for D89 and TAXII.
+- **WS2:** guard joins adjacent literals plus the "& ASI" and "and ASI" forms (keeping "LLM and ASI codes" legitimate); the CHANGELOG guard bullet mentions D90.
+
 ### 🔍 v2.13.0 cut-docs integration COMPLETE at `b99533b7` (pushed; 21 files, +268/-69). **Single red-reviewer gate dispatched.**
 - **Contents (beyond wave 1):**
   - wave 2: WS2 `0da32597` plus `985bbc1c`, the foreman's option (a) for the CORRECTIONS row;
