@@ -63,6 +63,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D83-D85, USER RULINGS 2026-10-12 (item 9 open points)
+- **D83, D80 scope: JSON carve-out + NOTICE (Recommended).** Only mappings/owasp_asi_top10.json gets the CC BY-SA 4.0 dep5 stanza. The NOTICE-DATA attribution covers the names wherever they are reproduced: render_markdown.py, app.js, TAXONOMIES.md, INCIDENTS.md.
+- **D84, licence text: add LICENSES/CC-BY-SA-4.0.txt (Recommended),** the canonical SPDX text, in the item 9 branch. The other dep5 identifiers are not touched.
+- **D85, "(ASI)" suffix: keep it in headings that introduce the codes (Recommended).** E.g. "OWASP Top 10 for Agentic Applications (ASI)". The mapping file's `framework` value is the bare official title.
+
+### 🔍 D73 (D81/D82): specialist finished `916159c7` (pushed). **Scoped re-check sent to the D73 gate.** Item 9 implementation dispatched in parallel.
+- **Docs corrected in place:**
+  - DATA_DICTIONARY:240 → "(`source_freshness` only; D81 moved ... into it)";
+  - VERSIONING:418-419 likewise;
+  - the grep found no other live surface.
+- **6g comment fixed.**
+- **CHANGELOG rewritten as user-ruled D81/D82.** It covers the bump semantics, 3,767 rows (2,171/1,517/79), 0 rows on the first rebuild, the D82 widening and the WS0-T3 reversal.
+- **WS0-T3 marker-shape spec §4 item 2:** gains a dated "Update 2026-10-12 (D81)" note with a do-not-regenerate marker; the original is preserved.
+- **Merge and rebuild:** main merged in (merge commit 7c5c401e; the specialist mislabelled it as origin/main). The rebuild delta vs main is 0 updated / 0 added / 0 other moves, with porcelain empty.
+- **Checks:** pytest 952 passed, 1 xfailed; validate and drift rc 0.
+- **Taken on trust:** the gate's corrected fire-proof counts and the 3,767 split.
+- **Foreman [R]:** origin = `916159c7`; 7 files, +116/-16 vs main (CHANGELOG, DATA_DICTIONARY, VERSIONING, the WS0-T3 spec, merge_and_dedupe.py, 2 tests). It lacks only board-only main commits.
+
 ### ✅ Item 9 step 1: source record **CLOSED per D77** (verbatim append + foreman string check), `17995bc2` on `ws0/v2130-item9-asi-source` (pushed)
 - **T&M comparison by the raw-text reviewer, in its words:** "VERDICT (T&M comparison): OWN PARAPHRASE, all 10 entries. I checked both editions, v1.0 (February 2025) and v1.1 (December 2025). No entry is near-verbatim, so D80's premise stands."
   - Method: 0 shared 5-grams in both editions; longest shared run 4 words; controls verbatim 15/15 and paraphrase 0/19; a side-by-side read with the closest T-code quoted per entry.
