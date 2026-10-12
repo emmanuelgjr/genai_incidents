@@ -63,6 +63,44 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 v2.13.0 notes: **BOUNCE #1 (red-reviewer on `9f42fdb0`, 2026-10-12)**
+**Verdict:** "VERDICT: BOUNCE". This is the first bounce on the notes.
+
+**Defects:**
+1. **False STIX claim** at notes :147-151 and :75-77, copied from CHANGELOG:157-160 and sitting on the notes' own trusted list: "every STIX/TAXII object's `modified` moves once ... `identity` to the newest incident date ... the client will re-import". The gate **built both bundles**:
+   - v2.12.0 had **no `identity` object**; it is new in v2.13.0.
+   - **2,543 objects are REPLACED, not moved:** 3 attack-patterns retired (AML.T0019, T0058, T0015.001), 2 new (T0115.001, T0115.000), and 2,540 relationships gone with 2,540 new ones.
+   - **Nothing is `revoked`** (0), so a static-TAXII or deduping client keeps the stale objects.
+   - The total stays at 65,141 only because the changes cancel out (agreement 6, form (d)).
+   - Correct as stated: 53 attack-patterns are present in both bundles, and all of them moved; the +1 ms rule holds for 9,784 unchanged incidents.
+   - **STIX `revoked` itself stays out of scope (user, D75: R5/A3 not selected).** The fix is truthful disclosure, in the notes and in the CHANGELOG (→ WS6).
+2. **The reuse-lint limitation is false:** "two files without licensing information". Measured on reuse 6.2.0: **109** files (340/449 have licence information; 348/449 have copyright).
+3. **Self-contradiction:** the opening says "every figure re-derived ... not copied from the CHANGELOG", while the closing lists CHANGELOG-read figures (3,767, 591 and ~94 have no Verification command).
+
+**Advisories:**
+- **Trusted figures the gate measured as correct, now promotable:** ATLAS 2,498/41/8/1 and 2,532/3,309; the 0-row rebuild (a clone on 2026-10-12, deterministic); 3,767 = 2,171/1,517/79; 1,065 `from` ids; 26 disputed all cna-tag; MISP timestamp 31/31; OECD titles 3,937/4,104 by a separate route; 69.2% reviewed.
+- **Undeclared delta:** `status_reason.as_of` moved 2026-10-03→2026-10-09 on all 29 retracted rows (the CVE re-sweep); `updated` did not move there. → Add a clause under item 3.
+- **The D82 bullet omits content_license.**
+- **"Minor release":** quote the real CHANGELOG rule and explain why the strict v2.12.0-schema rejection of the 22 disputed rows does not count as breaking.
+- **The Verification preamble** points to 0191e814, which lacks the notes file.
+- **The header check** doesn't test the disputed rows; adjust its comment.
+- Re-cut the trusted list.
+
+**Routing:**
+- The notes fixes go to the same distribution-engineer, with the gate's STIX text verbatim (requested).
+- The CHANGELOG:157-160 STIX sentence goes to WS6 as a separate small branch.
+- Then a re-gate by the same reviewer.
+
+### 🔍 v2.13.0 cut step 1: notes refreshed at `9f42fdb0` (pushed; contains main 0191e814). **Notes gate dispatched.**
+- **The new item 9 guard caught the notes themselves.** Main's full suite failed 1 test after the merge, because the notes' title said "OWASP agentic framework" and Headline 3 quoted the retired name. The author fixed both, so the guard works on release notes too.
+- **After the fix:** 1072 passed, 1 xfailed. Every Verification value is unchanged from pre-merge except the test count (997→1072).
+- **Added to the notes:**
+  - a pointer to CHANGELOG "Behaviour changes";
+  - the landmark/feed wording;
+  - "retired IDs never reissued, every retired ID keeps a record; not the same as resolving".
+- **The author's trusted list is unchanged.** It now also includes 776/1,065, taken from the foreman.
+- **The gate is asked to:** re-derive every figure by its own route, prove the Verification block can fail, audit the trusted list, check link hygiene and confirm the "minor release" call.
+
 ### ✅ v2.13.0 cut-docs: **DONE. D91 scoped re-check PASS on `0856810f`; MERGED to main 2026-10-12 as `00be3a4a` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS (D91 scoped re-check, release/v2.13.0-cut-docs @ 0856810f). DEFECTS: none."
 
