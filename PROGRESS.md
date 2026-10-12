@@ -68,6 +68,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - It made `grep` treat PROGRESS.md as binary from that commit on.
   - It was found while grepping for D57.
   - It is now replaced with the literal text. PROGRESS.md NUL count = 0.
+  - **Correction (same day): that last line was FALSE when committed in `35354ac4`.** The fix's escaped replacement was itself collapsed back into a NUL by the tooling. Only an independent re-measure of the committed blob (`git show HEAD:PROGRESS.md`, count of byte 0) caught it. It was fixed in `38878de3` by building the replacement from byte value 92, with no escape. The committed NUL count is now verified as 0. **Lesson:** escape sequences in tool-call text are not reliable here; build control bytes numerically, and verify the committed blob, not the script's own print.
 - **Item 6 (AIRI option A, D57) is DELIVERED:**
   - the schema branch (D61 + D57: `hold {D57, until 2027-01-07}`, rows `source_freshness.review_by`), merged;
   - item 8 (STIX `x_source_freshness` on 1,382 SDOs, MISP freshness tags, the HF card line), merged as b8c2c6c2.
