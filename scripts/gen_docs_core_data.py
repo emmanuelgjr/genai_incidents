@@ -78,6 +78,9 @@ CORE_FIELDS = [
     "id", "date", "year", "title", "severity", "attack_vector",
     "owasp_llm", "owasp_asi", "cve_ids", "affected", "corpus", "quality_tier",
     "tier", "primary_reference",
+    # D64: renderStats() counts status == "disputed" (a subset of the rows,
+    # still counted); retracted rows are already dropped from this payload.
+    "status",
 ]
 
 # Everything else: only read on row-expand or CSV export, so it is deferred

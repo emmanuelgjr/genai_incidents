@@ -50,3 +50,33 @@ def test_card_defines_source_freshness_because_the_jsonl_ships_it(tmp_path):
     assert "`as_of`" in card and "data/source_freshness.json" in card
     # Cited, not duplicated: the dictionary section stays authoritative.
     assert "DATA_DICTIONARY.md#source-freshness" in card
+
+
+def test_card_states_review_by_and_that_disputed_rows_stay_counted(tmp_path):
+    """D57 + D64. `review_by` rides in the verbatim rows; the card must define it.
+    The disputed count comes from data/stats.json (invariant 6) and must equal the
+    exported rows' own count, an independent path."""
+    stats = json.loads((hf.DATA / "stats.json").read_text(encoding="utf-8"))
+    n, jsonl = hf.build(tmp_path)
+    rows = [json.loads(l) for l in jsonl.read_text(encoding="utf-8").split("\n") if l]
+    card = (tmp_path / "README.md").read_text(encoding="utf-8")
+    assert "{status, as_of, sources, review_by}" in card
+    assert "`review_by` is the date a human is due to re-decide" in card
+    assert all("review_by" in r["source_freshness"] for r in rows if "source_freshness" in r)
+    disputed = [r for r in rows if r.get("status") == "disputed"]
+    assert len(disputed) == stats["disputed_count"] > 0
+    assert f"{stats['disputed_count']:,} of the rows above carry `status: disputed`" in card
+    assert f"**counted** in the {stats['incident_count']:,}" in card
+
+
+def test_build_refuses_when_stats_json_disagrees_with_the_rows(tmp_path, monkeypatch):
+    import pytest
+    bad = tmp_path / "data"
+    bad.mkdir()
+    (bad / "incidents.json").write_text(
+        json.dumps({"version": "9.9.9", "incidents": [{"id": "INC-1", "status": "disputed"}]}),
+        encoding="utf-8")
+    (bad / "stats.json").write_text(json.dumps({"incident_count": 1, "disputed_count": 0}), encoding="utf-8")
+    monkeypatch.setattr(hf, "DATA", bad)
+    with pytest.raises(SystemExit):
+        hf.build(tmp_path / "out")

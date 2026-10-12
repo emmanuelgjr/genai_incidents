@@ -323,6 +323,21 @@ caught at gate review, not by this file. Run both checks as part of step
    silently failed to trigger its downstream publications and step 9 is
    not satisfied by a green `gh run list` alone.
 
+   **`release-assets.yml` is a third downstream workflow (v2.13.0 item 8).**
+   It attaches `incidents.stix.json`, `incidents.min.json`, `taxii2.zip`,
+   `misp-feed.zip`, `build_manifest.json` and `SHA256SUMS` to the Release.
+   Before it existed a Release carried no assets at all. Check it the same way
+   (`gh run list --workflow=release-assets.yml -b v<version> ...`), then verify
+   the result instead of trusting the green tick:
+   ```bash
+   gh release download v<version> --dir /tmp/v<version>-assets
+   (cd /tmp/v<version>-assets && sha256sum -c SHA256SUMS)
+   python -c "import json;m=json.load(open('/tmp/v<version>-assets/build_manifest.json'));print(m['commit'],m['built_at'],m['incident_count'])"
+   ```
+   `build_manifest.json`'s `commit` must be the commit the tag points at
+   (`git rev-parse v<version>^{commit}`), and its counts must equal
+   `data/stats.json` at that tag.
+
    **Wait for `status: "completed"` before reading `conclusion` — do not
    run the check above immediately after step 7.** Both workflows are
    still `in_progress` with `conclusion: null` for some time right after
@@ -375,3 +390,40 @@ workflow manually against the already-published release rather than
 re-cutting anything — `gh workflow run publish.yml` — which is how the
 `v2.10.0` PyPI failure was actually resolved. Re-run step 9's check
 afterward to confirm the re-triggered run completed successfully.
+
+
+## What bumps what in the exports (v2.13.0 item 8)
+
+The STIX bundle, the static TAXII collection and the MISP feed are generated at
+export time and never committed. Their change-detection fields are derived, not
+stamped:
+
+| Surface | Field | Rule |
+|---|---|---|
+| STIX incident SDO, its relationships | `modified` | the entry's `updated` date, with `scripts/export_stix.py` `EXPORTER_VERSION` in the millisecond field (`2026-01-04T00:00:00.001Z`); never earlier than `created` |
+| STIX `attack-pattern` | `modified` | the pinned ATLAS `release_date` (floor 2024-01-01), same version suffix |
+| STIX `vulnerability` | `modified` | constant (a CVE object's content is its id), same version suffix |
+| STIX `identity` (carries `x_taxonomy_versions`) | `modified` | newest of every incident's `updated` and the taxonomy release dates, same version suffix |
+| TAXII `manifest.json` | `version` / `date_added` | the object's `modified` / `created` (no separate state) |
+| MISP event + manifest | `timestamp` | newest `updated` among the event's incidents, in Unix seconds, plus `scripts/export_misp.py` `EXPORTER_VERSION` seconds |
+
+`updated` moves exactly when an entry's content fields change
+(`scripts/merge_and_dedupe.py` `_CONTENT_FIELDS`), so an entry with no content
+change keeps a byte-identical SDO across builds.
+
+**Bump `EXPORTER_VERSION` (STIX and/or MISP) in the same change as any of:**
+a new or removed `x_` property or machinetag, a changed `source_name`/comment,
+a changed mapping from entry to object, a re-pin of a taxonomy that carries no
+release date (OWASP ASI, VERIS, CAPEC), or a re-derivation of a field the
+exporter reads that is *not* in `_CONTENT_FIELDS` (`tier`, `quality_tier`,
+`corpus`, `content_license`, `source_freshness`: re-deriving those does not move
+`updated`). `tests/test_export_modified.py::test_every_exported_entry_field_is_content_or_explicitly_declared`
+fails when an exported field is in neither group. The version is one millisecond
+(STIX, range 0-999) or one second (MISP) per bump, so a consumer that dedupes on
+(`id`, `modified`) re-imports exactly the objects that changed. Known limit: two
+content changes to one entry on the same calendar day produce one `modified`.
+
+`build_manifest.json` (schema `schema/build_manifest.schema.json`) and `SHA256SUMS`
+are written only by `scripts/export_integrity.py` in export/release steps, never
+by `make build`. `built_at` is the committer date of `commit` (or
+`SOURCE_DATE_EPOCH`), not the wall clock, so rebuilding a commit is byte-identical.

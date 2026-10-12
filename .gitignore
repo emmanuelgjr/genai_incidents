@@ -75,6 +75,12 @@ docs/misp/
 docs/data/incidents.core.json
 docs/data/detail/
 docs/data/SHA256SUMS
+# v2.13.0 item 8: build_manifest.json (commit + built_at + counts) is written
+# only by export/release steps -- scripts/export_integrity.py -- never by `make
+# build`, so it is never committed. docs/taxii2/, docs/misp/ and dist/ are
+# already ignored; these two are the committed-tree locations it must not land in.
+docs/data/build_manifest.json
+src/genai_incidents/data/build_manifest.json
 
 # Auto-generated local tool config (ecc-tools / claude-flow "homunculus"
 # repo-analysis output — never authored by us, and it was publishing local

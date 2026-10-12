@@ -6,6 +6,8 @@ Every applicable entry is mapped to four core taxonomies — **OWASP LLM Top 10 
 - **Version:** 2.12.0
 - **Generated:** 2026-10-09
 - **Total incidents:** **15,637**
+  - of which CVE-disputed (counted; confidence lowered): 22
+  - retracted (NOT counted; every CVE REJECTED): 29
 - **Date range:** 1983 – 2026
 - **With CVE:** 7,446
 - **Machine-readable:** [`data/incidents.json`](data/incidents.json) · [`data/incidents.min.json`](data/incidents.min.json)

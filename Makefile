@@ -1,4 +1,4 @@
-.PHONY: build validate lint-atlas atlas-fetch atlas-pin render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
+.PHONY: integrity verify-integrity package-manifest release-assets build validate lint-atlas atlas-fetch atlas-pin render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -68,10 +68,36 @@ docs-data:
 	python scripts/gen_docs_core_data.py
 	python scripts/gen_data_integrity.py
 
-# CI gate: docs/data/SHA256SUMS must match the files it lists and must list
-# everything served under docs/data/. Run `make docs-data` first.
+# CI gate: every served tree's SHA256SUMS must match the files it lists and
+# list everything served, and its build_manifest.json must satisfy the schema.
+# Run `make docs-data` (docs/data only) or `make integrity` (all three) first.
 verify-docs-data:
 	python scripts/verify_data_integrity.py
+
+# v2.13.0 item 8: export the STIX bundle, the static TAXII collection and the
+# MISP feed, then write build_manifest.json + SHA256SUMS into docs/data,
+# docs/taxii2 and docs/misp (in that order: the sums must cover the exports).
+# Release/export step only -- NOT part of `make build` (the manifest carries the
+# commit, which cannot be inside committed files). Run `make docs-data` first
+# for the site's core/detail shards if you want them hashed too.
+integrity: stix taxii misp
+	python scripts/gen_data_integrity.py
+	python scripts/verify_data_integrity.py
+
+verify-integrity:
+	python scripts/verify_data_integrity.py
+
+# The PyPI channel: stamp the package data with build_manifest.json (gitignored;
+# hatch ships it via [tool.hatch.build] artifacts). publish.yml runs this before
+# `python -m build`.
+package-manifest:
+	python scripts/export_integrity.py manifest --out src/genai_incidents/data/build_manifest.json
+
+# The GitHub-release channel: dist/release/ = STIX bundle + TAXII/MISP zips +
+# incidents.min.json + build_manifest.json + SHA256SUMS. release-assets.yml
+# uploads it; run this to reproduce the upload locally.
+release-assets: integrity
+	python scripts/package_release_assets.py
 
 # CI gate (WS6-T5 design pass): fails if a static filter <select> in
 # docs/index.html (severity/corpus/quality) reads an incident field that is

@@ -242,3 +242,33 @@ def test_safe_url_rejects_embedded_html_and_whitespace():
     # Malformed scraped URL that swallowed an HTML tag must not pass through.
     assert r.safe_url('https://x.com/news/221899/ /> <meta property=') == "#"
     assert r.safe_url('https://ok.com/a?b=1&c=2') == 'https://ok.com/a?b=1&c=2'
+
+
+# --- D64 (v2.13.0 item 8): DISPUTED card note --------------------------------
+
+
+def _card(**extra):
+    e = {"id": "INC-00001", "title": "t", "date": "2026-01-01",
+         "category": "vulnerability-disclosure", "severity": "High",
+         "description": "d", "cve_ids": ["CVE-2026-0001"]}
+    e.update(extra)
+    return "\n".join(r.render_incident_block(e))
+
+
+def test_disputed_card_has_banner_and_says_it_stays_counted():
+    card = _card(status="disputed",
+                 status_reason={"code": "cve-disputed", "as_of": "2026-10-09"})
+    assert "**DISPUTED**" in card and "checked 2026-10-09" in card
+    assert "stays counted" in card
+    assert "RETRACTED" not in card
+
+
+def test_retracted_card_banner_unchanged_and_not_disputed():
+    card = _card(status="retracted",
+                 status_reason={"code": "cve-rejected", "as_of": "2026-10-09"})
+    assert "**RETRACTED**" in card and "DISPUTED" not in card
+
+
+def test_standing_card_has_neither_banner():
+    card = _card()
+    assert "DISPUTED" not in card and "RETRACTED" not in card
