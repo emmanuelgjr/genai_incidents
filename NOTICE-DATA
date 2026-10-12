@@ -234,9 +234,17 @@ docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
 The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
-eight sources above, and, alongside AIAAIC and AIID above, one of the
-three whose terms bear on row-level text rather than only on a notice
-that must accompany copies. AIM's own terms self-incorporate OECD's general
+eight sources above. With AIAAIC and AIID, it is one of the three
+whose row text this project could not simply carry under the source's
+own licence grant. For each of the three, the text was either reduced
+to structural facts and a link, or its retained title was analysed as
+a separate copyright question (open for AIAAIC and AIM; resolved for
+AIID). For the other five, the grant covers the material reproduced,
+and the obligation is attribution or a notice that accompanies copies
+(CVE- and AVID-derived rows also carry a row-level content_license
+marker).
+
+AIM's own terms self-incorporate OECD's general
 Data-reuse conditions -- "Your use of the OECD AI incidents and
 hazards monitor (previously AI Incidents Monitor) ("AIM") is subject
 to the terms and conditions found at www.oecd.org/termsandconditions"

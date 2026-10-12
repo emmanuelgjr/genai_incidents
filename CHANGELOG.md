@@ -72,7 +72,8 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   counts eight upstream sources with an obligation detailed in it (it said three), and
   the OWASP attribution in it and in section 3.6 also lists `docs/charts/owasp_asi.svg`,
   which reproduces the ten risk names.
-  The 21 `OWASP-GENAI-*` rows of `ingest/avid_owasp_incidents.json` are a different
+  The 21 `OWASP-*` source ids (18 `OWASP-GENAI-*` and 3 `OWASP-AIX-*`) of
+  `ingest/avid_owasp_incidents.json`, folded into 6 rows, are a different
   upstream and stay OPEN.
 - **New guard** `tests/test_owasp_asi_naming.py`. Before it, `validate.py` and
   `check_stats_drift.py` caught a stale `owasp_asi` only in `data/stats.json`. The guard
