@@ -8,8 +8,10 @@ regenerate this text.*
 
 *Superseded in part by the **Update 2026-10-11 (D76)** section at the end:
 the pending state is now ratified and the feed-frame reading is accepted. The
-passages below that call the decision id a placeholder, or that call the feed
-tier `quality_tier: auto`'s layer, are kept as originally written.*
+passages below that call the decision id a placeholder are kept as originally
+written, as is the *Premise correction*'s pointer to INCLUSION.md §5's
+"comprehensive feed" layer, which §5 at the time mislabelled as
+`quality_tier: auto` (corrected under D75; see the same section).*
 
 ## What is being measured
 
