@@ -146,6 +146,16 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   `quality_tier: auto`; 69% of it is `reviewed`) and §4 (no CI gate
   sample-audits ingest changes) were corrected in place, with two
   `CORRECTIONS.md` rows.
+- **Tamper test runs again (2026-10-12).** When `data/incidents.json` moved past
+  the frame's pinned hash, two tests began to skip. The test that proves
+  `--check` rejects a tampered sample copy now reads the pinned blob
+  (`git show 6da13032:data/incidents.json`) and runs on every CI run, as the
+  reproduction test already did. The default-data test no longer skips. While
+  the working data matches the pin, it asserts reproduction. Once the data has
+  moved, it asserts that `--check` refuses. A new test proves that refusal
+  fires. The gate now also requires the marker's `decided` to be an ISO
+  `YYYY-MM-DD` date on the ratified path, so a `<YYYY-MM-DD>` placeholder no
+  longer passes. No `data/*.json` change.
 
 ### Changed - drift check now covers the README "Latest release" line, version metadata and the HF card template
 
