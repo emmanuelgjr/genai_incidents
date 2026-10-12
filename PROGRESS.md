@@ -40,6 +40,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### 🔍 Precision tamper-test fix + `decided` check: specialist reported `4ac1beb5` (pushed; branch `ws2/v2130-precision-tamper-blob`). **red-reviewer dispatched.**
+- **Tamper test:** it now runs against the pinned blob (6da13032) via `--data`. The untampered copy passes; the tampered copy fails "NOT reproduced: sample.json".
+- **Old :153 test:** replaced by `test_default_check_on_working_data_never_passes_moved_data`, which never skips.
+- **New test:** `test_check_refuses_data_that_moved_past_the_pin`.
+- **`decided` check:** `_is_iso_date` is applied on the ratified path only. The specialist placed it after the UNRATIFIED grace path, so the original placeholder shape keeps its 2.13.x grace. The gate is asked whether that leaves a hole.
+- **Specialist's counts:**
+  - main before: 57 passed, 2 skipped;
+  - after: the precision file gives 71 passed, 0 skipped;
+  - full suite: **949 passed, 1 xfailed, 0 skipped**.
+- **Remaining conditional skip:** fires only when the 6da13032 blob is unavailable AND the data does not match the pin. CI is `fetch-depth: 0`.
+- **Fire proofs FP1-FP5:** tamper detection off, no-op tamper, pin guard off, working-data tamper, `decided` check off. All fire.
+- **Checks:** validate rc 0, "authorised by D76"; drift rc 0.
+- **Foreman [R]:** origin = `4ac1beb5`; 3 files, +104/-16; `_is_iso_date` at validate.py:812, used at :922.
+- **Gate briefed** to run its own fire proofs, including a single-label flip, and to simulate a data move as item 9 will cause.
+
 ### ⛔ D73: **STOPPED, per the brief's stop condition. Goes back to the user as a ruling.** Branch `ws4/v2130-d73-content-fields` @ `6b1f1118` (pushed, no data change). A red-reviewer is assembling the ruling package.
 - **Literal D73 (tuple change only):** the rebuild bumps `updated`, and `last_seen` with it, on **15,657 of 15,666** rows. `added` changes on 0 rows. **The stop condition fired.**
 - **Cause, per the engineer:** `_apply_history` snapshots each entry at step 5. That is BEFORE `tier` is derived (6g) and before `quality_tier`/`corpus` are assigned, so every rebuild would bump, not only the first.
