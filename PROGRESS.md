@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D81-D82, USER RULINGS 2026-10-12 (D73 package)
+- **D81: the variant, all 4 fields + the step-5 reorder (Recommended).** tier, quality_tier, corpus and content_license go into `_CONTENT_FIELDS`, and quality_tier/corpus/tier are assigned before `_apply_history`.
+  - **This knowingly reverses the WS0-T3 link-1 gate ruling (2026-07-27)** that kept content_license out.
+  - Licence relabels and classifier changes will now move `updated`, STIX `modified` and the MISP timestamp on every affected row.
+- **D82: accept the freeze widening (Recommended).** The D71 stage-1 freeze also holds tier/quality_tier/corpus changes on published OECD/AIID rows until stage 2. Declared in the CHANGELOG and release notes.
+- **Routed to the same pipeline-engineer before merge:**
+  - gate advisory 1 (MUST): correct DATA_DICTIONARY.md:240 and VERSIONING.md:418-419 in place;
+  - advisory 2: the 6g comment;
+  - advisory 3: rewrite the CHANGELOG, user-ruled, with the bump semantics and counts;
+  - a dated supersession note on the WS0-T3 marker-shape spec §4.2 (agreement 4);
+  - merge origin/main in; delta, suite, validate and drift.
+- Then a scoped re-check by the D73 gate.
+
 ### 📦 D73 RULING PACKAGE: red-reviewer **PASS on `6b1f1118`** as "technically sound to merge IF the user picks it". No defects. Going to the user.
 **Verdict, in the gate's words:** "VERDICT: PASS. PASS here means the variant at `6b1f1118` is technically sound to merge if the user chooses it. It does not recommend a ruling. One condition comes with it (advisory 1): two live docs become false the moment it merges."
 
