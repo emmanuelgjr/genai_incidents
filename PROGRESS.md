@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9 step 1: correction committed `45718736` (pushed). **Scoped re-check sent to the same raw-text reviewer.**
+- **Correction section** "## Correction 2026-10-12 (raw-text gate)": §1 names, §2 version/title, §3 licence and descriptions, §4 repo coverage, §5 T&M, §6 implementation consequence, §7 user questions. The original text is preserved, with a do-not-regenerate marker and SUPERSEDED pointers (agreement 4).
+- **The auditor's recommendations for the user:**
+  - (a) keep the "&" name form, so no name changes;
+  - (b) adopt the official title as the framework display name;
+  - (c) add a SOURCE_LICENSES row + NOTICE-DATA + dep5 for the OWASP codes and names (CC BY-SA 4.0);
+  - (d) `url` → the Top 10, with a separate T&M reference; also decide whether the missing licence row for the 21 OWASP-GENAI-* rows is in scope.
+- **Foreman [R]:** the diff vs b4e6c4a7 is **+88/-0**, and no original line was removed. Marker at :5; Correction at :112. ls-remote = `45718736`.
+
 ### 🔁 Item 9 step 1: **BOUNCE #1 on the source record `b4e6c4a7` (red-reviewer raw-text check, 2026-10-12)**. Sent back to the same license-auditor for a dated correction section (agreement 4).
 **Verdict, in the gate's words:** "VERDICT: BOUNCE. Item 9 ASI source record b4e6c4a7: the two renames it proposes are wrong against the PDF. Do not implement the renames."
 
