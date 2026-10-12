@@ -63,6 +63,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 📦 v2.13.0 CUT PACKAGE: `docs/audits/v2.13.0-cut-package-2026-10-12.md` (`915693e6` + §4R `1a088732`)
+- **The package contains:**
+  - the item status table, 9/9 merged;
+  - the headline counts. The docs-warden derived them; the **foreman re-derived all [R] by its own route, and all match**: 15,666 rows / 15,637 / 29 retracted / 22 disputed / 1,915 landmark / 13,722 feed / taxonomy versions;
+  - the docs-warden's 18 findings (10 Med, 8 Low, 0 High);
+  - §4R, the inaccurate public claims at their precise current state;
+  - the release-notes obligations.
+- **Foreman correction found while writing §4R:**
+  - NOTICE-DATA:273 and dep5:70, "3,667 of 3,829", are about the OECD **title**, not the description.
+  - The current figure is **3,937 of 4,104** OECD-AIM-sourced rows, matching the item 7 memo's R3. The warden's row 3 had the right numbers, attached to the wrong field description.
+
+### ⚖ D89-D90, USER RULINGS 2026-10-12 (cut-package questions)
+- **D89, licence metadata: keep the single CC-BY-4.0 value, plus an exception note (Recommended).** The note goes in the README licensing list, the site strip, the Zenodo description and the CITATION abstract, pointing to NOTICE-DATA and the OWASP ASI carve-out.
+- **D90, short forms: fix the prose and exempt the UI (Recommended).**
+  - The bare "OWASP LLM/ASI" is rewritten with the official names: the served TAXII description, README:150 and the export_stix docstring. The guard learns the bare form.
+  - The short "OWASP ASI" UI and column labels stay.
+- **The "announcement claims" deliverable.** The user's answer was "Tweak to actual and more precise state", so §4 was superseded by §4R the same day. **The user did not name a specific announcement text;** §4R is the deliverable.
+
+### ▶ v2.13.0 cut-docs fixes dispatched (wave 1, parallel, one branch per owner off main 1a088732)
+- **The plan:** the foreman merges each branch into an integration branch, then ONE red-reviewer gate. Wave 2 (WS2: paper:96 + the guard learning the bare form + the taxonomy-card assertion) follows wave 1, so the guard isn't red on unfixed text.
+- **Wave 1 owners:**
+  - **WS0** license-auditor (worktree `ws0-v2130-cut-docs`, foreman commits): C1 README/site note (D89), C2, C3, C11.
+  - **WS6** distribution-engineer: C1 Zenodo/CITATION note (D89), C8 HF template, C9 (D90), N3.
+  - **WS3** schema-architect: C4, C5, C6, N4, warden #14 DATA_DICTIONARY rows.
+  - **WS4** pipeline-engineer: N1, N2.
+  - **WS5** governance-scribe (no Bash; foreman commits): C8 prose, N5, N6.
+- **C10, the README:144 rewrite,** is done AT the cut.
+
 ### ✅ Item 9 (OWASP ASI 2026 edition): **DONE. Re-gate PASS on `073b2c39`; MERGED to main 2026-10-12 as `4284b127` (`--no-ff`). v2.13.0 QUEUE 9/9 MERGED.**
 **Verdict, in the gate's words:** "VERDICT: PASS. Item 9 at 073b2c39 closes bounce #1 (all 3 defects), and D87/D88 are applied. DEFECTS: none."
 
