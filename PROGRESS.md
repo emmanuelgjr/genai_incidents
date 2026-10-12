@@ -63,6 +63,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 v2.13.0 cut, step 1: notes drafted `d565c22a` on `release/v2.13.0-notes` (pushed; 1 file, +524). The notes gate waits for the cut-docs merge.
+- **Content:** a "Read this first: behaviour changes" section (5 load_deprecations keys in a table; the D81 semantics; core `status` +440 B; new values), the licence exception (D89), 4 headlines, "also in this release", known limitations, and a Verification block. Absolute links only; link hygiene clean.
+- **Drafter's measurements:**
+  - counts 15,637 / 29 / 15,666 / 22 / 1,915;
+  - 5 deprecation keys;
+  - 3,936 gained oecd-aim;
+  - `updated` moved on 5,860 rows vs v2.12.0 (5,841 ATLAS + 22 disputed, 3 overlapping);
+  - id_deprecations 1,060 → 1,084, with the old records a byte prefix;
+  - STIX 65,141 objects; MISP 31 events; SHA256SUMS 35/8/35;
+  - pytest 997 passed, 1 xfailed.
+  - It lists the trusted figures explicitly.
+- **Refuted by the drafter: "21 OWASP-GENAI-* rows".** Foreman [R]: **18 distinct ids in 3 rows**; the ingest has the same 18. The figure came from SOURCE_LICENSES.md:320 (a live surface) and was carried onto the board and into the cut package unmeasured. The cut package gains a dated §7 correction. **NOTE → WS0:** fix SOURCE_LICENSES:320 in place.
+- **Other drafter flags:**
+  - "minor release" is its own call;
+  - the notes assume the item 9 CORRECTIONS row lands with cut-docs;
+  - re-run the Verification block after cut-docs merges.
+  - The "last_seen on OECD/AIID rows" freeze indicator is unusable, because the ATLAS rebuild bumped last_seen. It was left out of the notes.
+
 ### ▶ v2.13.0 CUT STARTED (user: "keep going", the standing go-ahead incl. publish steps): VERSIONING step 1 dispatched
 - **distribution-engineer** is drafting `docs/releases/v2.13.0.md` on `release/v2.13.0-notes`. It changes no version strings: step 1 only, and the notes are gated before any bump.
   - Scope: cut-package §1/§2/§4R/§5.
