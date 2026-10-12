@@ -63,6 +63,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔧 Foreman self-correction (2026-10-12): a NUL byte in PROGRESS.md, and item 6 confirmed delivered
+- **The NUL byte was the foreman's own.** It was introduced in board commit `101d92bf`, in the entry recording the engineer's NUL-byte slip. A Python escape in the foreman's heredoc wrote a literal NUL where the text meant the four characters backslash-x-0-0. That is the exact failure being recorded.
+  - It made `grep` treat PROGRESS.md as binary from that commit on.
+  - It was found while grepping for D57.
+  - It is now replaced with the literal text. PROGRESS.md NUL count = 0.
+- **Item 6 (AIRI option A, D57) is DELIVERED:**
+  - the schema branch (D61 + D57: `hold {D57, until 2027-01-07}`, rows `source_freshness.review_by`), merged;
+  - item 8 (STIX `x_source_freshness` on 1,382 SDOs, MISP freshness tags, the HF card line), merged as b8c2c6c2.
+  - The queue count is **8/9** (items 1-8); item 9 is in progress.
+  - Still open from item 6: the D63 overdue-review alert (WS4 note).
+
 ### ⚖ D83-D85, USER RULINGS 2026-10-12 (item 9 open points)
 - **D83, D80 scope: JSON carve-out + NOTICE (Recommended).** Only mappings/owasp_asi_top10.json gets the CC BY-SA 4.0 dep5 stanza. The NOTICE-DATA attribution covers the names wherever they are reproduced: render_markdown.py, app.js, TAXONOMIES.md, INCIDENTS.md.
 - **D84, licence text: add LICENSES/CC-BY-SA-4.0.txt (Recommended),** the canonical SPDX text, in the item 9 branch. The other dep5 identifiers are not touched.
