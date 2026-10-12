@@ -99,12 +99,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   shape owner's recommendation that kept `content_license` out of the content set; the
   affected docs are corrected in place and the WS0-T3 spec carries a dated supersession note.
 - **Build order.** `tier`, `quality_tier` and `corpus` are now derived before the `updated`
-  comparison instead of after it. Without that, the first rebuild would have bumped
-  `updated` on 15,657 of 15,666 rows. With it, the first rebuild moved 0 rows (no `updated`,
+  comparison instead of after it. Without that, every rebuild on a new calendar day would
+  have bumped `updated` on 15,657 rows (all except the 9 retained priors); the D73 gate
+  measured this on two simulated new days (2026-10-13 and 2026-10-20). With it, the first rebuild moved 0 rows (no `updated`,
   `added` or other field moves, measured against origin/main).
 - **Freeze widening (D82).** The D71 stage-1 OECD/AIID freeze now also holds `tier`,
-  `quality_tier` and `corpus` changes on published OECD/AIID rows, because they are content
-  fields and the freeze gates any content change on those rows.
+  `quality_tier`, `corpus` and `content_license` changes on published OECD/AIID rows, because
+  they are content fields and the freeze gates any content change on those rows. No OECD/AIID
+  row carries `content_license` today (0 of the non-retracted OECD/AIID rows; the field is
+  populated on 3,767 rows, none of them OECD/AIID), so this holds nothing yet.
 
 ### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
 
