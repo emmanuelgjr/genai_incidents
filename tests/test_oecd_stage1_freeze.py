@@ -287,7 +287,7 @@ def scratch(tmp_path_factory):
          # committed id_deprecations.json (it would drop the ruled records).
          "docs/audits/ID-silent-ids-appends-2026-10-09.json",
          "docs/audits/ID-group-ids-appends-2026-10-10.json"],
-        cwd=ROOT, check=True, capture_output=True).stdout.decode("utf-8").split(" ")
+        cwd=ROOT, check=True, capture_output=True).stdout.decode("utf-8").split("\x00")
     for rel in filter(None, tracked):
         src = ROOT / rel
         if src.is_file():
