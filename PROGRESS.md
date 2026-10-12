@@ -63,6 +63,40 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9 (OWASP ASI 2026): specialist reported `22172d59` (pushed). It is now merging main (D73) in; the gate follows.
+- **Scope:** 30 files, +1064/-44, no deletions. The record file was brought in from 17995bc2.
+- **Field-level delta, per the specialist:**
+  - incidents.json: **0 entries changed; 0 `updated` moves**; top-level unchanged. The delta tool was proven to fire on a planted corruption.
+  - Independent check: a full rebuild left data/*.json byte-identical.
+  - stats.json: 1 leaf (`taxonomy_versions.owasp_asi` 2025→2026). taxonomy_versions.json: 1 leaf.
+  - Mapping file: framework, version and url changed, plus added `citation.*` and `related.*`; no `entries.*` leaf changed.
+  - Exports: STIX `x_taxonomy_versions` only; MISP 62 version tags; HF card 2 lines; jsonl identical.
+- **Brief/record corrections (the specialist refuted the foreman's brief, via the record):**
+  - C2.6's "17 files" list has 16; it is 27 lines in 16 files. The gate's 17 counted CHANGELOG.
+  - A **line-wrapped** occurrence at docs/_config.yml:4-5 was missed by exact grep; now fixed.
+  - Prose variants fixed: index.html:37,45; TAXONOMIES:3; DATA_DICTIONARY:45.
+- **Left for a USER RULING** (each has a data, owner or layout consequence):
+  - schema/incident.schema.json and its src copy, 2 each (schema-architect's file);
+  - merge_and_dedupe.py:3215, which moves the top-level `description` of incidents.json;
+  - render_markdown.py:425, which rewrites 13,586 per-incident lines in docs/incidents/*.md;
+  - make_og_image.py:91 and banner SVGs (fixed-width text);
+  - paper:20 and a superpowers plan:142.
+  - The new guard pins their counts.
+- **Judgement calls:**
+  - the HF card keeps "(ASI)", the same shape as README:167, beyond D85's three files;
+  - the dep5 carve-out is `CC-BY-SA-4.0 AND CC-BY-4.0` (BY-SA for codes and names, BY for our descriptions); `reuse spdx` resolves it for this file only;
+  - the taxonomy-map card uses the bare name because of the layout;
+  - the NOTICE-DATA:27 "three upstream sources" intro is left for docs-warden.
+- **Fire proof:** before the change, validate and drift caught only a stale stats.json (P4 of 8). The new guard `tests/test_owasp_asi_naming.py` catches all 8 plants, including the line-wrapped name and the T&M mis-citation.
+- **Checks:** pytest 961 passed, 1 xfailed; validate, drift and lint rc 0.
+- **D84:** LICENSES/CC-BY-SA-4.0.txt is a byte copy of the reuse 6.2.0 wheel's own `LICENSES/CC-BY-SA-4.0.txt`, with the hash matching the wheel RECORD; sha256 7abe19ec...c297, 20,131 B. **Not compared online to spdx.org.**
+- **Harness note:** the subagent output tripped a "settings-json" instruction-shaped pattern. The only match is a factual mention that `.claude/settings.local.json` was already gitignored. Benign; nothing was requested.
+- **Foreman [R]:**
+  - origin = 22172d59; 30 files; no deletions;
+  - `.claude/settings.local.json` is NOT tracked on the branch;
+  - the LICENSES file sha256 = 7abe19ec9bb7...c297, matching the report;
+  - merge-tree vs main 0afe52ec: CONFLICT in CHANGELOG.md only.
+
 ### ✅ D73 (as ruled D81/D82): **DONE. Re-check PASS on `916159c7`; MERGED to main 2026-10-12 as `25a0dd36` (`--no-ff`)**
 **Verdict, in the gate's words:** "VERDICT: PASS. 916159c7 is sound to merge under D81/D82. DEFECTS: none."
 
