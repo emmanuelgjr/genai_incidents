@@ -8,7 +8,7 @@ atl=e['mitre_atlas']; pri=['AML.T0051.001','AML.T0057','AML.T0024']; atl_s=pri+[
 nist=e['nist_ai_rmf']; npri=['MEASURE-2.7','MAP-3.5','MANAGE-2.3']; nist_s=npri+[a for a in nist if a not in npri]
 mae=' · '.join(f"{m['layer']} {m['label']} ({m['role']})" for m in e['maestro_layers'])
 T=[('OWASP LLM Top 10 (2026)','core',codes(e['owasp_llm'],6)),
-   ('OWASP Agentic Top 10 (ASI)','core',codes(e['owasp_asi'],7)),
+   ('OWASP Top 10 for Agentic Applications','core',codes(e['owasp_asi'],7)),
    ('NIST AI RMF (AI 100-1)','core',codes(nist_s,3)),
    ('MITRE ATLAS','core',codes(atl_s,3)),
    ('MAESTRO layers','companion',mae),
@@ -51,6 +51,6 @@ def tax(dark):
         if x+w>cx+cw-14: x=cx+22; yy+=34
         o.append(f'<rect x="{x:.0f}" y="{yy}" width="{w:.0f}" height="26" rx="13" fill="{c["bg"]}" stroke="{c["bd"]}"/><text x="{x+w/2:.0f}" y="{yy+17}" text-anchor="middle" font-size="12" font-weight="600" fill="{c["fg"]}">{t}</text>')
         x+=w+8
-    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Taxonomy map: incident INC-00924 (EchoLeak) mapped onto OWASP LLM Top 10 2026, OWASP Agentic Top 10, NIST AI RMF, MITRE ATLAS (core), MAESTRO (companion) and a VERIS crosswalk (experimental)" {F}>'+''.join(o)+'</svg>\n'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Taxonomy map: incident INC-00924 (EchoLeak) mapped onto OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS (core), MAESTRO (companion) and a VERIS crosswalk (experimental)" {F}>'+''.join(o)+'</svg>\n'
 for n,dk in [('taxonomy-map-dark.svg',True),('taxonomy-map-light.svg',False)]:
     open('docs/assets/readme/'+n,'w',encoding='utf-8',newline='\n').write(tax(dk))

@@ -164,7 +164,7 @@ Full field reference: [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 | Taxonomy | Codes | Status |
 |---|---|---|
 | **OWASP Top 10 for LLM Applications (2026)** | `LLM01`–`LLM10` | core |
-| **OWASP Agentic Top 10 (ASI)** | `ASI01`–`ASI10` | core |
+| **OWASP Top 10 for Agentic Applications (ASI)** | `ASI01`–`ASI10` | core |
 | **NIST AI Risk Management Framework (AI 100-1)** | `GOVERN` / `MAP` / `MEASURE` / `MANAGE` subcategories | core |
 | **MITRE ATLAS** | tactics (`AML.TA00xx`) and techniques (`AML.T00xx`) | core |
 | **MAESTRO** architectural layers | `L1`–`L7` | companion — carried on entries whose upstream source already provides a MAESTRO mapping; not populated on every entry |
@@ -364,7 +364,8 @@ Always run `scripts/validate.py` before committing.
 The mapping files in `mappings/` document the controlled vocabulary used in this dataset. They are derived from the original sources:
 
 - OWASP LLM Top 10 (2026): <https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/>
-- OWASP Agentic Top 10 (ASI / "Agentic AI – Threats and Mitigations"): <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>
+- OWASP Top 10 for Agentic Applications ("OWASP Top 10 For Agentic Applications 2026", Version 2026 / December 2025; the `ASI01`–`ASI10` codes): <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>
+- OWASP "Agentic AI – Threats and Mitigations" v1.1 (December 2025), the separate foundational taxonomy the Top 10 relies upon: <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>
 - NIST AI Risk Management Framework (AI 100-1): <https://www.nist.gov/itl/ai-risk-management-framework>
 - NIST AI 600-1 Generative AI Profile: <https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf>
 - MITRE ATLAS: <https://atlas.mitre.org/>

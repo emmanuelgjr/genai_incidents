@@ -1,11 +1,11 @@
 """scripts/taxonomy_versions.py -- the single derivation of ``taxonomy_versions``.
 
 One dict, derived ONLY from the pinned mapping files under ``mappings/`` (never
-a literal in an exporter), so a re-pin of any taxonomy (e.g. the queued OWASP
+a literal in an exporter), so a re-pin of any taxonomy (e.g. the v2.13.0 OWASP
 ASI 2026 re-pin) flows into stats.json, the STIX bundle, the MISP manifest, the
 Hugging Face card and the pip package without touching any of them.
 
-    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2025",
+    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
      "capec": null, "veris": "1.4.1"}
 
 Sources:

@@ -89,6 +89,21 @@ Comment: This dataset aggregates entries from many upstream sources, each
  third-party material that an AVID record summarises. See
  docs/SOURCE_LICENSES.md sections 6.1 and 6.2.
 
+Files: mappings/owasp_asi_top10.json
+Copyright: OWASP Gen AI Security Project (risk codes and names)
+ 2026 Emmanuel G. Jr. and contributors (descriptions and file structure)
+License: CC-BY-SA-4.0 AND CC-BY-4.0
+Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
+ (this stanza must stay AFTER it: in dep5 the last matching stanza wins).
+ The risk codes ASI01-ASI10 and the ten risk names are from "OWASP Top 10
+ For Agentic Applications 2026" (Version 2026 / December 2025), OWASP Gen
+ AI Security Project - Agentic Security Initiative,
+ https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/,
+ and are licensed CC BY-SA 4.0 (decision D80). The ten descriptions are
+ this project's own paraphrase, not OWASP text, and stay CC BY 4.0. See
+ NOTICE-DATA and docs/SOURCE_LICENSES.md section 3.6, and
+ docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md.
+
 Files: docs/*
 Copyright: 2026 Emmanuel G. Jr. and contributors
 License: CC-BY-4.0

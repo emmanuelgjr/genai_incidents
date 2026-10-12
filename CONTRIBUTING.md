@@ -11,7 +11,7 @@ No exceptions. If you can't link to a public advisory, vendor post, news article
 Map each entry to the four core per-incident taxonomy fields below, **where appropriate**. MAESTRO and VERIS are not contributor-set: MAESTRO is inherited only from certain upstream sources, and VERIS is computed automatically at export time — see TAXONOMIES.md. If an incident is purely a generic CVE in an LLM-adjacent component with no agentic dimension, leave `owasp_asi` empty rather than guessing.
 
 - `owasp_llm`: OWASP Top 10 for LLM Applications 2026 — `LLM01`–`LLM10`
-- `owasp_asi`: OWASP Agentic Top 10 — `ASI01`–`ASI10`
+- `owasp_asi`: OWASP Top 10 for Agentic Applications — `ASI01`–`ASI10`
 - `nist_ai_rmf`: AI 100-1 subcategory codes (`GOVERN-1.1`, `MEASURE-2.7`, etc.) — pick the most relevant 1–4
 - `mitre_atlas`: ATLAS technique IDs (`AML.T0051`, including subtechniques like `AML.T0051.001`)
 

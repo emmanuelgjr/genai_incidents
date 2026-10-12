@@ -7,7 +7,7 @@ Following *Datasheets for Datasets* (Gebru et al.). For per-field definitions se
 ## Motivation
 A consolidated, machine-readable index of GenAI and agentic-AI security
 incidents, normalized and mapped to four core taxonomies (OWASP LLM Top 10,
-OWASP Agentic Top 10 (ASI), NIST AI RMF, MITRE ATLAS), plus a companion
+OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS), plus a companion
 MAESTRO architectural-layer mapping and an experimental VERIS 1.4.1
 crosswalk — so developers, AppSec/threat-intel teams, and researchers can
 query, pivot, and cite incidents instead of re-scraping scattered trackers.

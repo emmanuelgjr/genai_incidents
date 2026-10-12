@@ -1,7 +1,20 @@
 {
-  "framework": "OWASP Agentic Top 10 (ASI)",
-  "version": "2025",
-  "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+  "framework": "OWASP Top 10 for Agentic Applications",
+  "version": "2026",
+  "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+  "citation": {
+    "title": "OWASP Top 10 For Agentic Applications 2026",
+    "edition": "Version 2026 / December 2025",
+    "publisher": "OWASP Gen AI Security Project - Agentic Security Initiative",
+    "license": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/legalcode)",
+    "reproduced": "The codes ASI01-ASI10 and the ten risk names are reproduced from OWASP. Every description is this project's own paraphrase, not OWASP text (docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md, Correction 2, C2.3)."
+  },
+  "related": {
+    "title": "Agentic AI - Threats and Mitigations",
+    "version": "1.1 (December 2025)",
+    "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+    "relation": "The foundational OWASP taxonomy (T-codes) that the Top 10 maps to and relies upon. It is a separate document: the ASI01-ASI10 codes belong to the Top 10, not to Threats and Mitigations."
+  },
   "entries": {
     "ASI01": {
       "name": "Agent Goal Hijack",

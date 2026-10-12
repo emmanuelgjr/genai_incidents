@@ -605,7 +605,7 @@ def render():
     )
     lines.append(
         "Every applicable entry is mapped to four core taxonomies — **OWASP LLM Top 10 (2026)**, "
-        "**OWASP Agentic Top 10 (ASI)**, **NIST AI RMF**, and **MITRE ATLAS** — plus a companion "
+        "**OWASP Top 10 for Agentic Applications**, **NIST AI RMF**, and **MITRE ATLAS** — plus a companion "
         "**MAESTRO** mapping where the source provides it and an experimental **VERIS 1.4.1** "
         "crosswalk computed at export time. See docs/TAXONOMIES.md for the full picture."
     )
@@ -672,7 +672,7 @@ def render():
         CHART_DIR / "owasp_llm.svg",
     )
     render_owasp_bar_chart(
-        asi_counts, asi_names, "OWASP Agentic Top 10 (ASI) — incident coverage",
+        asi_counts, asi_names, "OWASP Top 10 for Agentic Applications — incident coverage",
         CHART_DIR / "owasp_asi.svg",
     )
 
@@ -722,7 +722,7 @@ def render():
         lines.append(f"| {code} | {name} | {llm_counts.get(code,0):,} |")
     lines.append("")
 
-    lines.append("### OWASP Agentic Top 10 (ASI)")
+    lines.append("### OWASP Top 10 for Agentic Applications (ASI)")
     lines.append("")
     lines.append("| Code | Name | Count |")
     lines.append("|---|---|---:|")

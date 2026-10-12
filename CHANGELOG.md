@@ -7,6 +7,50 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - OWASP ASI re-pinned to the 2026 Top 10 for Agentic Applications; citation fixed; OWASP attribution added (v2.13.0 item 9, D78-D80, D83-D85)
+
+- **Metadata relabel only: 0 entries change.** The codes `ASI01`-`ASI10`, their order, all
+  ten risk names (D78 keeps the "&" form of ASI02/ASI03) and all ten descriptions are
+  unchanged, so per-entry `owasp_asi` (and STIX `x_owasp_asi`) values are untouched:
+  0 of 15,666 entries in `data/incidents.json` differ from the previous build, field by
+  field, keyed by id; `updated` moves on 0 rows. Evidence:
+  `docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md` (Correction 2 governs).
+- **`mappings/owasp_asi_top10.json`:** `framework` "OWASP Agentic Top 10 (ASI)" ->
+  "OWASP Top 10 for Agentic Applications" (D79); `version` "2025" -> "2026" (the PDF
+  cover states "Version 2026 / December 2025"); `url` now points to the 2026 Top 10
+  (<https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>)
+  instead of the separate "Agentic AI - Threats and Mitigations" document, which it
+  mis-cited. New keys: `citation` (cover title "OWASP Top 10 For Agentic Applications
+  2026", edition, publisher, licence) and `related` (Threats and Mitigations v1.1,
+  December 2025, cited separately).
+- **`taxonomy_versions.owasp_asi` is now "2026"** in `data/stats.json`, the package's
+  `taxonomy_versions()`, the STIX identity's `x_taxonomy_versions`, the MISP
+  `genai-incidents:taxonomy-owasp-asi` tag and the Hugging Face card. **Consumer
+  impact:** anything that keys on `owasp_asi == "2025"` must accept "2026". No exported
+  code or name changes.
+- **Display name:** "OWASP Top 10 for Agentic Applications" on the live surfaces
+  (`INCIDENTS.md`, README, `docs/TAXONOMIES.md`, `docs/DATASHEET.md`,
+  `docs/DATA_DICTIONARY.md`, `CONTRIBUTING.md`, the site, `.zenodo.json`,
+  `CITATION.cff`, `pyproject.toml`, the HF card, the coverage chart and the README
+  taxonomy map). Headings that introduce the codes keep "(ASI)" (D85). Four
+  Threats-and-Mitigations mis-citations for the ASI codes are corrected (the mapping
+  `url`, README, `docs/TAXONOMIES.md`, the site subtitle link); T&M is now cited
+  separately. Some older variants of the name ("OWASP Agentic (ASI)", "OWASP Agentic
+  ASI Top 10") remain in the schema, the `data/incidents.json` description, the
+  per-incident pages, the banner and the social image, pending a ruling.
+- **Attribution (D80, D83, D84):** OWASP's CC BY-SA 4.0 licence is verified from the
+  PDF. New `docs/SOURCE_LICENSES.md` section 3.6; an OWASP attribution paragraph in
+  `NOTICE-DATA` that covers the codes and names wherever they are reproduced; a
+  `.reuse/dep5` carve-out for `mappings/owasp_asi_top10.json` (CC BY-SA 4.0 for the codes
+  and names, CC BY 4.0 for the project's own descriptions); `LICENSES/CC-BY-SA-4.0.txt`.
+  The 21 `OWASP-GENAI-*` rows of `ingest/avid_owasp_incidents.json` are a different
+  upstream and stay OPEN.
+- **New guard** `tests/test_owasp_asi_naming.py`. Before it, `validate.py` and
+  `check_stats_drift.py` caught a stale `owasp_asi` only in `data/stats.json`. The guard
+  fails on the retired name, unlisted name variants, an `owasp_asi` version literal or
+  title edition that disagrees with the pin, a T&M URL cited for the ASI codes, and a
+  missing "(ASI)" heading. Planted-input tests prove each rule fires.
+
 ### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
 
 - Agent-suggested; held for the user's merge ruling (the data change is user-visible

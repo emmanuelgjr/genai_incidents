@@ -302,6 +302,33 @@ fields into our schema).
 | Action | **(a) compatible.** No change required. |
 | Date-checked | 2026-07-15 |
 
+### 3.6 OWASP Top 10 for Agentic Applications (OWASP Gen AI Security Project) — added 2026-10-12 (v2.13.0 item 9, D80)
+*Used by:* `mappings/owasp_asi_top10.json` (the controlled vocabulary for the
+per-entry `owasp_asi` field). Not ingested by any script: no incident records
+come from this source. The material used is the ten codes `ASI01`–`ASI10` and
+the ten risk names, reproduced in the mapping file and wherever the names are
+displayed (`scripts/render_markdown.py` → `INCIDENTS.md`, `docs/app.js`,
+`docs/TAXONOMIES.md`). Publication: "OWASP Top 10 For Agentic Applications 2026"
+(PDF cover title), OWASP Gen AI Security Project - Agentic Security Initiative,
+Version 2026 / December 2025,
+<https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/>.
+Evidence: `docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md`
+(Correction 2 governs). The separate OWASP "Agentic AI - Threats and
+Mitigations" document (v1.1, December 2025) is not a source of any text in
+this repository (record C2.3: our descriptions share no 5-gram with either
+edition, and a side-by-side read found own paraphrase). This row does **not**
+cover the 21 `OWASP-GENAI-*` incident rows in `ingest/avid_owasp_incidents.json`
+(a different upstream; still OPEN, see §6.1).
+
+| Field | Value |
+|---|---|
+| License | **CC BY-SA 4.0, VERIFIED from the PDF itself** (physical p.2, printed "Page 1"): *"This document is licensed under Creative Commons, CC BY-SA 4.0"*, with the ShareAlike clause and a link to <https://creativecommons.org/licenses/by-sa/4.0/legalcode>. Source kind: text extracted from the PDF by two independent tools (pdftotext 4.06, pypdf 6.14.2) at the red-reviewer gate on 2026-10-12 (record C2.1; gate testimony, not re-fetched by the implementer). The PDF's own "Attribution Guidelines" bullet names a different OWASP document (an apparent upstream copy-paste error); that string is deliberately not reproduced here. |
+| Scrape-permitted | N/A — no automated fetch; the codes and names are transcribed into a hand-maintained mapping file. |
+| Redistribute-verbatim | **Codes and names only, with attribution.** The ten codes and risk names are reproduced verbatim (each name is attested verbatim by the PDF in at least one official form; record Correction §1 and D78). No OWASP prose is reproduced: all ten `description` strings are this project's own paraphrase (record C2.3, side-by-side read against the Top 10 and both T&M editions, with a 5-gram check as supporting evidence only, per C2.2). |
+| Relicense-compatible | **NO** for any OWASP prose (share-alike conflicts with the CC-BY-4.0 data grant; none is carried). The codes and names are carried under OWASP's own CC BY-SA 4.0 grant via a file-level carve-out (`.reuse/dep5` stanza for `mappings/owasp_asi_top10.json`, D80), not folded into the CC-BY-4.0 grant. Whether short risk names are copyrightable at all was not decided; the attribution and carve-out apply either way (D80). |
+| Action | **(b) share-alike, honored by carve-out + attribution (D80, D83).** Attribution line in `NOTICE-DATA` (covering the names wherever reproduced); carve-out stanza in `.reuse/dep5`; licence text at `LICENSES/CC-BY-SA-4.0.txt` (D84). |
+| Date-checked | 2026-10-12 (PDF licence page and cover, raw-text gate; record Correction 2) |
+
 ---
 
 ## 4. Academic red-team benchmarks (hand-curated citations)

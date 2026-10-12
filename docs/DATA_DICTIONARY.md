@@ -42,7 +42,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 | Field | Type | Notes |
 |---|---|---|
 | `owasp_llm` | enum[] | OWASP Top 10 for LLM Apps 2026 — `LLM01`–`LLM10`. Codes were renumbered from the 2025 edition on 2026-08-17; see [TAXONOMIES.md](TAXONOMIES.md#owasp-top-10-for-llm-applications-2026) for the crosswalk. |
-| `owasp_asi` | enum[] | OWASP Agentic (ASI) Top 10 — `ASI01`–`ASI10`. |
+| `owasp_asi` | enum[] | OWASP Top 10 for Agentic Applications — `ASI01`–`ASI10`. |
 | `owasp_dsgai` | string[] | OWASP Data Security for GenAI codes (`DSGAInn`, companion). |
 | `nist_ai_rmf` | string[] | NIST AI RMF subcategories, e.g. `MEASURE-2.7`, `MAP-3.5`. |
 | `mitre_atlas` | string[] | MITRE ATLAS technique ids, e.g. `AML.T0051`, `AML.T0048.003`. |

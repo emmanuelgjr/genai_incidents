@@ -66,7 +66,7 @@ taxonomies. Dataset version `{version}`.
 Every applicable incident is tagged with four core taxonomies:
 
 - **OWASP Top 10 for LLM Applications (2026)** — `LLM01`–`LLM10`
-- **OWASP Agentic Top 10 (ASI)** — `ASI01`–`ASI10`
+- **OWASP Top 10 for Agentic Applications (ASI)** — `ASI01`–`ASI10`
 - **NIST AI RMF (AI 100-1)** — `GOVERN` / `MAP` / `MEASURE` / `MANAGE`
 - **MITRE ATLAS** — techniques (`AML.T00xx`) and tactics (`AML.TA00xx`)
 

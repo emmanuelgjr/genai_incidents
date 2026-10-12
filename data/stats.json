@@ -10,7 +10,7 @@
   "taxonomy_versions": {
     "atlas": "2026.09",
     "owasp_llm": "2026",
-    "owasp_asi": "2025",
+    "owasp_asi": "2026",
     "capec": null,
     "veris": "1.4.1"
   }
