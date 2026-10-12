@@ -244,7 +244,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   unmeasured. Under ruling D75, `INCLUSION.md` §5 (the feed is not
   `quality_tier: auto`; 69% of it is `reviewed`) and §4 (no CI gate
   sample-audits ingest changes) were corrected in place, with two
-  `CORRECTIONS.md` rows.
+  `CORRECTIONS.md` rows. In the same commit, §6's "admitting at `auto` tier"
+  became "admitting at `quality_tier: auto`" (a meaning-preserving wording
+  edit, so no `CORRECTIONS.md` row).
 - **Tamper test runs again (2026-10-12).** When `data/incidents.json` moved past
   the frame's pinned hash, two tests began to skip. The test that proves
   `--check` rejects a tampered sample copy now reads the pinned blob
