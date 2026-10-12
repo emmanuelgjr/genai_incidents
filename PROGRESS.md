@@ -63,6 +63,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Item 9 step 1: source record **CLOSED per D77** (verbatim append + foreman string check), `17995bc2` on `ws0/v2130-item9-asi-source` (pushed)
+- **T&M comparison by the raw-text reviewer, in its words:** "VERDICT (T&M comparison): OWN PARAPHRASE, all 10 entries. I checked both editions, v1.0 (February 2025) and v1.1 (December 2025). No entry is near-verbatim, so D80's premise stands."
+  - Method: 0 shared 5-grams in both editions; longest shared run 4 words; controls verbatim 15/15 and paraphrase 0/19; a side-by-side read with the closest T-code quoted per entry.
+  - Both editions are CC BY-SA 4.0 (physical p.2).
+  - v1.1 replaced v1.0 in place at the same download URL; v1.0 came from Wayback 20250730004544.
+- **The append was done by the foreman, mechanically.** The gate's block was saved as received to a scratchpad file and appended with `cat >>`, with no retyping. So D77's "license-auditor appends" became a foreman shell append; the content is the gate's.
+- **Foreman [R] string check:**
+  - all **10/10** of the gate's grep strings occur exactly once;
+  - the diff is +115/-0;
+  - the block's only non-ASCII character is U+00A7 SECTION SIGN (×9), which is in the gate's own text. No curly quotes or dashes.
+- **Gate advisories, needing user rulings before the item 9 implementation dispatch:**
+  - (1) **D80 scope:** the same 10 OWASP names also sit in render_markdown.py (MIT), app.js and TAXONOMIES.md (CC-BY-4.0) and INCIDENTS.md (CC-BY-4.0). Carve out those too, or does NOTICE-DATA attribution suffice?
+  - (2) **The repo has no LICENSES/ directory,** so a CC-BY-SA-4.0 dep5 stanza fails `reuse lint` without LICENSES/CC-BY-SA-4.0.txt.
+  - (3) **D79 wording:** may "(ASI)" stay as a code-family hint after the new name in headings (INCIDENTS.md:92, TAXONOMIES.md:59, README.md:167)?
+- **D73 gate advisories (truncated remainder) received.** They are recorded in the D73 package entry above; the gate's EVIDENCE message is not yet requested.
+
 ### ⚖ D81-D82, USER RULINGS 2026-10-12 (D73 package)
 - **D81: the variant, all 4 fields + the step-5 reorder (Recommended).** tier, quality_tier, corpus and content_license go into `_CONTENT_FIELDS`, and quality_tier/corpus/tier are assigned before `_apply_history`.
   - **This knowingly reverses the WS0-T3 link-1 gate ruling (2026-07-27)** that kept content_license out.
