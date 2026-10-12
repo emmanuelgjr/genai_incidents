@@ -28,7 +28,7 @@
 |---|---|
 | 🧯 **AppSec / threat-intel** | triage AI-related CVEs and vendor advisories, and pull the corpus into OpenCTI or MISP |
 | 🎯 **A red-teamer** | scope attack classes against the OWASP Top 10 for LLM Applications, the OWASP Top 10 for Agentic Applications and MITRE ATLAS |
-| 🔬 **A researcher** | track incident trends with stable IDs, a DOI, and a published evidence trail |
+| 🔬 **A researcher** | track incident trends with IDs that are never reissued once retired and resolve after a merge, a DOI, and a published evidence trail |
 
 <p align="center">
 <picture>
@@ -53,7 +53,7 @@
 </tr>
 </table>
 
-The landmark tier is the curated, headline-worthy subset (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition) — cite the landmark count, not the full corpus, when you mean "notable incidents."
+The landmark tier is the headline-citation set: rows that are hand-curated, catalogued in the AI Incident Database, or AI-harm cases. Every other row is the feed, mainly the CVE/GHSA/OSV advisory stream plus OECD-sourced rows. It is a derived field and is not the same axis as `quality_tier` (see `docs/DATA_DICTIONARY.md`'s `tier` field for the exact definition). Cite the landmark count, not the full corpus, when you mean "headline incidents."
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/emmanuelgjr/genai_incidents/main/docs/charts/year_bar.svg" alt="Entries per year" width="760">
@@ -147,7 +147,7 @@ Every distribution channel ships from the same corpus, but not necessarily the s
 
 ## ✨ How it differs from AIID / MIT AI Risk Repository / AVID
 
-AIID, the MIT AI Risk Repository, and AVID are themselves primary or aggregated incident trackers, and this dataset draws on several of them as upstream sources (see [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md)) rather than replacing them. What this project adds is normalization onto security-oriented taxonomies (OWASP LLM/ASI, NIST AI RMF, MITRE ATLAS) across sources that don't share a common schema. A full side-by-side positioning comparison is planned but not yet written.
+AIID, the MIT AI Risk Repository, and AVID are themselves primary or aggregated incident trackers, and this dataset draws on several of them as upstream sources (see [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md)) rather than replacing them. What this project adds is normalization onto security-oriented taxonomies (OWASP Top 10 for LLM Applications, OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS) across sources that don't share a common schema. A full side-by-side positioning comparison is planned but not yet written.
 
 Beyond the obvious title/description/severity fields, a few worth knowing about before you build on this data:
 
@@ -414,8 +414,9 @@ Found something wrong in an existing entry? Open a [data correction](https://git
 **MIT** for code (`scripts/`, `schema/`, `src/genai_incidents/`) — [`LICENSE`](LICENSE). **CC-BY-4.0** for the dataset and documentation (`data/`, `INCIDENTS.md`, `mappings/`, `docs/`) — [`LICENSE-DATA`](LICENSE-DATA). Neither of those is the whole story:
 
 - **Two verbatim text bodies are Apache-2.0, not CC-BY-4.0, and are not relicensed by it**: MITRE ATLAS case-study text and NVIDIA garak probe docstrings, each reproduced under its own upstream license with its own attribution requirement that stays attached to that material specifically.
+- **One mapping file is CC BY-SA 4.0 in part**: `mappings/owasp_asi_top10.json` is `CC-BY-SA-4.0 AND CC-BY-4.0` — CC BY-SA 4.0 for the OWASP ASI codes and risk names, from the OWASP Top 10 for Agentic Applications (Version 2026, December 2025), and CC BY 4.0 for this project's own descriptions. See [`NOTICE-DATA`](NOTICE-DATA).
 - **AIAAIC-derived rows (a CC BY-SA 4.0, share-alike source) carry a row-level `content_license` marker** — machine-readable, naming AIAAIC as the attribution/share-alike target on the specific rows it applies to, mirrored into the STIX export as `x_content_license`. This is a per-row obligation honored proactively, not a dataset-wide CC-BY-SA carve-out.
-- **The OECD AI Incidents and Hazards Monitor (AIM) is a third upstream source carrying an active content obligation.** Its `description` field on AIM-sourced rows is reduced to structural facts and a source link rather than AIM's own LLM-generated summary text, and every AIM-sourced row carries a per-entry OECD attribution citation. The `title` field on those same rows is **not** covered by that reduction and remains a separate, open question.
+- **The OECD AI Incidents and Hazards Monitor (AIM) is, with AIAAIC and AIID, one of three upstream sources whose row text could not simply be carried under the source's own licence grant.** Its `description` field on AIM-sourced rows is reduced to structural facts and a source link rather than AIM's own LLM-generated summary text, and every AIM-sourced row carries a per-entry OECD attribution citation. The `title` field on those same rows is **not** covered by that reduction and remains a separate, open question.
 - **AIID, despite also being a CC BY-SA source, is a resolved question, not an open one** for the population this project ships — the legal analysis concludes no row-level marker is owed there. The two sources reach different outcomes under the same kind of license grant for reasons specific to each maker's legal situs, not because one was treated more carefully than the other.
 
 None of the above is exhaustive, and stating exact per-source row counts here would only drift out of sync with the audit that actually tracks them. [`NOTICE-DATA`](NOTICE-DATA) and [`docs/SOURCE_LICENSES.md`](docs/SOURCE_LICENSES.md) are the authoritative, currently-maintained accounts of every source's terms, this project's remediation for each, and the current per-source figures — read those, not this summary, before making a decision that depends on the details.

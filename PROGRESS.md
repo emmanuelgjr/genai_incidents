@@ -63,6 +63,171 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ v2.13.0 cut-docs: **DONE. D91 scoped re-check PASS on `0856810f`; MERGED to main 2026-10-12 as `00be3a4a` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS (D91 scoped re-check, release/v2.13.0-cut-docs @ 0856810f). DEFECTS: none."
+
+**Advisories:**
+- Paper §4 step 5: `resolve_id_status()` lacks backticks (cosmetic). → It can ride with the cut.
+- dep5 has long continuation lines, which is valid deb822.
+
+**Gate evidence:**
+- Exactly 6 files; every line matches its replacement text verbatim.
+- dep5 parses with debian.copyright, and the carve-out resolves.
+- **Its own render** (Edge, Segoe fallback): the label ink spans x 448-751, with ≥115px clearance and no vertical overlap.
+- **No new false claim:** "every retired ID keeps a record" agrees with the measurement that all 16,572 published IDs are live or recorded, 0 missing.
+- The guard file passes 120 tests; validate and drift rc 0; merge-tree clean; the data and PROGRESS diffs are empty.
+- The gate relied on the foreman's 1072 for the full suite; it did not rerun it.
+
+**Foreman [R] after merge at 00be3a4a:**
+- deletion diff empty;
+- parse_existing, merge_and_dedupe and render_markdown leave porcelain **empty**;
+- validate rc 0; drift clean;
+- **pytest 1072 passed, 1 xfailed** (read BEFORE the push).
+
+**This closes:** the docs-warden's 18 findings, except #4 (C10, README:144, done AT the cut), plus cut-package §4R C1-C11 / N1-N6, D89, D90 and the follow-on corrections.
+- **Follow-ups logged (not this cut):** the AIM rename sweep (WS6/WS4, which includes a data change); the WS2 card-guard docs.
+
+**NEXT:** release-notes refresh (merge main into `release/v2.13.0-notes`, re-run the whole Verification block, re-check the OWASP-* and 3,810/3,811 lines), then the notes gate.
+
+### 🔍 cut-docs bounce #2 fixes integrated at `0856810f` (pushed). **D91 scoped re-check sent to the same reviewer.**
+- **WS0** `4e14faf7` dep5 and `54790c7a` CHANGELOG, with the gate text verbatim.
+  - The CHANGELOG phrase was line-wrapped, so plain greps missed it, and it lived only on the integration branch. The foreman merged the integration branch into the WS0 branch (`3fbdf3f7`) so the owner could apply it.
+  - String check with whitespace collapsed: new 1, old 0.
+- **WS3** `0e2a11e6`: the flow label and SVGs, plus paper step 5, verbatim.
+  - **Foreman's brief refuted:** the new label is LONGER (DejaVu 353.0px vs 309.0). It still fits: rendered in DejaVu and Arial, dark and light, with no overlap and ≥93px clearance.
+- **Foreman [R]:** pytest **1072 passed, 1 xfailed**; validate rc 0; drift clean; old-text counts 0 in the paper, flow.py and both SVGs.
+
+### ⚖ D91, USER RULING 2026-10-12 (cut-docs bounce #2): **"Fix + scoped re-gate" (Recommended)**
+- The gate itself recommended "apply verbatim + string check". **The user chose the stricter route**, consistent with D53/D55/D56.
+- **Dispatched:**
+  - **WS0:** the dep5 phrases, verbatim; NOTICE-DATA unchanged. Plus the CHANGELOG TAXII "(was the unofficial "OWASP LLM/ASI" shorthand)".
+  - **WS3:** the flow.py label "retired IDs never reissued · every retired ID keeps a record", with SVGs regenerated and rendered. Plus paper §4 "so every retired ID has a record that resolve_id_status() reports".
+- Then the same reviewer re-checks that diff only.
+- **NEW FOLLOW-UP TASK (not this cut):** an OECD AIM rename sweep, "OECD AI Incidents Monitor" → "OECD AI Incidents and Hazards Monitor". Sites: README:203/:302, DATASHEET:38, paper:60, flow.py:17, auto-refresh.yml, Makefile. **ingest_external.py:233/:241 are a DATA change** (row descriptions and reference titles), which needs a field-level delta. → WS6 docs + WS4 data.
+
+### ⛔ cut-docs integration: **BOUNCE #2 (scoped re-gate on `df72392a`, 2026-10-12). ESCALATED to the user** (protocol step 6)
+**Verdict, in the gate's words:** "VERDICT: BOUNCE (bounce #2 on this gate, so per protocol this escalates to the user). Both defects are one-line wording fixes. I give the exact replacement text for each, so I recommend 'apply verbatim + string check' rather than a third full gate."
+
+**Defects:**
+1. **dep5:55-63:** "the last of the eight sources above" and "For the other five" refer to a list that dep5 does not contain. **The gate's own error:** it supplied NOTICE-DATA wording for dep5 without adapting it. NOTICE-DATA is correct.
+   Replacement text: "is the last of the eight sources NOTICE-DATA names as carrying an obligation." and "For the other five named there (MITRE ATLAS, garak, the CVE Program, AVID and the OWASP Top 10 for Agentic Applications), the grant covers...".
+2. **flow.py:28 and the SVGs:** "tombstoned IDs resolve" overclaims. `resolve_id()` returns None for 776 of 1,065 (73%).
+   - Replacement: "retired IDs never reissued · every retired ID keeps a record".
+   - Also fix paper §4 step 5, "so a citation of a tombstoned ID resolves", to "so every retired ID has a record that resolve_id_status() reports".
+   - **The bounce-1 fix introduced this label. The foreman's WS3 brief suggested "tombstoned IDs resolve" (my C5 wording: "citations of tombstoned IDs resolve"). Foreman's brief error.**
+
+**Adjudications and advisories:**
+- **3,810 vs 3,811: both are right.** 3,811 feed rows are OECD-sourced. INC-01434 also carries a CVE, so the disjoint split is 7,989 + 3,810 + 1,923 = 13,722. The gate presented overlapping figures. No live text states either number, and the cut package's "3,811 feed" is correct.
+- **README:203 old AIM name:** out of this cut. The former name is widespread (README:203/:302, DATASHEET:38, paper:60, flow.py:17, auto-refresh.yml, Makefile). → **a separate rename-sweep task (WS6/WS4).** Warning: ingest_external.py:233/:241 write the name into row data, so that part is a data change needing a delta.
+- **The flow label "OWASP LLM · ASI · NIST · ATLAS" is CONFIRMED exempt** (compact UI label).
+- CHANGELOG "(was the older short names)" is inaccurate. It should read '(was the unofficial "OWASP LLM/ASI" shorthand)'. Low priority; can ride along.
+- Guard residual passes are documented and acceptable.
+
+**Gate evidence:**
+- data/ and PROGRESS diffs empty; merge-tree clean; schema identical.
+- pytest 1072 passed, 1 xfailed; validate, drift and reuse spdx rc 0.
+- dep5 parses with debian.copyright; the carve-out resolves.
+- The guard fires on every plant it tried, including a backslash continuation, and passes the legitimate forms; the live scan is empty.
+- The paper §4 order is confirmed against the code.
+- DD:76 3,767 re-measured; SL:320 and CHANGELOG:75 correct; HF and Zenodo fixed.
+
+### 🔍 cut-docs bounce #1 fixes integrated at `df72392a` (pushed). **Scoped re-gate sent to the same reviewer.**
+- **Fixes:**
+  - **WS0 `b797ee8e`:** D1 applied the gate's wording verbatim. **The parenthetical was confirmed against E21 §5.1 and E23 before applying.** D2; SL:320; DD:76 now names 3 sources.
+  - **WS4 `9c09c548`:** `_derive_tier` docstring and the STIX comment. Comments only; the rebuild has an empty diff.
+  - **WS6 `ff139563`:** HF AIM name at :108/:143; .zenodo backticks; CHANGELOG D89/TAXII. **README:203 still has the old AIM name, routed to the gate.**
+  - **WS2 `7994635d`:** guard joins adjacent/+/f-string literals via tokenize, LLM_AND_ASI with field-noun exemptions, emphasis and Unicode slashes, and a correction-language rule in CORRECTIONS. **Control: the pre-fix guard passed all 5 of the gate's plants; the new guard fails each.** pytest 1072 passed.
+  - **WS3 `f855a3e3`:**
+    - schema feed wording, description-only;
+    - paper §4 renumbered into execution order;
+    - flow.py "stable IDs" replaced, with SVGs regenerated and rendered in DejaVu and Arial (no overlap).
+    - **It refuted the gate's feed split: 3,810 OECD-sourced feed rows, not 3,811.** The gate's sum is 13,723 vs 13,722. A second route agrees. The text carries no counts. **The cut package §4R and the notes may quote 3,811, so the notes gate will check.**
+- **Foreman judgment, sent to the gate to confirm:** the flow-diagram label "OWASP LLM · ASI · NIST · ATLAS" is a compact UI label, exempt under D90.
+- **Foreman [R] at df72392a:** pytest **1072 passed, 1 xfailed**; validate rc 0; drift clean; schema copies identical; merge-tree vs main clean.
+
+### 🔁 v2.13.0 cut-docs integration: **BOUNCE #1 (red-reviewer on `b99533b7`, 2026-10-12)**. Fixes routed to 5 owners; scoped re-gate by the same reviewer follows.
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. This is the first bounce I know of on the `release/v2.13.0-cut-docs` integration gate, at `b99533b7`."
+
+**Defects:**
+1. **The C2 rewording adds a NEW false claim** (NOTICE-DATA:236-239, README:419, dep5:55-58): "one of the three whose terms bear on row-level text".
+   - In fact `cve` (2,171 rows) and `avid` (79) carry row-level content_license markers.
+   - ATLAS and garak text is verbatim in rows (Apache-2.0).
+   - AIID has 0 markers.
+   - **The gate's true statement:** the distinction is whether the row text could be carried under the source's own licence grant. For AIAAIC, AIID and AIM it could not (reduced, or the title analysed separately). The gate supplied replacement wording, saved verbatim, to be applied by WS0 after confirming the AIID/AIM parenthetical against E21/E23. **This is the 2nd wrong wording of this sentence. The foreman's C2 brief framed it ("third" holds narrowly), and the specialist followed that framing. Foreman's brief error.**
+2. **CHANGELOG:75** still says "The 21 `OWASP-GENAI-*` rows". It should say 21 OWASP-* = 18 GENAI + 3 AIX, in 6 rows. The §7 correction missed the CHANGELOG.
+3. **C8 survives in the definition-of-record surfaces.**
+   - The schema tier description: "`feed` is the comprehensive vulnerability/advisory stream". Measured: 7,989 of 13,722 feed rows are CVE/GHSA/OSV/PYSEC, 3,811 are OECD and 1,923 are other, so about 42% are not vulns or advisories.
+   - The `_derive_tier` docstring (merge_and_dedupe.py:165-168): "the curated/notable LANDMARK set", "feed = the CVE/GHSA/OSV bulk".
+
+**Advisories:**
+- **Guard false-passes:**
+  - **adjacent Python string literals** (exactly how the TAXII description is written);
+  - "OWASP LLM & ASI" / "and ASI";
+  - Markdown bold;
+  - U+2044;
+  - anything in CHANGELOG (excluded);
+  - a quoted retired name used as current in CORRECTIONS.
+- The CHANGELOG guard bullet omits D90. [Unreleased] doesn't record the D89 Zenodo/CITATION notes or the TAXII description change.
+- **Paper §4:** the step order is still not execution order. Stamping is step 7, step 5 says "after stamping", and ID assignment runs after stamping.
+- **SOURCE_LICENSES:320-321:** garbled word order.
+- **HF card:** says "OECD AI Incidents Monitor". The current name is "OECD AI Incidents and Hazards Monitor".
+- **C5 residue:** the README flow SVGs say "stable IDs" (scripts/readme_assets/flow.py:28). Separately, export_stix.py:256 has a "notable subset" comment.
+- **DATA_DICTIONARY:76** (content_license) describes AIAAIC presence only; it omits the cve and avid markers. Pre-existing.
+- **.zenodo.json:** the description uses Markdown backticks, which Zenodo renders literally.
+
+**Routing (all as fix + scoped re-gate by the same reviewer):**
+- **WS0:** D1 (apply the gate's wording verbatim), D2 (CHANGELOG:75), the SL:320 garble, DD:76.
+- **WS3:** schema feed wording, paper §4 execution order, flow.py "stable IDs" and SVG regeneration.
+- **WS4:** the `_derive_tier` docstring and the export_stix:256 comment.
+- **WS6:** HF card AIM name, .zenodo backticks, CHANGELOG entries for D89 and TAXII.
+- **WS2:** guard joins adjacent literals plus the "& ASI" and "and ASI" forms (keeping "LLM and ASI codes" legitimate); the CHANGELOG guard bullet mentions D90.
+
+### 🔍 v2.13.0 cut-docs integration COMPLETE at `b99533b7` (pushed; 21 files, +268/-69). **Single red-reviewer gate dispatched.**
+- **Contents (beyond wave 1):**
+  - wave 2: WS2 `0da32597` plus `985bbc1c`, the foreman's option (a) for the CORRECTIONS row;
+  - WS0 follow-ups `1bf78b9d` and `c8d39d27` (OWASP-* 21 = 18 GENAI + 3 AIX, 6 rows; NOTICE-DATA:141);
+  - WS3 schema wording `e1b0ee61` and `caa6466d` (tier "headline-citation set" plus D75 closure note; description-only).
+- **Wave-2 refutations recorded:**
+  - The guard was already red at 9587519e on the wave-1 CORRECTIONS row. Resolved as option (a): the row label gets the official name plus "(ASI)", and the quoted retired name is allowed in CORRECTIONS.md only.
+  - A 4th bare "OWASP LLM/ASI" was line-wrapped at export_misp.py:18-19, so grep missed it.
+  - docs/outreach/ (sent mail) is exempt from D90 only.
+- **Foreman [R] on b99533b7:**
+  - pytest **1020 passed, 1 xfailed**;
+  - validate rc 0; drift clean;
+  - schema/src copies byte-identical (cmp);
+  - merge-tree vs origin/main clean.
+
+### 🔍 v2.13.0 cut, step 1: notes drafted `d565c22a` on `release/v2.13.0-notes` (pushed; 1 file, +524). The notes gate waits for the cut-docs merge.
+- **Content:** a "Read this first: behaviour changes" section (5 load_deprecations keys in a table; the D81 semantics; core `status` +440 B; new values), the licence exception (D89), 4 headlines, "also in this release", known limitations, and a Verification block. Absolute links only; link hygiene clean.
+- **Drafter's measurements:**
+  - counts 15,637 / 29 / 15,666 / 22 / 1,915;
+  - 5 deprecation keys;
+  - 3,936 gained oecd-aim;
+  - `updated` moved on 5,860 rows vs v2.12.0 (5,841 ATLAS + 22 disputed, 3 overlapping);
+  - id_deprecations 1,060 → 1,084, with the old records a byte prefix;
+  - STIX 65,141 objects; MISP 31 events; SHA256SUMS 35/8/35;
+  - pytest 997 passed, 1 xfailed.
+  - It lists the trusted figures explicitly.
+- **CORRECTED SAME DAY: the "refutation" below was half wrong (foreman).** The 21 is correct as a count of **`OWASP-*` ids: 18 `OWASP-GENAI-*` + 3 `OWASP-AIX-*`, in 6 dataset rows**. Only the prefix label "OWASP-GENAI-*" was wrong. The license-auditor caught this from 109+21=130. The text below is kept as written.
+- **Refuted by the drafter: "21 OWASP-GENAI-* rows".** Foreman [R]: **18 distinct ids in 3 rows**; the ingest has the same 18. The figure came from SOURCE_LICENSES.md:320 (a live surface) and was carried onto the board and into the cut package unmeasured. The cut package gains a dated §7 correction. **NOTE → WS0:** fix SOURCE_LICENSES:320 in place.
+- **Other drafter flags:**
+  - "minor release" is its own call;
+  - the notes assume the item 9 CORRECTIONS row lands with cut-docs;
+  - re-run the Verification block after cut-docs merges.
+  - The "last_seen on OECD/AIID rows" freeze indicator is unusable, because the ATLAS rebuild bumped last_seen. It was left out of the notes.
+
+### ▶ v2.13.0 CUT STARTED (user: "keep going", the standing go-ahead incl. publish steps): VERSIONING step 1 dispatched
+- **distribution-engineer** is drafting `docs/releases/v2.13.0.md` on `release/v2.13.0-notes`. It changes no version strings: step 1 only, and the notes are gated before any bump.
+  - Scope: cut-package §1/§2/§4R/§5.
+  - MUST include the "Behaviour changes" section (5 load_deprecations keys), the D81 semantics change, core `status`, the D89 licence exception and the known limitations.
+  - Absolute links only, no anchors. A Verification section with re-derived expected values.
+- **This runs in parallel with cut-docs wave 2** (the label-scientist on `release/v2.13.0-cut-docs`); the notes touch no data.
+- **Order from here:**
+  1. the gate on the cut-docs integration branch, then merge;
+  2. the gate on the notes, then merge;
+  3. steps 2-5 (version bump incl. the USER_AGENT via the ingest owner, CHANGELOG promotion, README:144 / Latest-release rewrite, make build, drift, prose sweep), with a pre-publish gate;
+  4. steps 6-9 (tag the merge commit, Release plus byte-verify, the Zenodo DOI plus 8b, registries).
+
 ### 🔧 v2.13.0 cut-docs: wave 1 DONE, integrated on `release/v2.13.0-cut-docs` @ `9587519e` (pushed; 14 files, +116/-49; all 5 merges clean). Wave 2 dispatched.
 **Wave 1 branches:**
 - **WS5 `e692270b`** (foreman-committed): C8 prose (README:56, DATA_DICTIONARY:12, paper:49-54); N5 §6 clause; N6 CORRECTIONS row for item 9.

@@ -25,7 +25,7 @@ def flow(dark):
         if i<len(steps)-1: o.append(f'<path d="M600 {y+56} v14" stroke="{c["acc"]}" stroke-width="2" marker-end="url(#a)"/>')
         y+=74
     o.append(f'<text x="600" y="{y+6}" text-anchor="middle" font-size="12" fill="{c["sub"]}">deterministic build · no model calls</text>')
-    o.append(f'<text x="600" y="{y+24}" text-anchor="middle" font-size="12" fill="{c["sub"]}">stable IDs · tombstones, never deletions</text>')
+    o.append(f'<text x="600" y="{y+24}" text-anchor="middle" font-size="12" fill="{c["sub"]}">retired IDs never reissued · every retired ID keeps a record</text>')
     outs=[('Searchable website','filter · search · deep-link'),('JSON + JSON Schema','data/incidents.json'),('PyPI package','pip install genai-incidents'),('Hugging Face dataset','load_dataset(…)'),('STIX 2.1 · TAXII 2.1','x-genai-incident SDOs'),('MISP feed','ATLAS + VERIS tags')]
     y=72; oy=[]
     for t,s in outs:

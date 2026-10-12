@@ -15,7 +15,8 @@
 `genai_incidents` is an open, continuously-maintained dataset of publicly
 disclosed security incidents and vulnerabilities involving generative-AI and
 agentic-AI systems. Each entry is consolidated from multiple upstream sources,
-deduplicated under stable identifiers, and **cross-mapped to six taxonomies**
+deduplicated under `INC-#####` identifiers whose numbers are never reissued
+once retired, and **cross-mapped to six taxonomies**
 — four core, stored on every applicable record (OWASP LLM Top 10 (2026),
 OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS); a companion mapping
 stored where the source provides it (MAESTRO); and an experimental,
@@ -46,9 +47,12 @@ involves a generative/agentic AI system or its supporting ML infrastructure;
 **(ii) security/safety relevance** — a vulnerability, exploit, misuse, or
 real-world harm; and **(iii) evidence** — at least one resolvable primary
 source. Records failing any gate are excluded regardless of keyword matches.
-Two tiers are surfaced explicitly: a curated/notable **landmark** set and the
-comprehensive **feed** of vulnerabilities/advisories; headline claims cite the
-landmark count rather than the raw total.
+Two tiers are surfaced explicitly. The **landmark** tier is the
+headline-citation set: rows that are hand-curated, catalogued in the AI
+Incident Database, or AI-harm cases; the **feed** is every other row, mainly
+the CVE/GHSA/OSV vulnerability and advisory stream plus OECD-sourced rows. The tier is derived and is a different axis from
+the vetting level `quality_tier`. Headline claims cite the landmark count
+rather than the raw total.
 
 ## 3. Sources
 
@@ -70,20 +74,36 @@ The build is a deterministic, idempotent pipeline
 2. **Deduplicate** with first-hit-wins keys (CVE id › source id › normalised
    reference URL › fuzzy title within ±1 year), resolving every match to the
    *live* absorbing record to avoid silent content loss on transitive merges.
-3. **Assign stable `INC-#####` ids**; merged-away ids are recorded in
-   `id_deprecations.json`, so citations of any ID that carries a tombstone
-   resolve. This is scoped: the 9 IDs in `docs/ID_POLICY.md` §1.4(a) are
-   unrecorded (no tombstone), and 8 IDs return `None` from `resolve_id()` (see
-   the v2.11.0 release notes).
-4. **Finalise content fields** (attack vector, framework mappings, curation
-   overrides) *before* history stamping, so the content snapshot is stable.
-5. **Enrich**: CWE/CVSS from NVD/GHSA; CISA KEV exploited-in-the-wild flags;
-   then derived provenance (`confidence`, `source_count`, `source_status`,
-   `tier`).
+3. **Finalise content fields** *before* history stamping, so the content
+   snapshot is stable: attack vector, framework mappings, curation overrides,
+   CISA KEV exploited-in-the-wild flags and rejected-CVE status (CWE/CVSS
+   arrive with the NVD/GHSA source records).
+4. **Classify, then stamp.** Derive the classifiers `quality_tier`, `corpus`
+   and `tier`, then stamp UTC `added`/`updated` dates, gated by a content
+   snapshot so unchanged entries don't churn. The three classifiers and
+   `content_license` (carried from the source record) are content fields
+   (rulings D81/D82), so a change to any of them bumps `updated`. Stamping is
+   keyed on CVE and source ids, not on `INC-#####` ids, so it runs before
+   step 5 assigns them.
+5. **Assign `INC-#####` ids.** The allocator never reissues a retired number,
+   and retired ids are recorded in `id_deprecations.json`, so every retired ID
+   has a record that resolve_id_status() reports. An ID is not a permanent
+   pointer to one incident:
+   across release tags v2.0.0–v2.12.0, 591 published IDs carried more than one
+   title, some of them a different incident (`docs/ID_POLICY.md` §4 rule 1 and
+   §8.6). Every ID published in any release tag now has a live entry or a
+   deprecation record. `resolve_id()` returns `None` for 776 of the 1,065
+   deprecated IDs: 763 withdrawals (`into: null`), the 9 pre-tombstone drops
+   of `docs/ID_POLICY.md` §1.4(a), 3 release-dependent IDs (`INC-00497`,
+   `INC-00554`, `INC-08139`) and 1 split group (`INC-00754`).
+   `resolve_id_status()` names the reason for each (`docs/ID_POLICY.md` §8).
 6. **Retain-on-drop**: incidents are never silently lost when a source stops
    emitting them; they are carried forward and marked `source_status: retained`.
-7. **Stamp** UTC dates, gated by a content snapshot so unchanged entries don't
-   churn; render Markdown/site/STIX; **validate** against schema and invariants.
+7. **Enrich** with derived provenance (`confidence`, `source_count`,
+   `source_status`) after history stamping, outside the content snapshot.
+   `tier` is derived again at this point; that matters only for the entries
+   retained in step 6, which skip the step-4 classifiers.
+8. **Render** Markdown/site/STIX and **validate** against schema and invariants.
 
 **Determinism.** The build must reproduce byte-identically across UTC days; CI
 fails on any drift. This is what makes the dataset reproducible and auditable.
@@ -93,7 +113,7 @@ fails on any drift. This is what makes the dataset reproducible and auditable.
 Mappings are produced by a combination of source-provided labels and
 heuristics seeded from the finalised attack vector, then cascaded
 (OWASP → ATLAS/NIST) via an authoritative technique→tactic map
-(`mappings/mitre_atlas.json`, ATLAS v2026.06). Mapping decisions are content
+(`mappings/mitre_atlas.json`, ATLAS v2026.09). Mapping decisions are content
 fields under the determinism contract and are disputable via the corrections
 process. We make no claim that heuristic mappings are expert-reviewed for every
 entry; the `quality_tier` and `confidence` fields expose how vetted each record

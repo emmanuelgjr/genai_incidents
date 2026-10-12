@@ -28,6 +28,13 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   `genai-incidents:taxonomy-owasp-asi` tag and the Hugging Face card. **Consumer
   impact:** anything that keys on `owasp_asi == "2025"` must accept "2026". No exported
   code or name changes.
+- **D89 exception notes:** the `.zenodo.json` description and the `CITATION.cff` abstract now
+  state that `mappings/owasp_asi_top10.json` is CC-BY-SA-4.0 AND CC-BY-4.0 (the OWASP ASI
+  codes and names are CC BY-SA 4.0), pointing to `NOTICE-DATA`.
+- **Served TAXII discovery description (D90)** now names the "OWASP Top 10 for LLM
+  Applications" and the "OWASP Top 10 for Agentic Applications" (was the unofficial
+  "OWASP LLM/ASI" shorthand); the Hugging Face card now uses the current "OECD AI
+  Incidents and Hazards Monitor" name for AIM.
 - **Display name:** "OWASP Top 10 for Agentic Applications" on the live surfaces
   (`INCIDENTS.md`, README, `docs/TAXONOMIES.md`, `docs/DATASHEET.md`,
   `docs/DATA_DICTIONARY.md`, `CONTRIBUTING.md`, the site, `.zenodo.json`,
@@ -72,14 +79,18 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   counts eight upstream sources with an obligation detailed in it (it said three), and
   the OWASP attribution in it and in section 3.6 also lists `docs/charts/owasp_asi.svg`,
   which reproduces the ten risk names.
-  The 21 `OWASP-GENAI-*` rows of `ingest/avid_owasp_incidents.json` are a different
+  The 21 `OWASP-*` source ids (18 `OWASP-GENAI-*` and 3 `OWASP-AIX-*`) of
+  `ingest/avid_owasp_incidents.json`, folded into 6 rows, are a different
   upstream and stay OPEN.
 - **New guard** `tests/test_owasp_asi_naming.py`. Before it, `validate.py` and
   `check_stats_drift.py` caught a stale `owasp_asi` only in `data/stats.json`. The guard
   fails on the retired name (with or without "OWASP", possessive, hyphenated, or split
   by a no-break space, `&nbsp;` or `<br>`), any other "OWASP Agentic ..." variant (no
   site is held, so any variant fails), the "ASI Top 10" / "LLM/ASI Top 10" shorthand
-  (D87), an `owasp_asi` / `owasp-asi` version literal (including the MISP tag form),
+  (D87), the bare "OWASP LLM/ASI" or "OWASP LLM and ASI" used as a name for the two
+  frameworks (D90; also with `&`, emphasis or a Unicode slash, and across adjacent Python
+  string literals; "OWASP LLM and ASI codes" and the "OWASP ASI" label pass), an
+  `owasp_asi` / `owasp-asi` version literal (including the MISP tag form),
   prose edition or title edition that disagrees with the pin, a T&M URL whose link text
   or preceding text does not name Threats and Mitigations, a missing "(ASI)" on a label
   for the codes (D88), a missing "(ASI)" heading, and an old name in the dataset
@@ -99,12 +110,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   shape owner's recommendation that kept `content_license` out of the content set; the
   affected docs are corrected in place and the WS0-T3 spec carries a dated supersession note.
 - **Build order.** `tier`, `quality_tier` and `corpus` are now derived before the `updated`
-  comparison instead of after it. Without that, the first rebuild would have bumped
-  `updated` on 15,657 of 15,666 rows. With it, the first rebuild moved 0 rows (no `updated`,
+  comparison instead of after it. Without that, every rebuild on a new calendar day would
+  have bumped `updated` on 15,657 rows (all except the 9 retained priors); the D73 gate
+  measured this on two simulated new days (2026-10-13 and 2026-10-20). With it, the first rebuild moved 0 rows (no `updated`,
   `added` or other field moves, measured against origin/main).
 - **Freeze widening (D82).** The D71 stage-1 OECD/AIID freeze now also holds `tier`,
-  `quality_tier` and `corpus` changes on published OECD/AIID rows, because they are content
-  fields and the freeze gates any content change on those rows.
+  `quality_tier`, `corpus` and `content_license` changes on published OECD/AIID rows, because
+  they are content fields and the freeze gates any content change on those rows. No OECD/AIID
+  row carries `content_license` today (0 of the non-retracted OECD/AIID rows; the field is
+  populated on 3,767 rows, none of them OECD/AIID), so this holds nothing yet.
 
 ### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
 
@@ -184,6 +198,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - Wording fix: `modified` / `updated` are documented as moving on content-field changes only;
   `tier`, `quality_tier`, `corpus`, `content_license`, `source_freshness` reach `modified` via an
   `EXPORTER_VERSION` bump (DATA_DICTIONARY, TAXII and MISP READMEs).
+- The served `docs/data/incidents.core.json` gains the `status` field (`CORE_FIELDS` in
+  `scripts/gen_docs_core_data.py`), present on the 22 disputed rows it carries (retracted rows are
+  not served): 6,687,566 → 6,688,006 bytes (+440 B), re-measured by building the payload with and
+  without `status` from the same corpus.
 - No row in `data/incidents.json` or `incidents.min.json` changed. Field-level delta:
   `docs/audits/ws6-v2130-export-integrity-2026-10-11.md`.
 
@@ -244,7 +262,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   unmeasured. Under ruling D75, `INCLUSION.md` §5 (the feed is not
   `quality_tier: auto`; 69% of it is `reviewed`) and §4 (no CI gate
   sample-audits ingest changes) were corrected in place, with two
-  `CORRECTIONS.md` rows.
+  `CORRECTIONS.md` rows. In the same commit, §6's "admitting at `auto` tier"
+  became "admitting at `quality_tier: auto`" (a meaning-preserving wording
+  edit, so no `CORRECTIONS.md` row).
 - **Tamper test runs again (2026-10-12).** When `data/incidents.json` moved past
   the frame's pinned hash, two tests began to skip. The test that proves
   `--check` rejects a tampered sample copy now reads the pinned blob
@@ -373,6 +393,26 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   and HF exports is a separate change.
 - Field-level delta: `docs/audits/cve-sweep/v2130-schema-delta-2026-10-09.md` and `.json`.
   It covers 1,404 entries and 1,492 fields, with 0 defects.
+
+### Behaviour changes - `load_deprecations()` returns a different shape for three keys (user ruling D72)
+
+- **If you read `load_deprecations()` directly, three values change shape** compared with
+  v2.12.0. The return type is still `dict[str, str | list[str]]`, but code that branches on
+  `isinstance(value, list)` takes a different branch for these keys:
+  - `INC-00311`: a list of 12 IDs -> the string `"INC-14726"`.
+  - `INC-01897`: a list of 8 IDs -> the string `"INC-14612"`.
+  - `INC-00497`: the string `"INC-00311"` -> a list of the same 12 IDs (`INC-14660` ...
+    `INC-14907`) it used to reach through `INC-00311`.
+
+  Two more values change but keep their shape (string -> string, item 4): `INC-03128`
+  `"INC-00754"` -> `"INC-14909"` and `INC-08185` `"INC-08139"` -> `"INC-14742"`. No other key
+  of the mapping changes (293 keys in both, of which 7 lists now and 8 in v2.12.0).
+  **Use `resolve_id_status()`** rather than indexing the mapping; it names the reason for
+  every ID. Re-derive: run `load_deprecations()` from the v2.12.0 tag's package
+  (`src/genai_incidents` plus that tag's `data/id_deprecations.json` and
+  `data/incidents.min.json`) and from this tree's, and diff the two mappings.
+  The `resolve_id()` and `resolve_id_group()` answers that change are listed in the two
+  entries below.
 
 ### Changed - three split IDs narrowed to their identified incidents; "never reused" claim corrected (agent-suggested, draft)
 

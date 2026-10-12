@@ -52,9 +52,19 @@ Comment: This dataset aggregates entries from many upstream sources, each
  See NOTICE-DATA and docs/SOURCE_LICENSES.md section 1.2a for the full
  framing, and docs/audits/E23-aiid-marking-ruling-2026-07-30.md for
  the full reasoning.
- The OECD AI Incidents and Hazards Monitor (AIM) is a third upstream
- source carrying an active content obligation, alongside AIAAIC and
- AIID above. AIM's title/summary fields are LLM-generated (OpenAI
+ The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
+ eight sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
+ whose row text this project could not simply carry under the source's
+ own licence grant. For each of the three, the text was either reduced
+ to structural facts and a link, or its retained title was analysed as
+ a separate copyright question (open for AIAAIC and AIM; resolved for
+ AIID). For the other five named there (MITRE ATLAS, garak, the CVE
+ Program, AVID and the OWASP Top 10 for Agentic Applications), the
+ grant covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
+ (CVE- and AVID-derived rows also carry a row-level content_license
+ marker).
+ .
+ AIM's title/summary fields are LLM-generated (OpenAI
  o3-mini) from third-party news articles of unresolved copyright
  status; AIM's own methodology page disclaims any grant over such
  third-party-protected material, and OECD's general Data-reuse terms
@@ -67,9 +77,12 @@ Comment: This dataset aggregates entries from many upstream sources, each
  (accessed on date)) is applied to every OECD-sourced row; both are
  implemented and merged. The title field remains OPEN, not resolved
  and not silent: it still ships the same LLM-generated text verbatim
- on 3,667 of 3,829 OECD-AIM-sourced rows -- the other 162 were merged
- into an entry whose own title, from a different upstream source,
- took precedence instead -- tracked at the same posture as AIAAIC's
+ on 3,937 of 4,104 non-retracted OECD-AIM-sourced rows (measured
+ 2026-10-12 by direct comparison of each title with its ingest title in
+ ingest/oecd_aim_full_incidents.json; see NOTICE-DATA and
+ docs/audits/v2.13.0-cut-package-2026-10-12.md section 4R row C3) -- the
+ other 167 were merged into an entry whose own text, from a different
+ upstream source, took precedence instead -- tracked at the same posture as AIAAIC's
  retained-headline question above. See NOTICE-DATA and
  docs/SOURCE_LICENSES.md section 1.5 for the full framing.
  CVE Program content (CVE ids, descriptions and record fields, via NVD

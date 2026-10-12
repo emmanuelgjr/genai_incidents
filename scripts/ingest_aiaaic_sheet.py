@@ -146,7 +146,7 @@ SECURITY_HEADLINE_KEYWORDS = (
     "child sexual"
 ).split()
 
-# Map AIAAIC ethical issue → OWASP LLM / ASI codes.
+# Map AIAAIC ethical issue → OWASP LLM and ASI codes.
 ETHICAL_TO_OWASP_LLM = {
     "Security": ["LLM02", "LLM04"],
     "Privacy/surveillance": ["LLM02"],

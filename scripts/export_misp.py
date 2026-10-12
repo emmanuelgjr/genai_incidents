@@ -16,7 +16,7 @@ so they stay grouped, and carrying taxonomy as attribute Tags:
   - one ``link`` attribute per reference URL,
   - one ``text`` attribute holding the incident title,
 with Tags ``genai-incidents:*`` (incident id, attack vector, severity, OWASP
-LLM/ASI, corpus, tier), ``mitre-atlas:technique="…"``, and ``veris:*``
+LLM and ASI codes, corpus, tier), ``mitre-atlas:technique="…"``, and ``veris:*``
 machinetags (VERIS 1.4.1 enum paths derived from ``attack_vector`` via the
 hand-curated ``mappings/veris.json``) on the title attribute.
 
