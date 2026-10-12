@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ v2.13.0 cut-docs: **DONE. D91 scoped re-check PASS on `0856810f`; MERGED to main 2026-10-12 as `00be3a4a` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS (D91 scoped re-check, release/v2.13.0-cut-docs @ 0856810f). DEFECTS: none."
+
+**Advisories:**
+- Paper §4 step 5: `resolve_id_status()` lacks backticks (cosmetic). → It can ride with the cut.
+- dep5 has long continuation lines, which is valid deb822.
+
+**Gate evidence:**
+- Exactly 6 files; every line matches its replacement text verbatim.
+- dep5 parses with debian.copyright, and the carve-out resolves.
+- **Its own render** (Edge, Segoe fallback): the label ink spans x 448-751, with ≥115px clearance and no vertical overlap.
+- **No new false claim:** "every retired ID keeps a record" agrees with the measurement that all 16,572 published IDs are live or recorded, 0 missing.
+- The guard file passes 120 tests; validate and drift rc 0; merge-tree clean; the data and PROGRESS diffs are empty.
+- The gate relied on the foreman's 1072 for the full suite; it did not rerun it.
+
+**Foreman [R] after merge at 00be3a4a:**
+- deletion diff empty;
+- parse_existing, merge_and_dedupe and render_markdown leave porcelain **empty**;
+- validate rc 0; drift clean;
+- **pytest 1072 passed, 1 xfailed** (read BEFORE the push).
+
+**This closes:** the docs-warden's 18 findings, except #4 (C10, README:144, done AT the cut), plus cut-package §4R C1-C11 / N1-N6, D89, D90 and the follow-on corrections.
+- **Follow-ups logged (not this cut):** the AIM rename sweep (WS6/WS4, which includes a data change); the WS2 card-guard docs.
+
+**NEXT:** release-notes refresh (merge main into `release/v2.13.0-notes`, re-run the whole Verification block, re-check the OWASP-* and 3,810/3,811 lines), then the notes gate.
+
 ### 🔍 cut-docs bounce #2 fixes integrated at `0856810f` (pushed). **D91 scoped re-check sent to the same reviewer.**
 - **WS0** `4e14faf7` dep5 and `54790c7a` CHANGELOG, with the gate text verbatim.
   - The CHANGELOG phrase was line-wrapped, so plain greps missed it, and it lived only on the integration branch. The foreman merged the integration branch into the WS0 branch (`3fbdf3f7`) so the owner could apply it.
