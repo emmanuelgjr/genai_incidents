@@ -32,9 +32,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   state that `mappings/owasp_asi_top10.json` is CC-BY-SA-4.0 AND CC-BY-4.0 (the OWASP ASI
   codes and names are CC BY-SA 4.0), pointing to `NOTICE-DATA`.
 - **Served TAXII discovery description (D90)** now names the "OWASP Top 10 for LLM
-  Applications" and the "OWASP Top 10 for Agentic Applications" (was the older short
-  names); the Hugging Face card now uses the current "OECD AI Incidents and Hazards
-  Monitor" name for AIM.
+  Applications" and the "OWASP Top 10 for Agentic Applications" (was the unofficial
+  "OWASP LLM/ASI" shorthand); the Hugging Face card now uses the current "OECD AI
+  Incidents and Hazards Monitor" name for AIM.
 - **Display name:** "OWASP Top 10 for Agentic Applications" on the live surfaces
   (`INCIDENTS.md`, README, `docs/TAXONOMIES.md`, `docs/DATASHEET.md`,
   `docs/DATA_DICTIONARY.md`, `CONTRIBUTING.md`, the site, `.zenodo.json`,
