@@ -154,11 +154,17 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   than `created`: an entry with no content change keeps a byte-identical SDO across builds, a
   changed entry moves forward, and an exporter change moves every object by 1 ms. Before this,
   `modified` was the bare `updated` date, so a change to the exporter (the 2026-10-01 OWASP
-  `source_name` relabel) changed object content without changing `modified`. **Every STIX and
-  TAXII object's `modified` moves once in this release** (+1 ms for incidents, relationships and
-  CVE objects; the 55 ATLAS `attack-pattern` objects move to the 2026-09-15 pin date; the
-  `identity` object to the newest incident date), so a client that dedupes on (`id`, `modified`)
-  re-imports the lot, which also delivers the earlier label fix. TAXII `manifest.json` `version`
+  `source_name` relabel) changed object content without changing `modified`. **Every object present in both the v2.12.0 and v2.13.0 bundles gets a new `modified`.** That is
+  +1 ms for the 9,132 CVE objects and for the 9,784 incidents and 19,848 relationships whose
+  entry is unchanged. The 5,853 incidents and 17,928 relationships whose entry changed take the
+  new `updated` date. The 53 surviving ATLAS `attack-pattern` objects take the 2026-09-15 pin
+  date. The ATLAS re-map retires 3 `attack-pattern` objects (`AML.T0019`, `AML.T0058`,
+  `AML.T0015.001`) and 2,540 relationships, and adds 2 (`AML.T0115.000`, `AML.T0115.001`) and
+  2,540 new relationships. A new `identity` object (carrying `x_taxonomy_versions`) appears for
+  the first time. The count stays 65,141. Retired objects are not emitted as `revoked`; they are
+  dropped. A client that dedupes on (`id`, `modified`) re-imports every surviving object, which
+  also delivers the earlier label fix, but keeps the retired objects unless it prunes against
+  the current bundle; static TAXII has no deletion signal. TAXII `manifest.json` `version`
   follows. What bumps what: `docs/VERSIONING.md`.
 - **MISP event `timestamp` is derived from the data** (newest `updated` among the event's
   incidents, plus the exporter version in seconds) instead of the fixed Jan 1 of the event's year.
