@@ -63,6 +63,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9 step 1: source record committed `b4e6c4a7` on `ws0/v2130-item9-asi-source` (pushed). **red-reviewer raw-text check dispatched.**
+- **The auditor's summary:**
+  - **metadata relabel, not a re-mapping**: codes ASI01-10 and their order are unchanged;
+  - names: 8 identical, 2 renamed. ASI02 "Tool Misuse & Exploitation" → "Tool Misuse" is **SUSPECT**, possibly a summariser truncation. ASI05 drops "(RCE)";
+  - official title "OWASP Top 10 for Agentic Applications for 2026" (OWASP GenAI Security Project, 2025-12-09); no version label stated;
+  - our `version: "2025"` and `url` (the T&M doc) are wrong for the Top 10. The Top 10 derives from the T&M doc and sits alongside it.
+- **Licence:**
+  - the site footer is CC BY-SA 4.0; the PDF's own licence is UNVERIFIED;
+  - **whether our descriptions are near-verbatim is UNKNOWN.** If they are, share-alike would conflict with CC-BY data, the AIAAIC-shaped issue;
+  - NOTICE-DATA and SOURCE_LICENSES have no OWASP row.
+- **Open user questions raised:** the framework display name; attribution on risk names; version "2026" vs "2025-12".
+- **Foreman [R]:**
+  - the record is 94 lines with 6 UNVERIFIED marks;
+  - the auditor's ASI02 note at :47 admits recall-from-memory and flags it UNVERIFIED;
+  - the auditor edited nothing else;
+  - the foreman moved the file from the main tree into worktree `ws0-v2130-item9`, committed it there and pushed, so the main tree is clean.
+- **Gate asked for:**
+  - the exact ten names from the raw PDF text and the HTML;
+  - the PDF's licence;
+  - a per-entry comparison of our descriptions against the official text (verbatim / near / own);
+  - an OWASP coverage grep;
+  - the blast-radius list for the two strings.
+
 ### ▶ Item 9 (OWASP ASI 2026), STEP 1 dispatched: license-auditor primary-source record
 The label-scientist has no web tools, so the license-auditor first writes `docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md`. It covers:
 - the official 2026 Top 10 for Agentic Applications: title, date, URL and version label, quoted;
