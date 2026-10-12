@@ -40,6 +40,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ⏸ RESUME CHECKPOINT (user exited, 2026-10-11): v2.13.0 queue 5/9 done
+**Done and merged:** items 1, 2, 3, 4, 5; the schema branch (D61 + D57); D69/D70; the item 6/7 memos. **Ruled:** items 6 (A) and 7 (C stage 1).
+
+**In flight when the session ended.** Background agents die with the session, so re-verify each branch by READING THE TREE (agreement 3), not from this note:
+1. **Item 7 stage 1:** `ws4/v2130-oecd-stage1` @ `52b0dcce` (main merged in). The final scoped gate was running. NEXT: gate it.
+   - Full pytest (not re-run after the fixture fix);
+   - per-entity delta vs main = 3,936 rows × 2 label fields only;
+   - fire proof.
+   Then `--no-ff` merge to main.
+2. **Item 8:** `ws6/v2130-export-integrity` @ `763a041e` (A2 panel + `status` added to CORE_FIELDS + main merged in). The final scoped gate was running. NEXT: gate the CORE_FIELDS payload change and the full chain, then merge. That merge conflicts with stage 1 only in CHANGELOG (keep both).
+3. **D75/D76:** `ws2/v2130-precision-ratify-inclusion` (worktree `ws2-v2130-ratify`, from `ebd7f7b3`). A fresh label-scientist was working; the branch may be empty or partial. CHECK `git log` and porcelain in that worktree. If unstarted, redispatch from the D73-D76 entry below. NEXT: gate it, then merge.
+
+**Queued, not started:**
+- **D73:** add tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS` (pipeline-engineer, after the stage-1 merge; show 0 `updated` bumps).
+- **Item 9:** OWASP ASI 2026 edition (label-scientist, after the stage-1 merge; it changes data). Blast radius is on this board (item 2 docs-warden entry).
+- **Item-2 follow-up docs branch:** N-a..N-h; N-d is a data change.
+- **docs-warden at the cut:** README:144, paper:73-77, "stable IDs" wording, INCLUSION (after D75).
+- **WS0 notes:** F2 (SOURCE_LICENSES disputed marker), S6 OECD docs after the stage-1 merge, memo `ruled_by` → `decided_by`.
+- **WS4 notes:** D66 decouple, D63 overdue-review alert, the "26 new DISPUTED" log wording.
+- **WS3:** the ID-reuse audit (spec in docs/audits).
+- **WS6:** `VERSION = "2.0.0"`.
+
+**Final deliverables still owed to the user:** the item status table; exact counts with re-derivation commands; the draft v2.13.0 CHANGELOG; the list of inaccurate announcement claims. **Release notes must carry the D72 "Behaviour changes" line** (load_deprecations raw shapes for INC-00311, INC-01897 and INC-00497).
+
 ### ⚖ D73-D76, USER RULINGS 2026-10-11 (items 5 and 8)
 - **D73 (R1): add tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS`.** source_freshness stays out. **Queued → pipeline-engineer after the stage-1 merge** (same file). The first rebuild must be shown to bump no `updated`; otherwise the change comes back to the user with a delta.
 - **D74 (R2-R4): accept all three.** release-assets.yml and the Pages `_site` check are verified on the first real release (v2.13.0) with the VERSIONING checklist. The MISP timestamp change and the identity over-bump are accepted.
