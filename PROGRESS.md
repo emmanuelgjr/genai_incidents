@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ▶ v2.13.0 cut step 2: USER_AGENT done `b3c17580` (pushed). **Fresh distribution-engineer dispatched for steps 2 (rest), 3, 4 and 5.**
+- **USER_AGENT:** ingest/common.py:97, INGESTION_CONDUCT.md:40 and :75 changed 2.12.0 → 2.13.0; no 2.12 left in either file. pytest 1072 passed. Drift fails only on `USER_AGENT '2.13.0' != stats '2.12.0'`, which is expected.
+- **Steps 2-5 brief:**
+  - the 4 remaining version strings (CITATION ×3, date 2026-10-13);
+  - CHANGELOG [Unreleased] → [2.13.0] — 2026-10-13;
+  - README Latest-release lead line plus the C10 paragraph rewrite (the cut-trap warning included);
+  - paper backticks;
+  - make build, with a field delta that may show ONLY version/generated;
+  - drift rc 0; INCIDENTS Version line;
+  - step-5 prose sweep;
+  - notes advisories 1/2, the post-cut re-tense, and the reuse re-run.
+- A fresh instance was used because the notes author was at ~195k tokens (agreement 3).
+
 ### ▶ v2.13.0 cut STEP 2 started on `release/v2.13.0-cut` (created on origin at main `f0b2e42b`)
 - **Release date: 2026-10-13. Foreman's convention call.**
   - Prior tags are consistent with the UTC date: v2.11.0 was tagged 2026-10-01 06:17 UTC (date-released 2026-10-01); v2.12.0 was tagged 2026-10-04 20:08 UTC (date-released 2026-10-04).
