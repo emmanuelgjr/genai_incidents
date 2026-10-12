@@ -78,23 +78,76 @@ Automated ingest is **precision-first**. Specific rules:
 - Weak, dictionary-word, or short tokens (`ai`, `ml`, `nemo`, `ray`,
   `prompt`, `agent`, `guidance`) must **never** be used as standalone
   substring matches — they are the documented cause of false positives.
-- **Any ingest change that adds entries must be sample-audited for relevance
-  before merge** (not just checked for count/dedup integrity). See
-  `scripts/precision_sample.py` and the CI gate.
+- **Relevance is measured by a dated precision audit, not by a per-change
+  gate.** No CI check samples or audits the entries an ingest change adds.
+  For relevance, CI runs the filter rules' unit tests (e.g.
+  `tests/test_ingest_cve.py`, `tests/test_ingest_wave12.py`); the rest of CI
+  checks schema, count and dedup integrity, not relevance. What exists is one
+  pinned, dated audit: `scripts/precision_sample.py` draws a seeded,
+  stratified sample of the published corpus, a human labels it in scope
+  or out of scope against §1, and `scripts/wilson_ci.py` computes precision
+  with a Wilson interval
+  ([`docs/audits/precision/2026-10-11/`](docs/audits/precision/2026-10-11/)).
+  `scripts/validate.py::check_precision_audit` checks that audit's integrity:
+  pinned sample and frame, published figure derived from human labels only,
+  and a user authorisation while the measurement is pending. It does not
+  look at new ingest changes and sets no precision floor. A new ingest
+  source should still be sample-audited for relevance by its reviewer before
+  merge; that is review practice, not an enforced gate.
+
+  *Corrected 2026-10-11 (ruling D75): this bullet previously said every ingest
+  change that adds entries "must be sample-audited for relevance before
+  merge" and pointed to "the CI gate". No such gate has existed, and
+  `scripts/precision_sample.py` did not exist until 2026-10-11. See
+  [CORRECTIONS.md](CORRECTIONS.md).*
 
 ---
 
 ## 5. Tiers
 
-The dataset is two layers, surfaced explicitly so consumers can choose:
+The dataset has two layers, surfaced explicitly so consumers can choose. The
+layer is the **`tier`** field. It is derived on every build by
+`scripts/merge_and_dedupe.py::_derive_tier`, which is the definition of
+record:
 
-- **Landmark** — notable, human-reviewed incidents with narrative depth
-  (`quality_tier: curated` / `reviewed`). The authoritative core.
-- **Comprehensive feed** — the broad, automatically-ingested vulnerability and
-  advisory stream (`quality_tier: auto`). High recall, lighter review.
+- **Landmark** (`tier: landmark`) is the notable headline set. A row is
+  landmark if it is hand-curated (`quality_tier: curated`), **or** is
+  catalogued in the AI Incident Database (`aiid_id` present), **or** is an
+  AI-harm case (`corpus: ai-harm`).
+- **Comprehensive feed** (`tier: feed`) is every other row. It is mainly the
+  broad CVE/GHSA/OSV vulnerability and advisory stream, plus `security`-corpus
+  rows from other sources such as OECD. High recall, lighter review.
 
-Headline claims should cite the curated set, not the raw total. Conflating the
-two is how a count can look larger than the dataset's true authority.
+**`tier` is not `quality_tier`.** `quality_tier` (`curated` / `reviewed` /
+`auto`) is a separate vetting axis, defined in
+[`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md), and neither field can
+be reconstructed from the other. The feed is **not** the `auto` layer: most
+feed rows are `quality_tier: reviewed` (for example, NVD-scored CVEs are
+labelled `reviewed`), and some landmark rows are `quality_tier: auto`. In the
+data as published at v2.12.0, excluding the 29 `status: retracted` rows:
+
+| `tier` | `auto` | `reviewed` | `curated` | Total |
+|---|---:|---:|---:|---:|
+| feed | 4,227 | 9,495 | 0 | 13,722 |
+| landmark | 185 | 1,611 | 119 | 1,915 |
+
+So 69% of the feed is `reviewed`. `reviewed` means a maintained catalogue,
+an NVD-scored CVE, a hand-picked row or a human/assisted review; it does not
+mean that a human checked each row against §1. Re-derive the table:
+
+```
+python -c "import json,collections; d=json.load(open('data/incidents.json',encoding='utf-8'))['incidents']; c=collections.Counter((e.get('tier'),e.get('quality_tier')) for e in d if e.get('status')!='retracted'); print(sorted(c.items(), key=str))"
+```
+
+Headline claims should cite the landmark count (`landmark_count` in
+[`data/stats.json`](data/stats.json)), not the raw total. Conflating the two
+is how a count can look larger than the dataset's true authority.
+
+*Corrected 2026-10-11 (ruling D75): this section previously defined landmark
+as `quality_tier: curated` / `reviewed` and the feed as `quality_tier: auto`.
+That was false: the split is `tier`, and most of the feed is `reviewed`. It
+also said to cite "the curated set", which is 119 rows, not the landmark
+count. See [CORRECTIONS.md](CORRECTIONS.md).*
 
 ---
 
@@ -106,7 +159,7 @@ two is how a count can look larger than the dataset's true authority.
   flagged via `corpus: ai-harm`; don't conflate with `security`.
 - **Borderline AI-nexus**: when unsure, require a **second** signal (e.g. a
   real AI product in `affected` **and** an AI-specific attack vector) before
-  admitting at `auto` tier; otherwise exclude and open a discussion.
+  admitting at `quality_tier: auto`; otherwise exclude and open a discussion.
 
 Disagreements are resolved by PR against this document — the policy is
 versioned, public, and correctable like the data itself.

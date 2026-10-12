@@ -179,7 +179,13 @@ def _derive_tier(entry: dict) -> str:
     of `quality_tier` (curated/reviewed vs auto), which is a different axis
     and a much larger set than this function returns. Reconciling §5's prose
     is an open maintainer item; until it closes, do not treat §5 as this
-    function's specification."""
+    function's specification.
+
+    Update 2026-10-11 (ruling D75): that item is closed. INCLUSION.md §5 was
+    corrected in place to describe `tier` by this function's rule and to
+    state that `quality_tier` is a separate axis (most feed rows are
+    `reviewed`). §5 now points here; this function remains the definition of
+    record, and §5 is a description of it, not a specification."""
     if (entry.get("quality_tier") == "curated"
             or entry.get("aiid_id")
             or entry.get("corpus") == "ai-harm"):
