@@ -63,6 +63,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D91, USER RULING 2026-10-12 (cut-docs bounce #2): **"Fix + scoped re-gate" (Recommended)**
+- The gate itself recommended "apply verbatim + string check". **The user chose the stricter route**, consistent with D53/D55/D56.
+- **Dispatched:**
+  - **WS0:** the dep5 phrases, verbatim; NOTICE-DATA unchanged. Plus the CHANGELOG TAXII "(was the unofficial "OWASP LLM/ASI" shorthand)".
+  - **WS3:** the flow.py label "retired IDs never reissued · every retired ID keeps a record", with SVGs regenerated and rendered. Plus paper §4 "so every retired ID has a record that resolve_id_status() reports".
+- Then the same reviewer re-checks that diff only.
+- **NEW FOLLOW-UP TASK (not this cut):** an OECD AIM rename sweep, "OECD AI Incidents Monitor" → "OECD AI Incidents and Hazards Monitor". Sites: README:203/:302, DATASHEET:38, paper:60, flow.py:17, auto-refresh.yml, Makefile. **ingest_external.py:233/:241 are a DATA change** (row descriptions and reference titles), which needs a field-level delta. → WS6 docs + WS4 data.
+
 ### ⛔ cut-docs integration: **BOUNCE #2 (scoped re-gate on `df72392a`, 2026-10-12). ESCALATED to the user** (protocol step 6)
 **Verdict, in the gate's words:** "VERDICT: BOUNCE (bounce #2 on this gate, so per protocol this escalates to the user). Both defects are one-line wording fixes. I give the exact replacement text for each, so I recommend 'apply verbatim + string check' rather than a third full gate."
 
