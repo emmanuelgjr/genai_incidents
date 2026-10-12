@@ -20,13 +20,37 @@ Known limits (each would need a parser, not a pattern, to close):
   to the nearest framework name, ASI code or other URL; a sentence that names
   Threats and Mitigations and then cites its URL for the ASI codes without
   naming either again passes.
+- D90 in Python string literals: adjacent literals (implicit concatenation,
+  also across comments and line breaks) and literals joined by a bare `+` are
+  joined before the name rules run (a hit that runs to the end of one literal
+  is judged on the joined text only). A name assembled any other way (a variable,
+  `%` or `.format()`, `"".join(...)`, a backslash-newline inside one literal)
+  is not seen.
+- D90 "OWASP LLM and ASI" / "OWASP LLM & ASI": fails unless a field noun
+  follows ("codes", "columns", "fields", "tags", ...; see LLM_AND_ASI), because
+  "OWASP LLM and ASI codes" is the legitimate wording for the two code fields
+  (the D90 UI labels "OWASP LLM" and "OWASP ASI" sharing one noun). The
+  consequence: the name used as a framework name immediately before such a
+  noun ("the OWASP LLM and ASI codes" meaning the frameworks' codes) passes,
+  and an intervening adjective other than "risk" ("OWASP LLM and ASI mapping
+  codes") fails. Accepted both ways.
+- CORRECTIONS.md: a quoted retired name passes only with correction language
+  ("was", "retired", "former", "corrected", ...; see CORRECTION_WORDS) in the
+  same sentence or table cell. Any such word anywhere in that sentence counts,
+  so a sentence that uses the quoted name as current and also says "was" about
+  something else passes.
+- CHANGELOG.md is excluded (EXCLUDE_PREFIXES): it is history, and its entries
+  name the retired forms to record what changed. A stale name added there is
+  not caught.
 """
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import subprocess
+import tokenize
 from pathlib import Path
 
 import pytest
@@ -69,8 +93,25 @@ SHORTHAND = re.compile(rf"\bASI{SEP}Top{SEP}?10\b", re.I)
 # "... Top 10" form is SHORTHAND's). D90 keeps the short label "OWASP ASI"
 # next to the codes (app.js, the filter, the INCIDENTS.md column header, an
 # image alt, TAXONOMIES), so only the slash pair is matched.
-_SLASH = r"(?:\s|&nbsp;|&#160;|&#xa0;)*/(?:\s|&nbsp;|&#160;|&#xa0;)*"
-BARE_LLM_ASI = re.compile(rf"\bOWASP{_POSS}{SEP}LLM{_SLASH}ASI\b(?!{SEP}Top{SEP}?10\b)", re.I)
+# The slash may be U+2044 FRACTION SLASH, U+2215 DIVISION SLASH, U+FF0F
+# FULLWIDTH SOLIDUS or an HTML entity; Markdown or HTML emphasis may wrap
+# either word (`OWASP **LLM/ASI**`, `OWASP <b>LLM</b>/<b>ASI</b>`).
+_SLASH_CHARS = "/" + chr(0x2044) + chr(0x2215) + chr(0xFF0F)
+_GAP = r"(?:\s|&nbsp;|&#160;|&#xa0;)*"
+_SLASH = rf"{_GAP}(?:[{_SLASH_CHARS}]|&#47;|&#x2f;|&sol;){_GAP}"
+_EMPH = r"(?:[*_`]|</?(?:strong|b|em|i|code)>)*"
+BARE_LLM_ASI = re.compile(
+    rf"\bOWASP{_POSS}{SEP}{_EMPH}LLM{_EMPH}{_SLASH}{_EMPH}ASI\b(?!{SEP}Top{SEP}?10\b)", re.I)
+# D90, the "and" / "&" pair. "OWASP LLM and ASI codes" (export_misp.py,
+# ingest_aiaaic_sheet.py, the README site-search alt) names the two code
+# fields, so it passes when a field noun follows; used on its own it is a name
+# for the two frameworks and fails. "... ASI Top 10" is SHORTHAND's.
+_AND = rf"(?:{SEP})?(?:&amp;|&)(?:{SEP})?|{SEP}and{SEP}"
+FIELD_NOUNS = (rf"(?:risk{SEP})?(?:codes?|columns?|fields?|filters?|tags?|values?|labels?"
+               rf"|IDs?|identifiers?|keys?|properties|property|arrays?|lists?)\b")
+LLM_AND_ASI = re.compile(
+    rf"\bOWASP{_POSS}{SEP}{_EMPH}LLM{_EMPH}(?:{_AND}){_EMPH}ASI\b"
+    rf"(?!{_EMPH}{SEP}{_EMPH}{FIELD_NOUNS})(?!{SEP}Top{SEP}?10\b)", re.I)
 # Sent correspondence quotes what the recipient was told (each file says "do
 # not edit the message body"), so D90 does not apply there.
 D90_EXEMPT = ("docs/outreach/",)
@@ -78,6 +119,12 @@ D90_EXEMPT = ("docs/outreach/",)
 # 2026-10-12 on the item 9 row); see _quoted_former_names.
 CORRECTIONS = "CORRECTIONS.md"
 QUOTE_PAIRS = ('""', "''", chr(0x201C) + chr(0x201D), chr(0x2018) + chr(0x2019))
+# ...and only as a former name: the sentence (or table cell) holding the quote
+# must say so. A sentence ends at ". ", "! ", "? ", a table pipe or a newline.
+CORRECTION_WORDS = re.compile(
+    r"\b(?:was|were|had\s+been|former(?:ly)?|retired|corrected|replaced|renamed|previously"
+    r"|unofficial|superseded|no\s+longer|instead\s+of|used\s+to)\b", re.I)
+_SENTENCE_END = re.compile(r"[.!?](?=\s)|[|\n]")
 # Variants still awaiting their writer. D86 (2026-10-12) renamed every held
 # site, the schema pair (schema-architect, sole writer of schema/) last, so
 # the table is empty and any live variant fails. Exact counts: should a site
@@ -156,13 +203,96 @@ def _quoted_former_names(rel: str, text: str) -> set[tuple[int, int]]:
     """Spans of the retired name quoted as a former name in CORRECTIONS.md.
 
     A correction row records what was corrected away, so there (only) the
-    retired name may appear inside quotation marks. Unquoted, it still fails.
+    retired name may appear inside quotation marks, in a sentence that says it
+    is a former name. Unquoted, or quoted as the current name, it still fails.
     """
     if rel != CORRECTIONS:
         return set()
     return {hit.span() for hit in RETIRED_NAME.finditer(text)
             if hit.start() > 0 and hit.end() < len(text)
-            and text[hit.start() - 1] + text[hit.end()] in QUOTE_PAIRS}
+            and text[hit.start() - 1] + text[hit.end()] in QUOTE_PAIRS
+            and CORRECTION_WORDS.search(_sentence(text, hit.start() - 1, hit.end() + 1))}
+
+
+def _sentence(text: str, start: int, end: int) -> str:
+    """The sentence or table cell around text[start:end], the span itself excluded."""
+    lo = max((m.end() for m in _SENTENCE_END.finditer(text, 0, start)), default=0)
+    m = _SENTENCE_END.search(text, end)
+    return text[lo:start] + " " + text[end:m.start() if m else len(text)]
+
+
+def _line(text: str, pos: int) -> int:
+    return text.count("\n", 0, pos) + 1
+
+
+Piece = tuple[int, int, int, int]   # (offset in joined, source line, source start, source end)
+
+
+def _python_literal_runs(text: str) -> list[tuple[str, list[Piece]]]:
+    """Runs of string literals Python joins into one string.
+
+    Adjacent literals (implicit concatenation, also across comments and line
+    breaks inside brackets) and literals joined by a bare `+`, for each run of
+    two or more: the joined bodies and where each body sits in the joined text
+    and in the source. Bodies are the raw source between the quotes (prefixes
+    and quotes stripped, escapes left as written, so source offsets hold); an
+    f-string's {fields} stay as text. Untokenizable source yields no runs.
+    """
+    lines = io.StringIO(text).readlines()        # split as tokenize reads it (LF only)
+    starts = [0]
+    for line in lines:
+        starts.append(starts[-1] + len(line))
+
+    def at(pos: tuple[int, int]) -> int:
+        return starts[pos[0] - 1] + pos[1]
+
+    try:
+        toks = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (tokenize.TokenError, SyntaxError):
+        return []
+    runs: list[tuple[str, list[Piece]]] = []
+    cur: list[tuple[int, int, int]] = []         # (source start, source end, line)
+    pending_plus = False
+    depth, fstart = 0, None
+    fstring_start = getattr(tokenize, "FSTRING_START", -1)
+    fstring_end = getattr(tokenize, "FSTRING_END", -1)
+
+    def close() -> None:
+        if len(cur) > 1:
+            joined, pieces = "", []
+            for a, b, line in cur:
+                pieces.append((len(joined), line, a, b))
+                joined += text[a:b]
+            runs.append((joined, pieces))
+        cur.clear()
+
+    for tok in toks:
+        if depth:                                    # inside an f-string (3.12+ tokens)
+            if tok.type == fstring_start:
+                depth += 1
+            elif tok.type == fstring_end:
+                depth -= 1
+                if not depth:
+                    cur.append((at(fstart.end), at(tok.start), fstart.start[0]))
+                    pending_plus = False
+            continue
+        if tok.type == fstring_start:                # any token that breaks a run closed it
+            depth, fstart = 1, tok
+            continue
+        if tok.type == tokenize.STRING:
+            prefix = len(re.match(r"[A-Za-z]*", tok.string).group(0))
+            q = 3 if tok.string[prefix:prefix + 3] in ('"""', "'''") else 1
+            cur.append((at(tok.start) + prefix + q, at(tok.end) - q, tok.start[0]))
+            pending_plus = False
+        elif tok.type in (tokenize.NL, tokenize.COMMENT):
+            pass
+        elif tok.type == tokenize.OP and tok.string == "+" and cur and not pending_plus:
+            pending_plus = True
+        else:
+            close()
+            pending_plus = False
+    close()
+    return runs
 
 
 def _tm_label(line: str, start: int, end: int, name: re.Pattern) -> str:
@@ -177,6 +307,38 @@ def _tm_label(line: str, start: int, end: int, name: re.Pattern) -> str:
     cut = max((h.end() for h in (*name.finditer(before), *ASI_CODE.finditer(before),
                                  *re.finditer(r"https?://\S+", before))), default=0)
     return before[cut:]                                           # bare: the text just before it
+
+
+def _joined_literal_problems(rel: str, text: str) -> tuple[list[str], set[int]]:
+    """The name rules on Python string literals as Python joins them.
+
+    Returns the problems and the source positions the plain-text scan must not
+    report again: where a joined hit starts (a duplicate), and any plain-text
+    hit that runs to the end of its literal, whose verdict depends on what the
+    next literal adds ("OWASP LLM and ASI " "codes" passes, "OWASP LLM/ASI "
+    "Top 10" is shorthand, not bare). Those are judged as joined only. Each
+    problem names the file and the line of the literal the hit starts in.
+    """
+    rules = [("retired name", RETIRED_NAME), ("shorthand (D87: use the official names)", SHORTHAND),
+             ("variant", VARIANT)]
+    if not rel.startswith(D90_EXEMPT):
+        rules += [("bare (D90: use the official names)", BARE_LLM_ASI),
+                  ("bare (D90: use the official names)", LLM_AND_ASI)]
+    out, skip = [], set()
+    runs = _python_literal_runs(text)
+    for joined, pieces in runs:
+        for what, rule in rules:
+            for hit in rule.finditer(joined):
+                off, line, a, _ = [pc for pc in pieces if pc[0] <= hit.start()][-1]
+                skip.add(a + hit.start() - off)
+                out.append(f"{rel}:{line}: {what} {hit.group(0)!r} in joined string literals")
+    for _, rule in rules:
+        for hit in rule.finditer(text):
+            for _, pieces in runs:
+                for _, _, a, b in pieces[:-1]:
+                    if a <= hit.start() < b and not text[hit.end():b].strip():
+                        skip.add(hit.start())
+    return out, skip
 
 
 def scan(root: Path, files: list[str]) -> list[str]:
@@ -194,15 +356,26 @@ def scan(root: Path, files: list[str]) -> list[str]:
             continue
         text = p.read_bytes().decode("utf-8", errors="ignore")
         quoted = _quoted_former_names(rel, text)
-        for hit in RETIRED_NAME.finditer(text):
+        joined_skip: set[int] = set()
+        if rel.endswith(".py"):
+            joined_problems, joined_skip = _joined_literal_problems(rel, text)
+            problems += joined_problems
+
+        def free(hit: re.Match) -> bool:
+            """Not already judged on the joined Python literals."""
+            return hit.start() not in joined_skip
+
+        for hit in filter(free, RETIRED_NAME.finditer(text)):
             if hit.span() not in quoted:
                 problems.append(f"{rel}: retired name {hit.group(0)!r}")
-        for hit in SHORTHAND.finditer(text):
+        for hit in filter(free, SHORTHAND.finditer(text)):
             problems.append(f"{rel}: shorthand {hit.group(0)!r} (D87: use the official names)")
         if not rel.startswith(D90_EXEMPT):
-            for hit in BARE_LLM_ASI.finditer(text):
-                problems.append(f"{rel}: bare {hit.group(0)!r} (D90: use the official names)")
-        n = sum(not any(a <= hit.start() < b for a, b in quoted) for hit in VARIANT.finditer(text))
+            for rule in (BARE_LLM_ASI, LLM_AND_ASI):
+                for hit in filter(free, rule.finditer(text)):
+                    problems.append(f"{rel}:{_line(text, hit.start())}: bare {hit.group(0)!r} (D90: use the official names)")
+        n = sum(not any(a <= hit.start() < b for a, b in quoted)
+                for hit in filter(free, VARIANT.finditer(text)))
         if n:
             variants[rel] = n
         for hit in VERSION_LITERAL.finditer(text):
@@ -351,6 +524,22 @@ NBSP = chr(0xA0)
     ("OWASP&nbsp;LLM/ASI", "D90"),
     ("frameworks (OWASP\n  LLM/ASI, NIST AI RMF)", "D90"),                 # line-wrapped
     ('description="Incidents mapped to OWASP LLM/ASI."', "D90"),           # served text
+    ("OWASP **LLM/ASI**", "D90"),                                          # emphasis
+    ("**OWASP LLM/ASI**", "D90"),
+    ("OWASP `LLM/ASI` mappings", "D90"),
+    ("OWASP <b>LLM</b>/<b>ASI</b>", "D90"),
+    ("OWASP LLM" + chr(0x2044) + "ASI", "D90"),                            # FRACTION SLASH
+    ("OWASP LLM" + chr(0x2215) + "ASI", "D90"),                            # DIVISION SLASH
+    ("OWASP LLM" + chr(0xFF0F) + "ASI", "D90"),                            # FULLWIDTH SOLIDUS
+    ("OWASP LLM&#47;ASI", "D90"),
+    ("mapped to OWASP LLM and ASI.", "D90"),                               # D90 "and" / "&"
+    ("frameworks (OWASP LLM & ASI, NIST AI RMF)", "D90"),
+    ("OWASP LLM &amp; ASI", "D90"),
+    ("OWASP LLM&ASI", "D90"),
+    ("OWASP's LLM and ASI mappings", "D90"),
+    ("OWASP\n  LLM and\n  ASI, NIST AI RMF", "D90"),
+    ("OWASP **LLM and ASI** coverage", "D90"),
+    ("OWASP LLM and ASI mapping codes", "D90"),                            # accepted false positive
     ('{"owasp_asi": "2025"}', "version literal"),
     ("'owasp_asi': '2025'", "version literal"),
     ('genai-incidents:taxonomy-owasp-asi="2025"', "version literal"),      # MISP tag
@@ -395,6 +584,17 @@ def test_guard_fires_on_planted_input(tmp_path, planted, expect):
     '<label for="f-asi">OWASP ASI</label>',
     "| Date | ID | Title | Severity | OWASP LLM | OWASP ASI | CVE |",
     "OWASP LLM and ASI codes",
+    "Tags (incident id, attack vector, severity, OWASP\nLLM and ASI codes, corpus, tier)",  # export_misp.py
+    "OWASP LLM and ASI codes, tags, and cite link",                       # README alt
+    "OWASP LLM and ASI risk codes",
+    "the OWASP LLM & ASI columns",
+    "OWASP LLM &amp; ASI fields",
+    "the OWASP LLM and ASI filters",
+    "OWASP LLM and ASI **codes**",
+    "the OWASP LLM and OWASP ASI columns",
+    "**OWASP LLM** / **OWASP ASI**",                                       # the two UI labels
+    "`owasp_llm`/`owasp_asi`",
+    "OWASP LLM / NIST / ASI",
     "the LLM/ASI/CVE columns",
     "dynamically-populated selects (year/llm/asi/vector)",
 ])
@@ -411,6 +611,12 @@ def test_guard_allows_legitimate_text(tmp_path, legit):
     (CORRECTIONS, 'Corrected the "OWASP Agentic Top 10 mapping".', False),               # not the whole quote
     (CORRECTIONS, 'Corrected the "OWASP Agentic Applications" mapping.', False),         # a variant, not the retired name
     ("docs/planted.md", 'The display name "OWASP Agentic Top 10" was unofficial.', False),  # CORRECTIONS only
+    (CORRECTIONS, 'Mapped to the "OWASP Agentic Top 10" today.', False),                 # quoted as current
+    (CORRECTIONS, 'Mapped to the "OWASP Agentic Top 10" today. The URL was wrong.', False),  # word in another sentence
+    (CORRECTIONS, '| Mapped to the "OWASP Agentic Top 10" | The URL was wrong |', False),    # word in another cell
+    (CORRECTIONS, 'The "OWASP Agentic Top 10" name is retired.', True),
+    (CORRECTIONS, 'Formerly "OWASP Agentic Top 10"; now the official name.', True),
+    (CORRECTIONS, '| x | The name "OWASP Agentic Top 10" was also unofficial. | y |', True),  # the real row's shape
 ])
 def test_corrections_may_quote_the_retired_name(tmp_path, rel, planted, clean):
     root = _scratch(tmp_path)
@@ -418,6 +624,67 @@ def test_corrections_may_quote_the_retired_name(tmp_path, rel, planted, clean):
     (root / rel).write_text(planted, encoding="utf-8")
     problems = scan(root, BASE + [rel])
     assert (problems == []) is clean, problems
+
+
+@pytest.mark.parametrize("source, expect, line", [
+    # The cut-docs gate's input: how export_taxii.py builds its served description.
+    ('d = (\n    "(GenAI incidents mapped to the OWASP LLM/"\n    "ASI, NIST AI RMF and MITRE ATLAS)"\n)\n', "D90", 2),
+    ("d = ('...OWASP LLM/' 'ASI, NIST')\n", "D90", 1),
+    ('d = ("mapped to OWASP "  # a comment between\n     "LLM/ASI")\n', "D90", 1),
+    ('d = "OWASP LLM" + "/ASI"\n', "D90", 1),
+    ('d = (f"{n} entries mapped to OWASP " "LLM/ASI")\n', "D90", 1),
+    ('d = ("x",\n     "mapped to OWASP LLM and "\n     "ASI.")\n', "D90", 2),
+    ('d = ("OWASP **LLM/" "ASI**")\n', "D90", 1),
+    ('d = ("x",\n     "mapped to the Agentic "\n     "Top 10")\n', "retired name", 2),
+    ('d = ("the ASI " "Top 10")\n', "shorthand", 1),
+    ('d = ("OWASP " "Agentic Applications")\n', "variant", 1),
+])
+def test_guard_joins_python_string_literals(tmp_path, source, expect, line):
+    root = _scratch(tmp_path)
+    (root / "scripts").mkdir()
+    (root / "scripts" / "planted.py").write_text(source, encoding="utf-8")
+    as_md = root / "docs" / "planted.md"                           # control: unjoined, it passes
+    as_md.parent.mkdir(parents=True, exist_ok=True)
+    as_md.write_text(source, encoding="utf-8")
+    assert scan(root, BASE + ["docs/planted.md"]) == []
+    problems = scan(root, BASE + ["scripts/planted.py"])
+    assert any(p.startswith(f"scripts/planted.py:{line}: ") and expect in p
+               and "in joined string literals" in p for p in problems), problems
+
+
+@pytest.mark.parametrize("source", [
+    'd = ("OWASP LLM and ASI " "codes")\n',
+    'x = "OWASP LLM/"\ny = "ASI"\n',                               # two statements
+    'f("OWASP LLM/", "ASI")\n',                                    # two arguments
+    'd = {"OWASP LLM/": "ASI"}\n',
+    'd = "OWASP LLM/" + x + "ASI"\n',
+    'd = ("the OWASP Top 10 for LLM "\n     "Applications, the OWASP Top 10 for Agentic Applications, NIST AI RMF")\n',
+    'd = ("OWASP LLM", "OWASP ASI")\n',                             # the two UI labels
+    'x = """unterminated\n"OWASP LLM/" "ASI"\n',                   # untokenizable: skipped, not crashed
+])
+def test_python_literal_join_allows(tmp_path, source):
+    root = _scratch(tmp_path)
+    (root / "scripts").mkdir()
+    (root / "scripts" / "ok.py").write_text(source, encoding="utf-8")
+    assert scan(root, BASE + ["scripts/ok.py"]) == []
+
+
+def test_python_literal_judged_as_joined(tmp_path):
+    """Inside a joined run the plain-text hit defers to the joined one: one
+    problem, the right rule, not a bare-form hit on the first literal alone."""
+    root = _scratch(tmp_path)
+    (root / "scripts").mkdir()
+    (root / "scripts" / "p.py").write_text('d = ("OWASP LLM/ASI "\n     "Top 10")\n', encoding="utf-8")
+    problems = scan(root, BASE + ["scripts/p.py"])
+    assert len(problems) == 1 and problems[0].startswith("scripts/p.py:1: shorthand"), problems
+    # A hit inside one literal that the join would hide ("fooOWASP" loses its
+    # word boundary) is still reported by the plain-text scan.
+    (root / "scripts" / "p.py").write_text('d = ("foo"\n     "OWASP LLM/ASI, NIST")\n', encoding="utf-8")
+    problems = scan(root, BASE + ["scripts/p.py"])
+    assert len(problems) == 1 and problems[0].startswith("scripts/p.py:2: bare"), problems
+    # A hit inside one literal is reported once, not once per scan.
+    (root / "scripts" / "p.py").write_text('d = ("x " "OWASP LLM/ASI, NIST")\n', encoding="utf-8")
+    assert len(scan(root, BASE + ["scripts/p.py"])) == 1
 
 
 def test_d90_exempts_sent_correspondence_only(tmp_path):

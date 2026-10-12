@@ -162,10 +162,10 @@ def _derive_purls(entry: dict) -> list[str]:
 
 
 def _derive_tier(entry: dict) -> str:
-    """Two-tier split: the curated/notable LANDMARK set vs the comprehensive
-    vulnerability/advisory FEED. landmark = hand-curated, a real-world incident
-    catalogued in the AI Incident Database (`aiid_id`), or an AI-harm case;
-    feed = the CVE/GHSA/OSV bulk. (The `real-world` *category* is deliberately
+    """Two-tier split: the LANDMARK set (the headline-citation set) vs the
+    comprehensive FEED. landmark = rows that are hand-curated, catalogued in
+    the AI Incident Database (`aiid_id`), or AI-harm cases; feed = every other
+    row, mainly the CVE/GHSA/OSV advisory stream plus OECD-sourced rows. (The `real-world` *category* is deliberately
     NOT used — it also tags exploited CVEs, which belong in the feed.) Headline
     claims should cite the landmark count, not the raw total.
 

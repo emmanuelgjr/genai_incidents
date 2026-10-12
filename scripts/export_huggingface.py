@@ -105,7 +105,7 @@ Key fields per record (full reference in the data dictionary):
 - `quality_tier` — `curated` / `reviewed` / `auto` (filter by vetting level)
 - `tier` — `landmark` (the headline-citation set: rows that are hand-curated, catalogued
   in the AI Incident Database, or AI-harm cases) or `feed` (everything else: mostly
-  CVE/GHSA/OSV advisories, plus OECD AI Incidents Monitor incident reports). A **different axis** from `quality_tier`, not a rename of it:
+  CVE/GHSA/OSV advisories, plus OECD AI Incidents and Hazards Monitor incident reports). A **different axis** from `quality_tier`, not a rename of it:
   most landmark rows qualify by being catalogued in the AI Incident Database, which
   says nothing about vetting level. Cite the landmark count, not the corpus total,
   when you mean "headline incidents"
@@ -140,7 +140,7 @@ which is authoritative; this is a summary of it.
 
 ## Sources & provenance
 
-Aggregated and de-duplicated from AIID, OECD AI Incidents Monitor, AIAAIC, MITRE ATLAS,
+Aggregated and de-duplicated from AIID, OECD AI Incidents and Hazards Monitor, AIAAIC, MITRE ATLAS,
 AVID, MIT FutureTech AI Risk Repository, NVD / GitHub Security Advisories / OSV, garak,
 promptfoo, red-team benchmark catalogues, and researcher blogs / vendor threat reports.
 

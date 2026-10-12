@@ -74,7 +74,18 @@ The build is a deterministic, idempotent pipeline
 2. **Deduplicate** with first-hit-wins keys (CVE id › source id › normalised
    reference URL › fuzzy title within ±1 year), resolving every match to the
    *live* absorbing record to avoid silent content loss on transitive merges.
-3. **Assign `INC-#####` ids.** The allocator never reissues a retired number,
+3. **Finalise content fields** *before* history stamping, so the content
+   snapshot is stable: attack vector, framework mappings, curation overrides,
+   CISA KEV exploited-in-the-wild flags and rejected-CVE status (CWE/CVSS
+   arrive with the NVD/GHSA source records).
+4. **Classify, then stamp.** Derive the classifiers `quality_tier`, `corpus`
+   and `tier`, then stamp UTC `added`/`updated` dates, gated by a content
+   snapshot so unchanged entries don't churn. The three classifiers and
+   `content_license` (carried from the source record) are content fields
+   (rulings D81/D82), so a change to any of them bumps `updated`. Stamping is
+   keyed on CVE and source ids, not on `INC-#####` ids, so it runs before
+   step 5 assigns them.
+5. **Assign `INC-#####` ids.** The allocator never reissues a retired number,
    and retired ids are recorded in `id_deprecations.json`, so a citation of a
    tombstoned ID resolves. An ID is not a permanent pointer to one incident:
    across release tags v2.0.0–v2.12.0, 591 published IDs carried more than one
@@ -85,21 +96,13 @@ The build is a deterministic, idempotent pipeline
    of `docs/ID_POLICY.md` §1.4(a), 3 release-dependent IDs (`INC-00497`,
    `INC-00554`, `INC-08139`) and 1 split group (`INC-00754`).
    `resolve_id_status()` names the reason for each (`docs/ID_POLICY.md` §8).
-4. **Finalise content fields** *before* history stamping, so the content
-   snapshot is stable: attack vector, framework mappings, curation overrides,
-   CISA KEV exploited-in-the-wild flags and rejected-CVE status (CWE/CVSS
-   arrive with the NVD/GHSA source records), then the classifiers
-   `quality_tier`, `corpus` and `tier`. These three and `content_license`
-   (carried from the source record) are content fields (rulings D81/D82), so
-   a change to any of them bumps `updated`.
-5. **Enrich** with derived provenance (`confidence`, `source_count`,
-   `source_status`) after history stamping, outside the content snapshot.
-   `tier` is derived again at this point; that matters only for retained
-   entries (step 6), which skip the step-4 classifiers.
 6. **Retain-on-drop**: incidents are never silently lost when a source stops
    emitting them; they are carried forward and marked `source_status: retained`.
-7. **Stamp** UTC dates, gated by a content snapshot so unchanged entries don't
-   churn; render Markdown/site/STIX; **validate** against schema and invariants.
+7. **Enrich** with derived provenance (`confidence`, `source_count`,
+   `source_status`) after history stamping, outside the content snapshot.
+   `tier` is derived again at this point; that matters only for the entries
+   retained in step 6, which skip the step-4 classifiers.
+8. **Render** Markdown/site/STIX and **validate** against schema and invariants.
 
 **Determinism.** The build must reproduce byte-identically across UTC days; CI
 fails on any drift. This is what makes the dataset reproducible and auditable.
