@@ -43,14 +43,12 @@ RETIRED_NAME = re.compile(r"OWASP\s+Agentic\s+Top\s*10", re.I)
 # Any other "OWASP Agentic ..." display-name variant (not the Agentic Security
 # Initiative, which is the OWASP team's real name).
 VARIANT = re.compile(r"OWASP\s+Agentic\b(?!\s+Security\s+Initiative)", re.I)
-# Variants still awaiting their writer. D86 (2026-10-12) renamed every other
-# held site; the schema pair is schema-architect's (sole writer of schema/)
-# and is cleared in its own commit. Exact counts, so a new occurrence fails,
-# and fixing one fails too until it is removed from this table.
-PENDING_VARIANTS = {
-    "schema/incident.schema.json": 2,
-    "src/genai_incidents/schema/incident.schema.json": 2,
-}
+# Variants still awaiting their writer. D86 (2026-10-12) renamed every held
+# site, the schema pair (schema-architect, sole writer of schema/) last, so
+# the table is empty and any live variant fails. Exact counts: should a site
+# ever be held again, a new occurrence fails, and fixing one fails too until
+# it is removed from this table.
+PENDING_VARIANTS: dict[str, int] = {}
 VERSION_LITERAL = re.compile(r"""["']?owasp_asi["']?\s*[:=]\s*["'](\d{4}(?:\.\d+)?)["']""")
 EDITION_IN_NAME = re.compile(r"Agentic\s+Applications\W{0,3}(?:for\s+)?(20\d\d)", re.I)
 

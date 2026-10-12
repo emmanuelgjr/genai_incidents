@@ -47,8 +47,11 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   following chips shifted); the social-card image (the taxonomy line is now set at
   26 px and wraps at its separators, because the full name does not fit one line at
   28 px); and the methods paper. The dated 2026-05-25 per-incident-pages plan is a
-  record and is left as written. The schema descriptions are renamed separately by
-  the schema owner.
+  record and is left as written. The two schema descriptions that named the
+  framework (the top-level `description` and the `owasp_asi` property's) now read
+  "OWASP Top 10 for Agentic Applications (ASI)" in `schema/incident.schema.json` and
+  its packaged copy (D86); description text only, no type, enum, pattern or
+  `required` change.
 - **Attribution (D80, D83, D84):** OWASP's CC BY-SA 4.0 licence is verified from the
   PDF. New `docs/SOURCE_LICENSES.md` section 3.6; an OWASP attribution paragraph in
   `NOTICE-DATA` that covers the codes and names wherever they are reproduced; a
