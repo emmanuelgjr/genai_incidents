@@ -65,8 +65,8 @@ def build(incidents: list[dict]) -> int:
         "title": "genai_incidents — static TAXII 2.1",
         "description": (
             "Read-only static TAXII 2.1 mirror of the genai_incidents dataset "
-            "(GenAI/agentic-AI security incidents mapped to OWASP LLM/ASI, NIST "
-            "AI RMF and MITRE ATLAS). Served as static JSON files over GitHub "
+            "(GenAI/agentic-AI security incidents mapped to the OWASP Top 10 for LLM "
+            "Applications, the OWASP Top 10 for Agentic Applications, NIST AI RMF and MITRE ATLAS). Served as static JSON files over GitHub "
             "Pages; see taxii2/README.md for the media-type caveat."
         ),
         "contact": "https://github.com/emmanuelgjr/genai_incidents",
