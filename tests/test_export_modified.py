@@ -138,8 +138,9 @@ def test_every_exported_entry_field_is_content_or_explicitly_declared():
     # Exported, NOT in _CONTENT_FIELDS: re-deriving these does not move
     # `updated`, so a change reaches STIX consumers only through an
     # EXPORTER_VERSION bump (audit note, ruling R1).
-    derived_by_exporter_version = {"tier", "quality_tier", "corpus", "content_license",
-                                   "source_freshness"}
+    # D73 (2026-10-11) moved tier/quality_tier/corpus/content_license INTO
+    # _CONTENT_FIELDS; only source_freshness (describes unchanged content) remains.
+    derived_by_exporter_version = {"source_freshness"}
     sample: dict[str, tuple[dict, object]] = {}
     for e in _real_rows():
         for k, v in e.items():

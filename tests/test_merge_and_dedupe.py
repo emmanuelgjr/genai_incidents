@@ -1361,11 +1361,12 @@ def test_merge_into_leaves_target_content_license_untouched():
     assert target["description"] == "AIAAIC-tracked incident. System: X."
 
 
-def test_content_license_excluded_from_content_fields():
-    # A licensing correction (e.g. an AIAAIC waiver downgrading `obligations`)
-    # must not present as a content change / bump `updated` (schema-architect
-    # memo Sec 4 item 2; WS0-T3 link-1 gate ruling (i)).
-    assert "content_license" not in m._CONTENT_FIELDS
+def test_content_license_in_content_fields_aiaaic_scratch_fields_are_not():
+    # D73 (2026-10-11) reverses the WS0-T3 link-1 ruling (i) for content_license
+    # only: it is exported (min.json, STIX, HF), so a licensing correction must
+    # bump `updated` or a consumer keyed on `updated`/STIX `modified` misses it.
+    # The AIAAIC scratch fields are build-internal and stay out.
+    assert "content_license" in m._CONTENT_FIELDS
     assert "aiaaic_ethical_tags" not in m._CONTENT_FIELDS
     assert "aiaaic_seed_facts" not in m._CONTENT_FIELDS
 
@@ -2556,3 +2557,63 @@ def test_content_into_map_ignores_naming_rulings():
     assert cmap == {"INC-00311": ["INC-14726", "INC-14907"], "INC-00497": "INC-00311"}
     live = {"INC-14726", "INC-14907"}
     assert m.resolve_live_targets("INC-00497", cmap, live) == live
+
+
+# ---------------------------------------------------------------------------
+# D73 (2026-10-11) -- tier / quality_tier / corpus / content_license are content
+# ---------------------------------------------------------------------------
+
+_D73_BASE = {
+    "title": "T", "description": "d", "tier": "feed", "quality_tier": "auto",
+    "corpus": "security", "content_license": "CC-BY-SA-4.0",
+    "cve_ids": ["CVE-2099-0001"], "source_ids": ["S-1"],
+}
+_D73_CHANGED = {"tier": "landmark", "quality_tier": "reviewed",
+                "corpus": "ai-harm", "content_license": "AIAAIC-obligations"}
+
+
+def _d73_apply(entry_overrides):
+    prev = {**_D73_BASE}
+    prev_ts = {"CVE-2099-0001": ("2026-01-01", "2026-02-02", m._content_snapshot(prev))}
+    e = {**_D73_BASE, **entry_overrides}
+    m._apply_history(e, prev_ts)
+    return e
+
+
+def test_d73_each_of_four_fields_bumps_updated():
+    unchanged = _d73_apply({})
+    # Fails if _apply_history stopped comparing, or the snapshot ignores everything:
+    assert unchanged["updated"] == "2026-02-02" and unchanged["added"] == "2026-01-01"
+    for f, v in _D73_CHANGED.items():
+        e = _d73_apply({f: v})
+        # Fails (stays 2026-02-02) when `f` is dropped from _CONTENT_FIELDS.
+        assert e["updated"] == str(m.utc_today()), f
+        assert e["added"] == "2026-01-01", f
+
+
+def test_d73_source_freshness_does_not_bump_updated():
+    e = _d73_apply({"source_freshness": {"status": "stale", "as_of": "2026-09-01",
+                                         "sources": ["airi"]}})
+    # Fails (bumps to today) if source_freshness is ever added to _CONTENT_FIELDS.
+    assert e["updated"] == "2026-02-02"
+
+
+def test_d73_rebuild_on_later_day_does_not_bump(tmp_path, monkeypatch):
+    """Ordering guard: tier/quality_tier/corpus are in the snapshot, so they must
+    be final BEFORE _apply_history compares. Fails (second build bumps to day 2)
+    if they are derived after it -- the 15,657-row spurious bump the first D73
+    rebuild showed."""
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    (ingest / "src.json").write_text(
+        _json.dumps([_oecd_entry("OECD-AIM-2020-03-03-d73a", "D73 steady state")]),
+        encoding="utf-8")
+    _freeze_utc_today(monkeypatch, datetime.date(2099, 6, 1))
+    m.main()
+    first = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    e1 = first["incidents"][0]
+    assert e1["tier"] and e1["quality_tier"] and e1["corpus"]
+    _freeze_utc_today(monkeypatch, datetime.date(2099, 6, 2))
+    m.main()
+    second = _json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+    assert second["incidents"][0]["updated"] == "2099-06-01"
+    assert first == second

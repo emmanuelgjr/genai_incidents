@@ -63,6 +63,44 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D73 (as ruled D81/D82): **DONE. Re-check PASS on `916159c7`; MERGED to main 2026-10-12 as `25a0dd36` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS. 916159c7 is sound to merge under D81/D82. DEFECTS: none."
+
+**Advisories.** All are routed to **docs-warden at the cut**:
+1. docs/paper/genai-incidents-methods.md:78-81 still lists `tier` among the post-history derived fields. Fix with a one-line in-place edit.
+2. The CHANGELOG says the "first rebuild would have bumped 15,657". In fact, without the reorder, EVERY new-day rebuild would. Optional wording fix.
+3. The D82 bullet omits content_license on OECD/AIID rows. This is moot today, since 0 such rows carry it.
+4. origin/main moved during the check; merge-tree stayed clean.
+
+**Gate evidence:**
+- All advisories 1-4 from the first gate are closed truthfully, and a live-surface sweep found no other "does not bump" claim.
+- No code change since 6b1f1118 except the 6g comment and the merge.
+- Fresh-clone rebuilds on 2026-10-12, 10-13 and 10-20 (patched): porcelain empty, field deltas {}, generated unchanged.
+- The WS0-T3 spec change is +7/-0.
+- merge-tree is clean vs both main tips, with exactly the 7 files.
+- **Full suite: 952 passed, 1 xfailed.**
+
+**Foreman [R] after merge, at 25a0dd36:**
+- the deletion diff is empty;
+- parse_existing + merge_and_dedupe rc 0, with porcelain **empty**;
+- validate rc 0, "15666/15666 entries valid", "precision: pending, authorised by D76";
+- drift clean;
+- **pytest: 952 passed, 1 xfailed** (602s).
+- Pushed `9d1cf99e..25a0dd36`; ls-remote = local.
+- **Process slip (foreman):** the push went out after reading the rebuild/validate/drift lines but **before** reading the pytest summary. The summary was confirmed green right after the push. The order should be verify-then-push.
+
+### 🔧 Foreman self-correction (2026-10-12): a NUL byte in PROGRESS.md, and item 6 confirmed delivered
+- **The NUL byte was the foreman's own.** It was introduced in board commit `101d92bf`, in the entry recording the engineer's NUL-byte slip. A Python escape in the foreman's heredoc wrote a literal NUL where the text meant the four characters backslash-x-0-0. That is the exact failure being recorded.
+  - It made `grep` treat PROGRESS.md as binary from that commit on.
+  - It was found while grepping for D57.
+  - It is now replaced with the literal text. PROGRESS.md NUL count = 0.
+  - **Correction (same day): that last line was FALSE when committed in `35354ac4`.** The fix's escaped replacement was itself collapsed back into a NUL by the tooling. Only an independent re-measure of the committed blob (`git show HEAD:PROGRESS.md`, count of byte 0) caught it. It was fixed in `38878de3` by building the replacement from byte value 92, with no escape. The committed NUL count is now verified as 0. **Lesson:** escape sequences in tool-call text are not reliable here; build control bytes numerically, and verify the committed blob, not the script's own print.
+- **Item 6 (AIRI option A, D57) is DELIVERED:**
+  - the schema branch (D61 + D57: `hold {D57, until 2027-01-07}`, rows `source_freshness.review_by`), merged;
+  - item 8 (STIX `x_source_freshness` on 1,382 SDOs, MISP freshness tags, the HF card line), merged as b8c2c6c2.
+  - The queue count is **8/9** (items 1-8); item 9 is in progress.
+  - Still open from item 6: the D63 overdue-review alert (WS4 note).
+
 ### ⚖ D83-D85, USER RULINGS 2026-10-12 (item 9 open points)
 - **D83, D80 scope: JSON carve-out + NOTICE (Recommended).** Only mappings/owasp_asi_top10.json gets the CC BY-SA 4.0 dep5 stanza. The NOTICE-DATA attribution covers the names wherever they are reproduced: render_markdown.py, app.js, TAXONOMIES.md, INCIDENTS.md.
 - **D84, licence text: add LICENSES/CC-BY-SA-4.0.txt (Recommended),** the canonical SPDX text, in the item 9 branch. The other dep5 identifiers are not touched.
@@ -347,7 +385,7 @@ STEP 2 follows: the label-scientist implements from that record, with a field-le
 
 ### 🔍 Item 7 stage 1: bounce #1 fix reported at `47277756` (pushed; contains main a792c422). **Full re-gate sent to the reviewer who found the defect.**
 - **Fixture change:** the `scratch` fixture now copies only `git ls-files -z` paths, adds `legacy/`, then runs parse_existing.py in the scratch repo and asserts rc 0.
-- **Self-reported slip:** 8a8790b3 shipped a literal NUL byte; 47277756 replaced it with `" "`.
+- **Self-reported slip:** 8a8790b3 shipped a literal NUL byte; 47277756 replaced it with `"\x00"`.
 - **Fresh clone, legacy file absent:** **935 passed, 2 skipped, 1 xfailed, 0 errors**. The worktree gives the same counts.
 - **Merging main** conflicted in CHANGELOG only (both kept). Rebuild porcelain is empty; validate and drift are green.
 - **Delta vs main:**
