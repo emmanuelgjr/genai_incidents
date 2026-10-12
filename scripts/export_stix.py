@@ -11,7 +11,7 @@ Modelling:
   - each distinct CVE -> a `vulnerability` SDO;
   - `relationship` SDOs link incidents to the techniques/CVEs they involve;
   - one `identity` SDO ("genai_incidents") carries `x_taxonomy_versions`, the
-    pinned versions of the taxonomies (ATLAS, OWASP LLM/ASI, CAPEC, VERIS)
+    pinned versions of the taxonomies (ATLAS, OWASP Top 10 for LLM Applications, OWASP Top 10 for Agentic Applications, CAPEC, VERIS)
     that the x_* mapping properties refer to.
 
 All STIX ids are derived deterministically (UUIDv5 over a fixed namespace),

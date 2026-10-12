@@ -103,8 +103,9 @@ Key fields per record (full reference in the data dictionary):
 - `cve_ids`, `cwe_ids`, `cvss_score` — where applicable
 - `references` — source URLs · `source_ids` — upstream provenance
 - `quality_tier` — `curated` / `reviewed` / `auto` (filter by vetting level)
-- `tier` — `landmark` (the curated, notable subset) or `feed` (the comprehensive
-  CVE/GHSA/OSV stream). A **different axis** from `quality_tier`, not a rename of it:
+- `tier` — `landmark` (the notable headline set: hand-curated rows, rows catalogued in the
+  AI Incident Database, and every `ai-harm` row) or `feed` (everything else: mostly
+  CVE/GHSA/OSV advisories, plus OECD AI Incidents Monitor incident reports). A **different axis** from `quality_tier`, not a rename of it:
   most landmark rows qualify by being catalogued in the AI Incident Database, which
   says nothing about vetting level. Cite the landmark count, not the corpus total,
   when you mean "notable incidents"

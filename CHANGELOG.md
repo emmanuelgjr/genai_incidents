@@ -184,6 +184,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - Wording fix: `modified` / `updated` are documented as moving on content-field changes only;
   `tier`, `quality_tier`, `corpus`, `content_license`, `source_freshness` reach `modified` via an
   `EXPORTER_VERSION` bump (DATA_DICTIONARY, TAXII and MISP READMEs).
+- The served `docs/data/incidents.core.json` gains the `status` field (`CORE_FIELDS` in
+  `scripts/gen_docs_core_data.py`), present on the 22 disputed rows it carries (retracted rows are
+  not served): 6,687,566 → 6,688,006 bytes (+440 B), re-measured by building the payload with and
+  without `status` from the same corpus.
 - No row in `data/incidents.json` or `incidents.min.json` changed. Field-level delta:
   `docs/audits/ws6-v2130-export-integrity-2026-10-11.md`.
 
