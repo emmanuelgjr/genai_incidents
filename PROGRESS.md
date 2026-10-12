@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D73 (as ruled D81/D82): **DONE. Re-check PASS on `916159c7`; MERGED to main 2026-10-12 as `25a0dd36` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS. 916159c7 is sound to merge under D81/D82. DEFECTS: none."
+
+**Advisories.** All are routed to **docs-warden at the cut**:
+1. docs/paper/genai-incidents-methods.md:78-81 still lists `tier` among the post-history derived fields. Fix with a one-line in-place edit.
+2. The CHANGELOG says the "first rebuild would have bumped 15,657". In fact, without the reorder, EVERY new-day rebuild would. Optional wording fix.
+3. The D82 bullet omits content_license on OECD/AIID rows. This is moot today, since 0 such rows carry it.
+4. origin/main moved during the check; merge-tree stayed clean.
+
+**Gate evidence:**
+- All advisories 1-4 from the first gate are closed truthfully, and a live-surface sweep found no other "does not bump" claim.
+- No code change since 6b1f1118 except the 6g comment and the merge.
+- Fresh-clone rebuilds on 2026-10-12, 10-13 and 10-20 (patched): porcelain empty, field deltas {}, generated unchanged.
+- The WS0-T3 spec change is +7/-0.
+- merge-tree is clean vs both main tips, with exactly the 7 files.
+- **Full suite: 952 passed, 1 xfailed.**
+
+**Foreman [R] after merge, at 25a0dd36:**
+- the deletion diff is empty;
+- parse_existing + merge_and_dedupe rc 0, with porcelain **empty**;
+- validate rc 0, "15666/15666 entries valid", "precision: pending, authorised by D76";
+- drift clean;
+- **pytest: 952 passed, 1 xfailed** (602s).
+- Pushed `9d1cf99e..25a0dd36`; ls-remote = local.
+- **Process slip (foreman):** the push went out after reading the rebuild/validate/drift lines but **before** reading the pytest summary. The summary was confirmed green right after the push. The order should be verify-then-push.
+
 ### 🔧 Foreman self-correction (2026-10-12): a NUL byte in PROGRESS.md, and item 6 confirmed delivered
 - **The NUL byte was the foreman's own.** It was introduced in board commit `101d92bf`, in the entry recording the engineer's NUL-byte slip. A Python escape in the foreman's heredoc wrote a literal NUL where the text meant the four characters backslash-x-0-0. That is the exact failure being recorded.
   - It made `grep` treat PROGRESS.md as binary from that commit on.
