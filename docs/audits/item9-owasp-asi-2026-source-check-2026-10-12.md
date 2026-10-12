@@ -180,3 +180,118 @@ Delta rule: expected field deltas are `version`, `url`, and (only if chosen) the
 2. `grep -n "OWASP" NOTICE-DATA docs/SOURCE_LICENSES.md .reuse/dep5` to confirm the line numbers (NOTICE-DATA:116; SOURCE_LICENSES.md 377, 386) and the absence of any ASI/Top-10 row.
 3. `grep -n "asi_names" scripts/render_markdown.py` and the other blast-radius locations to confirm line references.
 4. Confirm that no section above the Correction heading has had its original wording altered (diff against b4e6c4a7: only the top marker and "SUPERSEDED" pointer lines are added).
+
+## Correction 2 2026-10-12 (raw-text gate, bounce #2; user rulings D77-D80)
+
+> **DO NOT REGENERATE.** Dated record of red-reviewer's bounce #2 findings and the user's rulings D77-D80. Appended verbatim per D77; supersedes the Correction above only where stated here.
+
+Source: red-reviewer's raw-text pulls, 2026-10-12, with curl, pdftotext 4.06 and pypdf 6.14.2. The two tools agree wherever cited. The rulings D77-D80 are recorded as relayed by the foreman.
+
+### C2.1 Page-numbering basis (supersedes every page reference in the Correction above)
+
+All page references here are **physical PDF page numbers**. The page's own footer label is "Page N", where N = physical - 1. The cover has no label. Restated references for the Top 10 PDF (https://genai.owasp.org/download/52117/?tmstv=1765059207, 57 pages):
+
+| Content | Correction above said | Physical page | Printed label |
+|---|---|---|---|
+| Cover: "Version 2026" / "December 2025" | cover p.1 | 1 | none |
+| Licence: "This document is licensed under Creative Commons, CC BY-SA 4.0" | cover p.1 (WRONG: not on the cover) | 2 | Page 1 |
+| Table of contents (ASI02/ASI03 "and" form) | TOC p.2 | 3 | Page 2 |
+| "We map to our Agentic AI Threats and Mitigations, which remains our foundational and detailed taxonomy that this Top 10 relies upon." | p.5 (WRONG) | 7 | Page 6 |
+| Infographic ("&" form) | p.9 | 9 | Page 8 |
+| Heading "ASI02: Tool Misuse and Exploitation" | p.13 | 13 | Page 12 |
+| Heading "ASI03: Identity and Privilege Abuse" | p.16 | 16 | Page 15 |
+| Heading "ASI05: Unexpected Code Execution (RCE)" | p.22 | 22 | Page 21 |
+| Appendix cross-map table ("ASI ID / Title") | p.39 | 40 | Page 39 |
+
+These page errors originated in the gate's own testimony, not in the auditor's transcription. All quoted strings in the Correction above are exact and unchanged.
+
+### C2.2 Description check: limits of the Correction above (supersedes Correction §3, third bullet)
+
+The 5-gram check fires on copied text: a verbatim control scored 15/15. It does **not** detect close paraphrase: a paraphrase control scored 0/12 against the Top 10 and 0/19 against T&M. So the "own paraphrase" verdicts rest on the side-by-side read, with the 5-gram count as supporting evidence only. The Correction above omitted that half, and it also omitted that T&M had not been checked. T&M is now checked (C2.3).
+
+### C2.3 Comparison against Agentic AI - Threats and Mitigations (T&M)
+
+Editions read:
+- v1.1: landing https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/ links https://genai.owasp.org/download/45674/?tmstv=1739819891. Fetched 2026-10-12 12:35 UTC: 53 pages. Cover: "Agentic AI - Threats and Mitigations / OWASP Top 10 for LLM Apps & Gen AI Agentic Security Initiative / Version 1.1 / December 2025". The download URL's timestamp is February 2025 but it now serves v1.1: the file was replaced in place.
+- v1.0: Wayback snapshot 20250730004544 of the same URL. 48 pages. Cover: "Version 1.0 / February 2025". Our mapping file was first committed 2026-05-12 (c105bd7a), so either edition could have been its source; both were checked.
+
+Licence, both editions: physical p.2 (printed "Page 1"): "This document is licensed under Creative Commons, CC BY-SA 4.0". It carries the same ShareAlike clause and the same misplaced "OWASP Top 10 for LLMs - GenAI Red Teaming Guide" attribution-guideline string as the Top 10 PDF.
+
+Method: 5-gram overlap of our 10 `description` strings against each edition, with both extractors. Result: **0 shared 5-grams for all 10 entries in both editions**; the longest shared run is 4 words ("and long term memory", "human in the loop"). Controls: a verbatim T&M sentence scored 15/15 and a paraphrase 0/19. Then a side-by-side read against the closest T-code description (pdftotext text, v1.1; all quotes also present in v1.0 except T17, which v1.0 lacks):
+
+| Code | Closest T&M passage (exact) | Verdict |
+|---|---|---|
+| ASI01 | T6: "Intent Breaking and Goal Manipulation occurs when attackers exploit the lack of separation between data and instructions in AI agents, using prompt injections, compromised data sources, or malicious tools to alter the agent's planning, reasoning, and self-evaluation." | own paraphrase |
+| ASI02 | T2: "Tool Misuse occurs when attackers manipulate AI agents into abusing their authorized tools through deceptive prompts and operational misdirection, leading to unauthorized data access, system manipulation, or resource exploitation while staying within granted permissions." | own paraphrase |
+| ASI03 | T3: "Privilege Compromise occurs when attackers exploit mismanaged roles, overly permissive configurations, or dynamic permission inheritance to escalate privileges and misuse AI agents' access." | own paraphrase |
+| ASI04 | T17 (v1.1 only): "Adversaries compromise upstream components such as agent prompts, plugins, or framework updates, allowing malicious logic to spread through trusted software." | own paraphrase |
+| ASI05 | T11: "Unexpected RCE and Code Attacks occur when attackers exploit AI-generated code execution in agentic applications, leading to unsafe code generation, privilege escalation, or direct system compromise." | own paraphrase |
+| ASI06 | T1: "Memory Poisoning exploits AI agents' reliance on short-term and long-term memory, allowing attackers to corrupt stored information, bypass security checks" | own paraphrase (shared idea: short/long-term memory variants) |
+| ASI07 | T12: "Agent Communication Poisoning occurs when attackers manipulate inter-agent communication channels to inject false information, misdirect decision-making, and corrupt shared knowledge within multi-agent AI systems." | own paraphrase |
+| ASI08 | T5: "Cascading Hallucination Attacks exploit AI agents' inability to distinguish fact from fiction, allowing false information to propagate, embed, and amplify across interconnected systems" | own paraphrase |
+| ASI09 | T15: "Attackers exploit user trust in AI agents to influence human decision-making without users realizing they are being misled." | own paraphrase; closest in structure ("Attackers exploit ... trust in"), no shared 4-gram |
+| ASI10 | T13: "Rogue Agents in Multi-Agent Systems emerge when malicious or compromised AI agents infiltrate multi-agent architectures" ... "These rogue agents can be intentionally introduced by adversaries or arise from compromised AI components" | own paraphrase; structural echo (intentional vs emergent), different words |
+
+Conclusion: on both the Top 10 and T&M (v1.0 and v1.1), our 10 descriptions are own paraphrase. Share-alike reaches no description text on this evidence. The OWASP-derived elements of `mappings/owasp_asi_top10.json` are the codes ASI01-ASI10 and the 10 risk names.
+
+### C2.4 Correction §7(a) cost figure (supersedes the "~30 prose mentions" rationale)
+
+The "~30" figure counts the framework display name (C2.6), not the risk names. An "and"-form rename of ASI02/ASI03 would have touched about 6 live files: mappings/owasp_asi_top10.json, scripts/render_markdown.py:657-659, INCIDENTS.md, docs/TAXONOMIES.md, docs/charts/owasp_asi.svg, and docs/app.js:51 (ASI03). Moot after D78; recorded for accuracy.
+
+### C2.5 User rulings (resolve Correction §7)
+
+- **D77**: bounce #2 is closed by appending this section verbatim, then a foreman string check.
+- **D78** (resolves §7(a)): keep the "&" form. ASI02 stays "Tool Misuse & Exploitation" and ASI03 stays "Identity & Privilege Abuse". **No risk-name change for any of the 10 entries.**
+- **D79** (resolves §7(b) and §7(d)1): the framework display name becomes "OWASP Top 10 for Agentic Applications" on all live surfaces, and the version becomes "2026". Citations give the PDF cover title "OWASP Top 10 For Agentic Applications 2026" and "Version 2026 / December 2025". `url` points to the 2026 Top 10. T&M is cited separately.
+- **D80** (resolves §7(c)): add OWASP attribution rows to docs/SOURCE_LICENSES.md and NOTICE-DATA, and a `.reuse/dep5` carve-out stanza giving mappings/owasp_asi_top10.json CC BY-SA 4.0 for the OWASP codes and names. This was conditional on the T&M check (C2.3), which found own paraphrase, so it proceeds.
+- §7(d)2 (the 21 `OWASP-GENAI-*` rows) was not ruled on here and stays OPEN.
+
+### C2.6 Implementation consequence (supersedes Correction §6 where they differ)
+
+**mappings/owasp_asi_top10.json**:
+- `framework`: "OWASP Agentic Top 10 (ASI)" -> "OWASP Top 10 for Agentic Applications"
+- `version`: "2025" -> "2026"
+- `url`: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/" -> "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+- Add a separate T&M reference: https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/ (v1.1, December 2025). The key name follows the file's conventions.
+- Add the citation strings "OWASP Top 10 For Agentic Applications 2026" and "Version 2026 / December 2025" where the file or docs carry citations.
+- `entries.*.name`: unchanged (D78). `entries.*.description`: unchanged (C2.3). Per-entry `owasp_asi` and TAXII `x_owasp_asi` codes: unchanged.
+- Delta rule: the expected deltas are `framework`, `version`, `url`, plus any added T&M-reference or citation key. Anything else is a defect.
+
+**Version "2025" for owasp_asi elsewhere**:
+- src/genai_incidents/data/taxonomy_versions.json:4 is derived from the mapping file `version` via scripts/taxonomy_versions.py. Regenerate it; do not hand-edit.
+- Docstring example literals: scripts/taxonomy_versions.py:8 and src/genai_incidents/__init__.py:159.
+- stats.json, STIX, MISP and HF version strings flow from the mapping file.
+
+**Framework display name: all live occurrences of "OWASP Agentic Top 10"** (git grep on main; excludes data/*.json, .claude/worktrees, docs/audits, legacy/):
+- .zenodo.json:4, :19
+- CITATION.cff:29, :37
+- CONTRIBUTING.md:14
+- INCIDENTS.md:4, :92 (generated by scripts/render_markdown.py)
+- README.md:167, :367
+- docs/DATASHEET.md:10
+- docs/TAXONOMIES.md:10, :59
+- docs/index.html:32, :86, :138
+- docs/charts/owasp_asi.svg:1, :3 (generated)
+- docs/assets/readme/taxonomy-map-dark.svg:1 and taxonomy-map-light.svg:1 (generated by scripts/readme_assets/tax.py)
+- mappings/owasp_asi_top10.json:2
+- pyproject.toml:8
+- scripts/export_huggingface.py:69
+- scripts/readme_assets/tax.py:11
+- scripts/render_markdown.py:608, :675, :725
+
+That is 17 files. Exempt: CHANGELOG.md:1047 (history) and legacy/*.md (historical).
+
+**T&M mis-citations**, where the URL or label is given for the ASI codes:
+- mappings/owasp_asi_top10.json `url`
+- README.md:367
+- docs/TAXONOMIES.md:61
+- docs/index.html:86 (link text "OWASP Agentic Top 10" -> the T&M URL; missed by the Correction above)
+
+All four point to the 2026 Top 10. T&M is cited separately per D79.
+
+**Hardcoded risk-name copies** (no change under D78; listed for future single-sourcing): scripts/render_markdown.py:655-666 `asi_names`; docs/app.js:50-54. The app.js abbreviations ("Tool Misuse & Exploit", "Unexpected RCE", "Agentic Supply Chain", "Insecure Inter-Agent Comm", "Human-Agent Trust Exploit") are not any official form.
+
+**Licence surfaces (D80)**:
+- docs/SOURCE_LICENSES.md: a new row for the OWASP GenAI Security Project, "OWASP Top 10 for Agentic Applications" (Version 2026, December 2025). Licence CC BY-SA 4.0, verified from the PDF (physical p.2, printed "Page 1"). Material used: codes and risk names only; descriptions are project paraphrase (C2.3). Do not copy OWASP's "OWASP Top 10 for LLMs - GenAI Red Teaming Guide" attribution string.
+- NOTICE-DATA: one OWASP attribution line, naming the project, the asset title, the CC BY-SA 4.0 licence link https://creativecommons.org/licenses/by-sa/4.0/legalcode, and the indication of changes.
+- .reuse/dep5: today mappings/owasp_asi_top10.json falls under dep5:9 "Files: data/* INCIDENTS.md mappings/*" with "License: CC-BY-4.0". The carve-out stanza must name the file explicitly and come after line 9's stanza, because in dep5 the last matching stanza wins.
