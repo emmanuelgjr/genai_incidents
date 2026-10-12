@@ -7,6 +7,33 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
+
+- Agent-suggested; held for the user's merge ruling (the data change is user-visible
+  only through two non-content fields). Labels-only: `description_provenance =
+  "original"` and `description_source = "oecd-aim"` are now set on the 3,936
+  OECD-template rows that lacked them (3,937 now carry it with INC-00437), from the
+  WS4-T12 ingest stamp and a merge-time backfill keyed on the `OECD-AIM-` source id.
+  Neither field is a content field, so `updated`, `generated`, counts, titles, IDs
+  and `id_deprecations.json` are unchanged (0 rows, 0 deprecations). It is a
+  provenance label, not a licence marker. The labels reach `incidents.json` and the
+  Hugging Face JSONL export only; not `incidents.min.json`, STIX, MISP, TAXII,
+  `INCIDENTS.md`, `docs/incidents/*.md` or `stats.json`.
+- The OECD/AIID refresh freeze is now a deliberate gate (D58, extended by D67 and D71: nothing
+  from the OECD/AIID pair reaches main until stage 2. It holds added OECD-AIM- and AIID- source rows, upstream
+  title edits and, while an OECD/AIID ingest input differs from its commit, any content change to a published
+  OECD/AIID row; the baseline is read from git HEAD and the gate fails closed if it is unreadable).
+  `merge_and_dedupe.py` aborts with "Nothing was written" when a build would merge or
+  retitle a previously published ID through an OECD-AIM-/AIID- source id, edit the
+  title of a published OECD/AIID row, or add an OECD-AIM- source row not already
+  published, without a signed user approval
+  (`docs/audits/D42-approved-refresh-merges.json`, absent; a test asserts the set is
+  empty). The weekly refresh gains the AIID snapshot step (WS4-T14, continue-on-error,
+  output not committed) and therefore fails at "Re-merge + render + validate" while the
+  freeze holds, instead of at the unrelated E21 unit test. That test
+  (`test_oecd_aiid_content_disagreement_is_unique_to_inc00437`) is superseded by
+  `tests/test_aiid_signal_provenance.py`. See `docs/audits/oecd-stage1-build-2026-10-09.md`.
+
 ### Changed - export integrity: STIX `modified`, SHA256SUMS over STIX/TAXII/MISP, `build_manifest.json` on every channel, D57/D64 surfaces (agent-suggested, draft)
 
 - **STIX `modified` now changes when content changes.** It is the entry's `updated` date with

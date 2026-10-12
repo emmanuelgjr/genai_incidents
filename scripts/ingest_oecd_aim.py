@@ -851,6 +851,10 @@ def reclassify_attack_vector_from_narrative(attack_vector: str, title: str, narr
     return reclassified or attack_vector
 
 
+OECD_DESCRIPTION_PROVENANCE = "original"
+OECD_DESCRIPTION_SOURCE = "oecd-aim"
+
+
 def build_description(source_id: str, date: str, url: str, affected: str, attack_vector: str) -> str:
     """An originally-templated sentence built ONLY from structural facts
     already captured on the row (the AIM source id, the incident date, the
@@ -972,6 +976,15 @@ def normalize_body(body: dict, url: str) -> dict | None:
         "year": year,
         "category": "real-world",
         "description": description,
+        # WS4-T12 (D25(c), D42): `description` above is ALWAYS this script's
+        # own build_description() template, never AIID's or any other
+        # source's prose, so say so on every row at the single ingest code
+        # path (mirrors ingest_aiaaic_sheet.py). merge_and_dedupe.py carries
+        # these through normalize_entry() and they stay sticky to the dedup
+        # survivor; it also backfills them for union-retained rows from
+        # earlier crawls that predate this field.
+        "description_provenance": OECD_DESCRIPTION_PROVENANCE,
+        "description_source": OECD_DESCRIPTION_SOURCE,
         "corpus": corpus,
         "attack_vector": attack_vector,
         "affected": affected,

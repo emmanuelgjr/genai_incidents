@@ -113,6 +113,22 @@ jobs:
         run: python scripts/ingest_aiaaic_sheet.py
         continue-on-error: true
 
+      # WS4-T14 (D25(c), D42): keep ingest/aiid_full.json current. The OECD
+      # monitor cites AIID ids newer than the committed snapshot (max id 1581
+      # vs OECD citing up to 1702 on 2026-10-03), which is what produced the
+      # weekly E21 tripwire population (docs/audits/refresh-tripwire-2026-10-03.md).
+      # AIID's sanctioned weekly bulk channel only (D1): one GET of the
+      # snapshots index and one GET of the newest backup tarball, both through
+      # ingest/common.py (robots check, rate limit, identifying User-Agent).
+      # continue-on-error like the other sources; a failure leaves last
+      # week's snapshot in place and is reported in the summary below. The
+      # merge step is gated by D42's build-time guard, so a snapshot that
+      # newly links already-published entries cannot reach a PR unreviewed.
+      - name: Refresh AIID snapshot (sanctioned bulk channel)
+        id: ingest_aiid
+        run: python scripts/ingest_aiid_snapshot.py
+        continue-on-error: true
+
       # WS4-T17: is_numeric_slug()'s skip rule (WS4-T13) rests on a premise
       # -- every legacy numeric-slug page fails the body-shape check -- that
       # stops being observable the moment those URLs are never fetched. The
@@ -191,6 +207,7 @@ jobs:
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
           CVE_SWEEP: ${{ needs.cve-sweep.outputs.sweep_outcome || needs.cve-sweep.result }}
+          AIID: ${{ steps.ingest_aiid.outcome }}
         run: |
           {
             echo "### Source refresh results"
@@ -200,6 +217,7 @@ jobs:
             echo "| AIAAIC sheet | $AIAAIC |"
             echo "| OECD AI Incidents Monitor | $OECD |"
             echo "| CVE rejection/dispute sweep (separate job; not counted toward the all-failed abort) | $CVE_SWEEP |"
+            echo "| AIID snapshot | $AIID |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
           [ "$AIRI" = "success" ] && ok=$((ok+1))
@@ -208,6 +226,9 @@ jobs:
           if [ "$ok" -eq 0 ]; then
             echo "::error::All three source refreshes failed — the data would be stale. Aborting instead of opening a misleading refresh PR."
             exit 1
+          fi
+          if [ "$AIID" != "success" ]; then
+            echo "::warning::AIID snapshot refresh failed -- ingest/aiid_full.json is last week's snapshot; OECD rows citing newer AIID ids will be unlinked-to-snapshot (WS4-T14)."
           fi
           if [ "$ok" -lt 3 ]; then
             echo "::warning::Only $ok of 3 sources refreshed — the PR will carry last week's data for the failed source(s)."
@@ -372,7 +393,7 @@ jobs:
         run: |
           cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources:
-          AIRI Navigator, AIAAIC sheet, OECD AI Incidents Monitor.
+          AIRI Navigator, AIAAIC sheet, AIID snapshot, OECD AI Incidents Monitor.
 
           On each run this branch is recreated from the current `main`, so the
           diff is always relative to the latest `main` *at run time*. **Merge
