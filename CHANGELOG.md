@@ -79,7 +79,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   fails on the retired name (with or without "OWASP", possessive, hyphenated, or split
   by a no-break space, `&nbsp;` or `<br>`), any other "OWASP Agentic ..." variant (no
   site is held, so any variant fails), the "ASI Top 10" / "LLM/ASI Top 10" shorthand
-  (D87), an `owasp_asi` / `owasp-asi` version literal (including the MISP tag form),
+  (D87), the bare "OWASP LLM/ASI" or "OWASP LLM and ASI" used as a name for the two
+  frameworks (D90; also with `&`, emphasis or a Unicode slash, and across adjacent Python
+  string literals; "OWASP LLM and ASI codes" and the "OWASP ASI" label pass), an
+  `owasp_asi` / `owasp-asi` version literal (including the MISP tag form),
   prose edition or title edition that disagrees with the pin, a T&M URL whose link text
   or preceding text does not name Threats and Mitigations, a missing "(ASI)" on a label
   for the codes (D88), a missing "(ASI)" heading, and an old name in the dataset
