@@ -40,6 +40,68 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ▶ RESUMED 2026-10-12: item 8 MERGED; D75/D76 WIP rescued; stage-1 final gate + D75/D76 finish dispatched
+- **Item 8: DONE, MERGED to main** with `--no-ff` as `b8c2c6c2` (merge of `763a041e`; final gate PASS recorded at `7599b51e`). The merge was clean, with no conflict.
+  - **Foreman [R] after merge:**
+    - `git diff --diff-filter=D` (merge-base..763a041e) is empty; porcelain is empty.
+    - `validate.py` gives "15666/15666 entries valid; 0 with errors", and precision is still pending UNRATIFIED (D76 not yet on main).
+    - `check_stats_drift.py` gives "clean: 5 doc surfaces match data/stats.json", rc 0.
+    - **pytest: 851 passed, 1 xfailed.**
+  - The push was verified: `7599b51e..b8c2c6c2`, and ls-remote = local.
+  - Advisory A1 (release notes must say core gains `status`, +440 B) is carried to the cut.
+- **D75/D76 rescue.** The `ws2-v2130-ratify` worktree held **9 modified, uncommitted files**: CHANGELOG, CORRECTIONS, INCLUSION, DATA_DICTIONARY, the precision README and pending_authorization.json, merge_and_dedupe.py, validate.py and the precision tests. The previous specialist died with the session. The foreman committed them **as WIP `11abfa43`, unverified and ungated**, and pushed (ls-remote confirmed).
+  - A **fresh label-scientist** has been dispatched to verify the WIP against D75/D76, re-derive every figure, add D76 fire tests, merge main in and push.
+- **Item 7 stage 1:** a **fresh red-reviewer** has been dispatched for the final scoped gate on `52b0dcce`. It covers:
+  - full pytest;
+  - the per-entity delta vs main (expected 3,936 rows × 2 label fields);
+  - the merge-resolution review and the deletion/PROGRESS check;
+  - a fire proof;
+  - `merge-tree` vs the new main `b8c2c6c2`.
+
+### ⏸ RESUME CHECKPOINT (user exited, 2026-10-11): v2.13.0 queue 5/9 done
+**Done and merged:** items 1, 2, 3, 4, 5; the schema branch (D61 + D57); D69/D70; the item 6/7 memos. **Ruled:** items 6 (A) and 7 (C stage 1).
+
+**In flight when the session ended.** Background agents die with the session, so re-verify each branch by READING THE TREE (agreement 3), not from this note:
+1. **Item 7 stage 1:** `ws4/v2130-oecd-stage1` @ `52b0dcce` (main merged in). The final scoped gate was running. NEXT: gate it.
+   - Full pytest (not re-run after the fixture fix);
+   - per-entity delta vs main = 3,936 rows × 2 label fields only;
+   - fire proof.
+   Then `--no-ff` merge to main.
+2. **Item 8:** `ws6/v2130-export-integrity` @ `763a041e`. **FINAL GATE PASS arrived at the checkpoint.** Verdict: "Item 8 at 763a041e is ready to merge. The A2 change moves exactly one field on 22 rows of one served file, nothing else changed, and every gate is green."
+   - **Evidence:**
+     - core payload row-by-row: only `status` added, on the 22 disputed rows; retracted rows in core = 0; +440 B (6,687,566 → 6,688,006);
+     - detail shards, min.json and STIX are byte-identical;
+     - integrity 35/8/35 is clean;
+     - the fire proofs ran with isolated pyc caches;
+     - the merge-resolution diff touches CHANGELOG only, with 0 markers;
+     - `git merge-tree main 763a041e` gives rc 0 against 1be493c1;
+     - byte-exact build twice; 851 passed; validate, drift and lint green.
+   - **Advisory A1:** the release notes must mention that the served `data/incidents.core.json` gains `status` (+440 B).
+   - **NEXT: `--no-ff` merge to main** and re-run validate, drift and pytest. If stage 1 merges first, expect a CHANGELOG-only conflict (keep both).
+3. **D75/D76:** `ws2/v2130-precision-ratify-inclusion` (worktree `ws2-v2130-ratify`, from `ebd7f7b3`). A fresh label-scientist was working; the branch may be empty or partial. CHECK `git log` and porcelain in that worktree. If unstarted, redispatch from the D73-D76 entry below. NEXT: gate it, then merge.
+
+**Queued, not started:**
+- **D73:** add tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS` (pipeline-engineer, after the stage-1 merge; show 0 `updated` bumps).
+- **Item 9:** OWASP ASI 2026 edition (label-scientist, after the stage-1 merge; it changes data). Blast radius is on this board (item 2 docs-warden entry).
+- **Item-2 follow-up docs branch:** N-a..N-h; N-d is a data change.
+- **docs-warden at the cut:** README:144, paper:73-77, "stable IDs" wording, INCLUSION (after D75).
+- **WS0 notes:** F2 (SOURCE_LICENSES disputed marker), S6 OECD docs after the stage-1 merge, memo `ruled_by` → `decided_by`.
+- **WS4 notes:** D66 decouple, D63 overdue-review alert, the "26 new DISPUTED" log wording.
+- **WS3:** the ID-reuse audit (spec in docs/audits).
+- **WS6:** `VERSION = "2.0.0"`.
+
+**Final deliverables still owed to the user:** the item status table; exact counts with re-derivation commands; the draft v2.13.0 CHANGELOG; the list of inaccurate announcement claims. **Release notes must carry the D72 "Behaviour changes" line** (load_deprecations raw shapes for INC-00311, INC-01897 and INC-00497).
+
+### ⚖ D73-D76, USER RULINGS 2026-10-11 (items 5 and 8)
+- **D73 (R1): add tier, quality_tier, corpus and content_license to `_CONTENT_FIELDS`.** source_freshness stays out. **Queued → pipeline-engineer after the stage-1 merge** (same file). The first rebuild must be shown to bump no `updated`; otherwise the change comes back to the user with a delta.
+- **D74 (R2-R4): accept all three.** release-assets.yml and the Pages `_site` check are verified on the first real release (v2.13.0) with the VERSIONING checklist. The MISP timestamp change and the identity over-bump are accepted.
+- **D75 (follow-ups): fix INCLUSION §4/§5 now.** R5 (disputed status in STIX/MISP) and A3 (MISP removal-only / STIX revoked) were **not** selected, so they are not queued.
+- **D76 (item 5): accept the feed reading; ratify pending now**, with decision id D76.
+- **Dispatched:** a fresh label-scientist on `ws2/v2130-precision-ratify-inclusion` (D76 marker + code constant; D75 INCLUSION corrections + CORRECTIONS rows).
+- **Final checks before merge:**
+  - **stage 1** (`52b0dcce`, main merged in; the specialist did not re-run the full suite after a fixture fix) → stage-1 reviewer;
+  - **item 8** (`763a041e`: A2 panel + `status` added to CORE_FIELDS + main merged) → item-8 reviewer.
+
 ### ✅ Item 8 (export integrity + D57 + D64) — **PASS (re-gate on `38b231c8`, 2026-10-11)**. Before merge: the A2 JS-panel disputed figure, plus merging main into the branch.
 - **Verdict:** "The fix at 38b231c8 closes the D64 defect from bounce #1, and everything else holds."
 - **Gate evidence:**

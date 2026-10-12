@@ -22,6 +22,10 @@ jobs:
           cache: pip
       - name: Install build tooling
         run: pip install --upgrade build
+      - name: Stamp the package data with build_manifest.json (v2.13.0 item 8)
+        # commit + committer-date built_at + counts from data/stats.json. The
+        # file is gitignored; pyproject's [tool.hatch.build] artifacts ships it.
+        run: python scripts/export_integrity.py manifest --out src/genai_incidents/data/build_manifest.json
       - name: Build sdist + wheel
         run: python -m build
       - name: Publish to PyPI
