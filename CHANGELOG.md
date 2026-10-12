@@ -7,14 +7,24 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
-### Changed - tier, quality_tier, corpus and content_license now bump `updated` (agent-suggested, D73)
+### Changed - tier, quality_tier, corpus and content_license are now content fields (user-ruled, D81/D82)
 
-- `scripts/merge_and_dedupe.py` `_CONTENT_FIELDS` gains `tier`, `quality_tier`, `corpus` and
-  `content_license` (`source_freshness` stays out). A change to any of them now bumps `updated`,
-  so STIX `modified` and MISP timestamps move with it. `tier`/`quality_tier`/`corpus` are now
-  derived before the `updated` comparison rather than after it; without that reorder the first
-  rebuild would bump `updated` on 15,657 of 15,666 rows. Measured on the committed corpus: the
-  rebuild changes 0 rows (no `updated`, `added` or other field moves). Code and tests only.
+- **Consumer-visible.** `scripts/merge_and_dedupe.py` `_CONTENT_FIELDS` gains `tier`,
+  `quality_tier`, `corpus` and `content_license` (`source_freshness` stays out). From now on a
+  licence relabel or a classifier change on a row moves that row's `updated`, and with it its
+  STIX `modified` and MISP timestamp, so a consumer keyed on those sees the change. This
+  matters most for the 3,767 rows that carry `content_license` today (CVE-TOU 2,171, AIAAIC
+  1,517, AVID 79).
+- **Reversal.** This knowingly reverses the WS0-T3 link-1 gate ruling (2026-07-27) and the
+  shape owner's recommendation that kept `content_license` out of the content set; the
+  affected docs are corrected in place and the WS0-T3 spec carries a dated supersession note.
+- **Build order.** `tier`, `quality_tier` and `corpus` are now derived before the `updated`
+  comparison instead of after it. Without that, the first rebuild would have bumped
+  `updated` on 15,657 of 15,666 rows. With it, the first rebuild moved 0 rows (no `updated`,
+  `added` or other field moves, measured against origin/main).
+- **Freeze widening (D82).** The D71 stage-1 OECD/AIID freeze now also holds `tier`,
+  `quality_tier` and `corpus` changes on published OECD/AIID rows, because they are content
+  fields and the freeze gates any content change on those rows.
 
 ### Changed - OECD description provenance labels; refresh merge gate made deliberate (agent-suggested, D58 stage 1)
 

@@ -415,9 +415,9 @@ change keeps a byte-identical SDO across builds.
 a new or removed `x_` property or machinetag, a changed `source_name`/comment,
 a changed mapping from entry to object, a re-pin of a taxonomy that carries no
 release date (OWASP ASI, VERIS, CAPEC), or a re-derivation of a field the
-exporter reads that is *not* in `_CONTENT_FIELDS` (`tier`, `quality_tier`,
-`corpus`, `content_license`, `source_freshness`: re-deriving those does not move
-`updated`). `tests/test_export_modified.py::test_every_exported_entry_field_is_content_or_explicitly_declared`
+exporter reads that is *not* in `_CONTENT_FIELDS` (`source_freshness` only:
+re-deriving it does not move `updated`; `tier`, `quality_tier`, `corpus` and
+`content_license` are content fields since D81 and do move it). `tests/test_export_modified.py::test_every_exported_entry_field_is_content_or_explicitly_declared`
 fails when an exported field is in neither group. The version is one millisecond
 (STIX, range 0-999) or one second (MISP) per bump, so a consumer that dedupes on
 (`id`, `modified`) re-imports exactly the objects that changed. Known limit: two

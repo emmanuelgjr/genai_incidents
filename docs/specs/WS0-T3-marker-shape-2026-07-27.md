@@ -178,6 +178,13 @@ obligation set should say.
    correction — an AIAAIC waiver downgrading `obligations`, per §6.4 — present
    itself as a change to the incident's content. pipeline-engineer/foreman own
    the final call; this is the shape owner's reasoning, not a ruling.
+   **Update 2026-10-12 (user ruling D81, which knowingly reverses this
+   recommendation and the WS0-T3 link-1 gate ruling of 2026-07-27):**
+   `content_license` IS now in `_CONTENT_FIELDS`, together with `tier`,
+   `quality_tier` and `corpus`, because the field is exported (min.json, STIX,
+   HF) and a consumer keyed on `updated`/STIX `modified` would otherwise miss a
+   licence relabel. The paragraph above is preserved as the record of the
+   2026-07-27 reasoning. **Do not regenerate it as current guidance.**
 3. **min.json conditional carry (D12(a)).** In the `slim` dict
    (`merge_and_dedupe.py:1590-1613`), add the key **only when present** on the
    source entry — not `e.get("content_license")`, which would emit `null` on

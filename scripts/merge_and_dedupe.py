@@ -2879,8 +2879,12 @@ def main():
 
     # 6g) Provenance fields (INCLUSION.md trust layer). Pure, deterministic
     #     derivations of already-finalised fields — set AFTER history stamping
-    #     and kept OUT of the content snapshot, so they never perturb the
-    #     `updated`/drift logic. See DATA_DICTIONARY.md for the confidence rule.
+    #     and (except `tier`) kept OUT of the content snapshot, so they never
+    #     perturb the `updated`/drift logic. `tier` IS a content field (D81)
+    #     and is already set at step 5 before the `updated` comparison; the
+    #     re-derivation below matters only for the retained priors, which
+    #     bypass step 5 (9 rows at D81). See DATA_DICTIONARY.md for the
+    #     confidence rule.
     cwe_capec = _load_cwe_capec()
     freshness_sources = _load_source_freshness_registry()
     n_capec = n_purl = n_freshness = 0
