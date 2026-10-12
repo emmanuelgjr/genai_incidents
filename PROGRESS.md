@@ -40,6 +40,42 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **D67: also hold OECD row additions.** Extend the stage-1 gate so OECD-driven new rows (and upstream AIID title edits to published rows, unless the specialist justifies otherwise) also stop the build, until stage 2. It is being built on `ws4/v2130-oecd-stage1`, then re-gated, then merged.
 - A1 is declared at `9591ca0f`: INC-00437 key order. `field_delta_vs_ref.py` now reports key order and gives `1 ['INC-00437']`.
 
+### ✅ D75/D76: **DONE. Gate PASS on `51b88c31`; MERGED to main 2026-10-12 as `25c00a46` (`--no-ff`)**
+**Verdict, in the gate's words:** "VERDICT: PASS (D75/D76, branch ws2/v2130-precision-ratify-inclusion @ 51b88c31). DEFECTS: none." Not a second bounce.
+
+**Advisories, in the gate's words.** The foreman's routing follows each one.
+1. "Undisclosed third INCLUSION.md edit — §6 ('Borderline AI-nexus'): 'admitting at `auto` tier' → 'admitting at `quality_tier: auto`'. I count it inside D75's intent... neither the CHANGELOG entry nor the CORRECTIONS rows mention it... meaning-preserving, so no new CORRECTIONS row is needed." → **NOTE → docs-warden at the cut:** add a CHANGELOG clause.
+2. "Invariant 6 (active): the new §5 table hard-codes counts (13,722 / 1,915 / 9,495 ...) outside any stats:* marker... explicitly scoped 'as published at v2.12.0' with a re-derivation command, so it cannot go false... INCLUSION.md is not among the 5 drift surfaces, so CI cannot catch it. Form (c) caution." → **NOTE → WS6:** add INCLUSION.md to the drift surfaces or to a dated-figure allowlist.
+3. "check_precision_audit validates `decision`, `decided_by` and `entries_sha256` but never `decided`... a marker with decided '<YYYY-MM-DD>' would pass. Pre-existing." → **NOTE → WS2:** add a one-line date-shape check.
+4. "The HF card template (scripts/export_huggingface.py:106) calls landmark 'the curated, notable subset'; DATA_DICTIONARY/HF call feed 'the CVE/GHSA/OSV stream', but OECD contributes ~3,813 feed source ids and only 7,989 of the 13,722 feed rows carry a CVE/GHSA/OSV id... Candidate follow-up only." → **NOTE → docs-warden at the cut.**
+5. Premise drift: origin/main moved during the review, so the two-dot diff shows 10 files; the three-dot diff is exactly 9. "Ordinary merge."
+6. "My own footprint: I accidentally created C:/tmp/null (47 bytes, 'make: command not found')." → **Foreman:** the file was actually at `%TEMP%
+ull` (Git Bash /tmp). Inspected: 47 bytes, `/usr/bin/bash: line 1: make: command not found`. **Removed.** It was outside the repo.
+
+**Gate evidence.** The gate worked in a throwaway clone at 51b88c31, by its own route:
+- The three-dot scope is exactly 9 files, 186+/27-, with no data/ingest/mappings/schema path.
+- The post-WIP delta is the audit README only (6 lines). R5/A3 are absent.
+- merge_and_dedupe.py: docstring-only. The manual build ran twice and reproduced committed data byte-for-byte (incidents.json 67b0c8c2..., stats.json 7dae077d...).
+- pytest: 853 passed, 1 xfailed. validate rc 0, "pending, authorised by D76". Drift is clean.
+- Fire proofs:
+  - placeholder/D77 → rc 1;
+  - pin None → 5 tests fail plus validate rc 1;
+  - removing the new early return → test_gate_fires_on_wrong_decision_id fails.
+  - The early return appends its problem first, so there is no bypass.
+- Figures re-derived via the _derive_tier RULE rather than the field (0 mismatches). These are the same at v2.12.0, main and the tip:
+  - feed 13,722 = 9,495 reviewed (0.6920) + 4,227 auto;
+  - landmark 1,915 = 1,611 + 185 + 119;
+  - v2.3.1: 5,145 = 4,356 / 740 / 49.
+- History: §5 dates from 508b1314 (#60, 2026-06-10; first tag v2.3.1). precision_sample.py dates from 072115cc (2026-10-11), and no workflow ever referenced it.
+- The live-surface hunt found no remaining false §4/§5 claims.
+- The CHANGELOG and CORRECTIONS entries are accurate. Invariants 3/4/9 hold, with no network or model calls.
+
+**Foreman [R] after merge:**
+- the deletion diff is empty; porcelain is empty;
+- validate gives "15666/15666 entries valid; 0 with errors" and "precision: pending, authorised by D76";
+- drift is clean;
+- **pytest: 853 passed, 1 xfailed.**
+
 ### 🔍 D75/D76 — specialist reported `51b88c31` (pushed; contains main b8c2c6c2); **red-reviewer dispatched**
 - **WIP check:** the specialist verified WIP `11abfa43` against D75/D76 and edited one item: the false supersession note in the precision audit README. It then merged main (`0edaa542`, no conflict) and committed `51b88c31`.
 - **Scope:** 9 files vs main; no data/ change; R5/A3 not implemented.
