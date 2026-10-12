@@ -143,29 +143,57 @@ def test_sheet_rejects_bad_suggested_label():
         ps.build_sheet(s, {"suggestions": {s["entries"][0]["id"]: {"label": "maybe"}}})
 
 
-def test_committed_sample_reproduces_byte_for_byte():
-    """The committed sample re-derives exactly from the data it was drawn
-    from. Skipped (with the reason) once data/incidents.json moves past the
-    pinned hash -- reproduction is anchored to that data, see frame.json."""
+def test_default_check_on_working_data_never_passes_moved_data(capsys):
+    """`--check` with the DEFAULT --data (the working data/incidents.json).
+    Never skips: while the working data still hashes to the pin it must
+    reproduce (and seed 7 must not); once the data has moved past the pin it
+    must REFUSE with the pinned-data message rather than compare against moved
+    data. Byte-for-byte reproduction against the pin itself is covered on
+    every run by test_reproduces_from_pinned_blob (A1 follow-up, 2026-10-12)."""
     frame = json.loads((AUDIT / "frame.json").read_text(encoding="utf-8"))
     data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
-    if ps.canonical_sha256(data["incidents"]) != frame["data_incidents_sha256"]:
-        pytest.skip("data/incidents.json changed since the 2026-10-11 draw; reproduce against the pinned blob")
-    assert ps.main(["--check"]) == 0
-    assert ps.main(["--check", "--seed", "7"]) == 1  # a different seed does NOT reproduce
+    if ps.canonical_sha256(data["incidents"]) == frame["data_incidents_sha256"]:
+        assert ps.main(["--check"]) == 0
+        assert ps.main(["--check", "--seed", "7"]) == 1  # a different seed does NOT reproduce
+    else:
+        assert ps.main(["--check"]) == 1
+        assert "but the sample was drawn from" in capsys.readouterr().out
 
 
-def test_check_fires_on_tampered_copy(tmp_path):
-    frame = json.loads((AUDIT / "frame.json").read_text(encoding="utf-8"))
-    data = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
-    if ps.canonical_sha256(data["incidents"]) != frame["data_incidents_sha256"]:
-        pytest.skip("data/incidents.json changed since the 2026-10-11 draw")
+def test_check_refuses_data_that_moved_past_the_pin(tmp_path, capsys):
+    """Fire proof for --check's data-pin guard, independent of what the
+    working tree holds: the pinned blob with one incident edited is refused."""
+    data = _pinned_data(tmp_path)
+    if data is None:
+        pytest.skip(f"neither {PINNED_COMMIT} (shallow clone?) nor matching working data is available")
+    doc = json.loads(data.read_text(encoding="utf-8"))
+    doc["incidents"][0]["title"] = str(doc["incidents"][0].get("title", "")) + " (moved)"
+    moved = tmp_path / "moved_incidents.json"
+    moved.write_text(json.dumps(doc), encoding="utf-8")
+    assert ps.main(["--check", "--data", str(moved)]) == 1
+    assert "but the sample was drawn from" in capsys.readouterr().out
+
+
+def test_check_fires_on_tampered_copy(tmp_path, capsys):
+    """--check rejects a tampered copy of the committed sample. Runs against
+    the PINNED blob (as test_reproduces_from_pinned_blob does), so it keeps
+    running after data/incidents.json moves (A1 follow-up, 2026-10-12). The
+    untampered copy must pass first, and the tampered one must fail for the
+    TAMPER reason, not the data-pin guard."""
+    data = _pinned_data(tmp_path)
+    if data is None:
+        pytest.skip(f"neither {PINNED_COMMIT} (shallow clone?) nor matching working data is available")
     d = tmp_path / "a"
     shutil.copytree(AUDIT, d)
-    assert ps.main(["--check", "--out-dir", str(d)]) == 0
+    assert ps.main(["--check", "--data", str(data), "--out-dir", str(d)]) == 0
+    assert "reproduced byte-for-byte" in capsys.readouterr().out
     p = d / "sample.json"
-    p.write_text(p.read_text(encoding="utf-8").replace('"INC-07644"', '"INC-07645"', 1), encoding="utf-8")
-    assert ps.main(["--check", "--out-dir", str(d)]) == 1
+    text = p.read_text(encoding="utf-8")
+    assert '"INC-07644"' in text  # the tamper below must really change the file
+    p.write_text(text.replace('"INC-07644"', '"INC-07645"', 1), encoding="utf-8")
+    assert ps.main(["--check", "--data", str(data), "--out-dir", str(d)]) == 1
+    out = capsys.readouterr().out
+    assert "NOT reproduced: sample.json" in out and "but the sample was drawn from" not in out
 
 
 def test_rebuild_sheet_refuses_to_overwrite_human_labels(tmp_path):
@@ -372,6 +400,26 @@ def test_gate_fires_on_wrong_decision_id(tmp_path):
         problems, line = v.check_precision_audit(version, root)
         assert any("names decision 'D77'" in p for p in problems), (version, problems)
         assert "NOT authorised" in line and "authorised by" not in line
+
+
+@pytest.mark.parametrize("decided", ["<YYYY-MM-DD>", "2026-13-01", "2026-02-30", "11/10/2026",
+                                     "20261011", "2026-10-11T00:00", "", None, 20261011])
+def test_gate_fires_on_non_iso_decided(tmp_path, decided):
+    """D75/D76 gate advisory 3: a ruling must carry a real ISO date."""
+    root = _copy_root(tmp_path)
+    ap = _audit(root) / "pending_authorization.json"
+    m = json.loads(ap.read_text(encoding="utf-8"))
+    m["authorization"]["decided"] = decided
+    ap.write_text(json.dumps(m), encoding="utf-8")
+    problems = v.check_precision_audit("2.13.0", root)[0]
+    assert any("decided is" in p and "ISO YYYY-MM-DD" in p for p in problems), problems
+
+
+def test_committed_d76_decided_date_passes():
+    """Control for the test above: the committed D76 marker's date is valid."""
+    auth = json.loads((AUDIT / "pending_authorization.json").read_text(encoding="utf-8"))["authorization"]
+    assert auth["decided"] == "2026-10-11" and v._is_iso_date(auth["decided"])
+    assert not any("decided is" in p for p in v.check_precision_audit("2.13.0")[0])
 
 
 def test_gate_ratified_marker(tmp_path):
