@@ -74,6 +74,10 @@ BARE_LLM_ASI = re.compile(rf"\bOWASP{_POSS}{SEP}LLM{_SLASH}ASI\b(?!{SEP}Top{SEP}
 # Sent correspondence quotes what the recipient was told (each file says "do
 # not edit the message body"), so D90 does not apply there.
 D90_EXEMPT = ("docs/outreach/",)
+# The correction log may quote the retired name as a former name (ruling
+# 2026-10-12 on the item 9 row); see _quoted_former_names.
+CORRECTIONS = "CORRECTIONS.md"
+QUOTE_PAIRS = ('""', "''", chr(0x201C) + chr(0x201D), chr(0x2018) + chr(0x2019))
 # Variants still awaiting their writer. D86 (2026-10-12) renamed every held
 # site, the schema pair (schema-architect, sole writer of schema/) last, so
 # the table is empty and any live variant fails. Exact counts: should a site
@@ -148,6 +152,19 @@ def _missing_asi_labels(rel: str, text: str, name: re.Pattern) -> list[str]:
     return out
 
 
+def _quoted_former_names(rel: str, text: str) -> set[tuple[int, int]]:
+    """Spans of the retired name quoted as a former name in CORRECTIONS.md.
+
+    A correction row records what was corrected away, so there (only) the
+    retired name may appear inside quotation marks. Unquoted, it still fails.
+    """
+    if rel != CORRECTIONS:
+        return set()
+    return {hit.span() for hit in RETIRED_NAME.finditer(text)
+            if hit.start() > 0 and hit.end() < len(text)
+            and text[hit.start() - 1] + text[hit.end()] in QUOTE_PAIRS}
+
+
 def _tm_label(line: str, start: int, end: int, name: re.Pattern) -> str:
     """The text a T&M URL occurrence is cited for."""
     before = line[:start]
@@ -176,14 +193,16 @@ def scan(root: Path, files: list[str]) -> list[str]:
         if not p.is_file():
             continue
         text = p.read_bytes().decode("utf-8", errors="ignore")
+        quoted = _quoted_former_names(rel, text)
         for hit in RETIRED_NAME.finditer(text):
-            problems.append(f"{rel}: retired name {hit.group(0)!r}")
+            if hit.span() not in quoted:
+                problems.append(f"{rel}: retired name {hit.group(0)!r}")
         for hit in SHORTHAND.finditer(text):
             problems.append(f"{rel}: shorthand {hit.group(0)!r} (D87: use the official names)")
         if not rel.startswith(D90_EXEMPT):
             for hit in BARE_LLM_ASI.finditer(text):
                 problems.append(f"{rel}: bare {hit.group(0)!r} (D90: use the official names)")
-        n = len(VARIANT.findall(text))
+        n = sum(not any(a <= hit.start() < b for a, b in quoted) for hit in VARIANT.finditer(text))
         if n:
             variants[rel] = n
         for hit in VERSION_LITERAL.finditer(text):
@@ -383,6 +402,22 @@ def test_guard_allows_legitimate_text(tmp_path, legit):
     root = _scratch(tmp_path)
     (root / "docs" / "ok.md").write_text(legit, encoding="utf-8")
     assert scan(root, BASE + ["docs/ok.md"]) == []
+
+
+@pytest.mark.parametrize("rel, planted, clean", [
+    (CORRECTIONS, 'The display name "OWASP Agentic Top 10" was unofficial.', True),
+    (CORRECTIONS, "The display name " + chr(0x201C) + "OWASP Agentic Top 10" + chr(0x201D) + " was unofficial.", True),
+    (CORRECTIONS, "The display name OWASP Agentic Top 10 was unofficial.", False),       # unquoted
+    (CORRECTIONS, 'Corrected the "OWASP Agentic Top 10 mapping".', False),               # not the whole quote
+    (CORRECTIONS, 'Corrected the "OWASP Agentic Applications" mapping.', False),         # a variant, not the retired name
+    ("docs/planted.md", 'The display name "OWASP Agentic Top 10" was unofficial.', False),  # CORRECTIONS only
+])
+def test_corrections_may_quote_the_retired_name(tmp_path, rel, planted, clean):
+    root = _scratch(tmp_path)
+    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+    (root / rel).write_text(planted, encoding="utf-8")
+    problems = scan(root, BASE + [rel])
+    assert (problems == []) is clean, problems
 
 
 def test_d90_exempts_sent_correspondence_only(tmp_path):
