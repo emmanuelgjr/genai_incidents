@@ -1,7 +1,7 @@
 # GenAI & Agentic AI Security Incidents
 
 A consolidated, machine-readable index of GenAI and agentic AI security incidents.
-Every applicable entry is mapped to four core taxonomies — **OWASP LLM Top 10 (2026)**, **OWASP Agentic Top 10 (ASI)**, **NIST AI RMF**, and **MITRE ATLAS** — plus a companion **MAESTRO** mapping where the source provides it and an experimental **VERIS 1.4.1** crosswalk computed at export time. See docs/TAXONOMIES.md for the full picture.
+Every applicable entry is mapped to four core taxonomies — **OWASP LLM Top 10 (2026)**, **OWASP Top 10 for Agentic Applications**, **NIST AI RMF**, and **MITRE ATLAS** — plus a companion **MAESTRO** mapping where the source provides it and an experimental **VERIS 1.4.1** crosswalk computed at export time. See docs/TAXONOMIES.md for the full picture.
 
 - **Version:** 2.12.0
 - **Generated:** 2026-10-09
@@ -89,7 +89,7 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 | LLM09 | Vector and Embedding Weaknesses | 24 |
 | LLM10 | Improper Output Handling | 6,838 |
 
-### OWASP Agentic Top 10 (ASI)
+### OWASP Top 10 for Agentic Applications (ASI)
 
 | Code | Name | Count |
 |---|---|---:|

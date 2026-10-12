@@ -156,7 +156,7 @@ def _canonical_release(release: str) -> str:
 def taxonomy_versions() -> dict[str, str | None]:
     """Return the versions of the pinned taxonomies this release's framework
     codes belong to, e.g. ``{"atlas": "2026.09", "owasp_llm": "2026",
-    "owasp_asi": "2025", "capec": None, "veris": "1.4.1"}``.
+    "owasp_asi": "2026", "capec": None, "veris": "1.4.1"}``.
 
     Same dict as ``taxonomy_versions`` in the repository's ``data/stats.json``
     (derived from the pinned ``mappings/*.json`` at build time). A value of

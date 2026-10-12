@@ -17,7 +17,7 @@ disclosed security incidents and vulnerabilities involving generative-AI and
 agentic-AI systems. Each entry is consolidated from multiple upstream sources,
 deduplicated under stable identifiers, and **cross-mapped to six taxonomies**
 — four core, stored on every applicable record (OWASP LLM Top 10 (2026),
-OWASP Agentic (ASI) Top 10, NIST AI RMF, MITRE ATLAS); a companion mapping
+OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS); a companion mapping
 stored where the source provides it (MAESTRO); and an experimental,
 export-only crosswalk computed at MISP-export time rather than stored per
 record (VERIS 1.4.1). The dataset is built

@@ -1,8 +1,8 @@
 title: "GenAI & Agentic AI Security Incidents"
 description: >-
   A consolidated, machine-readable index of GenAI and agentic-AI security
-  incidents, mapped to four core taxonomies (OWASP LLM Top 10, OWASP
-  Agentic Top 10, NIST AI RMF, MITRE ATLAS), plus a companion MAESTRO
+  incidents, mapped to four core taxonomies (OWASP LLM Top 10, OWASP Top 10
+  for Agentic Applications, NIST AI RMF, MITRE ATLAS), plus a companion MAESTRO
   mapping and an experimental VERIS crosswalk.
 theme: minima
 markdown: kramdown

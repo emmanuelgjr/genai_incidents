@@ -271,10 +271,10 @@ def test_taxonomy_versions_derived_from_mappings_not_literals(tmp_path):
     for p in (ROOT / "mappings").glob("*.json"):
         shutil.copy(p, m / p.name)
     asi = json.loads((m / "owasp_asi_top10.json").read_text(encoding="utf-8"))
-    asi["version"] = "2026"
+    asi["version"] = "2099"
     (m / "owasp_asi_top10.json").write_text(json.dumps(asi), encoding="utf-8")
-    assert tvmod.taxonomy_versions(m)["owasp_asi"] == "2026"       # follows the pin
-    assert tvmod.taxonomy_versions()["owasp_asi"] == "2025"        # repo unchanged
+    assert tvmod.taxonomy_versions(m)["owasp_asi"] == "2099"       # follows the pin
+    assert tvmod.taxonomy_versions()["owasp_asi"] == "2026"        # repo unchanged
 
 
 def test_stats_json_carries_taxonomy_versions():

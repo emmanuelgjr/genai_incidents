@@ -87,9 +87,27 @@ def main() -> None:
     draw.text((70, 532), "incidents" + (f"  ·  {yr_range}" if yr_range else ""),
               font=_font(30), fill=MUTED)
 
-    draw.text((64, 280),
-              "Mapped to OWASP LLM Top 10 · OWASP Agentic · NIST AI RMF · MITRE ATLAS",
-              font=_font(28), fill=MUTED)
+    # The four core taxonomies, full names (v2.13.0 item 9, D79/D86). At 28 px
+    # the line no longer fits the 1072 px text column (Arial: 1,342 px), so it
+    # is set at 26 px and wrapped at the " · " separators, measured with the
+    # font actually loaded. More than two lines would run into the count
+    # panel at y=360, so that fails the build instead of overlapping.
+    tax_font = _font(26)
+    parts = ["Mapped to OWASP LLM Top 10", "OWASP Top 10 for Agentic Applications",
+             "NIST AI RMF", "MITRE ATLAS"]
+    lines: list[str] = []
+    for part in parts:
+        trial = f"{lines[-1]} · {part}" if lines else part
+        if lines and draw.textlength(trial + " ·", font=tax_font) <= 1072:
+            lines[-1] = trial
+        else:
+            if lines:
+                lines[-1] += " ·"
+            lines.append(part)
+    if len(lines) > 2:
+        raise SystemExit(f"og-image: taxonomy line wraps to {len(lines)} lines: {lines}")
+    for i, line in enumerate(lines):
+        draw.text((64, 268 + 36 * i), line, font=tax_font, fill=MUTED)
     draw.text((760, 470), "open data · CC-BY-4.0", font=_font(26), fill=RUST)
     draw.text((760, 510), "emmanuelgjr.github.io/genai_incidents",
               font=_font(24), fill=MUTED)

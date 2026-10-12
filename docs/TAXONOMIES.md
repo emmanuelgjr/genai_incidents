@@ -1,13 +1,13 @@
 # Taxonomies
 
-This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026, OWASP Agentic ASI Top 10, NIST AI RMF, MITRE ATLAS), a companion MAESTRO architectural-layer mapping, and an experimental VERIS 1.4.1 crosswalk. They don't compete — they describe **different facets** of the same incident.
+This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS), a companion MAESTRO architectural-layer mapping, and an experimental VERIS 1.4.1 crosswalk. They don't compete — they describe **different facets** of the same incident.
 
 ## Quick chooser
 
 | Question | Use |
 |---|---|
 | What kind of failure is this at the LLM layer? | **OWASP LLM Top 10** |
-| What kind of failure is this at the agent layer? | **OWASP Agentic Top 10 (ASI)** |
+| What kind of failure is this at the agent layer? | **OWASP Top 10 for Agentic Applications (ASI)** |
 | What organizational risk function should respond? | **NIST AI RMF** |
 | What adversary tactic/technique was used? | **MITRE ATLAS** |
 | Where in the architecture did it originate / impact? | **MAESTRO** (companion) |
@@ -56,9 +56,11 @@ Failure-mode catalog focused on LLM-based applications regardless of agency.
 
 ---
 
-## OWASP Agentic Top 10 (ASI)
+## OWASP Top 10 for Agentic Applications (ASI)
 
-Source: <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>
+Source: "OWASP Top 10 For Agentic Applications 2026", OWASP Gen AI Security Project - Agentic Security Initiative, Version 2026 / December 2025: <https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/> · licensed CC BY-SA 4.0 (the codes and risk names below are reproduced from it; the descriptions in `mappings/owasp_asi_top10.json` are this project's own paraphrase)
+
+Related, cited separately: OWASP "Agentic AI - Threats and Mitigations" v1.1 (December 2025), the foundational taxonomy the Top 10 maps to and relies upon: <https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/>. The `ASI01`-`ASI10` codes belong to the Top 10, not to Threats and Mitigations.
 
 Failure-mode catalog focused on **agentic** systems — agents with planning loops, tool use, memory, and inter-agent communication.
 

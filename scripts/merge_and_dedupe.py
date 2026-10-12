@@ -3224,7 +3224,7 @@ def main():
         "description": (
             "A consolidated, machine-readable index of GenAI and agentic AI security "
             "incidents. Every applicable entry is mapped to four core taxonomies: "
-            "OWASP LLM Top 10 (2026), OWASP Agentic ASI Top 10, NIST AI RMF (AI 100-1), "
+            "OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), "
             "and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried "
             "where the source provides it, and an experimental VERIS 1.4.1 crosswalk is "
             "computed at export time (see docs/TAXONOMIES.md)."

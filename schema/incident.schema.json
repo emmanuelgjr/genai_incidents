@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/emmanuelgjr/genai_incidents/schema/incident.schema.json",
   "title": "GenAI / Agentic AI Security Incident",
-  "description": "Schema for a single incident entry in the genai_incidents dataset, a consolidated index of GenAI and agentic AI security incidents. Every entry is mapped to four core taxonomies (OWASP LLM Top 10, OWASP Agentic (ASI) Top 10, NIST AI RMF, MITRE ATLAS) where applicable, plus optional companion MAESTRO and experimental VERIS crosswalk fields.",
+  "description": "Schema for a single incident entry in the genai_incidents dataset, a consolidated index of GenAI and agentic AI security incidents. Every entry is mapped to four core taxonomies (OWASP LLM Top 10, OWASP Top 10 for Agentic Applications (ASI), NIST AI RMF, MITRE ATLAS) where applicable, plus optional companion MAESTRO and experimental VERIS crosswalk fields.",
   "type": "object",
   "required": ["id", "title", "date", "year", "category", "description", "severity", "references"],
   "additionalProperties": false,
@@ -297,7 +297,7 @@
     },
     "owasp_asi": {
       "type": "array",
-      "description": "OWASP Agentic (ASI) Top 10 codes",
+      "description": "OWASP Top 10 for Agentic Applications (ASI) codes",
       "items": {
         "type": "string",
         "enum": ["ASI01", "ASI02", "ASI03", "ASI04", "ASI05", "ASI06", "ASI07", "ASI08", "ASI09", "ASI10"]
