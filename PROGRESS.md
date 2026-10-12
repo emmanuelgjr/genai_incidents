@@ -63,6 +63,42 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 Item 9 step 1: **BOUNCE #1 on the source record `b4e6c4a7` (red-reviewer raw-text check, 2026-10-12)**. Sent back to the same license-auditor for a dated correction section (agreement 4).
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. Item 9 ASI source record b4e6c4a7: the two renames it proposes are wrong against the PDF. Do not implement the renames."
+
+**Defects, condensed from the gate:**
+1. **ASI02:** the PDF TOC/heading reads "Tool Misuse and Exploitation"; the infographic/appendix reads "Tool Misuse & Exploitation". "Tool Misuse" is blog shorthand. Ours is attested.
+2. **ASI05:** "Unexpected Code Execution (RCE)" appears in all PDF places. Ours is exact.
+3. **ASI03 was missed:** the TOC/heading reads "Identity and Privilege Abuse" vs "&" elsewhere. **The PDF is internally inconsistent on "&" vs "and" (ASI02, ASI03), so this is a user ruling.**
+4. **A version IS stated:** cover p.1 reads "Version 2026 / December 2025"; no "v1.0".
+5. **PDF licence VERIFIED: CC BY-SA 4.0**, with the clause quoted. The Attribution Guidelines bullet names the wrong document (an OWASP copy-paste error).
+6. One quote was summariser output, not verbatim.
+7. "NOTICE-DATA has no OWASP match" is literally false (NOTICE-DATA:116 avid_owasp; SOURCE_LICENSES 377/386). The substance holds: there is no OWASP GenAI attribution or licence row.
+
+**Measured by the gate:**
+- **All 10 of our descriptions are OWN PARAPHRASE:** 5-gram overlap vs the PDF (verbatim control 15/15) plus a side-by-side read. Only codes and names are OWASP-derived.
+- The T&M relation is CONFIRMED by PDF p.5.
+- Codes ASI01-10 and their order are unchanged, so this is **still a metadata relabel**: `version` 2026, `url` the 2026 doc, names per the user's form choice, ASI05 unchanged.
+
+**Blast radius:**
+- mappings file;
+- render_markdown.py:657-660 (hardcoded names);
+- docs/app.js:50-54 (own labels);
+- INCIDENTS.md, TAXONOMIES.md (and :61 url), owasp_asi.svg;
+- README.md:367 (T&M title and url);
+- taxonomy_versions.json:4.
+- legacy/*.md is historical.
+
+**Advisories:**
+- single-source the ASI names out of render_markdown.py and app.js (follow-up);
+- the OWASP LLM Top 10, also CC BY-SA, lacks a SOURCE_LICENSES row (out of scope; → WS0 note).
+
+**Gate evidence:**
+- curl at 2026-10-12 12:24 UTC: the PDF is 200, 1,274,186 B, 57 pp;
+- the landing page HTML has no ASI list;
+- pdftotext 4.06 and pypdf 6.14.2 agree on every heading;
+- repo access was read-only.
+
 ### 🔍 Item 9 step 1: source record committed `b4e6c4a7` on `ws0/v2130-item9-asi-source` (pushed). **red-reviewer raw-text check dispatched.**
 - **The auditor's summary:**
   - **metadata relabel, not a re-mapping**: codes ASI01-10 and their order are unchanged;
