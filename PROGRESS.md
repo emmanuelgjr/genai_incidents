@@ -63,6 +63,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 cut-docs bounce #2 fixes integrated at `0856810f` (pushed). **D91 scoped re-check sent to the same reviewer.**
+- **WS0** `4e14faf7` dep5 and `54790c7a` CHANGELOG, with the gate text verbatim.
+  - The CHANGELOG phrase was line-wrapped, so plain greps missed it, and it lived only on the integration branch. The foreman merged the integration branch into the WS0 branch (`3fbdf3f7`) so the owner could apply it.
+  - String check with whitespace collapsed: new 1, old 0.
+- **WS3** `0e2a11e6`: the flow label and SVGs, plus paper step 5, verbatim.
+  - **Foreman's brief refuted:** the new label is LONGER (DejaVu 353.0px vs 309.0). It still fits: rendered in DejaVu and Arial, dark and light, with no overlap and ≥93px clearance.
+- **Foreman [R]:** pytest **1072 passed, 1 xfailed**; validate rc 0; drift clean; old-text counts 0 in the paper, flow.py and both SVGs.
+
 ### ⚖ D91, USER RULING 2026-10-12 (cut-docs bounce #2): **"Fix + scoped re-gate" (Recommended)**
 - The gate itself recommended "apply verbatim + string check". **The user chose the stricter route**, consistent with D53/D55/D56.
 - **Dispatched:**
