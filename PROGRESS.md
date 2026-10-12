@@ -63,6 +63,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Item 9: COMPLETE at `bba71064` (pushed). **Full red-reviewer gate dispatched.**
+- **schema-architect (D86 schema part):**
+  - Both schema files changed at L5 (top-level description) and L300 (`owasp_asi` description) → "OWASP Top 10 for Agentic Applications (ASI)".
+  - Description-only, shown by an independent route: the parsed structures with descriptions stripped are equal.
+  - src was synced via render_markdown; the files are byte-identical.
+  - Guard PENDING_VARIANTS = {}. Fire proof: reverting the src string → 1 failed.
+  - validate rc 0; pytest 965 passed, 1 xfailed; drift rc 0.
+- **Foreman [R]:**
+  - origin = bba71064, 4 files on top of 521cd73b;
+  - `git merge-tree` vs origin/main is **clean**;
+  - three-dot diff vs main: 68 files, +14,703/-13,643.
+- **The gate is asked to:**
+  - render the banners and the og image and measure the DejaVu wrap;
+  - fetch the canonical CC-BY-SA-4.0 text and diff it;
+  - check the dep5 `AND` semantics;
+  - hunt for missed names by its own route;
+  - re-check the per-entity delta and the 13,586-line claim.
+
 ### 🔍 Item 9 D86 (label-scientist part): `521cd73b` (pushed). **schema-architect dispatched for the schema pair;** one gate follows.
 - **Dataset `description`:** the delta is exactly 1 top-level leaf ("OWASP Agentic ASI Top 10" → "OWASP Top 10 for Agentic Applications"). 0 entries changed; 0 `updated` moves. min.json doesn't carry it, and the exports are identical apart from the HF build_manifest commit/built_at.
 - **Per-incident pages:** 30 files, +13,586/-13,586 lines. A pairwise check found 0 changed lines other than the exact label swap. The label keeps "(ASI)" per D85.
