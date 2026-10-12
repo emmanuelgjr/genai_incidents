@@ -63,6 +63,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D77-D80, USER RULINGS 2026-10-12 (item 9 package)
+- **D77, bounce #2 route: "Apply verbatim + string check".** The user chose this over the foreman's recommended "fix + scoped re-gate".
+  - The raw-text reviewer drafts the exact text of a second dated correction section, including the T&M comparison that D80 needs.
+  - The license-auditor appends it verbatim.
+  - The foreman greps for the corrected strings.
+- **D78, ASI02/ASI03 name form: keep "&" (Recommended).** No risk-name changes.
+- **D79, framework display name: official title, citing the cover (Recommended).**
+  - "OWASP Top 10 for Agentic Applications" goes in all live surfaces (17 files, ~31 lines), with version "2026".
+  - Citations give the PDF cover title and "Version 2026 / December 2025".
+  - `url` points to the 2026 Top 10; T&M is cited separately.
+- **D80, licensing: attribute + carve-out (Recommended).**
+  - Add OWASP rows to SOURCE_LICENSES and NOTICE-DATA.
+  - owasp_asi_top10.json gets its own `.reuse/dep5` stanza, CC BY-SA 4.0 for the OWASP codes and names.
+  - **First check our descriptions against the T&M doc too.**
+  - Not decided here: the 21 OWASP-GENAI-* rows' missing licence row (no option selected → stays a WS0 note).
+
 ### ⛔ Item 9 step 1: **BOUNCE #2 on the source record (scoped re-check of `45718736`, 2026-10-12). ESCALATED to the user** (protocol step 6)
 **Verdict, in the gate's words:** "VERDICT: BOUNCE. The ASI record correction (45718736) carries my own wrong page numbers, and its §6 blast radius is incomplete... The fixes are mechanical text edits."
 
