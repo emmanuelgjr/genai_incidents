@@ -63,6 +63,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D125, USER RULING 2026-10-13: post-lift docs bounce #2 → **apply verbatim + string check (Recommended).** pe-postlift inserts the gate's 48ffe0db licence section and the two corrected D66/D63 bullets, in CHANGELOG.md only. The foreman then string-checks "48ffe0db", "CC-BY-SA-4.0 AND CC-BY-4.0" and "LicenseRef-upstream-terms" in the `[Unreleased]` slice, confirms the diff is CHANGELOG-only and drift is clean, and merges. No third gate reading.
+
+### ✅ WS3 schema `review_by` description (D124): **PASS (gate-postlift on `c57e3fd1`), MERGED (HEAD^2 verified).**
+- Description-only change; the schema copies are byte-identical (`cmp`, plus the enforcing test). Zero data delta. validate 15,784/15,784.
+- The wording is consistent with DATA_DICTIONARY:16 and the HF card.
+
+### ⛔ Post-lift docs + D124: **BOUNCE #2 (gate-postlift on `b5e8d9b6`). ESCALATED to the user.**
+**The gate's own miss:** "it is MY MISS FROM BOUNCE #1, not the author's."
+- All 5 bounce-#1 fixes are exact and true. The D97/D98 entry matches the gate's recomputed field delta.
+- **Defect:** CHANGELOG `[Unreleased]` omits merge `48ffe0db` (D96, D99, D101):
+  - the 3 OWASP LLM mapping files are relicensed `CC-BY-SA-4.0 AND CC-BY-4.0`;
+  - `ingest/*.json` is declared `LicenseRef-upstream-terms`.
+  - The gate supplied a verbatim section.
+- **Optional, same commit:** precise D66 and D63 bullets. The FRESH fetches are stashed outside the tree (not the held inputs), and D63 opens an issue rather than labelling a PR.
+- **Completeness was judged** from `git log --first-parent v2.13.0..origin/main`. The other merges change no data, licence terms or published behaviour.
+- **Evidence:**
+  - zero data delta on both branches;
+  - the review_by wording is consistent across 3 surfaces;
+  - pytest 1273 + 1 xfail on both;
+  - merge-tree clean in both orders, giving the same tree.
+
 ### 🔁 Post-lift docs + D124: **BOUNCE #1 (gate-postlift on `bcc47f3a`).** 4 text-only defects, routed to pe-postlift. Zero data delta is confirmed.
 **Defects:**
 1. **The D124 coherence gap.** DATA_DICTIONARY:16 still defines `review_by` as the date a human "committed to re-decide" the source, which is false for the 1,382 AIRI rows after D124. :127 says retiring = tombstone, but D108 retired AIRI with none.
