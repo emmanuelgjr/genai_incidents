@@ -179,6 +179,16 @@ MISP event timestamp moves once, so a client that dedupes on version re-imports 
 one time (this also delivers the 2026-10-01 OWASP `source_name` fix that never bumped
 `modified`).
 
+> **Supersession note (2026-10-13, do not regenerate this paragraph).** The sentence above,
+> "every STIX/TAXII `modified` moves once", holds for the objects that persist, but is
+> not true of the whole bundle. Per CHANGELOG [2.13.0] and `docs/releases/v2.13.0.md`, 2,543
+> STIX objects are *replaced*, not moved: 3 `attack-pattern` objects (`AML.T0019`, `AML.T0058`,
+> `AML.T0015.001`) and 2,540 relationships are retired, and 2 `attack-pattern` objects and 2,540
+> relationships with new ids are added (2,542 new objects, plus the first `identity`, so the bundle
+> count stays 65,141 because additions and removals cancel). Nothing is emitted as `revoked`; retired objects are
+> simply absent, so a client that dedupes on (`id`, `modified`) must also prune ids that vanish.
+> The original wording above is left as written.
+
 ## 6. Fire proofs (agreement 6) and re-derivation
 
 `scripts/audit/export_fire_proofs.py` corrupts one source line, runs the guarding check, expects failure,

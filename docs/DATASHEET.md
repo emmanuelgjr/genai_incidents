@@ -131,6 +131,11 @@ review, and the Heuristic labels bullet below for known gaps.
   STIX 2.1 bundle, a static [TAXII-compatible discovery document](https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json),
   and a [MISP feed](https://emmanuelgjr.github.io/genai_incidents/misp/) whose events
   carry `genai-incidents:*`, `mitre-atlas:*`, and VERIS 1.4.1 `veris:*` machinetags.
+  The pinned edition of every external taxonomy is published as `taxonomy_versions` (in `data/stats.json`,
+  `build_manifest.json`, the Python package and the STIX `identity` object's `x_taxonomy_versions`) and, in the MISP feed, as one
+  `genai-incidents:taxonomy-<name>` machinetag per taxonomy. The STIX/TAXII OWASP LLM `external_references` `source_name` is
+  edition-qualified (`owasp-llm-top10-<edition>`, derived from the pinned crosswalk), so a client matching on it must read the current edition from
+  `taxonomy_versions` rather than hardcode one; see [`docs/DATA_DICTIONARY.md`](DATA_DICTIONARY.md).
 
 ## Maintenance
 Maintained at <https://github.com/emmanuelgjr/genai_incidents>; a weekly workflow

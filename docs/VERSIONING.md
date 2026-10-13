@@ -92,7 +92,8 @@ caught at gate review, not by this file. Run both checks as part of step
    - `.zenodo.json` — the top-level `"version"` field.
    - `ingest/common.py`'s `USER_AGENT` constant — the literal version
      string every ingest HTTP request sends to every upstream host
-     (`genai_incidents/2.9.0 (+https://github.com/emmanuelgjr; ...)`), also
+     (`genai_incidents/<X.Y.Z> (+https://github.com/emmanuelgjr; ...)`, where `<X.Y.Z>` is the
+     version being cut), also
      quoted verbatim in `docs/INGESTION_CONDUCT.md`. The code comment
      directly above it already states the policy — *"If you bump
      `pyproject.toml`'s version, bump this string too"* — because no single
@@ -161,11 +162,14 @@ caught at gate review, not by this file. Run both checks as part of step
    changed — see `docs/releases/v2.10.0.md`'s `generated`-semantics
    disclosure), or if the ID set or any entry differs, stop — a
    version-string cut must not be a silent data cut. The same `version`
-   string also lands in `data/incidents.min.json` and, once the site
-   deploy runs, `docs/data/incidents.min.json` — spot-check both, since
-   they are downstream copies of the same field and a rebuild that updates
+   string also lands in `data/incidents.min.json`, and `make build`'s
+   `render` step (`scripts/render_markdown.py`) copies that file to
+   `docs/data/incidents.min.json` and `src/genai_incidents/data/incidents.min.json`
+   — no site deploy is involved. Spot-check all three, since they are
+   downstream copies of the same field and a rebuild that updates
    `data/incidents.json` but not its derived artifacts is its own kind of
-   silent gap.
+   silent gap. (The Pages deploy and `make docs-data` re-copy the file
+   independently, but the committed copies come from `make build`.)
 
 4. **Run the docs-stats renderer and confirm its actual boundary.**
    `make build` (step 3) already ran `render-docs-stats`
@@ -216,9 +220,12 @@ caught at gate review, not by this file. Run both checks as part of step
 
 5. **Sweep live surfaces for prose the bump just made false.** The
    drift check in step 4 catches stale *numbers* inside markers, plus the version literals it
-   is told to read (the full list is in step 4: the README Latest-release lead
-   line, `pyproject.toml`, `.zenodo.json`, `CITATION.cff`, the `USER_AGENT`,
-   the `INCIDENTS.md` **Version:** line and the HF card template); it does
+   is told to read. Exactly: the README Latest-release lead line (version and
+   release date), `pyproject.toml` `[project]` version, `.zenodo.json` `version`,
+   `CITATION.cff` top-level `version:`, `CITATION.cff` `preferred-citation`
+   `version:`, `CITATION.cff` `date-released`, the `ingest/common.py`
+   `USER_AGENT` version, the `INCIDENTS.md` **Version:** line, and the HF card
+   template (no version or total literal allowed at all); it does
    not read English prose. The `v2.9.0` cut hit exactly this: after the version
    marker updated to read `2.9.0`, an adjacent paragraph still claimed *no
    version had been bumped or tagged yet* — true when it was written, false
@@ -247,6 +254,21 @@ caught at gate review, not by this file. Run both checks as part of step
    release date are now caught by the drift check in step 4; the rest of
    the paragraph's English, links and "previous release" text are still
    only caught by this read-through.)
+
+   **Pre-publish check: the site a11y workflow must be green on the release
+   commit.** `.github/workflows/a11y.yml` (axe-core, Lighthouse, 380px
+   overflow, `docs/data/SHA256SUMS`) only runs on pushes and pull requests
+   that touch the paths it lists (`docs/**`, `tests/a11y/**`, ...), and no
+   other gate runs it. During the v2.13.0 cut a docs merge that touched the
+   site broke a11y and nobody noticed, because nothing in this checklist
+   looked. Before tagging, run
+   `gh run list --workflow=a11y.yml -b main --limit 3 --json headSha,conclusion,status,createdAt`
+   and confirm the newest run for the commit you are about to tag (or, if
+   that commit touched no a11y path and so has no run, the most recent run
+   on `main`) has `status: "completed"` and `conclusion: "success"`. If the
+   cut touched `docs/**` and no run exists, dispatch one:
+   `gh workflow run a11y.yml --ref <branch>`, then
+   `gh run watch <id> --exit-status`. A red or missing run blocks the tag.
 
 6. **Tag, and push the tag.** `git tag -a v<version> -m "v<version>"` on
    the commit that carries the bumped strings, then `git push origin

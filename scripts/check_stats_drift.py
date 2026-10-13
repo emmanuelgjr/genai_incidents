@@ -1,7 +1,7 @@
 """CI gate for invariant 6: docs pull counts from ``data/stats.json``;
 hardcoded totals fail CI (WS6-T2).
 
-Two independent failure modes, both checked:
+Six independent failure modes, all checked:
 
 1. **Marked drift** — a ``<!-- stats:KEY -->...<!-- /stats:KEY -->`` span (or
    a ``<!-- stats:KEY:line -->`` line marker) whose current value no longer
@@ -16,6 +16,14 @@ Two independent failure modes, both checked:
    hand-typed straight into prose would sail through a "no diff after
    re-render" check with zero changes. This sweep is what actually
    satisfies "CI greps docs for hardcoded totals."
+3. **Stats vs corpus** — ``data/stats.json`` counts re-derived from the rows of
+   ``data/incidents.json`` and the packaged ``incidents.min.json``.
+4. **Latest-release lead line** — README ``## Latest release`` version and date vs
+   ``stats.json`` and the top released ``CHANGELOG.md`` heading.
+5. **Version literals** — ``pyproject.toml``, ``.zenodo.json``, ``CITATION.cff`` (top
+   version, preferred-citation version, ``date-released``), the ``ingest/common.py``
+   ``USER_AGENT`` and ``INCIDENTS.md`` ``**Version:**`` vs ``stats.json``.
+6. **HF card template** — placeholders present, no hardcoded totals or version literals.
 
 Run: ``python scripts/check_stats_drift.py``. Exits 1 with every offending
 line printed on any failure; exits 0 (silent, one summary line) if every
