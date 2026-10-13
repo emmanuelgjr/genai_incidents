@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 D114 AIID lift: **BOUNCE #1 (gate-aiidlift on `62be0943`).** One wording defect, plus user questions.
+**Defect:**
+- The D115 record's `also_recorded.D116` says "keep the existing 3,937 OECD titles … (already true while OECD is held; confirmed by tests/test_d114_aiid_lift.py)".
+- **Measured: 3,937 on main → 3,935 on the branch** (INC-00437 and INC-14682 switch to the AIID template).
+- The cited tests do not check titles. This is **agreement 6, form (c)**.
+
+**Gate evidence, by its own route:**
+- Provenance: it downloaded the artifact itself, and the sha256 is byte-identical. No other ingest bytes changed.
+- Per-entity delta identical to the author's: +113 all-AIID; 169 changed; 0 source-id, OECD-id or absorption changes; 0 severity changes; the 25 title edits equal the package table.
+- **A main clone overlaid with only the branch's merge_and_dedupe.py and the 2 AIID files reproduces all 31 outputs byte-identically**, and deterministically.
+- Mutations:
+  - (a) OECD edits, new rows, a reformat and a relationships touch → precondition abort; data unchanged.
+  - (b) a marker with the pin at None is refused; the pinned control passes and the per-item gate then fires.
+  - (c) a duplicate or merge → abort.
+  - (e) tamper + recompute is refused.
+  - (f) D115 is inert.
+- pytest 1249 + 1 xfail; validate 15,784/15,784; drift and lint clean; merge-tree clean vs 8b0953af.
+
+**Advisories:**
+- **A1.** INC-00437 and INC-14682 move title, description and references to the AIID template, gain an `aiid` tag, lose the description_source/provenance markers, fill `affected`, change attack_vector, and move date (00437: 2026-04-03→02-26). Both were in the D114-approved 25-title table. **→ User question (D116).**
+- **A2, content gap.** AIID-driven content changes pass ungated, including on the 39 OECD-carrying rows. Mutation (d): an AIID-1476 upstream change on INC-01371 moves severity High→Critical and the date 2021→2015 with rc 0. There is no magnitude tripwire; the PR review is the only check. **→ User question (tripwire).**
+- **A3.** The next refresh (Sun 10-18) auto-admits AIID adds, title edits and content changes. A human still merges the PR. **Fail-closed side effect:** an AIID id dropped, or a new row deduping into a published one, aborts the WHOLE refresh, including AIAAIC, KEV and the CVE sweep. **→ User question.**
+- **A4.** The licence surfaces must land before or with the merge (SOURCE_LICENSES:100; the E23 counts).
+- **A5.** The corpus (6), attack_vector (5), date (3), year (1) and references (4) moves are all explained by AIID upstream changes. None is unintended.
+- **A6.** The OECD real-build tests now stop at the precondition. The per-item path is exercised only with it monkeypatched; the gate's b2 control shows it still fires.
+
 ### 🔍 D114 AIID-side lift: `62be0943` on `ws4/aiid-lift-d114-2026-10-13`. **Gate dispatched (gate-aiidlift).**
 - **Design:**
   - The refresh stops holding `aiid_full.json` and its sidecar.
