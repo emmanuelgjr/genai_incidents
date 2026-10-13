@@ -21,7 +21,7 @@ touched, the list of frozen files stays single-sourced in merge_and_dedupe.py,
 and the held tree is byte-identical to main for every frozen input, which is
 the precondition under which the gate's A2 content-change check is vacuous.
 
-AIRI: airi_navigator_incidents.json is in _PAIR_INPUT_FILES (D71 reading: AIID-
+AIRI: the AIRI Navigator ingest file is in _PAIR_INPUT_FILES (D71 reading: AIID-
 keyed AIRI rows count as the pair), so a revived AIRI is held too. Its fresh
 file goes to the artifact and is not merged until the user rules; it does not
 turn the run red.
