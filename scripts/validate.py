@@ -758,9 +758,12 @@ def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
 # N9 precision-audit gate (v2.13.0 item 5). What it enforces, in EVERY status
 # (pending, partial and measured alike -- the measured state is the one that
 # publishes a figure, so it is the one the pins matter most for; BOUNCE #1):
-#   (a) the audit directory is the pinned one, and no other dated directory
-#       exists under docs/audits/precision/ (a newer self-consistent
-#       directory cannot quietly take over);
+#   (a) the audit directory is the pinned one, and no other directory of
+#       ANY name exists under docs/audits/precision/ (a newer self-consistent
+#       directory cannot quietly take over; b17 advisory 1: a variant such as
+#       "2026-10-11b" escaped the old date-shaped glob, so the rule is now
+#       "exactly one subdirectory", which scripts/wilson_ci.py's default
+#       directory choice also enforces);
 #   (b) the sample is untampered: sample.json's entries hash to its own
 #       declared entries_sha256 AND to the value pinned in code, and the
 #       review sheet lists exactly the sampled ids in order;
@@ -771,7 +774,10 @@ def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
 #   (d) results.json equals a fresh computation from the sheet's HUMAN
 #       columns (scripts/wilson_ci.py), and the DATASHEET "Measured
 #       precision" block equals the rendering of those results, so a figure
-#       cannot be hand-typed into either;
+#       cannot be hand-typed into either; and (b17 advisory 3) no precision
+#       figure sits in the DATASHEET OUTSIDE that block
+#       (wilson_ci.stray_precision_figures; its docstring lists the known
+#       limits it does not detect);
 #   (e) while the measurement is not complete (pending/partial), the pending
 #       state must be AUTHORISED by a D28-form marker
 #       (pending_authorization.json: decision id, decided_by "user", and an
@@ -841,12 +847,13 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
         return [f"precision: pinned audit directory {rel}/ is missing"], "precision: MISSING"
     others = sorted(
         p.relative_to(root).as_posix()
-        for p in (root / "docs" / "audits" / "precision").glob("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]")
+        for p in (root / "docs" / "audits" / "precision").iterdir()
         if p.is_dir() and p.resolve() != audit_dir.resolve()
     )
     if others:
-        problems.append(f"precision: dated audit director(ies) {others} exist besides the pinned {rel}/ -- a new "
-                        "audit needs its own user decision and new pins in scripts/validate.py")
+        problems.append(f"precision: audit director(ies) {others} exist besides the pinned {rel}/ -- only the "
+                        "pinned directory may exist; a new audit needs its own user decision and new pins in "
+                        "scripts/validate.py")
     try:
         sample = json.loads((audit_dir / w.SAMPLE_FILE).read_text(encoding="utf-8"))
         frame = json.loads((audit_dir / w.FRAME_FILE).read_text(encoding="utf-8"))
@@ -885,9 +892,11 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
         problems.append("precision: docs/DATASHEET.md 'Measured precision' block is missing or differs from "
                         "the rendering of results.json (hand-edited or stale) -- run "
                         "`python scripts/wilson_ci.py --render-datasheet`")
+    problems.extend(f"precision: {s}" for s in w.stray_precision_figures(ds))
     status = res["status"]
     if status == "measured":
-        return problems, f"precision: measured ({res['human_labelled']} human-labelled rows, {rel})"
+        line = f"precision: measured ({res['human_labelled']} human-labelled rows, {rel})"
+        return problems, (line + f" -- FAILING ({len(problems)} problem(s))" if problems else line)
 
     # Pending/partial: the D28-form authorisation is required (on top of the
     # unconditional pins above).
@@ -926,6 +935,12 @@ def check_precision_audit(version: str | None, root: Path = ROOT,
         problems.append(f"precision: {PRECISION_AUTH_FILE} names decision {decision!r} but the decision pinned "
                         f"in code is {required_decision!r}")
         return problems, f"precision: {status}, NOT authorised (marker {decision!r} vs code {required_decision!r})"
+    # b4: the marker names the pinned decision, but any other problem (a non-ISO
+    # date, a wrong decided_by, a broken pin...) means the pending state is NOT
+    # authorised -- the status line must not say it is.
+    if problems:
+        return problems, (f"precision: {status}, NOT authorised ({len(problems)} problem(s); marker names "
+                          f"{decision!r})")
     return problems, f"precision: {status}, authorised by {decision}"
 
 def main():
