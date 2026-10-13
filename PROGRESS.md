@@ -63,6 +63,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Over-merge split proposal: **MERGED** (tip `c57a0c89`, HEAD^2 verified). **AWAITING THE USER'S D110 ruling.**
+- **Foreman [R] string check:**
+  - the A1 cell text ×1 and "leaving 6" ×1;
+  - the A4 sentence is present, wrapped across :240-241. A one-line search missed it; it was re-found with a multi-term search;
+  - the dated marker is present; NUL 0; one file, +446.
+
 ### ✅ Over-merge split proposal: **PASS (gate-overmerge on `f1f1513f`).** 3 pre-merge wording fixes are with cs-overmerge, then merge, then the D110 ruling.
 **Verdict, in the gate's words:** "PASS. The figures are fit for the user to rule on. Every headline number I re-derived by a different route matched the proposal. There are no defects."
 
