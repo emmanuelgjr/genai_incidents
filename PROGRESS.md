@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🧹 CLEANUP EXECUTED (D92/D93/D94), 2026-10-13. Foreman [R] at every step.
+- **Rescue first:** the 3 unpushed local branches were pushed to `archive/local-*` on origin. Each ref was verified equal to the local SHA (967fc04b, 4f4c4508, 8e23d6e6).
+- **D93:** 5 unmerged remotes were copied to `archive/<name>`. Each copy was verified equal to the original before the original was deleted: ecc-tools, ws0/v2130-item9-asi-source, ws3/headroom-remeasure, ws4/t19-split-remediation, ws4/t22-abandoned-wip. `ws4/refresh-tripwire-42` was KEPT.
+- **Worktrees:**
+  - **61 → 5.** 56 were removed with `git worktree remove` (no --force; 0 were refused as dirty).
+  - Kept: main, `C:/repos/gi-wt-decouple` (the active D66 repair), ws4-refresh-tripwire-42, and 2 locked by a live session.
+  - The empty orphan directory was removed; prune ran.
+- **Local branches: 142 → 5.**
+  - 127 were deleted with `git branch -d`.
+  - 7 archived branches were deleted with -D, only after their local SHA was verified equal to their archive ref.
+  - 3 were deleted with -D after being verified as ancestors of origin/main.
+- **Remote branches: 81 → 20.** 66 merged branches were deleted (each verified as an ancestor of origin/main). Kept: main, refresh-state, auto-refresh/data, 8× release/*, 8× archive/*, ws4/refresh-tripwire-42, ws4/v2130-refresh-decouple.
+- **Ignored files:** removed dist/ (31 MB, stale since July), plus 6 `__pycache__`/`.pytest_cache` directories.
+- **Temp scratch:**
+  - Checked 66 clones in 6 old sessions. Only 6 tips were not contained in any origin ref or tag. All 6 are 2 gate scratch commits: "delete (scratch)" 65b56aa4, a stage-1 fire-proof; and "trial merge (throwaway clone)" ab6f3e24. Neither is real work.
+  - The 6 old session directories were deleted (about 13 GB). The current session was kept.
+- **PROGRESS.md (D94):** the dated log from 2026-10-04 back to 07-15 (original lines 2137-3804 and 3939-4532, 2,262 lines) was moved **verbatim** to `docs/board-archive/PROGRESS-log-to-2026-10-04.md` (`8b8a6365`).
+  - **Verified independently from disk:** all 4,758 original lines are present across the live board and the archive; 0 missing.
+  - In memory, the reconstruction equals the original byte for byte.
+  - The live board went from 1.05 MB to 740 KB and keeps the task table, Phase-1 declaration, escalations, decisions, precedents and corrections.
+- **D94 moves dispatched to distribution-engineer** on `chore/v2130-tidy-archive`: AGENT_TEAM.md and docs/superpowers/ → docs/archive/; the 2 one-off scripts → scripts/archive/; a reference sweep, including the CLAUDE.md path to "AGENT_TEAM.md section 7" (path only). A gate follows.
+
 ### ⚖ D92-D95, USER RULINGS 2026-10-13 (cleanup + AIRI); plan: `docs/audits/repo-cleanup-plan-2026-10-13.md` (`faab4964`)
 - **D92, cleanup scope: local plus merged remotes (Recommended).**
   - Remove the merged, clean worktrees and local branches (`git worktree remove` without --force; `git branch -d`).
