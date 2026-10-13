@@ -63,6 +63,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 📋 docs-warden sweep after the D114 merge (main @ 8525aa20): **9 findings**, plus **D124**
+- **Clean:**
+  - every count surface reads 15,755;
+  - version strings agree;
+  - the AIID licence wording is correct (SOURCE_LICENSES:100, README:202, NOTICE-DATA:254);
+  - no claim that the refresh is stalled;
+  - INGESTION_CONDUCT already says AIRI is retired.
+- **Findings:**
+  - **#1, HIGH:** CHANGELOG `[Unreleased]` is missing D114, D117, D108, PR #102, D120 and the drift gate.
+  - **#2, HIGH:** README:218 says AIRI is stale "under a dated hold".
+  - #3: the README:144 v2.13.0 paragraph needs "since the release" for the counts (now 15,755) and D108.
+  - #4: DATA_DICTIONARY:126/131 says "four weekly-refreshed sources"; it needs the AIRI chain plus D108.
+  - #5: `data/source_freshness.json` coverage note and the AIRI D57 hold.
+  - #6: SOURCE_LICENSES §1.4 follow-up cell and ingest line.
+  - #7: README:335 / Makefile:204 `ingest-all` still runs ingest-airi.
+  - #8: check_source_health.py:185 stale wording.
+  - #9: DATA_DICTIONARY:120/151 "reconciliation planned". Verify.
+- **⚖ D124, USER RULING 2026-10-13: D108 resolves the D57 AIRI hold (Recommended).** The registry and docs record AIRI as retired 2026-10-13 (D108), with D57 resolved. Its rows stay, marked stale. `ingest-all` drops AIRI. It is done as a gated registry change.
+- **Routing:** all 9 go to **pe-postlift** on `ws4/postlift-docs-d124-2026-10-13`. The registry change must follow its sanctioned procedure, with a field-level delta if any entry moves, and the validate provenance interaction explained.
+
 ### ✅ D114 AIID-side lift: **MERGED** (tip `6768e889`, HEAD^2 verified), closed under D122. Main has **15,784 rows / incident_count 15,755**.
 - **Gate history:**
   - BOUNCE #1: the D115 record's false 3,937 claim.
