@@ -2,6 +2,8 @@
 
 > **Dated record, do-not-regenerate** (CLAUDE.md agreement 4). Author: pipeline-engineer (WS4). **Nothing here is approved, ruled or human-reviewed. I decide nothing**; every "recommendation" below is an agent suggestion for the user to accept, change or reject. Edits no `data/*.json`, ingest file, script, workflow or test. The earlier memo `docs/audits/oecd-aiid-unfreeze-decision-memo-2026-10-09.md` is a record and is not edited; where today's measurement differs from it, the difference is stated here and the memo stands as written.
 >
+> **Dated caveat (2026-10-13, after gate bounce #1): ID ranges and row totals are provisional.** The ID ranges (INC-17216 and up) and row totals (15,666 / 17,470 / 17,409 / 15,779) are relative to `9c646d36`. Refresh PR #102 has since merged (692bb672) and used INC-17216..17220 for AIAAIC rows; main is now 15,671 rows / incident_count 15,642, so a rebuild today numbers new rows differently. The class counts (merges, retitles, title edits, content changes, adds) are unaffected. Open fact 10 below says PR #102 was open when written; it has since merged.
+>
 > Base: `main` @ `9c646d36`. Measured on 2026-10-13 against the `held-oecd-aiid-inputs` artifacts of weekly-refresh runs **38366793761** (today, dispatched from `main`, concluded success) and **38330687613** (2026-10-13 01:08Z, branch `ws4/v2130-refresh-decouple`). Artifacts expire 2026-11-12 (30-day retention); the hashes in section 0 pin what was measured.
 
 ## Ruling card (the five decisions; detail in section 2)
@@ -75,7 +77,7 @@ Existing rows changed: **190** (all carry an OECD/AIID id; none without one). Fi
 
 Intended-versus-unintended notes (agreement 2): (i) `description` changes on 180 rows, but in every case the new description is still one of the two project templates (0 of 180 are non-template), so no OECD/AIID narrative enters; the change is the template's own "Alleged deployer/developer" list following AIID's updated deployer/developer data (`affected`). (ii) `severity` moves on 4 rows, all upward (`INC-05170` Medium to High, `INC-00699` High to Critical, `INC-01514` High to Critical, `INC-14517` Medium to High); the memo said 4 upward severity changes, same count. (iii) `corpus` moves on 7 rows: 6 `ai-harm` to `security`, and `INC-01579` `security` to `ai-harm` (it takes AIID's title and template). (iv) `date` moves earlier on 14 rows, because a retitled/merged entry now holds an older source row (largest: `INC-00699` 2026-03-18 to 2024-06-24, `INC-01994` 2026-02-20 to 2025-06-27, `INC-01579` 2026-05-12 to 2025-05-31). (v) `aiid_id` is set or changed on 14 published rows: 13 gains from none (all from OECD alone) and one **changed value**, `INC-03717` 687 to 1684 (R10, an evidence-marked do-not-approve retitle). (vi) Nothing outside the pair's rows changes: control shows 0 diff for everything else.
 
-New rows: **1,811**, IDs `INC-17216` to `INC-19026` (contiguous, none reused; the high-water mark moves to 19,026). Mix: **1,712 OECD-only, 61 AIID-only, 38 both**. Corpus 1,781 `security` and 30 `ai-harm`. Severity High 1,004, Medium 410, Critical 397. IDs and tombstones: 7 IDs leave `incidents.json` and gain `merged` records (append-only; permanent); no deletion, no ID reuse; the full-file `id_deprecations.json` grows by exactly those 7.
+New rows: **1,811**, IDs `INC-17216` to `INC-19026` (provisional: PR #102 has since used INC-17216..17220; contiguous at `9c646d36`, none reused; the high-water mark moves to 19,026). Mix: **1,712 OECD-only, 61 AIID-only, 38 both**. Corpus 1,781 `security` and 30 `ai-harm`. Severity High 1,004, Medium 410, Critical 397. IDs and tombstones: 7 IDs leave `incidents.json` and gain `merged` records (append-only; permanent); no deletion, no ID reuse; the full-file `id_deprecations.json` grows by exactly those 7.
 
 ### 1.4 Per-source decomposition (what each fresh source does alone)
 
@@ -85,7 +87,7 @@ New rows: **1,811**, IDs `INC-17216` to `INC-19026` (contiguous, none reused; th
 | OECD only (AIID held) | 17,409 | 7 | 4 | 0 | 23 | 1,750 (1,712 OECD-only + 38 both) | 1,874 (OECD 1,806, AIID 68) |
 | AIID only (OECD held) | 15,779 | **0** | **0** | 25 | 169 | **113** (all AIID-only) | 113 |
 
-Readings: the merges and the doubtful bridges are an **OECD-side** phenomenon (7 of 7 from OECD alone). The AIID snapshot alone produces **no merges and no absorbing retitles**; its held change is 113 new AIID-only rows, 25 title edits and 169 rows with refreshed `affected`/`description`. The "AIID-only rows" figure is 113 if OECD stays held and 61 if OECD is lifted too (52 of the 113 are then cited by a new OECD row and become "both" rows). The memo's "about 94" was a subtraction of two unlike measurements; it is not reproduced (113 measured, with `entries_security_relevant` 1,099 to 1,211 = +112 in the provenance sidecar as a cross-check; the one-row difference is not explained and is not needed for the ruling).
+Readings: the merges and the doubtful bridges are an **OECD-side** phenomenon (7 of 7 from OECD alone). The AIID snapshot alone produces **no merges and no absorbing retitles**; its held change is 113 new AIID-only rows, 25 title edits and 169 rows with refreshed `affected`/`description`. The "AIID-only rows" figure is 113 if OECD stays held and 61 if OECD is lifted too (52 = 40 into 38 new both-rows + 12 absorbed into published rows, the retitle/merge hub ids: AIID-1595 and 1713 into INC-14407; 1609 into INC-13066; 1644 into INC-13321; 1657 into INC-00699; 1671 and 1672 into INC-14517; 1673 into INC-07910; 1679 into INC-07783; 1680 into INC-00813; 1684 into INC-03717; 1723 into INC-14284. Those 12 complete the bridges behind R2-R5, R9-R12 and the M3/M6/M7 hubs). The memo's "about 94" was a subtraction of two unlike measurements; it is not reproduced (113 measured, with `entries_security_relevant` 1,099 to 1,211 = +112 in the provenance sidecar as a cross-check; the one-row difference is not explained and is not needed for the ruling).
 
 ### 1.5 Staleness cost (what is not in the corpus because of the hold)
 
@@ -110,7 +112,7 @@ Cost reading: the committed OECD view is **88 days behind** (newest event 2026-0
 **A2. Narrow: lift the AIID side only; OECD (and AIRI) stay held.**
 - Consequence (measured, AIID-only overlay): +113 AIID-only rows (`INC-17216..INC-17328`; all `security`, all tier `landmark`, description is the project template "AI Incident Database (AIID) entry #n ..."; severity Medium 76 / High 30 / Critical 7; years 2020:1, 2022:2, 2023:6, 2024:11, 2025:14, 2026:79); 25 published-title edits (table 2.a-1); 169 content-changed rows (168 `description`, 154 `affected`, 25 `title`, 6 `corpus`, 5 `attack_vector`, 4 `references`, 3 `date`, 2 `tags`, 2 each of the provenance labels, 1 `year`; plus `updated`/`last_seen` on all 169). 0 merges, 0 tombstones, 0 retired IDs. 39 of the 169 changed rows also carry an OECD id (they are mixed rows; their AIID-driven fields change, their OECD fields do not).
 - E23 fit: E23's ruling is shape-based (the only AIID-authored text kept is a bare title; Layer 1 rests on U.S. situs; Layer 2 on the U.S. maker). 113 new titles and 25 edited titles are the same shape. But E23's published counts (1,463 of 1,465 etc.) and the "marker absence" measurement must be re-run (memo R4/R3), and the `aiid_incidents.json` (63 rows) / AIRI exclusion tripwire must still hold; I did not re-run those.
-- Risks: still rests on E23's uncertified situs (unchanged in kind, memo R5); AIID's own sentence "report contents are subject to their own intellectual property rights" applies to report text, which does not ship; 113 + 25 is about 7 percent growth in the AIID-titled population.
+- Risks: still rests on E23's uncertified situs (unchanged in kind, memo R5); the snapshot's `snapshot_license_txt` reads in full "Report contents are subject to their own intellectual property rights. Unless otherwise noted, the database is shared under (CC BY-SA 4.0). See: https://creativecommons.org/licenses/by-sa/4.0/"; the first sentence concerns report text, which does not ship, and how the BY-SA sentence is handled is in E23 and `SOURCE_LICENSES` 1.2/1.2a (not re-examined here); 113 + 25 is about 7 percent growth in the AIID-titled population.
 - Recommendation: **A2.** Reasons: it is the only slice with 0 merges and 0 deprecations, so nothing permanent is written; it is covered by an existing ruling in kind; it recovers the 25 corrections and 113 current incidents; it leaves the OECD title question (d) and the bridge question (b) untouched. Cost: engineering in section 3 (the hold script and the gate treat the pair as one).
 
 **A3. Lift both sources, but suppress the bridges the user rejects.**
@@ -203,13 +205,29 @@ Per-item observations I can add from today's data (not in the D42 file):
 ### (c) The AIID-only new rows
 
 - C1 hold (A1 behaviour): rows stay out; cost = 113 current incidents missing, growing.
-- C2 ship all: **113 rows** if OECD stays held (A2), **61** if OECD is lifted too (52 become "both" rows). IDs `INC-17216..INC-17328` (AIID alone). Row shape: tier `landmark`, `security`, `aiid_id` set on all, description a project template, no `content_license` marker (as for the existing AIID rows). AIID-authored text shipping: the 113 bare titles plus `affected` names. A sample of the AIID-only rows (as they appear under the both-source overlay, 61 rows) follows.
+- C2 ship all: **113 rows** if OECD stays held (A2), **61** if OECD is lifted too. The other 52 split as **40 into 38 new both-rows and 12 absorbed into published rows**, namely the retitle/merge hub ids: AIID-1595 and 1713 into INC-14407; 1609 into INC-13066; 1644 into INC-13321; 1657 into INC-00699; 1671 and 1672 into INC-14517; 1673 into INC-07910; 1679 into INC-07783; 1680 into INC-00813; 1684 into INC-03717; 1723 into INC-14284. So lifting AIID alone (A2) ships these 12 as standalone AIID-only rows, while a later OECD lift turns them into the hub bridges that drive R2-R5, R9-R12 and M3/M6/M7. IDs `INC-17216..INC-17328` (AIID alone; provisional, see the 2026-10-13 caveat under the Base line). Row shape: tier `landmark`, `security`, `aiid_id` set on all, description a project template, no `content_license` marker (as for the existing AIID rows). AIID-authored text shipping: the 113 bare titles plus `affected` names. A sample of the AIID-only rows (as they appear under the both-source overlay, 61 rows) follows.
 - C3 ship a subset: no natural cut exists (all 113 are one shape); a subset by year (79 are 2026) would just be a time-based hold.
 - Risk: E23 situs dependency (above); reversible only by a status/tombstone path (invariant: never delete).
 - Recommendation: **C2 under A2.**
 
-61 AIID-only new rows; ids INC-17217..INC-17306; severity {'Medium': 34, 'High': 21, 'Critical': 6}; corpus {'security': 61}; year {2020: 1, 2022: 1, 2023: 5, 2024: 9, 2025: 10, 2026: 35}
-sample (first 8): INC-17217 AIID-1586 Threat Actor Reportedly Used AI-Assisted Workflows to Compro; INC-17218 AIID-1588 Purportedly AI-Powered KT Platform Reportedly Used in Forced; INC-17219 AIID-1589 Purportedly AI-Powered 007TG Platform Reportedly Used by Sca; INC-17220 AIID-1592 Purportedly AI-Generated Images Reportedly Used During Four-; INC-17221 AIID-1596 Purported Deepfake Impersonation of Starmangalsutra Director; INC-17222 AIID-1599 Waymo Robotaxi Reportedly Remained Immobilized While Vandals; INC-17223 AIID-1602 Zoox Autonomous Vehicle Reportedly Entered Smoke-Obscured Fi; INC-17225 AIID-1605 Purportedly AI-Generated Image Prompted Emergency Investigat
+The 61 AIID-only rows under the both-source overlay (IDs provisional, as above):
+
+| Property | Count |
+|---|---|
+| severity | Medium 34, High 21, Critical 6 |
+| corpus | security 61 |
+| event year | 2020: 1, 2022: 1, 2023: 5, 2024: 9, 2025: 10, 2026: 35 |
+
+First 8 by ID (provisional numbering; AIID id and truncated title):
+
+- INC-17217 AIID-1586 Threat Actor Reportedly Used AI-Assisted Workflows to Compro
+- INC-17218 AIID-1588 Purportedly AI-Powered KT Platform Reportedly Used in Forced
+- INC-17219 AIID-1589 Purportedly AI-Powered 007TG Platform Reportedly Used by Sca
+- INC-17220 AIID-1592 Purportedly AI-Generated Images Reportedly Used During Four-
+- INC-17221 AIID-1596 Purported Deepfake Impersonation of Starmangalsutra Director
+- INC-17222 AIID-1599 Waymo Robotaxi Reportedly Remained Immobilized While Vandals
+- INC-17223 AIID-1602 Zoox Autonomous Vehicle Reportedly Entered Smoke-Obscured Fi
+- INC-17225 AIID-1605 Purportedly AI-Generated Image Prompted Emergency Investigat
 
 ### (d) The OECD `title` licence position
 
