@@ -63,6 +63,67 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D108 AIRI retired + refresh B2/B3 + refresh drift fix: **PASS (gate-airi on `29944158`), MERGED (HEAD^2 verified). Main's drift check is GREEN again.**
+**Verdict, in the gate's words:** "PASS… DEFECTS: none."
+
+**Gate evidence:**
+- **(a) Retirement.** The checker was run against the LIVE refresh-state counters (airi 15, stale) under failure, absent, success and skipped. Every run exits 0 with no ::error::, status retired, the counter frozen at 15 and last_success kept.
+  - Mutations: RETIRED_SOURCES emptied plus an airi failure → exit 1, counter 16. A stale aiaaic still alerts.
+  - The AIRI file is still held and still read.
+- **(b) B2/B3.**
+  - B2: a direct call on the swapped / id-last case raises on the branch and NOT at 692bb672, so it discriminates.
+  - B3: the override marker goes under runner.temp and is appended to the PR body; the guard runs before the PR step.
+- **(c) Drift fix.**
+  - check_stats_drift: rc 1 at 692bb672, rc 0 on the branch.
+  - **Count-only proof:** substituting 15,642 → 15,637 makes all 3 files sha-identical to 692bb672.
+  - The workflow order now matches the Makefile build. lint_atlas_ids is offline and already a hard gate in validate.yml.
+  - **A double rebuild was byte-identical to the committed tree.**
+- **(d)** actionlint rc 0; no references left to the removed steps.
+- **(e)** Clean-clone pytest 1219 + 1 xfail; merge-tree clean.
+
+**Foreman [R] on merged main:** check_stats_drift clean (5 surfaces); validate rc 0.
+
+**Advisories → register (new items):**
+- **R1.** Reviving AIRI needs the workflow ingest step and the outcomes key restored too. Fix the comment at check_source_health.py:61-63.
+- **R2.** Stale "monthly retry" wording at check_source_health.py:185, :190 and :248.
+- **R3, user/docs question.** `data/source_freshness.json` still has the airi D57 "hold" block (re-decide by 2027-01-07), and README:218 says "under a dated hold". D108 arguably answers the D57 re-decide. Changing the registry is a gated data change.
+- **R4.** Drift-gate test blind spots: render order inside one run block, and `if: false` on the gate step.
+- **R5.** Validate's provenance check passes in the refresh only because persist resets the state to main's copy (auto-refresh.yml:322). That reset is load-bearing and untested; this predates the branch.
+
+### ✅ D109: first ATLAS refresh dispatch (run 38372928453), **SUCCESS, NO-OP.**
+- The log reads: `[atlas-fetch] collection.version=2026.09 modified=2026-09-15 … sha256=935efa93…` and then `NO-OP: ATLAS-2026.09.yaml sha256 matches the committed snapshot; nothing written`.
+- "Detect change" reported success, and every later step (scan, re-pin, merge, delta, lint, tests, PR) was skipped. **No PR, as designed.**
+- The workflow is now proven to run end to end through change detection. The first real update will exercise the remaining steps. The next cron is 2026-11-03.
+- **Register a5 closed.**
+
+### ⚖ D117/D118, USER RULINGS 2026-10-13: over-merge (proposal `docs/audits/overmerge-split-proposal-2026-10-13.md`)
+- **D117: rule fix now, split later (Recommended).**
+  - **A2 now:** aggregate round-up URLs are not dedupe keys unless both sides already share a published row. Published data must stay byte-identical. Add a regression test that would have caught today's fold.
+  - **B-retire later, as its own release, once its blockers clear:**
+    - 3 invalid "2026-Q1" dates;
+    - 6 ingest rows that still hold OWASP round-up text;
+    - the split authorization generalised beyond the hardcoded D28 list.
+  - The 14 same-shape rows and the 598-row residue stay out of scope.
+- **D118: if the split happens, RETIRE INC-02646 (Recommended).** It becomes a `split` tombstone pointing to its successors, so the ID cannot silently change meaning (the D70 shape).
+- **ID note:** PR #102 used INC-17216..17220, so B's new IDs start at INC-17221 or later.
+- → **WS4: A2 rule fix** (`ws4/overmerge-rulefix-a2`). → Register: the B-retire split task plus its 3 blockers.
+
+### ✅ Over-merge split proposal: **MERGED** (tip `c57a0c89`, HEAD^2 verified). **AWAITING THE USER'S D110 ruling.**
+- **Foreman [R] string check:**
+  - the A1 cell text ×1 and "leaving 6" ×1;
+  - the A4 sentence is present, wrapped across :240-241. A one-line search missed it; it was re-found with a multi-term search;
+  - the dated marker is present; NUL 0; one file, +446.
+
+### ✅ Over-merge split proposal: **PASS (gate-overmerge on `f1f1513f`).** 3 pre-merge wording fixes are with cs-overmerge, then merge, then the D110 ruling.
+**Verdict, in the gate's words:** "PASS. The figures are fit for the user to rule on. Every headline number I re-derived by a different route matched the proposal. There are no defects."
+
+**Advisories:**
+- **A1, form (a).** The "stats.json byte-identical under A2" cell could not fail, because merge_and_dedupe never writes stats.json. **The gate closed it:** it rendered both copies and they are identical. The cell is to be reworded.
+- **A2, ID shift.** PR #102 merged, so option B's new IDs move +5 (INC-17221.., not INC-17216..) and live rows go 15,671 → 15,686. #102 touched neither the 3 rows, nor scripts/, nor the OWASP ingest. **The foreman states this when presenting D110**; the dated file is not edited for it.
+- **A3.** The measurement doc found 8 rows with round-up text; D97 rewrote 2, leaving the 6. To be reworded.
+- **A4.** A2's regex only matches "round-up" slugs. Add a scope note, and a regression test if A2 is ruled.
+- **A5, not independently re-derived:** the per-branch line trace (the 17/2/1 sum was checked); the 258/203/55 class counts (5 rows spot-checked); the two "probable" existing-row matches.
+
 ### ⚖ D114-D116, USER RULINGS 2026-10-13: OECD/AIID stage 2 (package `docs/audits/stage2-ruling-package-2026-10-13.md`)
 - **D114, (a)+(c): lift the AIID side only, and build suppression (Recommended).**
   - Ship the AIID-side changes now with OECD kept held: about 113 new AIID-only rows, 25 title edits and 169 content changes, re-derived at build time.
