@@ -63,6 +63,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D122/D123, USER RULINGS 2026-10-13 (D114 bounce #2)
+- **D122: apply verbatim + string check (Recommended).** The gate's exact README:144 and SOURCE_LICENSES:100 text is applied. The foreman string-checks, re-runs drift and the tests, and merges. No third gate reading.
+- **D123: add a PR-body size cap now (Recommended).** The D120 report is truncated with a note, the full report goes to the step summary or an artifact, and the whole pr-body.md is guarded below GitHub's 65,536-character limit. Tests must be proven to fire.
+- → pe-aiidlift, on the same branch, after fast-forwarding to fdc3d2fa.
+
 ### ⛔ D114 AIID lift: **BOUNCE #2 (gate-aiidlift re-gate on `fdc3d2fa`). ESCALATED to the user.** Both defects are text-only, with exact replacements; data and code are unaffected.
 **Defects:**
 1. **README:144** rewrote the v2.13.0 "Known limitations, as of this release" clause into post-release state. **v2.13.0 shipped frozen.** Keep the release wording and append "since the release, the AIID side has been lifted under D114…". The gate supplied exact text.
