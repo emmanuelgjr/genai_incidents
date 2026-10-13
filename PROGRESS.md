@@ -63,6 +63,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 v2.13.0 cut steps 2-5 DONE at `6847ea46` on `release/v2.13.0-cut` (pushed). **PRE-PUBLISH red-reviewer gate dispatched.**
+- **Version strings:** merge_and_dedupe, pyproject, CITATION ×3 (date-released 2026-10-13) and .zenodo are all 2.13.0. USER_AGENT was already done.
+- **CHANGELOG:** a fresh `## [Unreleased]`, then `## [2.13.0] — 2026-10-13`.
+- **README "Latest release":** rewritten for v2.13.0, with v2.12.0 condensed to a "Previous release" one-liner. A 2nd README stats:version marker still read 2.12.0; render_docs_stats fixed it.
+- **The naming guard caught the README draft** ("OWASP agentic mapping") and it was reworded.
+- **Step 3:** `make` is absent, so the targets were run in order, including lint-atlas. The per-entity delta vs b3c17580 is ONLY the top-level `version` in incidents.json and stats.json. 0 entries changed; `updated` 0; `generated` unchanged.
+- **Step 4:** drift rc 0; INCIDENTS Version 2.13.0; validate 15666/15666; lint 71 OK.
+- **Step 5:** the sweep found only the README paragraph false; it is fixed.
+- **Notes:**
+  - the preamble is fixed;
+  - the opening reads "the cut on 2026-10-13 has since moved all five, and the counts below are unchanged". The old conditional was replaced, not kept; the specialist flags that it can keep the old clause verbatim if preferred;
+  - the reuse figures are unchanged at 340/449 and 348/449.
+- **Paper:** backticks added.
+- **pytest:** 1072 passed, 1 xfailed.
+- **Not run by the specialist:** the negative drift test. The gate is asked to prove that the drift check fires.
+
 ### ▶ v2.13.0 cut step 2: USER_AGENT done `b3c17580` (pushed). **Fresh distribution-engineer dispatched for steps 2 (rest), 3, 4 and 5.**
 - **USER_AGENT:** ingest/common.py:97, INGESTION_CONDUCT.md:40 and :75 changed 2.12.0 → 2.13.0; no 2.12 left in either file. pytest 1072 passed. Drift fails only on `USER_AGENT '2.13.0' != stats '2.12.0'`, which is expected.
 - **Steps 2-5 brief:**
