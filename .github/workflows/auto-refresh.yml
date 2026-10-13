@@ -402,7 +402,16 @@ jobs:
           python scripts/parse_existing.py
           python scripts/merge_and_dedupe.py
           python scripts/render_markdown.py
+          python scripts/render_docs_stats.py
           python scripts/validate.py
+          python scripts/lint_atlas_ids.py
+
+      # Invariant 6 hard gate (PR #102 shipped README/DATASHEET/index.html at the
+      # old total because this workflow never ran the doc-stats step): a refresh
+      # whose counts moved but whose doc surfaces did not follow fails here,
+      # before any PR is opened. Mirrors `make build` + `make check-stats-drift`.
+      - name: Doc surfaces match stats.json (invariant 6)
+        run: python scripts/check_stats_drift.py
 
       # Hard gate: the same suite that runs on every PR/push. A regression in the
       # refreshed data or generated outputs blocks the PR instead of shipping it.
