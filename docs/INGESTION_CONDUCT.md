@@ -121,7 +121,10 @@ now literally true, not just true of content fetches.
 **Operational exposure of fail-closed (bounce #1, R4b), stated plainly, not
 just argued for ethically:** this pipeline currently touches 12 distinct
 hosts, mostly once a day, over one network path (the weekly
-AIRI/AIAAIC/OECD/KEV run plus the on-demand NVD/GHSA/OSV run). A host that
+AIRI/AIAAIC/AIID-snapshot/OECD/KEV run, `auto-refresh.yml`, whose separate
+`cve-sweep` job also reads `cvelistV5` and NVD, plus the on-demand NVD/GHSA/OSV run in
+`cve-enrich.yml` (manual dispatch); AIID was added to this list 2026-10-12, follow-up c9, after
+being checked against `.github/workflows/auto-refresh.yml` at `761eaef6`). A host that
 403s its own robots.txt intermittently, or serves it differently by
 geography or CDN edge, now breaks an ingest that worked fine under the
 pre-WS0-T4 code, which never checked robots.txt at all. That is the direct,

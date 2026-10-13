@@ -512,5 +512,31 @@ Corrected in place (memo not yet frozen). Old -> new, by section:
    attributed to "the foreman"; it is red-reviewer, who read it in the run log at the
    bounce #1 gate (advisory A2).
 
+## Dated correction note (2026-10-12, license-auditor, follow-up c10)
+
+Added as a supersession note; line 342 (S7) is preserved as written and is not
+edited. It reads `ruled_by: "user"` in a sentence that says the S7 suppression list
+should use "the same marker form as the approval file ... as WS4-T21 did for D28".
+Re-checked against the tree on 2026-10-12 (Grep and file reads, no shell):
+
+- The **D42 approval file's** marker form is `authorization.ruled_by == "user"`
+  (`scripts/merge_and_dedupe.py:2077`; `tests/test_d42_refresh_merge_gate.py:31`;
+  `docs/audits/D42-refresh-merge-review-2026-10-03.md:78`). Against that form,
+  line 342's `ruled_by` is accurate.
+- The **D28 split-authorization file's** field is `decided_by: "user"`
+  (`docs/audits/WS4-T19-authorized-splits-2026-09-18.json`, `authorization` object,
+  line 10), validated by WS4-T21; the same `decided_by` form is used by the precision
+  authorization (`scripts/validate.py:903`).
+- So the two existing marker forms differ in this field name, and line 342's
+  clause "as WS4-T21 did for D28" is accurate only for the **hash pinned in code**,
+  not for the field name. A reader taking that clause to mean the D28 field name
+  (`decided_by`) would be wrong for the approval file and right for D28.
+- **Do not read line 342 as a specification of the S7 field name.** The S7 builder
+  must choose one form deliberately and say which; this note does not choose.
+
+The board's earlier note that line 342 "says `ruled_by`, which is wrong" is therefore
+only half right: it is wrong as a description of D28, correct as a description of the
+approval file. Do-not-regenerate.
+
 *Agent-suggested; do not regenerate. Supersede by a dated addendum, not by rewriting
 (CLAUDE.md working agreement 4).*
