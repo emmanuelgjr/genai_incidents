@@ -63,6 +63,35 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 📋 docs-warden sweep after the licensing merge (main @ d12a5a6c): **15 findings**. 14 routed to WS6, 1 deferred.
+- **No live surface claims the D96 rewrite is done.**
+- **High:**
+  - **#1:** README:423 says "One mapping file is CC BY-SA"; there are now four.
+  - **#2:** the README licence section has nothing on ingest/ being under upstream terms.
+- **Medium:**
+  - **#3:** the README omits the 2 round-up rows.
+  - **#5/#6:** CITATION.cff:44-46 and .zenodo.json list only the ASI exception, and both feed external indexes.
+  - **#7/#8:** NOTICE-DATA:41 and :293 still say "eight". :293 also says AIM is the "last".
+  - **#9:** the HF card generator (export_huggingface.py:158-196) covers AIAAIC/OECD only.
+  - **#10:** the DATASHEET licence bullets.
+  - **#14:** TAXONOMIES has no OWASP LLM licence line, against the ASI one at :61.
+- **Low:**
+  - **#4:** the README:144 release blurb ("one mapping file").
+  - **#11:** the site footer/OG says unqualified CC-BY (index.html:37,253; incident-shard.html:49).
+  - **#12:** methods paper :167.
+  - **#13:** CONTRIBUTING :46/:21 (ingest/ drop-ins follow dep5).
+  - **#15:** the mapping JSONs carry no licence key.
+- **Clean:**
+  - dep5 arithmetic and stanza order;
+  - LICENSE-DATA and pyproject;
+  - INGESTION_CONDUCT "at least 10";
+  - SOURCE_LICENSES consistent;
+  - DATA_DICTIONARY;
+  - no other "eight sources".
+- **Routing:**
+  - #1-#14 go to **distribution-engineer** on `ws6/licensing-surfaces-2026-10-13` as one docs batch, with the a11y check required (#11 is a footer link, after the D89 axe precedent).
+  - **#15 is deferred** to the follow-ups register: optional licence metadata keys via the mapping tooling (schema-architect).
+
 ### ✅ WS0 licensing follow-ups c5-c11 + D96-D104: **MERGED** (`aff7635f`, closed under D103: verbatim strings + foreman grep, no fourth gate reading)
 - **Foreman [R] checks on `aff7635f`:**
   - **grep1** (`against the 2026 .LLM00_Preface`): 0 hits now, **3 hits on 88db5c67**, so it fires.
