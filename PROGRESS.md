@@ -63,6 +63,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ WS2 precision follow-ups: **BOUNCE #2 (gate-precfu re-gate on `70dc0290`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "This is BOUNCE #2 on the task, so by protocol it goes to the user. The remaining fix is one token and I have already checked it."
+
+**Defect 1:** `MENTION_RE` `(?<![a-z])precision(?![a-z]|-[a-z])` no longer counts **"Precisions"**. "- Precisions were 92% and 88%." returns [], although it fired at 26dfcdb4. The narrowing is undocumented in the docstring and the CHANGELOG. **Fix:** `precisions?(?![a-z]|-[a-z])` plus one should-fire test. Gate scratch: 129 passed. **Mutation: allowing the plural fails 0 tests today, so nothing pins the gap.**
+
+**Advisory 1:** "precision-recall AUC 0.91", "Precision-Recall: 92% / 80%" and "precision-weighted score 0.91" all slip through. That is within the documented compound limit (ruling (a)), but the CHANGELOG and code rationale call these compounds "a design term, not a mention", which is false for -recall and -weighted. → User question.
+
+**Evidence:**
+- Committed tree: validate rc 0 ("precision: pending, authorised by D76"); wilson --check and drift rc 0. Fresh-clone pytest 1130 + 1 xfail.
+- Bounce-1 defect fixed: sentence-final, ".92", in-section, fullwidth %, "percent" and "91,5 %" all fire. False positives stay clean.
+- Mutations on test_precision_audit: lookahead reverted → 7 fail; substring → 2; compound exclusion dropped → 4; imprecision guard → 1; hint dropped → 1; plural → 0.
+- Diff limited to wilson_ci.py, tests and the CHANGELOG bullet.
+- **Merge-tree was clean vs 761eaef6 only. Main has since moved, so the foreman re-checks before merge.**
+
 ### 🚨 REFRESH TEST RUN 38330687613 (on `7dd887fb`): **PR #101 opened but is NOT MERGEABLE. The foreman CLOSED it.** Three defects; this is the house failure mode (agreement 6).
 - **The run "failed" on purpose:** AIRI has failed 15 consecutive refreshes, so the source-health step fails loudly. That is by design. `7dd887fb` predates the D95 monthly-retry commit.
 - **The OECD/AIID hold WORKED. Foreman [R]:** a per-entity diff of data/incidents.json on PR head vs parent shows **0 content changes on OECD/AIID-sourced rows**, 0 rows added or removed, 15,666 rows.
