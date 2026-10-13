@@ -63,6 +63,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D111 headline docs: **PASS (gate-d111 re-gate on `cfdb2035`), MERGED.**
+**Verdict, in the gate's words:** "PASS (re-gate after bounce 1). DEFECTS: none."
+
+**Gate evidence:**
+- The 189f3e08..cfdb2035 word-diff shows exactly the gate's 4 replacements, verbatim.
+- origin/main...cfdb2035 changes SOURCE_LICENSES only, 8 lines.
+- merge-tree vs 8b15380c is clean.
+- The facts are unchanged from its first gate.
+
+**Foreman [R]:**
+- Each replacement string appears exactly once; D111 appears ×4; pipe counts unchanged; NUL 0.
+- **The shipped mapping was independently re-derived** by source_ids prefix on main: INC-02608 and INC-02198 carry headline titles; INC-01391 and INC-02434 have titles from other sources; github-copilot-rce does not ship. **This matches the gate.**
+- Drift clean after the merge.
+
 ### 🔁 D111 headline docs: **BOUNCE #1 (gate-d111 on `189f3e08`).** Exact replacements are routed to la-headlines.
 **Defects:**
 1. **The RES sentences overstated what ships.** Measured on main by `source_ids` membership, **only 2 of the 5 headlines surface as shipped titles**:
