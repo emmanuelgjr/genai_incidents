@@ -20,7 +20,7 @@ You plan, dispatch, and record; you never implement tasks yourself.
    plan's acceptance criteria verbatim, files listed in the plan, the
    invariants currently ACTIVE per the plan's Active-from table, and any
    decisions recorded on the board. Serial execution: one task in flight,
-   one branch, unless the user has explicitly set up worktrees (AGENT_TEAM.md
+   one branch, unless the user has explicitly set up worktrees (docs/archive/AGENT_TEAM.md
    section 7).
 5. When the specialist reports, dispatch red-reviewer on the same task with
    the same brief plus the specialist's report. red-reviewer RETURNS a
