@@ -178,3 +178,52 @@
 
 ### Expected alerts (not defects)
 - **The D63 overdue alert fires on its first Monday after merge** and stays red weekly until a refresh PR merges. The last merged refresh is #97, from 2026-07-27.
+
+---
+
+## Update, 2026-10-13 (end of session): decisions D108-D125 and what is still open
+
+> Appended under agreement 4. Nothing above was edited. The board (PROGRESS.md) holds the verdicts.
+
+### Closed this session (do not act on the lines above for these)
+- **a4 / A3, AIRI: retired.** D108 records the retirement and D124 resolves the D57 hold. The rows are kept and marked stale. `ingest-all` no longer runs AIRI.
+- **a5, the ATLAS refresh: closed.** The first dispatch (D109) succeeded as a no-op, because upstream is still 2026.09.
+- **A1, the over-merge.** D117 fixes the dedupe rule with byte-identical output. **The split itself is deferred** (D118, retire INC-02646); see the open items below.
+- **A2, copied headlines: kept** (D111). The position is documented. Only 2 of the 5 RES headlines ship as titles.
+- **a2 / a3, stage 2.** D114 lifts the AIID side, and that lift has merged: +113 rows, 169 updated, 0 merges. D115 records the per-item D42 rulings in inert form. D116 keeps the OECD titles; the count is now 3,935 after D119.
+- **The weekly refresh is working.** PR #102 merged (D112). The drift gate (render_docs_stats plus a hard check) is in. The D120 per-field AIID change report is in, with D123 size caps. D121 makes aborts loud.
+- **Refresh follow-ups B2 and B3** (swap check on the id column; override surfaced): done.
+
+### Still open
+- **OECD side of the freeze.** BINDING (D114): suppression (option A3) must be built and gated before any OECD lift. The D115 rulings stay inert until it exists.
+- **The OECD follow-up email** (D116). The draft is in `docs/audits/stage2-ruling-package-2026-10-13.md` §5. **The user sends it.**
+- **The over-merge split** (D118, retire INC-02646). It has three blockers:
+  - 3 rows dated "2026-Q1", which is not a valid date;
+  - 6 ingest rows that still hold OWASP round-up text;
+  - the split authorization has to be generalised beyond the hard-coded D28 list.
+
+  New IDs start at INC-17334 or later.
+- **D96, due next release:** paraphrase the OWASP LLM mapping descriptions, then narrow the carve-out.
+- **R11/R12 (D115):** these need a raw-record read.
+- **Engineering follow-ups:**
+  - A1 (D121): the approval-file and baseline refusals lack the "did not ship" sentence.
+  - R4: blind spots in the drift-gate test.
+  - R5: the load-bearing provenance reset is untested.
+  - D117 A1: stale docstrings.
+  - The original register's (b) list, B4-B12.
+- **Decisions from the original register (a) that are still the user's:**
+  - a7, waves 3/4;
+  - a8, duplicate-rejected CVEs;
+  - a9, N11;
+  - a10, E5;
+  - a11, TAXII;
+  - a12, MAL-2026-3607;
+  - a13, branch protection;
+  - a14, Dependabot;
+  - outreach: ENISA, FTC and the annotator follow-ups.
+
+### Expect
+- **Sun 2026-10-18 04:00 UTC: the first scheduled refresh under D114.**
+  - A new AIID snapshot ships through the PR, with the D120 change report. OECD stays held.
+  - **A human merges the PR.**
+  - If AIID drops an id or a new row would merge into a published one, the whole refresh aborts loudly (D121).
