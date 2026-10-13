@@ -86,7 +86,12 @@ jobs:
           name: cve-sweep-output
           path: sweep-out
           if-no-files-found: warn
-          retention-days: 3
+          # 14 days, not 3: the artifact is the only copy of the sweep's snapshot
+          # until the refresh job's PR carries it, and a refresh run that fails
+          # (or is waiting on a re-run) must not lose it. The sweep job has
+          # contents: read, so carrying it by a repo write here would widen its
+          # scope for no gain.
+          retention-days: 14
 
   refresh:
     runs-on: ubuntu-latest
@@ -357,6 +362,30 @@ jobs:
           fi
           rm -rf sweep-out
 
+      # v2.13.0 D66 (decouple): the OECD/AIID pair is FROZEN (D58/D67/D71, stage
+      # 1; the D42 build-time gate in merge_and_dedupe.py fails the build when a
+      # pair input would change a published row). The fetchers above still run,
+      # but their output must not reach the merge, or the gate aborts the whole
+      # job and AIAAIC / KEV / the CVE sweep / D60 retractions are lost with it
+      # (and the corpus-pinned tests fail, which is what has kept this workflow
+      # red since 2026-09-14). So restore every frozen pair input to its
+      # committed version here and upload the fresh bytes for the D42 review
+      # path. The gate itself is unchanged and still runs in the merge below; the
+      # script re-checks the result with the gate's own detector. If AIRI comes
+      # back, its file is held too (it is in _PAIR_INPUT_FILES): a revived AIRI
+      # lands in the artifact, not in the PR.
+      - name: Hold OECD/AIID pair inputs at their committed versions
+        run: python scripts/hold_pair_inputs.py --stash-dir held-pair-inputs
+
+      - name: Upload held OECD/AIID inputs (D42 review path)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: held-oecd-aiid-inputs
+          path: held-pair-inputs
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Re-merge + render + validate
         run: |
           python scripts/parse_existing.py
@@ -401,6 +430,12 @@ jobs:
           branch goes stale and merging it can revert that newer work. If it
           has sat open across other merges, close it and re-run this workflow
           (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
+
+          The OECD AI Incidents Monitor and AIID inputs are HELD at their
+          committed versions (D66; the stage-1 freeze, D58/D67/D71): this PR
+          carries AIAAIC, CISA KEV, the CVE rejection sweep and the D60
+          retractions only. The fresh OECD/AIID bytes are in the run's
+          `held-oecd-aiid-inputs` artifact for the D42 review.
 
           Review the diff before merging — flag any unexpected mass deletions
           or large taxonomy shifts. Schema validation and the full unit-test
@@ -461,8 +496,10 @@ jobs:
       # (`paused_until`) in ingest/_state/source_health.json — an expired,
       # malformed, or absurdly-far-future pause is not honored (see
       # scripts/check_source_health.py).
+      # D66/WS4-T9: `always()` so a failed earlier step (a merge gate abort, a
+      # test failure) cannot skip this and silence a source that is dead.
       - name: Enforce source health
-        if: steps.health.outcome == 'failure'
+        if: ${{ always() && steps.health.outcome == 'failure' }}
         run: |
           echo "::error::A source has failed 3+ consecutive weekly refreshes (see 'Source health check' step above). Failing this run on purpose so it cannot be mistaken for success."
           exit 1
@@ -474,7 +511,7 @@ jobs:
       # notification fires) without having blocked the PR that carries this
       # week's actually-good data.
       - name: Enforce OECD skip-rule sampling probe
-        if: steps.skip_probe.outcome == 'failure'
+        if: ${{ always() && steps.skip_probe.outcome == 'failure' }}
         run: |
           echo "::error::The OECD AIM skip-rule sampling probe found at least one legacy numeric-slug URL that now returns a real incident body (see 'Check OECD skip-rule sampling probe' step above for which one). is_numeric_slug()'s skip rule is dropping real incidents and needs attention before the next scheduled crawl. Failing this run on purpose so it cannot be mistaken for success."
           exit 1
