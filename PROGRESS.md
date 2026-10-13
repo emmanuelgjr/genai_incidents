@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 Stage-2 ruling package: **BOUNCE #1 (gate-stage2 on `3c97019b`).** Text fixes back with pe-stage2.
+- **The figures hold:** the gate re-measured almost every headline number by its own route and they match.
+- **Defects:**
+  1. **ID ranges not marked provisional.** INC-17216..17220 are now taken by PR #102's AIAAIC rows, and the totals are relative to 9c646d36.
+  2. **"52 become both-rows" is wrong.** It is 40 into 38 new both-rows plus **12 absorbed into published rows**: the bridge/hub ids that drive R2-R5, R9-R12 and M3/M6/M7. This matters for ruling (c).
+- **Advisories folded in:**
+  - quote the whole AIID licence string (it continues "…shared under (CC BY-SA 4.0)");
+  - render the :211 script dump as a table.
+- **Other advisories:**
+  - dated marker present; one file only; merge-tree clean vs 041ec3dc;
+  - the A3 suppression emulation is not reproduced, so it is testimony (A3 is not recommended).
+
 ### ✅ D112, USER RULING: merge refresh PR #102 (Recommended). **MERGED at `692bb672`.** Main now has 15,671 rows / 15,642 incidents. validate rc 0.
 - **⚠ DEFECT FOUND AFTER MERGE: `check_stats_drift` FAILS on main.**
   - README, docs/DATASHEET.md and docs/index.html (generic, :37, :45) still say 15,637, while stats.json says 15,642.
