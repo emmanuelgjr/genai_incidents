@@ -31,6 +31,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LISTED_FIELDS = ("severity", "date", "year", "corpus", "title", "attack_vector")
 MAX_ROWS_PER_FIELD = 150
+# D123: GitHub caps a PR body at 65,536 characters. The report shares the body
+# with the rest of it, so the copy that goes into the PR body is capped here and
+# the untruncated report goes to the step summary / an artifact.
+MAX_REPORT_CHARS = 40_000
+
+
+def cap(md: str, max_chars: int = MAX_REPORT_CHARS) -> str:
+    """Pure. Truncate *md* at a line boundary so the result, note included, is at
+    most *max_chars*; append a note saying where the full report is."""
+    if len(md) <= max_chars:
+        return md
+    nl = chr(10)
+    note = (nl + nl + f"**Report truncated at {max_chars:,} characters** (it was {len(md):,}); the full report is in "
+            "the workflow run's step summary and in the `aiid-change-report` run artifact." + nl)
+    cut = md[: max_chars - len(note)]
+    cut = cut[: cut.rfind(nl)] if nl in cut else cut
+    return cut + note
 
 
 def _is_aiid(e: dict) -> bool:
@@ -117,12 +134,15 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--before-ref", default="HEAD")
     ap.add_argument("--after", default=str(ROOT / "data" / "incidents.json"))
-    ap.add_argument("--out-md")
+    ap.add_argument("--out-md", help="the report as it goes into the PR body (capped, D123)")
+    ap.add_argument("--out-full-md", help="the untruncated report (step summary / artifact)")
     a = ap.parse_args()
     d = diff(_git_show(a.before_ref), json.loads(Path(a.after).read_text(encoding="utf-8")))
     md = render_md(d)
+    if a.out_full_md:
+        Path(a.out_full_md).write_text(md, encoding="utf-8", newline="\n")
     if a.out_md:
-        Path(a.out_md).write_text(md, encoding="utf-8", newline="\n")
+        Path(a.out_md).write_text(cap(md), encoding="utf-8", newline="\n")
     print(md)
     print(f"[aiid-change-report] new={d['new_rows_total']} (aiid {d['new_aiid_rows']}) changed={d['changed_rows']}")
     return 0

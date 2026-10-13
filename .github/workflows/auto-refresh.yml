@@ -494,8 +494,13 @@ jobs:
           # needs-ruling (a later needs_ruling=true output wins over the earlier
           # value) and the refresh continues.
           if python scripts/aiid_change_report.py --before-ref HEAD \
-               --out-md "$RUNNER_TEMP/aiid-change-report.md"; then
+               --out-md "$RUNNER_TEMP/aiid-change-report.md" \
+               --out-full-md "$RUNNER_TEMP/aiid-change-report-full.md"; then
+            # D123: the PR body gets the capped copy (GitHub's body limit is
+            # 65,536 characters); the full report goes to the step summary
+            # (1 MiB limit, so clipped at 900,000 bytes) and to an artifact.
             { echo; cat "$RUNNER_TEMP/aiid-change-report.md"; } >> "$RUNNER_TEMP/pr-body.md"
+            head -c 900000 "$RUNNER_TEMP/aiid-change-report-full.md" >> "$GITHUB_STEP_SUMMARY" || true
           else
             echo "::warning::aiid_change_report.py failed; flagging the PR needs-ruling (unknown AIID change state)."
             {
@@ -506,6 +511,23 @@ jobs:
             } >> "$RUNNER_TEMP/pr-body.md"
             echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # D123: the full, untruncated AIID change report (the PR body carries a
+      # capped copy). Never blocks the refresh.
+      - name: Upload full AIID change report
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: aiid-change-report
+          path: ${{ runner.temp }}/aiid-change-report-full.md
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # D123: GitHub rejects a PR body over 65,536 characters, which would make
+      # create-pull-request fail instead of failing soft. Cap the assembled body.
+      - name: Cap PR body size
+        run: python scripts/cap_pr_body.py "$RUNNER_TEMP/pr-body.md"
 
       - name: Ensure needs-ruling label exists
         if: steps.retracted.outputs.needs_ruling != 'false'

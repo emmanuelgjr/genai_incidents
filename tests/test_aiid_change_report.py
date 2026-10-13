@@ -106,6 +106,6 @@ def test_wiring_check_fires_when_the_append_or_the_flag_is_removed():
     seg_start = text.index("aiid_change_report.py failed")
     no_flag = text[:seg_start] + text[seg_start:].replace('echo "needs_ruling=true" >> "$GITHUB_OUTPUT"', "true", 1)
     assert any("needs-ruling" in p for p in check_wiring(no_flag))
-    aborts = text.replace("The refresh was not blocked.\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            echo \"needs_ruling=true\" >> \"$GITHUB_OUTPUT\"\n          fi\n\n      - name: Ensure",
-                          "x\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            exit 1\n          fi\n\n      - name: Ensure")
+    aborts = text.replace("The refresh was not blocked.\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            echo \"needs_ruling=true\" >> \"$GITHUB_OUTPUT\"\n          fi\n\n      # D123: the full, untruncated",
+                          "x\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            exit 1\n          fi\n\n      # D123: the full, untruncated")
     assert aborts != text and any("fail soft" in p for p in check_wiring(aborts))

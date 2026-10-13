@@ -2069,9 +2069,13 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. Every gate
-# refusal (AIID or OECD side) carries this sentence so whoever reads the red run
-# knows the whole refresh was lost, not just the held source.
+# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. The two
+# refusals that carry this sentence are the merge/retitle/add/title-edit/content
+# gate (_check_refresh_merge_authorization) and the OECD-lift precondition
+# (_check_oecd_lift_precondition). The approval-file and baseline refusals
+# (RefreshMergeApprovalError raised by _load_refresh_merge_approvals and
+# RefreshBaselineError by _load_gate_baseline) do NOT carry it; they name their
+# own cause and abort the build just as loudly.
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
     "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "
