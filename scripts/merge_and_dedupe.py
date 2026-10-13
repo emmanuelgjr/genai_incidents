@@ -488,6 +488,33 @@ def cve_disjoint(a: dict, b: dict) -> bool:
     return bool(ca) and bool(cb) and not (ca & cb)
 
 
+# Aggregate pages (D117 / A2, docs/audits/overmerge-split-proposal-2026-10-13.md).
+# A publisher round-up page is cited by many DISTINCT incidents, so sharing it
+# is not evidence of identity. Rows that cite one must not be bridged through
+# the reference-URL key unless both sides already co-resided in a published
+# row (the grandfather clause, ``_same_prior``). The CVE guard cannot do this
+# job: round-up rows carry no cve_ids, so ``cve_disjoint`` is vacuous.
+#
+# To register a new aggregate: add a regex (matched with ``re.search`` against
+# the ``normalize_url`` key, i.e. no scheme, no ``www.``, lowercase host+path)
+# to AGGREGATE_URL_PATTERNS, or an exact normalized key to AGGREGATE_URL_KEYS,
+# and add a case to tests/test_aggregate_url_dedupe.py. Do NOT add a generic
+# fan-out threshold: legitimate multi-report incidents share URLs too.
+AGGREGATE_URL_PATTERNS: tuple[re.Pattern, ...] = (
+    # OWASP GenAI Security Project quarterly/period exploit round-ups.
+    re.compile(r"^genai\.owasp\.org/\d{4}/\d{2}/\d{2}/[^?]*round-?up", re.IGNORECASE),
+)
+AGGREGATE_URL_KEYS: frozenset[str] = frozenset()
+
+
+def is_aggregate_url(normalized_url: str) -> bool:
+    """True when a ``normalize_url`` key names a known aggregate page."""
+    if not normalized_url:
+        return False
+    return (normalized_url in AGGREGATE_URL_KEYS
+            or any(p.search(normalized_url) for p in AGGREGATE_URL_PATTERNS))
+
+
 _ATTACK_VECTOR_NORMALIZE: dict[str, str] = {
     "supply": "supply-chain",
     "prompt": "prompt-injection",
@@ -1792,7 +1819,8 @@ def dedupe_entries(
             if other is target or other.get("_tombstoned"):
                 idx[key] = target
                 return
-            if weak and cve_disjoint(target, other) and not _same_prior(target, other):
+            if (weak and (cve_disjoint(target, other) or is_aggregate_url(key))
+                    and not _same_prior(target, other)):
                 # Shared weak key (reference URL) between entries with
                 # disjoint CVE sets — different incidents. Leave the key
                 # with its first owner instead of bridging them (#36).
@@ -1850,7 +1878,8 @@ def dedupe_entries(
             u = normalize_url(r.get("url", ""))
             if u and u in by_url:
                 candidate = _live(by_url[u])
-                if not cve_disjoint(candidate, e) or _same_prior(candidate, e):
+                if ((not cve_disjoint(candidate, e) and not is_aggregate_url(u))
+                        or _same_prior(candidate, e)):
                     url_hit = candidate
                     break
         if url_hit:
