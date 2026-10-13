@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D117/D118, USER RULINGS 2026-10-13: over-merge (proposal `docs/audits/overmerge-split-proposal-2026-10-13.md`)
+- **D117: rule fix now, split later (Recommended).**
+  - **A2 now:** aggregate round-up URLs are not dedupe keys unless both sides already share a published row. Published data must stay byte-identical. Add a regression test that would have caught today's fold.
+  - **B-retire later, as its own release, once its blockers clear:**
+    - 3 invalid "2026-Q1" dates;
+    - 6 ingest rows that still hold OWASP round-up text;
+    - the split authorization generalised beyond the hardcoded D28 list.
+  - The 14 same-shape rows and the 598-row residue stay out of scope.
+- **D118: if the split happens, RETIRE INC-02646 (Recommended).** It becomes a `split` tombstone pointing to its successors, so the ID cannot silently change meaning (the D70 shape).
+- **ID note:** PR #102 used INC-17216..17220, so B's new IDs start at INC-17221 or later.
+- → **WS4: A2 rule fix** (`ws4/overmerge-rulefix-a2`). → Register: the B-retire split task plus its 3 blockers.
+
 ### ✅ Over-merge split proposal: **MERGED** (tip `c57a0c89`, HEAD^2 verified). **AWAITING THE USER'S D110 ruling.**
 - **Foreman [R] string check:**
   - the A1 cell text ×1 and "leaving 6" ×1;
