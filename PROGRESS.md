@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 D111 headline docs: **BOUNCE #1 (gate-d111 on `189f3e08`).** Exact replacements are routed to la-headlines.
+**Defects:**
+1. **The RES sentences overstated what ships.** Measured on main by `source_ids` membership, **only 2 of the 5 headlines surface as shipped titles**:
+   - INC-02608 (tenable-copilot-filename).
+   - INC-02198 (ClickFix; it ships the FULL h1, and the ingest title is only its first 5 of 7 words).
+   - amazonq-rce → INC-02434 and mcpwned → INC-01391; their titles come from other sources.
+   - github-copilot-rce is **suppressed by the issue #88 manifest** and does not ship.
+2. **INC-02646 equals the "Exploit 1" section heading,** not the page heading (h1 "OWASP Gen AI Incident & Exploit Round-up, Q2'25").
+
+**⚠ Foreman premise error:** the D111 question to the user said "5 research-row titles match their post headlines" (true of the ingest file only) and "matches the OWASP round-up heading". **The ruling stands.** The actual exposure is SMALLER than the premise stated (2 shipped titles, not 5), so "leave titles" is unaffected. Recorded per the "brief agents that they may be wrong" practice. The gate caught it because the brief asked exactly that question.
+
+**Advisories:**
+- "D97/D98 rewrote descriptions only" holds for the D111 rows. The same merge changed INC-02382's title (the wrong-CVE fix), which was separately recorded.
+- The trailing space in the RES camoleak ingest title is already in the register as B6.
+- §1.6 (1) could add "(descriptions)". Future pass.
+
+**Evidence:**
+- Diff: 1 file, 4/4 lines.
+- merge-tree clean (fast-forward).
+- Raw curl h1s for all 5 posts and the OWASP page.
+- Titles are byte-identical across e6eb3410^1, e6eb3410 and main.
+
 ### ⚖ D108-D111, USER RULINGS 2026-10-13 (register section (a))
 - **D108, AIRI: retire it (Recommended).** Mark the source retired in source health, so it stops alerting. Keep its existing rows and provenance. Revisit only if the site returns. This ends the D95 monthly red run. → WS4.
 - **D109, ATLAS: dispatch once now (Recommended).** The output PR goes to the user and is not auto-merged.
