@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D108-D111, USER RULINGS 2026-10-13 (register section (a))
+- **D108, AIRI: retire it (Recommended).** Mark the source retired in source health, so it stops alerting. Keep its existing rows and provenance. Revisit only if the site returns. This ends the D95 monthly red run. → WS4.
+- **D109, ATLAS: dispatch once now (Recommended).** The output PR goes to the user and is not auto-merged.
+  - **Foreman checked:** atlas-refresh.yml opens a PR on its own branch `atlas-refresh/monthly` (create-pull-request, base main), so there is no clash with `auto-refresh/data`.
+  - Dispatched from main (run id in the commit log below).
+- **D110, over-merge: scope a split proposal (Recommended).** A specialist finds the dedupe cause and drafts a split plan for INC-00924, INC-02646 and INC-03233: new IDs, a field-level delta, and the tombstone/ID-policy impact. **It comes to the user before any data change.** → WS1, read-only proposal committed as a dated audit.
+- **D111, copied headlines: leave the titles (Recommended).** Short factual headlines are kept. Document the position in SOURCE_LICENSES §1.6/§1.7. → WS0.
+- **Next, the stage-2 ruling package** (register a2/a3: the OECD/AIID freeze, the 17 D42 changes, the OECD title licence). The foreman is preparing a full package for the user.
+
 ### ✅ WS4 refresh repair: **PASS (gate-refresh re-gate @ `2edf0422`), MERGED.** The test refresh is dispatched from main.
 **Verdict, in the gate's words:** "PASS… DEFECTS: none. Both bounce-#1 defects are fixed, A2 is folded in, and D107 is implemented as ruled."
 
