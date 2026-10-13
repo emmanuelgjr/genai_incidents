@@ -313,16 +313,28 @@ def render_block(res: dict) -> str:
 # b17 advisory 3: a precision figure hand-typed OUTSIDE the generated block.
 # "Figure" = a percentage (digits followed by %, a full-width percent sign,
 # "percent", "per cent" or "pct", optionally after a space or no-break space)
-# or a bare proportion written 0.xx / .xx. Characters outside ASCII are built
+# or a bare proportion written 0.xx / .xx. The proportion's lookahead rejects
+# only a further digit or a dot-then-digit, so a sentence-final "0.92." still
+# counts while version strings ("v2.13.0", "0.13.0.") and "CVSS 9.8." do not
+# (gate BOUNCE 1 on 26dfcdb4: the old lookahead "(?![0-9.])" let any figure
+# followed by a full stop through). Characters outside ASCII are built
 # numerically (house rule: no escape literals).
 _SPACES = "[" + chr(0x20) + chr(0xA0) + chr(0x202F) + "]*"
 _PERCENT = "(?:%|" + chr(0xFF05) + "|percent|per cent|pct)"
 FIGURE_RE = re.compile(
-    "(?<![0-9A-Za-z.])(?:[0-9]+(?:[.,][0-9]+)?" + _SPACES + _PERCENT + "|0?[.][0-9]+(?![0-9.]))",
+    "(?<![0-9A-Za-z.])(?:[0-9]+(?:[.,][0-9]+)?" + _SPACES + _PERCENT + "|0?[.][0-9]+(?![0-9]|[.][0-9]))",
     re.I,
 )
 _LIST_ITEM_RE = re.compile("^(?:[-*+]|[0-9]+[.)])" + chr(0x20))
 MEASURED_HEADING = "## Measured precision"
+# What counts as a MENTION of precision (rule 2 below): the word "precision"
+# standing alone. A hyphenated compound that starts with it ("precision-first",
+# "precision-oriented") describes a design choice, not a measurement, and does
+# not count (foreman ruling on the gate's false-positive advisory (a)).
+# "imprecision" does not count either.
+MENTION_RE = re.compile("(?<![a-z])precision(?![a-z]|-[a-z])", re.I)
+SECTION_RULE_HINT = ("figures in this section must be generated; put explanatory text outside the section or "
+                     "inside the generated block (i.e. emit it from wilson_ci.render_block)")
 
 
 def _chunks(text: str) -> list[str]:
@@ -349,12 +361,21 @@ def stray_precision_figures(text: str) -> list[str]:
       1. exactly one BLOCK_BEGIN and one BLOCK_END marker (a second, hand-made
          block would otherwise sit unchecked after the first);
       2. outside the block, no paragraph / list item / table that mentions
-         "precision" carries a figure (FIGURE_RE);
+         precision (MENTION_RE: the standalone word; "precision-first" and
+         other "precision-<word>" compounds are not mentions) carries a figure
+         (FIGURE_RE);
       3. outside the block, the "## Measured precision" section carries no
-         figure at all, whether or not the word appears next to it.
+         figure at all, whether or not the word appears next to it. This is
+         deliberately strict: an EXPLANATORY figure typed into the section's
+         prose ("Wilson 95% score intervals", "under 1% of the corpus") is
+         flagged too. Figures in that section must come from the generator;
+         put such text outside the section or emit it from render_block. The
+         generated block already states the interval method ("Wilson score
+         95% interval at Kish effective n"), so the prose need not repeat it.
     Known limits (documented, not detected): a bare integer ("precision: 92"),
     a figure spelled in words, a figure separated from the word "precision"
-    by a blank line OUTSIDE the Measured-precision section, and every file
+    by a blank line OUTSIDE the Measured-precision section, a figure next to
+    only a "precision-<word>" compound OUTSIDE the section, and every file
     other than docs/DATASHEET.md (README, release notes, CHANGELOG)."""
     text = text.replace(chr(13) + chr(10), chr(10))
     problems: list[str] = []
@@ -365,7 +386,7 @@ def stray_precision_figures(text: str) -> list[str]:
     block = datasheet_block(text)
     outside = text.replace(block, chr(10) + chr(10)) if block else text
     for chunk in _chunks(outside):
-        if "precision" in chunk.lower():
+        if MENTION_RE.search(chunk):
             for m in FIGURE_RE.finditer(chunk):
                 problems.append(f"DATASHEET: figure {m.group(0)!r} next to 'precision' outside the generated "
                                 f"block: {chunk.strip()[:120]!r}")
@@ -376,7 +397,7 @@ def stray_precision_figures(text: str) -> list[str]:
         section = rest if j < 0 else rest[:j]
         for m in FIGURE_RE.finditer(section):
             problems.append(f"DATASHEET: figure {m.group(0)!r} in the '{MEASURED_HEADING[3:]}' section outside "
-                            "the generated block")
+                            f"the generated block -- {SECTION_RULE_HINT}")
     return sorted(set(problems))
 
 

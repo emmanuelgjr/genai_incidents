@@ -745,6 +745,7 @@ def test_cli_refuses_when_no_dir(tmp_path, monkeypatch):
 
 # --------------------------------------------------------------------------- b17.3: stray figures
 NL = chr(10)
+BULLET = "precision-first heuristics; `quality_tier` records vetting level."
 
 
 def test_committed_datasheet_has_no_stray_precision_figure():
@@ -762,11 +763,22 @@ def test_committed_datasheet_has_no_stray_precision_figure():
     # a proportion rather than a percentage
     ("it is never hand-typed.", "it is never hand-typed. Precision was 0.93 on the pilot."),
     # elsewhere in the DATASHEET, in a list item that names precision
-    ("precision-first heuristics;", "precision-first heuristics (measured 95 percent);"),
+    (BULLET, BULLET + NL + "- Precision on the feed: 95 percent."),
     # a full-width percent sign, built numerically
-    ("precision-first heuristics;", "precision-first heuristics (97" + chr(0xFF05) + ");"),
+    (BULLET, BULLET + NL + "- Precision on the feed: 97" + chr(0xFF05) + "."),
     # a no-break space between number and sign
-    ("precision-first heuristics;", "precision-first heuristics (97" + chr(0xA0) + "%);"),
+    (BULLET, BULLET + NL + "- Precision on the feed: 97" + chr(0xA0) + "%."),
+    # gate BOUNCE 1 (defect 1): sentence-final proportions, near the word ...
+    (BULLET, BULLET + NL + "- Precision: 0.92."),
+    (BULLET, BULLET + NL + "- Precision is .92."),
+    (BULLET, BULLET + NL + "- precision was 0.9."),
+    # ... and in the Measured-precision section without the word
+    ("it is never hand-typed.", "it is never hand-typed." + NL + NL + "In-scope share: 0.92."),
+    # foreman ruling (a), should-fire half: a genuine mention next to a percentage
+    (BULLET, BULLET + NL + "- Measured precision on the feed was 64%."),
+    # ruling (b): explanatory figures in the section stay flagged
+    ("it is never hand-typed.", "it is never hand-typed. Intervals are Wilson 95% score intervals."),
+    ("it is never hand-typed.", "it is never hand-typed. Unsure rows are under 1% of the corpus."),
     # a table whose header names precision and whose row carries the number
     ("## Uses", "| Tier | Precision |" + NL + "|---|---|" + NL + "| feed | 88% |" + NL + NL + "## Uses"),
     # a second, hand-made block after the generated one
@@ -785,10 +797,17 @@ def test_stray_precision_figure_fires(tmp_path, old, new):
 
 @pytest.mark.parametrize("old,new", [
     # a percentage in a DIFFERENT bullet from the one naming precision
-    ("precision-first heuristics; `quality_tier` records vetting level.",
-     "precision-first heuristics; `quality_tier` records vetting level." + NL + "- **Coverage:** 40% of rows."),
+    (BULLET, BULLET + NL + "- **Coverage:** 40% of rows."),
     # version strings, dates and file names next to the word are not figures
     ("it is never hand-typed.", "it is never hand-typed (precision gate since v2.13.0, 2026-10-11, INCLUSION.md)."),
+    # gate BOUNCE 1 controls: sentence-final non-proportions next to a real mention
+    (BULLET, BULLET + NL + "- Precision gate since v2.13.0."),
+    (BULLET, BULLET + NL + "- Precision tooling 0.13.0."),
+    (BULLET, BULLET + NL + "- Precision of CVSS 9.8."),
+    (BULLET, BULLET + NL + "- Precision sample drawn 2026-10-11."),
+    # foreman ruling (a), should-pass half: the REAL "precision-first" bullet plus a percentage
+    ("precision-first heuristics;", "precision-first heuristics (64% of rows);"),
+    ("precision-first heuristics;", "precision-oriented heuristics (64% of rows);"),
 ])
 def test_stray_precision_figure_does_not_misfire(tmp_path, old, new):
     root = _copy_root(tmp_path)
@@ -803,5 +822,37 @@ def test_stray_figure_known_limit_bare_integer(tmp_path):
     that a future tightening shows up as a deliberate test change."""
     root = _copy_root(tmp_path)
     dsp = root / "docs" / "DATASHEET.md"
-    _edit(dsp, "precision-first heuristics;", "precision-first heuristics (score 92);")
+    _edit(dsp, BULLET, BULLET + NL + "- Precision score 92.")
     assert w.stray_precision_figures(dsp.read_text(encoding="utf-8")) == []
+
+
+def test_section_rule_message_says_figures_must_be_generated(tmp_path):
+    root = _copy_root(tmp_path)
+    dsp = root / "docs" / "DATASHEET.md"
+    _edit(dsp, "it is never hand-typed.", "it is never hand-typed. Intervals are Wilson 95% score intervals.")
+    probs = w.stray_precision_figures(dsp.read_text(encoding="utf-8"))
+    assert any("figures in this section must be generated" in p and "outside the section or inside the generated "
+               "block" in p for p in probs), probs
+
+
+def test_generated_block_already_states_interval_wording():
+    """Ruling (b): the interval method is covered by the generator, so the
+    section's prose has no need to type it."""
+    res = json.loads((AUDIT / "results.json").read_text(encoding="utf-8"))
+    assert "Wilson score 95% interval" in w.render_block(res)
+
+
+@pytest.mark.parametrize("text,mention", [
+    ("precision-first heuristics", False), ("precision-oriented design", False), ("imprecision", False),
+    ("Measured precision", True), ("precision: 0.9", True), ("Precision.", True), ("| Precision |", True),
+])
+def test_mention_rule(text, mention):
+    assert bool(w.MENTION_RE.search(text)) is mention
+
+
+@pytest.mark.parametrize("s,figs", [
+    ("Precision: 0.92.", ["0.92"]), ("is .92.", [".92"]), ("was 0.9.", ["0.9"]), ("0.92, then", ["0.92"]),
+    ("v2.13.0", []), ("0.13.0.", []), ("CVSS 9.8.", []), ("2026-10-11", []), ("92%.", ["92%"]),
+])
+def test_figure_regex_sentence_final(s, figs):
+    assert [m.group(0) for m in w.FIGURE_RE.finditer(s)] == figs

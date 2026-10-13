@@ -20,11 +20,18 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   the newest audit directory. Without `--audit-dir` they refuse (rc 2) if more than one
   directory exists.
 - **b17.3:** a precision figure typed into `docs/DATASHEET.md` outside the generated
-  block now fails `validate.py` and `wilson_ci.py --check`. The check looks for a
-  percentage or a 0.xx proportion in any paragraph, list item or table that mentions
-  precision, for any figure in the "Measured precision" section, and for a duplicate
-  block. It does not catch a bare integer, a figure written in words, or figures in other
-  files. These limits are listed in `stray_precision_figures` and pinned by a test.
+  block now fails `validate.py` and `wilson_ci.py --check`. The check looks for three
+  things:
+  - a percentage or a 0.xx proportion in any paragraph, list item or table that mentions
+    precision. A sentence-final "0.92." counts. Version strings such as "v2.13.0" and
+    "CVSS 9.8." do not. A "precision-<word>" compound such as "precision-first" is a
+    design term, not a mention;
+  - any figure in the "Measured precision" section, including explanatory ones. Figures
+    there must come from the generator;
+  - a duplicate block.
+
+  It does not catch a bare integer, a figure written in words, or figures in other files.
+  These limits are listed in `stray_precision_figures` and pinned by a test.
 
 ## [2.13.0] — 2026-10-13
 
