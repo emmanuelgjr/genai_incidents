@@ -63,6 +63,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ Stage-2 ruling package: **BOUNCE #2 (gate-stage2 on `f665a531`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "All six bounce-1 fixes check out. The bounce is for something new: I tested the new §2(c) claim by building forward from a simulated A2 lift, and the result undermines the package's main reason for recommending A2."
+
+**Defect:**
+- **A2 is NOT neutral on (b).** Simulation: the AIID-only build is treated as published, then OECD is lifted on top. The end state is the same 17,470 rows, but **tombstones go from 7 to 29**: 22 more permanent `merged` records.
+  - The 12 hub rows retire into published rows: INC-17221 and INC-17304 → INC-14407; INC-17229 → INC-13066; INC-17254 → INC-13321; INC-17262 → INC-00699; INC-17272 and INC-17273 → INC-14517; INC-17274 → INC-07910; INC-17279 → INC-07783; INC-17280 → INC-00813; INC-17283 → INC-03717; INC-17312 → INC-14284.
+  - 10 AIID-only rows merge into each other: 8 into INC-17225, INC-17276 → INC-17275, and INC-17306 → INC-17296.
+- **Form (d) of agreement 6:** the row total is invariant while the tombstone count differs fourfold.
+- **The fix is text only.** State the measured fact in §2(c) and in A2's Risks and Recommendation: "A2 therefore makes (b) and A3 a precondition for any later OECD lift." Drop the claim that A2 "leaves … (b) untouched".
+
+**Bounce-1 items, all confirmed:**
+- caveat sufficient;
+- the 52 split matches all 12 pairs;
+- the 12 are standalone rows in the AIID-only build;
+- the full licence string is quoted;
+- the table is fixed;
+- merge-tree is clean vs fdb54882.
+
 ### 🔁 Stage-2 ruling package: **BOUNCE #1 (gate-stage2 on `3c97019b`).** Text fixes back with pe-stage2.
 - **The figures hold:** the gate re-measured almost every headline number by its own route and they match.
 - **Defects:**
