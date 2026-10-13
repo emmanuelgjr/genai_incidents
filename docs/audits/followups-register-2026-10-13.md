@@ -1,0 +1,132 @@
+# Follow-up register (2026-10-13, after the v2.13.0 release)
+
+> **Dated record, do-not-regenerate** (CLAUDE.md agreement 4).
+> - **How it was built:** a read-only sweep of PROGRESS.md at `ca3777b6`, MASTER_IMPROVEMENT_PLAN.md, the v2.13.0 cut package, `docs/releases/v2.13.0.md` and `docs/outreach/README.md`.
+> - **Compiled by:** an Explore agent, transcribed by the foreman.
+> - **Line numbers:** PROGRESS.md at `ca3777b6`. "notes" means `docs/releases/v2.13.0.md`. "CP" means the cut package.
+> - **Exclusions:** items closed later on the board are left out. All v2.13.0 cut obligations (CP §5, §4R) are closed.
+> - **Reliability:** everything here is testimony. Re-measure an item before acting on it.
+
+## (a) User decisions and actions
+
+| # | Item | Origin | Why open | Depends on |
+|---|---|---|---|---|
+| a1 | Label the 150-row precision sheet (`human_label` and `human_by`). Then run `wilson_ci.py --render-datasheet` and `evaluate_ai_relevance.py`. | 132, 1175; CP §5; notes :351-355 | D76 ratified "pending". No precision figure exists. | — |
+| a2 | OECD/AIID freeze stage 2: lift or narrow it. Includes the 17 D42 changes (7 merges + 10 retitles) and about 94 AIID-only rows + 6 AIID-authored retitles. | 86, 133, 1477-1481; notes :356-361 | D71 holds everything until stage 2. The `ws4/refresh-tripwire-42` evidence is not on origin. | Then b9 |
+| a3 | Licence position on the OECD `title` text (LLM output; 3,937 rows) | notes :362-366 | Unresolved | Part of a2 |
+| a4 | AIRI: skip, pause or retire the dead ingest (14 consecutive 404s). A review is committed for 2027-01-07. | 85; D63; notes :367-370 | Needs the user | b2 |
+| a5 | Go or no-go for the first `atlas-refresh` dispatch. It has never run; its first cron run is 2026-11-03. | 89 | Needs the user's go | — |
+| a6 | Confirm the repo-cleanup plan | 92-100 | The inventory is in flight | — |
+| a7 | Approve source waves 3 (CourtListener bulk + 0din) and 4 (OpenSSF or a wider GHSA filter). FTC is on hold. | 2131, 2224, 2232 | Owed since v2.12.0 | e2 for FTC |
+| a8 | Policy for duplicate-rejected CVEs (3 entries): re-point or retract? | 2133 | No ruling | — |
+| a9 | N11: review the 410 wave-12 rows suppressed by the issue-#88 list | 2134, 2325 | No review | — |
+| a10 | E5 / WS1-T4: rename the scope, or add `ai_system_type` tagging (the plan recommends tagging) | 4516 | Pending | Gates WS1-T4 |
+| a11 | WS6-T4: a real TAXII server or honest labelling. Also: `CHANGELOG.md:1008`, "Static TAXII 2.1 endpoint", needs to be superseded or corrected. | 4688, 3852 | Undecided | Gates WS6-T4 |
+| a12 | MAL-2026-3607 kept as a bare identifier so INC-08450 does not split | 2213 | Open | b20 |
+| a13 | E8: `main` has no branch protection | 4510 | Routed to Phase 3 | WS4-T7 |
+| a14 | Two high Dependabot alerts | 2679 | No closure | — |
+
+## (b) Engineering follow-ups
+
+| # | Item | Owner | Origin | Status |
+|---|---|---|---|---|
+| b1 | Weekly refresh repair: D66 decouple, `if: always()` on source-health enforcement, keep the cve-sweep output | WS4 | D66; 66-84 | **IN FLIGHT** (`ws4/v2130-refresh-decouple`) |
+| b2 | D63 overdue-review alert | WS4 | D63 | **IN FLIGHT** (same branch) |
+| b3 | a11y workflow fails on main (axe critical/serious) | WS6 | 88-90; 3930 | **IN FLIGHT** (`ws6/v2130-a11y-fix`) |
+| b4 | The precision status line says "authorised" even when `problems` is non-empty | WS2 | 47; `validate.py:920-929` | open |
+| b5 | OECD AIM rename, data part: `ingest_external.py:233/:241` | WS4 | 324, 127 | Needs a field-level delta |
+| b6 | `VERSION = "2.0.0"`; WS6-T1 `data_version` / `fetch_latest()` are absent | WS6 | 130, 4689 | open |
+| b7 | WS3 ID-reuse audit: 591 multi-title IDs | WS3 | D70 | Spec in docs/audits |
+| b8 | ATLAS N-d: `ingest_external.py:68` parses `ATLAS-2026.06.yaml` | WS4 | 1896 | Moves data, so needs a delta |
+| b9 | Stage-2 machinery (S7/S8/S9; A6, A7) | WS4 / WS0 | 1462-1481 | After a2 |
+| b10 | Stage-1 test fixture should use `git archive HEAD` (low priority) | WS4 | 951 | open |
+| b11 | Slow marker for the stage-1 test file (~412 s) | WS4 | 988 | open |
+| b12 | INCLUSION §5 counts sit outside the drift surfaces | WS6 | 1034 | open |
+| b13 | The "26 new DISPUTED" log line counts existing disputes | WS4 | 1520; `ingest_cve_rejections.py:396` | open |
+| b14 | 8 NOT_IN_CVELIST ids are not flagged; `cve-enrich` has no concurrency group | WS4 | 1612 | open |
+| b15 | Single-source the ASI names: render_markdown.py and app.js | WS2 / WS6 | 870 | open |
+| b16 | D73 advisories: retained rows bypass `_apply_history`; the later-day test is thin | WS4 | 776-777 | open |
+| b17 | Item 5 advisories (dated-dir pin, newest-dir CLI, hand-typed figure) | WS2 | ~1229-1236 | open |
+| b18 | Drift-check advisories (tomllib on 3.10, id false positives, VERIS case) | WS6 | 2004-2080 | open |
+| b19 | ATLAS advisories (STIX validator, lint scope, tactic removal, validate.yml on bot PRs, guard inputs) | WS4 / WS2 | ~1915-1979 | open |
+| b20 | N7: possible over-merge in INC-08450 | WS1 | 2331 | open |
+| b21 | N3: no Crawl-delay parsing; no RFC 9309 wildcard support | WS4 | 2361 | open |
+| b22 | WS4-T16: `^\d+$` over-matches Unicode digits (`ingest_oecd_aim.py:151`) | WS4 | 3975 | open |
+| b23 | WS4-T18: strip query strings from reference URLs (data change) | WS4 | 3406 | Needs a ruling |
+| b24 | WS6-T10: `check_dead_filters.py` is case-sensitive | WS6 | 3447 | open |
+| b25 | `persist_refresh_state.sh`: `--force` and `[skip ci]` are untested | WS4 | 4321 | open |
+| b26 | WS4-T11 fixture: bucket counts are equal | WS4 | 4007 | open |
+| b27 | Package/validator parity on null-`into` supersession | WS4 + WS3 | 2674 | open |
+| b28 | STIX edition test independence | WS6 | 2675 | open |
+| b29 | TAXII template hard-codes "currently `-2026`" | WS6 | 2569 | open |
+| b30 | WS2-T5: `"fatal" in text` matches "non-fatal" | WS2 / WS4 | 4714 | open |
+| b31 | Publish `high_water_id` in stats.json | WS6 / WS4 | 4713 | open |
+| b32 | Generate NOTICE-DATA from a manifest | WS4 + WS0 | 4690 | Phase 2 |
+
+## (c) Docs follow-ups
+
+| # | Item | Owner | Origin |
+|---|---|---|---|
+| c1 | OECD AIM rename sweep, docs part: README:203/:302, DATASHEET:38, paper:60, flow.py:17, auto-refresh.yml, Makefile | WS6 | 324, 127 |
+| c2 | Older README "Previous release" paragraphs use relative links, which break on PyPI | WS6 | 151, 128 |
+| c3 | Supersession note for `ws6-v2130-export-integrity-2026-10-11.md:177-178` | WS6 | 211 |
+| c4 | WS2 taxonomy-card guard docs (the assertion already exists at `tests/test_owasp_asi_naming.py:433-440`) | WS2 | 130 |
+| c5 | SOURCE_LICENSES row for the 21 `OWASP-*` ids (18 GENAI + 3 AIX, 6 rows) | WS0 | CP §7 |
+| c6 | SOURCE_LICENSES row for the OWASP LLM Top 10 (CC BY-SA) | WS0 | 871 |
+| c7 | N4: no rows for `research_incidents.json` / `threat_reports_incidents.json`; the arXiv full-text check | WS0 | 2364 |
+| c8 | F2: SOURCE_LICENSES §2.5 "one lifecycle fact per CVE" now omits `disputed` | WS0 | 1562 |
+| c9 | S6 OECD docs: INGESTION_CONDUCT:122, SOURCE_LICENSES §1.2a, the HF card | WS0 | 1461 |
+| c10 | OECD memo :342 `ruled_by` → `decided_by` (needs a dated correction) | WS0 | 1251 |
+| c11 | Re-check the SOURCE_LICENSES §1.5 "Scrape-permitted" cell | WS0 | 1747 |
+| c12 | Item-2 warden notes N-a, N-b, N-e, N-f, N-g, N-h | WS6 / WS5 / WS0 / WS3 | 1897-2007 |
+| c13 | ATLAS docs advisories (CORRECTIONS row 1 citations, "up to four" requests, build-target line) | WS4 / WS5 | 1913-1979 |
+| c14 | VERSIONING fixes: the step-3 min.json claim; the step-2 UA example still says 2.9.0; the step-5 literals list | WS6 | 2003, 2676, 2033 |
+| c15 | README banner SVGs say "CC-BY-4.0 data" despite the ASI carve-out | WS6 / WS0 | 511 |
+| c16 | HF card says "real-world and research incidents" | WS6 | 2142 |
+| c17 | v2.11.0 leftovers (OpenCTI docstring, "(the corpus)" gloss, `source_name` docs, site UI fixes missing from the CHANGELOG) | WS6 | 2566-2572 |
+| c18 | ID_POLICY §3 / D31 rider | WS3 | 2678 |
+| c19 | D15 directional criterion not propagated | WS6 / WS0 | 4701 |
+| c20 | Reuse lint incomplete (CC-BY-4.0, MIT and Apache texts missing; 109 files without licence info) | WS0 | notes :375-379 |
+| c21 | Cosmetic visuals (og URL clip, runner font, ASI07 label clip, banner padding) | WS6 | ~548-577 |
+
+## (d) Plan tasks not done (`MASTER_IMPROVEMENT_PLAN.md`; Phase 1 was declared complete on 2026-07-31)
+
+- **d1, Phase 2 exit:** WS1-T1, T2, T3 and T4; WS3-T1, T2 and T6; WS2-T3; WS6-T8. **None is done.** WS1-T4 needs a10.
+- **d2, Phase 3 exit:** WS2-T1, T2, T4 and T5; WS4-T1, T4 and T5; WS1-T5 and T6; WS7-T3; WS6-T7; WS5-T5. WS2-T2 is blocked on e4.
+- **d3, Phase 4 and others:** WS3-T3 and T4; WS4-T3, T6, T7 and T8 (cosign); WS5-T1, T2b, T3, T4 and T6; WS6-T3, T4 (see a11) and T6; WS7-T1, T2 and T4.
+- **d4, partly done:**
+  - WS6-T1: VERSION, `data_version` and `fetch_latest` are not done.
+  - WS6-T5: the per-corpus pages are deferred.
+  - WS4-T2: CVSS rescores and the AIID re-diff are not done.
+
+## (e) Outreach (the user sends)
+
+| # | Item | Status |
+|---|---|---|
+| e1 | ENISA/EUVD reuse email | Drafted 2026-10-03, **not sent** |
+| e2 | FTC outreach about the 403 rule on the project UA | **Not drafted** |
+| e3 | OECD AIM | Sent 2026-07-31. The follow-up window (2026-08-21) passed with no reply recorded. |
+| e4 | Annotator (Mayur021) | Sent 2026-07-27. The follow-up was due around 2026-08-03, and no annotator has committed. This blocks WS2-T2. |
+
+## Items the compiler was unsure are still open
+
+- **U1, WS0-T4 clause 2.** The task-table cell is probably stale: outreach README:21 says the OECD send closed it.
+- **U2, the AIRI-hold "todo" row.** Probably stale: superseded by D57.
+- **U3, escalation cells E6, E20, E21, E22, E23 and E24.** Each has later closing evidence, so the cells are stale.
+- **U4, the E13 counsel step.** It is unclear whether counsel is still intended.
+- **U5, auto-refresh not running `render_docs_stats`.** Pytest may already catch the resulting drift.
+- **U6, WS4-T18 as a class task.** 0 pre-signed URLs exist today.
+- **U7, older entries with no recorded closure:**
+  - the `modified`-bump policy;
+  - N10;
+  - N2;
+  - the `load_incidents` doc;
+  - the cache-write audit;
+  - the STIX marker CI check;
+  - AIRI causal intent;
+  - the Dependabot count.
+- **U8, D66 wording mismatch.** The board says "carry AIRI/AIAAIC/KEV/cve-sweep while OECD/AIID held". The notes :360 say "decouple the AIID step from the OECD step".
+- **U9, WS6-T7 Zenodo redeposit.** It is effectively done (every release mints a version DOI) but is not marked.
+- **U10, the precision sheet.** It is no longer CI-forcing, since D76 defused the 2.14.0 tripwire.
+- **U11, STIX `revoked` / R5.** Excluded by the D75 ruling. It remains a disclosed limitation.
+- **U12, "card guard docs".** The assertion already exists. What remains is unspecified.
