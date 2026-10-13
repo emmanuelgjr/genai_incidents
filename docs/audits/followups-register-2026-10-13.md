@@ -130,3 +130,51 @@
 - **U10, the precision sheet.** It is no longer CI-forcing, since D76 defused the 2.14.0 tripwire.
 - **U11, STIX `revoked` / R5.** Excluded by the D75 ruling. It remains a disclosed limitation.
 - **U12, "card guard docs".** The assertion already exists. What remains is unspecified.
+
+---
+
+## Update, 2026-10-13 (later the same day): added after the licensing, rewrite, precision and refresh work
+
+> Appended under agreement 4. Nothing above was edited. Items that were *closed* today are listed first, so a reader does not act on a stale line above. Each item cites the board entry that records it.
+
+### Closed today (do not act on these lines above)
+- **Refresh repair, all merged.** The weekly refresh had not landed since #97 (2026-07-27). The repair (merge `2e60e395`) includes:
+  - D66 OECD/AIID hold;
+  - D63 overdue alert;
+  - D95 AIRI monthly retry;
+  - the AIAAIC loud-fail fix, for the renamed `Incident headline` column;
+  - D107 0.9 yield floor;
+  - held inputs moved outside the tree, behind a guard.
+
+  Test refresh run 38366793761 was dispatched from main.
+- **Licensing follow-ups c5-c11 and D96-D104.** Merged.
+- **D97/D98 description rewrites** (INC-02646, INC-03233, INC-02436) and the **INC-02382 wrong-CVE fix**. Merged, with CORRECTIONS rows.
+- **Licensing-surfaces sweep**: 14 of the docs-warden's 15 findings. Merged.
+- **WS2 precision follow-ups** (D105/D106). Merged.
+- **c17** (the released [2.11.0] CHANGELOG): closed won't-fix, D102.
+
+### (a) New user decisions
+- **A1. Over-merge split.** INC-00924 absorbs 6 unrelated Q1-2026 OWASP ids, INC-02646 absorbs 9 Q2-2025 ids, and INC-03233 absorbs 3 Q1-2025 ids. Incidents such as the DeepSeek breach, CVE-2025-23254 and the Meta agent leak therefore have no row of their own. Splitting them is an ID-policy and data change, using the WS4-T19/D28 split machinery.
+- **A2. Copied headlines.** INC-02646's title still equals the OWASP round-up heading (7 of 7 tokens). D97 rewrote descriptions only. Five RES titles equal post headlines and were kept under D98. Should titles be paraphrased too?
+- **A3. AIRI.** It has been dead since 2026-05-31, with 15 consecutive failures. It will go red on the first Sunday of each month, starting 2026-11-01. Retire it, or keep retrying?
+- **A4. The six non-shipped OWASP ingest rows** in `ingest/avid_owasp_incidents.json` that still hold OWASP text: Q1-2025-03, Q2-2025-02 and Q1-2026-04 verbatim; Q1-2025-02, Q1-2026-05 and Q1-2026-06 near-verbatim. They are covered by the NOTICE attribution and by D101 (upstream terms). Rewrite them, or leave them?
+
+### (b) New engineering follow-ups
+- **B1. D96 is due next release.** Paraphrase the OWASP LLM descriptions and scope text in the 2026 and 2025 mapping files and the crosswalk, then narrow the carve-out to codes and names.
+- **B2. Refresh A1.** `check_headline_system_sanity` filters on `r[0]` rather than `r[col["id"]]`, so it is blind if the ID column moves. The 0.9 floor backstops it, except under the override. One-line fix.
+- **B3. Refresh A2.** Surface the yield-drop override in `GITHUB_STEP_SUMMARY` and in the PR body.
+- **B4. CVE sweep yield floor.** This needs a design decision. Also, the non-weekly ingesters (cvelistv5, nvd_expanded, avid, arxiv, redteam, external) have no empty-result guard.
+- **B5. The OX MCP row's date.** The row says 2025-09, but the OX post is dated 2026-04-15 (owner WS2).
+- **B6. Trailing space** in the `RES-tenable-camoleak-2025` ingest title. It is ingest-only and reaches no output.
+- **B7. U+FFFD mojibake** in `owasp_llm_top10_2025.json` LLM08 and in 4 avid_owasp rows.
+- **B8. The arXiv abstract sample** proposed in SOURCE_LICENSES §6.1/§6.3 was never run.
+- **B9. Licence keys inside the mapping JSON files** (docs-warden #15). Optional; needs the mapping tooling (schema-architect).
+- **B10. REUSE missing licence texts.** `LICENSES/` lacks Apache-2.0, CC-BY-4.0 and MIT, so `reuse lint` shows 377/454.
+- **B11. INGESTION_CONDUCT host count.** It reads "at least 10" as a floor. Count it exactly from the rate limiter's per-host keys in a run log.
+- **B12. "precision-over-coverage"** (TAXONOMIES:167) may be another design compound. TAXONOMIES is not scanned today.
+
+### (c) New docs follow-ups
+- **C1. CONTRIBUTING:20** says "Edit `data/incidents.json` directly", which conflicts with the no-hand-edit rule.
+
+### Expected alerts (not defects)
+- **The D63 overdue alert fires on its first Monday after merge** and stays red weekly until a refresh PR merges. The last merged refresh is #97, from 2026-07-27.
