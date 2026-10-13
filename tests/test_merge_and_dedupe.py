@@ -863,7 +863,7 @@ def test_retention_carry_is_deterministic_across_days(tmp_path, monkeypatch):
 
 # ---------------------------------------------------------------------------
 # dedupe_entries — tombstone-resolution regressions
-# (docs/superpowers/specs/2026-06-03-dedup-tombstone-bug.md)
+# (docs/archive/superpowers/specs/2026-06-03-dedup-tombstone-bug.md)
 # ---------------------------------------------------------------------------
 
 def _dedupe_entry(title, year=2024, source_ids=None, cve_ids=None, references=None):

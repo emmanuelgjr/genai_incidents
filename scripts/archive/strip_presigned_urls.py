@@ -33,8 +33,8 @@ an empty query string loses its trailing `?`.
 Idempotent: running it twice changes nothing the second time.
 
 Usage:
-    python scripts/strip_presigned_urls.py            # rewrite in place
-    python scripts/strip_presigned_urls.py --dry-run  # report only
+    python scripts/archive/strip_presigned_urls.py            # rewrite in place
+    python scripts/archive/strip_presigned_urls.py --dry-run  # report only
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 TARGETS = [ROOT / "ingest" / "cve_nvd_expanded.json"]
 
 # A URL query string containing at least one X-Amz-* parameter. Matched

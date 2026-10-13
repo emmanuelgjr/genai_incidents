@@ -119,9 +119,21 @@ fetch and its content fetches share one consistent pacing budget, and the
 now literally true, not just true of content fetches.
 
 **Operational exposure of fail-closed (bounce #1, R4b), stated plainly, not
-just argued for ethically:** this pipeline currently touches 12 distinct
-hosts, mostly once a day, over one network path (the weekly
-AIRI/AIAAIC/OECD/KEV run plus the on-demand NVD/GHSA/OSV run). A host that
+just argued for ethically:** this pipeline currently touches at least 10
+distinct hosts (the 12 this paragraph carried was the 2026-07-29 figure of
+`docs/audits/WS0-T4-network-chokepoint-inventory-2026-07-29.md`, the "(b) Fail-closed's operational blast radius" item;
+re-counted 2026-10-13 from the fetch URLs in the scripts the runs below
+invoke: `www.airi-navigator.com`, `docs.google.com` (AIAAIC sheet export),
+`incidentdatabase.ai` and `pub-72b2b2fc36ec423189843747af98f80e.r2.dev` (AIID),
+`oecd.ai`, `www.cisa.gov`, `raw.githubusercontent.com` (cve-sweep),
+`services.nvd.nist.gov`, `api.github.com` and `api.osv.dev`; redirect targets
+cannot be listed from a static read, so the count is a floor and the 12 was
+not reproduced; the check is the per-host keys of the rate limiter in a run
+log), mostly once a day, over one network path (the weekly
+AIRI/AIAAIC/AIID-snapshot/OECD/KEV run, `auto-refresh.yml`, whose separate
+`cve-sweep` job also reads `cvelistV5` and NVD, plus the on-demand NVD/GHSA/OSV run in
+`cve-enrich.yml` (manual dispatch); AIID was added to this list 2026-10-12, follow-up c9, after
+being checked against `.github/workflows/auto-refresh.yml` at `761eaef6`). A host that
 403s its own robots.txt intermittently, or serves it differently by
 geography or CDN edge, now breaks an ingest that worked fine under the
 pre-WS0-T4 code, which never checked robots.txt at all. That is the direct,

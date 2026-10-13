@@ -1736,7 +1736,7 @@ def dedupe_entries(
     Every index hit and every transitive claim is resolved through
     ``_live`` so a merge can never target a tombstoned entry: content
     merged into a dead entry would be silently dropped with it (see
-    docs/superpowers/specs/2026-06-03-dedup-tombstone-bug.md).
+    docs/archive/superpowers/specs/2026-06-03-dedup-tombstone-bug.md).
 
     Weak keys (URL / fuzzy title) refuse to merge two entries whose CVE
     sets are disjoint (#36) — UNLESS both sides already co-resided in the
@@ -2726,7 +2726,7 @@ def main():
     #     carried VERBATIM — keeping its id / added / updated and bypassing
     #     dedupe — because re-feeding already-built records through the
     #     raw-ingest dedupe is non-idempotent (it re-canonicalises and can
-    #     oscillate). See docs/superpowers/specs/2026-06-01-retain-on-drop-design.md
+    #     oscillate). See docs/archive/superpowers/specs/2026-06-01-retain-on-drop-design.md
     # 6a) Scope purge: drop out-of-scope malicious-package entries (failed the
     #     inclusion policy) from freshly-built survivors. Dropped SILENTLY here —
     #     these carry ephemeral, build-local IDs, so recording deprecations from

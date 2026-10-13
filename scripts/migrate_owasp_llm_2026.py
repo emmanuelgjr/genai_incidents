@@ -199,7 +199,7 @@ def census(obj) -> Counter:
 # --------------------------------------------------------------------------
 # data/incidents.json is a build OUTPUT, but it is also a genuine build INPUT
 # for one path: merge_and_dedupe.py's retain-on-drop step
-# (load_retained_priors(), docs/superpowers/specs/2026-06-01-retain-on-drop-design.md).
+# (load_retained_priors(), docs/archive/superpowers/specs/2026-06-01-retain-on-drop-design.md).
 # Entries every source has dropped are carried VERBATIM out of the previous
 # data/incidents.json so the never-delete invariant holds. Those rows are not
 # re-derived from any ingest feed, so an inputs-only migration cannot reach
