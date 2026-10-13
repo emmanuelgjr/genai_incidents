@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ WS2 precision follow-ups: **MERGED** (tip `e00699b5`), closed under D105 (verbatim + foreman string check, no third gate reading)
+- **Commits:**
+  - `51b37d02`: D105 verbatim, `precisions?`.
+  - `e00699b5`: D106, `DESIGN_COMPOUNDS = ("first", "oriented")`. The pattern becomes `(?<![a-z])precisions?(?![a-z]|-(?:first|oriented)(?![a-z]))`. The CHANGELOG, docstring and comment rationale are corrected.
+  - The design-compound list is grep-derived: "precision-first" in INCLUSION, DATASHEET and docstrings; "precision-oriented" only in tests and the board.
+- **Foreman [R], fresh GitHub clone at e00699b5:**
+  - Pattern behaviour: Precisions, precision-recall, -weighted, -at-10, -firstly and "Precision:" → mention. precision-first, precision-oriented and imprecision → not.
+  - **Fire-proof by a different route:** with the 70dc0290 pattern reinstated, test_precision_audit has **11 failed** / 129 passed; restored, 140 passed.
+  - The live DATASHEET stray check returns [].
+  - merge-tree is clean vs 48650dca.
+- **On the merged main tree:** pytest **1148 passed + 1 xfail**; wilson --check, validate and drift rc 0.
+- **Specialist note → register:** "precision-over-coverage" (docs/TAXONOMIES.md:167) is a possible design compound. It is not exempt; TAXONOMIES is not scanned today. Also, a stale worktree `.claude/worktrees/agent-a968180e61f9e927b` still holds the branch; remove it.
+
 ### 🔁 WS6 licensing surfaces: **BOUNCE #1 (gate-licsurf on `1ab030a8`).** Back with de-licdocs.
 **Verdict, in the gate's words:** "BOUNCE… 3 defects, all text-only, and all three are claims that are false or understated against the tree and the published archives. Every mechanical check passes."
 
