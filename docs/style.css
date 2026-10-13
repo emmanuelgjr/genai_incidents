@@ -385,6 +385,8 @@ code, kbd { font-family: var(--mono); font-size: 0.9em; }
   animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.18s both;
 }
 .trust-strip .dot { color: var(--accent); }
+/* Links inside the strip sit in running text: distinguish by underline, not colour alone (axe link-in-text-block). */
+.trust-strip a { text-decoration: underline; text-underline-offset: 2px; }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 
