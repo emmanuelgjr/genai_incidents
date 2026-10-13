@@ -776,6 +776,8 @@ def test_committed_datasheet_has_no_stray_precision_figure():
     ("it is never hand-typed.", "it is never hand-typed." + NL + NL + "In-scope share: 0.92."),
     # foreman ruling (a), should-fire half: a genuine mention next to a percentage
     (BULLET, BULLET + NL + "- Measured precision on the feed was 64%."),
+    # D105: the plural is a mention too (fails on 70dc0290's singular-only pattern)
+    (BULLET, BULLET + NL + "- Precisions were 92% and 88%."),
     # ruling (b): explanatory figures in the section stay flagged
     ("it is never hand-typed.", "it is never hand-typed. Intervals are Wilson 95% score intervals."),
     ("it is never hand-typed.", "it is never hand-typed. Unsure rows are under 1% of the corpus."),
@@ -845,6 +847,7 @@ def test_generated_block_already_states_interval_wording():
 @pytest.mark.parametrize("text,mention", [
     ("precision-first heuristics", False), ("precision-oriented design", False), ("imprecision", False),
     ("Measured precision", True), ("precision: 0.9", True), ("Precision.", True), ("| Precision |", True),
+    ("Precisions were", True),
 ])
 def test_mention_rule(text, mention):
     assert bool(w.MENTION_RE.search(text)) is mention

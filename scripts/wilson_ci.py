@@ -328,11 +328,11 @@ FIGURE_RE = re.compile(
 _LIST_ITEM_RE = re.compile("^(?:[-*+]|[0-9]+[.)])" + chr(0x20))
 MEASURED_HEADING = "## Measured precision"
 # What counts as a MENTION of precision (rule 2 below): the word "precision"
-# standing alone. A hyphenated compound that starts with it ("precision-first",
+# or its plural "precisions" (D105) standing alone. A hyphenated compound that starts with it ("precision-first",
 # "precision-oriented") describes a design choice, not a measurement, and does
 # not count (foreman ruling on the gate's false-positive advisory (a)).
 # "imprecision" does not count either.
-MENTION_RE = re.compile("(?<![a-z])precision(?![a-z]|-[a-z])", re.I)
+MENTION_RE = re.compile("(?<![a-z])precisions?(?![a-z]|-[a-z])", re.I)
 SECTION_RULE_HINT = ("figures in this section must be generated; put explanatory text outside the section or "
                      "inside the generated block (i.e. emit it from wilson_ci.render_block)")
 
