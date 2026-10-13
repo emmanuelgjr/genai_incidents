@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D96-D98, USER RULINGS 2026-10-13 (licensing; measurements in `docs/audits/licensing-overlap-measurements-2026-10-13.md`, `ad38c61e`)
+- **The gate's measurements (red-reviewer, raw text, 5-gram plus run, with controls):**
+  - **owasp_llm_top10_2026.json: all 10 descriptions are copied** from OWASP's CC BY-SA text (4 verbatim, 6 near-verbatim). **owasp_llm_top10_2025.json: 4 of 10** copied. Both ship under CC-BY-4.0 `mappings/*` with no attribution. They appear in the repo and the Zenodo archives only, not in STIX, TAXONOMIES or the package.
+  - **OWASP-\* ids:** 18 GENAI ids give 4 verbatim, 4 near and 10 own; the 3 AIX are own. **2 of the 6 shipped rows carry round-up text:** INC-02646 is 81% verbatim, and INC-03233 is near-verbatim at 31%. 3 Q1-2026 ids appear on no round-up page.
+  - **Research/threat sample:** 102 measured, 0 verbatim, 4 with real spans, 6 close-paraphrase; 5 titles equal the post headline.
+- **D96, Q1: carve out now, rewrite next (Recommended).** Add a dep5 CC BY-SA carve-out for both LLM mapping files, a NOTICE-DATA attribution and a CORRECTIONS row (earlier releases shipped them under CC-BY). The descriptions get rewritten as own paraphrase next release, then the carve-out narrows to codes and names.
+- **D97, Q2: rewrite 2 rows and attribute (Recommended).** INC-02646 and INC-03233 are rewritten from primary sources (a data change with a field delta). Add the OWASP round-up attribution in NOTICE-DATA and a CORRECTIONS row. The 3 Q1-2026 ids are recorded as unconfirmed provenance.
+- **D98, Q3: accept and fix 4 spans (Recommended).** Document the "facts + own summary + link" posture. Rewrite the 4 real-span RES descriptions. Keep the headline-identical titles.
+- **Routing:**
+  - **license-auditor**, same branch: the 3 bounce defects (§1.6 provenance is 3 of 6, not 1; the c10 note's `decided_by` is not enforced; host tallies), plus the D96 dep5/NOTICE/CORRECTIONS work and the D97/D98 docs.
+  - **corpus-surgeon** on `ws1/licensing-rewrites-2026-10-13`: rewrite the 6 descriptions via ingest inputs, with a full field-level delta (expected: description plus updated on exactly 6 rows) and overlap proof.
+
 ### 🔍 WS0 licensing follow-ups c5-c11: `ef4ad825` on `ws0/followups-licensing-2026-10-13` (foreman-committed; 3 files, +147/-6). **Raw-text gate plus overlap measurements dispatched.**
 - **Rows drafted:**
   - §1.6 for the 21 OWASP-* ids;
