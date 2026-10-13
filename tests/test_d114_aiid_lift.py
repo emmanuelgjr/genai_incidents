@@ -95,7 +95,9 @@ def test_title_edit_passes_only_when_it_is_the_snapshots_own_title():
 
 
 def test_title_edit_on_an_oecd_titled_row_is_not_waived():
-    """D116: a title edit on a row whose ids are OECD-only is not an AIID title."""
+    """A title edit on a row whose source ids are OECD-only is never waived by the
+    class (the snapshot cannot supply its title). Scope: OECD-ONLY rows. Mixed
+    AIID+OECD rows are covered by the 3,935 pin below (D116/D119)."""
     edited = [PREV[0], PREV[1], PREV[2] | {"title": "New OECD title"}]
     with pytest.raises(m.RefreshMergeApprovalError, match="title edit INC-3"):
         _check(edited, titles={"AIID-1": "New OECD title"})
@@ -249,6 +251,37 @@ def test_the_12_hub_aiid_ids_ship_as_standalone_rows():
     for n in hubs:
         rows = by_sid.get(f"AIID-{n}", [])
         assert len(rows) == 1 and rows[0]["source_ids"] == [f"AIID-{n}"], n
+
+
+def _oecd_titled_count(rows, oecd_titles):
+    return sum(1 for e in rows if any(oecd_titles.get(s) == e["title"]
+                                      for s in e["source_ids"] if s.startswith("OECD-AIM-")))
+
+
+def _oecd_titles():
+    return {r["source_id"]: r["title"] for r in json.loads(
+        (ROOT / "ingest" / "oecd_aim_full_incidents.json").read_text(encoding="utf-8"))}
+
+
+def test_oecd_titled_row_count_is_pinned_at_3935():
+    """D116/D119: rows whose title equals the committed OECD ingest title for one
+    of their own OECD ids. 3,937 on main before the AIID lift; 3,935 after, the
+    two being INC-00437 and INC-14682 (D119 accepted the switch). Any further drop
+    must be a deliberate, declared change to this number."""
+    inc = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    assert _oecd_titled_count(inc, _oecd_titles()) == 3935
+    by = {e["id"]: e for e in inc}
+    for iid in ("INC-00437", "INC-14682"):
+        assert _oecd_titled_count([by[iid]], _oecd_titles()) == 0, iid
+
+
+def test_oecd_title_count_check_fires_on_a_retitled_row():
+    inc = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    titles = _oecd_titles()
+    base = _oecd_titled_count(inc, titles)
+    victim = next(e for e in inc if any(titles.get(s) == e["title"] for s in e["source_ids"] if s.startswith("OECD-AIM-")))
+    mutated = [dict(e, title="Mutated title") if e["id"] == victim["id"] else e for e in inc]
+    assert _oecd_titled_count(mutated, titles) == base - 1 != 3935
 
 
 def test_no_oecd_row_beyond_the_committed_oecd_ingest_is_in_the_corpus():

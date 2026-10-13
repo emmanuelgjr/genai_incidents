@@ -2069,6 +2069,16 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
+# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. Every gate
+# refusal (AIID or OECD side) carries this sentence so whoever reads the red run
+# knows the whole refresh was lost, not just the held source.
+REFRESH_DID_NOT_SHIP = (
+    "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
+    "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "
+    "the AIID snapshot. The cause is the refusal listed here."
+)
+
+
 class RefreshMergeApprovalError(SystemExit):
     """Raised (as a SystemExit, like SplitAuthorizationError) when a build
     would write an OECD/AIID-driven merge or retitle the user has not
@@ -2405,7 +2415,7 @@ def _check_refresh_merge_authorization(
             "that the user has not approved "
             f"({len(problems)}):{nl}" + nl.join(problems[:25])
             + (f"{nl}..." if len(problems) > 25 else "")
-            + chr(10) + "Nothing was written. This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
+            + chr(10) + REFRESH_DID_NOT_SHIP + " Nothing was written. This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
             "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
             f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
             "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
@@ -2464,7 +2474,7 @@ def _check_oecd_lift_precondition(
             "[FATAL] D114 binding precondition: a held OECD-side input differs from HEAD, "
             "but suppression (A3) has not been built and gated: " + why + ". Lifting OECD "
             "without suppression turns the 12 AIID hub rows into permanent merges (29 "
-            "instead of 7). Nothing was written. The OECD inputs stay held until a gated "
+            "instead of 7). " + REFRESH_DID_NOT_SHIP + " Nothing was written. The OECD inputs stay held until a gated "
             "suppression mechanism lands (see docs/audits/stage2-ruling-package-2026-10-13.md "
             "section 2(a), A2 Forward risk, and PROGRESS.md D114)."
         )

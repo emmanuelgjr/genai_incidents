@@ -489,6 +489,23 @@ jobs:
             echo "count=unknown" >> "$GITHUB_OUTPUT"
             echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
           fi
+          # D120: per-field report of AIID-driven changes (flag, never block).
+          # Fails soft like the retraction report: on error the PR is marked
+          # needs-ruling (a later needs_ruling=true output wins over the earlier
+          # value) and the refresh continues.
+          if python scripts/aiid_change_report.py --before-ref HEAD \
+               --out-md "$RUNNER_TEMP/aiid-change-report.md"; then
+            { echo; cat "$RUNNER_TEMP/aiid-change-report.md"; } >> "$RUNNER_TEMP/pr-body.md"
+          else
+            echo "::warning::aiid_change_report.py failed; flagging the PR needs-ruling (unknown AIID change state)."
+            {
+              echo
+              echo "### AIID-driven changes (D120 change report)"
+              echo
+              echo "**The AIID change report could not be produced** (see the workflow run). What the AIID snapshot changed in this refresh is UNKNOWN, so the PR is labelled \`needs-ruling\`; diff \`data/incidents.json\` against \`main\` by hand. The refresh was not blocked."
+            } >> "$RUNNER_TEMP/pr-body.md"
+            echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Ensure needs-ruling label exists
         if: steps.retracted.outputs.needs_ruling != 'false'

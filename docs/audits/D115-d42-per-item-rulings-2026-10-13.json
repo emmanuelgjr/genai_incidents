@@ -26,7 +26,8 @@
     {"item": "R12", "kind": "retitle", "id": "INC-14407", "ruling": "pending-raw-record-read"}
   ],
   "also_recorded": {
-    "D116": "keep the existing 3,937 OECD titles and add no new OECD rows until clarified (already true while OECD is held; confirmed by tests/test_d114_aiid_lift.py).",
+    "D116": "keep the existing OECD titles and add no new OECD rows until clarified. Measured effect of the AIID lift: rows whose title equals the committed OECD ingest title for one of their own OECD ids go 3,937 on main to 3,935 on this branch. The two rows are INC-00437 and INC-14682: AIID-1574 and AIID-1575 are now in the AIID snapshot, so the rows' title and description switch from the OECD template to the AIID template. Both rows are in the D114-approved 25-title-edit table (package table 2.a-1), and the user ruled D119 to accept the switch. No OECD ingest byte changed and no OECD row was added (tests/test_d114_aiid_lift.py::test_oecd_titled_row_count_is_pinned_at_3935 pins 3,935; any further drop must be a declared change).",
+    "D119": "accept the INC-00437 and INC-14682 title switch above (user ruling 2026-10-13).",
     "e": "per-item approval file for merges and retitles; class form for adds (the D114 standing AIID class in scripts/merge_and_dedupe.py)."
   }
 }
