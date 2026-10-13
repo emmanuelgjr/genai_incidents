@@ -63,6 +63,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D99-D102, USER RULINGS 2026-10-13 (licensing bounce #2 + open calls)
+- **D99, the crosswalk: yes, add it to D96 (Recommended).** `mappings/owasp_llm_2025_to_2026.json` gets the same carve-out, NOTICE and CORRECTIONS treatment, and is rewritten next release with the others.
+- **D100, the bounce #2 route: fix plus a scoped re-gate (Recommended).** It covers the crosswalk, the function-name fix (`_verify_split_authorization_marker`), A1 (append the gate's first-gate raw-text confirmations to the measurement record, then update the hedging cells) and A2 (CORRECTIONS "each file since its introduction").
+- **D101, ingest/: declare upstream terms (Recommended).** Add a `.reuse/dep5` stanza plus an `ingest/README` stating these are third-party snapshots under each upstream's own terms, pointing to SOURCE_LICENSES and NOTICE-DATA, and not under the project's CC BY or MIT grants. Documentation only.
+- **D102, the released [2.11.0] CHANGELOG: leave the record (Recommended).** **c17 is closed as won't-fix.**
+- The foreman merged origin/main into the licensing branch to bring in the measurement file; this is recorded in the branch history.
+
 ### ⛔ WS0 licensing: **BOUNCE #2 (re-gate on `be418fd3`). ESCALATED to the user** (protocol step 6)
 **Verdict, in the gate's words:** "VERDICT: BOUNCE. This is bounce #2 on this task, so per protocol it goes to the user. Both defects are small and mechanical."
 
