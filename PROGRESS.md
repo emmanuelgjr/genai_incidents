@@ -63,6 +63,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ WS0 licensing: **BOUNCE #3 (scoped re-gate on `88db5c67`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "Both defects are mechanical text fixes with no ruling needed, so 'apply the strings below verbatim, then a grep check' closes them."
+
+**Defects:**
+1. **The crosswalk measurement is attributed to "the 2026 LLM00_Preface.md" in 5 places:** dep5, NOTICE-DATA, CORRECTIONS, §3.7 intro and the record item 9. The LLM08 span is in `2026/final/LLM09_VectorAndEmbeddingWeaknesses.md`. The count (2/3/5) is unaffected. **Fix:** replace it with "against the 2026 edition's source files (LLM00_Preface.md and the LLM01-LLM10 files)". **Check:** `grep -rn "against the 2026 .LLM00_Preface" .reuse/dep5 NOTICE-DATA CORRECTIONS.md docs/` gives 0 hits.
+2. **SOURCE_LICENSES §3.7 still says two files / "releases through v2.13.0"** at :448 (Relicense cell), :449 (Action item 3) and :599 (summary row 7). **Fix:** "the three files"; "every release that carried each file, from its introduction". **Check:** `grep -n -E "both files|these two files" docs/SOURCE_LICENSES.md` returns only :206 and :232 (the research sample).
+
+**Verified:**
+- `reuse spdx` gives exactly 3 OWASP LLM files as CC-BY + CC-BY-SA.
+- The crosswalk figures match.
+- The memo function name is right (the code returns at :1967/:1968).
+- The A1 record is append-only, items 1-9 are faithful apart from defect 1, and the cell citations are correct.
+- Table pipe counts are consistent across 35 tables.
+- A2: 19fa2986 is first in v2.10.0, v2.9.0 has only the 2025 file, and the 2025 file has been present since c105bd7a (first tag v2.0.0).
+- D101: 24 upstream jsons resolve to upstream-terms; provenance, `_state` and the README to CC-BY; atlas to Apache; .py to MIT; no upstream file is CC-BY. The README maps all 24, no licence is claimed, and the build never reads `ingest/README.md` (`INGEST.glob("*.json")` at :2523 is non-recursive).
+- The f69b271f merge is clean; merge-tree vs 48f81697 is clean.
+
+**Advisories:**
+- **A1:** "upstream terms" under-claims for project-derived `cve_rejections.json` and for the mostly-own-summary curated files. It is disclosed in the comments and is legally harmless. `cve_rejections.json` is the clearest future CC-BY carve-back candidate.
+- **A2:** `data/.owasp_llm_migration.json` holds hashes only; `docs/charts/owasp_llm.svg` shows risk names and is covered by the NOTICE charts clause.
+
 ### 🔁 D97/D98 rewrites: **BOUNCE #1** (gate-rewrite on `b130900e`). Back with the corpus-surgeon.
 **Verdict, in the gate's words:** "BOUNCE. The D97/D98 rewrites on ws1/licensing-rewrites-2026-10-13 @ b130900e fail on 2 factual defects… The mechanics all hold."
 
