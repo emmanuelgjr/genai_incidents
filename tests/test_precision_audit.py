@@ -778,6 +778,12 @@ def test_committed_datasheet_has_no_stray_precision_figure():
     (BULLET, BULLET + NL + "- Measured precision on the feed was 64%."),
     # D105: the plural is a mention too (fails on 70dc0290's singular-only pattern)
     (BULLET, BULLET + NL + "- Precisions were 92% and 88%."),
+    # D106: only the design compounds are exempt; measurement compounds are mentions
+    # (each fails on 70dc0290's any-compound exemption)
+    (BULLET, BULLET + NL + "- precision-recall AUC 0.91."),
+    (BULLET, BULLET + NL + "- Precision-Recall: 92% / 80%"),
+    (BULLET, BULLET + NL + "- precision-weighted score 0.91."),
+    (BULLET, BULLET + NL + "- precision-at-10 of 0.8."),
     # ruling (b): explanatory figures in the section stay flagged
     ("it is never hand-typed.", "it is never hand-typed. Intervals are Wilson 95% score intervals."),
     ("it is never hand-typed.", "it is never hand-typed. Unsure rows are under 1% of the corpus."),
@@ -848,6 +854,8 @@ def test_generated_block_already_states_interval_wording():
     ("precision-first heuristics", False), ("precision-oriented design", False), ("imprecision", False),
     ("Measured precision", True), ("precision: 0.9", True), ("Precision.", True), ("| Precision |", True),
     ("Precisions were", True),
+    ("precision-recall AUC", True), ("Precision-Recall:", True), ("precision-weighted score", True),
+    ("precision-at-10", True), ("precision-firstly", True),
 ])
 def test_mention_rule(text, mention):
     assert bool(w.MENTION_RE.search(text)) is mention

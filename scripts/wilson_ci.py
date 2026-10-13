@@ -328,11 +328,19 @@ FIGURE_RE = re.compile(
 _LIST_ITEM_RE = re.compile("^(?:[-*+]|[0-9]+[.)])" + chr(0x20))
 MEASURED_HEADING = "## Measured precision"
 # What counts as a MENTION of precision (rule 2 below): the word "precision"
-# or its plural "precisions" (D105) standing alone. A hyphenated compound that starts with it ("precision-first",
-# "precision-oriented") describes a design choice, not a measurement, and does
-# not count (foreman ruling on the gate's false-positive advisory (a)).
-# "imprecision" does not count either.
-MENTION_RE = re.compile("(?<![a-z])precisions?(?![a-z]|-[a-z])", re.I)
+# or its plural "precisions" (D105), alone or as the head of any hyphenated
+# compound EXCEPT the design compounds in DESIGN_COMPOUNDS. Those name a
+# design choice of the ingest rules ("precision-first heuristics") and are
+# exempt (foreman ruling on the gate's false-positive advisory (a)). D106
+# narrowed that exemption: it used to cover every "precision-<word>" compound,
+# which also exempted measurements ("precision-recall AUC 0.91",
+# "precision-weighted score 0.91", "precision-at-10 of 0.8"). The list is the
+# set of design compounds found by grepping the repo's prose for
+# "precision-[a-z]+" (2026-10-13); a new design compound must be added here
+# deliberately, with a test. "imprecision" does not count either.
+DESIGN_COMPOUNDS = ("first", "oriented")
+MENTION_RE = re.compile(
+    "(?<![a-z])precisions?(?![a-z]|-(?:" + "|".join(DESIGN_COMPOUNDS) + ")(?![a-z]))", re.I)
 SECTION_RULE_HINT = ("figures in this section must be generated; put explanatory text outside the section or "
                      "inside the generated block (i.e. emit it from wilson_ci.render_block)")
 
@@ -361,9 +369,10 @@ def stray_precision_figures(text: str) -> list[str]:
       1. exactly one BLOCK_BEGIN and one BLOCK_END marker (a second, hand-made
          block would otherwise sit unchecked after the first);
       2. outside the block, no paragraph / list item / table that mentions
-         precision (MENTION_RE: the standalone word; "precision-first" and
-         other "precision-<word>" compounds are not mentions) carries a figure
-         (FIGURE_RE);
+         precision (MENTION_RE: "precision" or "precisions", alone or heading
+         any hyphenated compound except the design compounds "precision-first"
+         and "precision-oriented"; so "precision-recall", "precision-weighted"
+         and "precision-at-10" ARE mentions) carries a figure (FIGURE_RE);
       3. outside the block, the "## Measured precision" section carries no
          figure at all, whether or not the word appears next to it. This is
          deliberately strict: an EXPLANATORY figure typed into the section's
@@ -375,7 +384,9 @@ def stray_precision_figures(text: str) -> list[str]:
     Known limits (documented, not detected): a bare integer ("precision: 92"),
     a figure spelled in words, a figure separated from the word "precision"
     by a blank line OUTSIDE the Measured-precision section, a figure next to
-    only a "precision-<word>" compound OUTSIDE the section, and every file
+    only a design compound ("precision-first", "precision-oriented") OUTSIDE
+    the section, even when that figure is in fact a precision measurement,
+    and every file
     other than docs/DATASHEET.md (README, release notes, CHANGELOG)."""
     text = text.replace(chr(13) + chr(10), chr(10))
     problems: list[str] = []

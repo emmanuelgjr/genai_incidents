@@ -24,8 +24,11 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   things:
   - a percentage or a 0.xx proportion in any paragraph, list item or table that mentions
     precision. A sentence-final "0.92." counts. Version strings such as "v2.13.0" and
-    "CVSS 9.8." do not. A "precision-<word>" compound such as "precision-first" is a
-    design term, not a mention;
+    "CVSS 9.8." do not. "Precisions" counts as a mention. So does any
+    "precision-<word>" compound, such as "precision-recall", "precision-weighted" or
+    "precision-at-10", except the two design compounds the ingest rules use,
+    "precision-first" and "precision-oriented". A figure next to only one of those two
+    is not checked;
   - any figure in the "Measured precision" section, including explanatory ones. Figures
     there must come from the generator;
   - a duplicate block.
