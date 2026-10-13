@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 Post-lift docs + D124: **BOUNCE #1 (gate-postlift on `bcc47f3a`).** 4 text-only defects, routed to pe-postlift. Zero data delta is confirmed.
+**Defects:**
+1. **The D124 coherence gap.** DATA_DICTIONARY:16 still defines `review_by` as the date a human "committed to re-decide" the source, which is false for the 1,382 AIRI rows after D124. :127 says retiring = tombstone, but D108 retired AIRI with none.
+2. **The same `review_by` meaning ships** in schema/incident.schema.json:270 (and its src copy) and in the HF card text (export_huggingface.py:134).
+   - The HF card goes to pe-postlift.
+   - **The schema description goes to WS3 (schema-architect) as an OWNED FOLLOW-UP:** append the D124 exception sentence to the `review_by` description in both copies. It is description-only, with 0 data delta.
+3. **CHANGELOG 404 date.** 2026-05-31 is `last_success`; the 404s run since 2026-06-07 (`stale_since`). The same imprecision appears in auto-refresh.yml:116.
+4. **CHANGELOG `[Unreleased]` misses D97/D98** (e6eb3410: 4 published rows changed) **and the refresh repair** (D66 hold, D63 alert, KEV/AIID empty-result guards).
+
+**Advisories:**
+- A1: the README:144 "counts unchanged" now reads false against the current stats. Not acted on: it is original release wording, and the appended clause addresses it.
+- A3: the D120 wording overstates which fields get row lists.
+- A4: the Makefile probe comment names the 0-entry path only; a real 404 also exits non-zero.
+- A5: the gate's own AIRI mutant briefly wrote outside the scratchpad. The gate deleted it, and the shared tree is verified clean.
+
+**Gate evidence:**
+- **Per-entity diffs across v2.13.0, #102, the lift and the branch:** 15,637 → 15,642 → 15,755. The lift's 113 new AIID ids are absent before and present after. 169 changed rows, all AIID-carrying. **OECD-titled rows 3,937 → 3,935 by its own normalised-match route.**
+- Rebuild: porcelain empty; provenance VERIFIED; fire test reproduced.
+- AIRI 0-entry guard mutated: it fires.
+- reuse lint identical to main.
+- pytest 1273 + 1 xfail; merge-tree clean.
+
 ### 🔍 Post-lift docs + D124: `bcc47f3a` on `ws4/postlift-docs-d124-2026-10-13`. **Gate dispatched (gate-postlift).**
 - **Scope:** 7 files.
   - CHANGELOG `[Unreleased]`: all of today's merges.
