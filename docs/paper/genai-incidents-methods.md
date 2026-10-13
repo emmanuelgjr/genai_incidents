@@ -87,7 +87,7 @@ The build is a deterministic, idempotent pipeline
    step 5 assigns them.
 5. **Assign `INC-#####` ids.** The allocator never reissues a retired number,
    and retired ids are recorded in `id_deprecations.json`, so every retired ID
-   has a record that resolve_id_status() reports. An ID is not a permanent
+   has a record that `resolve_id_status()` reports. An ID is not a permanent
    pointer to one incident:
    across release tags v2.0.0–v2.12.0, 591 published IDs carried more than one
    title, some of them a different incident (`docs/ID_POLICY.md` §4 rule 1 and
