@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS2 precision follow-ups: **BOUNCE #1 (red-reviewer on `26dfcdb4`)**. The fix went back to the same label-scientist.
+- **Defect, in the gate's words:** "The b17.3 check misses a proportion that ends a sentence, and nothing documents that." The proportion branch is `0?[.][0-9]+(?![0-9.])`, and the following full stop defeats it. "- Precision: 0.92." passes clean, both in-section and near the word. The CHANGELOG claim overstates the coverage.
+  - The gate's fix, verified in-process: lookahead `(?![0-9]|[.][0-9])`.
+- **Advisory, false positives:** "precision-first heuristics" plus a % fires; so does "favour precision over recall" next to the ~36% control; so do in-section explanatory "95%" and "1%". The check scans the DATASHEET only, and the real file stays clean.
+- **Foreman ruling (tooling, not policy):**
+  - (a) Exclude "precision-first" from the word match, with tests both ways.
+  - (b) Keep the in-section rule strict, because generated figures only belong there. Document it as a known limit and make the error message actionable.
+- **Other gate evidence:** pins unchanged; the committed tree prints exactly the D76 line; the wrong sole directory is caught by validate; fresh-clone pytest 1099 passed.
+
 ### ✅ WS6 docs follow-ups: **DONE. Gate PASS on `6b331e07`; MERGED to main as `337117fc` (`--no-ff`)**
 - **Closed:** c2 (README fully absolute, 0 relative); c3 (supersession note); c14 (VERSIONING, **plus an a11y-green pre-publish requirement**); c15 (banner "CC-BY-4.0 data (with exceptions)"); c16 (HF card corpus wording); b29 (TAXII edition derived); c12 N-a, N-b, N-f, N-g, N-h.
   - **Partly closed: c17, 3 of 4 parts.** OPEN: "CHANGELOG lacks the site UI fixes" (the released [2.11.0] section). → **USER question: dated note or leave it.**
