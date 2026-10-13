@@ -63,6 +63,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ▶ Follow-up batches dispatched 2026-10-13 ("keep going"; no-ruling items from `docs/audits/followups-register-2026-10-13.md`)
+- **WS6 docs** on `ws6/followups-docs-2026-10-13`:
+  - c2: README relative links break on PyPI;
+  - c3: supersession note on the export-integrity audit;
+  - c14: VERSIONING fixes, plus an a11y check in pre-publish;
+  - c15: the banner "CC-BY-4.0 data" tagline vs D89;
+  - c16: the HF card corpus wording;
+  - c17: v2.11.0 leftovers;
+  - c12: N-a/N-b/N-f/N-g/N-h;
+  - b29: the TAXII "-2026" literal.
+- **WS4 hygiene** on `ws4/followups-hygiene-2026-10-13`:
+  - b13: the "new DISPUTED" log line;
+  - b22: Unicode-digit regex;
+  - b25: persist_refresh_state tests;
+  - b11: slow marker;
+  - b10: stage-1 fixture from `git archive`.
+- **WS2 precision** on `ws2/followups-precision-2026-10-13`:
+  - b4: the status line on problems;
+  - b17: dated-dir pin, Wilson CLI dir, hand-typed figure.
+- **Constraints on all three:** no data change; no touching auto-refresh.yml or the hold/gate code (the decouple branch owns those); each batch gated before merge.
+- **Held back (not dispatched):**
+  - c1 + b5: the AIM rename; the data part needs a field delta;
+  - b8: the ATLAS re-point; moves data;
+  - b23: query-string stripping; data, needs a ruling;
+  - c5-c11: licensing docs; WS0 next, some may need user calls;
+  - everything in register section (a), which needs user decisions.
+- **Refresh dispatch 38330687613:** the cve-sweep job succeeded; the refresh job is still in progress.
+
 ### ✅ D94 moves: **DONE. Gate PASS on `d31348c7`; MERGED to main 2026-10-13 as `de04ba9f` (`--no-ff`)**
 - **Moves:** AGENT_TEAM.md and docs/superpowers/ (7 files) → docs/archive/ (R100). The 2 one-off scripts → scripts/archive/ (ROOT is now `parents[2]`), plus a README.
 - **Live references updated:**
