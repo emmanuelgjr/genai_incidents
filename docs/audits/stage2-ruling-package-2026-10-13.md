@@ -10,9 +10,9 @@
 
 | # | Decision | Options | My recommendation (suggestion only) |
 |---|---|---|---|
-| (a) | Lift, narrow or keep stage 1 | A1 keep unchanged / A2 lift the AIID side only, keep OECD held / A3 lift everything except the doubtful bridges (needs new machinery) / A4 lift everything | **A2** now; A3 as a later design task; do not do A4 |
+| (a) | Lift, narrow or keep stage 1 | A1 keep unchanged / A2 lift the AIID side only, keep OECD held / A3 lift everything except the doubtful bridges (needs new machinery) / A4 lift everything | **A2**, which commits the project to building suppression (A3) before any OECD lift (forward path from A2 gives 29 permanent merges, not 7, without it); do not do A4 |
 | (b) | The D42 17 changes (7 merges + 10 retitles; today re-derived as 7 + 12) | approve all / reject all / partly approve | **Partly: record a per-item ruling now, but understand it publishes nothing until machinery exists.** Following the D42 evidence: approve-in-principle 3 merges (M1, M2, M5) and 6 retitles (R1-R6); reject 4 merges (M3, M4, M6, M7) and 4 retitles (R7-R10); R11 and R12 (new since D42) need a raw-record read first (table in 2.b) |
-| (c) | AIID-only new rows | hold / ship 113 / ship a subset | **Ship, as part of A2** (113 rows when OECD stays held; 61 if OECD is lifted too) |
+| (c) | AIID-only new rows | hold / ship 113 / ship a subset | **Ship, as part of A2, on the condition that suppression precedes any OECD lift** (113 rows when OECD stays held; 61 if OECD is lifted too) |
 | (d) | OECD `title` licence position | D1 ship incl. growth / D2 keep the existing 3,937, add no new OECD rows / D3 project-composed titles for new rows / D4 retract existing OECD titles | **D2 as the safe default**, plus the follow-up email in section 5 (user sends) |
 | (e) | How approvals are recorded | one signed file of per-item entries / bulk or class approvals / both | Per-item file for the merges and retitles; **a bulk form is needed for adds** (1,935 source rows) |
 
@@ -112,8 +112,28 @@ Cost reading: the committed OECD view is **88 days behind** (newest event 2026-0
 **A2. Narrow: lift the AIID side only; OECD (and AIRI) stay held.**
 - Consequence (measured, AIID-only overlay): +113 AIID-only rows (`INC-17216..INC-17328`; all `security`, all tier `landmark`, description is the project template "AI Incident Database (AIID) entry #n ..."; severity Medium 76 / High 30 / Critical 7; years 2020:1, 2022:2, 2023:6, 2024:11, 2025:14, 2026:79); 25 published-title edits (table 2.a-1); 169 content-changed rows (168 `description`, 154 `affected`, 25 `title`, 6 `corpus`, 5 `attack_vector`, 4 `references`, 3 `date`, 2 `tags`, 2 each of the provenance labels, 1 `year`; plus `updated`/`last_seen` on all 169). 0 merges, 0 tombstones, 0 retired IDs. 39 of the 169 changed rows also carry an OECD id (they are mixed rows; their AIID-driven fields change, their OECD fields do not).
 - E23 fit: E23's ruling is shape-based (the only AIID-authored text kept is a bare title; Layer 1 rests on U.S. situs; Layer 2 on the U.S. maker). 113 new titles and 25 edited titles are the same shape. But E23's published counts (1,463 of 1,465 etc.) and the "marker absence" measurement must be re-run (memo R4/R3), and the `aiid_incidents.json` (63 rows) / AIRI exclusion tripwire must still hold; I did not re-run those.
-- Risks: still rests on E23's uncertified situs (unchanged in kind, memo R5); the snapshot's `snapshot_license_txt` reads in full "Report contents are subject to their own intellectual property rights. Unless otherwise noted, the database is shared under (CC BY-SA 4.0). See: https://creativecommons.org/licenses/by-sa/4.0/"; the first sentence concerns report text, which does not ship, and how the BY-SA sentence is handled is in E23 and `SOURCE_LICENSES` 1.2/1.2a (not re-examined here); 113 + 25 is about 7 percent growth in the AIID-titled population.
-- Recommendation: **A2.** Reasons: it is the only slice with 0 merges and 0 deprecations, so nothing permanent is written; it is covered by an existing ruling in kind; it recovers the 25 corrections and 113 current incidents; it leaves the OECD title question (d) and the bridge question (b) untouched. Cost: engineering in section 3 (the hold script and the gate treat the pair as one).
+- Risks: still rests on E23's uncertified situs (unchanged in kind, memo R5); the snapshot's `snapshot_license_txt` reads in full "Report contents are subject to their own intellectual property rights. Unless otherwise noted, the database is shared under (CC BY-SA 4.0). See: https://creativecommons.org/licenses/by-sa/4.0/"; the first sentence concerns report text, which does not ship, and how the BY-SA sentence is handled is in E23 and `SOURCE_LICENSES` 1.2/1.2a (not re-examined here); 113 + 25 is about 7 percent growth in the AIID-titled population. **Forward risk:** If A2 ships and OECD is lifted later without suppression machinery, the same end state (17,470 rows) is reached with 29 permanent merges instead of 7: the 12 hub rows plus 10 AIID-only rows that later OECD rows bridge are retired. A2 therefore makes (b) and A3 a precondition for any later OECD lift.
+  Retirements in that forward path (IDs are provisional numbering, relative to `9c646d36`):
+
+  | Into (survivor) | Retired rows (22 in all) |
+  |---|---|
+  | INC-14407 | INC-17221, INC-17304 |
+  | INC-13066 | INC-17229 |
+  | INC-13321 | INC-17254 |
+  | INC-00699 | INC-17262 |
+  | INC-14517 | INC-17272, INC-17273 |
+  | INC-07910 | INC-17274 |
+  | INC-07783 | INC-17279 |
+  | INC-00813 | INC-17280 |
+  | INC-03717 | INC-17283 |
+  | INC-14284 | INC-17312 |
+  | INC-17225 | INC-17243, INC-17244, INC-17245, INC-17246, INC-17258, INC-17269, INC-17284, INC-17301 |
+  | INC-17275 | INC-17276 |
+  | INC-17296 | INC-17306 |
+
+  The first ten survivors are the 12 hub rows (12 retirements); the last three survivors take the 10 AIID-only-into-AIID-only merges. Measured by the gate (gate-stage2, 2026-10-13, a forward simulation from a published AIID-only build), not re-measured by me. A2 by itself writes 0 tombstones.
+
+- Recommendation: **A2, kept, but with its commitment stated.** Reasons: A2 itself writes 0 merges and 0 tombstones; it is covered by an existing ruling in kind; it recovers the 25 corrections and 113 current incidents. What it does not do is leave the bridge question (b) alone. If A2 ships and OECD is lifted later without suppression machinery, the same end state (17,470 rows) is reached with 29 permanent merges instead of 7: the 12 hub rows plus 10 AIID-only rows that later OECD rows bridge are retired. A2 therefore makes (b) and A3 a precondition for any later OECD lift. Choosing A2 therefore commits the project to building suppression (A3) before any OECD lift. If the user is not willing to make that commitment, the honest alternatives are A1 (keep everything held) or accepting 29 permanent merges. The OECD title question (d) is unaffected by A2. Cost: engineering in section 3 (the hold script and the gate treat the pair as one).
 
 **A3. Lift both sources, but suppress the bridges the user rejects.**
 - Consequence: depends on (b). Needs a suppression capability that does not exist (memo S7). My scratch emulation shows it is not trivial: stripping the doubtful AIID ids only from **fresh** OECD rows removed 2 of the 7 merges (M6, M7) and 1 of 12 retitles (`INC-03717`), leaving 5 merges and 11 retitles; the bridges M3, M4 and the `INC-00699`, `INC-00813` retitles still formed, because the published OECD rows already cite those AIID ids and the arriving AIID rows complete the key. Stripping the ids from **all** OECD rows (published ones too) made the build abort with the WS4-T19 split guard: it would split `INC-01628`, `INC-13066` and `INC-14317` into more rows (no D28 authorization for them). So a suppression must be keyed on the AIID id at the dedup-key level, and each suppression of an already-published bridge probably needs a split authorization or a different mechanism. This is design work, not a flag.
@@ -208,7 +228,8 @@ Per-item observations I can add from today's data (not in the D42 file):
 - C2 ship all: **113 rows** if OECD stays held (A2), **61** if OECD is lifted too. The other 52 split as **40 into 38 new both-rows and 12 absorbed into published rows**, namely the retitle/merge hub ids: AIID-1595 and 1713 into INC-14407; 1609 into INC-13066; 1644 into INC-13321; 1657 into INC-00699; 1671 and 1672 into INC-14517; 1673 into INC-07910; 1679 into INC-07783; 1680 into INC-00813; 1684 into INC-03717; 1723 into INC-14284. So lifting AIID alone (A2) ships these 12 as standalone AIID-only rows, while a later OECD lift turns them into the hub bridges that drive R2-R5, R9-R12 and M3/M6/M7. IDs `INC-17216..INC-17328` (AIID alone; provisional, see the 2026-10-13 caveat under the Base line). Row shape: tier `landmark`, `security`, `aiid_id` set on all, description a project template, no `content_license` marker (as for the existing AIID rows). AIID-authored text shipping: the 113 bare titles plus `affected` names. A sample of the AIID-only rows (as they appear under the both-source overlay, 61 rows) follows.
 - C3 ship a subset: no natural cut exists (all 113 are one shape); a subset by year (79 are 2026) would just be a time-based hold.
 - Risk: E23 situs dependency (above); reversible only by a status/tombstone path (invariant: never delete).
-- Recommendation: **C2 under A2.**
+- Forward-path warning (measured by the gate, not re-measured by me): If A2 ships and OECD is lifted later without suppression machinery, the same end state (17,470 rows) is reached with 29 permanent merges instead of 7: the 12 hub rows plus 10 AIID-only rows that later OECD rows bridge are retired. A2 therefore makes (b) and A3 a precondition for any later OECD lift. The 22 retirements are tabulated under A2's Risks. Shipping these 113 rows is only safe as a first step if suppression (A3) is built before OECD is lifted.
+- Recommendation: **C2 under A2**, on that condition.
 
 The 61 AIID-only rows under the both-source overlay (IDs provisional, as above):
 
