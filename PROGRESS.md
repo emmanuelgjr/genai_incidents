@@ -63,6 +63,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D125, USER RULING 2026-10-13: post-lift docs bounce #2 → **apply verbatim + string check (Recommended).** pe-postlift inserts the gate's 48ffe0db licence section and the two corrected D66/D63 bullets, in CHANGELOG.md only. The foreman then string-checks "48ffe0db", "CC-BY-SA-4.0 AND CC-BY-4.0" and "LicenseRef-upstream-terms" in the `[Unreleased]` slice, confirms the diff is CHANGELOG-only and drift is clean, and merges. No third gate reading.
+
 ### ✅ WS3 schema `review_by` description (D124): **PASS (gate-postlift on `c57e3fd1`), MERGED (HEAD^2 verified).**
 - Description-only change; the schema copies are byte-identical (`cmp`, plus the enforcing test). Zero data delta. validate 15,784/15,784.
 - The wording is consistent with DATA_DICTIONARY:16 and the HF card.
