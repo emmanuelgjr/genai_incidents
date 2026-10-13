@@ -57,7 +57,9 @@ CACHE_FILE = CACHE / "aiaaic_sheet.csv"
 
 EXPECTED_COLUMNS: dict[str, list[str]] = {
     "id":          ["aiaaic id#", "#", "id"],
-    "headline":    ["headline", "headline/title", "title"],
+    # "incident headline" is the 2026-10 sheet header (a title row was also
+    # added above the header; the header scan below already tolerates that).
+    "headline":    ["incident headline", "headline", "headline/title", "title"],
     "occurred":    ["occurred", "date"],
     "deployer":    ["deployer", "deployer(s)"],
     "developer":   ["developer", "developer(s)"],
@@ -75,6 +77,29 @@ EXPECTED_COLUMNS: dict[str, list[str]] = {
     "response":    ["response (taxonomy)", "response(s)", "response"],
     "summary":     ["summary/links", "summary", "links"],
 }
+
+
+# Columns whose absence makes the output wrong, not merely thinner: identity,
+# the inclusion filter (headline/ethical/technology), the date gate, the
+# reference URLs and the severity input. A missing one aborts the run
+# (SchemaDriftError -> non-zero exit); the remaining columns only warn.
+REQUIRED_COLUMNS = (
+    "id", "headline", "occurred", "technology", "ethical", "summary", "consequence",
+)
+
+# Yield floor: refuse to overwrite the committed file when the new row count
+# is below this fraction of it. Week-to-week churn of the sheet is a few
+# percent; 0.5 leaves room for a real, large reclassification while catching
+# the failure shapes seen (0 rows from a renamed column; a half-parsed sheet).
+MIN_YIELD_RATIO = 0.5
+
+
+class SchemaDriftError(RuntimeError):
+    """The sheet no longer has a column this parser requires."""
+
+
+class YieldCollapseError(RuntimeError):
+    """The run produced too few rows to trust; the committed file is kept."""
 
 
 def build_column_map(header_rows: list[list[str]]) -> dict[str, int]:
@@ -102,6 +127,12 @@ def build_column_map(header_rows: list[list[str]]) -> dict[str, int]:
         else:
             print(f"  [aiaaic] WARNING: column '{key}' not found (tried {aliases})", file=sys.stderr)
             col_map[key] = -1
+    missing = [k for k in REQUIRED_COLUMNS if col_map.get(k, -1) < 0]
+    if missing:
+        raise SchemaDriftError(
+            f"required AIAAIC column(s) not found: {missing}; "
+            f"header seen: {[c for c in merged if c]}"
+        )
     return col_map
 
 # Security-relevant ethical-issue / news-trigger / technology values.
@@ -553,7 +584,21 @@ def normalize_row(raw_row: list[str], col: dict[str, int]) -> dict | None:
     }
 
 
-def main():
+OUT_PATH = INGEST / "aiaaic_sheet_incidents.json"
+
+
+def check_yield(new_count: int, committed_count: int) -> None:
+    """Raise YieldCollapseError for 0 rows or a drop below MIN_YIELD_RATIO."""
+    if new_count == 0:
+        raise YieldCollapseError("parsed 0 security-relevant rows")
+    if committed_count and new_count < MIN_YIELD_RATIO * committed_count:
+        raise YieldCollapseError(
+            f"parsed {new_count} rows, below {MIN_YIELD_RATIO:.0%} of the "
+            f"committed {committed_count}"
+        )
+
+
+def run() -> int:
     body, _ = download_csv()
     rows = list(csv.reader(io.StringIO(body)))
     print(f"[aiaaic] {len(rows)} raw rows")
@@ -568,8 +613,7 @@ def main():
             header_idx = i + 1  # skip both header rows
             break
     if col is None:
-        print("[aiaaic] ERROR: could not find header row", file=sys.stderr)
-        return
+        raise SchemaDriftError("could not find the header row in the first 5 rows")
 
     out = []
     skipped = 0
@@ -580,10 +624,27 @@ def main():
         else:
             skipped += 1
 
-    out_path = INGEST / "aiaaic_sheet_incidents.json"
-    out_path.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"[aiaaic] wrote {len(out)} security-relevant entries -> {out_path} (skipped {skipped})")
+    committed = 0
+    if OUT_PATH.exists():
+        try:
+            committed = len(json.loads(OUT_PATH.read_text(encoding="utf-8")))
+        except (ValueError, OSError):
+            committed = 0
+    check_yield(len(out), committed)
+
+    OUT_PATH.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"[aiaaic] wrote {len(out)} security-relevant entries -> {OUT_PATH} "
+          f"(skipped {skipped}; committed file had {committed})")
+    return 0
+
+
+def main() -> int:
+    try:
+        return run()
+    except (SchemaDriftError, YieldCollapseError) as e:
+        print(f"[aiaaic] ERROR: {e}; {OUT_PATH.name} left untouched", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

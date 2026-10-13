@@ -404,14 +404,14 @@ jobs:
       # back, its file is held too (it is in _PAIR_INPUT_FILES): a revived AIRI
       # lands in the artifact, not in the PR.
       - name: Hold OECD/AIID pair inputs at their committed versions
-        run: python scripts/hold_pair_inputs.py --stash-dir held-pair-inputs
+        run: python scripts/hold_pair_inputs.py --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
       - name: Upload held OECD/AIID inputs (D42 review path)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: held-oecd-aiid-inputs
-          path: held-pair-inputs
+          path: ${{ runner.temp }}/held-pair-inputs
           if-no-files-found: warn
           retention-days: 30
 
@@ -490,6 +490,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh label create needs-ruling --color B60205 --description "Refresh retracts a landmark entry or more than 10 entries; needs a human ruling" || true
+
+      # create-pull-request commits EVERYTHING in the work tree. The held
+      # OECD/AIID bytes live only in the artifact (stash under runner.temp);
+      # this fails the run, before any PR is opened, if a held path differs
+      # from HEAD or stash content is anywhere in the tree (PR #101, 2026-10-13).
+      - name: Guard - no held path or stash content in the work tree
+        run: python scripts/hold_pair_inputs.py --check-clean --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
       - name: Open / update refresh PR
         id: cpr

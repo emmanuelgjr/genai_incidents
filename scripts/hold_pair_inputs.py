@@ -86,11 +86,60 @@ def hold(root: Path, stash_dir: Path) -> dict:
     return report
 
 
+STASH_DIR_NAME = "held-pair-inputs"
+
+
+def check_held_paths_clean(root: Path, stash_dir: Path | None = None) -> list[str]:
+    """Return the reasons the work tree must NOT be committed (empty = clean).
+
+    The PR step commits everything in the work tree. The fresh OECD/AIID bytes
+    belong only in the uploaded artifact (2026-10-13: a stash dir inside the
+    work tree put ~385k lines into refresh PR #101). Violations:
+      - the stash dir resolves to a path inside the repo root;
+      - a held ingest file is modified, staged or untracked vs HEAD;
+      - any tracked-or-untracked path sits under a ``held-pair-inputs/`` dir.
+    """
+    problems: list[str] = []
+    root = Path(root).resolve()
+    if stash_dir is not None:
+        try:
+            Path(stash_dir).resolve().relative_to(root)
+            problems.append(f"stash dir {stash_dir} is inside the work tree {root}")
+        except ValueError:
+            pass
+    st = m._git(root, "status", "--porcelain=v1", "--untracked-files=all")
+    if st.returncode != 0:
+        return problems + ["git status failed; cannot verify the tree is clean"]
+    held = {f"ingest/{n}" for n in held_files()}
+    for line in st.stdout.decode("utf-8", errors="replace").splitlines():
+        path = line[3:].strip().strip('"')
+        if " -> " in path:
+            path = path.split(" -> ")[-1]
+        if path in held:
+            problems.append(f"held path differs from HEAD: {path} ({line[:2].strip() or '?'})")
+        if f"/{STASH_DIR_NAME}/" in f"/{path}":
+            problems.append(f"stash content in work tree: {path}")
+    return problems
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--stash-dir", required=True, type=Path)
+    ap.add_argument("--stash-dir", type=Path)
     ap.add_argument("--root", type=Path, default=m.ROOT)
+    ap.add_argument(
+        "--check-clean", action="store_true",
+        help="guard mode: exit 1 if any held path or stash content is in the work tree",
+    )
     args = ap.parse_args(argv)
+    if args.check_clean:
+        problems = check_held_paths_clean(args.root, args.stash_dir)
+        for p in problems:
+            print(f"[FATAL] {p}", file=sys.stderr)
+        if not problems:
+            print("held-path guard: work tree carries no held path and no stash content")
+        return 1 if problems else 0
+    if args.stash_dir is None:
+        ap.error("--stash-dir is required unless --check-clean is given")
     report = hold(args.root, args.stash_dir)
     for name, v in sorted(report["files"].items()):
         print(f"  {'HELD   ' if v['changed'] else 'same   '} ingest/{name}")

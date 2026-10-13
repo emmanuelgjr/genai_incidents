@@ -38,6 +38,15 @@ def check(text) -> list[str]:
         problems.append("held OECD/AIID inputs must be uploaded as an artifact")
     elif "always()" not in str(steps[up].get("if", "")):
         problems.append("held-input upload must run with always()")
+    for i in (hold, up):
+        if i is not None and "runner.temp" not in str(steps[i]) and "RUNNER_TEMP" not in str(steps[i]):
+            problems.append("held-input stash/upload must live under runner.temp, not the work tree")
+    guard = idx(lambda s: "hold_pair_inputs.py --check-clean" in (s.get("run") or ""))
+    pr = idx(lambda s: "create-pull-request" in str(s.get("uses", "")))
+    if guard is None:
+        problems.append("no held-path guard step (--check-clean)")
+    elif pr is None or guard > pr:
+        problems.append("held-path guard must run before the PR step")
     return problems
 
 
@@ -50,9 +59,18 @@ def test_check_fires_on_mutations():
     assert any("no step runs" in p for p in check(t.replace("scripts/hold_pair_inputs.py", "scripts/nope.py")))
     assert any("must run with always()" in p for p in check(
         t.replace("always() && steps.health.outcome", "steps.health.outcome")))
-    moved = t.replace("run: python scripts/hold_pair_inputs.py --stash-dir held-pair-inputs",
+    moved = t.replace("run: python scripts/hold_pair_inputs.py --stash-dir \"$RUNNER_TEMP/held-pair-inputs\"",
                       "run: python scripts/merge_and_dedupe.py", 1)
     assert any("before the merge" in p or "no step runs" in p for p in check(moved))
+
+
+def test_stash_and_guard_checks_fire():
+    t = (WF / "auto-refresh.yml").read_text(encoding="utf-8")
+    in_tree = t.replace('"$RUNNER_TEMP/held-pair-inputs"', "held-pair-inputs").replace(
+        "${{ runner.temp }}/held-pair-inputs", "held-pair-inputs")
+    assert any("runner.temp" in p for p in check(in_tree))
+    no_guard = t.replace("--check-clean", "--help")
+    assert any("no held-path guard" in p for p in check(no_guard))
 
 
 def test_gate_logic_untouched_sentinel():
