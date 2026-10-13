@@ -274,11 +274,15 @@ law has no equivalent categorical carve-out -- AIID and AIAAIC are not
 two postures toward the same question; they are two legal systems
 answering it differently. Empirically, no row in the shipped corpus
 carries a content_license marker for AIID under any measurable
-definition of "an AIID row": 0 of 1,466, counting the union of the
-AIID tag, the aiid_id field, the AIID-<n> source-ID, and the
-incidentdatabase.ai reference-URL signals -- not merely the narrowest
-tags-only count. This resolution covers only the ~1,463-row population
-that ships via the sanctioned-snapshot path (section 1.2a); it does
+definition of "an AIID row": 0 of 1,585 (re-measured 2026-10-13 under
+D114 with scripts/audit/e23_recount.py; E23 recorded 0 of 1,466 in July),
+counting the union of the AIID tag, the aiid_id field, the AIID-<n>
+source-ID, and the incidentdatabase.ai reference-URL signals -- not
+merely the narrowest tags-only count. This resolution covers only the
+population that ships via the sanctioned-snapshot path (section 1.2a):
+~1,463 rows when ruled, 1,585 AIID-linked rows at the 2026-10-13
+re-measurement. The text kept from AIID is still only the bare title
+plus structured facts. It does
 not extend to the 63 hand-curated rows in ingest/aiid_incidents.json
 or the 1,457 AIRI Navigator rows sharing AIID's source-ID convention,
 which carry unreviewed, uncleared risk and are kept out of the shipped

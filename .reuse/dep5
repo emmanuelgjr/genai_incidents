@@ -37,9 +37,11 @@ Comment: This dataset aggregates entries from many upstream sources, each
  section 1.2a) likewise carry no BY-SA subset -- only the AIID-authored
  title and structured facts are kept, never the licensed narrative.
  AIID's content-licensing question is RESOLVED, not open, for the
- ~1,463-row population that ships (0 of 1,466 rows carry a
- content_license marker under every measurable definition -- tag,
- aiid_id field, AIID-<n> source-ID, or reference URL). AIID's maker is
+ population that ships (0 of 1,585 rows carry a content_license marker
+ under every measurable definition -- tag, aiid_id field, AIID-<n>
+ source-ID, or reference URL -- re-measured 2026-10-13 under D114 with
+ scripts/audit/e23_recount.py; E23 recorded ~1,463 rows and 0 of 1,466
+ in July). AIID's maker is
  US-situated, so U.S. Circular 33 excludes the retained title from
  copyright, and that same US situs means AIID's maker fails both the
  UK and EU sui generis database-right qualification tests, so no such
