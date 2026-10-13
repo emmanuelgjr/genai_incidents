@@ -63,6 +63,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 D114 AIID-side lift: `62be0943` on `ws4/aiid-lift-d114-2026-10-13`. **Gate dispatched (gate-aiidlift).**
+- **Design:**
+  - The refresh stops holding `aiid_full.json` and its sidecar.
+  - A standing hard-coded D114 AIID class waives new all-AIID rows and title edits that use the row's own AIID snapshot title.
+  - Still per-item: merges, absorbing retitles, absorptions, OECD and mixed adds.
+  - **OECD lift precondition:** `_check_oecd_lift_precondition` is unsatisfiable until a suppression marker AND a code-pinned hash exist.
+  - The approval-file hash is now pinned in code (closing the package's §2(e) gap).
+  - The D115 per-item record is committed and inert.
+- **Delta vs main (author):**
+  - 15,671 → 15,784 rows; **+113 (INC-17221..17333), all-AIID; 0 removed; 0 tombstones** (id_deprecations byte-identical).
+  - 169 changed, 25 title edits; 0 OECD-id changes; 0 absorptions.
+  - **This matches the package exactly** (113/25/169 and its per-field counts).
+  - The 12 hub ids ship as standalone rows.
+- **Flagged → possible user question:** INC-00437 and INC-14682 switch title and description from the OECD template to the AIID template, because AIID-1574 and 1575 now appear in the snapshot. No OECD byte changed. D116 ("keep the existing OECD titles") may not have anticipated this.
+- **Licence, owed before or with the merge:** live surfaces will be stale.
+  - SOURCE_LICENSES §1.2a says "nothing from AIID reaches main".
+  - The E23 counts in §1.2a and NOTICE-DATA need re-measuring: the AIID-sourced population becomes 1,584 rows, with 0 content_license markers.
+  - → WS0 after the gate, on the same branch.
+- **Known weak spot:** AIID-driven content changes pass because the D71 content check is vacuous with held inputs at HEAD. The gate is asked to measure whether this lets content change on OECD-carrying rows.
+- **Process defect:** the author's WIP commits lack the Co-Authored-By trailer. Pushed history is not rewritten; the merge commit carries it.
+
 ### ✅ D117 over-merge rule fix (A2): **PASS (gate-rulefix on `7f1526bf`), MERGED (HEAD^2 verified).**
 **Verdict, in the gate's words:** "PASS… DEFECTS: none."
 
