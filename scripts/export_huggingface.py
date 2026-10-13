@@ -188,7 +188,7 @@ source repository.
 Two entries (identified in `NOTICE-DATA`) carried description text taken from the
 **OWASP Gen AI Security Project incident round-ups** (**CC BY-SA 4.0**) in
 earlier releases; they were rewritten in the project's own wording on
-2026-10-13, and data published before that date still carries the original text. Separately, four mapping files in the source
+2026-10-13, after the release of that date; data from that release and every earlier release still carries the original text. Separately, four mapping files in the source
 repository (`mappings/owasp_asi_top10.json`, `mappings/owasp_llm_top10_2026.json`,
 `mappings/owasp_llm_top10_2025.json`, `mappings/owasp_llm_2025_to_2026.json`) are
 `CC-BY-SA-4.0 AND CC-BY-4.0` for the OWASP codes, names and (LLM files) description

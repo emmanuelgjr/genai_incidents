@@ -60,7 +60,7 @@ Comment: This dataset aggregates entries from many upstream sources, each
  a separate copyright question (open for AIAAIC and AIM; resolved for
  AIID). For six of the other seven named there (MITRE ATLAS, garak, the
  CVE Program, AVID, the OWASP Top 10 for Agentic Applications and the
- OWASP Top 10 for LLM Applications), the grant (for the two OWASP
+ OWASP Top 10 for LLM Applications), the grant (for the four OWASP
  mapping files, the carve-out stanzas below) covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
  (CVE- and AVID-derived rows also carry a row-level content_license
  marker). The seventh, the OWASP Gen AI incident round-ups, is an

@@ -143,8 +143,8 @@ review, and the Heuristic labels bullet below for known gaps.
   each upstream source's own terms, not this dataset's CC-BY-4.0 grant (carve-backs:
   provenance files, `ingest/_state/*`, `ingest/README.md` and
   `ingest/cve_rejections.json` are CC-BY-4.0; `ingest/atlas/ATLAS-*.yaml` is
-  Apache-2.0). `ingest/` is in the repository only, not in the PyPI package or
-  the Hugging Face dataset. File-level terms: `.reuse/dep5`.
+  Apache-2.0). None of the `ingest/` snapshots is in the PyPI wheel or sdist (the sdist picks up only `ingest/README.md`) or the Hugging Face dataset, but they are in
+  the repository and so in the GitHub source archives and each Zenodo deposit. File-level terms: `.reuse/dep5`.
 - Distributed via GitHub, PyPI (`genai-incidents`), Hugging Face Datasets, a
   STIX 2.1 bundle, a static [TAXII-compatible discovery document](https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json),
   and a [MISP feed](https://emmanuelgjr.github.io/genai_incidents/misp/) whose events
