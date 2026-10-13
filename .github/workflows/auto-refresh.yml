@@ -9,6 +9,10 @@ on:
       oecd_aim_limit:
         description: "Max OECD AIM pages to fetch (0 = all)"
         default: "3000"
+      try_airi:
+        description: "Also try the AIRI Navigator fetch on this manual run (D95: otherwise monthly only)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -108,8 +112,29 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # D95: AIRI is under review (D57; review date 2027-01-07) and its download
+      # has 404ed since 2026-05-31, so the fetch is retried MONTHLY, not weekly:
+      # on the first scheduled run of each month (Sunday, day-of-month 1-7), or
+      # on a manual run with try_airi. A week that does not try leaves the step
+      # `skipped`, which check_source_health.py treats as "not attempted" (the
+      # counter is neither reset nor incremented); a failed monthly attempt
+      # still counts toward the usual threshold and goes loud.
+      - name: Decide whether to try AIRI this run
+        id: airi_gate
+        env:
+          EVENT: ${{ github.event_name }}
+          TRY_AIRI: ${{ github.event.inputs.try_airi }}
+        run: |
+          dom=$(date -u +%-d)
+          if [ "$EVENT" = "schedule" ] && [ "$dom" -le 7 ]; then attempt=true
+          elif [ "$EVENT" = "workflow_dispatch" ] && [ "$TRY_AIRI" = "true" ]; then attempt=true
+          else attempt=false; fi
+          echo "attempt=$attempt" >> "$GITHUB_OUTPUT"
+          echo "::notice::AIRI attempt this run: $attempt (event=$EVENT, day-of-month=$dom)"
+
       - name: Refresh AIRI Navigator
         id: ingest_airi
+        if: steps.airi_gate.outputs.attempt == 'true'
         run: python scripts/ingest_airi_navigator.py
         continue-on-error: true
 
@@ -225,6 +250,8 @@ jobs:
             echo "| AIID snapshot | $AIID |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
+          total=3
+          [ "$AIRI" = "skipped" ] && total=2  # D95: monthly retry, not attempted this week
           [ "$AIRI" = "success" ] && ok=$((ok+1))
           [ "$AIAAIC" = "success" ] && ok=$((ok+1))
           [ "$OECD" = "success" ] && ok=$((ok+1))
@@ -235,8 +262,8 @@ jobs:
           if [ "$AIID" != "success" ]; then
             echo "::warning::AIID snapshot refresh failed -- ingest/aiid_full.json is last week's snapshot; OECD rows citing newer AIID ids will be unlinked-to-snapshot (WS4-T14)."
           fi
-          if [ "$ok" -lt 3 ]; then
-            echo "::warning::Only $ok of 3 sources refreshed — the PR will carry last week's data for the failed source(s)."
+          if [ "$ok" -lt "$total" ]; then
+            echo "::warning::Only $ok of $total sources refreshed — the PR will carry last week's data for the failed source(s)."
           fi
 
       # WS4-T9: the check above only catches "everything failed on the SAME
@@ -278,7 +305,9 @@ jobs:
         id: health
         continue-on-error: true
         env:
-          AIRI: ${{ steps.ingest_airi.outcome }}
+          # D95: a gated (deliberately not tried) AIRI is "not-attempted", which the
+          # checker leaves alone; a bare "skipped" would still count as a failure.
+          AIRI: ${{ steps.airi_gate.outputs.attempt == 'true' && steps.ingest_airi.outcome || 'not-attempted' }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
           KEV: ${{ steps.ingest_kev.outcome }}
