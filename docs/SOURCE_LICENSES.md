@@ -116,9 +116,11 @@ a file from AIID's own cloned GitHub repo) and `scripts/scrape_aiid.py`'s
 | Action | (a) compatible, low risk. No change required beyond noting the repo's own unclear code license doesn't cover a bare facts file we already treat conservatively. |
 | Date-checked | 2026-07-15 |
 
-### 1.4 MIT FutureTech AIRI Navigator
+### 1.4 MIT FutureTech AIRI Navigator (retired 2026-10-13, D108)
 *Ingested by:* `scripts/ingest_airi_navigator.py` (downloads
-`airi-navigator.com/downloads/airi-data.zip`).
+`airi-navigator.com/downloads/airi-data.zip`). **Retired 2026-10-13 (D108):** no longer
+fetched by the weekly refresh; the committed `ingest/airi_navigator_incidents.json`
+snapshot and its rows are retained and marked stale.
 
 | Field | Value |
 |---|---|
@@ -128,7 +130,7 @@ a file from AIID's own cloned GitHub repo) and `scripts/scrape_aiid.py`'s
 | Relicense-compatible | Compatible for AIRI's own CC BY 4.0 data with attribution. **UNKNOWN** only for whether AIID's CC-BY-SA share-alike (Section 1.2) applies transitively to the AIID-derived fields AIRI Navigator wraps — a wrapper's own license cannot grant away an upstream share-alike obligation it doesn't itself hold. |
 | Action | **(d) UNKNOWN, narrowed.** AIRI Navigator's own license is now established as CC BY 4.0 (see License above). What remains open is only the transitive-AIID-share-alike question. Outreach is redrafted accordingly: it now asks the AIRI Navigator maintainer (Spencer Michaels, contact given on the AIRI site) only about the AIID-derived-fields question, not about AIRI's own license, which the footer at airisk.mit.edu already answers. Separately, and independent of licensing: the ZIP download this ingest relies on (airi-navigator.com/downloads/airi-data.zip, the ZIP_URL constant in scripts/ingest_airi_navigator.py) now returns HTTP 404 with zero bytes, checked on both hosts with a browser user agent and referer header on 2026-07-16. The site's own source ties the download link's rendering to a feature-flag comparison that currently evaluates false, so the withdrawal looks deliberate on MIT FutureTech's part rather than an accidental move of the file. Cross-reference WS4-T9 / E6, which independently found this ingest currently non-functional. This source produces no data until that separate, non-licensing problem is fixed. **Operational status: RETIRED 2026-10-13 (D108)** — the ingest is no longer attempted and no longer alerts (`RETIRED_SOURCES` in `scripts/check_source_health.py`); the existing rows in `ingest/airi_navigator_incidents.json` and their provenance are retained unchanged; revisit only if the site returns. |
 | Outreach date | **Sent — two distinct messages, not one.** `docs/outreach/mit-airi-courtesy.md` (dead-ZIP courtesy notice + informal transitive-AIID question, to Spencer Michaels via airi-navigator.com) sent **2026-07-27**. `docs/outreach/airi-draft4-export-request.md` (substantive sanctioned-export/API request + the same transitive-AIID question stated more precisely, to `airisk@mit.edu`) sent **2026-07-29**. docs-warden finding N7 adjudicated these as distinct sends, not a resend of the same message — see that file's "Relationship to `docs/outreach/mit-airi-courtesy.md`" note. The "2026-07-16 (redrafted; not yet sent)" this row previously carried is stale, superseded by both sends above. |
-| Follow-up date | **D8's 30-day AIRI-hold clock keys to the 2026-07-29 `airi-draft4-export-request.md` send, not the 2026-07-27 courtesy send.** Decision point: MIT's reply, or **2026-08-28**, whichever comes first — at that point D8's deferred retire-or-replace decision for AIRI becomes live. |
+| Follow-up date | **D8's 30-day AIRI-hold clock keys to the 2026-07-29 `airi-draft4-export-request.md` send, not the 2026-07-27 courtesy send.** Decision point: MIT's reply, or **2026-08-28**, whichever comes first — at that point D8's deferred retire-or-replace decision for AIRI becomes live. **Superseded:** that date lapsed with no recorded decision and was replaced by D57 (2026-10-09, hold until 2027-01-07), and D57 was in turn resolved by D108 (2026-10-13, retired), recorded as D124. The original follow-up text above is kept as history. |
 | Date-checked | 2026-07-16 |
 
 ### 1.5 OECD AI Incidents and Hazards Monitor (AIM)
