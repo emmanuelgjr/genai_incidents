@@ -63,6 +63,31 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS6 licensing surfaces: **BOUNCE #1 (gate-licsurf on `1ab030a8`).** Back with de-licdocs.
+**Verdict, in the gate's words:** "BOUNCE… 3 defects, all text-only, and all three are claims that are false or understated against the tree and the published archives. Every mechanical check passes."
+
+**Defects:**
+1. SOURCE_LICENSES:177 says "the data change is recorded in CORRECTIONS.md". False: no row exists. The fix is to place the row (A1).
+2. README:425 and DATASHEET:144-145 say "ingest/ is in the repository only". **Every Zenodo deposit is a full-repo zip** (v2.13.0: 32,041,631 bytes; `git archive v2.13.0` has 37 ingest/ entries; no export-ignore). The PyPI and HF halves are true.
+3. The HF CARD says "data published before that date". But v2.13.0 was released ON 2026-10-13 (merge 9cdaf5e5, 20:27) before the rewrite (e6eb3410, 23:39). The per-tag description sha1 is identical across all 15 tags v2.0.0..v2.13.0.
+
+**Advisories:**
+- **A1:** the D97 CORRECTIONS row is owed. → Folded in.
+- **A2:** dep5 :63-64 still says "two OWASP mapping files". → Folded in.
+- **A3:** INC-02646's title still equals the round-up heading (7/7). NOTICE should say "descriptions in the project's own wording". → Folded in. **Whether headlines need rewriting is a user licensing call: added to the register.**
+- **A4: item-8 dispute adjudicated for the specialist.** AIM is last; the warden was wrong.
+- **A5:** the sdist lacks NOTICE-DATA. → Folded in.
+- **A6:** the gate's pytest ran concurrently with its own a11y edit, so it asked for a fresh rerun.
+
+**Evidence:**
+- 13 files; pytest 1079 + 1 xfail.
+- **Drift fires** on a planted `(INC-02646, INC-03233)`.
+- reuse per-file identical over 377 files; dep5 parses (11 paragraphs).
+- **a11y: axe 0 across 4 combinations; it fires on an emptied footer link (link-name).** Lighthouse 100; 380px PASS. The absolute NOTICE-DATA URL is correct (Pages serves docs/ only).
+- CITATION and Zenodo tails byte-equal.
+- Stale-phrase sweep: 0 hits.
+- merge-tree clean.
+
 ### ⚖ D105/D106, USER RULINGS 2026-10-13 (precision bounce #2)
 - **D105: apply verbatim + string check (Recommended).** `precisions?` plus a should-fire test, proven to fail on 70dc0290. The foreman verifies and merges, with no third gate reading.
 - **D106: exempt only the design compounds (Recommended).** The exemption is narrowed to the design compounds actually used (precision-first and precision-oriented, grep-derived). -recall, -weighted and -at now count as mentions. Correct the CHANGELOG and code rationale. → Fresh label-scientist `ls-precfix` on the same branch, after merging origin/main.
