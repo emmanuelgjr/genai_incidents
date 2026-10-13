@@ -1,7 +1,7 @@
 name: Refresh overdue alert
 
 # D63. The weekly refresh can fail, or succeed and open a PR nobody merges; from
-# 2026-07-19 to 2026-10-13 neither was noticed. This opens ONE issue
+# 2026-07-27 (PR #97, the last merged refresh) to 2026-10-13 neither was noticed. This opens ONE issue
 # (label `refresh-overdue`) when no `Weekly data refresh` PR has been MERGED in
 # max_age_days, and closes it when one is. N = 21: the refresh is weekly, so 21
 # days is three missed cycles -- one skipped or unreviewed week plus a human

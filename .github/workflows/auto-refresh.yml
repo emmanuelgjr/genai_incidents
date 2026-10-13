@@ -9,6 +9,10 @@ on:
       oecd_aim_limit:
         description: "Max OECD AIM pages to fetch (0 = all)"
         default: "3000"
+      accept_aiaaic_yield_drop:
+        description: "Accept an AIAAIC yield drop below 90% of the committed rows for this run (maintainer override; logged loudly)"
+        type: boolean
+        default: false
       try_airi:
         description: "Also try the AIRI Navigator fetch on this manual run (D95: otherwise monthly only)"
         type: boolean
@@ -140,6 +144,8 @@ jobs:
 
       - name: Refresh AIAAIC sheet
         id: ingest_aiaaic
+        env:
+          AIAAIC_ACCEPT_YIELD_DROP: ${{ github.event.inputs.accept_aiaaic_yield_drop == 'true' && '1' || '' }}
         run: python scripts/ingest_aiaaic_sheet.py
         continue-on-error: true
 
@@ -450,8 +456,10 @@ jobs:
         continue-on-error: true
         run: |
           cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
-          Automated weekly refresh of external sources:
-          AIRI Navigator, AIAAIC sheet, AIID snapshot, OECD AI Incidents Monitor.
+          Automated weekly refresh of external sources. This PR carries the
+          AIAAIC sheet, the CISA KEV catalog and the CVE rejection sweep (with
+          the D60 retractions); the AIRI Navigator, AIID snapshot and OECD AI
+          Incidents Monitor inputs are held out (see below).
 
           On each run this branch is recreated from the current `main`, so the
           diff is always relative to the latest `main` *at run time*. **Merge

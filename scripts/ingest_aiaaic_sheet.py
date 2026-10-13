@@ -20,6 +20,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -79,19 +80,43 @@ EXPECTED_COLUMNS: dict[str, list[str]] = {
 }
 
 
-# Columns whose absence makes the output wrong, not merely thinner: identity,
-# the inclusion filter (headline/ethical/technology), the date gate, the
-# reference URLs and the severity input. A missing one aborts the run
-# (SchemaDriftError -> non-zero exit); the remaining columns only warn.
+# Columns whose absence makes the output wrong, not merely thinner. Derived by
+# tracing every mapped column into normalize_row()'s returned dict:
+#   id            -> source_id
+#   headline      -> title, inclusion filter, attack_vector, OWASP fallbacks
+#   occurred      -> date, year (and the year gate)
+#   deployer / developer / system -> affected; system also -> description, seed facts
+#   technology    -> description, seed facts, inclusion filter
+#   purpose       -> attack_vector
+#   ethical       -> aiaaic_ethical_tags, owasp_llm / owasp_asi, inclusion filter
+#   jurisdiction / sector -> description, seed facts, tags (and affected fallback)
+#   harm_indiv / consequence -> severity
+#   summary       -> references
+# A missing one aborts the run (SchemaDriftError -> non-zero exit).
 REQUIRED_COLUMNS = (
-    "id", "headline", "occurred", "technology", "ethical", "summary", "consequence",
+    "id", "headline", "occurred", "deployer", "developer", "system", "technology",
+    "purpose", "ethical", "jurisdiction", "sector", "harm_indiv", "consequence",
+    "summary",
 )
 
-# Yield floor: refuse to overwrite the committed file when the new row count
-# is below this fraction of it. Week-to-week churn of the sheet is a few
-# percent; 0.5 leaves room for a real, large reclassification while catching
-# the failure shapes seen (0 rows from a renamed column; a half-parsed sheet).
-MIN_YIELD_RATIO = 0.5
+# Warning-only: these are read into the internal row but feed NOTHING published
+# (normalize_row() does not emit them; WS0-T3/D9 dropped the editorial cells).
+WARN_ONLY_COLUMNS = ("trigger", "harm_societal", "harm_env", "response")
+
+# Known limit of the header checks: a rename is caught, and a headline<->system
+# swap is caught by check_headline_system_sanity(), but two swapped columns of
+# the SAME kind (deployer<->developer, jurisdiction<->sector) still map by name
+# to the wrong cells and pass; those are only visible in the field delta.
+
+# Yield floor (D107): refuse to overwrite the committed file when the new row
+# count is below this fraction of it. Week-to-week churn of the sheet is a few
+# rows (+5 on 1,504 observed); a drop of more than 10% is not churn, it is a
+# parse or upstream problem and must be looked at. A maintainer who has looked
+# and accepts a legitimate large drop sets AIAAIC_ACCEPT_YIELD_DROP=1 for one
+# run (workflow_dispatch input accept_aiaaic_yield_drop); it is logged loudly.
+# Zero rows is never accepted. Schema drift is never overridable.
+MIN_YIELD_RATIO = 0.9
+YIELD_OVERRIDE_ENV = "AIAAIC_ACCEPT_YIELD_DROP"
 
 
 class SchemaDriftError(RuntimeError):
@@ -592,9 +617,40 @@ def check_yield(new_count: int, committed_count: int) -> None:
     if new_count == 0:
         raise YieldCollapseError("parsed 0 security-relevant rows")
     if committed_count and new_count < MIN_YIELD_RATIO * committed_count:
+        if os.environ.get(YIELD_OVERRIDE_ENV) == "1":
+            print(
+                f"[aiaaic] !!! WARNING !!! {YIELD_OVERRIDE_ENV}=1: ACCEPTING a yield drop "
+                f"from {committed_count} to {new_count} rows (below the "
+                f"{MIN_YIELD_RATIO:.0%} floor). Maintainer override; review the PR diff.",
+                file=sys.stderr,
+            )
+            return
         raise YieldCollapseError(
             f"parsed {new_count} rows, below {MIN_YIELD_RATIO:.0%} of the "
-            f"committed {committed_count}"
+            f"committed {committed_count} (set {YIELD_OVERRIDE_ENV}=1 for one run to accept "
+            "a legitimate large drop)"
+        )
+
+
+def check_headline_system_sanity(data_rows: list[list[str]], col: dict[str, int]) -> None:
+    """Catch a headline<->system header swap, which maps by name and passes.
+
+    A headline is a sentence; a system name is a short label. If the median
+    non-blank "headline" cell is shorter than the median non-blank "system"
+    cell, the two columns are swapped (or one is not what it claims to be).
+    """
+    import statistics
+
+    def lens(key):
+        i = col[key]
+        return [len(r[i].strip()) for r in data_rows
+                if r and r[0].startswith("AIAAIC") and i < len(r) and r[i].strip()]
+
+    h, s = lens("headline"), lens("system")
+    if h and s and statistics.median(h) < statistics.median(s):
+        raise SchemaDriftError(
+            f"headline column looks swapped with system name (median length "
+            f"{statistics.median(h)} < {statistics.median(s)})"
         )
 
 
@@ -614,6 +670,8 @@ def run() -> int:
             break
     if col is None:
         raise SchemaDriftError("could not find the header row in the first 5 rows")
+
+    check_headline_system_sanity(rows[header_idx + 1:], col)
 
     out = []
     skipped = 0

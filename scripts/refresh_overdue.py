@@ -4,7 +4,7 @@
 MERGED within --max-age-days. Merged, not opened: the refresh workflow can run
 green every Sunday and open a PR nobody reviews, and the alert exists to catch
 exactly that, as well as a workflow that has stopped producing PRs at all
-(which is what 2026-07-19 -> 2026-10-13 looked like).
+(which is what 2026-07-27 (PR #97, the last merged refresh) -> 2026-10-13 looked like).
 
 Pure decision logic: the workflow (.github/workflows/refresh-overdue-alert.yml)
 fetches the PR lists with `gh` and pipes them in, so this script makes no
