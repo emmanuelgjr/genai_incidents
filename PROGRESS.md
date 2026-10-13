@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔧 INGESTION DIAGNOSIS (pipeline-engineer, 2026-10-13): root cause found. **Foreman's premise refuted.**
+- **The refutation, in the engineer's words:** "No past red run was caused by the stage-1 gate." The gate merged 2026-10-12, after every failure.
+- **Cause A, 2026-07-26 to 09-13 (8 runs):** `persist_refresh_state.sh` hit `git checkout -B refresh-state origin/refresh-state` on a `--depth 1` single-branch clone, so the remote branch never existed. Fixed before 09-14.
+- **Cause B, 2026-09-14 to 10-11 (7 runs):** the `Unit tests` step on the post-ingest tree fails corpus-pinned tests:
+  - test_e21_partA_inc00437_provenance finds 29, 30, 42, 42 and 52 disagreements instead of [1574, 1575];
+  - from 10-11, 3 more in test_resolve_id_status (golden file).
+  - Every later step is skipped, including the refresh PR and source-health enforcement. **No refresh PR has opened since #97 (2026-07-19), so nothing has landed in ~3 months.** One source's change blocks all of them.
+  - **The stage-1 gate would be a second blocker from the next run.**
+- **Non-fatal:** AIRI `airi-data.zip` returns 404 every run (the last AIRI success was 2026-05-31; 14 consecutive failures, stale). OECD per-incident 404s appear weekly.
+- **Per source (refresh-state tip, 2026-10-11):** AIAAIC, KEV and OECD AIM fetched OK on 10-11, **but none of the data reached main**. The cve-sweep job succeeded every run, and its output was discarded each time.
+- **Other workflows:**
+  - healthy: publish, huggingface, pages, release-assets, validate, and the tripwire (idle);
+  - cve-enrich is dispatch-only by design (last run 07-02);
+  - **atlas-refresh has NEVER run;** its first cron run is 2026-11-03;
+  - **a11y has FAILED on the last 3 main pushes** (axe CRITICAL/SERIOUS).
+- **Fix plan and routing:**
+  1. **D66 decouple:** hold OECD/AIID inputs at HEAD; the gate is untouched; pinned tests pass as-is. → **DISPATCHED NOW** (the same engineer), on `ws4/v2130-refresh-decouple`, with ONE authorised dispatch run on that branch. The PR is opened but NOT merged.
+  2. Do not loosen the pinned tests; they signal real meaning changes (the engineer's recommendation, accepted).
+  3. `if: always()` on source-health enforcement, plus cve-sweep retention. → **DISPATCHED NOW** (same branch).
+  4. AIRI skip/pause/retire. → **NEEDS USER.**
+  5. Lift or narrow the freeze, plus the 17 D42 changes. → **NEEDS USER.** Note: ws4/refresh-tripwire-42 was not found on origin; the evidence may be local or in docs/audits.
+  6. Do not sync the in-tree source_health.json (D5).
+  7. **D63 overdue alert. → DISPATCHED NOW** (same branch, 2nd commit).
+  8. The first atlas-refresh dispatch. → **NEEDS USER go.**
+- **a11y → distribution-engineer dispatched** to diagnose (rule, element, introducing commit) and fix on `ws6/v2130-a11y-fix`.
+
 ### 🧭 2026-10-13: USER GOAL: repo cleanup + ingestion repair + full follow-up list ("improve and update")
 - **User, verbatim:** "we need to do a repo cleanup, multiple things seems way to cluttered. also nothing was injested, check all injestion automations and ensure they are working. list all follow ups. improve and update"
 - **Foreman [R]:**
