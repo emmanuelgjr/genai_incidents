@@ -63,6 +63,31 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D117 over-merge rule fix (A2): **PASS (gate-rulefix on `7f1526bf`), MERGED (HEAD^2 verified).**
+**Verdict, in the gate's words:** "PASS… DEFECTS: none."
+
+**Gate evidence, by its own route:**
+- **E1. Byte-identity on a clone merged with b10c131e.** After a full rebuild, porcelain is EMPTY across every tracked surface, and the 4 data files each cmp IDENT. Drift, validate and lint are clean.
+- **E2. The cmp fires.** Perturbing a published singleton's title changes 6 files.
+- **E3. Fresh state through the REAL `main()`,** with `prior_id_by_key={}` and FIX vs BASE code:
+  - survivors +15; OWASP ids per row go from {3:1, 6:1, 9:1} to {1:18};
+  - the 3 non-singletons attach by legitimate keys (DeepSeek legacy, EchoLeak CVE, CVE-2025-23254);
+  - with committed history: 0 rows differ.
+- **E4/E5.**
+  - `is_aggregate_url` is True ONLY for the 3 round-up keys across the whole build;
+  - no non-OWASP row cites them;
+  - other "roundup" URLs (roundup-tracker, the news sites) are False, because the pattern is host-anchored.
+- **E6, mutations:**
+  - removing the guard from `_claim` only → 3 tests fail;
+  - removing it from the URL branch only → 3 fail;
+  - letting aggregates override `_same_prior` → 1 fails.
+- **E7.** pytest on the merged tree: 1225 + 1 xfail.
+
+**Advisories → register:**
+- A1: stale docstring and comments omit the aggregate condition.
+- A2/A3: a perturbation of an absorbed member cannot fire, and a rebuild after perturb-and-restore leaves updated/last_seen bumped.
+- A4: Q2-2025-04 DeepSeek lands with the legacy row, while AIAAIC1891/INC-02499 stays separate. This belongs to the D118 split work.
+
 ### ✅ D108 AIRI retired + refresh B2/B3 + refresh drift fix: **PASS (gate-airi on `29944158`), MERGED (HEAD^2 verified). Main's drift check is GREEN again.**
 **Verdict, in the gate's words:** "PASS… DEFECTS: none."
 
