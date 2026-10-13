@@ -63,6 +63,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D92-D95, USER RULINGS 2026-10-13 (cleanup + AIRI); plan: `docs/audits/repo-cleanup-plan-2026-10-13.md` (`faab4964`)
+- **D92, cleanup scope: local plus merged remotes (Recommended).**
+  - Remove the merged, clean worktrees and local branches (`git worktree remove` without --force; `git branch -d`).
+  - Delete the merged remote branches.
+  - **Keep:** main, refresh-state, auto-refresh/data and release/*.
+  - Clear `__pycache__`, `.pytest_cache` and the stale `dist/`.
+- **D93, unmerged remotes: archive, keeping D42 (Recommended).** Rename ecc-tools, item9-asi-source, headroom-remeasure, t19-split-remediation and t22-abandoned-wip to `archive/<name>`. Keep `ws4/refresh-tripwire-42` as it is until the stage-2 ruling.
+- **D94, tracked clutter: all four.**
+  - Archive the old PROGRESS.md entries (from before v2.12.0) verbatim into docs/board-archive/.
+  - Move AGENT_TEAM.md and docs/superpowers/ to docs/archive/ (references updated).
+  - Move the 2 one-off scripts to scripts/archive/.
+  - Delete the old Temp scratch sessions, after checking their clones for commits that exist on no remote.
+- **D95, AIRI fetch: "retry monthly"** (the user's own option, not one of the three offered).
+  - AIRI's fetch runs once a month, not weekly. The rows stay under D57; the review stays 2027-01-07.
+  - → Routed to the pipeline-engineer on `ws4/v2130-refresh-decouple`, which is already editing auto-refresh.yml.
+- **Execution:** git housekeeping by the foreman (operational, verified step by step). PROGRESS archiving by the foreman (the sole board writer). Docs and script moves by a specialist on a branch, then a gate.
+
 ### ✅ a11y fix: **DONE. Gate PASS on `de786cf8`; MERGED to main 2026-10-13 (`--no-ff`)**
 - **Root cause (WS6):** axe `link-in-text-block` (serious), 1 node: the D89 "exceptions" link inside `.trust-strip` (docs/index.html ~:92). Colour was its only cue, because of the global `a { text-decoration: none }`.
   - **Introduced by the D89 cut-docs fix `ac153bac`** (merged as `00be3a4a`). Every main push since has failed a11y.
