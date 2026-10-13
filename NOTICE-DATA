@@ -38,7 +38,7 @@ per-source sections of docs/SOURCE_LICENSES.md are the authoritative
 account and take precedence over this file falling behind it. (Its
 "Summary of outcomes requiring escalation" table lists only the
 sources with an escalation, not every source with an obligation, and
-is not an enumeration of the eight above.)
+is not an enumeration of the ten above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -290,15 +290,21 @@ docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
 The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
-eight sources above. With AIAAIC and AIID, it is one of the three
+ten sources above. With AIAAIC and AIID, it is one of the three
 whose row text this project could not simply carry under the source's
 own licence grant. For each of the three, the text was either reduced
 to structural facts and a link, or its retained title was analysed as
 a separate copyright question (open for AIAAIC and AIM; resolved for
-AIID). For the other five, the grant covers the material reproduced,
-and the obligation is attribution or a notice that accompanies copies
-(CVE- and AVID-derived rows also carry a row-level content_license
-marker).
+AIID). For six of the other seven (MITRE ATLAS, garak, the CVE
+Program, AVID, the OWASP Top 10 for Agentic Applications and the OWASP
+Top 10 for LLM Applications), the grant covers the material reproduced
+(for the OWASP mapping files, subject to the carve-outs above), and the
+obligation is attribution or a notice that accompanies copies (CVE- and
+AVID-derived rows also carry a row-level content_license marker). The
+seventh, the OWASP Gen AI incident round-ups, is an exception: two
+shipped entries (INC-02646, INC-03233) carry CC BY-SA 4.0 round-up text
+until they are rewritten from their primary sources (decision D97); see
+the round-up paragraph above.
 
 AIM's own terms self-incorporate OECD's general
 Data-reuse conditions -- "Your use of the OECD AI incidents and

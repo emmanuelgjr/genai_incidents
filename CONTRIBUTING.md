@@ -18,7 +18,7 @@ Map each entry to the four core per-incident taxonomy fields below, **where appr
 ## Workflow
 
 1. Fork and branch.
-2. Edit `data/incidents.json` directly, or drop a JSON array into `ingest/<your_source>.json` and let the merger normalize it.
+2. Edit `data/incidents.json` directly, or drop a JSON array into `ingest/<your_source>.json` and let the merger normalize it. A file dropped under `ingest/` is not covered by this project's CC-BY-4.0 grant: it keeps its upstream source's own terms (see `.reuse/dep5` and `docs/SOURCE_LICENSES.md`), so do not add one without recording those terms.
 3. Run:
    ```bash
    python scripts/merge_and_dedupe.py
@@ -43,4 +43,4 @@ Map each entry to the four core per-incident taxonomy fields below, **where appr
 
 ## License
 
-By contributing, you agree to license your contributions under the project's dual license: code under MIT, data under CC-BY-4.0.
+By contributing, you agree to license your contributions under the project's dual license: code under MIT, data under CC-BY-4.0. Two groups of files do not follow that grant and are governed by `.reuse/dep5` instead: drop-ins under `ingest/` (upstream terms), and the OWASP carve-out mapping files (`mappings/owasp_asi_top10.json`, `mappings/owasp_llm_top10_2026.json`, `mappings/owasp_llm_top10_2025.json`, `mappings/owasp_llm_2025_to_2026.json`, each `CC-BY-SA-4.0 AND CC-BY-4.0`). See `NOTICE-DATA`.

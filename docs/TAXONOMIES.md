@@ -18,7 +18,7 @@ This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026,
 
 ## OWASP Top 10 for LLM Applications (2026)
 
-Source: <https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/> · canonical text: <https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final>
+Source: <https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/> · canonical text: <https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final> · licensed CC BY-SA 4.0 (the codes, names and description text in `mappings/owasp_llm_top10_2026.json` are from, or in part follow, the OWASP text; the descriptions are scheduled to be paraphrased in the next release, which has not happened yet). The 2025 edition, <https://genai.owasp.org/llm-top-10/>, kept in `mappings/owasp_llm_top10_2025.json`, and the crosswalk `mappings/owasp_llm_2025_to_2026.json` carry the same CC BY-SA 4.0 licence and the same caveat. See `NOTICE-DATA` and [`SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §3.7.
 
 Failure-mode catalog focused on LLM-based applications regardless of agency.
 
