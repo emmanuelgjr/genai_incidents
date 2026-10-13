@@ -63,6 +63,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🚨 REFRESH TEST RUN 38330687613 (on `7dd887fb`): **PR #101 opened but is NOT MERGEABLE. The foreman CLOSED it.** Three defects; this is the house failure mode (agreement 6).
+- **The run "failed" on purpose:** AIRI has failed 15 consecutive refreshes, so the source-health step fails loudly. That is by design. `7dd887fb` predates the D95 monthly-retry commit.
+- **The OECD/AIID hold WORKED. Foreman [R]:** a per-entity diff of data/incidents.json on PR head vs parent shows **0 content changes on OECD/AIID-sourced rows**, 0 rows added or removed, 15,666 rows.
+- **DEFECT 1, AIAAIC ingest wrote 0 rows and reported success.** The log reads `[aiaaic] WARNING: column 'headline' not found` … `2262 raw rows` … `wrote 0 security-relevant entries (skipped 2259)`, then `AIAAIC: success` and source health `aiaaic_sheet | success | 0 | ok`. `ingest/aiaaic_sheet_incidents.json` went from 1,504 rows to `[]`.
+  - **Downstream cascade:** 1,508 rows changed. `source_status` on 1,421; `source_ids`, `source_count` and `tags` on 78; `owasp_llm`/`mitre_atlas` on 59; `nist_ai_rmf` on 47; `owasp_asi` on 45.
+  - **Neither the tests (1083 passed) nor validation caught it.** A parser that cannot find its key column must fail, and a yield collapse must fail.
+- **DEFECT 2, `held-pair-inputs/` was COMMITTED into the PR.** That is the fresh `aiid_full.json`, `oecd_aim_full_incidents.json` (about 337k lines), the provenance and HOLD_REPORT. `scripts/hold_pair_inputs.py --stash-dir held-pair-inputs` (auto-refresh.yml:407) stashes inside the work tree, and create-pull-request commits everything. The bytes must live only in the artifact; the OECD title licence is unresolved.
+- **DEFECT 3:** `data/incidents.json` diff is about 1.5M lines for 1,508 changed rows. Likely a consequence of the cascade, but needs confirming: no formatting drift.
+- **Routing:** a FRESH pipeline-engineer goes on `ws4/v2130-refresh-decouple` (agreement 3 replace: pe-ingest-diag's report never arrived and it was told to stop). Its work:
+  - adapt the AIAAIC parser to the current sheet header;
+  - fail loudly on a missing key column or a 0/collapsed yield (yield floor vs the committed file), and record the outcome as failure in source health;
+  - stash held inputs outside the tree (`$RUNNER_TEMP`) or gitignore them;
+  - add tests proving each check fires.
+- **Deadline:** the next scheduled run is **Sun 2026-10-18 04:00 UTC**, which would reopen the same broken PR. Then gate, merge, and dispatch one test run.
+
 ### 🔍 WS6 licensing surfaces: `1ab030a8` on `ws6/licensing-surfaces-2026-10-13` (it merges 73bce51b). **Gate dispatched (gate-licsurf).**
 - **Fixed: findings #1-#14.**
   - README: four mapping files; an ingest/ bullet; a round-up bullet in the past tense; a parenthetical on the v2.13.0 blurb.
