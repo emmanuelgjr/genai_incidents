@@ -49,13 +49,15 @@ Merged after the v2.13.0 tag (`e6eb3410`).
 - **INC-02382:** `title` and `tags` corrected, with the wrong CVE removed; `updated` and
   `last_seen` move with it.
 
+### Changed - licensing: OWASP LLM mapping files are CC BY-SA 4.0 in part; ingest/ snapshots stay under upstream terms (D96, D99, D101; merge `48ffe0db`)
+
+- **`mappings/owasp_llm_top10_2026.json`, `mappings/owasp_llm_top10_2025.json` and the crosswalk `mappings/owasp_llm_2025_to_2026.json`** are now marked `CC-BY-SA-4.0 AND CC-BY-4.0` (`.reuse/dep5` carve-out). Their OWASP risk codes, names and description or scope text come from, or follow, the OWASP Top 10 for LLM Applications, which is CC BY-SA 4.0 (D96, D99). The dataset itself stays CC BY 4.0.
+- **`ingest/*.json`** is declared `LicenseRef-upstream-terms` (D101): these upstream snapshots stay under each upstream's own terms and are not covered by the project's CC BY 4.0 data grant or its MIT code licence. See `NOTICE-DATA` and `docs/SOURCE_LICENSES.md`.
+
 ### Fixed - refresh repair (merge `24adc076`): held inputs, overdue alert, empty-result guards
 
-- **D66:** the held OECD/AIID inputs are kept outside the work tree during a refresh
-  (`scripts/hold_pair_inputs.py`), with a guard that checks the result before the PR step.
-- **D63:** a scheduled overdue alert (`.github/workflows/refresh-overdue-alert.yml`,
-  `scripts/refresh_overdue.py`) labels `refresh-overdue` when no weekly refresh PR has been
-  merged in time.
+- **D66:** during a refresh the freshly fetched copies of the held OECD/AIID inputs are moved outside the work tree (`scripts/hold_pair_inputs.py`) and the committed versions restored, so the merge sees main's bytes; a guard fails the run before any PR is opened if a held path still differs or stash content is in the tree.
+- **D63:** a scheduled overdue alert (`.github/workflows/refresh-overdue-alert.yml`, `scripts/refresh_overdue.py`) opens or updates one issue labelled `refresh-overdue` when no weekly refresh PR has been merged in time, and closes it once one has.
 - **Empty-result guards** for the KEV and AIID ingests: a fetch that parses to nothing
   leaves the committed file untouched instead of overwriting it.
 
