@@ -63,6 +63,36 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS4 refresh repair: **BOUNCE #1 (gate-refresh, whole branch @ `2cb81847`).** Back with pe-refresh-fix. Plus **D107**.
+**Verdict, in the gate's words:** "The core of the branch holds up… Both defects are mechanical, one-line fixes, so the re-gate can be limited to them."
+
+**Defects:**
+1. **`REQUIRED_COLUMNS` misses `harm_indiv`.** `detect_severity` reads consequence + harm_indiv. Renaming the "Individual" sub-header in the real CSV gives exit 0, a WARNING only, and **severity changes on 87/1,509 rows**: a silent field delta (agreement 2).
+2. **PR body line 1** (auto-refresh.yml:453-454) names AIRI/AIID/OECD, exactly the sources D66 holds out, and omits KEV and the CVE sweep. It contradicts :463-467.
+
+**Advisories:**
+- **A1, the 0.5 yield floor is loose.** A 60% truncation passes and drops 443 rows. → **User ruling D107: floor = 90% (Recommended)**, plus an explicit, loudly-logged override path for a legitimate large drop.
+- **A2, folded in as a defect class.** Renaming Developer changes `affected` on 823 rows; renaming System name changes `description` on 1,118 rows; a headline/system header swap yields 1,007 rows and passes. Every column feeding a published field becomes required; the header-swap sanity check is added if principled, else documented.
+- **A3: the D63 alert WILL fire on its first Monday after merge.** #97 is 77.4 days old. It opens an issue and goes red weekly until a refresh PR merges. That is by design and expected. Nit: the docstring says 2026-07-19; #97 merged 2026-07-27. → Fixed.
+- **A4:** the guard keys on the dir name only. Fine for the current workflow.
+- **A5:** the bad run reset the AIAAIC counter on refresh-state (last_success 2026-10-13). Harmless.
+- **A6:** D95 is a monthly alert. Not-attempted weeks exit 0 and AIRI stays 15/stale. First-Sunday runs go red on purpose (16 on 2026-11-01). **Not weekly noise.**
+
+**Gate evidence:**
+- **(a) D66:** in PR #101 data, 0 of 5,411 OECD/AIID-sourced rows changed in any field. The block move is confirmed (6 adjacency breaks). The held list covers every file the OECD, AIID and AIRI ingesters write; caches are gitignored and unread. No other path found.
+- **(b) AIAAIC:** live yield 1,509, +5 rows; edits on AIAAIC1796 and AIAAIC2266; 292 order-only. **Matches the specialist exactly.**
+- **(c) Its own mutations:**
+  - 7/7 required renames → exit 1, file untouched;
+  - 0 rows, no header, 40%, id prefix, unparseable dates, blanked filter columns → exit 1;
+  - KEV empty or renamed key → exit, file untouched;
+  - guard: 7 mutation shapes → exit 1;
+  - workflow test: 5 mutations each fail it.
+  - The source-health outcome is pre-continue-on-error; `__main__` now does `sys.exit(main())`.
+- **(d) D95:** first Sunday only; try_airi defaults false; not-attempted leaves the counter alone; a bare "skipped" still counts.
+- **(e) D63:** fired on live data (#97, 77.4 days, exit 3). Boundary exact at 21.0 days.
+- **(f) actionlint:** 0. Permissions are minimal. Artifact path = stash dir. Guard sits immediately before the PR step.
+- **(g)** Tip: 1112 + 1 xfail. **Merged with main: 1188 + 1 xfail.** validate and drift 0. merge-tree clean. 0 data or ingest/*.json files touched.
+
 ### ✅ WS6 licensing surfaces: **PASS (gate-licsurf re-gate on `047a4584`), MERGED.**
 **Verdict, in the gate's words:** "PASS. The re-gate of ws6/licensing-surfaces-2026-10-13 @ 047a4584 found the 3 bounce-#1 defects fixed truthfully, and A1/A2/A3/A5 are folded in correctly. DEFECTS: none."
 
