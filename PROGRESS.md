@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Post-lift docs + D124: `bcc47f3a` on `ws4/postlift-docs-d124-2026-10-13`. **Gate dispatched (gate-postlift).**
+- **Scope:** 7 files.
+  - CHANGELOG `[Unreleased]`: all of today's merges.
+  - README:218 (AIRI retired) and :144 ("also since the release" appended; no bare total, because the drift check rejects one).
+  - DATA_DICTIONARY:126, :131 and :151.
+  - SOURCE_LICENSES §1.4 (a "Superseded" note; the original is kept).
+  - Makefile and README:335: AIRI dropped from `ingest-all`, the standalone probe kept.
+  - check_source_health.py comments.
+- **D124 registry: the zero-delta route.** Only 3 free-text `note` fields change in `data/source_freshness.json`. `status` stale, `hold.decision` D57 and `until` 2027-01-07 are kept, because changing them would move `review_by` on 1,382 rows and break a pinned test. **The foreman accepts this as the default.** `until` now serves as a "check whether the site has returned" date. The gate will judge whether that reads coherently.
+- **Zero data change:** after a rebuild, porcelain shows only the 7 edited files. validate rc 0 with provenance VERIFIED. **The provenance check fires** if a `retired` stamp is ever committed to main's counter.
+- pytest 1273 + 1 xfail; drift clean.
+
 ### 📋 docs-warden sweep after the D114 merge (main @ 8525aa20): **9 findings**, plus **D124**
 - **Clean:**
   - every count surface reads 15,755;
