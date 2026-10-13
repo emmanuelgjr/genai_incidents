@@ -63,6 +63,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D114-D116, USER RULINGS 2026-10-13: OECD/AIID stage 2 (package `docs/audits/stage2-ruling-package-2026-10-13.md`)
+- **D114, (a)+(c): lift the AIID side only, and build suppression (Recommended).**
+  - Ship the AIID-side changes now with OECD kept held: about 113 new AIID-only rows, 25 title edits and 169 content changes, re-derived at build time.
+  - **BINDING PRECONDITION: suppression (A3) must be built and gated before ANY later OECD lift.** Without it, the forward path gives 29 permanent merges instead of 7 (gate-stage2 measurement).
+  - → WS4: implement the AIID-only lift path plus the approval mechanics, with a full field-level delta and a gate.
+- **D115, (b): per-item rulings on the D42 set, as the package suggests (Recommended).**
+  - Approve in principle: M1, M2, M5 and R1-R6.
+  - Reject: M3, M4, M6, M7 and R7-R10.
+  - R11 and R12 wait for a raw-record read.
+  - Recorded now. **Operative only once suppression machinery exists** (the gate is all-or-nothing).
+- **D116, (d): keep the existing 3,937 OECD titles and add no new OECD rows until clarified; send the follow-up email (Recommended).**
+  - The draft is in the package. **The user sends it.**
+- **(e) Approval recording** follows the package: a per-item file for merges and retitles, and a bulk form for adds. → WS4, with D114.
+
 ### ⚠ CORRECTION to the entry below ("Stage-2 ruling package: MERGED"). Foreman error, now fixed.
 - **What went wrong.** The board commit `1ee3125a` recorded the package as merged when **no merge had happened**.
   - The foreman ran `git fetch <branch>` and then `git pull origin main`. The pull overwrote FETCH_HEAD with main, so `git merge FETCH_HEAD` merged main into itself, a no-op.
