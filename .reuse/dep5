@@ -60,13 +60,13 @@ Comment: This dataset aggregates entries from many upstream sources, each
  a separate copyright question (open for AIAAIC and AIM; resolved for
  AIID). For six of the other seven named there (MITRE ATLAS, garak, the
  CVE Program, AVID, the OWASP Top 10 for Agentic Applications and the
- OWASP Top 10 for LLM Applications), the grant (for the two OWASP
+ OWASP Top 10 for LLM Applications), the grant (for the four OWASP
  mapping files, the carve-out stanzas below) covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
  (CVE- and AVID-derived rows also carry a row-level content_license
  marker). The seventh, the OWASP Gen AI incident round-ups, is an
- exception: two shipped entries (INC-02646, INC-03233) carry CC BY-SA 4.0
- round-up text until they are rewritten from their primary sources
- (decision D97); see NOTICE-DATA and docs/SOURCE_LICENSES.md section 1.6.
+ exception: two shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0
+ round-up text up to and including v2.13.0 and were rewritten from their
+ primary sources on 2026-10-13 (decision D97); see NOTICE-DATA and docs/SOURCE_LICENSES.md section 1.6.
  .
  AIM's title/summary fields are LLM-generated (OpenAI
  o3-mini) from third-party news articles of unresolved copyright

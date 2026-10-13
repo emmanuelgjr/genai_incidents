@@ -38,7 +38,7 @@ per-source sections of docs/SOURCE_LICENSES.md are the authoritative
 account and take precedence over this file falling behind it. (Its
 "Summary of outcomes requiring escalation" table lists only the
 sources with an escalation, not every source with an obligation, and
-is not an enumeration of the eight above.)
+is not an enumeration of the ten above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -188,10 +188,11 @@ https://creativecommons.org/licenses/by-sa/4.0/legalcode). The
 round-ups summarise incidents reported by third parties; their
 underlying reporting is not OWASP's and is not covered by this notice.
 A measurement on 2026-10-13 found that two shipped entries, INC-02646
-and INC-03233, carry description text that is verbatim or near-verbatim
-from these round-ups; they are to be rewritten from their primary
-sources (decision D97), and until then that text remains under CC BY-SA
-4.0, not CC BY 4.0. The other shipped entries that cite these round-ups
+and INC-03233, carried description text that is verbatim or near-verbatim
+from these round-ups. Both were rewritten from their primary sources on
+2026-10-13 (decision D97) and now carry descriptions in the project's own wording; the
+releases up to and including v2.13.0 carried the CC BY-SA 4.0 round-up
+text under the CC BY 4.0 grant. The other shipped entries that cite these round-ups
 were measured as the project's own wording. Provenance of three rows,
 OWASP-GENAI-Q1-2026-01, -02 and -03, is unconfirmed: they appear on no
 cited round-up page. The three OWASP-AIX-* rows are the project's own
@@ -290,15 +291,21 @@ docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
 The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
-eight sources above. With AIAAIC and AIID, it is one of the three
+ten sources above. With AIAAIC and AIID, it is one of the three
 whose row text this project could not simply carry under the source's
 own licence grant. For each of the three, the text was either reduced
 to structural facts and a link, or its retained title was analysed as
 a separate copyright question (open for AIAAIC and AIM; resolved for
-AIID). For the other five, the grant covers the material reproduced,
-and the obligation is attribution or a notice that accompanies copies
-(CVE- and AVID-derived rows also carry a row-level content_license
-marker).
+AIID). For six of the other seven (MITRE ATLAS, garak, the CVE
+Program, AVID, the OWASP Top 10 for Agentic Applications and the OWASP
+Top 10 for LLM Applications), the grant covers the material reproduced
+(for the OWASP mapping files, subject to the carve-outs above), and the
+obligation is attribution or a notice that accompanies copies (CVE- and
+AVID-derived rows also carry a row-level content_license marker). The
+seventh, the OWASP Gen AI incident round-ups, is an exception: two
+shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
+up to and including v2.13.0 and were rewritten from their primary sources
+on 2026-10-13 (decision D97); see the round-up paragraph above.
 
 AIM's own terms self-incorporate OECD's general
 Data-reuse conditions -- "Your use of the OECD AI incidents and

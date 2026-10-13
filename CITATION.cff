@@ -41,9 +41,13 @@ abstract: >-
   computed at export time. Aggregated from AIID, OECD AIM, AIAAIC, MITRE
   ATLAS, AVID, MIT FutureTech AI Risk Navigator, NVD/GHSA/OSV, garak,
   promptfoo, and dozens of researcher blogs and vendor threat reports.
-  Exception: mappings/owasp_asi_top10.json is CC-BY-SA-4.0 AND CC-BY-4.0
-  (the OWASP ASI codes and names are CC BY-SA 4.0, from the OWASP Top 10
-  for Agentic Applications, Version 2026); see NOTICE-DATA.
+  Exceptions: four mapping files (mappings/owasp_asi_top10.json,
+  owasp_llm_top10_2026.json, owasp_llm_top10_2025.json,
+  owasp_llm_2025_to_2026.json) are CC-BY-SA-4.0 AND CC-BY-4.0 (OWASP
+  codes and names, and the OWASP LLM description text, are CC BY-SA
+  4.0); two entries (INC-02646, INC-03233) carried OWASP round-up text
+  under CC BY-SA 4.0 up to v2.13.0, since rewritten; ingest/ snapshots
+  keep their upstream terms; see NOTICE-DATA.
 version: "2.13.0"
 date-released: "2026-10-13"
 preferred-citation:

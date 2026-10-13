@@ -101,7 +101,7 @@ review, and the Heuristic labels bullet below for known gaps.
   text.
 
 ## Distribution & licence
-- **Data:** CC-BY-4.0. **Code:** MIT. DOI [10.5281/zenodo.20248675](https://doi.org/10.5281/zenodo.20248675).
+- **Data:** CC-BY-4.0, with the exceptions below. **Code:** MIT. DOI [10.5281/zenodo.20248675](https://doi.org/10.5281/zenodo.20248675).
 - **AIAAIC-derived rows carry an additional obligation.** Every row whose
   `content_license` field names the AIAAIC Repository (CC BY-SA 4.0,
   share-alike) carries that field as a row-level attribution/share-alike
@@ -127,6 +127,24 @@ review, and the Heuristic labels bullet below for known gaps.
   exceptions: `title`'s in `NOTICE-DATA`; `description`'s in
   [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)'s OECD AIM
   summary-of-outcomes row (§1.5 covers the full licensing analysis).
+- **Four mapping files are CC BY-SA 4.0 in part.** `mappings/owasp_asi_top10.json`
+  (OWASP ASI codes and risk names), `mappings/owasp_llm_top10_2026.json`,
+  `mappings/owasp_llm_top10_2025.json` and the crosswalk
+  `mappings/owasp_llm_2025_to_2026.json` (OWASP LLM codes, names and description
+  or scope text) are each `CC-BY-SA-4.0 AND CC-BY-4.0`. The OWASP LLM description
+  and scope text is scheduled to be paraphrased in the next release; it has not
+  been yet. See `NOTICE-DATA` and [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)
+  §3.6 and §3.7.
+- **Two rows carried OWASP Gen AI round-up text (CC BY-SA 4.0) up to and including
+  v2.13.0.** The descriptions of `INC-02646` and `INC-03233` were rewritten in the
+  project's own wording on 2026-10-13 (D97); earlier releases still carry the
+  original text (`NOTICE-DATA`; [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §1.6).
+- **`ingest/` keeps upstream terms.** The `ingest/*.json` snapshots stay under
+  each upstream source's own terms, not this dataset's CC-BY-4.0 grant (carve-backs:
+  provenance files, `ingest/_state/*`, `ingest/README.md` and
+  `ingest/cve_rejections.json` are CC-BY-4.0; `ingest/atlas/ATLAS-*.yaml` is
+  Apache-2.0). None of the `ingest/` snapshots is in the PyPI wheel or sdist (the sdist picks up only `ingest/README.md`) or the Hugging Face dataset, but they are in
+  the repository and so in the GitHub source archives and each Zenodo deposit. File-level terms: `.reuse/dep5`.
 - Distributed via GitHub, PyPI (`genai-incidents`), Hugging Face Datasets, a
   STIX 2.1 bundle, a static [TAXII-compatible discovery document](https://emmanuelgjr.github.io/genai_incidents/taxii2/discovery.json),
   and a [MISP feed](https://emmanuelgjr.github.io/genai_incidents/misp/) whose events

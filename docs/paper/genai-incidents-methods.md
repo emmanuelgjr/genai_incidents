@@ -164,7 +164,7 @@ treatment.
 
 ## 9. Availability and reproducibility
 
-Open data (CC-BY-4.0) and code (MIT). Distributed via GitHub, PyPI
+Open data (CC-BY-4.0, with documented exceptions, see NOTICE-DATA) and code (MIT). Distributed via GitHub, PyPI
 (`genai-incidents`), Hugging Face Datasets, a STIX 2.1 bundle, a static
 TAXII-compatible discovery document, a MISP feed, a browsable site, and a
 per-version DOI on Zenodo. The entire dataset is regenerable from the

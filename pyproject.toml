@@ -67,4 +67,5 @@ include = [
   "LICENSE-DATA",
   "CHANGELOG.md",
   "CITATION.cff",
+  "NOTICE-DATA",
 ]
