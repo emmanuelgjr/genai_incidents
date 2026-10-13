@@ -148,7 +148,7 @@ def load_sitemap() -> list[str]:
 # is treated as unknown and IS fetched: this rule skips only what is
 # unambiguous, never guesses. See `is_numeric_slug()`'s docstring for the
 # boundary cases this was checked against (leading zeros, a bare year).
-_NUMERIC_SLUG_RE = re.compile(r"^\d+$")
+_NUMERIC_SLUG_RE = re.compile(r"[0-9]+")  # ASCII digits only: \d matches Unicode digits in Python str patterns (b22)
 
 
 def is_numeric_slug(url: str) -> bool:
