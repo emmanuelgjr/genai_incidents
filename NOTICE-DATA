@@ -144,8 +144,9 @@ of ingest/avid_owasp_incidents.json are a different use of OWASP
 material and are covered by the round-up paragraph below.
 
 OWASP Top 10 for Large Language Model Applications (LLM Top 10). The
-risk codes LLM01-LLM10, the risk names and the description text in
-mappings/owasp_llm_top10_2026.json and mappings/owasp_llm_top10_2025.json
+risk codes LLM01-LLM10, the risk names, and the description and scope text
+in mappings/owasp_llm_top10_2026.json, mappings/owasp_llm_top10_2025.json
+and the crosswalk mappings/owasp_llm_2025_to_2026.json
 are from, or in part follow closely, "OWASP Top 10 for Large Language
 Model Applications" by the OWASP GenAI Security Project, OWASP
 Foundation: the 2026 edition (Version 2026, published 2026-08-03),
@@ -159,16 +160,20 @@ side-by-side measurement (2026-10-13) found that in the 2026 file 4 of
 the 10 descriptions are verbatim and 6 near-verbatim to OWASP's text,
 and that in the 2025 file 4 of the 10 are verbatim or near-verbatim
 (3 and 1); the other six 2025 descriptions are the project's own
-wording. This attribution covers the codes, names and descriptions
-wherever they are reproduced from these two files (including
-INCIDENTS.md, docs/TAXONOMIES.md and the charts and site that display
-them). Both mapping files are carved out of the CC BY 4.0 grant for
-this material (CC BY-SA 4.0; see .reuse/dep5 and the OWASP LLM Top 10
-row, section 3.7, of docs/SOURCE_LICENSES.md; decision D96). The
-descriptions are scheduled to be rewritten as the project's own
-paraphrase in the next release; releases up to and including v2.13.0
-shipped these two files under CC BY 4.0 without this attribution, as
-recorded in CORRECTIONS.md.
+wording. The crosswalk holds all 20 risk names (name_2025, name_2026) and
+ten scope_change strings, measured against the 2026 LLM00_Preface.md:
+two are verbatim, three are near-verbatim or share a phrase, five are the
+project's own wording. This attribution covers the codes, names,
+descriptions and scope text wherever they are reproduced from these three
+files (including INCIDENTS.md, docs/TAXONOMIES.md and the charts and site
+that display them). All three mapping files are carved out of the CC BY
+4.0 grant for this material (CC BY-SA 4.0; see .reuse/dep5 and the OWASP
+LLM Top 10 row, section 3.7, of docs/SOURCE_LICENSES.md; decisions D96 and
+D99). The descriptions and scope text are scheduled to be rewritten as the
+project's own paraphrase in the next release. Every release that carried
+each of these files, from its introduction, shipped it under CC BY 4.0
+without this attribution (the 2026 file and the crosswalk first shipped in
+v2.10.0), as recorded in CORRECTIONS.md.
 
 OWASP Gen AI Security Project incident round-ups. Some incident text in
 this dataset, in the rows whose source ids begin OWASP-GENAI- (in

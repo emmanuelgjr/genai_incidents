@@ -527,8 +527,8 @@ Re-checked against the tree on 2026-10-12 (Grep and file reads, no shell):
   (`docs/audits/WS4-T19-authorized-splits-2026-09-18.json`, `authorization` object,
   line 10), but **nothing enforces that field for D28**. Corrected on the raw-text
   gate (2026-10-13): this note first said `decided_by` was "validated by WS4-T21",
-  which is wrong. The D28 validator, `_check_split_authorization`
-  (`scripts/merge_and_dedupe.py:1930-1967`), checks only `authorization` is a dict,
+  which is wrong. The D28 validator, `_verify_split_authorization_marker`
+  (defined at `scripts/merge_and_dedupe.py:1907`, called at `:1986`; body checks at `:1930-1967`), checks only `authorization` is a dict,
   `decision == "D28"`, the file's own `entries_sha256` against a fresh hash of its
   `entries`, and that hash against the value pinned in code
   (`REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256`); it never reads `decided_by`.

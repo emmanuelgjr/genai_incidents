@@ -1,0 +1,31 @@
+Upstream terms (REUSE identifier: LicenseRef-upstream-terms)
+
+This is NOT a licence grant and it is not the text of any licence. It is a
+placeholder identifier, used in .reuse/dep5, that means:
+
+    The files so marked are third-party upstream snapshots or hand-curated
+    records derived from third-party sources. They remain under each
+    upstream source's OWN terms, which differ from source to source. They are
+    not covered by this repository's CC BY 4.0 data grant (LICENSE-DATA) or by
+    its MIT code licence (LICENSE), and nothing in this repository grants you
+    rights in them beyond what the upstream grants.
+
+Where to find the terms for a given file:
+
+  - docs/SOURCE_LICENSES.md has one row per upstream source: its licence (or
+    the fact that none was found), what is permitted, what this project does
+    with it, the operative clause quoted with its URL, and the date checked.
+  - NOTICE-DATA records the specific attributions and notices the upstreams
+    require to accompany copies (for example CC BY-SA 4.0 attribution, the
+    CVE Terms of Use notice, the MIT notice for AVID, and the Apache License
+    2.0 texts for MITRE ATLAS and garak).
+  - ingest/README.md maps each file under ingest/ to its source.
+
+Some files marked with this identifier contain wording written by this
+project's maintainers (short summaries and links) on top of third-party facts.
+That does not change the marking: the file as a whole is distributed under the
+upstream terms described above, and no specific licence (CC0, CC BY, or any
+other) is claimed for it by this identifier.
+
+If an upstream's terms are unknown, docs/SOURCE_LICENSES.md says UNKNOWN for
+that source; UNKNOWN means no rights are claimed, not that rights are granted.
