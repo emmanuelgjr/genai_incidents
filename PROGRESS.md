@@ -63,6 +63,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D94 moves: **DONE. Gate PASS on `d31348c7`; MERGED to main 2026-10-13 as `de04ba9f` (`--no-ff`)**
+- **Moves:** AGENT_TEAM.md and docs/superpowers/ (7 files) → docs/archive/ (R100). The 2 one-off scripts → scripts/archive/ (ROOT is now `parents[2]`), plus a README.
+- **Live references updated:**
+  - CLAUDE.md:23 changed **path only** (word-diff verified by the gate);
+  - .gitignore comment;
+  - docs/_config.yml exclude `superpowers` → `archive`;
+  - the naming-guard EXCLUDE_PREFIXES;
+  - code comments.
+- **Gate verdict, in its words:** "VERDICT: PASS ... DEFECTS: none."
+- **Gate evidence:**
+  - 18 files: 10 renames, 1 add, 7 modified; no other deletions;
+  - **the Jekyll exclude is a path-prefix match anchored at the source root** (`archive` does NOT match docs/board-archive; nothing previously published is now excluded);
+  - the moved scripts' ROOT is correct;
+  - the naming guard scans 265 → 266 files and loses nothing; **fire-proof: reverting the prefix fails the guard**;
+  - fresh-clone pytest 1072 passed; validate and drift rc 0.
+- **Advisories:** exclude `archive/` if an exact directory is wanted later; CLAUDE.md:23 now runs past the wrap width (cosmetic).
+- **Foreman [R] after merge:** validate rc 0; drift clean; naming guard 120 passed.
+- **D92-D94 CLEANUP COMPLETE.**
+
 ### 🧹 CLEANUP EXECUTED (D92/D93/D94), 2026-10-13. Foreman [R] at every step.
 - **Rescue first:** the 3 unpushed local branches were pushed to `archive/local-*` on origin. Each ref was verified equal to the local SHA (967fc04b, 4f4c4508, 8e23d6e6).
 - **D93:** 5 unmerged remotes were copied to `archive/<name>`. Each copy was verified equal to the original before the original was deleted: ecc-tools, ws0/v2130-item9-asi-source, ws3/headroom-remeasure, ws4/t19-split-remediation, ws4/t22-abandoned-wip. `ws4/refresh-tripwire-42` was KEPT.
