@@ -117,6 +117,11 @@ WARN_ONLY_COLUMNS = ("trigger", "harm_societal", "harm_env", "response")
 # Zero rows is never accepted. Schema drift is never overridable.
 MIN_YIELD_RATIO = 0.9
 YIELD_OVERRIDE_ENV = "AIAAIC_ACCEPT_YIELD_DROP"
+# B3: when the override is used, the warning must also be visible to a reviewer
+# of the refresh PR alone. The step appends it to $GITHUB_STEP_SUMMARY and writes
+# a markdown marker to the path in this env var (the workflow points it outside
+# the work tree, at $RUNNER_TEMP, and the PR-body step appends it to the body).
+OVERRIDE_MARKER_ENV = "AIAAIC_OVERRIDE_MARKER"
 
 
 class SchemaDriftError(RuntimeError):
@@ -618,12 +623,24 @@ def check_yield(new_count: int, committed_count: int) -> None:
         raise YieldCollapseError("parsed 0 security-relevant rows")
     if committed_count and new_count < MIN_YIELD_RATIO * committed_count:
         if os.environ.get(YIELD_OVERRIDE_ENV) == "1":
-            print(
-                f"[aiaaic] !!! WARNING !!! {YIELD_OVERRIDE_ENV}=1: ACCEPTING a yield drop "
+            msg = (
+                f"{YIELD_OVERRIDE_ENV}=1: ACCEPTING a yield drop "
                 f"from {committed_count} to {new_count} rows (below the "
-                f"{MIN_YIELD_RATIO:.0%} floor). Maintainer override; review the PR diff.",
-                file=sys.stderr,
+                f"{MIN_YIELD_RATIO:.0%} floor). Maintainer override; review the PR diff."
             )
+            print(f"[aiaaic] !!! WARNING !!! {msg}", file=sys.stderr)
+            nl = chr(10)
+            note = nl.join([
+                "### WARNING: AIAAIC yield floor OVERRIDDEN",
+                "",
+                f"This refresh was run with the maintainer override. {msg}",
+                "",
+            ])
+            for env in ("GITHUB_STEP_SUMMARY", OVERRIDE_MARKER_ENV):
+                target = os.environ.get(env)
+                if target:
+                    with open(target, "a", encoding="utf-8") as f:
+                        f.write(note + nl)
             return
         raise YieldCollapseError(
             f"parsed {new_count} rows, below {MIN_YIELD_RATIO:.0%} of the "
@@ -643,8 +660,9 @@ def check_headline_system_sanity(data_rows: list[list[str]], col: dict[str, int]
 
     def lens(key):
         i = col[key]
+        idc = col["id"]  # B2: the mapped id column, not position 0
         return [len(r[i].strip()) for r in data_rows
-                if r and r[0].startswith("AIAAIC") and i < len(r) and r[i].strip()]
+                if idc < len(r) and r[idc].startswith("AIAAIC") and i < len(r) and r[i].strip()]
 
     h, s = lens("headline"), lens("system")
     if h and s and statistics.median(h) < statistics.median(s):

@@ -217,3 +217,59 @@ def test_workflow_records_a_nonzero_exit_as_failure_outcome():
     assert step["run"] == "python scripts/ingest_aiaaic_sheet.py"
     assert step["continue-on-error"] is True
     assert "AIAAIC: ${{ steps.ingest_aiaaic.outcome }}" in text
+
+
+def test_sanity_check_uses_the_mapped_id_column_not_position_zero(sheet, monkeypatch, capsys):
+    # B2: id column moved last AND headline/system headers swapped. Row position 0
+    # is no longer the id, so a startswith("AIAAIC") on r[0] would skip every row,
+    # see no lengths, and let the swap through. Must exit 1 even with the override.
+    out, committed, feed = sheet
+    monkeypatch.setenv(a.YIELD_OVERRIDE_ENV, "1")
+    hdr = ["System name" if c == "Incident headline" else "Incident headline" if c == "System name" else c
+           for c in HEADER]
+    rows = [["Incidents"] + [""] * 19, hdr[1:] + [hdr[0]], SUB[1:] + [SUB[0]]]
+    rows += [_data_row(i)[1:] + [_data_row(i)[0]] for i in range(10)]
+    buf = io.StringIO()
+    csv.writer(buf).writerows(rows)
+    feed(buf.getvalue())
+    assert a.main() == 1
+    assert out.read_text(encoding="utf-8") == committed
+    # must be the swap check that fired, not some incidental later failure
+    assert "swapped" in capsys.readouterr().err
+
+
+def test_override_is_surfaced_in_step_summary_and_pr_marker(sheet, monkeypatch, tmp_path):
+    # B3: a reviewer of the PR alone must see the floor was overridden.
+    out, _, feed = sheet
+    summary, marker = tmp_path / "summary.md", tmp_path / "marker.md"
+    monkeypatch.setenv(a.YIELD_OVERRIDE_ENV, "1")
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    monkeypatch.setenv(a.OVERRIDE_MARKER_ENV, str(marker))
+    feed(_csv(n=4))
+    assert a.main() == 0
+    for f in (summary, marker):
+        t = f.read_text(encoding="utf-8")
+        assert "yield floor OVERRIDDEN" in t and "from 10 to 4" in t
+
+
+def test_no_marker_without_an_override(sheet, monkeypatch, tmp_path):
+    out, _, feed = sheet
+    marker = tmp_path / "marker.md"
+    monkeypatch.setenv(a.OVERRIDE_MARKER_ENV, str(marker))
+    feed(_csv(n=10))
+    assert a.main() == 0
+    assert not marker.exists()
+
+
+def test_workflow_appends_the_override_marker_to_the_pr_body():
+    text = WF.read_text(encoding="utf-8")
+    steps = yaml.safe_load(text)["jobs"]["refresh"]["steps"]
+    step = next(s for s in steps if s.get("id") == "ingest_aiaaic")
+    marker = step["env"]["AIAAIC_OVERRIDE_MARKER"]
+    assert marker.startswith("${{ runner.temp }}/")  # outside the work tree
+    name = marker.rsplit("/", 1)[1]
+    body = next(s for s in steps if s.get("id") == "retracted")
+    assert f'"$RUNNER_TEMP/{name}"' in body["run"]
+    cat = f'cat "$RUNNER_TEMP/{name}" >> "$RUNNER_TEMP/pr-body.md"'
+    assert cat in body["run"]
+    assert body["run"].index(cat) < body["run"].index("newly_retracted_report.py")
