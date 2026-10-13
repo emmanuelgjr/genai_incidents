@@ -103,3 +103,43 @@ def test_gate_script_decisions():
     assert run("schedule", "", 28) is False
     assert run("workflow_dispatch", "false", 3) is False   # a test dispatch does not pollute the counter
     assert run("workflow_dispatch", "true", 20) is True
+
+
+def test_simulated_sundays_gate_plus_health_end_to_end(tmp_path):
+    """Gate decision (the workflow's own shell) feeding the real health checker,
+    one run per Sunday, AIRI always failing when tried. Starts at the live
+    state (14 consecutive failures, stale)."""
+    import os, shutil
+    from datetime import date, timedelta
+
+    script = next(s for s in _wf()["jobs"]["refresh"]["steps"] if s.get("id") == "airi_gate")["run"]
+    git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git" / "bin" / "bash.exe"
+    bash = str(git_bash) if git_bash.exists() else shutil.which("bash")
+    state = tmp_path / "s.json"
+    state.write_text(json.dumps(STALE), encoding="utf-8")
+
+    def attempt(d):
+        out = tmp_path / "out"
+        out.write_text("", encoding="utf-8")
+        env = dict(os.environ, EVENT="schedule", TRY_AIRI="", GITHUB_OUTPUT=out.as_posix())
+        fn = "date() { echo " + str(d.day) + "; }"
+        subprocess.run([bash, "-c", fn + chr(10) + script], env=env, check=True, capture_output=True)
+        return "attempt=true" in out.read_text(encoding="utf-8")
+
+    d, rows = date(2026, 10, 18), []
+    while d <= date(2026, 12, 6):
+        tried = attempt(d)
+        outcome = "failure" if tried else h.NOT_ATTEMPTED
+        rc = h.main(["--outcomes-json", json.dumps({"airi_navigator": outcome}),
+                     "--state-file", str(state), "--today", d.isoformat()])
+        n = json.loads(state.read_text())["airi_navigator"]["consecutive_failures"]
+        rows.append((d.isoformat(), tried, n, rc))
+        d += timedelta(days=7)
+    print(rows)
+    assert rows == [
+        ("2026-10-18", False, 14, 0), ("2026-10-25", False, 14, 0),
+        ("2026-11-01", True, 15, 1),
+        ("2026-11-08", False, 15, 0), ("2026-11-15", False, 15, 0),
+        ("2026-11-22", False, 15, 0), ("2026-11-29", False, 15, 0),
+        ("2026-12-06", True, 16, 1),
+    ]
