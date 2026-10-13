@@ -63,6 +63,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚠ CORRECTION to the entry below ("Stage-2 ruling package: MERGED"). Foreman error, now fixed.
+- **What went wrong.** The board commit `1ee3125a` recorded the package as merged when **no merge had happened**.
+  - The foreman ran `git fetch <branch>` and then `git pull origin main`. The pull overwrote FETCH_HEAD with main, so `git merge FETCH_HEAD` merged main into itself, a no-op.
+  - The pushed board claim was therefore false for one commit.
+- **Fixed by merge `e3c2eecb`.** It merges `origin/ws4/stage2-package-2026-10-13` by explicit ref; the foreman verified **HEAD^2 = 6aa68c55** and that the file is present (57,436 bytes).
+- **Other merges today checked.** Each fetched the branch AFTER pulling, so this was the only one affected.
+- **Lesson:** merge remote branches by explicit ref (`origin/<branch>`), never FETCH_HEAD after another fetch or pull, and verify HEAD^2 before recording. The entry below stays as written (agreement 4).
+
 ### ✅ Stage-2 ruling package: **MERGED** (tip `6aa68c55`), closed under D113. Now **AWAITING THE USER'S RULING.**
 - **Foreman [R] string check on 6aa68c55:**
   - the required sentence appears ×3 (§2(c), A2 Risks, A2 Recommendation); "29 permanent merges instead of 7" appears ×3; "untouched" ×0;
