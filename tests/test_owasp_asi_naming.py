@@ -65,7 +65,7 @@ TM_URL = "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/"
 # test_dataset_description_and_pages_renamed below); data/ is build output
 # except data/stats.json (scanned).
 EXCLUDE_PREFIXES = (
-    "legacy/", "docs/audits/", "docs/superpowers/plans/",
+    "legacy/", "docs/audits/", "docs/archive/superpowers/plans/",
     "docs/incidents/", "docs/data/", "data/",
     "ingest/", "src/genai_incidents/data/incidents.min.json",
     "CHANGELOG.md", "PROGRESS.md", "tests/test_owasp_asi_naming.py",

@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 INGEST = ROOT / "ingest"
 CACHE = INGEST / "_cache" / "nvd"
 OUT = INGEST / "cve_nvd_expanded.json"
