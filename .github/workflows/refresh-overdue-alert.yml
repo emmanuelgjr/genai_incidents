@@ -1,0 +1,81 @@
+name: Refresh overdue alert
+
+# D63. The weekly refresh can fail, or succeed and open a PR nobody merges; from
+# 2026-07-27 (PR #97, the last merged refresh) to 2026-10-13 neither was noticed. This opens ONE issue
+# (label `refresh-overdue`) when no `Weekly data refresh` PR has been MERGED in
+# max_age_days, and closes it when one is. N = 21: the refresh is weekly, so 21
+# days is three missed cycles -- one skipped or unreviewed week plus a human
+# lag does not page, a month-long stall does. The run also goes red when
+# overdue so GitHub's own failed-workflow notification fires.
+#
+# The only network use is `gh` talking to this repository's own PRs/issues
+# (same class as persist_refresh_state.sh); scripts/refresh_overdue.py makes no
+# network call.
+
+on:
+  schedule:
+    # Mondays 06:00 UTC, the day after the Sunday refresh.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: "Overdue threshold in days (0 forces the alert, for testing)"
+        default: "21"
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+concurrency:
+  group: refresh-overdue-alert
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MAX_AGE: ${{ github.event.inputs.max_age_days || '21' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Evaluate
+        id: eval
+        run: |
+          merged=$(gh pr list --head auto-refresh/data --state merged --limit 10 --json number,mergedAt,title)
+          open=$(gh pr list --head auto-refresh/data --state open --limit 10 --json number,createdAt,title)
+          printf '{"merged": %s, "open": %s}' "$merged" "$open" > "$RUNNER_TEMP/prs.json"
+          set +e
+          python scripts/refresh_overdue.py --max-age-days "$MAX_AGE" \
+            --input "$RUNNER_TEMP/prs.json" --out-md "$RUNNER_TEMP/overdue.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          rc=${PIPESTATUS[0]}
+          [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ] || exit "$rc"
+
+      - name: Open or update the overdue issue
+        if: steps.eval.outputs.overdue == 'true'
+        run: |
+          gh label create refresh-overdue --color B60205 --description "No weekly data refresh PR merged recently (D63)" || true
+          n=$(gh issue list --label refresh-overdue --state open --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then
+            gh issue edit "$n" --body-file "$RUNNER_TEMP/overdue.md"
+          else
+            gh issue create --title "Weekly data refresh is overdue" --label refresh-overdue --body-file "$RUNNER_TEMP/overdue.md"
+          fi
+
+      - name: Close the overdue issue when on time
+        if: steps.eval.outputs.overdue == 'false'
+        run: |
+          for n in $(gh issue list --label refresh-overdue --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "A refresh PR has merged within the threshold; closing."
+          done
+
+      - name: Fail the run when overdue
+        if: steps.eval.outputs.overdue == 'true'
+        run: |
+          echo "::error::No 'Weekly data refresh' PR has merged within ${MAX_AGE} days (D63). See the issue labelled refresh-overdue."
+          exit 1

@@ -55,6 +55,11 @@ def main() -> None:
             "knownRansomwareCampaignUse": v.get("knownRansomwareCampaignUse", ""),
         }
 
+    if not vulns:
+        # An empty/renamed feed must not overwrite the committed snapshot and
+        # report success (the AIAAIC 2026-10-13 silent-empty shape).
+        sys.exit("[kev] ERROR: feed parsed to 0 CVEs; committed snapshot left untouched")
+
     snapshot = {
         "catalogVersion": raw.get("catalogVersion", ""),
         "count": len(vulns),

@@ -55,6 +55,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_STATE_PATH = ROOT / "ingest" / "_state" / "source_health.json"
 DEFAULT_THRESHOLD = 3  # consecutive failed refreshes before a source goes "stale"
+NOT_ATTEMPTED = "not-attempted"  # D95: passed by the workflow for a gated, deliberately skipped step
 MAX_PAUSE_HORIZON_DAYS = 180  # ~6 months; a pause can't be dated further out
 # than this from "today" without renewal — see pause_status()'s docstring.
 
@@ -162,6 +163,14 @@ def update_source_health(
     pause_notices: dict[str, str] = {}
 
     for source, outcome in outcomes.items():
+        if outcome == NOT_ATTEMPTED:
+            # D95: the step was not attempted this run (AIRI is retried monthly). A bare
+            # GitHub "skipped" is NOT this: it still counts as a failure (tested), so a
+            # step skipped by accident cannot hide a dead source.
+            # Neither a success nor a failure: leave the counter, status and
+            # last_* fields exactly as they were, so skipped weeks cannot reset
+            # nor inflate it, and a failed monthly attempt still accumulates.
+            continue
         entry = dict(new_state.get(source, {}))
         succeeded = outcome == "success"
 
@@ -202,7 +211,7 @@ def render_summary(state: dict, outcomes: dict[str, str]) -> str:
     for source in sorted(outcomes):
         entry = state.get(source, {})
         lines.append(
-            f"| {source} | {outcomes[source]} | {entry.get('consecutive_failures', 0)} "
+            f"| {source} | {outcomes[source]}{' (monthly retry; counter unchanged)' if outcomes[source] == NOT_ATTEMPTED else ''} | {entry.get('consecutive_failures', 0)} "
             f"| {entry.get('status', 'unknown')} | {'yes' if entry.get('paused') else 'no'} |"
         )
     return "\n".join(lines)

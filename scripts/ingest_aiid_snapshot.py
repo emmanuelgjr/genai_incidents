@@ -384,6 +384,8 @@ def main() -> None:
             out.append(entry)
 
     out.sort(key=lambda e: e["aiid_id"])
+    if not out:
+        sys.exit("[aiid] ERROR: parsed 0 entries; committed snapshot left untouched")
     OUT_PATH.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print(
         f"Wrote {len(out)} AIID entries -> {OUT_PATH} "

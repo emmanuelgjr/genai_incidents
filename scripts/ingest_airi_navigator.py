@@ -175,6 +175,8 @@ def main():
             skipped += 1
 
     out_path = INGEST / "airi_navigator_incidents.json"
+    if not out:
+        sys.exit("[airi] ERROR: parsed 0 entries; committed file left untouched")
     out_path.write_text(json.dumps(out, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"[airi] wrote {len(out)} entries -> {out_path} (skipped {skipped})")
 
