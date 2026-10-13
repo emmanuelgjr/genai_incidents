@@ -63,6 +63,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Post-lift docs + D124: **MERGED** (tip `f5afdc27`, HEAD^2 verified), closed under D125.
+- **Foreman [R] string check** on the `[Unreleased]` slice: "48ffe0db" ×1, "CC-BY-SA-4.0 AND CC-BY-4.0" ×1, "LicenseRef-upstream-terms" ×1, the D66 text ×1, the D63 text ×1, "404 since 2026-06-07" ×1. NUL 0. The final commit changes CHANGELOG.md only (+7/-5); the other 8 files are the gated set.
+- **On merged main:** drift clean; validate rc 0; **pytest 1273 + 1 xfail**; porcelain clean.
+- **Every surface flagged by the post-D114 docs sweep is now fixed,** and D124 is recorded on the README, DATA_DICTIONARY, HF card, schema, registry notes, SOURCE_LICENSES §1.4 and Makefile.
+
 ### ⚖ D125, USER RULING 2026-10-13: post-lift docs bounce #2 → **apply verbatim + string check (Recommended).** pe-postlift inserts the gate's 48ffe0db licence section and the two corrected D66/D63 bullets, in CHANGELOG.md only. The foreman then string-checks "48ffe0db", "CC-BY-SA-4.0 AND CC-BY-4.0" and "LicenseRef-upstream-terms" in the `[Unreleased]` slice, confirms the diff is CHANGELOG-only and drift is clean, and merges. No third gate reading.
 
 ### ✅ WS3 schema `review_by` description (D124): **PASS (gate-postlift on `c57e3fd1`), MERGED (HEAD^2 verified).**
