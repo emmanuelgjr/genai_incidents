@@ -63,6 +63,99 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS6 licensing surfaces: **BOUNCE #1 (gate-licsurf on `1ab030a8`).** Back with de-licdocs.
+**Verdict, in the gate's words:** "BOUNCE… 3 defects, all text-only, and all three are claims that are false or understated against the tree and the published archives. Every mechanical check passes."
+
+**Defects:**
+1. SOURCE_LICENSES:177 says "the data change is recorded in CORRECTIONS.md". False: no row exists. The fix is to place the row (A1).
+2. README:425 and DATASHEET:144-145 say "ingest/ is in the repository only". **Every Zenodo deposit is a full-repo zip** (v2.13.0: 32,041,631 bytes; `git archive v2.13.0` has 37 ingest/ entries; no export-ignore). The PyPI and HF halves are true.
+3. The HF CARD says "data published before that date". But v2.13.0 was released ON 2026-10-13 (merge 9cdaf5e5, 20:27) before the rewrite (e6eb3410, 23:39). The per-tag description sha1 is identical across all 15 tags v2.0.0..v2.13.0.
+
+**Advisories:**
+- **A1:** the D97 CORRECTIONS row is owed. → Folded in.
+- **A2:** dep5 :63-64 still says "two OWASP mapping files". → Folded in.
+- **A3:** INC-02646's title still equals the round-up heading (7/7). NOTICE should say "descriptions in the project's own wording". → Folded in. **Whether headlines need rewriting is a user licensing call: added to the register.**
+- **A4: item-8 dispute adjudicated for the specialist.** AIM is last; the warden was wrong.
+- **A5:** the sdist lacks NOTICE-DATA. → Folded in.
+- **A6:** the gate's pytest ran concurrently with its own a11y edit, so it asked for a fresh rerun.
+
+**Evidence:**
+- 13 files; pytest 1079 + 1 xfail.
+- **Drift fires** on a planted `(INC-02646, INC-03233)`.
+- reuse per-file identical over 377 files; dep5 parses (11 paragraphs).
+- **a11y: axe 0 across 4 combinations; it fires on an emptied footer link (link-name).** Lighthouse 100; 380px PASS. The absolute NOTICE-DATA URL is correct (Pages serves docs/ only).
+- CITATION and Zenodo tails byte-equal.
+- Stale-phrase sweep: 0 hits.
+- merge-tree clean.
+
+### ⚖ D105/D106, USER RULINGS 2026-10-13 (precision bounce #2)
+- **D105: apply verbatim + string check (Recommended).** `precisions?` plus a should-fire test, proven to fail on 70dc0290. The foreman verifies and merges, with no third gate reading.
+- **D106: exempt only the design compounds (Recommended).** The exemption is narrowed to the design compounds actually used (precision-first and precision-oriented, grep-derived). -recall, -weighted and -at now count as mentions. Correct the CHANGELOG and code rationale. → Fresh label-scientist `ls-precfix` on the same branch, after merging origin/main.
+
+### 🔍 WS4 refresh repair: fix `2cb81847` for the PR #101 defects. **Whole-branch gate dispatched (gate-refresh).**
+- **AIAAIC root cause:** `Headline` → `Incident headline`; the sheet also gained a title row. Changes:
+  - an alias was added;
+  - `REQUIRED_COLUMNS` failing raises `SchemaDriftError` (exit 1); a missing header row is now an error;
+  - `MIN_YIELD_RATIO = 0.5`, with 0 always failing and the file written only after the check;
+  - the outcome propagates through `steps.ingest_aiaaic.outcome`.
+- **Fresh yield:** 1,509 vs 1,504. +5 rows; AIAAIC2266/1796 upstream edits; 292 owasp_llm reorders with identical sets.
+- **Held inputs** now stash to `$RUNNER_TEMP`, with a `--check-clean` guard before the PR step.
+- **Same empty-result guard** added to KEV, AIRI and the AIID snapshot. OECD (union) and the CVE sweep are left as-is, with reasons.
+- **PR #101's 1.5M-line diff** is a cascade block move: 15,394 entries moved; the serialisation round-trips byte-exact. Not formatting drift.
+- **Specialist checks:** pytest 1112 + 1 xfail; validate and drift clean; actionlint clean on auto-refresh.yml. The fire-proof reverted the 3 production files: 6 fail and 9 error.
+- **The gate is asked:**
+  - can any fresh OECD/AIID byte reach a PR;
+  - its own mutation fire-proofs;
+  - whether a stale AIRI makes every weekly run "fail" and turns the alert into noise;
+  - the D63 alert's input;
+  - merge-tree.
+
+### ⛔ WS2 precision follow-ups: **BOUNCE #2 (gate-precfu re-gate on `70dc0290`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "This is BOUNCE #2 on the task, so by protocol it goes to the user. The remaining fix is one token and I have already checked it."
+
+**Defect 1:** `MENTION_RE` `(?<![a-z])precision(?![a-z]|-[a-z])` no longer counts **"Precisions"**. "- Precisions were 92% and 88%." returns [], although it fired at 26dfcdb4. The narrowing is undocumented in the docstring and the CHANGELOG. **Fix:** `precisions?(?![a-z]|-[a-z])` plus one should-fire test. Gate scratch: 129 passed. **Mutation: allowing the plural fails 0 tests today, so nothing pins the gap.**
+
+**Advisory 1:** "precision-recall AUC 0.91", "Precision-Recall: 92% / 80%" and "precision-weighted score 0.91" all slip through. That is within the documented compound limit (ruling (a)), but the CHANGELOG and code rationale call these compounds "a design term, not a mention", which is false for -recall and -weighted. → User question.
+
+**Evidence:**
+- Committed tree: validate rc 0 ("precision: pending, authorised by D76"); wilson --check and drift rc 0. Fresh-clone pytest 1130 + 1 xfail.
+- Bounce-1 defect fixed: sentence-final, ".92", in-section, fullwidth %, "percent" and "91,5 %" all fire. False positives stay clean.
+- Mutations on test_precision_audit: lookahead reverted → 7 fail; substring → 2; compound exclusion dropped → 4; imprecision guard → 1; hint dropped → 1; plural → 0.
+- Diff limited to wilson_ci.py, tests and the CHANGELOG bullet.
+- **Merge-tree was clean vs 761eaef6 only. Main has since moved, so the foreman re-checks before merge.**
+
+### 🚨 REFRESH TEST RUN 38330687613 (on `7dd887fb`): **PR #101 opened but is NOT MERGEABLE. The foreman CLOSED it.** Three defects; this is the house failure mode (agreement 6).
+- **The run "failed" on purpose:** AIRI has failed 15 consecutive refreshes, so the source-health step fails loudly. That is by design. `7dd887fb` predates the D95 monthly-retry commit.
+- **The OECD/AIID hold WORKED. Foreman [R]:** a per-entity diff of data/incidents.json on PR head vs parent shows **0 content changes on OECD/AIID-sourced rows**, 0 rows added or removed, 15,666 rows.
+- **DEFECT 1, AIAAIC ingest wrote 0 rows and reported success.** The log reads `[aiaaic] WARNING: column 'headline' not found` … `2262 raw rows` … `wrote 0 security-relevant entries (skipped 2259)`, then `AIAAIC: success` and source health `aiaaic_sheet | success | 0 | ok`. `ingest/aiaaic_sheet_incidents.json` went from 1,504 rows to `[]`.
+  - **Downstream cascade:** 1,508 rows changed. `source_status` on 1,421; `source_ids`, `source_count` and `tags` on 78; `owasp_llm`/`mitre_atlas` on 59; `nist_ai_rmf` on 47; `owasp_asi` on 45.
+  - **Neither the tests (1083 passed) nor validation caught it.** A parser that cannot find its key column must fail, and a yield collapse must fail.
+- **DEFECT 2, `held-pair-inputs/` was COMMITTED into the PR.** That is the fresh `aiid_full.json`, `oecd_aim_full_incidents.json` (about 337k lines), the provenance and HOLD_REPORT. `scripts/hold_pair_inputs.py --stash-dir held-pair-inputs` (auto-refresh.yml:407) stashes inside the work tree, and create-pull-request commits everything. The bytes must live only in the artifact; the OECD title licence is unresolved.
+- **DEFECT 3:** `data/incidents.json` diff is about 1.5M lines for 1,508 changed rows. Likely a consequence of the cascade, but needs confirming: no formatting drift.
+- **Routing:** a FRESH pipeline-engineer goes on `ws4/v2130-refresh-decouple` (agreement 3 replace: pe-ingest-diag's report never arrived and it was told to stop). Its work:
+  - adapt the AIAAIC parser to the current sheet header;
+  - fail loudly on a missing key column or a 0/collapsed yield (yield floor vs the committed file), and record the outcome as failure in source health;
+  - stash held inputs outside the tree (`$RUNNER_TEMP`) or gitignore them;
+  - add tests proving each check fires.
+- **Deadline:** the next scheduled run is **Sun 2026-10-18 04:00 UTC**, which would reopen the same broken PR. Then gate, merge, and dispatch one test run.
+
+### 🔍 WS6 licensing surfaces: `1ab030a8` on `ws6/licensing-surfaces-2026-10-13` (it merges 73bce51b). **Gate dispatched (gate-licsurf).**
+- **Fixed: findings #1-#14.**
+  - README: four mapping files; an ingest/ bullet; a round-up bullet in the past tense; a parenthetical on the v2.13.0 blurb.
+  - CITATION.cff and .zenodo.json: identical "Exceptions:" tails.
+  - NOTICE-DATA: "ten".
+  - HF card generator; DATASHEET; site og and footer; methods paper; CONTRIBUTING; TAXONOMIES.
+  - The D97/D98 "pending" cells are now past tense: NOTICE-DATA round-up paragraph, SOURCE_LICENSES §1.6/§1.7 and summary rows 6/8.
+- **Specialist checks:**
+  - pytest 1079 + 1 xfail.
+  - Drift clean. **It fired twice on the first HF text**: a bare `02646` and a `2.13.0` literal.
+  - reuse 377/454, unchanged.
+  - **a11y: axe 0 (light/dark, desktop/mobile), Lighthouse 100, 380px PASS.**
+- **Dispute:** the specialist says the warden's #8 ordering claim is wrong (AIM is still last). The real stale text was "For the other five…". The gate will adjudicate.
+- **New follow-ups (for the register):**
+  - CONTRIBUTING:20 still says "Edit `data/incidents.json` directly", which conflicts with the no-hand-edit rule.
+  - The wheel and sdist ship no NOTICE-DATA, though the bundled `incidents.min.json` carries row-level obligations (AIAAIC/OECD).
+
 ### ✅ D97/D98 rewrites + INC-02382 CVE fix: **PASS (gate-rewrite on `64467e49`), MERGED.** CORRECTIONS row placed.
 **Verdict, in the gate's words:** "PASS. ws1/licensing-rewrites-2026-10-13 @ 64467e49 fixes both bounce #1 defects, and the delta is exactly as declared. DEFECTS: none."
 
