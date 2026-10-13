@@ -63,6 +63,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS4 hygiene follow-ups: **BOUNCE #1 (red-reviewer on `a64ea795`)**. The fix is back with the same pipeline-engineer.
+- **Defect:** b10's HEAD-sourced fixture plus the working-tree comparison in `test_committed_inputs_do_not_abort` would **fail every refresh run that changes data**. auto-refresh, cve-enrich and atlas-refresh all run Re-merge, then pytest, on an uncommitted tree, under a hard gate.
+  - The gate reproduced it: a simulated refresh gave old fixture 8 passed, new fixture 1 failed.
+  - **It would have re-broken ingestion, the exact failure being repaired.**
+  - Fix: compare against `git show HEAD:<path>`; prove it on a clean tree, on a simulated refresh, and with a planted edit.
+- **Gate evidence, all clean:**
+  - **b13:** 2 mutations fail, which supplies the missing fire-proof.
+  - **b22:** independent derivation over 13,670 oecd.ai URLs; 0 reclassified; the mutation fails.
+  - **b25:** mutations of the REAL script (no --force, no [skip ci], a neutered racer) all fail. On Linux, the BASH_ENV ordering is deterministic.
+  - **b11:** no deselection in any of the 4 workflows or the Makefile (8 of 1,080 tests are marked slow).
+  - Fresh-clone pytest 1079 passed; clean rebuild porcelain empty.
+- **Advisories:**
+  - **A1:** the b10 test can't fire on a clean checkout. → Make it self-contained (routed).
+  - **A2:** the `render_log_md` "New DISPUTED" summary still uses the combined count. → **Follow-up.**
+  - **A3:** an assertion message reads backwards. → Routed.
+
 ### 🔁 WS2 precision follow-ups: **BOUNCE #1 (red-reviewer on `26dfcdb4`)**. The fix went back to the same label-scientist.
 - **Defect, in the gate's words:** "The b17.3 check misses a proportion that ends a sentence, and nothing documents that." The proportion branch is `0?[.][0-9]+(?![0-9.])`, and the following full stop defeats it. "- Precision: 0.92." passes clean, both in-section and near the word. The CHANGELOG claim overstates the coverage.
   - The gate's fix, verified in-process: lookahead `(?![0-9]|[.][0-9])`.
