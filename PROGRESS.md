@@ -63,6 +63,33 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D108 AIRI retired + refresh B2/B3 + refresh drift fix: **PASS (gate-airi on `29944158`), MERGED (HEAD^2 verified). Main's drift check is GREEN again.**
+**Verdict, in the gate's words:** "PASS… DEFECTS: none."
+
+**Gate evidence:**
+- **(a) Retirement.** The checker was run against the LIVE refresh-state counters (airi 15, stale) under failure, absent, success and skipped. Every run exits 0 with no ::error::, status retired, the counter frozen at 15 and last_success kept.
+  - Mutations: RETIRED_SOURCES emptied plus an airi failure → exit 1, counter 16. A stale aiaaic still alerts.
+  - The AIRI file is still held and still read.
+- **(b) B2/B3.**
+  - B2: a direct call on the swapped / id-last case raises on the branch and NOT at 692bb672, so it discriminates.
+  - B3: the override marker goes under runner.temp and is appended to the PR body; the guard runs before the PR step.
+- **(c) Drift fix.**
+  - check_stats_drift: rc 1 at 692bb672, rc 0 on the branch.
+  - **Count-only proof:** substituting 15,642 → 15,637 makes all 3 files sha-identical to 692bb672.
+  - The workflow order now matches the Makefile build. lint_atlas_ids is offline and already a hard gate in validate.yml.
+  - **A double rebuild was byte-identical to the committed tree.**
+- **(d)** actionlint rc 0; no references left to the removed steps.
+- **(e)** Clean-clone pytest 1219 + 1 xfail; merge-tree clean.
+
+**Foreman [R] on merged main:** check_stats_drift clean (5 surfaces); validate rc 0.
+
+**Advisories → register (new items):**
+- **R1.** Reviving AIRI needs the workflow ingest step and the outcomes key restored too. Fix the comment at check_source_health.py:61-63.
+- **R2.** Stale "monthly retry" wording at check_source_health.py:185, :190 and :248.
+- **R3, user/docs question.** `data/source_freshness.json` still has the airi D57 "hold" block (re-decide by 2027-01-07), and README:218 says "under a dated hold". D108 arguably answers the D57 re-decide. Changing the registry is a gated data change.
+- **R4.** Drift-gate test blind spots: render order inside one run block, and `if: false` on the gate step.
+- **R5.** Validate's provenance check passes in the refresh only because persist resets the state to main's copy (auto-refresh.yml:322). That reset is load-bearing and untested; this predates the branch.
+
 ### ✅ D109: first ATLAS refresh dispatch (run 38372928453), **SUCCESS, NO-OP.**
 - The log reads: `[atlas-fetch] collection.version=2026.09 modified=2026-09-15 … sha256=935efa93…` and then `NO-OP: ATLAS-2026.09.yaml sha256 matches the committed snapshot; nothing written`.
 - "Detect change" reported success, and every later step (scan, re-pin, merge, delta, lint, tests, PR) was skipped. **No PR, as designed.**
