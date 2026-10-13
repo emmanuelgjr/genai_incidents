@@ -2046,6 +2046,18 @@ class RefreshMergeApprovalError(SystemExit):
     approved."""
 
 
+# D114/(e): the entries hash of the COMMITTED per-item approval file, pinned in
+# code exactly as REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256 pins D28's. None =
+# "no per-item approvals have been recorded": the default approval path then must
+# be absent or empty, and a file there with entries is refused even when it is
+# signed and its own hash matches (a tamper-plus-recompute cannot pass). The
+# commit that records a per-item ruling sets this to the file's hash in the same
+# change. D115's per-item rulings are NOT recorded here: they live in a separate,
+# unread record file (docs/audits/D115-d42-per-item-rulings-2026-10-13.json) and
+# stay inert until suppression exists.
+REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256: str | None = None
+
+
 def _refresh_merge_entries_sha256(entries: list) -> str:
     return hashlib.sha256(
         json.dumps(entries, sort_keys=True, separators=(",", ":")).encode()
@@ -2084,6 +2096,16 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
         raise RefreshMergeApprovalError(
             f"[FATAL] {path}: authorization.entries_sha256 does not match its "
             "entries -- the list was edited after it was ruled on."
+        )
+    if Path(path).resolve() == REFRESH_MERGE_APPROVAL_PATH.resolve() and (
+        REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256 is None
+        or auth.get("entries_sha256") != REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256
+    ):
+        raise RefreshMergeApprovalError(
+            f"[FATAL] {path}: the entries hash is not the one pinned in code "
+            "(REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256). A ruling is recorded by "
+            "pinning its hash in the same commit; recomputing the file's own "
+            "hash after an edit is exactly what the pin exists to refuse."
         )
     out: set[tuple] = set()
     for e in entries:
@@ -2168,10 +2190,20 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
     )
 
 
-# Files whose content is OECD- or AIID-derived. When none differs from the
-# committed version, no OECD/AIID input can have driven a change (D71/A2).
+# D114 (2026-10-13): the AIID side of the stage-1 freeze is LIFTED; the OECD
+# side stays held. Two disjoint sets:
+#   _AIID_LIFTED_FILES    the sanctioned AIID snapshot and its provenance sidecar.
+#                         The weekly refresh no longer restores them to HEAD; the
+#                         gate's AIID standing class (below) covers what they drive.
+#   _PAIR_INPUT_FILES     everything still HELD. Name kept (hold_pair_inputs.py and
+#                         the stage-1 tests import it); it now means "the held
+#                         pair", i.e. OECD + AIRI + the two AIID-derived side files
+#                         that nothing in the weekly refresh regenerates.
+# When none of the held files differs from the committed version, no OECD input
+# can have driven a change (D71/A2).
+_AIID_LIFTED_FILES = ("aiid_full.json", "aiid_full.provenance.json")
 _PAIR_INPUT_FILES = (
-    "aiid_full.json", "aiid_incidents.json", "aiid_oecd_relationships.json",
+    "aiid_incidents.json", "aiid_oecd_relationships.json",
     "oecd_aim_full_incidents.json",
     # AIRI Navigator rows are keyed by AIID-<n> ids (1,457 of them, all on
     # published rows). Reading of D71, recorded on the board: AIID-keyed AIRI
@@ -2200,6 +2232,11 @@ def _pair_inputs_changed(root: Path | None = None) -> bool:
     return False
 
 
+# Counters for the D114 standing AIID class, reset on every gate call and printed
+# by _run_refresh_gate so the class is visible in the build log, never silent.
+_LAST_AIID_CLASS_USE: dict = {"add": 0, "title_edit": 0}
+
+
 def _gate_snapshot(e: dict) -> dict:
     snap = _content_snapshot(e)
     snap["description_provenance"] = e.get("description_provenance")
@@ -2215,6 +2252,8 @@ def _check_refresh_merge_authorization(
     curation: dict | None = None,
     pair_inputs_changed: bool = True,
     first_build: bool = False,
+    aiid_class: bool = False,
+    aiid_titles: dict | None = None,
 ) -> None:
     """D42 guard + D67/D71 holds: nothing driven by the frozen OECD/AIID pair
     reaches a build until the user rules. Held (each needs a signed approval):
@@ -2225,9 +2264,20 @@ def _check_refresh_merge_authorization(
                 ingest input differs from its committed version
       add       an OECD-AIM- or AIID- source id no published entry carried (D67/D71),
                 whether it becomes a new row or is absorbed into a published one
+
+    D114 standing AIID class (``aiid_class=True``; only ever passed while every
+    held pair input is byte-identical to HEAD): two of the holds above are
+    waived for changes that cannot alter identity and are AIID-authored:
+      add         a new row whose every OECD/AIID source id is AIID-prefixed
+      title edit  a published row's title becomes exactly the snapshot title of
+                  one of its own AIID source ids (``aiid_titles``), no id absorbed
+    Merges, retitles that absorb ids, and AIID ids absorbed into a published
+    row stay per-item. Each waiver is counted in ``_LAST_AIID_CLASS_USE``.
     Call after id assignment and BEFORE any output write."""
+    _LAST_AIID_CLASS_USE.update(add=0, title_edit=0)
     if first_build:
         return
+    aiid_titles = aiid_titles or {}
     approval_path = approval_path or REFRESH_MERGE_APPROVAL_PATH
     approved = _load_refresh_merge_approvals(approval_path)
     prev_by_id = {p["id"]: p for p in prev_incidents if p.get("id")}
@@ -2275,10 +2325,16 @@ def _check_refresh_merge_authorization(
                     f"{sorted(s for s in gained if _is_gated_source(s))[:4]}"
                 )
             elif gated_row and not curated:
-                problems.append(
-                    f"title edit {iid} (D67): {prev.get('title', '')[:60]!r} -> "
-                    f"{cur.get('title', '')[:60]!r}; no source id absorbed"
-                )
+                if aiid_class and any(
+                    str(s).startswith("AIID-") and aiid_titles.get(s) == cur.get("title")
+                    for s in sids_cur
+                ):
+                    _LAST_AIID_CLASS_USE["title_edit"] += 1
+                else:
+                    problems.append(
+                        f"title edit {iid} (D67): {prev.get('title', '')[:60]!r} -> "
+                        f"{cur.get('title', '')[:60]!r}; no source id absorbed"
+                    )
         # D71/A2: any other content change on a published OECD/AIID row, when an
         # OECD/AIID ingest input differs from its committed version.
         if gated_row and pair_inputs_changed and ("content", iid) not in approved:
@@ -2300,6 +2356,11 @@ def _check_refresh_merge_authorization(
             s for s in (cur.get("source_ids") or [])
             if _is_gated_source(s) and s not in prev_sids and ("add", s) not in approved
         )
+        if new_src and aiid_class and iid not in prev_by_id and all(
+            str(x).startswith("AIID-") for x in cur.get("source_ids") or [] if _is_gated_source(x)
+        ):
+            _LAST_AIID_CLASS_USE["add"] += len(new_src)
+            continue
         if new_src:
             kind = "new row" if iid not in prev_by_id else "absorbed into published row"
             problems.append(
@@ -2322,13 +2383,93 @@ def _check_refresh_merge_authorization(
         )
 
 
+# D114 BINDING PRECONDITION (user ruling 2026-10-13): suppression (A3) must be
+# built and gated before ANY later OECD lift. Without it the forward path gives
+# 29 permanent merges instead of 7 (docs/audits/stage2-ruling-package-2026-10-13.md,
+# A2 "Forward risk"). Enforced here, in the gate every build passes through:
+# if ANY held pair input (OECD, AIRI, the AIID side files) differs from HEAD, the
+# build refuses unless the marker below exists AND its canonical-JSON sha256 equals
+# the value pinned in code. The pin is None today, so no file can satisfy it; the
+# commit that lands and gates suppression must change this constant and add the
+# marker together, which a diff reviewer cannot miss. File presence authorizes
+# nothing, the same shape as the D28 and D42 files.
+SUPPRESSION_GATE_MARKER_PATH = ROOT / "docs" / "audits" / "D114-suppression-gated.json"
+REQUIRED_SUPPRESSION_MARKER_SHA256: str | None = None
+
+
+class OecdLiftPreconditionError(RefreshMergeApprovalError):
+    """A held (OECD-side) input differs from HEAD and no gated suppression exists."""
+
+
+def _check_oecd_lift_precondition(
+    held_inputs_changed: bool,
+    marker_path: Path | None = None,
+    required_sha256: str | None = None,
+) -> None:
+    if not held_inputs_changed:
+        return
+    marker_path = marker_path or SUPPRESSION_GATE_MARKER_PATH
+    required = required_sha256 if required_sha256 is not None else REQUIRED_SUPPRESSION_MARKER_SHA256
+    why = None
+    if required is None:
+        why = "no suppression mechanism is registered in code (REQUIRED_SUPPRESSION_MARKER_SHA256 is None)"
+    elif not marker_path.exists():
+        why = f"the marker {marker_path} does not exist"
+    else:
+        try:
+            doc = json.loads(marker_path.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            why = f"the marker is unreadable ({exc})"
+        else:
+            auth = doc.get("authorization") if isinstance(doc, dict) else None
+            got = hashlib.sha256(
+                json.dumps(doc, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest()
+            if not (isinstance(auth, dict) and auth.get("ruled_by") == "user"
+                    and auth.get("decision") == "D114"):
+                why = "the marker has no authorization with decision D114 and ruled_by == 'user'"
+            elif got != required:
+                why = "the marker's hash is not the one pinned in code"
+    if why:
+        raise OecdLiftPreconditionError(
+            "[FATAL] D114 binding precondition: a held OECD-side input differs from HEAD, "
+            "but suppression (A3) has not been built and gated: " + why + ". Lifting OECD "
+            "without suppression turns the 12 AIID hub rows into permanent merges (29 "
+            "instead of 7). Nothing was written. The OECD inputs stay held until a gated "
+            "suppression mechanism lands (see docs/audits/stage2-ruling-package-2026-10-13.md "
+            "section 2(a), A2 Forward risk, and PROGRESS.md D114)."
+        )
+
+
+def _aiid_snapshot_titles(root: Path | None = None) -> dict[str, str]:
+    path = (root or ROOT) / "ingest" / "aiid_full.json"
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return {}
+    return {r["source_id"]: r.get("title") for r in rows
+            if isinstance(r, dict) and str(r.get("source_id", "")).startswith("AIID-")}
+
+
 def _run_refresh_gate(deduped: list[dict], fresh: list[dict], curation: dict) -> None:
-    """main()'s single entry point to the gate (stubbed by fixture-based tests)."""
+    """main()'s single entry point to the gate (stubbed by fixture-based tests).
+
+    D114: the AIID snapshot is lifted, OECD is held. The standing AIID class
+    (see _check_refresh_merge_authorization) is valid ONLY while every held input
+    is byte-identical to HEAD; when one differs the D114 precondition runs first
+    and, if it passes, the class is OFF and every AIID/OECD change is per-item."""
     prev, first_build = _load_gate_baseline()
+    held_changed = _pair_inputs_changed()
+    _check_oecd_lift_precondition(held_changed)
     _check_refresh_merge_authorization(
         prev, deduped, fresh, curation=curation,
-        pair_inputs_changed=_pair_inputs_changed(), first_build=first_build,
+        pair_inputs_changed=held_changed, first_build=first_build,
+        aiid_class=not held_changed, aiid_titles=_aiid_snapshot_titles(),
     )
+    if not first_build and not held_changed:
+        print(f"[gate] D114 standing AIID class: {_LAST_AIID_CLASS_USE['add']} AIID source row(s) added as "
+              f"new rows, {_LAST_AIID_CLASS_USE['title_edit']} AIID title edit(s); merges and absorbing "
+              "retitles remain per-item; OECD inputs held at HEAD")
 
 
 def _check_split_authorization(
