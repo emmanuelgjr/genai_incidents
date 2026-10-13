@@ -63,6 +63,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Stage-2 ruling package: **MERGED** (tip `6aa68c55`), closed under D113. Now **AWAITING THE USER'S RULING.**
+- **Foreman [R] string check on 6aa68c55:**
+  - the required sentence appears ×3 (§2(c), A2 Risks, A2 Recommendation); "29 permanent merges instead of 7" appears ×3; "untouched" ×0;
+  - all 22 retirement IDs are present;
+  - the gate attribution is present, and the IDs are marked provisional;
+  - the dated marker is present; NUL 0; one file, +371; merge-tree clean.
+- **The author kept A2, conditioned on suppression (A3) being built before any OECD lift.** The honest alternatives are A1, or accepting 29 merges.
+- **Gate history:**
+  - BOUNCE #1: provisional IDs; the 52 split.
+  - BOUNCE #2: the A2 forward path gives 29 tombstones vs 7, a form (d) aggregate.
+  - Both are recorded above.
+
 ### ⚖ D113, USER RULING 2026-10-13: stage-2 package bounce #2 → **apply text + string check (Recommended).** The author adds the gate's measured 29-vs-7 sentence to §2(c) and A2's Risks and Recommendation, drops "leaves (b) untouched" and re-states the recommendation honestly. The foreman verifies the strings and merges the package for the user's ruling. No further gate reading.
 
 ### ⛔ Stage-2 ruling package: **BOUNCE #2 (gate-stage2 on `f665a531`). ESCALATED to the user.**
