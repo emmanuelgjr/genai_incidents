@@ -273,7 +273,7 @@ def _run_merge(root: Path) -> subprocess.CompletedProcess:
                           cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
-def _extract_head(root: Path) -> None:
+def _extract_head(root: Path, repo: Path = ROOT, specs: list[str] | None = None) -> None:
     """Populate `root` from the COMMITTED tree (git HEAD via `git archive`).
     Extracted so a fast test can pin the no-leak property (followups b10)."""
     # Build from COMMITTED content only, read out of git HEAD (`git archive`),
@@ -282,18 +282,19 @@ def _extract_head(root: Path) -> None:
     # which exists only after parse_existing.py has run) and (ii) any
     # uncommitted edit to a tracked file, so the suite could pass or fail
     # depending on what the caller's tree happens to contain (followups b10).
-    specs = ["scripts", "data", "ingest", "mappings", "schema", "legacy",
-             "docs/audits/WS4-T19-authorized-splits-2026-09-18.json",
-             # v2.13.0 item 4 / D69: step 8b reads the ruled deprecation appends from
-             # docs/audits; without them the control build would not reproduce the
-             # committed id_deprecations.json (it would drop the ruled records).
-             "docs/audits/ID-silent-ids-appends-2026-10-09.json",
-             "docs/audits/ID-group-ids-appends-2026-10-10.json"]
+    if specs is None:
+        specs = ["scripts", "data", "ingest", "mappings", "schema", "legacy",
+                 "docs/audits/WS4-T19-authorized-splits-2026-09-18.json",
+                 # v2.13.0 item 4 / D69: step 8b reads the ruled deprecation appends from
+                 # docs/audits; without them the control build would not reproduce the
+                 # committed id_deprecations.json (it would drop the ruled records).
+                 "docs/audits/ID-silent-ids-appends-2026-10-09.json",
+                 "docs/audits/ID-group-ids-appends-2026-10-10.json"]
     in_head = [sp for sp in specs
                if subprocess.run(["git", "ls-tree", "--name-only", "HEAD", "--", sp],
-                                 cwd=ROOT, check=True, capture_output=True).stdout.strip()]
+                                 cwd=repo, check=True, capture_output=True).stdout.strip()]
     archive = subprocess.run(["git", "archive", "--format=tar", "HEAD", "--", *in_head],
-                             cwd=ROOT, check=True, capture_output=True).stdout
+                             cwd=repo, check=True, capture_output=True).stdout
     with tarfile.open(fileobj=io.BytesIO(archive)) as tf:
         tf.extractall(root, **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
 
@@ -325,15 +326,23 @@ def scratch(tmp_path_factory):
 
 
 def test_scratch_inputs_come_from_head_not_the_working_tree(tmp_path):
-    """b10: extracted bytes equal `git show HEAD:<path>`, and a gitignored
-    working-tree file is absent. (The manual proof planted an uncommitted
-    edit on a tracked file and showed it is not extracted.)"""
-    _extract_head(tmp_path)
-    assert not (tmp_path / "data" / "legacy_consolidated.json").exists()
-    for rel in ("scripts/merge_and_dedupe.py", "data/id_deprecations.json"):
-        head = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT, check=True,
-                              capture_output=True).stdout
-        assert (tmp_path / rel).read_bytes() == head
+    """b10, self-contained (works in a clean CI checkout): a tiny temporary git
+    repo with a committed file, a dirty edit to it, and an untracked file.
+    `_extract_head` must return the committed bytes and omit the untracked one."""
+    repo, out = tmp_path / "repo", tmp_path / "out"
+    (repo / "data").mkdir(parents=True)
+    out.mkdir()
+    tracked = repo / "data" / "x.json"
+    tracked.write_bytes(b'{"committed": true}\n')
+    for args in (("init", "-q"), ("config", "core.autocrlf", "false"), ("add", "-A"),
+                 ("-c", "user.email=t@e.x", "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                  "commit", "-q", "-m", "c")):
+        subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+    tracked.write_bytes(b'{"DIRTY": true}\n')                      # uncommitted edit
+    (repo / "data" / "legacy_consolidated.json").write_bytes(b"{}")  # untracked
+    _extract_head(out, repo=repo, specs=["data"])
+    assert (out / "data" / "x.json").read_bytes() == b'{"committed": true}\n'
+    assert not (out / "data" / "legacy_consolidated.json").exists()
 
 
 def _restore_data(root: Path) -> None:
@@ -386,7 +395,12 @@ def test_committed_inputs_do_not_abort(scratch):
     """The control build in the fixture exited 0 on the committed inputs; the
     committed data tree is also unchanged by it (rebuild is a fixed point)."""
     for rel in ("data/incidents.json", "data/id_deprecations.json"):
-        assert (scratch / rel).read_bytes() == (ROOT / rel).read_bytes(), rel
+        # Compare against the COMMITTED bytes (same source as the fixture's inputs),
+        # not the working tree: the refresh workflows run this suite on an
+        # uncommitted, freshly re-merged tree.
+        head = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT, check=True,
+                              capture_output=True).stdout
+        assert (scratch / rel).read_bytes() == head, rel
 
 
 @pytest.mark.slow

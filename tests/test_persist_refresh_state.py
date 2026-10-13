@@ -402,7 +402,7 @@ def test_force_push_overwrites_a_non_fast_forward_refresh_state(tmp_path, origin
     tip = git("rev-parse", "refresh-state", cwd=origin_repo).strip()
     assert tip != racer_sha
     ancestor = run(["git", "merge-base", "--is-ancestor", racer_sha, tip], cwd=origin_repo)
-    assert ancestor.returncode == 1, "racer commit was overwritten, not merged: a true force-push"
+    assert ancestor.returncode == 1, "racer commit is still reachable from the tip, so the push did not overwrite it (not a force-push)"
 
 
 def test_non_fast_forward_test_fires_without_force(tmp_path, origin_repo):
