@@ -1,6 +1,6 @@
 {
   "version": "2.13.0",
-  "generated": "2026-10-09",
+  "generated": "2026-10-13",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
   "incident_count": 15637,
@@ -259836,7 +259836,7 @@
       "date": "2025-01-31",
       "year": 2025,
       "category": "real-world",
-      "description": "Cybercrime group Storm-2139 hijacked Azure OpenAI accounts via stolen credentials, jailbroke the models to bypass content safeguards, and resold access. They produced thousands of policy-violating outputs including non-consensual explicit images.",
+      "description": "Storm-2139, a cybercrime network, obtained stolen Azure OpenAI customer credentials, took over the accounts, and changed settings so the models' safety controls no longer applied. Members sold the altered access to others, who used it to mass-produce prohibited content, including sexually explicit images of real people made without their consent. Microsoft pursued legal action against the group (December 2024 to February 2025).",
       "attack_vector": "auth-bypass",
       "affected": "Microsoft Azure OpenAI Service",
       "severity": "High",
@@ -259880,7 +259880,7 @@
         "reasoning"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-10-13",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005",
@@ -259896,7 +259896,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06"
+      "last_seen": "2026-10-13"
     },
     {
       "id": "INC-02646",
@@ -259918,7 +259918,7 @@
       "date": "2025-04-29",
       "year": 2025,
       "category": "vulnerability-disclosure",
-      "description": "Attackers exploited GPT-4.1's tool integration by embedding malicious instructions within tool descriptions. This 'tool poisoning' caused the AI to execute unauthorized actions including data exfiltration without user awareness.",
+      "description": "In April 2025, researchers showed that GPT-4.1 agents can be steered by poisoned tool metadata. Hidden directives placed in a tool's description field were obeyed by the model, which then took actions the user had not requested and sent data to the attacker. The weakness is trust in third-party tool definitions, notably MCP-style integrations.",
       "attack_vector": "tool-abuse",
       "affected": "OpenAI GPT-4.1 (tool/agent integrations)",
       "severity": "Critical",
@@ -260030,7 +260030,7 @@
         "voice-cloning"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-10-13",
       "mitre_atlas_tactics": [
         "AML.TA0000",
         "AML.TA0001",
@@ -260069,7 +260069,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-586"
       ]
@@ -1161616,7 +1161616,7 @@
       "date": "2025-08",
       "year": 2025,
       "category": "research",
-      "description": "Researchers disclosed critical Claude Code vulnerabilities (CVE-2025-54794, CVE-2025-54795) allowing attackers to bypass security restrictions and execute unauthorized commands using the model itself.",
+      "description": "Cymulate researcher Elad Beber found two flaws in Anthropic's Claude Code during its research preview: CVE-2025-54794, a path-restriction bypass (CVSS 7.7), and CVE-2025-54795, a command injection (CVSS 8.7). Crafted prompts exploiting them let an attacker escape the working-directory sandbox and run commands the tool should have refused; Claude itself was used to study its own safeguards. Fixed in v0.2.111 and v1.0.20.",
       "attack_vector": "rce",
       "affected": "Anthropic Claude Code",
       "severity": "High",
@@ -1161649,7 +1161649,7 @@
         "command-injection"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-10-13",
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0012",
@@ -1161662,7 +1161662,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06"
+      "last_seen": "2026-10-13"
     },
     {
       "id": "INC-01264",
