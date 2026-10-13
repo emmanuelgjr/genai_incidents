@@ -63,6 +63,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 Pre-publish bounce #1 fixed at `a11f8954` (notes only, pushed). **Scoped re-check sent.**
+- **D1:** "16 of the 17 gained appended records (24 records in all); `INC-00754` already had one ... and gained none ... reports `group`".
+  - **The gate's own two figures were inconsistent, and its "14 of 17" was wrong.** INC-00497 and INC-08139 are among the 17 (silent_ids.py), and both gained records.
+  - The specialist and the **foreman [R], by an independent route,** both measured: 24 appended; 16 distinct gained, all within the 17; INC-00754 the only one not gained; none outside.
+- **D2 + A1:** the preamble now says "Run from the `v2.13.0` tag ... identical to `main` @ `0191e814` apart from the version strings moved at the cut".
+- pytest 1072 passed, 1 xfailed; link hygiene clean; drift clean.
+
 ### 🔁 v2.13.0 PRE-PUBLISH gate: **BOUNCE #1 (red-reviewer on `6847ea46`, 2026-10-13)**. Two one-sentence notes defects; everything else in steps 2-5 PASSED on the gate's own re-run.
 **Verdict, in the gate's words:** "VERDICT: BOUNCE ... Two defects, both one-sentence text fixes in docs/releases/v2.13.0.md. That file becomes the Release body, the tag copy and the Zenodo archive copy, so these need fixing before step 6."
 
