@@ -63,6 +63,63 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🟢 TEST REFRESH run 38366793761 (from main 2e60e395): **SUCCESS. Refresh PR #102 opened. The first clean refresh since #97 (2026-07-27).** Held for the user.
+**Run:** cve-sweep=success, refresh=success. AIRI was not attempted (D95; not the first Sunday). The run is green.
+
+**Foreman [R], per-entity diff of data/incidents.json, PR head 81cc3db5 vs parent:**
+- **Rows 15,666 → 15,671. 5 added, 0 removed.** The new rows are INC-17216..17220, from AIAAIC2276, 2271, 2270, 2269 and 1782; these are the same 5 the gates predicted.
+- **11 changed:**
+  - 5 KEV: `exploited_in_wild`, `kev_date_added`;
+  - 4 CVE sweep: `status_reason`;
+  - INC-04074 (AIAAIC1796): `affected`, `description`;
+  - INC-14603 (AIAAIC2266): `title`.
+
+  The last two are the upstream edits both gates predicted. Only the bookkeeping fields `updated` and `last_seen` moved alongside.
+- **0 OECD/AIID-sourced rows changed** (D66 hold).
+- Row order of the common ids is unchanged.
+- **No `held-pair-inputs/` in the tree.** No OECD/AIID ingest file is touched. The PR's files are AIAAIC sheet, KEV, cve_rejections, the cve-sweep audit and generated surfaces.
+- The INCIDENTS.md diff (about 16.6k lines) is table-line shifting from the inserted rows. Total 15,637 → 15,642 (+5).
+
+**Stale-base check:** the base is 2e60e395. Since then main has changed only PROGRESS.md, SOURCE_LICENSES and the register, with **0 overlap** with the PR's files. merge-tree vs 9c646d36 is clean. GitHub: MERGEABLE (UNSTABLE: only CodeQL ran, all passing).
+
+**→ User decision: merge PR #102?**
+
+### ✅ D111 headline docs: **PASS (gate-d111 re-gate on `cfdb2035`), MERGED.**
+**Verdict, in the gate's words:** "PASS (re-gate after bounce 1). DEFECTS: none."
+
+**Gate evidence:**
+- The 189f3e08..cfdb2035 word-diff shows exactly the gate's 4 replacements, verbatim.
+- origin/main...cfdb2035 changes SOURCE_LICENSES only, 8 lines.
+- merge-tree vs 8b15380c is clean.
+- The facts are unchanged from its first gate.
+
+**Foreman [R]:**
+- Each replacement string appears exactly once; D111 appears ×4; pipe counts unchanged; NUL 0.
+- **The shipped mapping was independently re-derived** by source_ids prefix on main: INC-02608 and INC-02198 carry headline titles; INC-01391 and INC-02434 have titles from other sources; github-copilot-rce does not ship. **This matches the gate.**
+- Drift clean after the merge.
+
+### 🔁 D111 headline docs: **BOUNCE #1 (gate-d111 on `189f3e08`).** Exact replacements are routed to la-headlines.
+**Defects:**
+1. **The RES sentences overstated what ships.** Measured on main by `source_ids` membership, **only 2 of the 5 headlines surface as shipped titles**:
+   - INC-02608 (tenable-copilot-filename).
+   - INC-02198 (ClickFix; it ships the FULL h1, and the ingest title is only its first 5 of 7 words).
+   - amazonq-rce → INC-02434 and mcpwned → INC-01391; their titles come from other sources.
+   - github-copilot-rce is **suppressed by the issue #88 manifest** and does not ship.
+2. **INC-02646 equals the "Exploit 1" section heading,** not the page heading (h1 "OWASP Gen AI Incident & Exploit Round-up, Q2'25").
+
+**⚠ Foreman premise error:** the D111 question to the user said "5 research-row titles match their post headlines" (true of the ingest file only) and "matches the OWASP round-up heading". **The ruling stands.** The actual exposure is SMALLER than the premise stated (2 shipped titles, not 5), so "leave titles" is unaffected. Recorded per the "brief agents that they may be wrong" practice. The gate caught it because the brief asked exactly that question.
+
+**Advisories:**
+- "D97/D98 rewrote descriptions only" holds for the D111 rows. The same merge changed INC-02382's title (the wrong-CVE fix), which was separately recorded.
+- The trailing space in the RES camoleak ingest title is already in the register as B6.
+- §1.6 (1) could add "(descriptions)". Future pass.
+
+**Evidence:**
+- Diff: 1 file, 4/4 lines.
+- merge-tree clean (fast-forward).
+- Raw curl h1s for all 5 posts and the OWASP page.
+- Titles are byte-identical across e6eb3410^1, e6eb3410 and main.
+
 ### ⚖ D108-D111, USER RULINGS 2026-10-13 (register section (a))
 - **D108, AIRI: retire it (Recommended).** Mark the source retired in source health, so it stops alerting. Keep its existing rows and provenance. Revisit only if the site returns. This ends the D95 monthly red run. → WS4.
 - **D109, ATLAS: dispatch once now (Recommended).** The output PR goes to the user and is not auto-merged.

@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 240" role="img" aria-label="Incidents per year, 1983–2026" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="11">
 <rect x="0" y="0" width="100%" height="100%" fill="white"/>
-<text x="44" y="18" font-weight="600">Incidents per year (15,637 total)</text>
+<text x="44" y="18" font-weight="600">Incidents per year (15,642 total)</text>
 <line x1="44" y1="30.0" x2="748" y2="30.0" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="33.0" text-anchor="end" fill="#666">7,396</text>
+<text x="38" y="33.0" text-anchor="end" fill="#666">7,399</text>
 <line x1="44" y1="64.8" x2="748" y2="64.8" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="67.8" text-anchor="end" fill="#666">5,916</text>
+<text x="38" y="67.8" text-anchor="end" fill="#666">5,919</text>
 <line x1="44" y1="99.6" x2="748" y2="99.6" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="102.6" text-anchor="end" fill="#666">4,437</text>
+<text x="38" y="102.6" text-anchor="end" fill="#666">4,439</text>
 <line x1="44" y1="134.4" x2="748" y2="134.4" stroke="#e5e5e5" stroke-width="1"/>
-<text x="38" y="137.4" text-anchor="end" fill="#666">2,958</text>
+<text x="38" y="137.4" text-anchor="end" fill="#666">2,959</text>
 <line x1="44" y1="169.2" x2="748" y2="169.2" stroke="#e5e5e5" stroke-width="1"/>
 <text x="38" y="172.2" text-anchor="end" fill="#666">1,479</text>
 <line x1="44" y1="204.0" x2="748" y2="204.0" stroke="#e5e5e5" stroke-width="1"/>
@@ -52,13 +52,13 @@
 <rect x="568.6" y="201.3" width="18.2" height="2.7" fill="#0a58ca" rx="1"><title>2019: 116</title></rect>
 <rect x="591.3" y="180.8" width="18.2" height="23.2" fill="#0a58ca" rx="1"><title>2020: 985</title></rect>
 <text x="600.4" y="218" text-anchor="middle" fill="#666">2020</text>
-<rect x="614.0" y="183.6" width="18.2" height="20.4" fill="#0a58ca" rx="1"><title>2021: 865</title></rect>
+<rect x="614.0" y="183.7" width="18.2" height="20.3" fill="#0a58ca" rx="1"><title>2021: 865</title></rect>
 <rect x="636.7" y="178.8" width="18.2" height="25.2" fill="#0a58ca" rx="1"><title>2022: 1,072</title></rect>
 <text x="645.8" y="218" text-anchor="middle" fill="#666">2022</text>
 <rect x="659.4" y="180.8" width="18.2" height="23.2" fill="#0a58ca" rx="1"><title>2023: 988</title></rect>
-<rect x="682.1" y="164.8" width="18.2" height="39.2" fill="#0a58ca" rx="1"><title>2024: 1,666</title></rect>
+<rect x="682.1" y="164.8" width="18.2" height="39.2" fill="#0a58ca" rx="1"><title>2024: 1,667</title></rect>
 <text x="691.2" y="218" text-anchor="middle" fill="#666">2024</text>
-<rect x="704.9" y="154.7" width="18.2" height="49.3" fill="#0a58ca" rx="1"><title>2025: 2,096</title></rect>
-<rect x="727.6" y="30.0" width="18.2" height="174.0" fill="#0a58ca" rx="1"><title>2026: 7,396</title></rect>
+<rect x="704.9" y="154.7" width="18.2" height="49.3" fill="#0a58ca" rx="1"><title>2025: 2,097</title></rect>
+<rect x="727.6" y="30.0" width="18.2" height="174.0" fill="#0a58ca" rx="1"><title>2026: 7,399</title></rect>
 <text x="736.6" y="218" text-anchor="middle" fill="#666">2026</text>
 </svg>
