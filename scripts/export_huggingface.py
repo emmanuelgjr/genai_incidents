@@ -58,10 +58,11 @@ configs:
 
 # GenAI & Agentic AI Security Incidents
 
-**{count} real-world and research incidents** involving generative-AI and agentic-AI
-systems — prompt injection, jailbreaks, data exfiltration, deepfakes, model and
-supply-chain compromise, agent hijacking, and AI-enabled harms — cross-mapped to six
-taxonomies. Dataset version `{version}`.
+**{count} records** of publicly disclosed security issues involving generative-AI and
+agentic-AI systems: vulnerability disclosures (the largest category), real-world incidents,
+research demonstrations, threat reports and red-team findings. Topics include prompt
+injection, jailbreaks, data exfiltration, deepfakes, model and supply-chain compromise,
+agent hijacking, and AI-enabled harms — cross-mapped to six taxonomies. Dataset version `{version}`.
 
 Every applicable incident is tagged with four core taxonomies:
 

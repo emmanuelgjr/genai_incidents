@@ -6,8 +6,10 @@ TAXII 2.1 is normally a live HTTP API. A static mirror cannot set the
 ``application/taxii+json;version=2.1`` response media type or honour query-string
 pagination, but it CAN publish every resource a client needs as a plain JSON
 file at a predictable path. Point a TAXII-aware tool (or plain ``curl``) at the
-files below; OpenCTI/other importers that accept a STIX bundle can also just pull
-the collection ``objects.json`` directly.
+files below. Note that ``objects.json`` is a TAXII envelope (``{more, objects}``),
+not a STIX bundle: a tool that imports a ``bundle`` (OpenCTI's file import, for
+one; this project has not validated that path against a live instance) should
+use the real bundle at ``data/incidents.stix.json`` instead.
 
 Layout (all relative to the Pages root, e.g.
 https://emmanuelgjr.github.io/genai_incidents):
@@ -32,7 +34,7 @@ import json
 import uuid
 from pathlib import Path
 
-from export_stix import build_bundle, NS
+from export_stix import build_bundle, NS, _owasp_llm_source_name
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -146,7 +148,7 @@ This directory is a **read-only, static** TAXII 2.1 mirror of the
 ## OWASP edition label
 
 OWASP LLM `external_references` in these objects carry an edition-qualified
-`source_name`, currently `owasp-llm-top10-2026` (until 2026-10-01 13:43 UTC,
+`source_name`, `{_owasp_llm_source_name()}` in this build (until 2026-10-01 13:43 UTC,
 the Pages deploy of `7dc80602`, it read `owasp-llm-top10-2025`, which was the
 wrong edition for these codes). The edition is derived from the crosswalk
 `mappings/owasp_llm_2025_to_2026.json`. The relabel changed object content
@@ -180,8 +182,10 @@ copy was built from.
 GitHub Pages serves these files as `application/json`, **not** the
 `{TAXII_MEDIA}` media type a strict TAXII 2.1 client expects, and it cannot
 honour `?added_after=`/pagination query strings. Tools that tolerate the generic
-JSON type (or that accept a STIX bundle directly) can consume the collection
-`objects.json` as-is — it is a valid STIX 2.1 envelope. For a fully
+JSON type can read the collection `objects.json` as-is: it is a TAXII 2.1
+envelope (`{{more, objects}}`) whose `objects` array holds STIX 2.1 objects, **not**
+a STIX `bundle`, so a tool that expects a bundle must be given
+`data/incidents.stix.json` instead. For a fully
 conformant live API, mirror these objects behind a real TAXII server
 (e.g. Medallion) or import the STIX bundle at `data/incidents.stix.json`.
 
