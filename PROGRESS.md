@@ -63,6 +63,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🧭 2026-10-13: USER GOAL: repo cleanup + ingestion repair + full follow-up list ("improve and update")
+- **User, verbatim:** "we need to do a repo cleanup, multiple things seems way to cluttered. also nothing was injested, check all injestion automations and ensure they are working. list all follow ups. improve and update"
+- **Foreman [R]:**
+  - **auto-refresh.yml (weekly cron) has FAILED on every run seen:** schedule runs on 10-11, 10-04, 09-27 and 09-20, and dispatch runs on 10-09 and 09-14.
+  - cve-enrich.yml is dispatch-only and last ran 2026-07-02.
+- **Dispatched, all read-only and reporting first:**
+  1. pipeline-engineer: diagnose ingestion (failure logs, per-source last success, fix plan split into "already ruled, e.g. D66 decouple" vs "needs user");
+  2. Explore: clutter inventory (about 45 worktrees, local and remote branches, untracked or generated files, tracked clutter, stashes), classified SAFE / NEEDS-CONFIRM / NEEDS-RESCUE / KEEP;
+  3. Explore: a deduplicated follow-up list from PROGRESS, the plan, the cut package, the notes and outreach.
+- **No deletion happens before user confirmation of the cleanup plan.** Rescue comes before any removal.
+
 ### 🚀 v2.13.0 PUBLISHED 2026-10-13 (steps 6-9)
 - **Pre-publish re-check, in the gate's words:** "VERDICT: PASS (scoped re-check of pre-publish bounce #1, release/v2.13.0-cut @ a11f8954). DEFECTS: none."
   - **The gate corrected itself:** "the foreman's refutation stands ... I had excluded group C (00497 and 08139) from the v2.11.0 eight, but that group is part of the eight."
