@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ WS6 docs follow-ups: **DONE. Gate PASS on `6b331e07`; MERGED to main as `337117fc` (`--no-ff`)**
+- **Closed:** c2 (README fully absolute, 0 relative); c3 (supersession note); c14 (VERSIONING, **plus an a11y-green pre-publish requirement**); c15 (banner "CC-BY-4.0 data (with exceptions)"); c16 (HF card corpus wording); b29 (TAXII edition derived); c12 N-a, N-b, N-f, N-g, N-h.
+  - **Partly closed: c17, 3 of 4 parts.** OPEN: "CHANGELOG lacks the site UI fixes" (the released [2.11.0] section). → **USER question: dated note or leave it.**
+  - **Still open: c12 N-e** (WS0; it tracks the ATLAS re-point).
+- **The gate's verdict, in its words:** "VERDICT: PASS ... DEFECTS: none."
+- **What the gate re-derived by its own route:**
+  - c16 categories: 8,006 / 7,160 / 307 / 111 / 41 / 12, out of 15,637;
+  - c3: built both bundles; 2,543 retired, 2,543 added including the identity, 0 persisting with an unchanged `modified`;
+  - N-a: 7 check functions in 6 modes;
+  - the c14 literal list matches the code;
+  - the TAXII derivation fires (crosswalk 2099 gives "2099");
+  - README: 100 links, 0 relative, all 36 repo paths exist;
+  - the banner clears the graphic; the a11y run on 6b331e07 succeeded;
+  - fresh-clone pytest 1072 passed.
+- **Advisories:**
+  1. c17 is partial (above).
+  2. N-e is open.
+  3. VERSIONING step 5's "no version literal at all" is slightly too strong, since VERIS and years are exempt.
+  4. **"(the largest category)" on the HF card is an unguarded qualitative claim** (true by a margin of 846). → Note.
+  5. The banner can't link to NOTICE-DATA. The foreman accepts this: the README and the site strip both link.
+- **Foreman [R] after merge:** validate rc 0; drift clean. **The full pytest was NOT re-run before the push.** That relies on the gate's fresh-clone run at 6b331e07, and main had moved only through PROGRESS.md since.
+
 ### ▶ Follow-up batches dispatched 2026-10-13 ("keep going"; no-ruling items from `docs/audits/followups-register-2026-10-13.md`)
 - **WS6 docs** on `ws6/followups-docs-2026-10-13`:
   - c2: README relative links break on PyPI;
