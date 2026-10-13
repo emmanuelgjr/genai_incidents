@@ -63,6 +63,41 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D112, USER RULING: merge refresh PR #102 (Recommended). **MERGED at `692bb672`.** Main now has 15,671 rows / 15,642 incidents. validate rc 0.
+- **⚠ DEFECT FOUND AFTER MERGE: `check_stats_drift` FAILS on main.**
+  - README, docs/DATASHEET.md and docs/index.html (generic, :37, :45) still say 15,637, while stats.json says 15,642.
+  - **Root cause:** `auto-refresh.yml` runs `render_markdown.py` but never `render_docs_stats.py` or `check_stats_drift.py`. Any count-changing refresh therefore ships drifted surfaces, and earlier refreshes hid this because their counts didn't move.
+  - **The foreman's pre-merge verification missed it.** It diffed the data per entity and checked the files list, but did not run the drift check on the PR head. An agreement 6 lesson: verifying the data delta is not verifying the surfaces.
+  - **Fix routed to pe-airi** on `ws4/retire-airi-2026-10-13`, which already edits the same workflow:
+    - add render_docs_stats plus a hard drift gate before the PR step;
+    - regenerate main's surfaces;
+    - add a test that fires.
+
+  Main stays drifted until that merges (CI "Validate dataset" is expected red).
+
+### 🔍 Three deliverables in, all gated by DIFFERENT-ROUTE reviewers before going to the user
+- **D108, AIRI retired** (pe-airi `8d43617d`):
+  - code-level `RETIRED_SOURCES`;
+  - stamped over the live refresh-state each run;
+  - fetch step removed; data kept and held;
+  - B2 (id column) and B3 (override surfaced) done.
+
+  The drift fix is now being added to the same branch. A gate follows.
+- **D110, over-merge split proposal** (cs-overmerge `f1f1513f`):
+  - **Root cause:** the reference-URL dedupe key; `cve_disjoint` cannot fire on empty cve_ids.
+  - 258 candidate over-merges elsewhere, 14 of the same shape.
+  - Options: A2 (rule fix, byte-identical output), B-retire (+15 rows, INC-02646 split to 9 successors), B-keep (advised against: D70 shape), C.
+  - **Recommendation:** A2 now, B-retire later.
+  - **Blockers for B:** 3 "2026-Q1" dates; 6 ingest rows with round-up text.
+  - → gate-overmerge.
+- **Stage-2 ruling package** (pe-stage2 `3c97019b`), measured from today's held artifact:
+  - **2,066 held changes:** 7 merges, 12 retitles, 25 title edits, 190 content changes, 1,935 adds (1,811 new rows).
+  - OECD is 88 days behind; AIID is 91.
+  - **Recommendation:** A2, lift the AIID side only (0 merges, 0 tombstones, 113 rows).
+  - The D42 17 ruled per item.
+  - Engineering gaps: the approval file is not pinned; hold_pair_inputs makes approvals inert; per-id adds abort the next run.
+  - → gate-stage2.
+
 ### 🟢 TEST REFRESH run 38366793761 (from main 2e60e395): **SUCCESS. Refresh PR #102 opened. The first clean refresh since #97 (2026-07-27).** Held for the user.
 **Run:** cve-sweep=success, refresh=success. AIRI was not attempted (D95; not the first Sunday). The run is green.
 
