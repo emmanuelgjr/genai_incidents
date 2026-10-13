@@ -63,6 +63,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ WS6 licensing surfaces: **PASS (gate-licsurf re-gate on `047a4584`), MERGED.**
+**Verdict, in the gate's words:** "PASS. The re-gate of ws6/licensing-surfaces-2026-10-13 @ 047a4584 found the 3 bounce-#1 defects fixed truthfully, and A1/A2/A3/A5 are folded in correctly. DEFECTS: none."
+
+**Gate evidence:**
+- **sdist and wheel built at both commits.** The only ingest/ entry in the sdist is ingest/README.md (a bare README.md glob, CC-BY); the wheel has 0.
+- **HF card** is verbatim. Drift fires on a planted `(INC-02646, INC-03233)`.
+- **The new CORRECTIONS row checks out:**
+  - 5 columns.
+  - 81%/31%/run 9 match.
+  - The per-row diff over e6eb3410 is description/updated/last_seen only, titles unchanged.
+  - The original text is present in all 15 tags.
+  - v2.13.0's NOTICE has 0 "round-up" hits.
+  - The release (20:27) preceded the rewrite (23:39).
+- reuse lint identical to main. Fresh-clone pytest 1079 + 1 xfail. Stale-phrase sweep 0. merge-tree clean.
+
+**⚠ CORRECTION to the bounce-#1 entry below, made by the gate itself.** Its **A5 ("the sdist lacks NOTICE-DATA") was WRONG.** NOTICE-DATA was already in both the sdist and the wheel at 1ab030a8, via the build tool's default licence-file globs. The gate had read the include list instead of building, which is agreement 6 form (a)/(b). **Do not count A5 as a fixed finding.** The new pyproject include line is redundant but harmless and explicit, so it is kept. The bounce-#1 entry stays as written (agreement 4); this note supersedes its A5 line.
+
+**Foreman [R] on the merged main tree:** pytest **1148 passed + 1 xfail**; drift clean; validate rc 0; porcelain clean.
+
 ### ✅ WS2 precision follow-ups: **MERGED** (tip `e00699b5`), closed under D105 (verbatim + foreman string check, no third gate reading)
 - **Commits:**
   - `51b37d02`: D105 verbatim, `precisions?`.
