@@ -63,6 +63,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D103/D104, USER RULINGS 2026-10-13
+- **D103, licensing bounce #3: apply verbatim + grep, then merge (Recommended).**
+  - The license-auditor applies the gate's exact strings.
+  - The foreman runs the two greps (expected: 0 hits; only :206 and :232) plus `reuse spdx`, then records and merges. There is no fourth gate reading.
+- **D104: carve `ingest/cve_rejections.json` back to CC BY (Recommended).** It is project-derived state with no CVE text. Done in the same fix.
+
+### 🔍 D97/D98 rewrites: bounce #1 fixed at `64467e49`. **Scoped re-gate dispatched.**
+- **What changed:**
+  - The CVE is removed from the RES camoleak text, title and tags.
+  - INC-02646 now uses a neutral actor (0.0%, run 3).
+  - INC-03233's dates now attach to the activity.
+  - **INC-02382's title and tag `cve-2025-59145` are fixed at the merge winner, EXT-2025-CAMOLEAK in `ingest/aiid_incidents.json`.**
+- **Delta:** 4 rows (INC-02382 title/tags; 3 descriptions; plus updated/last_seen).
+- **The gate is asked:**
+  - whether editing `ingest/aiid_incidents.json` interacts with the D71 OECD/AIID freeze;
+  - to check the draft CORRECTIONS row. It may wrongly say INC-02382's description changed.
+
 ### ⛔ WS0 licensing: **BOUNCE #3 (scoped re-gate on `88db5c67`). ESCALATED to the user.**
 **Verdict, in the gate's words:** "Both defects are mechanical text fixes with no ruling needed, so 'apply the strings below verbatim, then a grep check' closes them."
 
