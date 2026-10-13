@@ -63,6 +63,37 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ WS4 refresh repair: **PASS (gate-refresh re-gate @ `2edf0422`), MERGED.** The test refresh is dispatched from main.
+**Verdict, in the gate's words:** "PASS… DEFECTS: none. Both bounce-#1 defects are fixed, A2 is folded in, and D107 is implemented as ruled."
+
+**Gate evidence:**
+- **The 14/4 column split, checked dynamically.** Each of the 18 mapped columns was overwritten with adversarial text and the changed `normalize_row` outputs counted. Warn-only columns (trigger, harm_societal, harm_env, response) changed **0** outputs; every required column changed some (254-2089). So no warn-only column reaches any published or derived field.
+- **Real-CSV renames:** every required column exits 1 with the file untouched; warn-only columns exit 0.
+- **Header-swap check:**
+  - Real medians are headline 57 vs system 12, so it does not fire on the real sheet.
+  - A real swap fires.
+  - Misfire probes: 30% or 45% of headlines shortened → no fire; 55% → fires.
+- **D107:**
+  - Floor boundaries are exact: 9/10 passes; 1509/1676 passes and 1509/1677 fails.
+  - The override fires only on exactly "1", and logs loudly.
+  - It never rescues 0 rows, schema drift or a missing header.
+  - **Inert on schedule runs and on default dispatches** (the expression renders '').
+- The PR body matches the steps. The D63 date reads 2026-07-27.
+- The specialist's tests fire under the gate's own code mutations.
+- **Live AIAAIC ingest is identical to the first gate:** 1,509 rows; +5; edits on AIAAIC1796 and AIAAIC2266.
+- pytest 1210 + 1 xfail; validate, drift and actionlint 0. 0 data or ingest/*.json files touched.
+
+**Foreman [R]:** main d6c2f22b is an ancestor of 2edf0422, and **the merged tree is identical to the gated tree** (`HEAD^{tree} == 2edf0422^{tree}`).
+
+**Advisories → follow-up (small, WS4):**
+- **A1:** the swap check filters rows on `r[0]` instead of `r[col["id"]]`. If the ID column moves, the check is blind; today the 0.9 floor backstops it, but not under the override. One-line fix.
+- **A2:** the override warning only reaches step stderr. Surface it in GITHUB_STEP_SUMMARY and the PR body.
+- **A3:** same-kind column swaps (deployer↔developer) pass, as documented.
+
+**Expect:**
+- the D63 overdue alert fires on the first Monday (#97 is 77 days old) until a refresh PR merges;
+- AIRI goes red on the first Sunday monthly (2026-11-01).
+
 ### 🔁 WS4 refresh repair: **BOUNCE #1 (gate-refresh, whole branch @ `2cb81847`).** Back with pe-refresh-fix. Plus **D107**.
 **Verdict, in the gate's words:** "The core of the branch holds up… Both defects are mechanical, one-line fixes, so the re-gate can be limited to them."
 
