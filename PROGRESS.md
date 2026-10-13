@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ WS0 licensing follow-ups c5-c11 + D96-D104: **MERGED** (`aff7635f`, closed under D103: verbatim strings + foreman grep, no fourth gate reading)
+- **Foreman [R] checks on `aff7635f`:**
+  - **grep1** (`against the 2026 .LLM00_Preface`): 0 hits now, **3 hits on 88db5c67**, so it fires.
+  - **Finding:** the gate's grep pattern needs a character before `LLM00`, so it **cannot see the 2 un-backticked occurrences** (dep5 and NOTICE-DATA). A positive check covers them: the new string appears exactly once in each of the 5 files.
+  - **grep2:** only :206 and :232, as the gate predicted.
+  - **`reuse spdx`:**
+    - CC-BY + CC-BY-SA for exactly the 3 OWASP LLM files (2025, 2026, crosswalk), as well as ASI;
+    - `cve_rejections.json` → CC-BY (D104);
+    - upstream jsons → LicenseRef-upstream-terms;
+    - `_state` → CC-BY.
+  - NUL 0. pytest 1079 passed, 1 xfailed.
+- **Gate history:**
+  - BOUNCE #1: 3 record defects.
+  - BOUNCE #2: crosswalk; function name.
+  - BOUNCE #3: source attribution; §3.7 wording.
+  - Each of those checks is recorded above.
+- **Still to do:**
+  - the D96 rewrite of the OWASP LLM descriptions (next release);
+  - the D97/D98 data rewrites (separate branch, in re-gate);
+  - the INC-02382 CORRECTIONS row, which the foreman places after the rewrites pass;
+  - **docs-warden sweep** (licensing text changed, protocol step 7).
+
 ### ⚖ D103/D104, USER RULINGS 2026-10-13
 - **D103, licensing bounce #3: apply verbatim + grep, then merge (Recommended).**
   - The license-auditor applies the gate's exact strings.
