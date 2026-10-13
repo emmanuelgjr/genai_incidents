@@ -523,14 +523,23 @@ Re-checked against the tree on 2026-10-12 (Grep and file reads, no shell):
   (`scripts/merge_and_dedupe.py:2077`; `tests/test_d42_refresh_merge_gate.py:31`;
   `docs/audits/D42-refresh-merge-review-2026-10-03.md:78`). Against that form,
   line 342's `ruled_by` is accurate.
-- The **D28 split-authorization file's** field is `decided_by: "user"`
+- The **D28 split-authorization file WRITES** `decided_by: "user"`
   (`docs/audits/WS4-T19-authorized-splits-2026-09-18.json`, `authorization` object,
-  line 10), validated by WS4-T21; the same `decided_by` form is used by the precision
-  authorization (`scripts/validate.py:903`).
-- So the two existing marker forms differ in this field name, and line 342's
-  clause "as WS4-T21 did for D28" is accurate only for the **hash pinned in code**,
-  not for the field name. A reader taking that clause to mean the D28 field name
-  (`decided_by`) would be wrong for the approval file and right for D28.
+  line 10), but **nothing enforces that field for D28**. Corrected on the raw-text
+  gate (2026-10-13): this note first said `decided_by` was "validated by WS4-T21",
+  which is wrong. The D28 validator, `_check_split_authorization`
+  (`scripts/merge_and_dedupe.py:1930-1967`), checks only `authorization` is a dict,
+  `decision == "D28"`, the file's own `entries_sha256` against a fresh hash of its
+  `entries`, and that hash against the value pinned in code
+  (`REQUIRED_SPLIT_AUTHORIZATION_ENTRIES_SHA256`); it never reads `decided_by`.
+  The only enforced `decided_by` check in the tree is the precision-authorization
+  gate (`scripts/validate.py:903`: `decided_by` must equal `"user"`).
+- So, by field name: the D42 approval file **enforces** `ruled_by`; the D28 file
+  **writes but does not enforce** `decided_by`; the precision authorization
+  **enforces** `decided_by`. Line 342's clause "as WS4-T21 did for D28" is accurate
+  only for the **hash pinned in code**, not for the field name or its enforcement.
+  A reader taking that clause to mean the D28 field name (`decided_by`) would be
+  wrong for the approval file, and would also wrongly assume D28 enforces it.
 - **Do not read line 342 as a specification of the S7 field name.** The S7 builder
   must choose one form deliberately and say which; this note does not choose.
 
