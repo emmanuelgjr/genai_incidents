@@ -188,10 +188,11 @@ https://creativecommons.org/licenses/by-sa/4.0/legalcode). The
 round-ups summarise incidents reported by third parties; their
 underlying reporting is not OWASP's and is not covered by this notice.
 A measurement on 2026-10-13 found that two shipped entries, INC-02646
-and INC-03233, carry description text that is verbatim or near-verbatim
-from these round-ups; they are to be rewritten from their primary
-sources (decision D97), and until then that text remains under CC BY-SA
-4.0, not CC BY 4.0. The other shipped entries that cite these round-ups
+and INC-03233, carried description text that is verbatim or near-verbatim
+from these round-ups. Both were rewritten from their primary sources on
+2026-10-13 (decision D97) and now carry the project's own wording; the
+releases up to and including v2.13.0 carried the CC BY-SA 4.0 round-up
+text under the CC BY 4.0 grant. The other shipped entries that cite these round-ups
 were measured as the project's own wording. Provenance of three rows,
 OWASP-GENAI-Q1-2026-01, -02 and -03, is unconfirmed: they appear on no
 cited round-up page. The three OWASP-AIX-* rows are the project's own
@@ -302,9 +303,9 @@ Top 10 for LLM Applications), the grant covers the material reproduced
 obligation is attribution or a notice that accompanies copies (CVE- and
 AVID-derived rows also carry a row-level content_license marker). The
 seventh, the OWASP Gen AI incident round-ups, is an exception: two
-shipped entries (INC-02646, INC-03233) carry CC BY-SA 4.0 round-up text
-until they are rewritten from their primary sources (decision D97); see
-the round-up paragraph above.
+shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
+up to and including v2.13.0 and were rewritten from their primary sources
+on 2026-10-13 (decision D97); see the round-up paragraph above.
 
 AIM's own terms self-incorporate OECD's general
 Data-reuse conditions -- "Your use of the OECD AI incidents and

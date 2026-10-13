@@ -185,10 +185,10 @@ Exact per-row counts and the merge-precedence exceptions: `title`'s in
 summary-of-outcomes row (§1.5 covers the full licensing analysis), in the
 source repository.
 
-Two entries (identified in `NOTICE-DATA`) carry description text taken from the
-**OWASP Gen AI Security Project incident round-ups**, which is **CC BY-SA 4.0**;
-they are pending a rewrite from primary sources, and until then that text is
-CC BY-SA 4.0, not CC BY 4.0. Separately, four mapping files in the source
+Two entries (identified in `NOTICE-DATA`) carried description text taken from the
+**OWASP Gen AI Security Project incident round-ups** (**CC BY-SA 4.0**) in
+earlier releases; they were rewritten in the project's own wording on
+2026-10-13, and data published before that date still carries the original text. Separately, four mapping files in the source
 repository (`mappings/owasp_asi_top10.json`, `mappings/owasp_llm_top10_2026.json`,
 `mappings/owasp_llm_top10_2025.json`, `mappings/owasp_llm_2025_to_2026.json`) are
 `CC-BY-SA-4.0 AND CC-BY-4.0` for the OWASP codes, names and (LLM files) description
@@ -204,7 +204,7 @@ in the source repository is the authoritative account.
 - **Build provenance:** `build_manifest.json` (commit, build time, counts, taxonomy versions) and `SHA256SUMS` (`sha256sum -c`) ship beside `incidents.jsonl` in this repository
 - **Citation:** [`CITATION.cff`](https://github.com/emmanuelgjr/genai_incidents/blob/main/CITATION.cff) · DOI [10.5281/zenodo.20248675](https://doi.org/10.5281/zenodo.20248675) (Zenodo concept DOI, always resolves to the latest release)
 
-**Licence:** data **CC-BY-4.0** (with exceptions: see Licensing above for row-level AIAAIC and OWASP round-up obligations), code MIT.
+**Licence:** data **CC-BY-4.0** (with exceptions: see Licensing above for row-level AIAAIC obligations and the OWASP carve-outs), code MIT.
 """
 
 

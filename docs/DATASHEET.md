@@ -135,10 +135,10 @@ review, and the Heuristic labels bullet below for known gaps.
   and scope text is scheduled to be paraphrased in the next release; it has not
   been yet. See `NOTICE-DATA` and [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)
   §3.6 and §3.7.
-- **Two rows carry OWASP Gen AI round-up text (CC BY-SA 4.0).** `INC-02646` and
-  `INC-03233` are pending a rewrite from their primary sources; until then that
-  text is CC BY-SA 4.0, not CC BY 4.0 (`NOTICE-DATA`;
-  [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §1.6).
+- **Two rows carried OWASP Gen AI round-up text (CC BY-SA 4.0) up to and including
+  v2.13.0.** The descriptions of `INC-02646` and `INC-03233` were rewritten in the
+  project's own wording on 2026-10-13 (D97); earlier releases still carry the
+  original text (`NOTICE-DATA`; [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §1.6).
 - **`ingest/` keeps upstream terms.** The `ingest/*.json` snapshots stay under
   each upstream source's own terms, not this dataset's CC-BY-4.0 grant (carve-backs:
   provenance files, `ingest/_state/*`, `ingest/README.md` and

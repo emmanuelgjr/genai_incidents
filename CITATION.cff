@@ -45,9 +45,9 @@ abstract: >-
   owasp_llm_top10_2026.json, owasp_llm_top10_2025.json,
   owasp_llm_2025_to_2026.json) are CC-BY-SA-4.0 AND CC-BY-4.0 (OWASP
   codes and names, and the OWASP LLM description text, are CC BY-SA
-  4.0); two entries (INC-02646, INC-03233) carry OWASP round-up text
-  under CC BY-SA 4.0 pending rewrite; ingest/ snapshots keep their
-  upstream terms; see NOTICE-DATA.
+  4.0); two entries (INC-02646, INC-03233) carried OWASP round-up text
+  under CC BY-SA 4.0 up to v2.13.0, since rewritten; ingest/ snapshots
+  keep their upstream terms; see NOTICE-DATA.
 version: "2.13.0"
 date-released: "2026-10-13"
 preferred-citation:
