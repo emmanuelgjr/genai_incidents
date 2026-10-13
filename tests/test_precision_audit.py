@@ -411,8 +411,10 @@ def test_gate_fires_on_non_iso_decided(tmp_path, decided):
     m = json.loads(ap.read_text(encoding="utf-8"))
     m["authorization"]["decided"] = decided
     ap.write_text(json.dumps(m), encoding="utf-8")
-    problems = v.check_precision_audit("2.13.0", root)[0]
+    problems, line = v.check_precision_audit("2.13.0", root)
     assert any("decided is" in p and "ISO YYYY-MM-DD" in p for p in problems), problems
+    # b4: the status line must not call a failing marker "authorised"
+    assert "NOT authorised" in line and "authorised by" not in line, line
 
 
 def test_unratified_grace_path_still_accepts_placeholder_date(tmp_path):
@@ -555,8 +557,9 @@ def test_extra_dated_audit_dir_is_caught(tmp_path):
     shutil.copytree(_audit(root), root / "docs" / "audits" / "precision" / "2026-12-01")
     problems = v.check_precision_audit("2.14.0", root)[0]
     assert len(problems) == 1 and "2026-12-01" in problems[0]
-    # wilson_ci follows the newest directory; the gate keeps checking the pinned one
-    assert w.latest_audit_dir(root / "docs" / "audits" / "precision").name == "2026-12-01"
+    # b17 advisory 2: wilson_ci no longer follows the newest directory; it refuses to guess
+    with pytest.raises(w.AuditDirError, match="refusing to guess"):
+        w.sole_audit_dir(root / "docs" / "audits" / "precision")
 
 
 def test_missing_pinned_dir_is_caught(tmp_path):
@@ -659,3 +662,146 @@ def test_double_bom_or_missing_column_is_refused(tmp_path):
     p.write_bytes(b"id,label,human_by\nINC-1,in-scope,Jane\n")
     with pytest.raises(w.LabelError, match="required column"):
         w.read_human_labels(p)
+
+
+# --------------------------------------------------------------------------- b4: status line
+def test_status_line_on_committed_tree_is_exactly_authorised_by_d76():
+    """Control for the b4 tests: the real tree's line is unchanged."""
+    problems, line = v.check_precision_audit("2.13.0")
+    assert problems == [] and line == "precision: pending, authorised by D76"
+
+
+@pytest.mark.parametrize("corrupt", ["decided", "decided_by", "entries_sha256", "extra_dir", "stray_figure"])
+def test_status_line_says_not_authorised_whenever_problems(tmp_path, corrupt):
+    """b4: with the marker naming the pinned D76 but ANY problem present, the
+    line used to read "authorised by D76". It must now say NOT authorised."""
+    root = _copy_root(tmp_path)
+    ap = _audit(root) / "pending_authorization.json"
+    m = json.loads(ap.read_text(encoding="utf-8"))
+    if corrupt == "extra_dir":
+        (root / "docs" / "audits" / "precision" / "2026-10-11b").mkdir()
+    elif corrupt == "stray_figure":
+        _edit(root / "docs" / "DATASHEET.md", "it is never hand-typed.", "it is never hand-typed. Precision is 92%.")
+    else:
+        m["authorization"][corrupt] = {"decided": "2026/10/11", "decided_by": "agent",
+                                       "entries_sha256": "0" * 64}[corrupt]
+        ap.write_text(json.dumps(m), encoding="utf-8")
+    problems, line = v.check_precision_audit("2.13.0", root)
+    assert problems, corrupt
+    assert m["authorization"]["decision"] == "D76"  # the marker still names the pinned decision
+    assert line.startswith("precision: pending, NOT authorised") and "authorised by" not in line, line
+
+
+def test_measured_line_flags_problems(tmp_path):
+    root = _measured_copy(tmp_path)
+    (root / "docs" / "audits" / "precision" / "2026-10-11b").mkdir()
+    problems, line = v.check_precision_audit("2.14.0", root)
+    assert problems and line.startswith("precision: measured") and "FAILING (1 problem(s))" in line
+
+
+# --------------------------------------------------------------------------- b17.1: directory pin
+@pytest.mark.parametrize("name", ["2026-10-11b", "2026-10-11 copy", "2026-10-12", "20261011", "scratch"])
+def test_any_extra_audit_dir_is_caught(tmp_path, name):
+    """b17 advisory 1: the old date-shaped glob did not see '2026-10-11b'.
+    Every directory besides the pinned one now fails, empty or full."""
+    root = _copy_root(tmp_path)
+    assert v.check_precision_audit("2.13.0", root)[0] == []  # control
+    (root / "docs" / "audits" / "precision" / name).mkdir()
+    problems = v.check_precision_audit("2.13.0", root)[0]
+    assert len(problems) == 1 and name in problems[0] and "besides the pinned" in problems[0]
+
+
+def test_loose_file_in_precision_root_is_not_flagged(tmp_path):
+    """Only directories are audits; a loose file is not flagged (scope note)."""
+    root = _copy_root(tmp_path)
+    (root / "docs" / "audits" / "precision" / "NOTES.txt").write_text("x", encoding="utf-8")
+    assert v.check_precision_audit("2.13.0", root)[0] == []
+
+
+# --------------------------------------------------------------------------- b17.2: CLI directory choice
+def test_cli_uses_the_sole_dir_and_refuses_when_two_exist(tmp_path, monkeypatch, capsys):
+    root = _copy_root(tmp_path)
+    prec = root / "docs" / "audits" / "precision"
+    monkeypatch.setattr(w, "PRECISION_ROOT", prec)
+    ds = str(root / "docs" / "DATASHEET.md")
+    assert w.sole_audit_dir() == _audit(root)  # control: one dir -> that dir
+    assert w.main(["--datasheet", ds, "--check"]) == 0
+    shutil.copytree(_audit(root), prec / "2026-10-11b")  # a self-consistent variant, sorts last
+    with pytest.raises(w.AuditDirError):
+        w.sole_audit_dir()
+    capsys.readouterr()
+    assert w.main(["--datasheet", ds, "--check"]) == 2
+    assert "refusing to guess" in capsys.readouterr().out
+    assert ev.main([]) == 2  # the evaluation stub shares the rule
+    # an explicit --audit-dir is still honoured
+    assert w.main(["--audit-dir", str(_audit(root)), "--datasheet", ds, "--check"]) == 0
+
+
+def test_cli_refuses_when_no_dir(tmp_path, monkeypatch):
+    monkeypatch.setattr(w, "PRECISION_ROOT", tmp_path / "none")
+    with pytest.raises(w.AuditDirError, match="no audit directory"):
+        w.sole_audit_dir()
+
+
+# --------------------------------------------------------------------------- b17.3: stray figures
+NL = chr(10)
+
+
+def test_committed_datasheet_has_no_stray_precision_figure():
+    """Control: the real DATASHEET passes (it also carries an unrelated '~36%')."""
+    text = (ROOT / "docs" / "DATASHEET.md").read_text(encoding="utf-8")
+    assert "36%" in text
+    assert w.stray_precision_figures(text) == []
+
+
+@pytest.mark.parametrize("old,new", [
+    # in the Measured-precision section, next to the word
+    ("it is never hand-typed.", "it is never hand-typed. Precision is 92%."),
+    # in the Measured-precision section, WITHOUT the word (rule 3)
+    ("it is never hand-typed.", "it is never hand-typed." + NL + NL + "Pilot result: 91.5 %."),
+    # a proportion rather than a percentage
+    ("it is never hand-typed.", "it is never hand-typed. Precision was 0.93 on the pilot."),
+    # elsewhere in the DATASHEET, in a list item that names precision
+    ("precision-first heuristics;", "precision-first heuristics (measured 95 percent);"),
+    # a full-width percent sign, built numerically
+    ("precision-first heuristics;", "precision-first heuristics (97" + chr(0xFF05) + ");"),
+    # a no-break space between number and sign
+    ("precision-first heuristics;", "precision-first heuristics (97" + chr(0xA0) + "%);"),
+    # a table whose header names precision and whose row carries the number
+    ("## Uses", "| Tier | Precision |" + NL + "|---|---|" + NL + "| feed | 88% |" + NL + NL + "## Uses"),
+    # a second, hand-made block after the generated one
+    (w.BLOCK_END, w.BLOCK_END + NL + NL + w.BLOCK_BEGIN + NL + "92" + NL + w.BLOCK_END),
+])
+def test_stray_precision_figure_fires(tmp_path, old, new):
+    root = _copy_root(tmp_path)
+    dsp = root / "docs" / "DATASHEET.md"
+    assert v.check_precision_audit("2.13.0", root)[0] == []  # control
+    _edit(dsp, old, new)
+    assert w.stray_precision_figures(dsp.read_text(encoding="utf-8"))
+    problems, line = v.check_precision_audit("2.13.0", root)
+    assert any("DATASHEET" in p for p in problems) and "NOT authorised" in line
+    assert w.main(["--audit-dir", str(_audit(root)), "--datasheet", str(dsp), "--check"]) == 1
+
+
+@pytest.mark.parametrize("old,new", [
+    # a percentage in a DIFFERENT bullet from the one naming precision
+    ("precision-first heuristics; `quality_tier` records vetting level.",
+     "precision-first heuristics; `quality_tier` records vetting level." + NL + "- **Coverage:** 40% of rows."),
+    # version strings, dates and file names next to the word are not figures
+    ("it is never hand-typed.", "it is never hand-typed (precision gate since v2.13.0, 2026-10-11, INCLUSION.md)."),
+])
+def test_stray_precision_figure_does_not_misfire(tmp_path, old, new):
+    root = _copy_root(tmp_path)
+    dsp = root / "docs" / "DATASHEET.md"
+    _edit(dsp, old, new)
+    assert w.stray_precision_figures(dsp.read_text(encoding="utf-8")) == []
+
+
+def test_stray_figure_known_limit_bare_integer(tmp_path):
+    """Documented known limit (stray_precision_figures docstring): a bare
+    integer outside the Measured-precision section is NOT detected. Pinned so
+    that a future tightening shows up as a deliberate test change."""
+    root = _copy_root(tmp_path)
+    dsp = root / "docs" / "DATASHEET.md"
+    _edit(dsp, "precision-first heuristics;", "precision-first heuristics (score 92);")
+    assert w.stray_precision_figures(dsp.read_text(encoding="utf-8")) == []

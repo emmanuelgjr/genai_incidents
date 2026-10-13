@@ -85,7 +85,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--audit-dir", type=Path, default=None)
     ap.add_argument("--data", type=Path, default=ROOT / "data" / "incidents.json")
     a = ap.parse_args(argv)
-    audit_dir = a.audit_dir or w.latest_audit_dir()
+    try:
+        audit_dir = a.audit_dir or w.sole_audit_dir()
+    except w.AuditDirError as exc:
+        print(f"[eval-ai-relevance] REFUSED: {exc}")
+        return 2
     try:
         labels = w.read_human_labels(audit_dir / w.SHEET_FILE)
     except w.LabelError as exc:

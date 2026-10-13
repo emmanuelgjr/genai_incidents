@@ -7,6 +7,25 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Fixed - precision-audit gate follow-ups (register items b4, b17; tooling only, 0 data changes)
+
+- **b4:** `scripts/validate.py` no longer prints "precision: pending, authorised by D76"
+  when the gate has found problems (for example a non-ISO `decided` in the marker). The
+  line now reads "NOT authorised (N problem(s) ...)". A measured state with problems is
+  suffixed "FAILING". On the committed tree the line is unchanged.
+- **b17.1:** the audit-directory pin rejects every directory under
+  `docs/audits/precision/` except the pinned one. The old date-shaped glob did not see a
+  variant such as `2026-10-11b`.
+- **b17.2:** `scripts/wilson_ci.py` and `scripts/evaluate_ai_relevance.py` no longer pick
+  the newest audit directory. Without `--audit-dir` they refuse (rc 2) if more than one
+  directory exists.
+- **b17.3:** a precision figure typed into `docs/DATASHEET.md` outside the generated
+  block now fails `validate.py` and `wilson_ci.py --check`. The check looks for a
+  percentage or a 0.xx proportion in any paragraph, list item or table that mentions
+  precision, for any figure in the "Measured precision" section, and for a duplicate
+  block. It does not catch a bare integer, a figure written in words, or figures in other
+  files. These limits are listed in `stray_precision_figures` and pinned by a test.
+
 ## [2.13.0] — 2026-10-13
 
 ### Changed - OWASP ASI re-pinned to the 2026 Top 10 for Agentic Applications; citation fixed; OWASP attribution added (v2.13.0 item 9, D78-D80, D83-D88)

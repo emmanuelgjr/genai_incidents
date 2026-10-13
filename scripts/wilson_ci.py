@@ -99,9 +99,30 @@ def wilson(x: float, n: float, z: float = Z95) -> tuple[float, float]:
     return max(0.0, centre - half), min(1.0, centre + half)
 
 
-def latest_audit_dir(root: Path = PRECISION_ROOT) -> Path | None:
-    dated = sorted(p for p in root.glob("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]") if p.is_dir())
-    return dated[-1] if dated else None
+class AuditDirError(ValueError):
+    """The default audit directory is ambiguous (more than one) or absent."""
+
+
+def sole_audit_dir(root: Path | None = None) -> Path:
+    """The ONE audit directory under docs/audits/precision/ (b17 advisory 2).
+
+    This used to pick the newest dated directory, so a second directory --
+    including a variant such as ``2026-10-11b`` that a date-shaped glob does
+    not even see -- silently became what the CLI measured and rendered, while
+    scripts/validate.py kept checking the pinned one. Now ANY second
+    subdirectory is an error: pass ``--audit-dir`` explicitly, or (for a new
+    audit) take the user decision and re-pin scripts/validate.py first. The
+    pin itself lives only in validate.py; this function does not duplicate it,
+    and validate.py fails if the sole directory is not the pinned one.
+    """
+    root = PRECISION_ROOT if root is None else root
+    dirs = sorted(p for p in root.iterdir() if p.is_dir()) if root.is_dir() else []
+    if not dirs:
+        raise AuditDirError(f"no audit directory under {root}")
+    if len(dirs) > 1:
+        raise AuditDirError(f"{len(dirs)} directories under {root} ({[d.name for d in dirs]}); "
+                            "refusing to guess -- pass --audit-dir explicitly")
+    return dirs[0]
 
 
 REQUIRED_SHEET_COLUMNS = ("id", "human_label", "human_by")
@@ -289,6 +310,76 @@ def render_block(res: dict) -> str:
     return f"{BLOCK_BEGIN}\n{head}\n\n{body}\n\nRe-derive: `python scripts/wilson_ci.py --check`\n{BLOCK_END}"
 
 
+# b17 advisory 3: a precision figure hand-typed OUTSIDE the generated block.
+# "Figure" = a percentage (digits followed by %, a full-width percent sign,
+# "percent", "per cent" or "pct", optionally after a space or no-break space)
+# or a bare proportion written 0.xx / .xx. Characters outside ASCII are built
+# numerically (house rule: no escape literals).
+_SPACES = "[" + chr(0x20) + chr(0xA0) + chr(0x202F) + "]*"
+_PERCENT = "(?:%|" + chr(0xFF05) + "|percent|per cent|pct)"
+FIGURE_RE = re.compile(
+    "(?<![0-9A-Za-z.])(?:[0-9]+(?:[.,][0-9]+)?" + _SPACES + _PERCENT + "|0?[.][0-9]+(?![0-9.]))",
+    re.I,
+)
+_LIST_ITEM_RE = re.compile("^(?:[-*+]|[0-9]+[.)])" + chr(0x20))
+MEASURED_HEADING = "## Measured precision"
+
+
+def _chunks(text: str) -> list[str]:
+    """Blank-line paragraphs; a list paragraph is further split per item (so
+    one bullet's percentage is not attributed to another bullet's mention of
+    precision). Tables stay whole: a header naming precision and a row
+    carrying the number are one unit."""
+    out: list[str] = []
+    for para in re.split("(?:" + chr(10) + "[" + chr(32) + chr(9) + "]*){2,}", text):
+        cur: list[str] = []
+        for line in para.split(chr(10)):
+            if _LIST_ITEM_RE.match(line) and cur:
+                out.append(chr(10).join(cur))
+                cur = []
+            cur.append(line)
+        if cur:
+            out.append(chr(10).join(cur))
+    return out
+
+
+def stray_precision_figures(text: str) -> list[str]:
+    """Problems for any precision figure in the DATASHEET that the generated
+    block did not put there. Rules (each one has a test that makes it fire):
+      1. exactly one BLOCK_BEGIN and one BLOCK_END marker (a second, hand-made
+         block would otherwise sit unchecked after the first);
+      2. outside the block, no paragraph / list item / table that mentions
+         "precision" carries a figure (FIGURE_RE);
+      3. outside the block, the "## Measured precision" section carries no
+         figure at all, whether or not the word appears next to it.
+    Known limits (documented, not detected): a bare integer ("precision: 92"),
+    a figure spelled in words, a figure separated from the word "precision"
+    by a blank line OUTSIDE the Measured-precision section, and every file
+    other than docs/DATASHEET.md (README, release notes, CHANGELOG)."""
+    text = text.replace(chr(13) + chr(10), chr(10))
+    problems: list[str] = []
+    nb, ne = text.count(BLOCK_BEGIN), text.count(BLOCK_END)
+    if (nb, ne) != (1, 1):
+        problems.append(f"DATASHEET has {nb} precision:begin and {ne} precision:end markers; exactly one each "
+                        "is allowed")
+    block = datasheet_block(text)
+    outside = text.replace(block, chr(10) + chr(10)) if block else text
+    for chunk in _chunks(outside):
+        if "precision" in chunk.lower():
+            for m in FIGURE_RE.finditer(chunk):
+                problems.append(f"DATASHEET: figure {m.group(0)!r} next to 'precision' outside the generated "
+                                f"block: {chunk.strip()[:120]!r}")
+    i = outside.find(MEASURED_HEADING)
+    if i >= 0:
+        rest = outside[i + len(MEASURED_HEADING):]
+        j = rest.find(chr(10) + "## ")
+        section = rest if j < 0 else rest[:j]
+        for m in FIGURE_RE.finditer(section):
+            problems.append(f"DATASHEET: figure {m.group(0)!r} in the '{MEASURED_HEADING[3:]}' section outside "
+                            "the generated block")
+    return sorted(set(problems))
+
+
 def datasheet_block(text: str) -> str | None:
     i, j = text.find(BLOCK_BEGIN), text.find(BLOCK_END)
     if i < 0 or j < 0 or j < i:
@@ -307,9 +398,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--datasheet", type=Path, default=DATASHEET)
     a = ap.parse_args(argv)
-    audit_dir = a.audit_dir or latest_audit_dir()
-    if audit_dir is None:
-        print("[wilson] no docs/audits/precision/<date>/ directory")
+    try:
+        audit_dir = a.audit_dir or sole_audit_dir()
+    except AuditDirError as exc:
+        print(f"[wilson] REFUSED: {exc}")
         return 2
     audit_dir = audit_dir.resolve()
     # the repo root that owns this audit dir (<root>/docs/audits/precision/<date>), so the
@@ -336,8 +428,13 @@ def main(argv: list[str] | None = None) -> int:
         ds = a.datasheet.read_text(encoding="utf-8").replace("\r\n", "\n")
         if datasheet_block(ds) != block:
             bad.append("DATASHEET 'Measured precision' block differs from results")
+        stray = stray_precision_figures(ds)
         if bad:
             print("[wilson] STALE: " + "; ".join(bad) + " -- run `python scripts/wilson_ci.py --render-datasheet`")
+        if stray:
+            print("[wilson] HAND-TYPED: " + "; ".join(stray) + " -- remove the figure; only the generated block "
+                  "may state precision")
+        if bad or stray:
             return 1
         print("[wilson] results.json and DATASHEET block match a fresh computation.")
         return 0
