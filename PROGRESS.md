@@ -63,6 +63,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ WS0 licensing: **BOUNCE #2 (re-gate on `be418fd3`). ESCALATED to the user** (protocol step 6)
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. This is bounce #2 on this task, so per protocol it goes to the user. Both defects are small and mechanical."
+
+**Defects:**
+1. **The crosswalk `mappings/owasp_llm_2025_to_2026.json` carries OWASP CC BY-SA text but is outside the D96 carve-out.** It resolves to CC-BY-4.0 only. It holds all 20 OWASP risk names, and its `scope_change` strings match the 2026 Preface: LLM03 verbatim (60%, run 18), LLM04 "absorbs fine-tuning subversion", LLM08 verbatim (56%, run 9), LLM05 and LLM06 near-verbatim. The CORRECTIONS and NOTICE texts both say "these two files". The fix is to add it to the stanza, NOTICE and CORRECTIONS, **or** treat it as a new user question if D96 is read as exactly two files.
+2. **The c10 memo note names the wrong function.** Lines 1930-1967 are in `_verify_split_authorization_marker` (defined :1907, called :1986), not `_check_split_authorization` (:2334). The substance holds: neither reads `decided_by`.
+
+**Confirmed against the gate's own measurements:**
+- §1.6 (3 of 6; AIX lineage; overlap figures);
+- §3.7 (all 10 + 2025 figures; licence evidence);
+- §1.7/§1.8 (the sample; exact host counts; arithmetic 0 + 4 + 6 + 92 = 102);
+- §1.2a hold scope matches the code;
+- **"at least 10" hosts: exactly 10 re-derived**;
+- **NOTICE "ten" sources is correct**;
+- the foreman's `reuse spdx` [R] holds;
+- CORRECTIONS is a single added row;
+- memo +35/-0, line 342 untouched;
+- merge-tree clean.
+
+**Advisories:**
+- **A1:** the gate's first-gate Part A raw confirmations (OWASP footer, embracethered absence, c11) never reached the measurement record, so some cells still hedge. → Append them to the measurement file (agreement 5) and update the cells.
+- **A2:** the 2026 LLM file only exists since 19fa2986 (2026-08-17). CORRECTIONS should say "each file since its introduction".
+- **A3:** ingest/*.json has no REUSE licence info (pre-existing). `reuse lint` shows 345/453 licensed, with Apache-2.0, CC-BY-4.0 and MIT texts missing.
+
 ### 🔍 D97/D98 rewrites: corpus-surgeon `b130900e` on `ws1/licensing-rewrites-2026-10-13`. **Gate dispatched.**
 - **Shipped rows changed: 3.** INC-02646 (it was 81% verbatim), INC-03233 (31%) and INC-02436 (a RES span).
 - **Ingest-only rewrites: 3.** For RES camoleak, ox-mcp and anthropic-aug, another source's description wins the merge. They ship as INC-02382, INC-01015 and INC-08177 respectively.
