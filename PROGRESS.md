@@ -63,6 +63,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D113, USER RULING 2026-10-13: stage-2 package bounce #2 → **apply text + string check (Recommended).** The author adds the gate's measured 29-vs-7 sentence to §2(c) and A2's Risks and Recommendation, drops "leaves (b) untouched" and re-states the recommendation honestly. The foreman verifies the strings and merges the package for the user's ruling. No further gate reading.
+
 ### ⛔ Stage-2 ruling package: **BOUNCE #2 (gate-stage2 on `f665a531`). ESCALATED to the user.**
 **Verdict, in the gate's words:** "All six bounce-1 fixes check out. The bounce is for something new: I tested the new §2(c) claim by building forward from a simulated A2 lift, and the result undermines the package's main reason for recommending A2."
 
