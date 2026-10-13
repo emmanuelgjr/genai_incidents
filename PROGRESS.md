@@ -78,7 +78,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - Publish to PyPI succeeded: **PyPI latest 2.13.0**, with a wheel and an sdist.
   - Publish to Hugging Face succeeded: the HF raw card reads "Dataset version `2.13.0`", with the new OWASP/OECD names.
   - **Release assets succeeded (D74: first real release verified).** There are 6 assets. **`sha256sum -c SHA256SUMS` passes 5/5**, against assets downloaded by the foreman. build_manifest records commit 9cdaf5e5, built_at 2026-10-13T00:27:00Z (commit-date), dirty False, 15,637 / 29 / 22 / 1,915.
-  - The Pages deploy for 3fa025f7 is running. **The live STIX/TAXII check is pending.**
+  - **Live STIX/TAXII VERIFIED** after Pages run 38327821325 succeeded on 3fa025f7:
+    - the live `data/incidents.stix.json` has **65,141 objects** and 15,637 incidents, 1 `identity` (taxonomy_versions atlas 2026.09 / owasp_llm 2026 / owasp_asi 2026 / veris 1.4.1), 55 attack-patterns (= 53 persisting + 2 new) and revoked 0;
+    - the live TAXII `objects.json` has **65,141**;
+    - the live `data/SHA256SUMS` lists incidents.stix.json (1).
+- **v2.13.0 RELEASE COMPLETE. Steps 1-9 are all done and verified.**
+- **Follow-ups (not in this release):**
+  - OECD AIM rename sweep (WS6 docs + WS4 data delta: ingest_external.py:233/:241);
+  - README older Previous-release relative links, which break on PyPI (WS6);
+  - supersession note on the dated audit ws6-v2130-export-integrity:177-178 (WS6);
+  - WS2 taxonomy-card guard docs;
+  - D66 decouple (WS4); D63 overdue-review alert (WS4);
+  - WS3 ID-reuse audit (spec in docs/audits);
+  - WS6 `VERSION = "2.0.0"`;
+  - the 21 OWASP-* SOURCE_LICENSES row (WS0, open);
+  - precision labelling of the 150-row sheet (user action);
+  - OECD/AIID stage 2 (future).
 
 ### 🔍 Pre-publish bounce #1 fixed at `a11f8954` (notes only, pushed). **Scoped re-check sent.**
 - **D1:** "16 of the 17 gained appended records (24 records in all); `INC-00754` already had one ... and gained none ... reports `group`".
