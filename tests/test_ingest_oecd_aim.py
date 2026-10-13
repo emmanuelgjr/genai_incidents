@@ -624,6 +624,21 @@ def test_tally_reasons_counts_each_bucket_independently():
 # (docs/audits/E21-tripwire-refresh-2026-09-14.md).
 
 
+def test_is_numeric_slug_rejects_unicode_digits():
+    """b22 / WS4-T16: `\\d` matches any Unicode decimal digit in a Python str
+    pattern, so a slug of Arabic-Indic / fullwidth digits was classed legacy
+    and skipped. Strings are built with chr() so no escape literal can be
+    collapsed into real bytes by tooling."""
+    arabic_indic = "".join(chr(0x0660 + n) for n in (2, 5, 6))   # U+0662 U+0665 U+0666
+    fullwidth = "".join(chr(0xFF10 + n) for n in (2, 5, 6))      # U+FF12 U+FF15 U+FF16
+    mixed = "25" + chr(0x0666)
+    assert arabic_indic.isdigit() and arabic_indic.isdecimal()  # the premise: \d WOULD match
+    for slug in (arabic_indic, fullwidth, mixed):
+        assert o.is_numeric_slug("https://oecd.ai/en/incidents/" + slug) is False
+    # control: the ASCII equivalent is still legacy
+    assert o.is_numeric_slug("https://oecd.ai/en/incidents/256") is True
+
+
 def test_is_numeric_slug_classifies_legacy_vs_modern():
     # Legacy scheme: real examples observed live in the OECD AIM sitemap
     # (E21 audit, 2026-09-14): /en/incidents/256, /321, /281, /342, /359.

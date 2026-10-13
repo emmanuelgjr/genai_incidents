@@ -13,6 +13,12 @@ sys.path.insert(0, str(ROOT / "scripts"))
 def pytest_configure(config):
     config.addinivalue_line(
         "markers",
+        "slow: multi-minute scratch-repo builds (tests/test_oecd_stage1_freeze.py, "
+        "~400 s). Runs by default, including in CI; developers may skip it "
+        "locally with `pytest -m 'not slow'`.",
+    )
+    config.addinivalue_line(
+        "markers",
         "real_robots: exercise ingest.common's real robots.txt logic "
         "instead of the autouse allow-everything stub below.",
     )

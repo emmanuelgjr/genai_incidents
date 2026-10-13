@@ -63,6 +63,394 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D105/D106, USER RULINGS 2026-10-13 (precision bounce #2)
+- **D105: apply verbatim + string check (Recommended).** `precisions?` plus a should-fire test, proven to fail on 70dc0290. The foreman verifies and merges, with no third gate reading.
+- **D106: exempt only the design compounds (Recommended).** The exemption is narrowed to the design compounds actually used (precision-first and precision-oriented, grep-derived). -recall, -weighted and -at now count as mentions. Correct the CHANGELOG and code rationale. → Fresh label-scientist `ls-precfix` on the same branch, after merging origin/main.
+
+### 🔍 WS4 refresh repair: fix `2cb81847` for the PR #101 defects. **Whole-branch gate dispatched (gate-refresh).**
+- **AIAAIC root cause:** `Headline` → `Incident headline`; the sheet also gained a title row. Changes:
+  - an alias was added;
+  - `REQUIRED_COLUMNS` failing raises `SchemaDriftError` (exit 1); a missing header row is now an error;
+  - `MIN_YIELD_RATIO = 0.5`, with 0 always failing and the file written only after the check;
+  - the outcome propagates through `steps.ingest_aiaaic.outcome`.
+- **Fresh yield:** 1,509 vs 1,504. +5 rows; AIAAIC2266/1796 upstream edits; 292 owasp_llm reorders with identical sets.
+- **Held inputs** now stash to `$RUNNER_TEMP`, with a `--check-clean` guard before the PR step.
+- **Same empty-result guard** added to KEV, AIRI and the AIID snapshot. OECD (union) and the CVE sweep are left as-is, with reasons.
+- **PR #101's 1.5M-line diff** is a cascade block move: 15,394 entries moved; the serialisation round-trips byte-exact. Not formatting drift.
+- **Specialist checks:** pytest 1112 + 1 xfail; validate and drift clean; actionlint clean on auto-refresh.yml. The fire-proof reverted the 3 production files: 6 fail and 9 error.
+- **The gate is asked:**
+  - can any fresh OECD/AIID byte reach a PR;
+  - its own mutation fire-proofs;
+  - whether a stale AIRI makes every weekly run "fail" and turns the alert into noise;
+  - the D63 alert's input;
+  - merge-tree.
+
+### ⛔ WS2 precision follow-ups: **BOUNCE #2 (gate-precfu re-gate on `70dc0290`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "This is BOUNCE #2 on the task, so by protocol it goes to the user. The remaining fix is one token and I have already checked it."
+
+**Defect 1:** `MENTION_RE` `(?<![a-z])precision(?![a-z]|-[a-z])` no longer counts **"Precisions"**. "- Precisions were 92% and 88%." returns [], although it fired at 26dfcdb4. The narrowing is undocumented in the docstring and the CHANGELOG. **Fix:** `precisions?(?![a-z]|-[a-z])` plus one should-fire test. Gate scratch: 129 passed. **Mutation: allowing the plural fails 0 tests today, so nothing pins the gap.**
+
+**Advisory 1:** "precision-recall AUC 0.91", "Precision-Recall: 92% / 80%" and "precision-weighted score 0.91" all slip through. That is within the documented compound limit (ruling (a)), but the CHANGELOG and code rationale call these compounds "a design term, not a mention", which is false for -recall and -weighted. → User question.
+
+**Evidence:**
+- Committed tree: validate rc 0 ("precision: pending, authorised by D76"); wilson --check and drift rc 0. Fresh-clone pytest 1130 + 1 xfail.
+- Bounce-1 defect fixed: sentence-final, ".92", in-section, fullwidth %, "percent" and "91,5 %" all fire. False positives stay clean.
+- Mutations on test_precision_audit: lookahead reverted → 7 fail; substring → 2; compound exclusion dropped → 4; imprecision guard → 1; hint dropped → 1; plural → 0.
+- Diff limited to wilson_ci.py, tests and the CHANGELOG bullet.
+- **Merge-tree was clean vs 761eaef6 only. Main has since moved, so the foreman re-checks before merge.**
+
+### 🚨 REFRESH TEST RUN 38330687613 (on `7dd887fb`): **PR #101 opened but is NOT MERGEABLE. The foreman CLOSED it.** Three defects; this is the house failure mode (agreement 6).
+- **The run "failed" on purpose:** AIRI has failed 15 consecutive refreshes, so the source-health step fails loudly. That is by design. `7dd887fb` predates the D95 monthly-retry commit.
+- **The OECD/AIID hold WORKED. Foreman [R]:** a per-entity diff of data/incidents.json on PR head vs parent shows **0 content changes on OECD/AIID-sourced rows**, 0 rows added or removed, 15,666 rows.
+- **DEFECT 1, AIAAIC ingest wrote 0 rows and reported success.** The log reads `[aiaaic] WARNING: column 'headline' not found` … `2262 raw rows` … `wrote 0 security-relevant entries (skipped 2259)`, then `AIAAIC: success` and source health `aiaaic_sheet | success | 0 | ok`. `ingest/aiaaic_sheet_incidents.json` went from 1,504 rows to `[]`.
+  - **Downstream cascade:** 1,508 rows changed. `source_status` on 1,421; `source_ids`, `source_count` and `tags` on 78; `owasp_llm`/`mitre_atlas` on 59; `nist_ai_rmf` on 47; `owasp_asi` on 45.
+  - **Neither the tests (1083 passed) nor validation caught it.** A parser that cannot find its key column must fail, and a yield collapse must fail.
+- **DEFECT 2, `held-pair-inputs/` was COMMITTED into the PR.** That is the fresh `aiid_full.json`, `oecd_aim_full_incidents.json` (about 337k lines), the provenance and HOLD_REPORT. `scripts/hold_pair_inputs.py --stash-dir held-pair-inputs` (auto-refresh.yml:407) stashes inside the work tree, and create-pull-request commits everything. The bytes must live only in the artifact; the OECD title licence is unresolved.
+- **DEFECT 3:** `data/incidents.json` diff is about 1.5M lines for 1,508 changed rows. Likely a consequence of the cascade, but needs confirming: no formatting drift.
+- **Routing:** a FRESH pipeline-engineer goes on `ws4/v2130-refresh-decouple` (agreement 3 replace: pe-ingest-diag's report never arrived and it was told to stop). Its work:
+  - adapt the AIAAIC parser to the current sheet header;
+  - fail loudly on a missing key column or a 0/collapsed yield (yield floor vs the committed file), and record the outcome as failure in source health;
+  - stash held inputs outside the tree (`$RUNNER_TEMP`) or gitignore them;
+  - add tests proving each check fires.
+- **Deadline:** the next scheduled run is **Sun 2026-10-18 04:00 UTC**, which would reopen the same broken PR. Then gate, merge, and dispatch one test run.
+
+### 🔍 WS6 licensing surfaces: `1ab030a8` on `ws6/licensing-surfaces-2026-10-13` (it merges 73bce51b). **Gate dispatched (gate-licsurf).**
+- **Fixed: findings #1-#14.**
+  - README: four mapping files; an ingest/ bullet; a round-up bullet in the past tense; a parenthetical on the v2.13.0 blurb.
+  - CITATION.cff and .zenodo.json: identical "Exceptions:" tails.
+  - NOTICE-DATA: "ten".
+  - HF card generator; DATASHEET; site og and footer; methods paper; CONTRIBUTING; TAXONOMIES.
+  - The D97/D98 "pending" cells are now past tense: NOTICE-DATA round-up paragraph, SOURCE_LICENSES §1.6/§1.7 and summary rows 6/8.
+- **Specialist checks:**
+  - pytest 1079 + 1 xfail.
+  - Drift clean. **It fired twice on the first HF text**: a bare `02646` and a `2.13.0` literal.
+  - reuse 377/454, unchanged.
+  - **a11y: axe 0 (light/dark, desktop/mobile), Lighthouse 100, 380px PASS.**
+- **Dispute:** the specialist says the warden's #8 ordering claim is wrong (AIM is still last). The real stale text was "For the other five…". The gate will adjudicate.
+- **New follow-ups (for the register):**
+  - CONTRIBUTING:20 still says "Edit `data/incidents.json` directly", which conflicts with the no-hand-edit rule.
+  - The wheel and sdist ship no NOTICE-DATA, though the bundled `incidents.min.json` carries row-level obligations (AIAAIC/OECD).
+
+### ✅ D97/D98 rewrites + INC-02382 CVE fix: **PASS (gate-rewrite on `64467e49`), MERGED.** CORRECTIONS row placed.
+**Verdict, in the gate's words:** "PASS. ws1/licensing-rewrites-2026-10-13 @ 64467e49 fixes both bounce #1 defects, and the delta is exactly as declared. DEFECTS: none."
+
+**Gate evidence:**
+- **(a) Per-row delta e94ae7f7 → 64467e49:** exactly 4 rows.
+  - INC-02382: title, tags, updated, last_seen.
+  - INC-02436, INC-02646, INC-03233: description, updated, last_seen.
+  - Plus the `generated` stamp. 15,666 rows; ID set and order equal.
+- **(b) Freeze.** `aiid_incidents.json` IS a pair input (:2174), but the hold is row-scoped to AIID-/OECD-AIM- ids (:2040, :2261). INC-02382 carries EXT and RES ids only, so not holding it was correct.
+  - **The gate fires:** a direct call with `AIID-1` added → HELD ("title edit INC-02382 (D67)", "content change (D71): ['tags']").
+  - An armed-gate rebuild from e94ae7f7 reproduces 64467e49 byte for byte.
+- **(c) Overlap and facts:** all 6 new texts score 0.0% 5-gram, longest run 2-4. The shipped EXT camoleak text is 7.5% (run 7). Facts are matched to the sources. No cited source has a CamoLeak CVE (Legit 0 hits, SecurityWeek 0).
+- **(e) Clean clone:** pytest 1079 + 1 xfail; validate and drift rc 0; merge-tree clean vs d12a5a6c.
+
+**Advisories:**
+- (1) The draft CORRECTIONS row wrongly said INC-02382's description changed. **The gate's corrected sentence was used.**
+- (2) Trailing space in the RES camoleak ingest title. It reaches no output; tidy at the next ingest edit.
+- (3) Editing any EXT row in aiid_incidents.json arms a check of all 63 AIID rows. Conservative, not a defect.
+- (4) The OX date mismatch is still open.
+
+**Foreman [R] on the merged tree:** validate rc 0, drift clean, pytest 1079 + 1 xfail, NUL 0.
+
+**→ The live surfaces still describing D97/D98 as pending** (NOTICE-DATA round-up paragraph, SOURCE_LICENSES §1.6/§1.7) are routed to WS6 de-licdocs, which is already editing NOTICE-DATA.
+
+### 📋 docs-warden sweep after the licensing merge (main @ d12a5a6c): **15 findings**. 14 routed to WS6, 1 deferred.
+- **No live surface claims the D96 rewrite is done.**
+- **High:**
+  - **#1:** README:423 says "One mapping file is CC BY-SA"; there are now four.
+  - **#2:** the README licence section has nothing on ingest/ being under upstream terms.
+- **Medium:**
+  - **#3:** the README omits the 2 round-up rows.
+  - **#5/#6:** CITATION.cff:44-46 and .zenodo.json list only the ASI exception, and both feed external indexes.
+  - **#7/#8:** NOTICE-DATA:41 and :293 still say "eight". :293 also says AIM is the "last".
+  - **#9:** the HF card generator (export_huggingface.py:158-196) covers AIAAIC/OECD only.
+  - **#10:** the DATASHEET licence bullets.
+  - **#14:** TAXONOMIES has no OWASP LLM licence line, against the ASI one at :61.
+- **Low:**
+  - **#4:** the README:144 release blurb ("one mapping file").
+  - **#11:** the site footer/OG says unqualified CC-BY (index.html:37,253; incident-shard.html:49).
+  - **#12:** methods paper :167.
+  - **#13:** CONTRIBUTING :46/:21 (ingest/ drop-ins follow dep5).
+  - **#15:** the mapping JSONs carry no licence key.
+- **Clean:**
+  - dep5 arithmetic and stanza order;
+  - LICENSE-DATA and pyproject;
+  - INGESTION_CONDUCT "at least 10";
+  - SOURCE_LICENSES consistent;
+  - DATA_DICTIONARY;
+  - no other "eight sources".
+- **Routing:**
+  - #1-#14 go to **distribution-engineer** on `ws6/licensing-surfaces-2026-10-13` as one docs batch, with the a11y check required (#11 is a footer link, after the D89 axe precedent).
+  - **#15 is deferred** to the follow-ups register: optional licence metadata keys via the mapping tooling (schema-architect).
+
+### ✅ WS0 licensing follow-ups c5-c11 + D96-D104: **MERGED** (`aff7635f`, closed under D103: verbatim strings + foreman grep, no fourth gate reading)
+- **Foreman [R] checks on `aff7635f`:**
+  - **grep1** (`against the 2026 .LLM00_Preface`): 0 hits now, **3 hits on 88db5c67**, so it fires.
+  - **Finding:** the gate's grep pattern needs a character before `LLM00`, so it **cannot see the 2 un-backticked occurrences** (dep5 and NOTICE-DATA). A positive check covers them: the new string appears exactly once in each of the 5 files.
+  - **grep2:** only :206 and :232, as the gate predicted.
+  - **`reuse spdx`:**
+    - CC-BY + CC-BY-SA for exactly the 3 OWASP LLM files (2025, 2026, crosswalk), as well as ASI;
+    - `cve_rejections.json` → CC-BY (D104);
+    - upstream jsons → LicenseRef-upstream-terms;
+    - `_state` → CC-BY.
+  - NUL 0. pytest 1079 passed, 1 xfailed.
+- **Gate history:**
+  - BOUNCE #1: 3 record defects.
+  - BOUNCE #2: crosswalk; function name.
+  - BOUNCE #3: source attribution; §3.7 wording.
+  - Each of those checks is recorded above.
+- **Still to do:**
+  - the D96 rewrite of the OWASP LLM descriptions (next release);
+  - the D97/D98 data rewrites (separate branch, in re-gate);
+  - the INC-02382 CORRECTIONS row, which the foreman places after the rewrites pass;
+  - **docs-warden sweep** (licensing text changed, protocol step 7).
+
+### ⚖ D103/D104, USER RULINGS 2026-10-13
+- **D103, licensing bounce #3: apply verbatim + grep, then merge (Recommended).**
+  - The license-auditor applies the gate's exact strings.
+  - The foreman runs the two greps (expected: 0 hits; only :206 and :232) plus `reuse spdx`, then records and merges. There is no fourth gate reading.
+- **D104: carve `ingest/cve_rejections.json` back to CC BY (Recommended).** It is project-derived state with no CVE text. Done in the same fix.
+
+### 🔍 D97/D98 rewrites: bounce #1 fixed at `64467e49`. **Scoped re-gate dispatched.**
+- **What changed:**
+  - The CVE is removed from the RES camoleak text, title and tags.
+  - INC-02646 now uses a neutral actor (0.0%, run 3).
+  - INC-03233's dates now attach to the activity.
+  - **INC-02382's title and tag `cve-2025-59145` are fixed at the merge winner, EXT-2025-CAMOLEAK in `ingest/aiid_incidents.json`.**
+- **Delta:** 4 rows (INC-02382 title/tags; 3 descriptions; plus updated/last_seen).
+- **The gate is asked:**
+  - whether editing `ingest/aiid_incidents.json` interacts with the D71 OECD/AIID freeze;
+  - to check the draft CORRECTIONS row. It may wrongly say INC-02382's description changed.
+
+### ⛔ WS0 licensing: **BOUNCE #3 (scoped re-gate on `88db5c67`). ESCALATED to the user.**
+**Verdict, in the gate's words:** "Both defects are mechanical text fixes with no ruling needed, so 'apply the strings below verbatim, then a grep check' closes them."
+
+**Defects:**
+1. **The crosswalk measurement is attributed to "the 2026 LLM00_Preface.md" in 5 places:** dep5, NOTICE-DATA, CORRECTIONS, §3.7 intro and the record item 9. The LLM08 span is in `2026/final/LLM09_VectorAndEmbeddingWeaknesses.md`. The count (2/3/5) is unaffected. **Fix:** replace it with "against the 2026 edition's source files (LLM00_Preface.md and the LLM01-LLM10 files)". **Check:** `grep -rn "against the 2026 .LLM00_Preface" .reuse/dep5 NOTICE-DATA CORRECTIONS.md docs/` gives 0 hits.
+2. **SOURCE_LICENSES §3.7 still says two files / "releases through v2.13.0"** at :448 (Relicense cell), :449 (Action item 3) and :599 (summary row 7). **Fix:** "the three files"; "every release that carried each file, from its introduction". **Check:** `grep -n -E "both files|these two files" docs/SOURCE_LICENSES.md` returns only :206 and :232 (the research sample).
+
+**Verified:**
+- `reuse spdx` gives exactly 3 OWASP LLM files as CC-BY + CC-BY-SA.
+- The crosswalk figures match.
+- The memo function name is right (the code returns at :1967/:1968).
+- The A1 record is append-only, items 1-9 are faithful apart from defect 1, and the cell citations are correct.
+- Table pipe counts are consistent across 35 tables.
+- A2: 19fa2986 is first in v2.10.0, v2.9.0 has only the 2025 file, and the 2025 file has been present since c105bd7a (first tag v2.0.0).
+- D101: 24 upstream jsons resolve to upstream-terms; provenance, `_state` and the README to CC-BY; atlas to Apache; .py to MIT; no upstream file is CC-BY. The README maps all 24, no licence is claimed, and the build never reads `ingest/README.md` (`INGEST.glob("*.json")` at :2523 is non-recursive).
+- The f69b271f merge is clean; merge-tree vs 48f81697 is clean.
+
+**Advisories:**
+- **A1:** "upstream terms" under-claims for project-derived `cve_rejections.json` and for the mostly-own-summary curated files. It is disclosed in the comments and is legally harmless. `cve_rejections.json` is the clearest future CC-BY carve-back candidate.
+- **A2:** `data/.owasp_llm_migration.json` holds hashes only; `docs/charts/owasp_llm.svg` shows risk names and is covered by the NOTICE charts clause.
+
+### 🔁 D97/D98 rewrites: **BOUNCE #1** (gate-rewrite on `b130900e`). Back with the corpus-surgeon.
+**Verdict, in the gate's words:** "BOUNCE. The D97/D98 rewrites on ws1/licensing-rewrites-2026-10-13 @ b130900e fail on 2 factual defects… The mechanics all hold."
+
+**Defects:**
+1. **The camoleak rewrite cites CVE-2025-59145.** The Legit page has 0 "CVE" hits. NVD's CVE-2025-59145 is the color-name npm account takeover (published 2025-09-15), not Copilot. The rewrite promoted a pre-existing title/tag error into the description as a stated fact. Ingest-only (EXT wins the merge).
+2. **INC-02646 now reads "researchers showed".** The source says "attackers exploited GPT-4.1's tool integration" (April-June 2025, unauthorized data access). The rewrite changed the actor without a source.
+
+**Gate evidence (its own route):**
+- **Per-row delta e94ae7f7 → b130900e:** exactly 3 rows (INC-02436/02646/03233); only description, last_seen and updated moved. Top-level `generated` moved; the ID set and order are equal (15,666). The script fires: it caught all 3 rows plus the stamp.
+- **`last_seen = updated` coupling** is mechanical (:2903-2904). The data has 0/15,666 rows with last_seen ≠ updated.
+- **Primary pages fetched itself:** NEW text is 0.0% 5-gram, with runs 2-4. OLD text reproduces the audit (81%, runs 10/9/9/8). Controls: 100% and 0%.
+- **Rebuild from the pre-change state** in a clean clone equals b130900e (sha 60531564…). pytest 1079 + 1 xfail; validate and drift rc 0.
+- **Freeze:** no OECD/AIID ids are involved. INC-08177 is unchanged.
+- **Merge:** merge-tree is clean against 670e9cee.
+
+**Every other added fact verified against its source:** Beber/Cymulate, CVSS 7.7/8.7, v0.2.111/v1.0.20, "at least 17", Omer Mayraz/Legit, June 2025, the Storm-2139 details.
+
+**Advisories:**
+- **Live public error:** INC-02382's title and tag carry the wrong CVE-2025-59145, and have since c105bd7a. **Foreman folded the fix into this task as a declared delta** (title + tags on INC-02382, corrected at the ingest source). Any CORRECTIONS row is drafted in the report and placed by the foreman, because the licensing branch also edits CORRECTIONS.md.
+- The INC-03233 date span attaches to the incident, not to the legal action. Optional rephrase.
+- The OX date mismatch is confirmed (2026-04-15 vs 2025-09). It stays flagged for WS2.
+- data/incidents.json has 15,666 rows vs incident_count 15,637 (29 retracted). Consistent.
+
+### ⚖ D99-D102, USER RULINGS 2026-10-13 (licensing bounce #2 + open calls)
+- **D99, the crosswalk: yes, add it to D96 (Recommended).** `mappings/owasp_llm_2025_to_2026.json` gets the same carve-out, NOTICE and CORRECTIONS treatment, and is rewritten next release with the others.
+- **D100, the bounce #2 route: fix plus a scoped re-gate (Recommended).** It covers the crosswalk, the function-name fix (`_verify_split_authorization_marker`), A1 (append the gate's first-gate raw-text confirmations to the measurement record, then update the hedging cells) and A2 (CORRECTIONS "each file since its introduction").
+- **D101, ingest/: declare upstream terms (Recommended).** Add a `.reuse/dep5` stanza plus an `ingest/README` stating these are third-party snapshots under each upstream's own terms, pointing to SOURCE_LICENSES and NOTICE-DATA, and not under the project's CC BY or MIT grants. Documentation only.
+- **D102, the released [2.11.0] CHANGELOG: leave the record (Recommended).** **c17 is closed as won't-fix.**
+- The foreman merged origin/main into the licensing branch to bring in the measurement file; this is recorded in the branch history.
+
+### ⛔ WS0 licensing: **BOUNCE #2 (re-gate on `be418fd3`). ESCALATED to the user** (protocol step 6)
+**Verdict, in the gate's words:** "VERDICT: BOUNCE. This is bounce #2 on this task, so per protocol it goes to the user. Both defects are small and mechanical."
+
+**Defects:**
+1. **The crosswalk `mappings/owasp_llm_2025_to_2026.json` carries OWASP CC BY-SA text but is outside the D96 carve-out.** It resolves to CC-BY-4.0 only. It holds all 20 OWASP risk names, and its `scope_change` strings match the 2026 Preface: LLM03 verbatim (60%, run 18), LLM04 "absorbs fine-tuning subversion", LLM08 verbatim (56%, run 9), LLM05 and LLM06 near-verbatim. The CORRECTIONS and NOTICE texts both say "these two files". The fix is to add it to the stanza, NOTICE and CORRECTIONS, **or** treat it as a new user question if D96 is read as exactly two files.
+2. **The c10 memo note names the wrong function.** Lines 1930-1967 are in `_verify_split_authorization_marker` (defined :1907, called :1986), not `_check_split_authorization` (:2334). The substance holds: neither reads `decided_by`.
+
+**Confirmed against the gate's own measurements:**
+- §1.6 (3 of 6; AIX lineage; overlap figures);
+- §3.7 (all 10 + 2025 figures; licence evidence);
+- §1.7/§1.8 (the sample; exact host counts; arithmetic 0 + 4 + 6 + 92 = 102);
+- §1.2a hold scope matches the code;
+- **"at least 10" hosts: exactly 10 re-derived**;
+- **NOTICE "ten" sources is correct**;
+- the foreman's `reuse spdx` [R] holds;
+- CORRECTIONS is a single added row;
+- memo +35/-0, line 342 untouched;
+- merge-tree clean.
+
+**Advisories:**
+- **A1:** the gate's first-gate Part A raw confirmations (OWASP footer, embracethered absence, c11) never reached the measurement record, so some cells still hedge. → Append them to the measurement file (agreement 5) and update the cells.
+- **A2:** the 2026 LLM file only exists since 19fa2986 (2026-08-17). CORRECTIONS should say "each file since its introduction".
+- **A3:** ingest/*.json has no REUSE licence info (pre-existing). `reuse lint` shows 345/453 licensed, with Apache-2.0, CC-BY-4.0 and MIT texts missing.
+
+### 🔍 D97/D98 rewrites: corpus-surgeon `b130900e` on `ws1/licensing-rewrites-2026-10-13`. **Gate dispatched.**
+- **Shipped rows changed: 3.** INC-02646 (it was 81% verbatim), INC-03233 (31%) and INC-02436 (a RES span).
+- **Ingest-only rewrites: 3.** For RES camoleak, ox-mcp and anthropic-aug, another source's description wins the merge. They ship as INC-02382, INC-01015 and INC-08177 respectively.
+- **New text measured:** 0.0% 5-gram overlap with the source, longest run ≤ 4. The OLD-vs-source figures reproduce the gate's. Controls: verbatim 100%, cross 0%.
+- **Field delta:** `description`, `updated` and `last_seen` on exactly 3 rows; `last_seen` follows `updated` (merge_and_dedupe:2904). Also the build stamp `generated`. The ID set and the count of 15,666 are equal. The rebuild is deterministic.
+- **Over-merge:** INC-02646 and INC-03233 each describe ONE incident (Q2-2025-01 and Q1-2025-01), so the rewrite was clean. The other folded ids remain row-less. That goes to the over-merge task.
+- **Factual fixes:** camoleak was found by a Legit Security researcher, not by Tenable. **Flag → WS2:** the OX post is dated 2026-04-15, but the row says 2025-09.
+- **Finding for the user package:** 6 more OWASP ingest rows still carry verbatim or near text (Q1-2025-03, Q2-2025-02 and Q1-2026-04 verbatim; Q1-2025-02, Q1-2026-05 and Q1-2026-06 near). They don't ship as their own rows. **Foreman [R]:** `ingest/*.json` has NO dep5 licence declaration; only `ingest/atlas/*.yaml` does. That means ingest/ is raw upstream input under upstream terms, so it is not relicensed CC-BY. → User question: should ingest/ state its status explicitly?
+- **The gate is asked** to: run its own delta; fetch the sources and check overlap AND factual support for every added fact; measure the shipped INC-02382 text; check the clean-clone rebuild.
+
+### 🔁 WS0 licensing c5-c11: **BOUNCE #1 (raw-text gate on `ef4ad825`)**. Fixes are with the license-auditor, together with the D96-D98 docs.
+- **Defects:**
+  1. §1.6 says 1 of 6 Q1-2026 rows matches the round-up; **3 of 6** match (-04, -05, -06).
+  2. The c10 note says `decided_by` is validated by WS4-T21. It isn't: the D28 validator checks only the decision and the hashes.
+  3. The host tallies are wrong. They should read OpenAI 29, Microsoft 14, arxiv 4.
+- **Confirmed on raw bytes:**
+  - the OWASP footer (CC BY-SA), on 5 pages;
+  - the GenAI-LLM-Top10 README licence line;
+  - AI Exchange CC0;
+  - embracethered has no licence;
+  - oecd.ai robots.txt (7 Disallow rules);
+  - sitemap HEAD returns 405 and GET returns 200, with **no 302**;
+  - incident page HEAD and GET both return 200;
+  - the methodology terms sentence is present, and the page says nothing about bots;
+  - c8 matches the code;
+  - c9: AIID is weekly, cve-enrich is dispatch-only, and the gate's abort conditions match;
+  - c10 citations are correct apart from defect 2;
+  - c7: arXiv has no abstract or author fields;
+  - the dated memo is +26/-0 only.
+- **Advisories:**
+  - A1, A2 and A5 are routed to the license-auditor: superseded hedges; the §1.2a hold described too broadly; a quote truncation; a host re-count.
+  - **A3, OVER-MERGE (proposed task, needs scoping and likely a user ruling).** INC-00924 (EchoLeak) absorbs 6 unrelated Q1-2026 OWASP ids, INC-02646 absorbs 9 and INC-03233 absorbs 3, probably because they share a round-up URL. As a result, the DeepSeek breach, CVE-2025-23254 and the Meta agent leak have no row of their own. The corpus-surgeon was told to rewrite only each surviving incident's description and to report the composition. The split is a separate task (WS4-T19/D28 machinery).
+  - **A4:** U+FFFD mojibake in owasp_llm_top10_2025 LLM08 and in 4 avid_owasp rows. → Follow-up.
+  - **A6:** the arXiv abstract sample was not run. → Follow-up.
+
+### ⚖ D96-D98, USER RULINGS 2026-10-13 (licensing; measurements in `docs/audits/licensing-overlap-measurements-2026-10-13.md`, `ad38c61e`)
+- **The gate's measurements (red-reviewer, raw text, 5-gram plus run, with controls):**
+  - **owasp_llm_top10_2026.json: all 10 descriptions are copied** from OWASP's CC BY-SA text (4 verbatim, 6 near-verbatim). **owasp_llm_top10_2025.json: 4 of 10** copied. Both ship under CC-BY-4.0 `mappings/*` with no attribution. They appear in the repo and the Zenodo archives only, not in STIX, TAXONOMIES or the package.
+  - **OWASP-\* ids:** 18 GENAI ids give 4 verbatim, 4 near and 10 own; the 3 AIX are own. **2 of the 6 shipped rows carry round-up text:** INC-02646 is 81% verbatim, and INC-03233 is near-verbatim at 31%. 3 Q1-2026 ids appear on no round-up page.
+  - **Research/threat sample:** 102 measured, 0 verbatim, 4 with real spans, 6 close-paraphrase; 5 titles equal the post headline.
+- **D96, Q1: carve out now, rewrite next (Recommended).** Add a dep5 CC BY-SA carve-out for both LLM mapping files, a NOTICE-DATA attribution and a CORRECTIONS row (earlier releases shipped them under CC-BY). The descriptions get rewritten as own paraphrase next release, then the carve-out narrows to codes and names.
+- **D97, Q2: rewrite 2 rows and attribute (Recommended).** INC-02646 and INC-03233 are rewritten from primary sources (a data change with a field delta). Add the OWASP round-up attribution in NOTICE-DATA and a CORRECTIONS row. The 3 Q1-2026 ids are recorded as unconfirmed provenance.
+- **D98, Q3: accept and fix 4 spans (Recommended).** Document the "facts + own summary + link" posture. Rewrite the 4 real-span RES descriptions. Keep the headline-identical titles.
+- **Routing:**
+  - **license-auditor**, same branch: the 3 bounce defects (§1.6 provenance is 3 of 6, not 1; the c10 note's `decided_by` is not enforced; host tallies), plus the D96 dep5/NOTICE/CORRECTIONS work and the D97/D98 docs.
+  - **corpus-surgeon** on `ws1/licensing-rewrites-2026-10-13`: rewrite the 6 descriptions via ingest inputs, with a full field-level delta (expected: description plus updated on exactly 6 rows) and overlap proof.
+
+### 🔍 WS0 licensing follow-ups c5-c11: `ef4ad825` on `ws0/followups-licensing-2026-10-13` (foreman-committed; 3 files, +147/-6). **Raw-text gate plus overlap measurements dispatched.**
+- **Rows drafted:**
+  - §1.6 for the 21 OWASP-* ids;
+  - §1.7 and §1.8 for research (135) and threat-reports (82);
+  - §3.7 for the OWASP LLM Top 10.
+- **Corrected in place:** §2.5 now covers the `disputed` marker; §1.2a gains a stage-1 freeze status row; §1.5 OECD scrape re-check; INGESTION_CONDUCT now lists AIID in the weekly run.
+- **c10, the register was half wrong:** `ruled_by` is correct for the D42 approval file, and `decided_by` is the D28 field. The memo gets a dated note.
+- **Correction found:** §6.3 claimed the arXiv ingest carries abstracts and authors. It doesn't.
+- **NEW FINDING, needs a USER ruling (Q1):** `mappings/owasp_llm_top10_2026.json` descriptions are **not all own paraphrase**. LLM01, LLM06 and LLM08 contain verbatim OWASP spans (CC BY-SA 4.0), yet the file ships under the CC-BY-4.0 `mappings/*` grant with no OWASP attribution. This is the same shape as ASI (D80), and worse, because there the descriptions were own paraphrase.
+- **Q2:** the 21 OWASP-* rows. The 18 GENAI ids come from 3 CC BY-SA round-ups; the AIX source is unknown; overlap was unmeasured.
+- **Q3:** research and threat-reports. No vendor terms were read; the posture is "facts + summary + link".
+- **The author used WebFetch (which summarises), so ALL quotes are pending.** The gate does raw-text verification plus 5-gram overlap: Q1 all 10 descriptions, Q2 the 21 rows and the 6 shipped rows, Q3 a sample of ≥30. **Rulings wait for those measurements.**
+
+### ✅ WS4 hygiene follow-ups: **DONE. Re-gate PASS on `b1fefd29`; MERGED to main as `9022c50a` (`--no-ff`)**
+- **Closed:**
+  - **b13:** the dispute log separates genuinely new disputes from first dispute-aware checks;
+  - **b22:** the OECD numeric slug is `[0-9]+`, with 0 of 13,670 URLs reclassified;
+  - **b25:** tests for persist_refresh_state `--force` and `[skip ci]`;
+  - **b11:** a `slow` marker, still run in CI;
+  - **b10:** the stage-1 fixture extracts from `git archive HEAD` and compares against `git show HEAD:`.
+- **Gate verdict, in its words:** "VERDICT: PASS ... The bounce-1 defect is fixed."
+- **Gate evidence:**
+  - its own data-changing simulated refresh gives 24 passed (the same setup failed at a64ea795);
+  - a committed corrupted input still FAILS the fixed-point test;
+  - the A1 test fails under 2 mutations, even on a clean checkout;
+  - fresh-clone pytest 1079 passed; merge-tree clean.
+- **Advisories:**
+  - **A2 is open:** `render_log_md` "- New DISPUTED" still uses the combined count. → Follow-up.
+  - A note: the HEAD comparison could misfire if .gitattributes eol or smudge rules are ever added for data/*.json.
+- **Foreman [R] after merge:** validate rc 0; drift clean; **pytest 1079 passed, 1 xfailed** (read before the push).
+
+### 🔁 WS4 hygiene follow-ups: **BOUNCE #1 (red-reviewer on `a64ea795`)**. The fix is back with the same pipeline-engineer.
+- **Defect:** b10's HEAD-sourced fixture plus the working-tree comparison in `test_committed_inputs_do_not_abort` would **fail every refresh run that changes data**. auto-refresh, cve-enrich and atlas-refresh all run Re-merge, then pytest, on an uncommitted tree, under a hard gate.
+  - The gate reproduced it: a simulated refresh gave old fixture 8 passed, new fixture 1 failed.
+  - **It would have re-broken ingestion, the exact failure being repaired.**
+  - Fix: compare against `git show HEAD:<path>`; prove it on a clean tree, on a simulated refresh, and with a planted edit.
+- **Gate evidence, all clean:**
+  - **b13:** 2 mutations fail, which supplies the missing fire-proof.
+  - **b22:** independent derivation over 13,670 oecd.ai URLs; 0 reclassified; the mutation fails.
+  - **b25:** mutations of the REAL script (no --force, no [skip ci], a neutered racer) all fail. On Linux, the BASH_ENV ordering is deterministic.
+  - **b11:** no deselection in any of the 4 workflows or the Makefile (8 of 1,080 tests are marked slow).
+  - Fresh-clone pytest 1079 passed; clean rebuild porcelain empty.
+- **Advisories:**
+  - **A1:** the b10 test can't fire on a clean checkout. → Make it self-contained (routed).
+  - **A2:** the `render_log_md` "New DISPUTED" summary still uses the combined count. → **Follow-up.**
+  - **A3:** an assertion message reads backwards. → Routed.
+
+### 🔁 WS2 precision follow-ups: **BOUNCE #1 (red-reviewer on `26dfcdb4`)**. The fix went back to the same label-scientist.
+- **Defect, in the gate's words:** "The b17.3 check misses a proportion that ends a sentence, and nothing documents that." The proportion branch is `0?[.][0-9]+(?![0-9.])`, and the following full stop defeats it. "- Precision: 0.92." passes clean, both in-section and near the word. The CHANGELOG claim overstates the coverage.
+  - The gate's fix, verified in-process: lookahead `(?![0-9]|[.][0-9])`.
+- **Advisory, false positives:** "precision-first heuristics" plus a % fires; so does "favour precision over recall" next to the ~36% control; so do in-section explanatory "95%" and "1%". The check scans the DATASHEET only, and the real file stays clean.
+- **Foreman ruling (tooling, not policy):**
+  - (a) Exclude "precision-first" from the word match, with tests both ways.
+  - (b) Keep the in-section rule strict, because generated figures only belong there. Document it as a known limit and make the error message actionable.
+- **Other gate evidence:** pins unchanged; the committed tree prints exactly the D76 line; the wrong sole directory is caught by validate; fresh-clone pytest 1099 passed.
+
+### ✅ WS6 docs follow-ups: **DONE. Gate PASS on `6b331e07`; MERGED to main as `337117fc` (`--no-ff`)**
+- **Closed:** c2 (README fully absolute, 0 relative); c3 (supersession note); c14 (VERSIONING, **plus an a11y-green pre-publish requirement**); c15 (banner "CC-BY-4.0 data (with exceptions)"); c16 (HF card corpus wording); b29 (TAXII edition derived); c12 N-a, N-b, N-f, N-g, N-h.
+  - **Partly closed: c17, 3 of 4 parts.** OPEN: "CHANGELOG lacks the site UI fixes" (the released [2.11.0] section). → **USER question: dated note or leave it.**
+  - **Still open: c12 N-e** (WS0; it tracks the ATLAS re-point).
+- **The gate's verdict, in its words:** "VERDICT: PASS ... DEFECTS: none."
+- **What the gate re-derived by its own route:**
+  - c16 categories: 8,006 / 7,160 / 307 / 111 / 41 / 12, out of 15,637;
+  - c3: built both bundles; 2,543 retired, 2,543 added including the identity, 0 persisting with an unchanged `modified`;
+  - N-a: 7 check functions in 6 modes;
+  - the c14 literal list matches the code;
+  - the TAXII derivation fires (crosswalk 2099 gives "2099");
+  - README: 100 links, 0 relative, all 36 repo paths exist;
+  - the banner clears the graphic; the a11y run on 6b331e07 succeeded;
+  - fresh-clone pytest 1072 passed.
+- **Advisories:**
+  1. c17 is partial (above).
+  2. N-e is open.
+  3. VERSIONING step 5's "no version literal at all" is slightly too strong, since VERIS and years are exempt.
+  4. **"(the largest category)" on the HF card is an unguarded qualitative claim** (true by a margin of 846). → Note.
+  5. The banner can't link to NOTICE-DATA. The foreman accepts this: the README and the site strip both link.
+- **Foreman [R] after merge:** validate rc 0; drift clean. **The full pytest was NOT re-run before the push.** That relies on the gate's fresh-clone run at 6b331e07, and main had moved only through PROGRESS.md since.
+
+### ▶ Follow-up batches dispatched 2026-10-13 ("keep going"; no-ruling items from `docs/audits/followups-register-2026-10-13.md`)
+- **WS6 docs** on `ws6/followups-docs-2026-10-13`:
+  - c2: README relative links break on PyPI;
+  - c3: supersession note on the export-integrity audit;
+  - c14: VERSIONING fixes, plus an a11y check in pre-publish;
+  - c15: the banner "CC-BY-4.0 data" tagline vs D89;
+  - c16: the HF card corpus wording;
+  - c17: v2.11.0 leftovers;
+  - c12: N-a/N-b/N-f/N-g/N-h;
+  - b29: the TAXII "-2026" literal.
+- **WS4 hygiene** on `ws4/followups-hygiene-2026-10-13`:
+  - b13: the "new DISPUTED" log line;
+  - b22: Unicode-digit regex;
+  - b25: persist_refresh_state tests;
+  - b11: slow marker;
+  - b10: stage-1 fixture from `git archive`.
+- **WS2 precision** on `ws2/followups-precision-2026-10-13`:
+  - b4: the status line on problems;
+  - b17: dated-dir pin, Wilson CLI dir, hand-typed figure.
+- **Constraints on all three:** no data change; no touching auto-refresh.yml or the hold/gate code (the decouple branch owns those); each batch gated before merge.
+- **Held back (not dispatched):**
+  - c1 + b5: the AIM rename; the data part needs a field delta;
+  - b8: the ATLAS re-point; moves data;
+  - b23: query-string stripping; data, needs a ruling;
+  - c5-c11: licensing docs; WS0 next, some may need user calls;
+  - everything in register section (a), which needs user decisions.
+- **Refresh dispatch 38330687613:** the cve-sweep job succeeded; the refresh job is still in progress.
+
 ### ✅ D94 moves: **DONE. Gate PASS on `d31348c7`; MERGED to main 2026-10-13 as `de04ba9f` (`--no-ff`)**
 - **Moves:** AGENT_TEAM.md and docs/superpowers/ (7 files) → docs/archive/ (R100). The 2 one-off scripts → scripts/archive/ (ROOT is now `parents[2]`), plus a README.
 - **Live references updated:**
