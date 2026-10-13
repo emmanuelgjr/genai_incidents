@@ -463,6 +463,7 @@ REGISTERED_PRODUCERS = {
     "atlas_entry_delta.py": "INTERNAL (refresh-PR audit report comparing two corpus files; writes a report, distributes no rows)",
     "package_release_assets.py": "INHERITS (byte-copies data/incidents.min.json into the GitHub Release asset; asserted by test_release_assets_min_json_is_a_byte_copy_so_it_carries_tier)",
     "check_stats_drift.py": "INTERNAL (CI gate: re-derives incident/retracted/disputed/landmark counts from the rows and compares to data/stats.json; writes nothing)",
+    "aiid_change_report.py": "INTERNAL (refresh-PR body: per-field AIID change report for the reviewer, D120; diffs tier among other fields, writes a markdown report, distributes no rows)",
     "newly_retracted_report.py": "INTERNAL (refresh-PR body: lists newly retracted entry ids, CVE ids and tier for the reviewer; writes a markdown report, distributes no rows)",
     "precision_sample.py": "INTERNAL (N9 precision audit: writes the 150 sampled rows, each with its `tier`, into docs/audits/precision/<date>/ as an audit record; not a distribution of the corpus)",
     "evaluate_ai_relevance.py": "INTERNAL (N9 follow-up: scores ai_relevance.assess() against human labels; prints a report, writes nothing)",
