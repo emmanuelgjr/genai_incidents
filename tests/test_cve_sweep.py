@@ -590,3 +590,23 @@ def test_nvd_feeder_per_id_failure_does_not_abort(tmp_path, monkeypatch):
     assert len(st) == 30, "the same id was retried by the rotation and succeeded"
     log = json.loads((tmp_path / "log" / "2026-10-09.json").read_text(encoding="utf-8"))
     assert log["failures"] == {}, "a failure later fixed in the same run is not left on record"
+
+
+def test_dispute_summary_separates_genuinely_new_from_first_check():
+    """b13: the console line must not call a first-ever dispute-aware sighting
+    'new'. A previously dispute-aware, not-disputed record that turns disputed
+    is new; a pre-dispute-aware (v1) or never-checked record is first-check."""
+    v = ing.RECORD_VERSION
+    disputed = {"state": "PUBLISHED", "v": v, "disputed": True, "dispute_signals": ["cna-tag"]}
+    states = {c: dict(disputed) for c in ("CVE-2099-0001", "CVE-2099-0002", "CVE-2099-0003")}
+    before = {
+        "CVE-2099-0001": {"state": "PUBLISHED", "v": v, "disputed": False},   # genuinely new
+        "CVE-2099-0002": {"state": "PUBLISHED", "v": 1, "disputed": False},   # first aware check
+        "CVE-2099-0003": None,                                                # never checked
+    }
+    checked = {c: "rotation" for c in states}
+    log = ing.build_log("2099-01-01", {}, sorted(states), before, states, checked, {}, 3)
+    assert len(log["new_disputed"]) == 3  # the structural list is unchanged
+    assert ing.dispute_summary(log) == "1 new DISPUTED; 2 DISPUTED on first dispute-aware check"
+    # fire: the old behaviour (count everything as new) would have said 3
+    assert "3 new DISPUTED" not in ing.dispute_summary(log)

@@ -18,12 +18,14 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import io
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import tarfile
 from pathlib import Path
 
 import pytest
@@ -271,28 +273,37 @@ def _run_merge(root: Path) -> subprocess.CompletedProcess:
                           cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
+def _extract_head(root: Path, repo: Path = ROOT, specs: list[str] | None = None) -> None:
+    """Populate `root` from the COMMITTED tree (git HEAD via `git archive`).
+    Extracted so a fast test can pin the no-leak property (followups b10)."""
+    # Build from COMMITTED content only, read out of git HEAD (`git archive`),
+    # never from the caller's working tree. A copy of working-tree bytes would
+    # leak (i) gitignored/untracked files (e.g. data/legacy_consolidated.json,
+    # which exists only after parse_existing.py has run) and (ii) any
+    # uncommitted edit to a tracked file, so the suite could pass or fail
+    # depending on what the caller's tree happens to contain (followups b10).
+    if specs is None:
+        specs = ["scripts", "data", "ingest", "mappings", "schema", "legacy",
+                 "docs/audits/WS4-T19-authorized-splits-2026-09-18.json",
+                 # v2.13.0 item 4 / D69: step 8b reads the ruled deprecation appends from
+                 # docs/audits; without them the control build would not reproduce the
+                 # committed id_deprecations.json (it would drop the ruled records).
+                 "docs/audits/ID-silent-ids-appends-2026-10-09.json",
+                 "docs/audits/ID-group-ids-appends-2026-10-10.json"]
+    in_head = [sp for sp in specs
+               if subprocess.run(["git", "ls-tree", "--name-only", "HEAD", "--", sp],
+                                 cwd=repo, check=True, capture_output=True).stdout.strip()]
+    archive = subprocess.run(["git", "archive", "--format=tar", "HEAD", "--", *in_head],
+                             cwd=repo, check=True, capture_output=True).stdout
+    with tarfile.open(fileobj=io.BytesIO(archive)) as tf:
+        tf.extractall(root, **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
+
+
 @pytest.fixture(scope="module")
 def scratch(tmp_path_factory):
     """Scratch copy of the repo after a CONTROL build on committed inputs."""
     root = tmp_path_factory.mktemp("scratch_repo")
-    # Build from TRACKED content only: a copytree of the caller's working dir
-    # would leak gitignored/untracked files (e.g. data/legacy_consolidated.json,
-    # which exists only after parse_existing.py has run) and make the suite
-    # pass or fail depending on what the caller's tree happens to contain.
-    tracked = subprocess.run(
-        ["git", "ls-files", "-z", "--", "scripts", "data", "ingest", "mappings", "schema", "legacy",
-         "docs/audits/WS4-T19-authorized-splits-2026-09-18.json",
-         # v2.13.0 item 4 / D69: step 8b reads the ruled deprecation appends from
-         # docs/audits; without them the control build would not reproduce the
-         # committed id_deprecations.json (it would drop the ruled records).
-         "docs/audits/ID-silent-ids-appends-2026-10-09.json",
-         "docs/audits/ID-group-ids-appends-2026-10-10.json"],
-        cwd=ROOT, check=True, capture_output=True).stdout.decode("utf-8").split("\x00")
-    for rel in filter(None, tracked):
-        src = ROOT / rel
-        if src.is_file():
-            (root / rel).parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(src, root / rel)
+    _extract_head(root)
     # the merge reads data/legacy_consolidated.json (gitignored), so build it
     # here exactly as CI's "Re-merge" step does
     legacy = subprocess.run([sys.executable, str(root / "scripts" / "parse_existing.py")], cwd=root,
@@ -312,6 +323,26 @@ def scratch(tmp_path_factory):
     # it and stand alone (a build that wrongly succeeds writes data/).
     shutil.copytree(root / "data", root.parent / (root.name + "_pristine_data"))
     return root
+
+
+def test_scratch_inputs_come_from_head_not_the_working_tree(tmp_path):
+    """b10, self-contained (works in a clean CI checkout): a tiny temporary git
+    repo with a committed file, a dirty edit to it, and an untracked file.
+    `_extract_head` must return the committed bytes and omit the untracked one."""
+    repo, out = tmp_path / "repo", tmp_path / "out"
+    (repo / "data").mkdir(parents=True)
+    out.mkdir()
+    tracked = repo / "data" / "x.json"
+    tracked.write_bytes(b'{"committed": true}\n')
+    for args in (("init", "-q"), ("config", "core.autocrlf", "false"), ("add", "-A"),
+                 ("-c", "user.email=t@e.x", "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                  "commit", "-q", "-m", "c")):
+        subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True)
+    tracked.write_bytes(b'{"DIRTY": true}\n')                      # uncommitted edit
+    (repo / "data" / "legacy_consolidated.json").write_bytes(b"{}")  # untracked
+    _extract_head(out, repo=repo, specs=["data"])
+    assert (out / "data" / "x.json").read_bytes() == b'{"committed": true}\n'
+    assert not (out / "data" / "legacy_consolidated.json").exists()
 
 
 def _restore_data(root: Path) -> None:
@@ -359,13 +390,20 @@ def _synthetic_oecd_row(rows: list[dict], sid: str, extra: list[str]) -> dict:
     return row
 
 
+@pytest.mark.slow
 def test_committed_inputs_do_not_abort(scratch):
     """The control build in the fixture exited 0 on the committed inputs; the
     committed data tree is also unchanged by it (rebuild is a fixed point)."""
     for rel in ("data/incidents.json", "data/id_deprecations.json"):
-        assert (scratch / rel).read_bytes() == (ROOT / rel).read_bytes(), rel
+        # Compare against the COMMITTED bytes (same source as the fixture's inputs),
+        # not the working tree: the refresh workflows run this suite on an
+        # uncommitted, freshly re-merged tree.
+        head = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT, check=True,
+                              capture_output=True).stdout
+        assert (scratch / rel).read_bytes() == head, rel
 
 
+@pytest.mark.slow
 def test_gate_aborts_on_fresh_bridging_input(scratch):
     """ONE new OECD row cross-referencing two already-published AIID entries
     (the 2026-10-03 mechanism, constructed: a live crawl is out of scope)."""
@@ -378,6 +416,7 @@ def test_gate_aborts_on_fresh_bridging_input(scratch):
     )
 
 
+@pytest.mark.slow
 def test_d67_gate_aborts_on_a_new_oecd_row(scratch):
     """D67: a purely ADDED OECD row (no AIID cross-reference, no merge)."""
     out = _fresh_input_aborts(
@@ -388,6 +427,7 @@ def test_d67_gate_aborts_on_a_new_oecd_row(scratch):
     assert "merge INC-" not in out and "title edit INC-" not in out  # only the addition fired
 
 
+@pytest.mark.slow
 def test_d67_gate_aborts_on_an_upstream_aiid_title_edit(scratch):
     """D67(b): AIID edits the title of an already-published, AIID-only row."""
     victim = _published_aiid_only(scratch)[0]["source_ids"][0]
@@ -440,6 +480,7 @@ def test_fail_closed_check_fires():
     assert check_fail_closed(text.replace(cpr, cpr.replace("        uses:", "        if: always()\n        uses:", 1)))
 
 
+@pytest.mark.slow
 def test_d71_gate_aborts_on_a_new_aiid_only_row(scratch):
     """D71: a purely ADDED AIID row (the weekly snapshot gains new incidents)."""
     def add(rows):
@@ -455,6 +496,7 @@ def test_d71_gate_aborts_on_a_new_aiid_only_row(scratch):
     assert "content change INC-" not in out and "merge INC-" not in out
 
 
+@pytest.mark.slow
 def test_a2_gate_aborts_when_the_snapshot_gains_an_id_a_published_row_cites(scratch):
     """A2/D71: the gate review's observed case. INC-00437 cites AIID-1574, which
     the committed snapshot lacks; a snapshot that gains it rewrites INC-00437's
@@ -473,6 +515,7 @@ def test_a2_gate_aborts_when_the_snapshot_gains_an_id_a_published_row_cites(scra
     assert "add OECD/AIID" not in out
 
 
+@pytest.mark.slow
 def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
     """Counterpart: a content change driven by a NON-pair input (here a CVE-only
     row's severity edited in the CVE ingest file) is not held, because no
@@ -496,6 +539,7 @@ def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
         _restore_data(scratch)
 
 
+@pytest.mark.slow
 def test_a1_gate_aborts_on_an_airi_only_change_to_an_aiid_linked_row(scratch):
     """AIRI rows are keyed AIID-<n>; an AIRI-only edit (tags here) of a row that
     is published under that AIID id moves the published row. With airi_navigator

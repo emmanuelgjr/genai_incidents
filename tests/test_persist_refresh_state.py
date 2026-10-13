@@ -34,6 +34,7 @@ real script on disk currently has them.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -307,3 +308,116 @@ def test_manual_prefix_git_sequence_sanity_check(tmp_path, origin_repo):
         f"stdout={checkout.stdout}\nstderr={checkout.stderr}"
     )
     assert "is not a commit" in checkout.stderr, checkout.stderr
+
+
+# ---------------------------------------------------------------------------
+# followups b25: the `[skip ci]` commit marker and the `--force` push were
+# untested. Tests only -- scripts/persist_refresh_state.sh is not modified.
+# ---------------------------------------------------------------------------
+
+
+def remote_tip_subject(origin_repo) -> str:
+    return git("log", "-1", "--format=%s", "refresh-state", cwd=origin_repo).strip()
+
+
+def test_state_commit_carries_skip_ci_marker(tmp_path, origin_repo):
+    """A state-persist commit must say `[skip ci]` so the push to
+    refresh-state never triggers a workflow run (both on the orphan-create
+    path and the update path)."""
+    workdir = make_workdir(tmp_path, "work_skip_a", {"n": 1})
+    assert invoke_script(workdir, origin_repo.as_uri(), tmp_path / "clone_skip_a").returncode == 0
+    assert remote_tip_subject(origin_repo).endswith("[skip ci]")
+
+    workdir = make_workdir(tmp_path, "work_skip_b", {"n": 2})
+    assert invoke_script(workdir, origin_repo.as_uri(), tmp_path / "clone_skip_b").returncode == 0
+    assert remote_tip_subject(origin_repo).endswith("[skip ci]")
+
+
+def test_skip_ci_check_fires_when_marker_removed(tmp_path, origin_repo):
+    """Proof of fire for the marker test: a COPY of the script without
+    ` [skip ci]` produces a tip subject the marker assertion would reject."""
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert text.count(" [skip ci]\"") == 1
+    mutated = tmp_path / "persist_refresh_state.no-skip.sh"
+    mutated.write_text(text.replace(" [skip ci]\"", "\"", 1), encoding="utf-8", newline="\n")
+    workdir = make_workdir(tmp_path, "work_noskip", {"n": 1})
+    result = run([BASH, to_posix(mutated), to_posix(origin_repo.as_uri()), STATE_REL_PATH,
+                  to_posix(tmp_path / "clone_noskip")], cwd=workdir)
+    assert result.returncode == 0, result.stderr
+    assert not remote_tip_subject(origin_repo).endswith("[skip ci]")
+
+
+def _make_racing_git_env(tmp_path, origin_repo):
+    """Env that makes bash define a `git` wrapper function. On the script's `git push` it
+    first advances origin's refresh-state with a DIFFERENT commit (prepared in
+    a separate clone), so the script's own push is a non-fast-forward. Every
+    other git invocation, and the push itself, pass through to the real git."""
+    racer = tmp_path / "racer"
+    git("clone", "--quiet", "--branch", "refresh-state", "--single-branch",
+        origin_repo.as_uri(), str(racer), cwd=tmp_path)
+    git("config", "user.name", "racer", cwd=racer)
+    git("config", "user.email", "racer@example.com", cwd=racer)
+    (racer / STATE_REL_PATH).write_text(json.dumps({"racer": "wrote first"}), encoding="utf-8")
+    git("add", STATE_REL_PATH, cwd=racer)
+    git("commit", "--quiet", "-m", "concurrent writer", cwd=racer)
+    # A bash function (sourced via BASH_ENV) rather than a PATH shim: Git for
+    # Windows' bash re-prepends /mingw64/bin to PATH, so a PATH shim never wins.
+    shim = tmp_path / "git_race.sh"
+    shim.write_text(
+        "git() {\n"
+        '  if [ "$1" = "push" ] && [ ! -e "$RACE_DONE" ]; then\n'
+        '    : > "$RACE_DONE"\n'
+        '    command git -C "$RACER" push --quiet origin HEAD:refresh-state || return 97\n'
+        "  fi\n"
+        '  command git "$@"\n'
+        "}\n",
+        encoding="utf-8", newline="\n")
+    return {
+        **os.environ,
+        "BASH_ENV": to_posix(shim),
+        "RACER": to_posix(racer),
+        "RACE_DONE": to_posix(tmp_path / "race_done"),
+    }
+
+
+def _run_with_race(script_path, tmp_path, origin_repo, workdir, clone_name):
+    env = _make_racing_git_env(tmp_path, origin_repo)
+    return run([BASH, to_posix(script_path), to_posix(origin_repo.as_uri()), STATE_REL_PATH,
+                to_posix(tmp_path / clone_name)], cwd=workdir, env=env)
+
+
+def test_force_push_overwrites_a_non_fast_forward_refresh_state(tmp_path, origin_repo):
+    """Non-fast-forward case: another writer advances refresh-state between the
+    script's fetch and its push. The script's `--force` makes its push win
+    (refresh-state is a single-writer scratch branch holding one counter file;
+    last write wins). Checks the race really happened (the racer's commit is no
+    longer reachable from the tip) and that the persisted content is the script's."""
+    seed_refresh_state(origin_repo, tmp_path, {"n": 0})
+    workdir = make_workdir(tmp_path, "work_force", {"n": 5})
+    result = _run_with_race(SCRIPT, tmp_path, origin_repo, workdir, "clone_force")
+    assert result.returncode == 0, f"stdout={result.stdout}\nstderr={result.stderr}"
+    assert (tmp_path / "race_done").exists(), "the racing writer never ran"
+    assert read_remote_state_file(origin_repo, tmp_path) == {"n": 5}
+    racer_sha = git("rev-parse", "HEAD", cwd=tmp_path / "racer").strip()
+    tip = git("rev-parse", "refresh-state", cwd=origin_repo).strip()
+    assert tip != racer_sha
+    ancestor = run(["git", "merge-base", "--is-ancestor", racer_sha, tip], cwd=origin_repo)
+    assert ancestor.returncode == 1, "racer commit is still reachable from the tip, so the push did not overwrite it (not a force-push)"
+
+
+def test_non_fast_forward_test_fires_without_force(tmp_path, origin_repo):
+    """Proof of fire for the test above: a COPY of the real script with
+    `--force` removed must be REJECTED by the same race (non-fast-forward),
+    exit non-zero, and leave the racer's content on origin. Asserts the
+    mutation really removes exactly one `--force` first."""
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert text.count("git push --force origin HEAD:refresh-state") == 1
+    mutated = tmp_path / "persist_refresh_state.no-force.sh"
+    mutated.write_text(text.replace("git push --force origin", "git push origin", 1),
+                       encoding="utf-8", newline="\n")
+    seed_refresh_state(origin_repo, tmp_path, {"n": 0})
+    workdir = make_workdir(tmp_path, "work_noforce", {"n": 5})
+    result = _run_with_race(mutated, tmp_path, origin_repo, workdir, "clone_noforce")
+    assert result.returncode != 0, f"stdout={result.stdout}\nstderr={result.stderr}"
+    assert "rejected" in result.stderr or "non-fast-forward" in result.stderr, result.stderr
+    assert read_remote_state_file(origin_repo, tmp_path) == {"racer": "wrote first"}

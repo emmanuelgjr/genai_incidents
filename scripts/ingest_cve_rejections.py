@@ -285,6 +285,18 @@ def write_log(log: dict) -> None:
     (LOG_DIR / f"{log['date']}.md").write_text(render_log_md(log), encoding="utf-8", newline="\n")
 
 
+def dispute_summary(log: dict) -> str:
+    """Accurate console wording for the log's dispute list. ``new_disputed``
+    holds every record seen disputed that had no prior dispute flag, which
+    includes records first examined by the dispute-aware check (they may have
+    been disputed long before). Only entries whose prior record was already
+    dispute-aware are genuinely NEW disputes; the rest are reported as
+    first-checked so the line cannot overstate (followups register b13)."""
+    nd = log["new_disputed"]
+    first = sum(1 for d in nd if d["first_dispute_aware_check"])
+    return f"{len(nd) - first} new DISPUTED; {first} DISPUTED on first dispute-aware check"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-requests", type=int, default=-1,
@@ -393,7 +405,7 @@ def main() -> int:
     write_log(log)
     rejected = sorted(c for c, r in states.items() if r["state"] == "REJECTED")
     print(f"[cve-rejections] checked {done} this run; {len(states)}/{len(ids)} corpus CVEs "
-          f"have a state; {len(rejected)} REJECTED; {len(log['new_disputed'])} new DISPUTED; "
+          f"have a state; {len(rejected)} REJECTED; {dispute_summary(log)}; "
           f"{len(failures)} failed -> {OUT_FILE}", flush=True)
     if attempted and len(failures) / attempted > MAX_FAIL_RATE:
         print(f"[cve-rejections] FAIL: {len(failures)}/{attempted} fetches failed "
