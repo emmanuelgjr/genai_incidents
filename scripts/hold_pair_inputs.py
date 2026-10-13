@@ -5,8 +5,8 @@ D71); D66 says the weekly refresh must still land AIAAIC, KEV, the CVE sweep
 and the D60 retractions while that freeze holds. The fetchers for the pair keep
 running every week, so this step runs AFTER them and BEFORE the merge:
 
-  1. every file in merge_and_dedupe._PAIR_INPUT_FILES (plus the AIID snapshot's
-     provenance sidecar, which must stay consistent with its snapshot) that
+  1. every file in merge_and_dedupe._PAIR_INPUT_FILES (since D114 the AIID
+     snapshot and its sidecar are NOT among them: that side is lifted) that
      differs from git HEAD is copied to --stash-dir, then restored to HEAD (or
      removed if it is not tracked);
   2. HOLD_REPORT.json in --stash-dir records, per file, whether it changed and
@@ -43,7 +43,13 @@ sys.path.insert(0, str(HERE))
 
 import merge_and_dedupe as m  # noqa: E402
 
-EXTRA_HELD = ("aiid_full.provenance.json",)
+# D114 (2026-10-13): the AIID snapshot (aiid_full.json) and its provenance sidecar
+# are LIFTED: no longer held, so the weekly refresh commits fresh AIID bytes and
+# the gate's standing AIID class covers what they drive. Nothing is held beyond
+# merge_and_dedupe._PAIR_INPUT_FILES (OECD, AIRI, the two AIID side files).
+# Restoring OECD to HEAD is also what keeps the build clear of the OECD-lift
+# precondition (merge_and_dedupe._check_oecd_lift_precondition).
+EXTRA_HELD: tuple[str, ...] = ()
 
 
 def held_files() -> tuple[str, ...]:

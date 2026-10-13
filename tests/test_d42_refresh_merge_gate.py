@@ -444,6 +444,8 @@ def test_run_refresh_gate_wires_baseline_pair_signal_and_curation(monkeypatch):
     row = {"id": "INC-5", "title": "AIID row", "source_ids": ["AIID-5"], "severity": "Medium"}
     monkeypatch.setattr(m, "_load_gate_baseline", lambda *a, **k: ([row], False))
     monkeypatch.setattr(m, "_pair_inputs_changed", lambda *a, **k: True)
+    # D114: a changed held input hits the OECD-lift precondition first
+    monkeypatch.setattr(m, "_check_oecd_lift_precondition", lambda *a, **k: None)
     with pytest.raises(m.RefreshMergeApprovalError) as ei:
         m._run_refresh_gate([{**row, "severity": "High"}], [], {})
     assert "content change INC-5 (D71)" in str(ei.value)

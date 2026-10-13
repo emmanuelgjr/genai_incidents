@@ -1,0 +1,33 @@
+{
+  "_record": "D115 per-item rulings on the D42 set, user ruling 2026-10-13 (PROGRESS.md D114-D116; package docs/audits/stage2-ruling-package-2026-10-13.md section 2(b)). DATED RECORD, do-not-regenerate (CLAUDE.md agreement 4).",
+  "_inert": "INERT BY DESIGN. No code reads this file. It is deliberately NOT docs/audits/D42-approved-refresh-merges.json (the only file the gate reads) and uses the key 'rulings', not 'entries', so even a copy of it placed at the approval path approves nothing. It becomes operative only after suppression (A3) exists and is gated (D114 binding precondition), by a later commit that writes the approval file and pins its hash in code (REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256). tests/test_d114_aiid_lift.py proves the inertness.",
+  "decision": "D115",
+  "ruled_by": "user",
+  "ruled_on": "2026-10-13",
+  "rulings": [
+    {"item": "M1", "kind": "merge", "from": "INC-02381", "into": "INC-01579", "ruling": "approve-in-principle"},
+    {"item": "M2", "kind": "merge", "from": "INC-14310", "into": "INC-01994", "ruling": "approve-in-principle"},
+    {"item": "M3", "kind": "merge", "from": "INC-01469", "into": "INC-00699", "ruling": "reject"},
+    {"item": "M4", "kind": "merge", "from": "INC-08148", "into": "INC-01628", "ruling": "reject"},
+    {"item": "M5", "kind": "merge", "from": "INC-13241", "into": "INC-01514", "ruling": "approve-in-principle"},
+    {"item": "M6", "kind": "merge", "from": "INC-14317", "into": "INC-13066", "ruling": "reject"},
+    {"item": "M7", "kind": "merge", "from": "INC-14902", "into": "INC-00699", "ruling": "reject"},
+    {"item": "R1", "kind": "retitle", "id": "INC-01579", "ruling": "approve-in-principle"},
+    {"item": "R2", "kind": "retitle", "id": "INC-13321", "ruling": "approve-in-principle"},
+    {"item": "R3", "kind": "retitle", "id": "INC-14517", "ruling": "approve-in-principle"},
+    {"item": "R4", "kind": "retitle", "id": "INC-07910", "ruling": "approve-in-principle"},
+    {"item": "R5", "kind": "retitle", "id": "INC-07783", "ruling": "approve-in-principle"},
+    {"item": "R6", "kind": "retitle", "id": "INC-01514", "ruling": "approve-in-principle"},
+    {"item": "R7", "kind": "retitle", "id": "INC-01994", "ruling": "reject"},
+    {"item": "R8", "kind": "retitle", "id": "INC-00699", "ruling": "reject"},
+    {"item": "R9", "kind": "retitle", "id": "INC-00813", "ruling": "reject"},
+    {"item": "R10", "kind": "retitle", "id": "INC-03717", "ruling": "reject"},
+    {"item": "R11", "kind": "retitle", "id": "INC-14284", "ruling": "pending-raw-record-read"},
+    {"item": "R12", "kind": "retitle", "id": "INC-14407", "ruling": "pending-raw-record-read"}
+  ],
+  "also_recorded": {
+    "D116": "keep the existing OECD titles and add no new OECD rows until clarified. Measured effect of the AIID lift: rows whose title equals the committed OECD ingest title for one of their own OECD ids go 3,937 on main to 3,935 on this branch. The two rows are INC-00437 and INC-14682: AIID-1574 and AIID-1575 are now in the AIID snapshot, so the rows' title and description switch from the OECD template to the AIID template. Both rows are in the D114-approved 25-title-edit table (package table 2.a-1), and the user ruled D119 to accept the switch. No OECD ingest byte changed and no OECD row was added (tests/test_d114_aiid_lift.py::test_oecd_titled_row_count_is_pinned_at_3935 pins 3,935; any further drop must be a declared change).",
+    "D119": "accept the INC-00437 and INC-14682 title switch above (user ruling 2026-10-13).",
+    "e": "per-item approval file for merges and retitles; class form for adds (the D114 standing AIID class in scripts/merge_and_dedupe.py)."
+  }
+}

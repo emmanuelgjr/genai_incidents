@@ -199,7 +199,33 @@ def test_every_aiid_signal_row_is_explained(built):
 
 def _first_row(built, pred):
     surviving, raw_by_sid, aiid_desc = built
+    if pred is _is_oecd_b:
+        return _oecd_b_row(built)
     return copy.deepcopy(next(e for e in surviving if pred(e)))
+
+
+def _oecd_b_row(built):
+    """An OECD-template row under an AIID signal. D114 (2026-10-13): lifting the
+    AIID snapshot gave the last two natural such rows (INC-00437, INC-14682) their
+    own AIID snapshot rows, so they now ship the AIID template and none remains in
+    the corpus. The class is still reachable (an OECD row that cites an AIID id the
+    snapshot lacks), so the mutation tests need one: take the first labelled OECD
+    template row and give it an AIID signal, then require the control to explain
+    it, so a synthesis that is not a faithful B row fails loudly instead of
+    weakening the tests that use it."""
+    surviving, raw_by_sid, aiid_desc = built
+    natural = next((e for e in surviving if _is_oecd_b(e)), None)
+    if natural is not None:
+        return copy.deepcopy(natural)
+    for e in surviving:
+        if (not e.get("aiid_id") and e.get("description_source") == "oecd-aim"
+                and e.get("description", "").startswith("Tracked by the OECD AI Incidents")
+                and not any(str(s).startswith("AIID-") for s in e.get("source_ids") or [])):
+            row = copy.deepcopy(e)
+            row["aiid_id"] = 1
+            if explain_aiid_signal_rows([row], raw_by_sid, aiid_desc, exemptions={}) == []:
+                return row
+    raise AssertionError("no OECD template row could be given an AIID signal")
 
 
 def _is_oecd_b(e):
