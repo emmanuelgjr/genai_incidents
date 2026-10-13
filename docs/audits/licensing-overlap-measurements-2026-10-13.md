@@ -112,3 +112,19 @@
 - RES-tenable-copilot-filename
 
 **By host:** all embracethered rows are own wording. All vendor threat-report rows are own wording except the one above.
+
+## Raw-text confirmations (red-reviewer, first gate, 2026-10-13)
+
+> Appended 2026-10-13 by license-auditor from the foreman's transcription of the first gate's testimony (CLAUDE.md agreement 5: the verdict text lands in the commit). Nothing above this heading is edited. These are the gate's findings, not re-measured by the author, who has no shell. Dated record, do-not-regenerate.
+
+These confirm, from raw text (curl, `pdftotext`), the points `docs/SOURCE_LICENSES.md` previously carried as WebFetch readings (method-suspect):
+
+1. **OWASP footer.** The CC BY-SA sentence ("Unless otherwise specified, all content on the site is Creative Commons Attribution-ShareAlike v4.0") is verbatim in the raw HTML of all 5 `genai.owasp.org` pages checked.
+2. **embracethered.com absence (checked).** A grep for `licen`, `creative commons`, `cc-by` and `reuse` finds nothing on the post or on `/blog/`. The footer "(c) WUNDERWUZZI 2018-2026" is present. This is the raw-HTML check the SOURCE_LICENSES absence finding required.
+3. **GenAI-LLM-Top10 README.** The licence line is verbatim. The GitHub API `license` field returns null.
+4. **OWASP AI Exchange.** The CC0 sentence is verbatim.
+5. **`oecd.ai/robots.txt`.** 7 Disallow rules plus a `Sitemap:` line; no Allow, no Crawl-delay.
+6. **OECD sitemap** (`oecd.ai/sitemaps/incident-monitor-sitemap.xml`): HEAD returns 405 (`allow: GET`); GET returns 200 with 0 redirects.
+7. **OECD incident page** `2026-10-06-3049`: HEAD 200, GET 200.
+8. **OECD methodology page.** The terms sentence ("Your use of the OECD AI incidents and hazards monitor ... is subject to the terms and conditions found at www.oecd.org/termsandconditions") appears twice. There is no bot or scraping language.
+9. **Crosswalk `mappings/owasp_llm_2025_to_2026.json`** against the 2026 edition's source files (LLM00_Preface.md and the LLM01-LLM10 files; the LLM08 span is in `LLM09_VectorAndEmbeddingWeaknesses.md`): it holds all 20 risk names (`name_2025` / `name_2026`). Its `scope_change` strings: LLM03 verbatim (60%, run 18); LLM04 shares the phrase "absorbs fine-tuning subversion"; LLM08 verbatim (56%, run 9); LLM05 and LLM06 near-verbatim (run 7); the other 5 own. The code labels are as the gate reported them; the author did not re-derive which crosswalk key each belongs to.

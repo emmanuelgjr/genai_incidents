@@ -45,6 +45,53 @@ Each `*.json` file here is a per-source aggregator output — a top-level JSON a
 | `*.provenance.json` | Per-ingest provenance (release tag, hashes, window, yields, skipped-and-why) | Not sources: the merger reads them as zero rows. |
 | `threat_reports_incidents.json` | Vendor TI reports (Anthropic, OpenAI, GTI, MSTIC, etc.) | Each named operation/actor is split into its own entry |
 
+## Licensing of the files in `ingest/`
+
+The `*.json` files here are third-party upstream snapshots, or hand-curated
+records derived from third-party sources. **They stay under each upstream's own
+terms.** They are not covered by this project's CC BY 4.0 data grant
+(`LICENSE-DATA`) or its MIT code licence (`LICENSE`), and no specific licence
+(CC0, CC BY or other) is claimed for them. Some hand-curated files also contain
+the maintainers' own short summaries and links; the file as a whole is still
+marked with the upstream terms. In `.reuse/dep5` they carry the identifier
+`LicenseRef-upstream-terms` (explained in `LICENSES/LicenseRef-upstream-terms.txt`).
+The terms per source, and what this project does with each, are in
+[`docs/SOURCE_LICENSES.md`](../docs/SOURCE_LICENSES.md); the notices the upstreams
+require to travel with copies are in [`NOTICE-DATA`](../NOTICE-DATA).
+`UNKNOWN` in `docs/SOURCE_LICENSES.md` means no rights are claimed, not that rights
+are granted.
+
+Project-authored files here keep the project's licences: `*.provenance.json`
+(per-ingest provenance), `_state/` (source-health and probe state) and this
+`README.md`, and `cve_rejections.json` (D104), are CC BY 4.0; `common.py` and `__init__.py` are MIT. The pinned MITRE
+ATLAS snapshot `atlas/ATLAS-*.yaml` is Apache-2.0 (its own `.reuse/dep5` stanza).
+
+`merge_and_dedupe.py` reads `ingest/*.json` only (`INGEST.glob("*.json")`), so this
+`README.md` is never parsed as a source.
+
+| File | Upstream | `docs/SOURCE_LICENSES.md` |
+|---|---|---|
+| `aiaaic_incidents.json`, `aiaaic_sheet_incidents.json` | AIAAIC Repository (CC BY-SA 4.0) | §1.1 |
+| `aiid_full.json` | AI Incident Database, official snapshot | §1.2a |
+| `aiid_incidents.json` | AI Incident Database, hand-curated rows | §1.2, §1.2a |
+| `aiid_oecd_relationships.json` | AIID repo data file (ID and URL pairs) | §1.3 |
+| `airi_navigator_incidents.json` | MIT FutureTech AIRI Navigator | §1.4 |
+| `oecd_aim_full_incidents.json` | OECD AI Incidents and Hazards Monitor | §1.5 |
+| `avid_owasp_incidents.json` | AVID (`AVID-*` rows) and OWASP Gen AI round-ups (`OWASP-*` rows) | §6.1, §1.6 |
+| `research_incidents.json` | Researcher and vendor security blogs | §1.7 |
+| `threat_reports_incidents.json` | Vendor threat-intelligence reports | §1.8 |
+| `cisa_kev.json` | CISA Known Exploited Vulnerabilities | §2.1 |
+| `cve_incidents.json`, `cve_nvd_expanded.json` | NVD, GitHub Security Advisories, OSV | §2.2, §2.3, §2.4 |
+| `cve_rejections.json` | CVE Program record state (cvelistV5); project-derived state (check dates, dispute signals), no CVE text, CC BY 4.0 (D104) | §2.5 |
+| `wave12_cvelistv5.json` | CVE Program (cvelistV5, CVE Terms of Use) | §6.2 |
+| `atlas_full.json`, `atlas_incidents.json` | MITRE ATLAS (Apache-2.0) | §3.1 |
+| `garak_probes.json` | NVIDIA garak | §3.3 |
+| `promptfoo_plugins.json` | promptfoo | §3.4 |
+| `cve_ai_curated.json` | ModelOriented/CVE-AI | §3.5 |
+| `redteam_benchmarks.json` | Academic red-team benchmark citations | §4 |
+| `arxiv_incidents.json`, `wave12_arxiv.json` | arXiv papers and cs.CR metadata | §6.3 |
+| `wave12_avid.json` | AVID (`avidml/avid-db`, MIT) | §6.1 |
+
 ## File order is load-bearing
 
 `merge_and_dedupe.py` reads `ingest/*.json` in **sorted name order**, and a

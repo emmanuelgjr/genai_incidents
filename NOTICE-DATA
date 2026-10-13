@@ -24,11 +24,13 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, eight upstream sources carry an obligation
+As of this writing, ten upstream sources carry an obligation
 detailed in full below: MITRE ATLAS and garak (Apache License 2.0
 text), the CVE Program and AVID (notices that must accompany copies),
 the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
-for its codes and risk names), the AIAAIC Repository, the AI Incident
+for its codes and risk names), the OWASP Top 10 for LLM Applications
+and the OWASP Gen AI incident round-ups (CC BY-SA 4.0 attribution; see
+the two OWASP paragraphs below), the AIAAIC Repository, the AI Incident
 Database (AIID), and the OECD AI Incidents and Hazards Monitor (AIM).
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here, the
@@ -137,9 +139,63 @@ INCIDENTS.md and docs/charts/owasp_asi.svg (both via
 scripts/render_markdown.py), docs/TAXONOMIES.md and docs/app.js.
 mappings/owasp_asi_top10.json is carved out of the CC BY
 4.0 grant for this material (CC BY-SA 4.0; see .reuse/dep5 and the
-OWASP row, section 3.6, of docs/SOURCE_LICENSES.md). This does not cover
-the OWASP-* rows (OWASP-GENAI-* and OWASP-AIX-*) of
-ingest/avid_owasp_incidents.json, which are a different upstream.
+OWASP row, section 3.6, of docs/SOURCE_LICENSES.md). The OWASP-* rows
+of ingest/avid_owasp_incidents.json are a different use of OWASP
+material and are covered by the round-up paragraph below.
+
+OWASP Top 10 for Large Language Model Applications (LLM Top 10). The
+risk codes LLM01-LLM10, the risk names, and the description and scope text
+in mappings/owasp_llm_top10_2026.json, mappings/owasp_llm_top10_2025.json
+and the crosswalk mappings/owasp_llm_2025_to_2026.json
+are from, or in part follow closely, "OWASP Top 10 for Large Language
+Model Applications" by the OWASP GenAI Security Project, OWASP
+Foundation: the 2026 edition (Version 2026, published 2026-08-03),
+https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ and
+https://github.com/GenAI-Security-Project/GenAI-LLM-Top10, and the 2025
+edition, https://genai.owasp.org/llm-top-10/, licensed under CC BY-SA
+4.0, https://creativecommons.org/licenses/by-sa/4.0/legalcode. Changes:
+the descriptions are shortened and edited, and in places reworded; the
+codes and names are reproduced as published in each edition. A
+side-by-side measurement (2026-10-13) found that in the 2026 file 4 of
+the 10 descriptions are verbatim and 6 near-verbatim to OWASP's text,
+and that in the 2025 file 4 of the 10 are verbatim or near-verbatim
+(3 and 1); the other six 2025 descriptions are the project's own
+wording. The crosswalk holds all 20 risk names (name_2025, name_2026) and
+ten scope_change strings, measured against the 2026 edition's source files (LLM00_Preface.md and the LLM01-LLM10 files):
+two are verbatim, three are near-verbatim or share a phrase, five are the
+project's own wording. This attribution covers the codes, names,
+descriptions and scope text wherever they are reproduced from these three
+files (including INCIDENTS.md, docs/TAXONOMIES.md and the charts and site
+that display them). All three mapping files are carved out of the CC BY
+4.0 grant for this material (CC BY-SA 4.0; see .reuse/dep5 and the OWASP
+LLM Top 10 row, section 3.7, of docs/SOURCE_LICENSES.md; decisions D96 and
+D99). The descriptions and scope text are scheduled to be rewritten as the
+project's own paraphrase in the next release. Every release that carried
+each of these files, from its introduction, shipped it under CC BY 4.0
+without this attribution (the 2026 file and the crosswalk first shipped in
+v2.10.0), as recorded in CORRECTIONS.md.
+
+OWASP Gen AI Security Project incident round-ups. Some incident text in
+this dataset, in the rows whose source ids begin OWASP-GENAI- (in
+ingest/avid_owasp_incidents.json) and in the dataset entries they were
+merged into, was drawn from the OWASP Gen AI Security Project's
+incident and exploit round-up reports published at genai.owasp.org
+(Jan-Feb 2025, 2025-03-06; Q2 2025, 2025-07-14; Q1 2026, 2026-04-14),
+OWASP Foundation, which the site licenses as CC BY-SA 4.0 ("Unless
+otherwise specified, all content on the site is Creative Commons
+Attribution-ShareAlike v4.0",
+https://creativecommons.org/licenses/by-sa/4.0/legalcode). The
+round-ups summarise incidents reported by third parties; their
+underlying reporting is not OWASP's and is not covered by this notice.
+A measurement on 2026-10-13 found that two shipped entries, INC-02646
+and INC-03233, carry description text that is verbatim or near-verbatim
+from these round-ups; they are to be rewritten from their primary
+sources (decision D97), and until then that text remains under CC BY-SA
+4.0, not CC BY 4.0. The other shipped entries that cite these round-ups
+were measured as the project's own wording. Provenance of three rows,
+OWASP-GENAI-Q1-2026-01, -02 and -03, is unconfirmed: they appear on no
+cited round-up page. The three OWASP-AIX-* rows are the project's own
+wording. See section 1.6 of docs/SOURCE_LICENSES.md.
 
 The AIAAIC Repository is a CC BY-SA 4.0 source (share-alike). Per
 project decision D2, AIAAIC's own narrative/descriptive cell text is

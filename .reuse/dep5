@@ -53,16 +53,20 @@ Comment: This dataset aggregates entries from many upstream sources, each
  framing, and docs/audits/E23-aiid-marking-ruling-2026-07-30.md for
  the full reasoning.
  The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
- eight sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
+ ten sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
  whose row text this project could not simply carry under the source's
  own licence grant. For each of the three, the text was either reduced
  to structural facts and a link, or its retained title was analysed as
  a separate copyright question (open for AIAAIC and AIM; resolved for
- AIID). For the other five named there (MITRE ATLAS, garak, the CVE
- Program, AVID and the OWASP Top 10 for Agentic Applications), the
- grant covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
+ AIID). For six of the other seven named there (MITRE ATLAS, garak, the
+ CVE Program, AVID, the OWASP Top 10 for Agentic Applications and the
+ OWASP Top 10 for LLM Applications), the grant (for the two OWASP
+ mapping files, the carve-out stanzas below) covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
  (CVE- and AVID-derived rows also carry a row-level content_license
- marker).
+ marker). The seventh, the OWASP Gen AI incident round-ups, is an
+ exception: two shipped entries (INC-02646, INC-03233) carry CC BY-SA 4.0
+ round-up text until they are rewritten from their primary sources
+ (decision D97); see NOTICE-DATA and docs/SOURCE_LICENSES.md section 1.6.
  .
  AIM's title/summary fields are LLM-generated (OpenAI
  o3-mini) from third-party news articles of unresolved copyright
@@ -117,6 +121,31 @@ Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
  NOTICE-DATA and docs/SOURCE_LICENSES.md section 3.6, and
  docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md.
 
+Files: mappings/owasp_llm_top10_2026.json mappings/owasp_llm_top10_2025.json mappings/owasp_llm_2025_to_2026.json
+Copyright: OWASP GenAI Security Project, OWASP Foundation (risk codes, names and
+ description and scope text taken from, or following, the OWASP Top 10 for
+ Large Language Model Applications)
+ 2026 Emmanuel G. Jr. and contributors (selection, editing and file structure)
+License: CC-BY-SA-4.0 AND CC-BY-4.0
+Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
+ (this stanza must stay AFTER it: in dep5 the last matching stanza wins).
+ The risk codes LLM01-LLM10, the risk names and the description text are
+ from, or in part follow, "OWASP Top 10 for Large Language Model
+ Applications", OWASP GenAI Security Project (2026 edition, Version 2026,
+ published 2026-08-03,
+ https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/; 2025
+ edition, https://genai.owasp.org/llm-top-10/), and are licensed CC BY-SA
+ 4.0 (decision D96). A raw-text measurement on 2026-10-13 found 4
+ verbatim and 6 near-verbatim descriptions in the 2026 file and 4 verbatim
+ or near-verbatim in the 2025 file. The crosswalk
+ mappings/owasp_llm_2025_to_2026.json (decision D99) holds all 20 risk
+ names and 10 scope_change strings that were measured against the 2026
+ edition's source files (LLM00_Preface.md and the LLM01-LLM10 files): 2 verbatim, 3 near-verbatim or shared-phrase, 5 own.
+ The descriptions and scope_change strings are to be rewritten as the
+ project's own paraphrase in the next release. See NOTICE-DATA,
+ docs/SOURCE_LICENSES.md section 3.7 and
+ docs/audits/licensing-overlap-measurements-2026-10-13.md.
+
 Files: docs/*
 Copyright: 2026 Emmanuel G. Jr. and contributors
 License: CC-BY-4.0
@@ -130,6 +159,36 @@ Comment: Verbatim copy of a MITRE ATLAS release (mitre-atlas/atlas-data,
  verbatim is covered by docs/SOURCE_LICENSES.md section 3.1 and the
  MITRE ATLAS notice in NOTICE-DATA. Provenance and sha256 are in
  ingest/atlas/ATLAS.provenance.json.
+
+Files: ingest/*.json
+Copyright: The respective upstream rights holders, per source (see docs/SOURCE_LICENSES.md)
+License: LicenseRef-upstream-terms
+Comment: Everything under ingest/ that matches this pattern is a third-party
+ upstream snapshot, or a hand-curated record derived from third-party
+ sources, and stays under each upstream's OWN terms (decision D101). It is
+ NOT covered by this project's CC-BY-4.0 data grant or its MIT code
+ licence, and no specific licence (CC0, CC-BY or other) is claimed for it
+ here. Some hand-curated files also contain the maintainers' own short
+ summaries and links; the file as a whole is still marked with the upstream
+ terms. The terms per source are in docs/SOURCE_LICENSES.md and the
+ notices in NOTICE-DATA; the file-to-source map is ingest/README.md. The
+ identifier is explained in LICENSES/LicenseRef-upstream-terms.txt.
+ Carve-backs for project-authored files under ingest/ follow in the next
+ stanza (this stanza must stay BEFORE it: in dep5 the last matching
+ stanza wins). ingest/atlas/ATLAS-*.yaml has its own Apache-2.0 stanza
+ above, and the *.py files (ingest/common.py, ingest/__init__.py) are MIT
+ under the first stanza.
+
+Files: ingest/*.provenance.json ingest/_state/* ingest/README.md ingest/cve_rejections.json
+Copyright: 2026 Emmanuel G. Jr. and contributors
+License: CC-BY-4.0
+Comment: Project-authored files under ingest/, carved back out of the
+ "ingest/*.json" upstream-terms stanza above (decision D101): the
+ per-ingest provenance records (release tags, hashes, windows, yields),
+ the source-health and probe state under ingest/_state/, and ingest/README.md.
+ They record what this project fetched and did, not third-party content.
+ ingest/cve_rejections.json is project-derived state (check dates and
+ dispute signals), with no CVE text, under decision D104.
 
 Files: LICENSE
 Copyright: 2026 Emmanuel G. Jr.
