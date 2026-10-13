@@ -63,6 +63,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 D97/D98 rewrites: corpus-surgeon `b130900e` on `ws1/licensing-rewrites-2026-10-13`. **Gate dispatched.**
+- **Shipped rows changed: 3.** INC-02646 (it was 81% verbatim), INC-03233 (31%) and INC-02436 (a RES span).
+- **Ingest-only rewrites: 3.** For RES camoleak, ox-mcp and anthropic-aug, another source's description wins the merge. They ship as INC-02382, INC-01015 and INC-08177 respectively.
+- **New text measured:** 0.0% 5-gram overlap with the source, longest run ≤ 4. The OLD-vs-source figures reproduce the gate's. Controls: verbatim 100%, cross 0%.
+- **Field delta:** `description`, `updated` and `last_seen` on exactly 3 rows; `last_seen` follows `updated` (merge_and_dedupe:2904). Also the build stamp `generated`. The ID set and the count of 15,666 are equal. The rebuild is deterministic.
+- **Over-merge:** INC-02646 and INC-03233 each describe ONE incident (Q2-2025-01 and Q1-2025-01), so the rewrite was clean. The other folded ids remain row-less. That goes to the over-merge task.
+- **Factual fixes:** camoleak was found by a Legit Security researcher, not by Tenable. **Flag → WS2:** the OX post is dated 2026-04-15, but the row says 2025-09.
+- **Finding for the user package:** 6 more OWASP ingest rows still carry verbatim or near text (Q1-2025-03, Q2-2025-02 and Q1-2026-04 verbatim; Q1-2025-02, Q1-2026-05 and Q1-2026-06 near). They don't ship as their own rows. **Foreman [R]:** `ingest/*.json` has NO dep5 licence declaration; only `ingest/atlas/*.yaml` does. That means ingest/ is raw upstream input under upstream terms, so it is not relicensed CC-BY. → User question: should ingest/ state its status explicitly?
+- **The gate is asked** to: run its own delta; fetch the sources and check overlap AND factual support for every added fact; measure the shipped INC-02382 text; check the clean-clone rebuild.
+
 ### 🔁 WS0 licensing c5-c11: **BOUNCE #1 (raw-text gate on `ef4ad825`)**. Fixes are with the license-auditor, together with the D96-D98 docs.
 - **Defects:**
   1. §1.6 says 1 of 6 Q1-2026 rows matches the round-up; **3 of 6** match (-04, -05, -06).
