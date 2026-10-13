@@ -63,6 +63,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D109: first ATLAS refresh dispatch (run 38372928453), **SUCCESS, NO-OP.**
+- The log reads: `[atlas-fetch] collection.version=2026.09 modified=2026-09-15 … sha256=935efa93…` and then `NO-OP: ATLAS-2026.09.yaml sha256 matches the committed snapshot; nothing written`.
+- "Detect change" reported success, and every later step (scan, re-pin, merge, delta, lint, tests, PR) was skipped. **No PR, as designed.**
+- The workflow is now proven to run end to end through change detection. The first real update will exercise the remaining steps. The next cron is 2026-11-03.
+- **Register a5 closed.**
+
 ### ⚖ D117/D118, USER RULINGS 2026-10-13: over-merge (proposal `docs/audits/overmerge-split-proposal-2026-10-13.md`)
 - **D117: rule fix now, split later (Recommended).**
   - **A2 now:** aggregate round-up URLs are not dedupe keys unless both sides already share a published row. Published data must stay byte-identical. Add a regression test that would have caught today's fold.
