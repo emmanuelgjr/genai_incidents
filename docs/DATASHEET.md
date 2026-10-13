@@ -17,7 +17,7 @@ trackers (AIID, MIT AI Risk Repository, AVID, and others; see the
 Collection section below) as upstream sources rather than replacing them.
 
 ## Composition
-- **Instances:** consolidated incidents (<!-- stats:incident_count -->15,637<!-- /stats:incident_count -->,
+- **Instances:** consolidated incidents (<!-- stats:incident_count -->15,642<!-- /stats:incident_count -->,
   of which <!-- stats:disputed_count -->22<!-- /stats:disputed_count --> are CVE-disputed and still counted,
   as of this build — authoritative live count in
   [`data/stats.json`](../data/stats.json)), each an alleged
