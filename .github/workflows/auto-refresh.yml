@@ -13,10 +13,6 @@ on:
         description: "Accept an AIAAIC yield drop below 90% of the committed rows for this run (maintainer override; logged loudly)"
         type: boolean
         default: false
-      try_airi:
-        description: "Also try the AIRI Navigator fetch on this manual run (D95: otherwise monthly only)"
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -116,36 +112,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # D95: AIRI is under review (D57; review date 2027-01-07) and its download
-      # has 404ed since 2026-05-31, so the fetch is retried MONTHLY, not weekly:
-      # on the first scheduled run of each month (Sunday, day-of-month 1-7), or
-      # on a manual run with try_airi. A week that does not try leaves the step
-      # `skipped`, which check_source_health.py treats as "not attempted" (the
-      # counter is neither reset nor incremented); a failed monthly attempt
-      # still counts toward the usual threshold and goes loud.
-      - name: Decide whether to try AIRI this run
-        id: airi_gate
-        env:
-          EVENT: ${{ github.event_name }}
-          TRY_AIRI: ${{ github.event.inputs.try_airi }}
-        run: |
-          dom=$(date -u +%-d)
-          if [ "$EVENT" = "schedule" ] && [ "$dom" -le 7 ]; then attempt=true
-          elif [ "$EVENT" = "workflow_dispatch" ] && [ "$TRY_AIRI" = "true" ]; then attempt=true
-          else attempt=false; fi
-          echo "attempt=$attempt" >> "$GITHUB_OUTPUT"
-          echo "::notice::AIRI attempt this run: $attempt (event=$EVENT, day-of-month=$dom)"
-
-      - name: Refresh AIRI Navigator
-        id: ingest_airi
-        if: steps.airi_gate.outputs.attempt == 'true'
-        run: python scripts/ingest_airi_navigator.py
-        continue-on-error: true
+      # D108 (2026-10-13): the AIRI Navigator source is RETIRED. Its download
+      # has 404ed since 2026-05-31, so it is no longer fetched (the D95 monthly
+      # retry and the try_airi input are gone), and scripts/check_source_health.py
+      # (RETIRED_SOURCES) never alerts on it. Its existing rows stay in the build
+      # unchanged: ingest/airi_navigator_incidents.json is committed and is still
+      # held/restored by hold_pair_inputs.py. Revisit only if the site returns.
 
       - name: Refresh AIAAIC sheet
         id: ingest_aiaaic
         env:
           AIAAIC_ACCEPT_YIELD_DROP: ${{ github.event.inputs.accept_aiaaic_yield_drop == 'true' && '1' || '' }}
+          # B3: written (outside the work tree) only if the yield floor is overridden;
+          # the PR-body step appends it so the PR alone shows the override.
+          AIAAIC_OVERRIDE_MARKER: ${{ runner.temp }}/aiaaic-yield-override.md
         run: python scripts/ingest_aiaaic_sheet.py
         continue-on-error: true
 
@@ -239,7 +219,6 @@ jobs:
       # per-source outcomes and abort in the nothing-refreshed case.
       - name: Ingest result summary
         env:
-          AIRI: ${{ steps.ingest_airi.outcome }}
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
           CVE_SWEEP: ${{ needs.cve-sweep.outputs.sweep_outcome || needs.cve-sweep.result }}
@@ -249,20 +228,18 @@ jobs:
             echo "### Source refresh results"
             echo "| Source | Outcome |"
             echo "|---|---|"
-            echo "| AIRI Navigator | $AIRI |"
+            echo "| AIRI Navigator | retired 2026-10-13 (D108); existing rows retained |"
             echo "| AIAAIC sheet | $AIAAIC |"
             echo "| OECD AI Incidents Monitor | $OECD |"
             echo "| CVE rejection/dispute sweep (separate job; not counted toward the all-failed abort) | $CVE_SWEEP |"
             echo "| AIID snapshot | $AIID |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ok=0
-          total=3
-          [ "$AIRI" = "skipped" ] && total=2  # D95: monthly retry, not attempted this week
-          [ "$AIRI" = "success" ] && ok=$((ok+1))
+          total=2  # AIAAIC + OECD (AIRI retired, D108)
           [ "$AIAAIC" = "success" ] && ok=$((ok+1))
           [ "$OECD" = "success" ] && ok=$((ok+1))
           if [ "$ok" -eq 0 ]; then
-            echo "::error::All three source refreshes failed — the data would be stale. Aborting instead of opening a misleading refresh PR."
+            echo "::error::Every source refresh failed — the data would be stale. Aborting instead of opening a misleading refresh PR."
             exit 1
           fi
           if [ "$AIID" != "success" ]; then
@@ -311,15 +288,14 @@ jobs:
         id: health
         continue-on-error: true
         env:
-          # D95: a gated (deliberately not tried) AIRI is "not-attempted", which the
-          # checker leaves alone; a bare "skipped" would still count as a failure.
-          AIRI: ${{ steps.airi_gate.outputs.attempt == 'true' && steps.ingest_airi.outcome || 'not-attempted' }}
+          # D108: airi_navigator is deliberately absent. The checker stamps it
+          # `retired` from its own RETIRED_SOURCES list, whatever the restored state says.
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
           KEV: ${{ steps.ingest_kev.outcome }}
         run: |
           python scripts/check_source_health.py \
-            --outcomes-json "{\"airi_navigator\": \"$AIRI\", \"aiaaic_sheet\": \"$AIAAIC\", \"oecd_aim\": \"$OECD\", \"cisa_kev\": \"$KEV\"}" \
+            --outcomes-json "{\"aiaaic_sheet\": \"$AIAAIC\", \"oecd_aim\": \"$OECD\", \"cisa_kev\": \"$KEV\"}" \
             --summary-file "$GITHUB_STEP_SUMMARY"
 
       # D5, continued: push the just-updated counter to `refresh-state` via
@@ -458,8 +434,10 @@ jobs:
           cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources. This PR carries the
           AIAAIC sheet, the CISA KEV catalog and the CVE rejection sweep (with
-          the D60 retractions); the AIRI Navigator, AIID snapshot and OECD AI
-          Incidents Monitor inputs are held out (see below).
+          the D60 retractions); the AIID snapshot and OECD AI Incidents Monitor
+          inputs are held out (see below). The AIRI Navigator source is retired
+          (D108, 2026-10-13): it is no longer fetched and its existing rows are
+          retained unchanged.
 
           On each run this branch is recreated from the current `main`, so the
           diff is always relative to the latest `main` *at run time*. **Merge
@@ -479,6 +457,9 @@ jobs:
           suite both ran green in this workflow before the PR was opened.
 
           BODY
+          if [ -s "$RUNNER_TEMP/aiaaic-yield-override.md" ]; then
+            cat "$RUNNER_TEMP/aiaaic-yield-override.md" >> "$RUNNER_TEMP/pr-body.md"
+          fi
           if python scripts/newly_retracted_report.py --before-ref HEAD \
                --out-md "$RUNNER_TEMP/newly-retracted.md" --github-output "$GITHUB_OUTPUT"; then
             cat "$RUNNER_TEMP/newly-retracted.md" >> "$RUNNER_TEMP/pr-body.md"

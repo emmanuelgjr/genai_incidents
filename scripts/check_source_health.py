@@ -56,6 +56,21 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_STATE_PATH = ROOT / "ingest" / "_state" / "source_health.json"
 DEFAULT_THRESHOLD = 3  # consecutive failed refreshes before a source goes "stale"
 NOT_ATTEMPTED = "not-attempted"  # D95: passed by the workflow for a gated, deliberately skipped step
+# D108 (2026-10-13): sources retired by user ruling. A retired source is never
+# attempted, never counted, and never alerts; its ingest file and provenance
+# stay in the build unchanged (never delete entries). This is CODE, not state:
+# the live counters are restored from the `refresh-state` branch each run, and
+# update_source_health() stamps `status: retired` over whatever that copy says,
+# so no one has to hand-edit that branch. To revive a source, remove it here.
+RETIRED_SOURCES: dict[str, dict[str, str]] = {
+    "airi_navigator": {
+        "retired_on": "2026-10-13",
+        "retired_reason": (
+            "D108: www.airi-navigator.com has returned 404 since 2026-05-31; "
+            "source retired, existing rows retained; revisit only if the site returns"
+        ),
+    },
+}
 MAX_PAUSE_HORIZON_DAYS = 180  # ~6 months; a pause can't be dated further out
 # than this from "today" without renewal — see pause_status()'s docstring.
 
@@ -163,6 +178,9 @@ def update_source_health(
     pause_notices: dict[str, str] = {}
 
     for source, outcome in outcomes.items():
+        if source in RETIRED_SOURCES:
+            # D108: whatever outcome a caller passes for a retired source is ignored.
+            continue
         if outcome == NOT_ATTEMPTED:
             # D95: the step was not attempted this run (AIRI is retried monthly). A bare
             # GitHub "skipped" is NOT this: it still counts as a failure (tested), so a
@@ -203,13 +221,29 @@ def update_source_health(
             else:
                 degraded.append(source)
 
+    # D108: stamp retired sources regardless of what outcomes were supplied (the
+    # workflow no longer passes one). Prior counters/last_* are kept as history.
+    for source, info in RETIRED_SOURCES.items():
+        entry = dict(new_state.get(source, {}))
+        entry["status"] = "retired"
+        entry["retired_on"] = info["retired_on"]
+        entry["retired_reason"] = info["retired_reason"]
+        entry.setdefault("consecutive_failures", 0)
+        new_state[source] = entry
+
     return new_state, stale, degraded, pause_notices
 
 
 def render_summary(state: dict, outcomes: dict[str, str]) -> str:
     lines = ["### Source health (consecutive-failure tracking)", "", "| Source | This run | Consecutive failures | Status | Paused |", "|---|---|---|---|---|"]
-    for source in sorted(outcomes):
+    # D108: a retired source is listed once, as retired, whether or not a caller
+    # passed an outcome for it.
+    for source in sorted(set(outcomes) | set(RETIRED_SOURCES)):
         entry = state.get(source, {})
+        if source in RETIRED_SOURCES:
+            lines.append(f"| {source} | retired {RETIRED_SOURCES[source]['retired_on']} (not attempted) "
+                         f"| {entry.get('consecutive_failures', 0)} (frozen) | retired | no |")
+            continue
         lines.append(
             f"| {source} | {outcomes[source]}{' (monthly retry; counter unchanged)' if outcomes[source] == NOT_ATTEMPTED else ''} | {entry.get('consecutive_failures', 0)} "
             f"| {entry.get('status', 'unknown')} | {'yes' if entry.get('paused') else 'no'} |"

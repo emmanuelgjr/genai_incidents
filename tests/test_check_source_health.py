@@ -29,12 +29,12 @@ import check_source_health as h  # noqa: E402
 
 def test_single_failure_is_only_degraded_not_stale():
     state, stale, degraded, notices = h.update_source_health(
-        {}, {"airi_navigator": "failure"}, today="2026-06-07", threshold=3
+        {}, {"example_source": "failure"}, today="2026-06-07", threshold=3
     )
-    assert state["airi_navigator"]["consecutive_failures"] == 1
-    assert state["airi_navigator"]["status"] == "degraded"
+    assert state["example_source"]["consecutive_failures"] == 1
+    assert state["example_source"]["status"] == "degraded"
     assert stale == []
-    assert degraded == ["airi_navigator"]
+    assert degraded == ["example_source"]
     assert notices == {}
 
 
@@ -45,11 +45,11 @@ def test_source_fails_loudly_after_threshold_consecutive_failures():
     stale: list[str] = []
     for d in dates:
         state, stale, _degraded, _notices = h.update_source_health(
-            state, {"airi_navigator": "failure"}, today=d, threshold=3
+            state, {"example_source": "failure"}, today=d, threshold=3
         )
-    assert state["airi_navigator"]["consecutive_failures"] == 3
-    assert state["airi_navigator"]["status"] == "stale"
-    assert stale == ["airi_navigator"], (
+    assert state["example_source"]["consecutive_failures"] == 3
+    assert state["example_source"]["status"] == "stale"
+    assert stale == ["example_source"], (
         "a source at/above the consecutive-failure threshold must be reported "
         "as stale (loud), not silently folded into a warning"
     )
@@ -57,20 +57,20 @@ def test_source_fails_loudly_after_threshold_consecutive_failures():
 
 def test_success_resets_consecutive_failures():
     state, _, _, _ = h.update_source_health(
-        {"airi_navigator": {"consecutive_failures": 5, "status": "stale"}},
-        {"airi_navigator": "success"},
+        {"example_source": {"consecutive_failures": 5, "status": "stale"}},
+        {"example_source": "success"},
         today="2026-07-19",
         threshold=3,
     )
-    assert state["airi_navigator"]["consecutive_failures"] == 0
-    assert state["airi_navigator"]["status"] == "ok"
-    assert state["airi_navigator"]["last_success"] == "2026-07-19"
+    assert state["example_source"]["consecutive_failures"] == 0
+    assert state["example_source"]["status"] == "ok"
+    assert state["example_source"]["last_success"] == "2026-07-19"
 
 
 def test_active_pause_does_not_report_as_newly_stale():
     """A reasoned, time-boxed pause silences the loud gate without hiding status."""
     prior = {
-        "airi_navigator": {
+        "example_source": {
             "consecutive_failures": 6,
             "status": "stale",
             "paused": True,
@@ -79,13 +79,13 @@ def test_active_pause_does_not_report_as_newly_stale():
         }
     }
     state, stale, degraded, notices = h.update_source_health(
-        prior, {"airi_navigator": "failure"}, today="2026-07-19", threshold=3
+        prior, {"example_source": "failure"}, today="2026-07-19", threshold=3
     )
-    assert state["airi_navigator"]["status"] == "stale"
-    assert state["airi_navigator"]["consecutive_failures"] == 7
+    assert state["example_source"]["status"] == "stale"
+    assert state["example_source"]["consecutive_failures"] == 7
     assert stale == [], "an active pause must not trip the loud-failure gate"
     assert degraded == []
-    assert notices == {"airi_navigator": "active"}
+    assert notices == {"example_source": "active"}
 
 
 @pytest.mark.parametrize(
@@ -103,18 +103,18 @@ def test_active_pause_does_not_report_as_newly_stale():
 def test_invalid_pause_is_not_honored(entry_extra):
     """paused: true alone (or with a blank/missing reason or expiry) must NOT silence
     the gate — that is exactly the one-line bypass advisory (a) warned about."""
-    prior = {"airi_navigator": {"consecutive_failures": 6, "status": "stale", **entry_extra}}
+    prior = {"example_source": {"consecutive_failures": 6, "status": "stale", **entry_extra}}
     state, stale, degraded, notices = h.update_source_health(
-        prior, {"airi_navigator": "failure"}, today="2026-07-19", threshold=3
+        prior, {"example_source": "failure"}, today="2026-07-19", threshold=3
     )
-    assert stale == ["airi_navigator"], "an invalid pause must not stop the source from being loud"
-    assert notices == {"airi_navigator": "invalid"}
+    assert stale == ["example_source"], "an invalid pause must not stop the source from being loud"
+    assert notices == {"example_source": "invalid"}
 
 
 def test_expired_pause_is_not_honored():
     """A pause with a paused_until in the past must expire back to loud, not stay silenced."""
     prior = {
-        "airi_navigator": {
+        "example_source": {
             "consecutive_failures": 6,
             "status": "stale",
             "paused": True,
@@ -123,10 +123,10 @@ def test_expired_pause_is_not_honored():
         }
     }
     state, stale, degraded, notices = h.update_source_health(
-        prior, {"airi_navigator": "failure"}, today="2026-07-19", threshold=3
+        prior, {"example_source": "failure"}, today="2026-07-19", threshold=3
     )
-    assert stale == ["airi_navigator"], "an expired pause must not stop the source from being loud"
-    assert notices == {"airi_navigator": "expired"}
+    assert stale == ["example_source"], "an expired pause must not stop the source from being loud"
+    assert notices == {"example_source": "expired"}
 
 
 def test_pause_status_helper_classifies_correctly():
@@ -183,14 +183,14 @@ def test_pause_status_caps_far_future_pause_as_invalid():
 
 def test_independent_sources_tracked_independently():
     state, stale, degraded, notices = h.update_source_health(
-        {}, {"airi_navigator": "failure", "aiaaic_sheet": "success", "oecd_aim": "failure"},
+        {}, {"example_source": "failure", "aiaaic_sheet": "success", "oecd_aim": "failure"},
         today="2026-06-07", threshold=3,
     )
     assert state["aiaaic_sheet"]["status"] == "ok"
-    assert state["airi_navigator"]["status"] == "degraded"
+    assert state["example_source"]["status"] == "degraded"
     assert state["oecd_aim"]["status"] == "degraded"
     assert stale == []
-    assert set(degraded) == {"airi_navigator", "oecd_aim"}
+    assert set(degraded) == {"example_source", "oecd_aim"}
     assert notices == {}
 
 
@@ -208,13 +208,13 @@ def test_cli_exits_nonzero_when_a_source_crosses_threshold(tmp_path):
     # Prime the state file with 2 prior consecutive failures, then feed a 3rd.
     h.save_state(
         state_file,
-        {"airi_navigator": {"consecutive_failures": 2, "status": "degraded"}},
+        {"example_source": {"consecutive_failures": 2, "status": "degraded"}},
     )
     result = subprocess.run(
         [
             sys.executable,
             str(Path(__file__).resolve().parents[1] / "scripts" / "check_source_health.py"),
-            "--outcomes-json", json.dumps({"airi_navigator": "failure"}),
+            "--outcomes-json", json.dumps({"example_source": "failure"}),
             "--state-file", str(state_file),
             "--threshold", "3",
             "--today", "2026-06-21",
@@ -224,7 +224,7 @@ def test_cli_exits_nonzero_when_a_source_crosses_threshold(tmp_path):
     assert result.returncode == 1, result.stdout + result.stderr
     assert "::error::" in result.stdout
     new_state = json.loads(state_file.read_text(encoding="utf-8"))
-    assert new_state["airi_navigator"]["status"] == "stale"
+    assert new_state["example_source"]["status"] == "stale"
 
 
 def test_cli_exits_zero_and_warns_when_below_threshold(tmp_path):
@@ -251,7 +251,7 @@ def test_cli_exits_nonzero_when_pause_has_expired(tmp_path):
     h.save_state(
         state_file,
         {
-            "airi_navigator": {
+            "example_source": {
                 "consecutive_failures": 6,
                 "status": "stale",
                 "paused": True,
@@ -264,7 +264,7 @@ def test_cli_exits_nonzero_when_pause_has_expired(tmp_path):
         [
             sys.executable,
             str(Path(__file__).resolve().parents[1] / "scripts" / "check_source_health.py"),
-            "--outcomes-json", json.dumps({"airi_navigator": "failure"}),
+            "--outcomes-json", json.dumps({"example_source": "failure"}),
             "--state-file", str(state_file),
             "--threshold", "3",
             "--today", "2026-07-19",
@@ -283,7 +283,7 @@ def test_cli_exits_nonzero_when_pause_is_an_unpadded_date_typo(tmp_path):
     h.save_state(
         state_file,
         {
-            "airi_navigator": {
+            "example_source": {
                 "consecutive_failures": 6,
                 "status": "stale",
                 "paused": True,
@@ -296,7 +296,7 @@ def test_cli_exits_nonzero_when_pause_is_an_unpadded_date_typo(tmp_path):
         [
             sys.executable,
             str(Path(__file__).resolve().parents[1] / "scripts" / "check_source_health.py"),
-            "--outcomes-json", json.dumps({"airi_navigator": "failure"}),
+            "--outcomes-json", json.dumps({"example_source": "failure"}),
             "--state-file", str(state_file),
             "--threshold", "3",
             "--today", "2026-07-19",
@@ -314,3 +314,68 @@ def test_any_non_success_outcome_counts_as_a_failure(outcome):
     )
     assert state["src"]["consecutive_failures"] == 1
     assert degraded == ["src"]
+
+
+# --- D108: retired sources (AIRI Navigator, 2026-10-13) ---------------------
+
+LIVE_AIRI_STATE = {  # the shape restored from the refresh-state branch
+    "airi_navigator": {"consecutive_failures": 15, "last_attempt": "2026-10-04",
+                       "last_outcome": "failure", "last_success": "2026-05-31", "status": "stale"},
+}
+
+
+def test_retired_source_is_stamped_over_a_stale_live_state_and_never_alerts():
+    # The retired status reaches the live run from CODE, not from the restored state.
+    for outcome in ("failure", "skipped", "success", h.NOT_ATTEMPTED):
+        state, stale, degraded, notices = h.update_source_health(
+            LIVE_AIRI_STATE, {"airi_navigator": outcome}, today="2026-10-18", threshold=3)
+        assert state["airi_navigator"]["status"] == "retired"
+        assert stale == [] and degraded == [] and notices == {}
+        assert state["airi_navigator"]["consecutive_failures"] == 15  # history kept, frozen
+        assert state["airi_navigator"]["last_success"] == "2026-05-31"
+        assert state["airi_navigator"]["retired_on"] == "2026-10-13"
+
+
+def test_retired_source_is_stamped_even_when_the_workflow_passes_no_outcome():
+    state, stale, degraded, _ = h.update_source_health(
+        LIVE_AIRI_STATE, {"aiaaic_sheet": "success"}, today="2026-10-18")
+    assert state["airi_navigator"]["status"] == "retired"
+    assert stale == [] and degraded == []
+    assert state["aiaaic_sheet"]["status"] == "ok"
+
+
+def test_retirement_does_not_silence_other_sources():
+    _, stale, _, _ = h.update_source_health(
+        {"example_source": {"consecutive_failures": 5, "status": "stale"}, **LIVE_AIRI_STATE},
+        {"example_source": "failure", "airi_navigator": "failure"}, today="2026-10-18")
+    assert stale == ["example_source"]
+
+
+def test_cli_exits_zero_for_a_failing_retired_source(tmp_path):
+    sf = tmp_path / "s.json"
+    sf.write_text(json.dumps(LIVE_AIRI_STATE), encoding="utf-8")
+    r = subprocess.run(
+        [sys.executable, str(Path(h.__file__)), "--state-file", str(sf), "--today", "2026-10-18",
+         "--outcomes-json", json.dumps({"airi_navigator": "failure"})],
+        capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "::error::" not in r.stdout
+    assert json.loads(sf.read_text(encoding="utf-8"))["airi_navigator"]["status"] == "retired"
+    assert "| airi_navigator | retired 2026-10-13 (not attempted)" in r.stdout
+
+
+def test_airi_retirement_is_wired_in_the_workflow_and_data_is_kept():
+    import yaml
+    root = Path(h.__file__).resolve().parents[1]
+    text = (root / ".github" / "workflows" / "auto-refresh.yml").read_text(encoding="utf-8")
+    wf = yaml.safe_load(text)
+    on = wf.get(True) or wf.get("on")
+    assert "try_airi" not in on["workflow_dispatch"]["inputs"]
+    ids = {s.get("id") for s in wf["jobs"]["refresh"]["steps"]}
+    assert not ids & {"airi_gate", "ingest_airi"}
+    assert "ingest_airi_navigator" not in text
+    assert 'airi_navigator\\"' not in text  # not passed to the health checker
+    # existing rows are retained and still held as a pair input
+    assert (root / "ingest" / "airi_navigator_incidents.json").exists()
+    import hold_pair_inputs as hp
+    assert "airi_navigator_incidents.json" in hp.held_files()

@@ -130,7 +130,7 @@ invoke: `www.airi-navigator.com`, `docs.google.com` (AIAAIC sheet export),
 cannot be listed from a static read, so the count is a floor and the 12 was
 not reproduced; the check is the per-host keys of the rate limiter in a run
 log), mostly once a day, over one network path (the weekly
-AIRI/AIAAIC/AIID-snapshot/OECD/KEV run, `auto-refresh.yml`, whose separate
+AIAAIC/AIID-snapshot/OECD/KEV run, `auto-refresh.yml` (the AIRI Navigator, `www.airi-navigator.com`, was retired 2026-10-13 under D108: no longer fetched, existing rows retained), whose separate
 `cve-sweep` job also reads `cvelistV5` and NVD, plus the on-demand NVD/GHSA/OSV run in
 `cve-enrich.yml` (manual dispatch); AIID was added to this list 2026-10-12, follow-up c9, after
 being checked against `.github/workflows/auto-refresh.yml` at `761eaef6`). A host that
