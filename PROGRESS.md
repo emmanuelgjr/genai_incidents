@@ -63,6 +63,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D97/D98 rewrites + INC-02382 CVE fix: **PASS (gate-rewrite on `64467e49`), MERGED.** CORRECTIONS row placed.
+**Verdict, in the gate's words:** "PASS. ws1/licensing-rewrites-2026-10-13 @ 64467e49 fixes both bounce #1 defects, and the delta is exactly as declared. DEFECTS: none."
+
+**Gate evidence:**
+- **(a) Per-row delta e94ae7f7 → 64467e49:** exactly 4 rows.
+  - INC-02382: title, tags, updated, last_seen.
+  - INC-02436, INC-02646, INC-03233: description, updated, last_seen.
+  - Plus the `generated` stamp. 15,666 rows; ID set and order equal.
+- **(b) Freeze.** `aiid_incidents.json` IS a pair input (:2174), but the hold is row-scoped to AIID-/OECD-AIM- ids (:2040, :2261). INC-02382 carries EXT and RES ids only, so not holding it was correct.
+  - **The gate fires:** a direct call with `AIID-1` added → HELD ("title edit INC-02382 (D67)", "content change (D71): ['tags']").
+  - An armed-gate rebuild from e94ae7f7 reproduces 64467e49 byte for byte.
+- **(c) Overlap and facts:** all 6 new texts score 0.0% 5-gram, longest run 2-4. The shipped EXT camoleak text is 7.5% (run 7). Facts are matched to the sources. No cited source has a CamoLeak CVE (Legit 0 hits, SecurityWeek 0).
+- **(e) Clean clone:** pytest 1079 + 1 xfail; validate and drift rc 0; merge-tree clean vs d12a5a6c.
+
+**Advisories:**
+- (1) The draft CORRECTIONS row wrongly said INC-02382's description changed. **The gate's corrected sentence was used.**
+- (2) Trailing space in the RES camoleak ingest title. It reaches no output; tidy at the next ingest edit.
+- (3) Editing any EXT row in aiid_incidents.json arms a check of all 63 AIID rows. Conservative, not a defect.
+- (4) The OX date mismatch is still open.
+
+**Foreman [R] on the merged tree:** validate rc 0, drift clean, pytest 1079 + 1 xfail, NUL 0.
+
+**→ The live surfaces still describing D97/D98 as pending** (NOTICE-DATA round-up paragraph, SOURCE_LICENSES §1.6/§1.7) are routed to WS6 de-licdocs, which is already editing NOTICE-DATA.
+
 ### 📋 docs-warden sweep after the licensing merge (main @ d12a5a6c): **15 findings**. 14 routed to WS6, 1 deferred.
 - **No live surface claims the D96 rewrite is done.**
 - **High:**

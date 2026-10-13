@@ -1281,7 +1281,7 @@
   },
   {
     "source_id": "EXT-2025-CAMOLEAK",
-    "title": "CamoLeak (CVE-2025-59145) prompt injection leaks private code via GitHub Copilot Chat",
+    "title": "CamoLeak prompt injection leaks private code via GitHub Copilot Chat",
     "date": "2025-06",
     "year": 2025,
     "category": "real-world",
@@ -1297,7 +1297,7 @@
       {"title": "CamoLeak: Critical GitHub Copilot Vulnerability - Legit Security", "url": "https://www.legitsecurity.com/blog/camoleak-critical-github-copilot-vulnerability-leaks-private-source-code", "type": "research"},
       {"title": "GitHub Copilot Chat Flaw Leaked Data From Private Repositories - SecurityWeek", "url": "https://www.securityweek.com/github-copilot-chat-flaw-leaked-data-from-private-repositories/", "type": "news"}
     ],
-    "tags": ["camoleak", "cve-2025-59145", "github-copilot", "prompt-injection", "csp-bypass"]
+    "tags": ["camoleak", "github-copilot", "prompt-injection", "csp-bypass"]
   },
   {
     "source_id": "EXT-2025-DEEPSEEK-DB",
