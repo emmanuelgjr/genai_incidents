@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 WS0 licensing follow-ups c5-c11: `ef4ad825` on `ws0/followups-licensing-2026-10-13` (foreman-committed; 3 files, +147/-6). **Raw-text gate plus overlap measurements dispatched.**
+- **Rows drafted:**
+  - §1.6 for the 21 OWASP-* ids;
+  - §1.7 and §1.8 for research (135) and threat-reports (82);
+  - §3.7 for the OWASP LLM Top 10.
+- **Corrected in place:** §2.5 now covers the `disputed` marker; §1.2a gains a stage-1 freeze status row; §1.5 OECD scrape re-check; INGESTION_CONDUCT now lists AIID in the weekly run.
+- **c10, the register was half wrong:** `ruled_by` is correct for the D42 approval file, and `decided_by` is the D28 field. The memo gets a dated note.
+- **Correction found:** §6.3 claimed the arXiv ingest carries abstracts and authors. It doesn't.
+- **NEW FINDING, needs a USER ruling (Q1):** `mappings/owasp_llm_top10_2026.json` descriptions are **not all own paraphrase**. LLM01, LLM06 and LLM08 contain verbatim OWASP spans (CC BY-SA 4.0), yet the file ships under the CC-BY-4.0 `mappings/*` grant with no OWASP attribution. This is the same shape as ASI (D80), and worse, because there the descriptions were own paraphrase.
+- **Q2:** the 21 OWASP-* rows. The 18 GENAI ids come from 3 CC BY-SA round-ups; the AIX source is unknown; overlap was unmeasured.
+- **Q3:** research and threat-reports. No vendor terms were read; the posture is "facts + summary + link".
+- **The author used WebFetch (which summarises), so ALL quotes are pending.** The gate does raw-text verification plus 5-gram overlap: Q1 all 10 descriptions, Q2 the 21 rows and the 6 shipped rows, Q3 a sample of ≥30. **Rulings wait for those measurements.**
+
 ### 🔁 WS4 hygiene follow-ups: **BOUNCE #1 (red-reviewer on `a64ea795`)**. The fix is back with the same pipeline-engineer.
 - **Defect:** b10's HEAD-sourced fixture plus the working-tree comparison in `test_committed_inputs_do_not_abort` would **fail every refresh run that changes data**. auto-refresh, cve-enrich and atlas-refresh all run Re-merge, then pytest, on an uncommitted tree, under a hard gate.
   - The gate reproduced it: a simulated refresh gave old fixture 8 passed, new fixture 1 failed.
