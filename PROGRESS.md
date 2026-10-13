@@ -76,6 +76,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Q3:** research and threat-reports. No vendor terms were read; the posture is "facts + summary + link".
 - **The author used WebFetch (which summarises), so ALL quotes are pending.** The gate does raw-text verification plus 5-gram overlap: Q1 all 10 descriptions, Q2 the 21 rows and the 6 shipped rows, Q3 a sample of ≥30. **Rulings wait for those measurements.**
 
+### ✅ WS4 hygiene follow-ups: **DONE. Re-gate PASS on `b1fefd29`; MERGED to main as `9022c50a` (`--no-ff`)**
+- **Closed:**
+  - **b13:** the dispute log separates genuinely new disputes from first dispute-aware checks;
+  - **b22:** the OECD numeric slug is `[0-9]+`, with 0 of 13,670 URLs reclassified;
+  - **b25:** tests for persist_refresh_state `--force` and `[skip ci]`;
+  - **b11:** a `slow` marker, still run in CI;
+  - **b10:** the stage-1 fixture extracts from `git archive HEAD` and compares against `git show HEAD:`.
+- **Gate verdict, in its words:** "VERDICT: PASS ... The bounce-1 defect is fixed."
+- **Gate evidence:**
+  - its own data-changing simulated refresh gives 24 passed (the same setup failed at a64ea795);
+  - a committed corrupted input still FAILS the fixed-point test;
+  - the A1 test fails under 2 mutations, even on a clean checkout;
+  - fresh-clone pytest 1079 passed; merge-tree clean.
+- **Advisories:**
+  - **A2 is open:** `render_log_md` "- New DISPUTED" still uses the combined count. → Follow-up.
+  - A note: the HEAD comparison could misfire if .gitattributes eol or smudge rules are ever added for data/*.json.
+- **Foreman [R] after merge:** validate rc 0; drift clean; **pytest 1079 passed, 1 xfailed** (read before the push).
+
 ### 🔁 WS4 hygiene follow-ups: **BOUNCE #1 (red-reviewer on `a64ea795`)**. The fix is back with the same pipeline-engineer.
 - **Defect:** b10's HEAD-sourced fixture plus the working-tree comparison in `test_committed_inputs_do_not_abort` would **fail every refresh run that changes data**. auto-refresh, cve-enrich and atlas-refresh all run Re-merge, then pytest, on an uncommitted tree, under a hard gate.
   - The gate reproduced it: a simulated refresh gave old fixture 8 passed, new fixture 1 failed.
