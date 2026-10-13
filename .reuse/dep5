@@ -140,7 +140,7 @@ Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
  or near-verbatim in the 2025 file. The crosswalk
  mappings/owasp_llm_2025_to_2026.json (decision D99) holds all 20 risk
  names and 10 scope_change strings that were measured against the 2026
- LLM00_Preface.md: 2 verbatim, 3 near-verbatim or shared-phrase, 5 own.
+ edition's source files (LLM00_Preface.md and the LLM01-LLM10 files): 2 verbatim, 3 near-verbatim or shared-phrase, 5 own.
  The descriptions and scope_change strings are to be rewritten as the
  project's own paraphrase in the next release. See NOTICE-DATA,
  docs/SOURCE_LICENSES.md section 3.7 and
@@ -179,7 +179,7 @@ Comment: Everything under ingest/ that matches this pattern is a third-party
  above, and the *.py files (ingest/common.py, ingest/__init__.py) are MIT
  under the first stanza.
 
-Files: ingest/*.provenance.json ingest/_state/* ingest/README.md
+Files: ingest/*.provenance.json ingest/_state/* ingest/README.md ingest/cve_rejections.json
 Copyright: 2026 Emmanuel G. Jr. and contributors
 License: CC-BY-4.0
 Comment: Project-authored files under ingest/, carved back out of the
@@ -187,6 +187,8 @@ Comment: Project-authored files under ingest/, carved back out of the
  per-ingest provenance records (release tags, hashes, windows, yields),
  the source-health and probe state under ingest/_state/, and ingest/README.md.
  They record what this project fetched and did, not third-party content.
+ ingest/cve_rejections.json is project-derived state (check dates and
+ dispute signals), with no CVE text, under decision D104.
 
 Files: LICENSE
 Copyright: 2026 Emmanuel G. Jr.

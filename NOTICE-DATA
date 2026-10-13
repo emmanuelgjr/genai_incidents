@@ -161,7 +161,7 @@ the 10 descriptions are verbatim and 6 near-verbatim to OWASP's text,
 and that in the 2025 file 4 of the 10 are verbatim or near-verbatim
 (3 and 1); the other six 2025 descriptions are the project's own
 wording. The crosswalk holds all 20 risk names (name_2025, name_2026) and
-ten scope_change strings, measured against the 2026 LLM00_Preface.md:
+ten scope_change strings, measured against the 2026 edition's source files (LLM00_Preface.md and the LLM01-LLM10 files):
 two are verbatim, three are near-verbatim or share a phrase, five are the
 project's own wording. This attribution covers the codes, names,
 descriptions and scope text wherever they are reproduced from these three

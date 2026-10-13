@@ -63,7 +63,7 @@ are granted.
 
 Project-authored files here keep the project's licences: `*.provenance.json`
 (per-ingest provenance), `_state/` (source-health and probe state) and this
-`README.md` are CC BY 4.0; `common.py` and `__init__.py` are MIT. The pinned MITRE
+`README.md`, and `cve_rejections.json` (D104), are CC BY 4.0; `common.py` and `__init__.py` are MIT. The pinned MITRE
 ATLAS snapshot `atlas/ATLAS-*.yaml` is Apache-2.0 (its own `.reuse/dep5` stanza).
 
 `merge_and_dedupe.py` reads `ingest/*.json` only (`INGEST.glob("*.json")`), so this
@@ -82,7 +82,7 @@ ATLAS snapshot `atlas/ATLAS-*.yaml` is Apache-2.0 (its own `.reuse/dep5` stanza)
 | `threat_reports_incidents.json` | Vendor threat-intelligence reports | §1.8 |
 | `cisa_kev.json` | CISA Known Exploited Vulnerabilities | §2.1 |
 | `cve_incidents.json`, `cve_nvd_expanded.json` | NVD, GitHub Security Advisories, OSV | §2.2, §2.3, §2.4 |
-| `cve_rejections.json` | CVE Program record state (cvelistV5) | §2.5 |
+| `cve_rejections.json` | CVE Program record state (cvelistV5); project-derived state (check dates, dispute signals), no CVE text, CC BY 4.0 (D104) | §2.5 |
 | `wave12_cvelistv5.json` | CVE Program (cvelistV5, CVE Terms of Use) | §6.2 |
 | `atlas_full.json`, `atlas_incidents.json` | MITRE ATLAS (Apache-2.0) | §3.1 |
 | `garak_probes.json` | NVIDIA garak | §3.3 |
