@@ -112,8 +112,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # D108 (2026-10-13): the AIRI Navigator source is RETIRED. Its download
-      # has 404ed since 2026-05-31, so it is no longer fetched (the D95 monthly
+      # D108 (2026-10-13): the AIRI Navigator source is RETIRED. Its last
+      # successful download was on 2026-05-31 and it has 404ed since 2026-06-07, so it is no longer fetched (the D95 monthly
       # retry and the try_airi input are gone), and scripts/check_source_health.py
       # (RETIRED_SOURCES) never alerts on it. Its existing rows stay in the build
       # unchanged: ingest/airi_navigator_incidents.json is committed and is still

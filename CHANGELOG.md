@@ -7,6 +7,92 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Added - AIID-side lift of the OECD/AIID freeze (D114): 113 new AIID rows, 169 updated rows (INC-17221 to INC-17333)
+
+- **+113 AIID-only rows, INC-17221 to INC-17333.** All are new AIID incidents the frozen
+  snapshot did not carry. The title is the only AIID-authored text kept (E23 shape);
+  the description is the project template.
+- **169 existing rows updated, including 25 title edits** that use the row's own AIID
+  snapshot title. **0 merges and 0 tombstones.** No ID is retired or reused.
+- **OECD stays held.** The OECD side of the freeze is lifted only after suppression is
+  built (D114 precondition); the refresh gate still holds the OECD inputs.
+- **Title effects (D116, D119):** `INC-00437` and `INC-14682` switch from the OECD title to
+  the AIID title, so OECD-titled rows go from 3,937 to 3,935.
+- **Counts:** `incident_count` goes from 15,637 (v2.13.0) to 15,755 (15,784 rows including
+  29 retracted), which is the 113 AIID rows plus the 5 AIAAIC rows below.
+- AIID changes now ship through the weekly refresh. The first scheduled refresh under D114
+  is Sunday 2026-10-18.
+
+### Added - refresh PR #102: +5 AIAAIC rows (D112)
+
+- Five new AIAAIC rows, INC-17216 to INC-17220, merged at `692bb672`. It was the first clean
+  scheduled refresh since PR #97 (2026-07-27).
+
+### Changed - AIRI Navigator retired (D108); the D57 hold is resolved (D124)
+
+- **AIRI Navigator is retired as of 2026-10-13 (D108).** Its last successful download was on
+  2026-05-31; it has returned 404 since 2026-06-07. It is no longer fetched and no longer alerts (`RETIRED_SOURCES` in
+  `scripts/check_source_health.py`); the monthly retry and the `try_airi` workflow input
+  are gone. Its rows and provenance stay unchanged and stay marked stale; none is
+  deleted or tombstoned.
+- **D124 (2026-10-13): D108 resolves the D57 hold.** `data/source_freshness.json` records
+  the retirement and the resolution. The registry status stays `stale` (retirement is not
+  a freshness value), and each row's `source_freshness` marker is unchanged.
+- `make ingest-all` no longer runs `ingest-airi`.
+
+### Changed - licensing own-wording rewrites (D97/D98) and one wrong-CVE fix (4 rows, 0 added or removed)
+
+Merged after the v2.13.0 tag (`e6eb3410`).
+
+- **INC-02436, INC-02646, INC-03233:** `description` rewritten in the project's own wording
+  (D97/D98); `updated` and `last_seen` move with it.
+- **INC-02382:** `title` and `tags` corrected, with the wrong CVE removed; `updated` and
+  `last_seen` move with it.
+
+### Changed - licensing: OWASP LLM mapping files are CC BY-SA 4.0 in part; ingest/ snapshots stay under upstream terms (D96, D99, D101; merge `48ffe0db`)
+
+- **`mappings/owasp_llm_top10_2026.json`, `mappings/owasp_llm_top10_2025.json` and the crosswalk `mappings/owasp_llm_2025_to_2026.json`** are now marked `CC-BY-SA-4.0 AND CC-BY-4.0` (`.reuse/dep5` carve-out). Their OWASP risk codes, names and description or scope text come from, or follow, the OWASP Top 10 for LLM Applications, which is CC BY-SA 4.0 (D96, D99). The dataset itself stays CC BY 4.0.
+- **`ingest/*.json`** is declared `LicenseRef-upstream-terms` (D101): these upstream snapshots stay under each upstream's own terms and are not covered by the project's CC BY 4.0 data grant or its MIT code licence. See `NOTICE-DATA` and `docs/SOURCE_LICENSES.md`.
+
+### Fixed - refresh repair (merge `24adc076`): held inputs, overdue alert, empty-result guards
+
+- **D66:** during a refresh the freshly fetched copies of the held OECD/AIID inputs are moved outside the work tree (`scripts/hold_pair_inputs.py`) and the committed versions restored, so the merge sees main's bytes; a guard fails the run before any PR is opened if a held path still differs or stash content is in the tree.
+- **D63:** a scheduled overdue alert (`.github/workflows/refresh-overdue-alert.yml`, `scripts/refresh_overdue.py`) opens or updates one issue labelled `refresh-overdue` when no weekly refresh PR has been merged in time, and closes it once one has.
+- **Empty-result guards** for the KEV and AIID ingests: a fetch that parses to nothing
+  leaves the committed file untouched instead of overwriting it.
+
+### Fixed - over-merge rule (D117); 0 data changes
+
+- Aggregate round-up URLs (the OWASP "round-up" reference pages) are no longer
+  reference-URL dedupe keys in `scripts/merge_and_dedupe.py`, so unrelated incidents that
+  cite one such page are not merged. Grandfathered pairs still merge. **Published output is
+  byte-identical** before and after. The split of the 3 rows already merged is a separate,
+  later decision (D118).
+
+### Added - refresh PR tooling: per-field change report (D120), PR-body size caps (D123), loud abort (D121)
+
+- **D120:** the refresh PR reports every AIID-driven field change as a count per field, and lists
+  the rows for severity, date, year, corpus, title and attack_vector only, with a flag for
+  rows that carry an OECD id.
+  It does not block; if it cannot be built it fails soft to a needs-ruling PR.
+- **D123:** the report is truncated with a note when long, the full report goes to the
+  step summary, and the whole `pr-body.md` is capped below GitHub's 65,536-character
+  limit (`scripts/cap_pr_body.py`).
+- **D121:** the AIID-side refusal stays fail-closed, and the abort message now says that
+  AIAAIC, KEV and the CVE sweep did not ship.
+
+### Fixed - refresh drift gate and AIAAIC loud failure (tooling only)
+
+- The scheduled refresh now renders the doc stats (`render_docs_stats`) and runs
+  `check_stats_drift` as a hard step before it opens a PR, so a refresh PR cannot carry
+  counts that disagree with the docs. Main's drift check had been red after PR #102.
+- `scripts/ingest_aiaaic_sheet.py` fails loudly when a required column is missing
+  (`REQUIRED_COLUMNS`) instead of silently emitting fewer fields, and it adapts to the
+  2026-10 sheet header. A yield drop below 90% of the committed count needs an explicit
+  maintainer override (`accept_aiaaic_yield_drop`), which is now also written to the step
+  summary and appended to the refresh PR body (B3). The headline/system sanity check reads
+  the mapped id column rather than position 0 (B2).
+
 ### Fixed - precision-audit gate follow-ups (register items b4, b17; tooling only, 0 data changes)
 
 - **b4:** `scripts/validate.py` no longer prints "precision: pending, authorised by D76"

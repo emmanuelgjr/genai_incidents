@@ -133,7 +133,7 @@ registry, **not** the build date. Everything that source contributed to the row,
 including any taxonomy or risk-tier tags it supplied, is current through `as_of` and no
 further. `review_by` is the date a human is due to re-decide whether that source is
 refreshed or retired (the `until` of the registry hold); it is a declared date that
-nothing evaluates, not a claim that anything happens then. Absence of the field means no *tracked* source feeding the row is known to be
+nothing evaluates, not a claim that anything happens then. (Exception, user ruling D124, 2026-10-13: AIRI Navigator was retired by D108 on 2026-10-13, so on its rows `review_by` is a date to re-check whether the site has returned, not an open decision.) Absence of the field means no *tracked* source feeding the row is known to be
 stale — not that the row has been verified current. Full definition, the registry's own
 fields, and what the registry does and does not cover:
 [`docs/DATA_DICTIONARY.md` → Source freshness](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATA_DICTIONARY.md#source-freshness),

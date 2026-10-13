@@ -61,7 +61,10 @@ NOT_ATTEMPTED = "not-attempted"  # D95: passed by the workflow for a gated, deli
 # stay in the build unchanged (never delete entries). This is CODE, not state:
 # the live counters are restored from the `refresh-state` branch each run, and
 # update_source_health() stamps `status: retired` over whatever that copy says,
-# so no one has to hand-edit that branch. To revive a source, remove it here.
+# so no one has to hand-edit that branch. To revive a source, remove it here AND
+# restore its ingest step in .github/workflows/auto-refresh.yml AND its key in the
+# workflow's outcomes JSON; removing it here alone leaves a source nothing fetches and
+# nothing reports on (gate-airi advisory R1).
 RETIRED_SOURCES: dict[str, dict[str, str]] = {
     "airi_navigator": {
         "retired_on": "2026-10-13",
@@ -182,12 +185,13 @@ def update_source_health(
             # D108: whatever outcome a caller passes for a retired source is ignored.
             continue
         if outcome == NOT_ATTEMPTED:
-            # D95: the step was not attempted this run (AIRI is retried monthly). A bare
+            # D95: the step was not attempted this run (a gated, deliberately skipped step; no
+            # source is gated this way since AIRI was retired, D108). A bare
             # GitHub "skipped" is NOT this: it still counts as a failure (tested), so a
             # step skipped by accident cannot hide a dead source.
             # Neither a success nor a failure: leave the counter, status and
             # last_* fields exactly as they were, so skipped weeks cannot reset
-            # nor inflate it, and a failed monthly attempt still accumulates.
+            # nor inflate it, and a failed attempt still accumulates.
             continue
         entry = dict(new_state.get(source, {}))
         succeeded = outcome == "success"
@@ -245,7 +249,7 @@ def render_summary(state: dict, outcomes: dict[str, str]) -> str:
                          f"| {entry.get('consecutive_failures', 0)} (frozen) | retired | no |")
             continue
         lines.append(
-            f"| {source} | {outcomes[source]}{' (monthly retry; counter unchanged)' if outcomes[source] == NOT_ATTEMPTED else ''} | {entry.get('consecutive_failures', 0)} "
+            f"| {source} | {outcomes[source]}{' (not attempted; counter unchanged)' if outcomes[source] == NOT_ATTEMPTED else ''} | {entry.get('consecutive_failures', 0)} "
             f"| {entry.get('status', 'unknown')} | {'yes' if entry.get('paused') else 'no'} |"
         )
     return "\n".join(lines)

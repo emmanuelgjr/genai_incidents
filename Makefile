@@ -149,6 +149,11 @@ ingest-cve-rejections:
 
 # Pull the MIT FutureTech AI Risk Navigator dataset (wraps AIID with extra
 # taxonomy and authoritative incident dates).
+# RETIRED 2026-10-13 (D108): the download has 404ed since 2026-05-31, so this is
+# NOT part of ingest-all or the weekly refresh. Kept standalone only so a human
+# can probe whether the site has returned: it exits non-zero WITHOUT touching the
+# committed snapshot when it parses 0 entries. To revive AIRI, see the note on
+# RETIRED_SOURCES in scripts/check_source_health.py.
 # Output: ingest/airi_navigator_incidents.json
 ingest-airi:
 	python scripts/ingest_airi_navigator.py
@@ -200,8 +205,8 @@ ingest-cvelistv5:
 ingest-arxiv:
 	python scripts/ingest_arxiv_oaipmh.py
 
-# Refresh every external source. Heavy: NVD/GHSA, AIRI, AIAAIC, AIID, OECD AIM.
-ingest-all: ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim
+# Refresh every external source. Heavy: NVD/GHSA, AIAAIC, AIID, OECD AIM. (AIRI retired, D108.)
+ingest-all: ingest-cve ingest-kev ingest-cve-rejections ingest-aiaaic ingest-aiid ingest-oecd-aim
 # D1/E1/WS0-T4 (2026-07-16): AIID's Terms of Use prohibit high-volume/bot
 # access; scrape_aiid.py ran ThreadPoolExecutor(max_workers=12) against
 # per-incident pages, an active ToS violation. Disabled here (stop-half of
