@@ -43,10 +43,31 @@ def repo(tmp_path):
     return tmp_path
 
 
-def test_held_files_are_the_gates_pair_files_plus_aiid_provenance():
-    assert set(m._PAIR_INPUT_FILES) <= set(h.held_files())
-    assert "aiid_full.provenance.json" in h.held_files()
+def test_held_files_are_exactly_the_gates_held_pair_files_and_aiid_snapshot_is_lifted():
+    """D114: the AIID snapshot and its sidecar are LIFTED; OECD, AIRI and the two
+    AIID side files stay held. Fires if the lift regresses (AIID held again) or
+    if the OECD side is accidentally released."""
+    assert set(h.held_files()) == set(m._PAIR_INPUT_FILES)
+    assert "oecd_aim_full_incidents.json" in h.held_files()
     assert "airi_navigator_incidents.json" in h.held_files()  # a revived AIRI is held
+    for lifted in ("aiid_full.json", "aiid_full.provenance.json"):
+        assert lifted not in h.held_files()
+        assert lifted in m._AIID_LIFTED_FILES
+
+
+def test_hold_leaves_fresh_aiid_snapshot_in_place_and_holds_oecd(repo, tmp_path_factory):
+    """AIID changes survive the hold; OECD changes in the SAME run do not."""
+    stash = tmp_path_factory.mktemp("stash")
+    (repo / "ingest" / "aiid_full.json").write_text('{"fresh": 1}\n', encoding="utf-8", newline="")
+    (repo / "ingest" / "aiid_full.provenance.json").write_text('{"fresh": 2}\n', encoding="utf-8", newline="")
+    oecd = repo / "ingest" / "oecd_aim_full_incidents.json"
+    oecd.write_text('{"fresh": 3}\n', encoding="utf-8", newline="")
+    report = h.hold(repo, stash)
+    assert (repo / "ingest" / "aiid_full.json").read_text() == '{"fresh": 1}\n'
+    assert (repo / "ingest" / "aiid_full.provenance.json").read_text() == '{"fresh": 2}\n'
+    assert json.loads(oecd.read_text()) == {"committed": "oecd_aim_full_incidents.json"}
+    assert report["held_count"] == 1 and "aiid_full.json" not in report["files"]
+    assert m._pair_inputs_changed(repo) is False  # AIID bytes do not trip the held-pair signal
 
 
 def test_hold_restores_changed_inputs_and_stashes_fresh_bytes(repo, tmp_path_factory):
@@ -66,7 +87,6 @@ def test_hold_restores_changed_inputs_and_stashes_fresh_bytes(repo, tmp_path_fac
     assert (stash / "oecd_aim_full_incidents.json").read_text() == '{"fresh": 1}\n'
     assert (stash / "airi_navigator_incidents.json").read_text() == '{"revived": 1}\n'
     assert report["held_count"] == 2
-    assert report["files"]["aiid_full.json"]["changed"] is False
     assert kev.read_text() == '["new kev"]\n'  # non-pair sources are NOT held
 
 
@@ -89,7 +109,7 @@ def test_hold_is_a_noop_when_nothing_changed(repo, tmp_path_factory):
 
 def test_postcheck_fails_when_the_restore_does_not_take(repo, tmp_path_factory, monkeypatch):
     stash = tmp_path_factory.mktemp("stash")
-    (repo / "ingest" / "aiid_full.json").write_text('{"fresh": 1}\n', encoding="utf-8", newline="")
+    (repo / "ingest" / "oecd_aim_full_incidents.json").write_text('{"fresh": 1}\n', encoding="utf-8", newline="")
     # sabotage: pretend the restore happened but leave the fresh bytes in place
     monkeypatch.setattr(h, "hold", lambda root, stash_dir: {"files": {}, "held_count": 0})
     assert h.main(["--stash-dir", str(stash), "--root", str(repo)]) == 1

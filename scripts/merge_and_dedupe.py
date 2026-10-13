@@ -2053,7 +2053,7 @@ class RefreshMergeApprovalError(SystemExit):
 # signed and its own hash matches (a tamper-plus-recompute cannot pass). The
 # commit that records a per-item ruling sets this to the file's hash in the same
 # change. D115's per-item rulings are NOT recorded here: they live in a separate,
-# unread record file (docs/audits/D115-d42-per-item-rulings-2026-10-13.json) and
+# unread dated record file under docs/audits (named in PROGRESS.md) and
 # stay inert until suppression exists.
 REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256: str | None = None
 

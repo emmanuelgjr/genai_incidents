@@ -61,10 +61,18 @@ def test_guard_fires_on_stash_inside_tree(repo):
 
 def test_guard_fires_on_unrestored_held_path_then_passes_once_restored(repo, tmp_path_factory):
     outside = tmp_path_factory.mktemp("stash2") / "held-pair-inputs"
-    _fresh(repo, "aiid_full.json")
+    _fresh(repo, "aiid_oecd_relationships.json")
     assert any("held path differs" in x for x in h.check_held_paths_clean(repo, outside))
     assert h.main(["--check-clean", "--root", str(repo), "--stash-dir", str(outside)]) == 1
-    _git(repo, "checkout", "--", "ingest/aiid_full.json")
+    _git(repo, "checkout", "--", "ingest/aiid_oecd_relationships.json")
+    assert h.check_held_paths_clean(repo, outside) == []
+
+
+def test_guard_ignores_the_lifted_aiid_snapshot(repo, tmp_path_factory):
+    """D114: a fresh AIID snapshot in the tree is expected (it is committed by the
+    refresh PR) and must not trip the held-path guard."""
+    outside = tmp_path_factory.mktemp("stash4") / "held-pair-inputs"
+    _fresh(repo, "aiid_full.json")
     assert h.check_held_paths_clean(repo, outside) == []
 
 

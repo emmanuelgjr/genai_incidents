@@ -351,11 +351,17 @@ def _restore_data(root: Path) -> None:
     shutil.copytree(pristine, root / "data")
 
 
-def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> str:
+D114_PRECONDITION = ("D114 binding precondition",)
+GATE_MARKERS = ("D42/D25(a)", "D58/D67/D71")
+
+
+def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str,
+                        markers: tuple[str, ...] = GATE_MARKERS) -> str:
     """Apply `mutate` to an ingest file's rows, run the real merge, require an
     abort that wrote nothing, then restore the file."""
     path = root / "ingest" / ingest_name
-    original = path.read_text(encoding="utf-8")
+    original_bytes = path.read_bytes()  # byte-exact restore (Windows write_text would rewrite newlines)
+    original = original_bytes.decode("utf-8")
     try:
         rows = json.loads(original)
         mutate(rows)
@@ -365,14 +371,35 @@ def _fresh_input_aborts(root: Path, ingest_name: str, mutate, expect: str) -> st
         res = _run_merge(root)
         out = res.stdout + res.stderr
         assert res.returncode != 0, out[-600:]
-        assert "D42/D25(a)" in out and "Nothing was written" in out and "D58/D67/D71" in out
+        assert "Nothing was written" in out and all(mk in out for mk in markers)
         assert expect in out, out[-1200:]
         after = _tree_hash(root)
         after[f"ingest/{ingest_name}"] = hashlib.sha256(path.read_bytes()).hexdigest()
         assert after == before, "gate aborted but the data tree changed"
         return out
     finally:
-        path.write_text(original, encoding="utf-8")
+        path.write_bytes(original_bytes)
+        _restore_data(root)
+
+
+def _fresh_input_passes(root: Path, ingest_name: str, mutate) -> tuple[str, list[dict]]:
+    """Counterpart for the LIFTED side: apply `mutate`, run the real merge, require
+    exit 0 through the D114 standing class, return (stdout, rebuilt incidents),
+    then restore the file and the data tree."""
+    path = root / "ingest" / ingest_name
+    original_bytes = path.read_bytes()  # byte-exact restore (Windows write_text would rewrite newlines)
+    original = original_bytes.decode("utf-8")
+    try:
+        rows = json.loads(original)
+        mutate(rows)
+        path.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+        res = _run_merge(root)
+        out = res.stdout + res.stderr
+        assert res.returncode == 0, out[-1200:]
+        assert "D114 standing AIID class" in out
+        return out, json.loads((root / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
+    finally:
+        path.write_bytes(original_bytes)
         _restore_data(root)
 
 
@@ -412,7 +439,8 @@ def test_gate_aborts_on_fresh_bridging_input(scratch):
         scratch, "oecd_aim_full_incidents.json",
         lambda rows: rows.append(_synthetic_oecd_row(
             rows, "OECD-AIM-2026-10-01-zz01", [a["source_ids"][0], b["source_ids"][0]])),
-        "merge INC-",
+        "suppression (A3) has not been built and gated",
+        markers=D114_PRECONDITION,
     )
 
 
@@ -422,22 +450,29 @@ def test_d67_gate_aborts_on_a_new_oecd_row(scratch):
     out = _fresh_input_aborts(
         scratch, "oecd_aim_full_incidents.json",
         lambda rows: rows.append(_synthetic_oecd_row(rows, "OECD-AIM-2026-10-02-zz02", [])),
-        "add OECD/AIID source(s) ['OECD-AIM-2026-10-02-zz02'] (new row)",
+        "suppression (A3) has not been built and gated",
+        markers=D114_PRECONDITION,
     )
-    assert "merge INC-" not in out and "title edit INC-" not in out  # only the addition fired
+    # D116: no new OECD rows reach the corpus while OECD is held
+    assert "merge INC-" not in out and "title edit INC-" not in out
 
 
 @pytest.mark.slow
-def test_d67_gate_aborts_on_an_upstream_aiid_title_edit(scratch):
-    """D67(b): AIID edits the title of an already-published, AIID-only row."""
-    victim = _published_aiid_only(scratch)[0]["source_ids"][0]
+def test_d114_aiid_title_edit_passes_the_standing_class(scratch):
+    """D114: AIID edits the title of an already-published, AIID-only row. Before
+    the lift this aborted ("title edit INC-", D67(b)); the standing AIID class now
+    passes it because the new title is exactly the snapshot's own title for one
+    of the row's AIID ids."""
+    pub = _published_aiid_only(scratch)[0]
+    victim = pub["source_ids"][0]
 
     def edit(rows):
         row = next(r for r in rows if r.get("source_id") == victim)
         row["title"] = row["title"] + " (edited upstream)"
 
-    out = _fresh_input_aborts(scratch, "aiid_full.json", edit, "title edit INC-")
-    assert "add OECD/AIID" not in out and "merge INC-" not in out
+    out, rebuilt = _fresh_input_passes(scratch, "aiid_full.json", edit)
+    assert "1 AIID title edit(s)" in out
+    assert next(e for e in rebuilt if e["id"] == pub["id"])["title"].endswith("(edited upstream)")
 
 
 # ---- S5: weekly workflow fails closed at the merge step --------------------
@@ -481,8 +516,9 @@ def test_fail_closed_check_fires():
 
 
 @pytest.mark.slow
-def test_d71_gate_aborts_on_a_new_aiid_only_row(scratch):
-    """D71: a purely ADDED AIID row (the weekly snapshot gains new incidents)."""
+def test_d114_new_aiid_only_row_passes_and_ships_as_a_standalone_row(scratch):
+    """D114: a purely ADDED AIID row (the weekly snapshot gains new incidents).
+    Before the lift this aborted ("add OECD/AIID source(s) ['AIID-99999']")."""
     def add(rows):
         row = copy.deepcopy(rows[0])
         row.update(source_id="AIID-99999", aiid_id=99999, title="Synthetic AIID row (test)")
@@ -491,18 +527,22 @@ def test_d71_gate_aborts_on_a_new_aiid_only_row(scratch):
         row["description"] = "AI Incident Database (AIID) entry #99999: Synthetic AIID row (test)."
         rows.append(row)
 
-    out = _fresh_input_aborts(scratch, "aiid_full.json", add,
-                              "add OECD/AIID source(s) ['AIID-99999'] (new row)")
-    assert "content change INC-" not in out and "merge INC-" not in out
+    out, rebuilt = _fresh_input_passes(scratch, "aiid_full.json", add)
+    assert "1 AIID source row(s) added" in out
+    new = [e for e in rebuilt if "AIID-99999" in e["source_ids"]]
+    assert len(new) == 1 and new[0]["source_ids"] == ["AIID-99999"]
 
 
 @pytest.mark.slow
-def test_a2_gate_aborts_when_the_snapshot_gains_an_id_a_published_row_cites(scratch):
-    """A2/D71: the gate review's observed case. INC-00437 cites AIID-1574, which
-    the committed snapshot lacks; a snapshot that gains it rewrites INC-00437's
-    content (description, provenance, severity, date, references, taxonomy ...)
-    with no title change and no new source id, which D42/D67 alone did not hold."""
+def test_d114_snapshot_gaining_an_id_a_published_row_cites_passes(scratch):
+    """The former A2 abort case: INC-00437 cites AIID-1574, which the committed
+    snapshot lacks; a snapshot that gains it rewrites INC-00437's content. This is
+    AIID-driven content on a published row with no merge and no absorbed id, the
+    exact shape the D114 class covers (and the same shape as the 2 real rows
+    INC-00437/INC-14682 in the lift's own delta)."""
     def add(rows):
+        if any(r.get("source_id") == "AIID-1574" for r in rows):
+            return
         base = copy.deepcopy(rows[0])
         base.update(source_id="AIID-1574", aiid_id=1574, title="Snapshot title for 1574", severity="Critical",
                     date="2026-04-03", year=2026,
@@ -511,8 +551,8 @@ def test_a2_gate_aborts_when_the_snapshot_gains_an_id_a_published_row_cites(scra
         base["description"] = "AI Incident Database (AIID) entry #1574: Snapshot title for 1574."
         rows.append(base)
 
-    out = _fresh_input_aborts(scratch, "aiid_full.json", add, "content change INC-00437 (D71)")
-    assert "add OECD/AIID" not in out
+    _out, rebuilt = _fresh_input_passes(scratch, "aiid_full.json", add)
+    assert any("AIID-1574" in e["source_ids"] for e in rebuilt)
 
 
 @pytest.mark.slow
@@ -522,7 +562,8 @@ def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
     OECD/AIID input differs from HEAD. Proves the rule does not over-hold."""
     _restore_data(scratch)
     path = scratch / "ingest" / "cve_incidents.json"
-    original = path.read_text(encoding="utf-8")
+    original_bytes = path.read_bytes()  # byte-exact restore (Windows write_text would rewrite newlines)
+    original = original_bytes.decode("utf-8")
     rows = json.loads(original)
     inc = json.loads((scratch / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
     cve_only = {e["source_ids"][0]: e for e in inc if len(e["source_ids"]) == 1 and e["source_ids"][0].startswith("CVE-")}
@@ -535,7 +576,7 @@ def test_a2_content_change_is_not_held_when_pair_inputs_are_committed(scratch):
         new = json.loads((scratch / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
         assert next(e for e in new if e["source_ids"] == [victim["source_id"]])["severity"] == "Critical"
     finally:
-        path.write_text(original, encoding="utf-8")
+        path.write_bytes(original_bytes)
         _restore_data(scratch)
 
 
@@ -555,6 +596,8 @@ def test_a1_gate_aborts_on_an_airi_only_change_to_an_aiid_linked_row(scratch):
         row = next(r for r in rows if r.get("source_id") == victim)
         row["tags"] = list(row.get("tags") or []) + ["airi-edit-test"]
 
+    # D114: AIRI is a held input, so the OECD-lift precondition fires first
     out = _fresh_input_aborts(scratch, "airi_navigator_incidents.json", edit,
-                              f"content change {by_sid[victim]['id']} (D71)")
+                              "suppression (A3) has not been built and gated",
+                              markers=D114_PRECONDITION)
     assert "add OECD/AIID" not in out

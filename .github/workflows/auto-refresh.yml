@@ -385,6 +385,10 @@ jobs:
       # script re-checks the result with the gate's own detector. If AIRI comes
       # back, its file is held too (it is in _PAIR_INPUT_FILES): a revived AIRI
       # lands in the artifact, not in the PR.
+      # D114 (2026-10-13): the AIID snapshot (ingest/aiid_full.json + sidecar) is
+      # LIFTED and no longer restored here; only the OECD side is held. The gate
+      # applies a standing AIID class while every held input is at HEAD, and
+      # refuses any OECD lift without a gated suppression mechanism.
       - name: Hold OECD/AIID pair inputs at their committed versions
         run: python scripts/hold_pair_inputs.py --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
@@ -442,9 +446,9 @@ jobs:
         run: |
           cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources. This PR carries the
-          AIAAIC sheet, the CISA KEV catalog and the CVE rejection sweep (with
-          the D60 retractions); the AIID snapshot and OECD AI Incidents Monitor
-          inputs are held out (see below). The AIRI Navigator source is retired
+          AIAAIC sheet, the CISA KEV catalog, the CVE rejection sweep (with
+          the D60 retractions) and the AIID snapshot (lifted under D114); the
+          OECD AI Incidents Monitor inputs are held out (see below). The AIRI Navigator source is retired
           (D108, 2026-10-13): it is no longer fetched and its existing rows are
           retained unchanged.
 
@@ -455,11 +459,14 @@ jobs:
           has sat open across other merges, close it and re-run this workflow
           (Actions → "Weekly auto-refresh" → Run workflow) rather than merging.
 
-          The OECD AI Incidents Monitor and AIID inputs are HELD at their
-          committed versions (D66; the stage-1 freeze, D58/D67/D71): this PR
-          carries AIAAIC, CISA KEV, the CVE rejection sweep and the D60
-          retractions only. The fresh OECD/AIID bytes are in the run's
-          `held-oecd-aiid-inputs` artifact for the D42 review.
+          The OECD AI Incidents Monitor inputs (and the AIID side files nothing
+          regenerates) are HELD at their committed versions (D66; the stage-1
+          freeze, D58/D67/D71; D114 lifted the AIID snapshot only). New AIID
+          rows and AIID title edits in this PR passed the gate's standing AIID
+          class (D114); merges and retitles that absorb ids still need per-item
+          approval. Any OECD lift is refused until suppression is built and
+          gated (D114 binding precondition). The fresh OECD bytes are in the
+          run's `held-oecd-aiid-inputs` artifact for the D42 review.
 
           Review the diff before merging — flag any unexpected mass deletions
           or large taxonomy shifts. Schema validation and the full unit-test
