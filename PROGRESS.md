@@ -63,6 +63,31 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 WS0 licensing c5-c11: **BOUNCE #1 (raw-text gate on `ef4ad825`)**. Fixes are with the license-auditor, together with the D96-D98 docs.
+- **Defects:**
+  1. §1.6 says 1 of 6 Q1-2026 rows matches the round-up; **3 of 6** match (-04, -05, -06).
+  2. The c10 note says `decided_by` is validated by WS4-T21. It isn't: the D28 validator checks only the decision and the hashes.
+  3. The host tallies are wrong. They should read OpenAI 29, Microsoft 14, arxiv 4.
+- **Confirmed on raw bytes:**
+  - the OWASP footer (CC BY-SA), on 5 pages;
+  - the GenAI-LLM-Top10 README licence line;
+  - AI Exchange CC0;
+  - embracethered has no licence;
+  - oecd.ai robots.txt (7 Disallow rules);
+  - sitemap HEAD returns 405 and GET returns 200, with **no 302**;
+  - incident page HEAD and GET both return 200;
+  - the methodology terms sentence is present, and the page says nothing about bots;
+  - c8 matches the code;
+  - c9: AIID is weekly, cve-enrich is dispatch-only, and the gate's abort conditions match;
+  - c10 citations are correct apart from defect 2;
+  - c7: arXiv has no abstract or author fields;
+  - the dated memo is +26/-0 only.
+- **Advisories:**
+  - A1, A2 and A5 are routed to the license-auditor: superseded hedges; the §1.2a hold described too broadly; a quote truncation; a host re-count.
+  - **A3, OVER-MERGE (proposed task, needs scoping and likely a user ruling).** INC-00924 (EchoLeak) absorbs 6 unrelated Q1-2026 OWASP ids, INC-02646 absorbs 9 and INC-03233 absorbs 3, probably because they share a round-up URL. As a result, the DeepSeek breach, CVE-2025-23254 and the Meta agent leak have no row of their own. The corpus-surgeon was told to rewrite only each surviving incident's description and to report the composition. The split is a separate task (WS4-T19/D28 machinery).
+  - **A4:** U+FFFD mojibake in owasp_llm_top10_2025 LLM08 and in 4 avid_owasp rows. → Follow-up.
+  - **A6:** the arXiv abstract sample was not run. → Follow-up.
+
 ### ⚖ D96-D98, USER RULINGS 2026-10-13 (licensing; measurements in `docs/audits/licensing-overlap-measurements-2026-10-13.md`, `ad38c61e`)
 - **The gate's measurements (red-reviewer, raw text, 5-gram plus run, with controls):**
   - **owasp_llm_top10_2026.json: all 10 descriptions are copied** from OWASP's CC BY-SA text (4 verbatim, 6 near-verbatim). **owasp_llm_top10_2025.json: 4 of 10** copied. Both ship under CC-BY-4.0 `mappings/*` with no attribution. They appear in the repo and the Zenodo archives only, not in STIX, TAXONOMIES or the package.
