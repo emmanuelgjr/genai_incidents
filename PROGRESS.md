@@ -63,6 +63,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 D97/D98 rewrites: **BOUNCE #1** (gate-rewrite on `b130900e`). Back with the corpus-surgeon.
+**Verdict, in the gate's words:** "BOUNCE. The D97/D98 rewrites on ws1/licensing-rewrites-2026-10-13 @ b130900e fail on 2 factual defects… The mechanics all hold."
+
+**Defects:**
+1. **The camoleak rewrite cites CVE-2025-59145.** The Legit page has 0 "CVE" hits. NVD's CVE-2025-59145 is the color-name npm account takeover (published 2025-09-15), not Copilot. The rewrite promoted a pre-existing title/tag error into the description as a stated fact. Ingest-only (EXT wins the merge).
+2. **INC-02646 now reads "researchers showed".** The source says "attackers exploited GPT-4.1's tool integration" (April-June 2025, unauthorized data access). The rewrite changed the actor without a source.
+
+**Gate evidence (its own route):**
+- **Per-row delta e94ae7f7 → b130900e:** exactly 3 rows (INC-02436/02646/03233); only description, last_seen and updated moved. Top-level `generated` moved; the ID set and order are equal (15,666). The script fires: it caught all 3 rows plus the stamp.
+- **`last_seen = updated` coupling** is mechanical (:2903-2904). The data has 0/15,666 rows with last_seen ≠ updated.
+- **Primary pages fetched itself:** NEW text is 0.0% 5-gram, with runs 2-4. OLD text reproduces the audit (81%, runs 10/9/9/8). Controls: 100% and 0%.
+- **Rebuild from the pre-change state** in a clean clone equals b130900e (sha 60531564…). pytest 1079 + 1 xfail; validate and drift rc 0.
+- **Freeze:** no OECD/AIID ids are involved. INC-08177 is unchanged.
+- **Merge:** merge-tree is clean against 670e9cee.
+
+**Every other added fact verified against its source:** Beber/Cymulate, CVSS 7.7/8.7, v0.2.111/v1.0.20, "at least 17", Omer Mayraz/Legit, June 2025, the Storm-2139 details.
+
+**Advisories:**
+- **Live public error:** INC-02382's title and tag carry the wrong CVE-2025-59145, and have since c105bd7a. **Foreman folded the fix into this task as a declared delta** (title + tags on INC-02382, corrected at the ingest source). Any CORRECTIONS row is drafted in the report and placed by the foreman, because the licensing branch also edits CORRECTIONS.md.
+- The INC-03233 date span attaches to the incident, not to the legal action. Optional rephrase.
+- The OX date mismatch is confirmed (2026-04-15 vs 2025-09). It stays flagged for WS2.
+- data/incidents.json has 15,666 rows vs incident_count 15,637 (29 retracted). Consistent.
+
 ### ⚖ D99-D102, USER RULINGS 2026-10-13 (licensing bounce #2 + open calls)
 - **D99, the crosswalk: yes, add it to D96 (Recommended).** `mappings/owasp_llm_2025_to_2026.json` gets the same carve-out, NOTICE and CORRECTIONS treatment, and is rewritten next release with the others.
 - **D100, the bounce #2 route: fix plus a scoped re-gate (Recommended).** It covers the crosswalk, the function-name fix (`_verify_split_authorization_marker`), A1 (append the gate's first-gate raw-text confirmations to the measurement record, then update the hedging cells) and A2 (CORRECTIONS "each file since its introduction").
