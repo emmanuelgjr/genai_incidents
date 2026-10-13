@@ -30,8 +30,8 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ### Changed - AIRI Navigator retired (D108); the D57 hold is resolved (D124)
 
-- **AIRI Navigator is retired as of 2026-10-13 (D108).** Its download has returned 404
-  since 2026-05-31. It is no longer fetched and no longer alerts (`RETIRED_SOURCES` in
+- **AIRI Navigator is retired as of 2026-10-13 (D108).** Its last successful download was on
+  2026-05-31; it has returned 404 since 2026-06-07. It is no longer fetched and no longer alerts (`RETIRED_SOURCES` in
   `scripts/check_source_health.py`); the monthly retry and the `try_airi` workflow input
   are gone. Its rows and provenance stay unchanged and stay marked stale; none is
   deleted or tombstoned.
@@ -39,6 +39,25 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
   the retirement and the resolution. The registry status stays `stale` (retirement is not
   a freshness value), and each row's `source_freshness` marker is unchanged.
 - `make ingest-all` no longer runs `ingest-airi`.
+
+### Changed - licensing own-wording rewrites (D97/D98) and one wrong-CVE fix (4 rows, 0 added or removed)
+
+Merged after the v2.13.0 tag (`e6eb3410`).
+
+- **INC-02436, INC-02646, INC-03233:** `description` rewritten in the project's own wording
+  (D97/D98); `updated` and `last_seen` move with it.
+- **INC-02382:** `title` and `tags` corrected, with the wrong CVE removed; `updated` and
+  `last_seen` move with it.
+
+### Fixed - refresh repair (merge `24adc076`): held inputs, overdue alert, empty-result guards
+
+- **D66:** the held OECD/AIID inputs are kept outside the work tree during a refresh
+  (`scripts/hold_pair_inputs.py`), with a guard that checks the result before the PR step.
+- **D63:** a scheduled overdue alert (`.github/workflows/refresh-overdue-alert.yml`,
+  `scripts/refresh_overdue.py`) labels `refresh-overdue` when no weekly refresh PR has been
+  merged in time.
+- **Empty-result guards** for the KEV and AIID ingests: a fetch that parses to nothing
+  leaves the committed file untouched instead of overwriting it.
 
 ### Fixed - over-merge rule (D117); 0 data changes
 
@@ -50,8 +69,9 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ### Added - refresh PR tooling: per-field change report (D120), PR-body size caps (D123), loud abort (D121)
 
-- **D120:** the refresh PR lists every AIID-driven field change (rows for severity, date,
-  corpus, title and attack_vector, with a flag for rows that carry an OECD id).
+- **D120:** the refresh PR reports every AIID-driven field change as a count per field, and lists
+  the rows for severity, date, year, corpus, title and attack_vector only, with a flag for
+  rows that carry an OECD id.
   It does not block; if it cannot be built it fails soft to a needs-ruling PR.
 - **D123:** the report is truncated with a note when long, the full report goes to the
   step summary, and the whole `pr-body.md` is capped below GitHub's 65,536-character
