@@ -63,6 +63,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔍 WS6 licensing surfaces: `1ab030a8` on `ws6/licensing-surfaces-2026-10-13` (it merges 73bce51b). **Gate dispatched (gate-licsurf).**
+- **Fixed: findings #1-#14.**
+  - README: four mapping files; an ingest/ bullet; a round-up bullet in the past tense; a parenthetical on the v2.13.0 blurb.
+  - CITATION.cff and .zenodo.json: identical "Exceptions:" tails.
+  - NOTICE-DATA: "ten".
+  - HF card generator; DATASHEET; site og and footer; methods paper; CONTRIBUTING; TAXONOMIES.
+  - The D97/D98 "pending" cells are now past tense: NOTICE-DATA round-up paragraph, SOURCE_LICENSES §1.6/§1.7 and summary rows 6/8.
+- **Specialist checks:**
+  - pytest 1079 + 1 xfail.
+  - Drift clean. **It fired twice on the first HF text**: a bare `02646` and a `2.13.0` literal.
+  - reuse 377/454, unchanged.
+  - **a11y: axe 0 (light/dark, desktop/mobile), Lighthouse 100, 380px PASS.**
+- **Dispute:** the specialist says the warden's #8 ordering claim is wrong (AIM is still last). The real stale text was "For the other five…". The gate will adjudicate.
+- **New follow-ups (for the register):**
+  - CONTRIBUTING:20 still says "Edit `data/incidents.json` directly", which conflicts with the no-hand-edit rule.
+  - The wheel and sdist ship no NOTICE-DATA, though the bundled `incidents.min.json` carries row-level obligations (AIAAIC/OECD).
+
 ### ✅ D97/D98 rewrites + INC-02382 CVE fix: **PASS (gate-rewrite on `64467e49`), MERGED.** CORRECTIONS row placed.
 **Verdict, in the gate's words:** "PASS. ws1/licensing-rewrites-2026-10-13 @ 64467e49 fixes both bounce #1 defects, and the delta is exactly as declared. DEFECTS: none."
 
