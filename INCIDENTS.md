@@ -8521,7 +8521,7 @@ All **15,637** incidents in a single table, newest-first. Each `INC-*****` link 
 | 8,389 | 2025-06 | [`INC-10414`](docs/incidents/2025.md#inc-10414) | ash_authentication_phoenix has Insufficient Session Expiration | Low | LLM04, LLM10 | ASI04, ASI05 | `CVE-2025-4754` |
 | 8,390 | 2025-06 | [`INC-02338`](docs/incidents/2025.md#inc-02338) | AstrBot — Path Traversal (CVE-2025-48957) | High | LLM04, LLM10 | ASI03, ASI04, ASI05 | `CVE-2025-48957` |
 | 8,391 | 2025-06 | [`INC-10426`](docs/incidents/2025.md#inc-10426) | Backend.AI Missing Authorization vulnerability | Critical | LLM04 | ASI03, ASI04 | `CVE-2025-49651` (+2) |
-| 8,392 | 2025-06 | [`INC-02382`](docs/incidents/2025.md#inc-02382) | CamoLeak (CVE-2025-59145) prompt injection leaks private code via GitHub Copilot Chat | Critical | LLM01, LLM02, LLM10 | ASI01, ASI02, ASI06, ASI09 |  |
+| 8,392 | 2025-06 | [`INC-02382`](docs/incidents/2025.md#inc-02382) | CamoLeak prompt injection leaks private code via GitHub Copilot Chat | Critical | LLM01, LLM02, LLM10 | ASI01, ASI02, ASI06, ASI09 |  |
 | 8,393 | 2025-06 | [`INC-02432`](docs/incidents/2025.md#inc-02432) | Cisco Study: 46% of Orgs Report Internal GenAI Data Leaks | Medium | LLM02 | ASI09 |  |
 | 8,394 | 2025-06 | [`INC-02435`](docs/incidents/2025.md#inc-02435) | Claude Code DNS Exfiltration (CVE-2025-55284) | High | LLM01, LLM02, LLM04 | ASI01, ASI02, ASI04 | `CVE-2025-55284` |
 | 8,395 | 2025-06 | [`INC-02439`](docs/incidents/2025.md#inc-02439) | Claude Code — Vulnerability (CVE-2025-52882) | Medium | LLM04 | ASI04 | `CVE-2025-52882` |

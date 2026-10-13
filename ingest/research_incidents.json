@@ -545,11 +545,11 @@
   },
   {
     "source_id": "RES-tenable-camoleak-2025",
-    "title": "CamoLeak: GitHub Copilot Chat CSP Bypass and Hidden Comment Injection (CVE-2025-59145)",
+    "title": "CamoLeak: GitHub Copilot Chat CSP Bypass and Hidden Comment Injection ",
     "date": "2025-10",
     "year": 2025,
     "category": "research",
-    "description": "In June 2025 a Legit Security researcher found that GitHub Copilot Chat could be manipulated by instructions hidden in pull request text. Because Copilot acts with the viewing user's access, the injected prompt could read a victim's private repository content and smuggle it out through image requests routed via GitHub's own Camo proxy, which sidestepped the content security policy (CVE-2025-59145, CVSS 9.6). GitHub fixed it by turning off image display in Copilot Chat.",
+    "description": "In June 2025 a Legit Security researcher found that GitHub Copilot Chat could be manipulated by instructions hidden in pull request text. Because Copilot acts with the viewing user's access, the injected prompt could read a victim's private repository content and smuggle it out through image requests routed via GitHub's own Camo proxy, which sidestepped the content security policy (CVSS 9.6). GitHub fixed it by turning off image display in Copilot Chat.",
     "attack_vector": "data-exfiltration",
     "affected": "GitHub Copilot Chat",
     "severity": "Critical",
@@ -558,7 +558,7 @@
     "nist_ai_rmf": ["MEASURE-2.7"],
     "mitre_atlas": ["AML.T0051", "AML.T0057"],
     "references": [{"title": "CamoLeak Legit Security", "url": "https://www.legitsecurity.com/blog/camoleak-critical-github-copilot-vulnerability-leaks-private-source-code", "type": "research"}],
-    "tags": ["github-copilot", "camoleak", "csp-bypass", "cve-2025-59145"]
+    "tags": ["github-copilot", "camoleak", "csp-bypass"]
   },
   {
     "source_id": "RES-tenable-tra-2025-11",
