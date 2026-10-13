@@ -63,6 +63,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 v2.13.0 PRE-PUBLISH gate: **BOUNCE #1 (red-reviewer on `6847ea46`, 2026-10-13)**. Two one-sentence notes defects; everything else in steps 2-5 PASSED on the gate's own re-run.
+**Verdict, in the gate's words:** "VERDICT: BOUNCE ... Two defects, both one-sentence text fixes in docs/releases/v2.13.0.md. That file becomes the Release body, the tag copy and the Zenodo archive copy, so these need fixing before step 6."
+
+**Defects:**
+1. **Notes :297-299, "All 17 now have appended records".** This is false: INC-00754 gained no record (exactly 1 record at both v2.12.0 and the cut, and it reports `group`). The text predates the cut, so the notes gate at 9e85357d missed it. The CHANGELOG and README are correct.
+2. **Notes :388, "The data and code it measures are identical to `main` @ `0191e814`".** This became false at the bump. **The notes gate suggested this wording pre-cut and the foreman relayed it to the cut specialist without accounting for the bump. Foreman's relay error.**
+
+**Advisories:**
+- **A1:** "Run from a checkout of this branch (`release/v2.13.0-notes`)" is wrong in a Release body. → Change to "Run from the `v2.13.0` tag" (fixed together with D2).
+- **A2:** the older Previous-release paragraphs in README use relative links, which break on PyPI. → **Follow-up (pre-existing).**
+- **A3:** the README "now have records" wording is true as written.
+- **A4:** stray-check scope.
+
+**Bounce counting (foreman):** this is the cut's bounce #1. The notes task closed with PASS; defect 1 lives in notes text, and the gate flagged that the count is the foreman's call. It is treated as cut bounce #1 and not escalated; the user has been told.
+
+**Gate evidence (its own re-run):**
+- **Versions:** all 5 strings, INCIDENTS, both README markers and stats read 2.13.0; date-released 2026-10-13; CHANGELOG headings correct; grep shows only dated history.
+- **Rebuild:** byte-identical. The delta vs b3c17580 is version only. The delta vs v2.12.0 is the 8,713 entries, field counts all match the notes, and the id_deprecations prefix check holds.
+- **Drift:** rc 0, and **proved to fire on 6 mutations.**
+- **README:** every claim verified, with absolute links.
+- **Metadata:** parses; zenodo=CITATION; concept DOI ×16 with no other DOI.
+- **Tests and scope:** fresh-clone pytest 1072 passed, 1 xfailed; 16 files; merge-tree clean.
+- **Notes:** link hygiene clean; the DOI placeholder is present at :29.
+
+**Routing:** de-cut applies D1, which it must re-measure (the gate's "14" vs "16 of the 17" conflict internally), plus D2 + A1. Then a scoped re-check by the same reviewer.
+
 ### 🔍 v2.13.0 cut steps 2-5 DONE at `6847ea46` on `release/v2.13.0-cut` (pushed). **PRE-PUBLISH red-reviewer gate dispatched.**
 - **Version strings:** merge_and_dedupe, pyproject, CITATION ×3 (date-released 2026-10-13) and .zenodo are all 2.13.0. USER_AGENT was already done.
 - **CHANGELOG:** a fresh `## [Unreleased]`, then `## [2.13.0] — 2026-10-13`.
