@@ -63,6 +63,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⛔ D114 AIID lift: **BOUNCE #2 (gate-aiidlift re-gate on `fdc3d2fa`). ESCALATED to the user.** Both defects are text-only, with exact replacements; data and code are unaffected.
+**Defects:**
+1. **README:144** rewrote the v2.13.0 "Known limitations, as of this release" clause into post-release state. **v2.13.0 shipped frozen.** Keep the release wording and append "since the release, the AIID side has been lifted under D114…". The gate supplied exact text.
+2. **SOURCE_LICENSES:100** still says content changes are held "only when an OECD/AIID ingest input differs". The AIID snapshot now differs weekly WITHOUT triggering the check (mutation d1: INC-01371 severity High→Critical, rc 0). The gate's exact text names the held inputs and says AIID-driven content changes ship under D114, listed (not gated) by D120.
+
+**Advisories:**
+- **A1.** D121 is met for the two scoped refusals, but the comment at :2072 overclaims "every refusal". The approval-file and baseline refusals lack the sentence. → Follow-up.
+- **A2.** The D120 report could exceed GitHub's 65,536-character PR-body limit (150 rows × 6 fields). This run's is 6.5 KB. If create-pull-request fails on an oversized body, a "fail-soft" report could stop the PR. **A total-size cap is cheap insurance before Sunday.**
+- **A3.** needs_ruling relies on last-value-wins for GITHUB_OUTPUT. That is runner behaviour and cannot be measured locally.
+
 ### ⚖ D119-D121, USER RULINGS 2026-10-13 (D114 AIID-lift advisories)
 - **D119: accept the INC-00437 / INC-14682 switch from OECD to AIID title (Recommended).** It is consistent with D114's approved 25-title table and lowers OECD-title exposure. The D115 record must state 3,937 → 3,935 and name the two rows.
 - **D120: per-field change report in the refresh PR (Recommended).** Every AIID-driven field change is listed, with row lists for severity, date, corpus, title and attack_vector and an OECD-carrying flag. No auto-blocking; it fails soft to needs-ruling. **It must land before Sun 2026-10-18 04:00 UTC.**
