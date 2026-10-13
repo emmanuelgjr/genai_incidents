@@ -7,6 +7,8 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+## [2.13.0] — 2026-10-13
+
 ### Changed - OWASP ASI re-pinned to the 2026 Top 10 for Agentic Applications; citation fixed; OWASP attribution added (v2.13.0 item 9, D78-D80, D83-D88)
 
 - **Metadata relabel only: 0 entries change.** The codes `ASI01`-`ASI10`, their order, all

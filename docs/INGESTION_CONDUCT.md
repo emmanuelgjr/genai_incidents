@@ -37,7 +37,7 @@ separate, deliberately non-code enforcement mechanism.
 `USER_AGENT` (`ingest/common.py:96-99`) is a single module-level constant:
 
 ```
-genai_incidents/2.12.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
+genai_incidents/2.13.0 (+https://github.com/emmanuelgjr; contact: emmanuelgjr@gmail.com)
 ```
 
 It names the project, links to the repo, and gives a contact address
@@ -72,7 +72,7 @@ justified the `Mozilla/5.0` prefix had no supporting measurement. Full
 evidence: `docs/audits/WS0-T4-network-chokepoint-inventory-2026-07-29.md`
 §13.
 
-Version number (`2.12.0`, bumped at every cut per `docs/VERSIONING.md` step 2)
+Version number (`2.13.0`, bumped at every cut per `docs/VERSIONING.md` step 2)
 is in the constant itself; the full reasoning above is in the comment
 immediately above it (`ingest/common.py:62-95`).
 

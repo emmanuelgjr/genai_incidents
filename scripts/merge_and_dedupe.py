@@ -3219,7 +3219,7 @@ def main():
     # 9) Write outputs
     n_retracted = sum(1 for e in deduped if e.get("status") == "retracted")
     out = {
-        "version": "2.12.0",
+        "version": "2.13.0",
         "generated": generated,
         "description": (
             "A consolidated, machine-readable index of GenAI and agentic AI security "
