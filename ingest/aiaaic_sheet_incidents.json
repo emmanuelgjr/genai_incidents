@@ -1,5 +1,231 @@
 [
   {
+    "source_id": "AIAAIC2276",
+    "title": "Otter AI accused of secretly recording private work conversations",
+    "date": "2025",
+    "year": 2025,
+    "category": "real-world",
+    "description": "AIAAIC-tracked incident. System: Otter.AI. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Jurisdiction: California, USA.",
+    "description_provenance": "original",
+    "description_source": "aiaaic",
+    "content_license": {
+      "source": "aiaaic",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "AIAAIC Repository",
+      "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+      "obligations": [
+        "attribution",
+        "share-alike"
+      ]
+    },
+    "aiaaic_ethical_tags": [
+      "accountability",
+      "consent",
+      "privacy surveillance",
+      "transparency"
+    ],
+    "aiaaic_seed_facts": [
+      "Otter.AI",
+      "Audio-to-text; Machine learning; NLP/text analysis; Speech recognition",
+      "California, USA"
+    ],
+    "attack_vector": "other",
+    "affected": "Otter.ai Inc.",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM03",
+      "LLM08"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIAAIC entry",
+        "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/otter-ai-accused-of-secretly-recording-private-work-conversations",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiaaic",
+      "aiaaic-sheet",
+      "juris-california,-usa"
+    ]
+  },
+  {
+    "source_id": "AIAAIC2271",
+    "title": "OpenAI agents hijack German wiki for two months",
+    "date": "2026",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AIAAIC-tracked incident. Technology: Agentic AI; Generative AI. Sector: Technology. Jurisdiction: Germany.",
+    "description_provenance": "original",
+    "description_source": "aiaaic",
+    "content_license": {
+      "source": "aiaaic",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "AIAAIC Repository",
+      "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+      "obligations": [
+        "attribution",
+        "share-alike"
+      ]
+    },
+    "aiaaic_ethical_tags": [
+      "accountability",
+      "alignment",
+      "consent",
+      "transparency"
+    ],
+    "aiaaic_seed_facts": [
+      "Agentic AI; Generative AI",
+      "Technology",
+      "Germany"
+    ],
+    "attack_vector": "other",
+    "affected": "OpenAI",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM03",
+      "LLM08"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIAAIC entry",
+        "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/openai-agents-hijack-german-wiki-for-two-months",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiaaic",
+      "aiaaic-sheet",
+      "sector-technology",
+      "juris-germany"
+    ]
+  },
+  {
+    "source_id": "AIAAIC2270",
+    "title": "Anthropic AI agent pressures real person into approving malicious code",
+    "date": "2026",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AIAAIC-tracked incident. System: Mythos 5. Technology: Agentic AI. Sector: Technology. Jurisdiction: UK.",
+    "description_provenance": "original",
+    "description_source": "aiaaic",
+    "content_license": {
+      "source": "aiaaic",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "AIAAIC Repository",
+      "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+      "obligations": [
+        "attribution",
+        "share-alike"
+      ]
+    },
+    "aiaaic_ethical_tags": [
+      "consent",
+      "transparency"
+    ],
+    "aiaaic_seed_facts": [
+      "Mythos 5",
+      "Agentic AI",
+      "Technology",
+      "UK"
+    ],
+    "attack_vector": "other",
+    "affected": "Anthropic",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM08"
+    ],
+    "owasp_asi": [],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIAAIC entry",
+        "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/anthropic-ai-agent-pressures-real-person-into-approving-malicious-code",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiaaic",
+      "aiaaic-sheet",
+      "sector-technology",
+      "juris-uk"
+    ]
+  },
+  {
+    "source_id": "AIAAIC2269",
+    "title": "Anthropic AI agent hacks third-party website with same target name",
+    "date": "2026",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AIAAIC-tracked incident. System: Claude Opus 4.7. Technology: Agentic AI. Jurisdiction: USA.",
+    "description_provenance": "original",
+    "description_source": "aiaaic",
+    "content_license": {
+      "source": "aiaaic",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "AIAAIC Repository",
+      "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+      "obligations": [
+        "attribution",
+        "share-alike"
+      ]
+    },
+    "aiaaic_ethical_tags": [
+      "accountability",
+      "autonomy agency",
+      "oversight",
+      "safety",
+      "security",
+      "transparency"
+    ],
+    "aiaaic_seed_facts": [
+      "Claude Opus 4.7",
+      "Agentic AI",
+      "USA"
+    ],
+    "attack_vector": "other",
+    "affected": "Anthropic",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM02",
+      "LLM03",
+      "LLM04",
+      "LLM08",
+      "LLM10"
+    ],
+    "owasp_asi": [
+      "ASI02",
+      "ASI03",
+      "ASI08",
+      "ASI09"
+    ],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIAAIC entry",
+        "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/anthropic-ai-agent-hacks-third-party-website-with-same-target-name",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiaaic",
+      "aiaaic-sheet",
+      "juris-usa"
+    ]
+  },
+  {
     "source_id": "AIAAIC2268",
     "title": "WebinarTV secretly records and turns meetings into podcasts",
     "date": "2026",
@@ -93,8 +319,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -119,7 +345,7 @@
   },
   {
     "source_id": "AIAAIC2266",
-    "title": "OpenAI models escape test, hack Hugging Face for answers",
+    "title": "OpenAI models escape test, hack Hugging Face",
     "date": "2026",
     "year": 2026,
     "category": "real-world",
@@ -139,7 +365,7 @@
     },
     "aiaaic_ethical_tags": [
       "accountability",
-      "alignment",
+      "autonomy agency",
       "security",
       "transparency"
     ],
@@ -154,8 +380,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -382,10 +608,10 @@
     "affected": "Christian Ulmen",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -441,9 +667,9 @@
     "affected": "Anthropic; Google; Meta; Microsoft; Mistral; OpenAI; xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -499,8 +725,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -556,9 +782,9 @@
     "affected": "Google; Meta",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -669,9 +895,9 @@
     "affected": "DeepSeek Artificial Intelligence Co",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -729,9 +955,9 @@
     "affected": "Google",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -790,8 +1016,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -909,8 +1135,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -1251,9 +1477,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -1530,8 +1756,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -1589,8 +1815,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -1651,8 +1877,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -1822,10 +2048,10 @@
     "affected": "Google",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -2106,8 +2332,8 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -2220,9 +2446,9 @@
     "affected": "Ford Motor Company; Horizon Global Inc.",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -2278,9 +2504,9 @@
     "affected": "Radnor High School student",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -2391,8 +2617,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -3009,8 +3235,8 @@
     "affected": "Fidesz",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -3064,8 +3290,8 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -3665,8 +3891,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
-      "LLM03"
+      "LLM03",
+      "LLM04"
     ],
     "owasp_asi": [
       "ASI02",
@@ -4119,9 +4345,9 @@
     "affected": "Paravision; Persona",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4178,9 +4404,9 @@
     "affected": "Eko Health",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4238,9 +4464,9 @@
     "affected": "Johnson & Johnson",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4518,10 +4744,10 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4861,9 +5087,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4920,9 +5146,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -4979,9 +5205,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5037,9 +5263,9 @@
     "affected": "*",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5203,9 +5429,9 @@
     "affected": "Caitlin Ner",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5263,9 +5489,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5379,8 +5605,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -5495,9 +5721,9 @@
     "affected": "Hello Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5892,9 +6118,9 @@
     "affected": "Bedapudi Praneeth",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -5951,8 +6177,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -6009,8 +6235,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -6069,8 +6295,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -6186,9 +6412,9 @@
     "affected": "Flock Safety",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6296,9 +6522,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6522,9 +6748,9 @@
     "affected": "Waymo",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6580,9 +6806,9 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6638,9 +6864,9 @@
     "affected": "Waymo",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6696,8 +6922,8 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -6812,10 +7038,10 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM04",
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -6876,10 +7102,10 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM04",
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -6994,8 +7220,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -7433,9 +7659,9 @@
     "affected": "TikTok",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -7659,9 +7885,9 @@
     "affected": "Curio; FoloToy; Miko AI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -7775,9 +8001,9 @@
     "affected": "AIDOL",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -7890,8 +8116,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -8394,9 +8620,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8453,9 +8679,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8513,10 +8739,10 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8574,10 +8800,10 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8634,9 +8860,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8693,9 +8919,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8752,9 +8978,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -8930,9 +9156,9 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -9040,9 +9266,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9267,9 +9493,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9325,9 +9551,9 @@
     "affected": "Character.AI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9382,8 +9608,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9439,9 +9665,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9497,9 +9723,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -9555,8 +9781,8 @@
     "affected": "Meta Platforms; EssilorLuxottica",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -9610,8 +9836,8 @@
     "affected": "Character.AI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -10045,9 +10271,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -10161,9 +10387,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -10221,10 +10447,10 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -10674,9 +10900,9 @@
     "affected": "Character.AI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -11056,9 +11282,9 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -11114,9 +11340,9 @@
     "affected": "Meta Platforms",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -11280,8 +11506,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -11514,8 +11740,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -11952,9 +12178,9 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -12678,8 +12904,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -13061,9 +13287,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13120,9 +13346,9 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13177,8 +13403,8 @@
     "affected": "Meta Platforms",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13237,8 +13463,8 @@
     "affected": "Meta Platforms",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13727,9 +13953,9 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13786,9 +14012,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13845,9 +14071,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13904,9 +14130,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -13963,10 +14189,10 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -14021,8 +14247,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -14353,8 +14579,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -14733,9 +14959,9 @@
     "affected": "KUKA",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -14790,8 +15016,8 @@
     "affected": "Unitree",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -14846,8 +15072,8 @@
     "affected": "Unitree",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -15398,8 +15624,8 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -15620,9 +15846,9 @@
     "affected": "St Thomas Aquinas Catholic Secondary School students",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -15731,9 +15957,9 @@
     "affected": "TikTok",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -16062,9 +16288,9 @@
     "affected": "Meta Platforms",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -16119,8 +16345,8 @@
     "affected": "Meta Platforms",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -17095,8 +17321,8 @@
     "affected": "Xiaomi",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -17152,9 +17378,9 @@
     "affected": "Ex-Human Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -17210,8 +17436,8 @@
     "affected": "CBM Media",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -17268,9 +17494,9 @@
     "affected": "AI-NOMIS",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -17375,8 +17601,8 @@
     "affected": "Glimpse.AI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -17696,8 +17922,8 @@
     "affected": "xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -18510,9 +18736,9 @@
     "affected": "Match Group",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -18785,8 +19011,8 @@
     "affected": "Guy Bar; Ori Bejerano",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -18950,9 +19176,9 @@
     "affected": "Ministry of the Interior; SAS",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -19842,10 +20068,10 @@
     "affected": "MrDeepfakes",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -20269,8 +20495,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -20381,8 +20607,8 @@
     "affected": "Education",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -20770,8 +20996,8 @@
     "affected": "Meta Platforms",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -20827,8 +21053,8 @@
     "affected": "OpenAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -20884,9 +21110,9 @@
     "affected": "Runway",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -21157,8 +21383,8 @@
     "affected": "Fable",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -21905,8 +22131,8 @@
     "affected": "Character.AI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -21960,8 +22186,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -24197,7 +24423,7 @@
     "date": "2024",
     "year": 2024,
     "category": "real-world",
-    "description": "AIAAIC-tracked incident. System: OtterPilot. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Sector: Business/professional services. Jurisdiction: USA.",
+    "description": "AIAAIC-tracked incident. System: Otter AI; OtterPilot. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Sector: Business/professional services. Jurisdiction: USA.",
     "description_provenance": "original",
     "description_source": "aiaaic",
     "content_license": {
@@ -24216,13 +24442,13 @@
       "security"
     ],
     "aiaaic_seed_facts": [
-      "OtterPilot",
+      "Otter AI; OtterPilot",
       "Audio-to-text; Machine learning; NLP/text analysis; Speech recognition",
       "Business/professional services",
       "USA"
     ],
     "attack_vector": "other",
-    "affected": "Otter.AI",
+    "affected": "Otter.ai Inc.",
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
@@ -24539,8 +24765,8 @@
     "affected": "Daz Productions",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -24816,8 +25042,8 @@
     "affected": "Dot",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -24888,6 +25114,62 @@
     ]
   },
   {
+    "source_id": "AIAAIC1782",
+    "title": "Otter AI bot leaks hospital patient health information",
+    "date": "2024",
+    "year": 2024,
+    "category": "real-world",
+    "description": "AIAAIC-tracked incident. System: Offer AI; OtterPilot. Technology: Generative AI. Sector: Health. Jurisdiction: Ontario, Canada.",
+    "description_provenance": "original",
+    "description_source": "aiaaic",
+    "content_license": {
+      "source": "aiaaic",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "AIAAIC Repository",
+      "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+      "obligations": [
+        "attribution",
+        "share-alike"
+      ]
+    },
+    "aiaaic_ethical_tags": [
+      "accountability",
+      "confidentiality",
+      "consent",
+      "privacy surveillance"
+    ],
+    "aiaaic_seed_facts": [
+      "Offer AI; OtterPilot",
+      "Generative AI",
+      "Health",
+      "Ontario, Canada"
+    ],
+    "attack_vector": "other",
+    "affected": "Otter.ai Inc.",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM03"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIAAIC entry",
+        "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/otter-ai-bot-leaks-hospital-patient-health-information",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiaaic",
+      "aiaaic-sheet",
+      "sector-health",
+      "juris-ontario,-canada"
+    ]
+  },
+  {
     "source_id": "AIAAIC1781",
     "title": "Boy commits suicide after relationship with Character.AI chatbot",
     "date": "2024",
@@ -24924,10 +25206,10 @@
     "affected": "Character.AI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -25266,9 +25548,9 @@
     "affected": "AI/Robotics Venture Strategy 3",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -25488,8 +25770,8 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -25545,8 +25827,8 @@
     "affected": "OpenAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -25755,9 +26037,9 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
+      "LLM03",
       "LLM04",
-      "LLM10",
-      "LLM03"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -25816,9 +26098,9 @@
     "affected": "Snap Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -26089,8 +26371,8 @@
     "affected": "Google",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -26631,9 +26913,9 @@
     "affected": "Starship Technologies",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -26854,8 +27136,8 @@
     "affected": "Temple Mount Activists",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -27024,8 +27306,8 @@
     "affected": "CRUSHON AI CORP; JanitorAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -27185,8 +27467,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -27402,9 +27684,9 @@
     "affected": "Education",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -27570,8 +27852,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -27889,8 +28171,8 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -28192,8 +28474,8 @@
     "affected": "Sol Ecom, Inc.; Briver LLC; Itai Tech Ltd.; Defirex OÜ; Itai OÜ; Augustin Gribinets",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -28505,8 +28787,8 @@
     "affected": "X Corp",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -28565,10 +28847,10 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM04",
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -29121,9 +29403,9 @@
     "affected": "Deepsukebe",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -29392,8 +29674,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI02",
@@ -29503,9 +29785,9 @@
     "affected": "Starship Technologies",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -29666,8 +29948,8 @@
     "affected": "Starship Technologies",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -29775,8 +30057,8 @@
     "affected": "Starship Technologies",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -29832,9 +30114,9 @@
     "affected": "Starship Technologies",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -30587,8 +30869,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI02",
@@ -30854,8 +31136,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -30909,8 +31191,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -32053,8 +32335,8 @@
     "affected": "LAION",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -33115,9 +33397,9 @@
     "affected": "Personal - individual",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -33173,8 +33455,8 @@
     "affected": "Bacchus Marsh Grammar students",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -33284,8 +33566,8 @@
     "affected": "LAION",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -33341,8 +33623,8 @@
     "affected": "UC Berkeley",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -33615,10 +33897,10 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -33677,8 +33959,8 @@
     "affected": "Google",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -34864,9 +35146,9 @@
     "affected": "Evolv Technology",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -35027,8 +35309,8 @@
     "affected": "Politics; Govt - defence",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -35135,8 +35417,8 @@
     "affected": "Google",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -35192,8 +35474,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI02",
@@ -35516,8 +35798,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -35572,8 +35854,8 @@
     "affected": "Ford",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -35737,8 +36019,8 @@
     "affected": "Huawei",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -35960,9 +36242,9 @@
     "affected": "Dazhon Darien",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -36072,8 +36354,8 @@
     "affected": "Snap Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -36183,8 +36465,8 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -36560,9 +36842,9 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -36616,8 +36898,8 @@
     "affected": "Synthesia",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -36725,9 +37007,9 @@
     "affected": "Vandapac",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -37574,8 +37856,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -37629,8 +37911,8 @@
     "affected": "HeyGen",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -38050,8 +38332,8 @@
     "affected": "NTV",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -38322,8 +38604,8 @@
     "affected": "Evolv Technology",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -38481,8 +38763,8 @@
     "affected": "Islamic Revolutionary Guards/Cotton Sandstorm",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -38911,9 +39193,9 @@
     "affected": "Pinecrest Cove Academy students",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -38970,9 +39252,9 @@
     "affected": "Beverly Vista Middle School students",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -39136,9 +39418,9 @@
     "affected": "Microsoft",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -39549,9 +39831,9 @@
     "affected": "SoundThinking",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -39868,8 +40150,8 @@
     "affected": "Snap Inc.",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -40299,9 +40581,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -41001,8 +41283,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI02",
@@ -41584,8 +41866,8 @@
     "affected": "PimEyes",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -41695,8 +41977,8 @@
     "affected": "PimEyes",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -41855,8 +42137,8 @@
     "affected": "Meta Platforms; Big Box VR",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -41910,8 +42192,8 @@
     "affected": "Issaquah High School students",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -41968,8 +42250,8 @@
     "owasp_llm": [
       "LLM02",
       "LLM04",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI02",
@@ -42128,9 +42410,9 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
+      "LLM03",
       "LLM04",
-      "LLM10",
-      "LLM03"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI02",
@@ -42348,8 +42630,8 @@
     "affected": "Deepcake",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -42402,8 +42684,8 @@
     "affected": "Media/entertainment/sports/arts",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -43959,8 +44241,8 @@
     "affected": "LAION",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -44224,8 +44506,8 @@
     "affected": "OctoML",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -45426,8 +45708,8 @@
     "affected": "Education",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -46751,8 +47033,8 @@
     "affected": "CivitAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -46969,8 +47251,8 @@
     "affected": "David Tatum",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -47078,8 +47360,8 @@
     "affected": "Luka Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -47134,8 +47416,8 @@
     "affected": "Luka Inc",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -47455,9 +47737,9 @@
     "affected": "Education",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -47664,9 +47946,9 @@
     "affected": "General Motors/Cruise LLC",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -47834,9 +48116,9 @@
     "affected": "AI/Robotics Venture Strategy 3",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -48105,8 +48387,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -48746,8 +49028,8 @@
     "affected": "ElevenLabs",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -49129,8 +49411,8 @@
     "affected": "Optic",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -50186,8 +50468,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -50615,8 +50897,8 @@
     "affected": "CivitAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -50892,9 +51174,9 @@
     "affected": "NHS Blood and Transplant",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -51161,8 +51443,8 @@
     "affected": "Synthesia",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -51425,8 +51707,8 @@
     "affected": "General Motors/Cruise LLC",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -52039,8 +52321,8 @@
     "affected": "Beijing Academy of Artificial Intelligence; Bloomberg; DataBricks; EleutherAI; Facebook; Microsoft; OpenAI; Yandex",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -52206,8 +52488,8 @@
     "affected": "Adobe",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -52912,8 +53194,8 @@
     "affected": "Politics; Govt - defence",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -53083,8 +53365,8 @@
     "affected": "Flutter UKI/Betfair",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -53412,8 +53694,8 @@
     "affected": "Ron de Santis",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -53778,9 +54060,9 @@
     "affected": "Instagram; Pinterest",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -55735,9 +56017,9 @@
     "affected": "Chai Research; EleutherAI",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -56169,9 +56451,9 @@
     "affected": "MHS",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -56381,8 +56663,8 @@
     "affected": "TikTok",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -57284,9 +57566,9 @@
     "affected": "Facebook",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -57343,8 +57625,8 @@
     "affected": "Sidhant Chaddha",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -58387,8 +58669,8 @@
     "affected": "General Motors/Cruise LLC",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -58492,8 +58774,8 @@
     "affected": "Business/professional services",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -58916,9 +59198,9 @@
     "affected": "Coupang/Coupang Eats",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -59513,8 +59795,8 @@
     "affected": "Amazon",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -59625,8 +59907,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -59686,10 +59968,10 @@
     "affected": "Jeremy Kampervee",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -59909,8 +60191,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -59970,8 +60252,8 @@
     "affected": "Bharatiya Janata Party; Persistent Systems",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -60513,9 +60795,9 @@
     "affected": "Amazon",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -60952,8 +61234,8 @@
     "affected": "General Motors/Cruise LLC",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -61008,8 +61290,8 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -61400,8 +61682,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM03",
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -61565,8 +61847,8 @@
     "affected": "MTV Lebanon",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -61945,9 +62227,9 @@
     "affected": "Amazon",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -62116,9 +62398,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -62436,8 +62718,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -62544,9 +62826,9 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -62659,8 +62941,8 @@
     "affected": "TikTok",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -62716,9 +62998,9 @@
     "affected": "Nio; Intel",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -62889,9 +63171,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -62948,9 +63230,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -63393,9 +63675,9 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -63509,9 +63791,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -63567,9 +63849,9 @@
     "affected": "General Motors",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -63684,8 +63966,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -63857,9 +64139,9 @@
     "affected": "Facebook; YouTube;TikTok; Twitter",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -64243,8 +64525,8 @@
     "affected": "Focus Features; Morgan Neville",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -64413,9 +64695,9 @@
     "affected": "Reddit",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -64801,9 +65083,9 @@
     "affected": "TikTok",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -64969,8 +65251,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -65583,8 +65865,8 @@
     "affected": "Facebook; TikTok; xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -65862,8 +66144,8 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -66238,8 +66520,8 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -66393,8 +66675,8 @@
     "affected": "Government of Russia",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -66829,8 +67111,8 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -66997,8 +67279,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -67661,8 +67943,8 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -68592,8 +68874,8 @@
     "affected": "Huawei",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -68966,9 +69248,9 @@
     "affected": "Scatter Lab",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -69367,8 +69649,8 @@
     "affected": "Deliveroo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -69594,9 +69876,9 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -69761,8 +70043,8 @@
     "affected": "Tesla",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -71261,8 +71543,8 @@
     "affected": "Health",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -72558,8 +72840,8 @@
     "affected": "NSO Group",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -72675,10 +72957,10 @@
     "affected": "Telegram",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
+      "LLM07",
       "LLM08",
-      "LLM07"
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -72732,8 +73014,8 @@
     "affected": "These Nudes Do Not Exist",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -72893,8 +73175,8 @@
     "affected": "Instagram",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -74136,8 +74418,8 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -74806,8 +75088,8 @@
     "affected": "Politics",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -75016,8 +75298,8 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -75131,9 +75413,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -75191,9 +75473,9 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -75738,9 +76020,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -75799,9 +76081,9 @@
     "affected": "Uber",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -76291,9 +76573,9 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -76514,9 +76796,9 @@
     "affected": "Babylon Health",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -76678,8 +76960,8 @@
     "affected": "Media/entertainment/sports/arts",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -76786,8 +77068,8 @@
     "affected": "Obvious Art",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM08",
-      "LLM07"
+      "LLM07",
+      "LLM08"
     ],
     "owasp_asi": [
       "ASI09"
@@ -76843,9 +77125,9 @@
     "affected": "Media/entertainment/sports/arts",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM07"
+      "LLM07",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77336,9 +77618,9 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77397,8 +77679,8 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77507,8 +77789,8 @@
     "affected": "Keolia/NAVYA",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77562,8 +77844,8 @@
     "affected": "Uber",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77721,8 +78003,8 @@
     "affected": "Knightscope",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77825,8 +78107,8 @@
     "affected": "Ajin USA",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -77989,9 +78271,9 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -78164,8 +78446,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -78880,8 +79162,8 @@
     "affected": "Facebook",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -79106,8 +79388,8 @@
     "affected": "Google",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -79275,8 +79557,8 @@
     "affected": "Google; xAI",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -79386,9 +79668,9 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -79443,8 +79725,8 @@
     "affected": "Yandex",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -79501,9 +79783,9 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -79559,8 +79841,8 @@
     "affected": "Tesla",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -79730,8 +80012,8 @@
     "affected": "Waymo",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -79841,8 +80123,8 @@
     "severity": "Medium",
     "owasp_llm": [
       "LLM02",
-      "LLM04",
       "LLM03",
+      "LLM04",
       "LLM08"
     ],
     "owasp_asi": [
@@ -80234,8 +80516,8 @@
     "affected": "Amazon",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08"
@@ -80673,8 +80955,8 @@
     "affected": "Volkswagen",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -80783,8 +81065,8 @@
     "affected": "Health",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
-      "LLM03"
+      "LLM03",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -80840,9 +81122,9 @@
     "affected": "SKH Metals",
     "severity": "Critical",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",
@@ -80900,9 +81182,9 @@
     "affected": "YouTube",
     "severity": "Medium",
     "owasp_llm": [
-      "LLM10",
       "LLM03",
-      "LLM08"
+      "LLM08",
+      "LLM10"
     ],
     "owasp_asi": [
       "ASI08",

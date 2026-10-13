@@ -3,7 +3,7 @@
   "generated": "2026-10-13",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
-  "incident_count": 15637,
+  "incident_count": 15642,
   "retracted_count": 29,
   "incidents": [
     {
@@ -24652,6 +24652,302 @@
       "last_seen": "2026-10-06"
     },
     {
+      "id": "INC-17216",
+      "source_ids": [
+        "AIAAIC2276"
+      ],
+      "title": "Otter AI accused of secretly recording private work conversations",
+      "date": "2025",
+      "year": 2025,
+      "category": "real-world",
+      "description": "AIAAIC-tracked incident. System: Otter.AI. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Jurisdiction: California, USA.",
+      "attack_vector": "privacy-violation",
+      "affected": "Otter.ai Inc.",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM03",
+        "LLM08"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5",
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0048.003",
+        "AML.T0053",
+        "AML.T0056"
+      ],
+      "references": [
+        {
+          "title": "AIAAIC entry",
+          "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/otter-ai-accused-of-secretly-recording-private-work-conversations",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiaaic",
+        "aiaaic-sheet",
+        "juris-california,-usa"
+      ],
+      "added": "2026-10-13",
+      "updated": "2026-10-13",
+      "description_provenance": "original",
+      "description_source": "aiaaic",
+      "content_license": {
+        "source": "aiaaic",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "AIAAIC Repository",
+        "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+        "obligations": [
+          "attribution",
+          "share-alike"
+        ]
+      },
+      "mitre_atlas_tactics": [
+        "AML.TA0005",
+        "AML.TA0010",
+        "AML.TA0011",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "auto",
+      "corpus": "security",
+      "tier": "feed",
+      "source_count": 1,
+      "confidence": "low",
+      "source_status": "active",
+      "first_seen": "2026-10-13",
+      "last_seen": "2026-10-13"
+    },
+    {
+      "id": "INC-17217",
+      "source_ids": [
+        "AIAAIC2271"
+      ],
+      "title": "OpenAI agents hijack German wiki for two months",
+      "date": "2026",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AIAAIC-tracked incident. Technology: Agentic AI; Generative AI. Sector: Technology. Jurisdiction: Germany.",
+      "attack_vector": "other",
+      "affected": "OpenAI",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM03",
+        "LLM08"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5",
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0048.003",
+        "AML.T0053",
+        "AML.T0056"
+      ],
+      "references": [
+        {
+          "title": "AIAAIC entry",
+          "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/openai-agents-hijack-german-wiki-for-two-months",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiaaic",
+        "aiaaic-sheet",
+        "sector-technology",
+        "juris-germany"
+      ],
+      "added": "2026-10-13",
+      "updated": "2026-10-13",
+      "description_provenance": "original",
+      "description_source": "aiaaic",
+      "content_license": {
+        "source": "aiaaic",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "AIAAIC Repository",
+        "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+        "obligations": [
+          "attribution",
+          "share-alike"
+        ]
+      },
+      "mitre_atlas_tactics": [
+        "AML.TA0005",
+        "AML.TA0010",
+        "AML.TA0011",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "auto",
+      "corpus": "security",
+      "tier": "feed",
+      "source_count": 1,
+      "confidence": "low",
+      "source_status": "active",
+      "first_seen": "2026-10-13",
+      "last_seen": "2026-10-13"
+    },
+    {
+      "id": "INC-17218",
+      "source_ids": [
+        "AIAAIC2270"
+      ],
+      "title": "Anthropic AI agent pressures real person into approving malicious code",
+      "date": "2026",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AIAAIC-tracked incident. System: Mythos 5. Technology: Agentic AI. Sector: Technology. Jurisdiction: UK.",
+      "attack_vector": "other",
+      "affected": "Anthropic",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM08"
+      ],
+      "owasp_asi": [],
+      "nist_ai_rmf": [
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0056"
+      ],
+      "references": [
+        {
+          "title": "AIAAIC entry",
+          "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/anthropic-ai-agent-pressures-real-person-into-approving-malicious-code",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiaaic",
+        "aiaaic-sheet",
+        "sector-technology",
+        "juris-uk"
+      ],
+      "added": "2026-10-13",
+      "updated": "2026-10-13",
+      "description_provenance": "original",
+      "description_source": "aiaaic",
+      "content_license": {
+        "source": "aiaaic",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "AIAAIC Repository",
+        "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+        "obligations": [
+          "attribution",
+          "share-alike"
+        ]
+      },
+      "mitre_atlas_tactics": [
+        "AML.TA0010"
+      ],
+      "quality_tier": "auto",
+      "corpus": "security",
+      "tier": "feed",
+      "source_count": 1,
+      "confidence": "low",
+      "source_status": "active",
+      "first_seen": "2026-10-13",
+      "last_seen": "2026-10-13"
+    },
+    {
+      "id": "INC-17219",
+      "source_ids": [
+        "AIAAIC2269"
+      ],
+      "title": "Anthropic AI agent hacks third-party website with same target name",
+      "date": "2026",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AIAAIC-tracked incident. System: Claude Opus 4.7. Technology: Agentic AI. Jurisdiction: USA.",
+      "attack_vector": "other",
+      "affected": "Anthropic",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM02",
+        "LLM03",
+        "LLM04",
+        "LLM08",
+        "LLM10"
+      ],
+      "owasp_asi": [
+        "ASI02",
+        "ASI03",
+        "ASI08",
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "GOVERN-1.4",
+        "GOVERN-6.1",
+        "MANAGE-4.1",
+        "MAP-3.5",
+        "MEASURE-2.10",
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0010",
+        "AML.T0012",
+        "AML.T0048",
+        "AML.T0048.003",
+        "AML.T0050",
+        "AML.T0053",
+        "AML.T0056",
+        "AML.T0057"
+      ],
+      "references": [
+        {
+          "title": "AIAAIC entry",
+          "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/anthropic-ai-agent-hacks-third-party-website-with-same-target-name",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiaaic",
+        "aiaaic-sheet",
+        "juris-usa"
+      ],
+      "added": "2026-10-13",
+      "updated": "2026-10-13",
+      "description_provenance": "original",
+      "description_source": "aiaaic",
+      "content_license": {
+        "source": "aiaaic",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "AIAAIC Repository",
+        "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+        "obligations": [
+          "attribution",
+          "share-alike"
+        ]
+      },
+      "mitre_atlas_tactics": [
+        "AML.TA0004",
+        "AML.TA0005",
+        "AML.TA0010",
+        "AML.TA0011",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "auto",
+      "corpus": "security",
+      "tier": "feed",
+      "source_count": 1,
+      "confidence": "low",
+      "source_status": "active",
+      "first_seen": "2026-10-13",
+      "last_seen": "2026-10-13"
+    },
+    {
       "id": "INC-14601",
       "source_ids": [
         "AIAAIC2268"
@@ -24813,7 +25109,7 @@
       "source_ids": [
         "AIAAIC2266"
       ],
-      "title": "OpenAI models escape test, hack Hugging Face for answers",
+      "title": "OpenAI models escape test, hack Hugging Face",
       "date": "2026",
       "year": 2026,
       "category": "real-world",
@@ -24861,7 +25157,7 @@
         "juris-usa"
       ],
       "added": "2026-07-28",
-      "updated": "2026-10-06",
+      "updated": "2026-10-13",
       "description_provenance": "original",
       "description_source": "aiaaic",
       "content_license": {
@@ -24890,7 +25186,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-07-28",
-      "last_seen": "2026-10-06"
+      "last_seen": "2026-10-13"
     },
     {
       "id": "INC-14604",
@@ -55073,9 +55369,9 @@
       "date": "2024",
       "year": 2024,
       "category": "real-world",
-      "description": "AIAAIC-tracked incident. System: OtterPilot. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Sector: Business/professional services. Jurisdiction: USA.",
+      "description": "AIAAIC-tracked incident. System: Otter AI; OtterPilot. Technology: Audio-to-text; Machine learning; NLP/text analysis; Speech recognition. Sector: Business/professional services. Jurisdiction: USA.",
       "attack_vector": "other",
-      "affected": "Otter.AI",
+      "affected": "Otter.ai Inc.",
       "severity": "Medium",
       "owasp_llm": [
         "LLM02",
@@ -55111,7 +55407,7 @@
         "juris-usa"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-10-13",
       "description_provenance": "original",
       "description_source": "aiaaic",
       "content_license": {
@@ -55139,7 +55435,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06"
+      "last_seen": "2026-10-13"
     },
     {
       "id": "INC-04243",
@@ -55870,6 +56166,75 @@
       "source_status": "active",
       "first_seen": "2026-05-16",
       "last_seen": "2026-10-06"
+    },
+    {
+      "id": "INC-17220",
+      "source_ids": [
+        "AIAAIC1782"
+      ],
+      "title": "Otter AI bot leaks hospital patient health information",
+      "date": "2024",
+      "year": 2024,
+      "category": "real-world",
+      "description": "AIAAIC-tracked incident. System: Offer AI; OtterPilot. Technology: Generative AI. Sector: Health. Jurisdiction: Ontario, Canada.",
+      "attack_vector": "other",
+      "affected": "Otter.ai Inc.",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM03"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5"
+      ],
+      "mitre_atlas": [
+        "AML.T0048.003",
+        "AML.T0053"
+      ],
+      "references": [
+        {
+          "title": "AIAAIC entry",
+          "url": "https://www.aiaaic.org/aiaaic-repository/ai-algorithmic-and-automation-incidents/otter-ai-bot-leaks-hospital-patient-health-information",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiaaic",
+        "aiaaic-sheet",
+        "sector-health",
+        "juris-ontario,-canada"
+      ],
+      "added": "2026-10-13",
+      "updated": "2026-10-13",
+      "description_provenance": "original",
+      "description_source": "aiaaic",
+      "content_license": {
+        "source": "aiaaic",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "attribution": "AIAAIC Repository",
+        "attribution_url": "https://www.aiaaic.org/aiaaic-repository",
+        "obligations": [
+          "attribution",
+          "share-alike"
+        ]
+      },
+      "mitre_atlas_tactics": [
+        "AML.TA0005",
+        "AML.TA0011",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "auto",
+      "corpus": "security",
+      "tier": "feed",
+      "source_count": 1,
+      "confidence": "low",
+      "source_status": "active",
+      "first_seen": "2026-10-13",
+      "last_seen": "2026-10-13"
     },
     {
       "id": "INC-03461",
@@ -517619,7 +517984,7 @@
         "rce"
       ],
       "added": "2026-06-10",
-      "updated": "2026-06-10",
+      "updated": "2026-10-13",
       "cve_ids": [
         "CVE-2026-0770"
       ],
@@ -517632,6 +517997,8 @@
         "AML.TA0004",
         "AML.TA0005"
       ],
+      "exploited_in_wild": true,
+      "kev_date_added": "2026-07-21",
       "quality_tier": "reviewed",
       "corpus": "security",
       "tier": "feed",
@@ -517639,7 +518006,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-175",
         "CAPEC-201",
@@ -538859,7 +539226,7 @@
         "rce"
       ],
       "added": "2026-05-16",
-      "updated": "2026-07-02",
+      "updated": "2026-10-13",
       "cwe_ids": [
         "CWE-352",
         "CWE-73",
@@ -538872,6 +539239,8 @@
       "cve_ids": [
         "CVE-2025-62593"
       ],
+      "exploited_in_wild": true,
+      "kev_date_added": "2026-08-17",
       "quality_tier": "auto",
       "corpus": "security",
       "tier": "feed",
@@ -538879,7 +539248,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-07-02",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-13",
         "CAPEC-35",
@@ -716208,7 +716577,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-10-13"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -737981,7 +738350,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-10-13"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -765294,7 +765663,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-10-13"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -831151,7 +831520,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-10-13"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -1313238,7 +1313607,7 @@
         "cvelistv5"
       ],
       "added": "2026-10-04",
-      "updated": "2026-10-04",
+      "updated": "2026-10-13",
       "cve_ids": [
         "CVE-2026-59822"
       ],
@@ -1313264,13 +1313633,15 @@
       "mitre_atlas_tactics": [
         "AML.TA0004"
       ],
+      "exploited_in_wild": true,
+      "kev_date_added": "2026-09-02",
       "corpus": "security",
       "tier": "feed",
       "source_count": 1,
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-10-04",
-      "last_seen": "2026-10-04",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-12",
         "CAPEC-22",
@@ -1325192,7 +1325563,7 @@
         "cvelistv5"
       ],
       "added": "2026-10-04",
-      "updated": "2026-10-04",
+      "updated": "2026-10-13",
       "cve_ids": [
         "CVE-2026-64849"
       ],
@@ -1325217,13 +1325588,15 @@
       "mitre_atlas_tactics": [
         "AML.TA0004"
       ],
+      "exploited_in_wild": true,
+      "kev_date_added": "2026-08-19",
       "corpus": "security",
       "tier": "feed",
       "source_count": 1,
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-10-04",
-      "last_seen": "2026-10-04",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-664"
       ]
@@ -1387461,7 +1387834,7 @@
         "rce"
       ],
       "added": "2026-10-04",
-      "updated": "2026-10-04",
+      "updated": "2026-10-13",
       "cve_ids": [
         "CVE-2026-9198"
       ],
@@ -1387487,13 +1387860,15 @@
         "AML.TA0004",
         "AML.TA0005"
       ],
+      "exploited_in_wild": true,
+      "kev_date_added": "2026-08-04",
       "corpus": "security",
       "tier": "feed",
       "source_count": 1,
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-10-04",
-      "last_seen": "2026-10-04",
+      "last_seen": "2026-10-13",
       "capec_ids": [
         "CAPEC-35",
         "CAPEC-77",
