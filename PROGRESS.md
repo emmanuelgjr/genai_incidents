@@ -63,6 +63,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Over-merge split proposal: **PASS (gate-overmerge on `f1f1513f`).** 3 pre-merge wording fixes are with cs-overmerge, then merge, then the D110 ruling.
+**Verdict, in the gate's words:** "PASS. The figures are fit for the user to rule on. Every headline number I re-derived by a different route matched the proposal. There are no defects."
+
+**Advisories:**
+- **A1, form (a).** The "stats.json byte-identical under A2" cell could not fail, because merge_and_dedupe never writes stats.json. **The gate closed it:** it rendered both copies and they are identical. The cell is to be reworded.
+- **A2, ID shift.** PR #102 merged, so option B's new IDs move +5 (INC-17221.., not INC-17216..) and live rows go 15,671 → 15,686. #102 touched neither the 3 rows, nor scripts/, nor the OWASP ingest. **The foreman states this when presenting D110**; the dated file is not edited for it.
+- **A3.** The measurement doc found 8 rows with round-up text; D97 rewrote 2, leaving the 6. To be reworded.
+- **A4.** A2's regex only matches "round-up" slugs. Add a scope note, and a regression test if A2 is ruled.
+- **A5, not independently re-derived:** the per-branch line trace (the 17/2/1 sum was checked); the 258/203/55 class counts (5 rows spot-checked); the two "probable" existing-row matches.
+
 ### ⚖ D114-D116, USER RULINGS 2026-10-13: OECD/AIID stage 2 (package `docs/audits/stage2-ruling-package-2026-10-13.md`)
 - **D114, (a)+(c): lift the AIID side only, and build suppression (Recommended).**
   - Ship the AIID-side changes now with OECD kept held: about 113 new AIID-only rows, 25 title edits and 169 content changes, re-derived at build time.
