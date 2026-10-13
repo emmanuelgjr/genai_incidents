@@ -63,6 +63,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ a11y fix: **DONE. Gate PASS on `de786cf8`; MERGED to main 2026-10-13 (`--no-ff`)**
+- **Root cause (WS6):** axe `link-in-text-block` (serious), 1 node: the D89 "exceptions" link inside `.trust-strip` (docs/index.html ~:92). Colour was its only cue, because of the global `a { text-decoration: none }`.
+  - **Introduced by the D89 cut-docs fix `ac153bac`** (merged as `00be3a4a`). Every main push since has failed a11y.
+  - **None of the cut gates ran a11y, so the foreman's docs integration shipped an a11y regression.**
+- **Fix:** 2 lines in docs/style.css, `.trust-strip a { text-decoration: underline; ... }`. The D89 content is unchanged.
+- **Gate verdict, in its words:** "VERDICT: PASS (ws6/v2130-a11y-fix @ de786cf8). DEFECTS: none."
+- **Gate evidence:**
+  - dispatch run 38329934070 on de786cf8 passed with 0 violations in all 4 combinations;
+  - **control:** main's run 38329805292 at 4958ac1a fails with the same rule, so the 2 lines are the only difference;
+  - the selector matches exactly 1 link;
+  - merge-tree clean.
+- **Advisories:** pytest and drift were not re-run by the gate (CSS only); hover gives no extra cue (cosmetic).
+- **Follow-up (process):** a11y should be in the pre-publish gate checklist, or the site edits in cut-docs should have triggered it. → **Note for VERSIONING/gates.**
+
 ### 🔧 INGESTION DIAGNOSIS (pipeline-engineer, 2026-10-13): root cause found. **Foreman's premise refuted.**
 - **The refutation, in the engineer's words:** "No past red run was caused by the stage-1 gate." The gate merged 2026-10-12, after every failure.
 - **Cause A, 2026-07-26 to 09-13 (8 runs):** `persist_refresh_state.sh` hit `git checkout -B refresh-state origin/refresh-state` on a `--depth 1` single-branch clone, so the remote branch never existed. Fixed before 09-14.
