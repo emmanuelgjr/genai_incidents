@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D119-D121, USER RULINGS 2026-10-13 (D114 AIID-lift advisories)
+- **D119: accept the INC-00437 / INC-14682 switch from OECD to AIID title (Recommended).** It is consistent with D114's approved 25-title table and lowers OECD-title exposure. The D115 record must state 3,937 → 3,935 and name the two rows.
+- **D120: per-field change report in the refresh PR (Recommended).** Every AIID-driven field change is listed, with row lists for severity, date, corpus, title and attack_vector and an OECD-carrying flag. No auto-blocking; it fails soft to needs-ruling. **It must land before Sun 2026-10-18 04:00 UTC.**
+- **D121: keep fail-closed, with a loud abort (Recommended).** An AIID-side refusal aborts the whole refresh, and the message must say AIAAIC, KEV and the CVE sweep did not ship.
+- **Routing:**
+  - **pe-aiidlift** takes: the defect fix, plus a real 3,935 OECD-title count test that fires; D120; the D121 message; and the **E23 recount** (numbers only, with methods).
+  - **license-auditor** then writes the §1.2a / :100 / NOTICE-DATA surfaces from those figures, on the same branch.
+  - Then a scoped re-gate, then merge.
+
 ### 🔁 D114 AIID lift: **BOUNCE #1 (gate-aiidlift on `62be0943`).** One wording defect, plus user questions.
 **Defect:**
 - The D115 record's `also_recorded.D116` says "keep the existing 3,937 OECD titles … (already true while OECD is held; confirmed by tests/test_d114_aiid_lift.py)".
