@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D105/D106, USER RULINGS 2026-10-13 (precision bounce #2)
+- **D105: apply verbatim + string check (Recommended).** `precisions?` plus a should-fire test, proven to fail on 70dc0290. The foreman verifies and merges, with no third gate reading.
+- **D106: exempt only the design compounds (Recommended).** The exemption is narrowed to the design compounds actually used (precision-first and precision-oriented, grep-derived). -recall, -weighted and -at now count as mentions. Correct the CHANGELOG and code rationale. → Fresh label-scientist `ls-precfix` on the same branch, after merging origin/main.
+
+### 🔍 WS4 refresh repair: fix `2cb81847` for the PR #101 defects. **Whole-branch gate dispatched (gate-refresh).**
+- **AIAAIC root cause:** `Headline` → `Incident headline`; the sheet also gained a title row. Changes:
+  - an alias was added;
+  - `REQUIRED_COLUMNS` failing raises `SchemaDriftError` (exit 1); a missing header row is now an error;
+  - `MIN_YIELD_RATIO = 0.5`, with 0 always failing and the file written only after the check;
+  - the outcome propagates through `steps.ingest_aiaaic.outcome`.
+- **Fresh yield:** 1,509 vs 1,504. +5 rows; AIAAIC2266/1796 upstream edits; 292 owasp_llm reorders with identical sets.
+- **Held inputs** now stash to `$RUNNER_TEMP`, with a `--check-clean` guard before the PR step.
+- **Same empty-result guard** added to KEV, AIRI and the AIID snapshot. OECD (union) and the CVE sweep are left as-is, with reasons.
+- **PR #101's 1.5M-line diff** is a cascade block move: 15,394 entries moved; the serialisation round-trips byte-exact. Not formatting drift.
+- **Specialist checks:** pytest 1112 + 1 xfail; validate and drift clean; actionlint clean on auto-refresh.yml. The fire-proof reverted the 3 production files: 6 fail and 9 error.
+- **The gate is asked:**
+  - can any fresh OECD/AIID byte reach a PR;
+  - its own mutation fire-proofs;
+  - whether a stale AIRI makes every weekly run "fail" and turns the alert into noise;
+  - the D63 alert's input;
+  - merge-tree.
+
 ### ⛔ WS2 precision follow-ups: **BOUNCE #2 (gate-precfu re-gate on `70dc0290`). ESCALATED to the user.**
 **Verdict, in the gate's words:** "This is BOUNCE #2 on the task, so by protocol it goes to the user. The remaining fix is one token and I have already checked it."
 
