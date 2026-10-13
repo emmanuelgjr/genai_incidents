@@ -63,6 +63,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🟢 TEST REFRESH run 38366793761 (from main 2e60e395): **SUCCESS. Refresh PR #102 opened. The first clean refresh since #97 (2026-07-27).** Held for the user.
+**Run:** cve-sweep=success, refresh=success. AIRI was not attempted (D95; not the first Sunday). The run is green.
+
+**Foreman [R], per-entity diff of data/incidents.json, PR head 81cc3db5 vs parent:**
+- **Rows 15,666 → 15,671. 5 added, 0 removed.** The new rows are INC-17216..17220, from AIAAIC2276, 2271, 2270, 2269 and 1782; these are the same 5 the gates predicted.
+- **11 changed:**
+  - 5 KEV: `exploited_in_wild`, `kev_date_added`;
+  - 4 CVE sweep: `status_reason`;
+  - INC-04074 (AIAAIC1796): `affected`, `description`;
+  - INC-14603 (AIAAIC2266): `title`.
+
+  The last two are the upstream edits both gates predicted. Only the bookkeeping fields `updated` and `last_seen` moved alongside.
+- **0 OECD/AIID-sourced rows changed** (D66 hold).
+- Row order of the common ids is unchanged.
+- **No `held-pair-inputs/` in the tree.** No OECD/AIID ingest file is touched. The PR's files are AIAAIC sheet, KEV, cve_rejections, the cve-sweep audit and generated surfaces.
+- The INCIDENTS.md diff (about 16.6k lines) is table-line shifting from the inserted rows. Total 15,637 → 15,642 (+5).
+
+**Stale-base check:** the base is 2e60e395. Since then main has changed only PROGRESS.md, SOURCE_LICENSES and the register, with **0 overlap** with the PR's files. merge-tree vs 9c646d36 is clean. GitHub: MERGEABLE (UNSTABLE: only CodeQL ran, all passing).
+
+**→ User decision: merge PR #102?**
+
 ### ✅ D111 headline docs: **PASS (gate-d111 re-gate on `cfdb2035`), MERGED.**
 **Verdict, in the gate's words:** "PASS (re-gate after bounce 1). DEFECTS: none."
 
