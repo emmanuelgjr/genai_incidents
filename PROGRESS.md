@@ -63,6 +63,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🚀 v2.13.0 PUBLISHED 2026-10-13 (steps 6-9)
+- **Pre-publish re-check, in the gate's words:** "VERDICT: PASS (scoped re-check of pre-publish bounce #1, release/v2.13.0-cut @ a11f8954). DEFECTS: none."
+  - **The gate corrected itself:** "the foreman's refutation stands ... I had excluded group C (00497 and 08139) from the v2.11.0 eight, but that group is part of the eight."
+  - It re-derived 16/17 by its own route.
+- **Merge:** release/v2.13.0-cut merged to main as **`9cdaf5e5`** (`--no-ff`).
+  - **Foreman [R] before push:** rebuild porcelain empty; validate rc 0; drift clean; **pytest 1072 passed, 1 xfailed**.
+- **Step 6:** annotated tag `v2.13.0` (tag object 85d0cb9d). **`refs/tags/v2.13.0^{}` = `9cdaf5e5`, the merge commit** (`git ls-remote origin 'refs/tags/v2.13.0*'`). No board commit between the merge and the tag. Tagged 2026-10-13 00:32 UTC, which matches date-released.
+- **Step 7:** GitHub Release published 2026-10-13T00:32:37Z; not a draft, not a prerelease. **Body byte-equal** to docs/releases/v2.13.0.md (API + UTF-8: 42,946 / 42,946).
+- **Step 8:** Zenodo version DOI **10.5281/zenodo.23328791**.
+  - Verified: doi.org returns 302; the record has version 2.13.0, conceptdoi 10.5281/zenodo.20248675 and publication_date 2026-10-13.
+  - **8b:** the notes' DOI paragraph was filled in place, with the v2.12.0 wording and a dated declaration (`3fa025f7`). `gh release edit`, then re-byte-verified: **byte-equal 42,954 / 42,954**, DOI present.
+- **Step 9, registries verified (not just workflows):**
+  - Publish to PyPI succeeded: **PyPI latest 2.13.0**, with a wheel and an sdist.
+  - Publish to Hugging Face succeeded: the HF raw card reads "Dataset version `2.13.0`", with the new OWASP/OECD names.
+  - **Release assets succeeded (D74: first real release verified).** There are 6 assets. **`sha256sum -c SHA256SUMS` passes 5/5**, against assets downloaded by the foreman. build_manifest records commit 9cdaf5e5, built_at 2026-10-13T00:27:00Z (commit-date), dirty False, 15,637 / 29 / 22 / 1,915.
+  - The Pages deploy for 3fa025f7 is running. **The live STIX/TAXII check is pending.**
+
 ### 🔍 Pre-publish bounce #1 fixed at `a11f8954` (notes only, pushed). **Scoped re-check sent.**
 - **D1:** "16 of the 17 gained appended records (24 records in all); `INC-00754` already had one ... and gained none ... reports `group`".
   - **The gate's own two figures were inconsistent, and its "14 of 17" was wrong.** INC-00497 and INC-08139 are among the 17 (silent_ids.py), and both gained records.
