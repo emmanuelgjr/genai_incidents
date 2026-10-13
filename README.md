@@ -285,13 +285,15 @@ See [`schema/incident.schema.json`](https://github.com/emmanuelgjr/genai_inciden
 │   ├── owasp_llm_2025_to_2026.json ← crosswalk for the v2.10.0 code migration
 │   ├── owasp_asi_top10.json
 │   ├── nist_ai_rmf.json
-│   ├── mitre_atlas.json
+│   ├── mitre_atlas.json            ← the pinned ATLAS release (technique/tactic names, deprecations)
+│   ├── atlas_id_translations.json  ← old → new ATLAS id translations used by the ATLAS refresh
 │   ├── cwe_capec.json
 │   ├── cwe_attack_vector.json
 │   ├── veris.json
 │   └── maestro_layers.json
 ├── legacy/                     ← original source files (preserved verbatim)
 ├── ingest/                     ← per-source aggregator outputs (CVE, AIID, ATLAS, etc.)
+│   └── atlas/                  ← the fetched upstream ATLAS release (ATLAS-<release>.yaml) + sha256 provenance
 ├── scripts/
 │   ├── parse_existing.py             ← parse legacy/ → data/legacy_consolidated.json
 │   ├── ingest_external.py            ← parse cloned source repos under ../_external/ → ingest/*.json
@@ -305,7 +307,11 @@ See [`schema/incident.schema.json`](https://github.com/emmanuelgjr/genai_inciden
 │   ├── merge_and_dedupe.py           ← merge legacy + ingest/* → data/incidents.json
 │   ├── render_markdown.py            ← data/incidents.json → INCIDENTS.md + data/stats.json + docs/charts/*.svg
 │   ├── render_docs_stats.py          ← templates data/stats.json's counts into README/DATASHEET/site/CITATION.cff (invariant 6)
-│   ├── check_stats_drift.py          ← CI gate: fails on any doc surface out of sync with data/stats.json, or a hardcoded total
+│   ├── check_stats_drift.py          ← CI gate: fails on a stats.json/corpus mismatch, a doc count out of sync with stats.json, an unmarked hardcoded total, or a stale version literal (Latest-release line, pyproject, .zenodo.json, CITATION.cff, USER_AGENT, INCIDENTS.md, HF card)
+│   ├── fetch_atlas.py                ← the ONE network step of the ATLAS refresh → ingest/atlas/ (via ingest/common.py)
+│   ├── atlas_pin.py                  ← offline: derive mappings/mitre_atlas.json from the fetched release
+│   ├── atlas_entry_delta.py          ← per-entry before/after delta report for an ATLAS refresh
+│   ├── lint_atlas_ids.py             ← `make lint-atlas`: no ATLAS id absent from, or deprecated in, the pinned release
 │   ├── export_stix.py / export_taxii.py / export_misp.py / export_huggingface.py  ← format exporters
 │   └── validate.py                   ← validate JSON against schema
 ├── INCIDENTS.md                ← rendered index: unified table, newest-first
@@ -324,7 +330,7 @@ See [`schema/incident.schema.json`](https://github.com/emmanuelgjr/genai_inciden
 
 ```bash
 pip install -r requirements.txt
-make build      # parse legacy, merge + dedupe, render, template doc stats (invariant 6), validate
+make build      # parse legacy, merge + dedupe, render, template doc stats (invariant 6), validate, lint-atlas
 make test       # pytest tests/
 make ingest-all # (heavy: refresh AIID/AIRI/AIAAIC/OECD AIM/NVD from network)
 ```
@@ -336,7 +342,7 @@ python scripts/parse_existing.py     # legacy/ -> data/legacy_consolidated.json
 python scripts/merge_and_dedupe.py   # legacy + ingest/* -> data/incidents.json
 python scripts/render_markdown.py    # data/incidents.json -> INCIDENTS.md + docs/incidents/<year>.md + data/stats.json
 python scripts/render_docs_stats.py  # data/stats.json -> templated counts in README/DATASHEET/site/CITATION.cff
-python scripts/check_stats_drift.py  # CI gate: fails on drift or an unmarked hardcoded total
+python scripts/check_stats_drift.py  # CI gate: fails on stats/corpus mismatch, doc-count drift, an unmarked hardcoded total or a stale version literal
 python scripts/validate.py           # schema check
 ```
 
