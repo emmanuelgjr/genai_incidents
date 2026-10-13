@@ -63,6 +63,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D114 AIID-side lift: **MERGED** (tip `6768e889`, HEAD^2 verified), closed under D122. Main has **15,784 rows / incident_count 15,755**.
+- **Gate history:**
+  - BOUNCE #1: the D115 record's false 3,937 claim.
+  - BOUNCE #2: the README release clause; the SOURCE_LICENSES content-hold wording.
+  - Every data and mechanics check passed both times, including reproduction from main and mutations (a)-(f).
+- **Foreman [R] under D122, on a fresh GitHub clone at 6768e889:**
+  - **String check:** the D122 README:144 text ×1 and SOURCE_LICENSES:100 text ×1; the old wordings ×0.
+  - **Data unchanged since fdc3d2fa:** `git diff fdc3d2fa HEAD -- data/ ingest/` is empty.
+  - **D123 cap, by my own route:** a synthetic 196,029-character pr-body.md through the real `cap_pr_body.py` comes out at 59,981 characters (<65,536), with the head kept and the note present.
+  - **Mutation:** `if len(..) <= max` → `if True` in cap_pr_body.py makes **2 tests fail**. Restored.
+  - **Merged with current main:** full pytest **1273 passed + 1 xfail**; drift clean; validate OK.
+- **⚠ Not gated by a reviewer:** the D123 size-cap code. It was verified by the foreman's own route only, per the D122 closing route. A reviewer may audit it later.
+- **On main after the merge:** validate rc 0; drift clean.
+- **What happens next:**
+  - **Sunday 2026-10-18 04:00 UTC:** the first scheduled refresh under D114. It will fetch a newer AIID snapshot. The standing class admits new AIID rows, own-title edits and content changes; the D120 report lists them in the PR; OECD stays held.
+  - The D63 overdue alert should clear now that PR #102 merged.
+  - **Binding:** suppression (A3) before any OECD lift.
+
 ### ⚖ D122/D123, USER RULINGS 2026-10-13 (D114 bounce #2)
 - **D122: apply verbatim + string check (Recommended).** The gate's exact README:144 and SOURCE_LICENSES:100 text is applied. The foreman string-checks, re-runs drift and the tests, and merges. No third gate reading.
 - **D123: add a PR-body size cap now (Recommended).** The D120 report is truncated with a note, the full report goes to the step summary or an artifact, and the whole pr-body.md is guarded below GitHub's 65,536-character limit. Tests must be proven to fire.
