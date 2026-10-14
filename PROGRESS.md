@@ -83,6 +83,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔨 D130-1 — `unverified` status machinery (WS3): **DISPATCHED 2026-10-14** to schema-architect on `ws3/d130-1-unverified-status-2026-10-14` (worktree `C:/repos/gi-wt-d130`, base `e91b61ae`). No data rows change; only intended data delta `unverified_count: 0`; fixture tests mutation-proven at every retracted-handling site.
+
 ### ✅ D129: **PASS (gate-d129 on `0bf6c002`), MERGED to main 2026-10-14 (`--no-ff`, HEAD^2 = `0bf6c002`)**
 **Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none." Gate premise correction: branch merge-base is `af39a62f`, not `fd81080b` (the two-dot diff's 951 deletions are main-side board/audit commits; three-dot and merge-tree touch only the 3 files).
 
