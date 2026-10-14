@@ -483,8 +483,9 @@ def cve_disjoint(a: dict, b: dict) -> bool:
     (URL / fuzzy-title) merges must never bridge them (#36). (Aggregate
     round-up URLs are refused separately by ``is_aggregate_url`` because
     their rows carry no CVEs and this predicate is vacuous for them, D117.)
-    CVE-key and source_id-key merges are unaffected: a shared identity key implies the
-    sets are not disjoint or the rows are the same upstream record.
+    CVE-key and source_id-key merges are unaffected: a shared identity key
+    implies the sets are not disjoint or the rows are the same upstream
+    record.
     """
     ca, cb = set(a.get("cve_ids") or []), set(b.get("cve_ids") or [])
     return bool(ca) and bool(cb) and not (ca & cb)
@@ -2094,16 +2095,17 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. EVERY
-# refresh-gate refusal carries this sentence (hardening batch, advisory A1):
-#   _check_refresh_merge_authorization   the merge/retitle/add/title-edit/content gate
-#   _check_oecd_lift_precondition        the OECD-lift precondition
-#   _load_refresh_merge_approvals        4 refusals (unreadable, unsigned, hash
-#                                        mismatch, hash not pinned in code)
-#   _load_gate_baseline                  4 refusals (unparseable/empty baseline,
-#                                        shallow repo, history-but-no-HEAD file,
-#                                        no git + no baseline)
-# tests/test_d121_loud_abort.py enumerates all 10 and fails if one drops it.
+# D121 (user ruling 2026-10-13), widened by D126: fail-closed stays, as a LOUD
+# abort. EVERY abort in this file -- the refresh-gate refusals, the approval
+# loader's refusals (including a malformed signed entry), the ruled-appends
+# SystemExits, SplitAuthorizationError and the legacy-missing guard -- carries
+# this sentence. Every abort here is reachable from main(), which is the refresh
+# path, and each fires before any output write, so the sentence is always true.
+# The enumeration is NOT kept here (a count in a comment goes stale):
+# tests/test_d121_loud_abort.py::test_every_abort_in_the_file_carries_the_sentence
+# scans the AST for every raise / exit call / assert and fails on any that lacks
+# it; a deliberately exempt abort must be added to its ABORT_ALLOWLIST with a
+# written justification.
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
     "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "

@@ -182,15 +182,45 @@ def test_each_trigger_really_reaches_its_refusal_when_sentence_blanked(trigger, 
 # refresh path (the weekly refresh runs this same script); each aborts the whole
 # build before any output write, so the sentence is true for all of them and is
 # carried unconditionally (no refresh-mode conditional to get wrong).
-_EXIT_CALLS = {"exit", "quit", "_exit"}  # sys.exit / exit / quit / os._exit
+_EXIT_CALLS = {"exit", "quit", "_exit", "abort"}  # sys.exit / exit / quit / os._exit / os.abort
 # Explicit, justified allowlist of aborts exempt from the sentence, keyed by
 # (enclosing function, "raise"|"assert"|exit-call name). EMPTY today: there is no
 # non-refresh abort in the file. Adding an entry needs a written justification.
 ABORT_ALLOWLIST: dict[tuple[str, str], str] = {}
 
 
+def _has_sentence_name(node) -> bool:
+    """True iff an ast.Name REFRESH_DID_NOT_SHIP occurs under `node`. Comments,
+    docstrings and string text are NOT nodes of that kind, so they never count."""
+    return any(isinstance(n, ast.Name) and n.id == "REFRESH_DID_NOT_SHIP" for n in ast.walk(node))
+
+
+def _returns_of(fn):
+    """Return statements of `fn` itself (not of functions nested inside it)."""
+    out, stack = [], list(fn.body)
+    while stack:
+        n = stack.pop()
+        if isinstance(n, ast.Return):
+            out.append(n)
+        if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
+            stack.extend(ast.iter_child_nodes(n))
+    return out
+
+
+def _handler_converts(h: ast.ExceptHandler) -> bool:
+    """A handler that can catch AssertionError (bare/Exception/BaseException/
+    AssertionError) and converts it (contains a raise that is not a bare re-raise)."""
+    t = h.type
+    names = ([] if t is None else [e.id for e in t.elts if isinstance(e, ast.Name)] if isinstance(t, ast.Tuple)
+             else [t.id] if isinstance(t, ast.Name) else [])
+    catches = t is None or bool({"Exception", "BaseException", "AssertionError"} & set(names))
+    raises = [n for s in h.body for n in ast.walk(s) if isinstance(n, ast.Raise)]
+    return catches and any(r.exc is not None for r in raises) and not any(r.exc is None for r in raises)
+
+
 def _abort_findings(src: str) -> list[str]:
-    """Return a description of every abort in `src` that lacks the sentence."""
+    """Return a description of every abort in `src` that lacks the sentence.
+    All matching is on AST nodes, never on source text."""
     tree = ast.parse(src)
     parents = {c: p for p in ast.walk(tree) for c in ast.iter_child_nodes(p)}
 
@@ -201,8 +231,22 @@ def _abort_findings(src: str) -> list[str]:
                 return n.name
         return "<module>"
 
-    helpers = {n.name for n in ast.walk(tree)
-               if isinstance(n, ast.FunctionDef) and "REFRESH_DID_NOT_SHIP" in ast.get_source_segment(src, n)}
+    # a helper is compliant only if it returns something and EVERY return carries the Name
+    helpers = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.FunctionDef):
+            rets = [r for r in _returns_of(n) if r.value is not None]
+            if rets and all(_has_sentence_name(r.value) for r in rets):
+                helpers.add(n.name)
+
+    def guarded(node) -> bool:
+        child, p = node, parents.get(node)
+        while p is not None:
+            if isinstance(p, ast.Try) and child in p.body and any(_handler_converts(h) for h in p.handlers):
+                return True
+            child, p = p, parents.get(p)
+        return False
+
     bad = []
     for node in ast.walk(tree):
         seg = ast.get_source_segment(src, node) or ""
@@ -213,24 +257,19 @@ def _abort_findings(src: str) -> list[str]:
             exc = node.exc
             # a bare `raise`, `raise err`, `raise SomeName` fail by design
             ok = (isinstance(exc, ast.Call)
-                  and ("REFRESH_DID_NOT_SHIP" in seg
+                  and (_has_sentence_name(exc)
                        or (isinstance(exc.func, ast.Name) and exc.func.id in helpers)))
             if not ok:
                 bad.append(f"raise without sentence: {where}: {seg[:60]!r}")
         elif isinstance(node, ast.Call):
             f = node.func
             name = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", "")
-            if (name in _EXIT_CALLS and "REFRESH_DID_NOT_SHIP" not in seg
+            if (name in _EXIT_CALLS and not _has_sentence_name(node)
                     and (enclosing_func(node), name) not in ABORT_ALLOWLIST):
                 bad.append(f"exit call without sentence: {where}: {seg[:60]!r}")
         elif isinstance(node, ast.Assert):
-            # only legal as a value check swallowed by an enclosing try/except
-            p, guarded = node, False
-            while p in parents:
-                p = parents[p]
-                if isinstance(p, ast.Try) and p.handlers:
-                    guarded = True
-            if not guarded and (enclosing_func(node), "assert") not in ABORT_ALLOWLIST:
+            # only legal inside a try BODY whose handler catches AssertionError and converts it
+            if not guarded(node) and (enclosing_func(node), "assert") not in ABORT_ALLOWLIST:
                 bad.append(f"unguarded assert: {where}")
     return bad
 
@@ -255,7 +294,7 @@ def test_the_abort_scanner_fires_on_a_new_abort_without_the_sentence(snippet, ex
 
 def test_the_abort_scanner_accepts_a_sentenced_abort_and_a_guarded_assert():
     ok = ('def f():\n    raise SomeNewError("x " + REFRESH_DID_NOT_SHIP)\n'
-          'def g():\n    try:\n        assert 1\n    except Exception:\n        pass\n')
+          'def g():\n    try:\n        assert 1\n    except Exception:\n        raise SystemExit(REFRESH_DID_NOT_SHIP)\n')
     assert _abort_findings(ok) == []
 
 
@@ -349,3 +388,39 @@ def test_wellformed_approvals_and_unknown_kinds_unchanged(tmp_path):
             {"kind": "future-kind", "x": 1}]
     got = m._load_refresh_merge_approvals(_approval(tmp_path, _signed(ents)))
     assert got == {("merge", "A", "B"), ("retitle", "C"), ("add", "S"), ("content", "D")}
+
+
+_PROBES = {
+    "helper_docstring_mentions_sentence": (
+        'def _r(why):\n    """Plain refusal; NOT the REFRESH_DID_NOT_SHIP wording."""\n    return SystemExit(why)\n'
+        'def f():\n    raise _r("x")\n', "raise without sentence"),
+    "helper_dead_branch": (
+        'def _r(why):\n    if False:\n        return SystemExit(REFRESH_DID_NOT_SHIP)\n    return SystemExit(why)\n'
+        'def f():\n    raise _r("x")\n', "raise without sentence"),
+    "raise_main_call": (
+        'def main():\n    raise SystemExit(REFRESH_DID_NOT_SHIP)\ndef f():\n    raise main()\n', "raise without sentence"),
+    "assert_wrong_handler": (
+        'def f(d):\n    try:\n        assert d, "no"\n    except KeyError:\n        pass\n', "unguarded assert"),
+    "assert_in_handler": (
+        'def f(d):\n    try:\n        pass\n    except Exception:\n        assert d\n'
+        '        raise SystemExit(REFRESH_DID_NOT_SHIP)\n', "unguarded assert"),
+    "assert_handler_plain_reraises": (
+        'def f(d):\n    try:\n        assert d\n    except Exception:\n        raise\n', "unguarded assert"),
+    "comment_inside_raise": (
+        'def f():\n    raise SystemExit(\n        "x"  # REFRESH_DID_NOT_SHIP\n    )\n', "raise without sentence"),
+    "os_abort": ('import os\ndef f():\n    os.abort()\n', "exit call without sentence"),
+}
+
+
+@pytest.mark.parametrize("name", list(_PROBES))
+def test_the_abort_scanner_flags_each_gate_probe(name):
+    snippet, expect = _PROBES[name]
+    assert any(expect in b for b in _abort_findings(snippet)), name
+
+
+def test_a_compliant_helper_and_a_converting_assert_are_accepted():
+    ok = ('def _r(why):\n    return SystemExit(why + REFRESH_DID_NOT_SHIP)\n'
+          'def f():\n    raise _r("x")\n'
+          'def g(d):\n    try:\n        assert d\n    except AssertionError:\n'
+          '        raise SystemExit("y" + REFRESH_DID_NOT_SHIP)\n')
+    assert _abort_findings(ok) == []
