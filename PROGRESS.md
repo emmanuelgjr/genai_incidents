@@ -63,6 +63,43 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D128 + D129, USER RULINGS 2026-10-14
+- **D128: a stop after any output write names what was written (Recommended).**
+  - The script tracks the output files it has written.
+  - A stop after the first write lists them and gives the restore hint (`git checkout`).
+  - In the refresh job it still says nothing was published. That is true: the PR step never runs.
+  - The "nothing was written" wording is used only when nothing was written.
+- **D129: queue the fix for a corrupt ingest file (Recommended), after D127 merges.**
+  - Today an unparseable `ingest/*.json` gives only a WARN, the source drops to 0 rows, and the build exits 0 and writes its outputs.
+  - The fix is to fail closed with the job-aware message.
+
+### 🔁 D127: **BOUNCE #1 (gate-d127 on `477a235f`).**
+**Defects:**
+1. **The catch-all says "nothing was written" after files have been written, in both modes.**
+   - Reproduced by making `data/incidents.min.json` a directory. The log shows `wrote id_deprecations.json` and `wrote data/incidents.json`, then a PermissionError with "nothing … was written".
+   - The header comment overclaims for the same reason.
+   - D128 rules on the wording.
+2. **The G5 check misses a direct `sys.exit` in `main()` after a write.** `_EXITS=set()` survives all 103 tests, so the exit-call branch has never been seen to fail.
+3. **`except BaseException` narrowed to `except Exception` survives all 103 tests.** Nothing tests KeyboardInterrupt or other non-Exception stops.
+
+**Gate evidence:**
+- Own subprocess probes in both modes: a corrupt legacy file and a missing legacy file. rc 1, the wording is correct and appears exactly once, the traceback is kept, and nothing is written.
+- 8 of the gate's own mutations are caught.
+- The flag appears only on auto-refresh's merge step. Nothing else consumes the old text.
+- Importers are unaffected.
+- Built twice, byte-identical. drift rc 0. actionlint rc 0 on auto-refresh. pytest 1376 + 1 xfailed. Data diff empty. No strays.
+
+**Advisories:**
+- Further G5 holes: attribute calls, loops, writes inside helpers, shadowed helpers, a raising `__init__`. The ordering is by line number, not execution order.
+- An `abort_sentence()` call inside a ternary.
+- A `GITHUB_ENV` echo of the flag in another workflow.
+- The duplicated "Nothing was written" (cosmetic).
+- An import-time failure gives no sentence.
+- In non-refresh mode, explicit refusals are only lightly tested.
+- **The corrupt-ingest issue: now D129.**
+
+**Routing:** redispatch the D127 specialist with defects 1-3 under D128. A second bounce escalates to the user.
+
 ### ⚖ D127, USER RULING 2026-10-13: catch-all + job-aware wording (Recommended).
 - **G1: a catch-all around `main()`.** Every stop, including an unexpected exception, exits with a message.
 - **G2: job-aware wording.** The weekly refresh sets a flag. In that job the full D121 sentence stays. Every other job (PR CI, cve-enrich, atlas-refresh, local runs) says "build refused; nothing was written".
