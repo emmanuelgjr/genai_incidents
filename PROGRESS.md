@@ -63,6 +63,38 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔁 D126: **BOUNCE #1 (gate-d126 on `dcbf8953`).**
+**Defects:**
+1. **The header comment is now false** (merge_and_dedupe.py:2096-2106). This is the same form as D121's A1.
+   - It says it lists "EVERY refresh-gate refusal" and that the approvals loader has "4 refusals". There are now 7 approval sites, plus the ruled-appends, split and legacy-missing sites.
+   - It says the test "enumerates all 10".
+   - This diff made the comment false, and the specialist left it as it was.
+2. **The H3 scanner has holes, proven on the real file.** The suite still reports 67 passed with each of these in place:
+   - **(a)** The helper check is a text search, so a helper whose *docstring* mentions the sentence but returns a bare SystemExit passes. A `raise main()` passes too.
+   - **(b)** An assert counts as guarded under any try, even `except KeyError`. At runtime that raised a raw AssertionError with no sentence.
+   - **(c)** A comment inside a multi-line raise passes the check.
+   - **(d)** `os.abort` is missing from the exit calls.
+
+**Gate evidence:**
+- The gate counted 21 abort sites itself, and each carries the sentence. Every one runs before the first write (:3436).
+- No other module is reachable that could abort.
+- The committed ruled-appends files load identically under the old and new code (17/17 and 7/7). No approval file is committed, and the pin is still None, so no committed input changes.
+- pytest 1340 + 1 xfailed. Built twice, byte-identical. drift rc 0. Data diff empty. The positive control fires.
+
+**Foreman acknowledges A3/A4 as within D126's intent:**
+- the ruled-appends shape check;
+- rejecting a truthy non-list `entries`;
+- rejecting merge entries whose from/into are not strings.
+
+None of these changes any committed input.
+
+**Advisories, held for the user after merge:**
+- **A1.** Uncaught exceptions (json.loads failures, KeyErrors in main) still abort without the sentence. The gate's proposed fix is a `__main__` wrapper.
+- **A2.** The sentence also fires in PR CI, cve-enrich and atlas-refresh, where "the whole refresh did not ship" is misleading. Wording, or making it conditional on refresh mode, is a ruling for the user.
+- **A5.** A cosmetic over-long line at :485-486.
+
+**Routing:** redispatch pipeline-engineer with defects 1-2 and A5.
+
 ### ⚖ D126, USER RULING 2026-10-13: every refresh abort carries the did-not-ship sentence (Recommended).
 - **Covers advisories H1 and H2:**
   - ruled-appends SystemExit;
