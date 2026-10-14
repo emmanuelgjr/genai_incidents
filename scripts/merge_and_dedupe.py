@@ -2097,28 +2097,36 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13), widened by D126, made job-aware by D127:
-# fail-closed stays, as a LOUD abort. Every stop of this script says so, in
-# wording that is TRUE for the job running it:
-#   * the weekly refresh (auto-refresh.yml sets GENAI_REFRESH_RUN=1 on its
-#     merge step ONLY) gets REFRESH_DID_NOT_SHIP -- the whole refresh did not ship;
-#   * every other job (PR CI, cve-enrich, atlas-refresh, a local `make build`)
-#     gets NON_REFRESH_REFUSED -- a build refused, nothing written. Those jobs
-#     never ship AIAAIC / CISA KEV / the CVE sweep, so claiming they did not
-#     would be false.
-# abort_sentence() picks the wording when called, i.e. at raise time. Two layers
-# carry it: (1) every explicit abort (refusals, approval loader, ruled-appends
-# SystemExits, SplitAuthorizationError, the legacy-missing guard) appends
-# abort_sentence() itself; (2) _run_main(), the `__main__` wrapper, is the
-# catch-all: an unexpected exception (traceback kept visible) or a SystemExit
-# with a str / non-zero code that lacks the sentence exits non-zero with it.
-# The enumeration is NOT kept here (a count in a comment goes stale):
-# tests/test_d121_loud_abort.py::test_every_abort_in_the_file_carries_the_sentence
-# scans the AST for every raise / exit call / assert and fails on any that lacks
-# a call to abort_sentence(); a deliberately exempt abort must be added to its
-# ABORT_ALLOWLIST with a written justification. "Before any output write" is
-# also checked, not asserted in prose: test_every_abort_is_ordered_before_the
-# _first_output_write fails if main() can reach an abort after its first write.
+# D121 (user ruling 2026-10-13), widened by D126, made job-aware by D127 and
+# write-aware by D128: fail-closed stays, as a LOUD abort. Every stop of this
+# script says so, in wording that is TRUE for the job running it AND for how far
+# the build got. The wording is chosen by (job mode x whether any output file was
+# written before the stop):
+#   * nothing written, weekly refresh (auto-refresh.yml sets GENAI_REFRESH_RUN=1
+#     on its merge step ONLY): REFRESH_DID_NOT_SHIP;
+#   * nothing written, any other job (PR CI, cve-enrich, atlas-refresh, local
+#     `make build`): NON_REFRESH_REFUSED ("nothing was written");
+#   * something written, refresh: the whole refresh did not ship and NOTHING WAS
+#     PUBLISHED (the PR step never runs), but it lists the files already
+#     written and the `git checkout --` restore hint -- it does NOT say nothing
+#     was written;
+#   * something written, other job: "partially written", the files, the hint.
+# Every output file is written through _write_output(), which records the path in
+# _WRITTEN BEFORE the write is attempted (a failed write can leave a truncated
+# file). abort_sentence() reads _WRITTEN and the env at raise time. Two layers
+# carry it: (1) every explicit abort appends abort_sentence() itself; (2)
+# _run_main(), the `__main__` wrapper, is the catch-all: an unexpected exception
+# (traceback kept visible) or a SystemExit with a str / non-zero code that lacks
+# the sentence exits non-zero with it.
+# Guarantees, and where each is checked (counts are NOT kept here -- they go stale):
+#   - every explicit abort carries abort_sentence(): tests/test_d121_loud_abort.py
+#     ::test_every_abort_in_the_file_carries_the_sentence (AST scan);
+#   - every explicit abort reachable from main() is ordered before main()'s first
+#     output write: tests/test_d127_job_aware_abort.py (a hard rule today, so the
+#     "nothing was written" wording is what an explicit refusal normally says);
+#   - an UNEXPECTED stop after a write (OSError, KeyboardInterrupt, a KeyError in
+#     _slim_entry) is covered by the tracking, not by ordering: main() performs
+#     no raw write, only _write_output, and that records before it writes.
 REFRESH_RUN_ENV = "GENAI_REFRESH_RUN"
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
@@ -2126,11 +2134,46 @@ REFRESH_DID_NOT_SHIP = (
     "the AIID snapshot. The cause is the refusal listed here."
 )
 NON_REFRESH_REFUSED = "Build refused; nothing was written. The cause is the refusal listed here."
+_WRITTEN: list[str] = []  # output paths written (or begun) in this process, in order
+
+
+def _rel(path: Path) -> str:
+    try:
+        return Path(path).resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _write_output(path: Path, text: str) -> None:
+    """The ONLY way main() writes an output file: record, then write."""
+    if _rel(path) not in _WRITTEN:
+        _WRITTEN.append(_rel(path))
+    Path(path).write_text(text, encoding="utf-8", newline="\n")
+
+
+def _nothing_written() -> str:
+    """The legacy suffix, only while it is true (D128)."""
+    return "" if _WRITTEN else " Nothing was written."
 
 
 def abort_sentence() -> str:
-    """The job-aware abort sentence, evaluated at raise time (env read each call)."""
-    return REFRESH_DID_NOT_SHIP if os.environ.get(REFRESH_RUN_ENV) == "1" else NON_REFRESH_REFUSED
+    """The job-aware, write-aware abort sentence, evaluated at raise time."""
+    refresh = os.environ.get(REFRESH_RUN_ENV) == "1"
+    if not _WRITTEN:
+        return REFRESH_DID_NOT_SHIP if refresh else NON_REFRESH_REFUSED
+    files = ", ".join(_WRITTEN)
+    hint = f"Restore the working tree with: git checkout -- {' '.join(_WRITTEN)}."
+    if refresh:
+        return (
+            "THE WHOLE REFRESH DID NOT SHIP: this build stopped after writing some outputs, so nothing "
+            "from this run was published -- the PR step never runs: not AIAAIC, not CISA KEV, not the CVE "
+            "rejection sweep or its retractions, and not the AIID snapshot. Files already written in the "
+            f"working tree: {files}. {hint} The cause is the stop listed here."
+        )
+    return (
+        f"Build stopped partway; outputs were PARTIALLY written: {files}. {hint} "
+        "The cause is the stop listed here."
+    )
 
 
 class RefreshMergeApprovalError(SystemExit):
@@ -2263,7 +2306,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         except Exception as exc:  # noqa: BLE001 - any failure is the same fail-closed outcome
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: the published baseline ({where}) is missing, empty or "
-                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. " + abort_sentence() + " Nothing was written."
+                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. " + abort_sentence() + _nothing_written()
             )
         return inc
 
@@ -2278,14 +2321,14 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} in a shallow (or unreadable) "
                 "repository, so a first build cannot be told from a deleted file; the refresh gate "
-                "cannot run. " + abort_sentence() + " Nothing was written."
+                "cannot run. " + abort_sentence() + _nothing_written()
             )
         hist = _git(root, "log", "--oneline", "-1", "--all", "--", rel)
         if hist.returncode == 0 and not hist.stdout.strip():
             return [], True  # git repo, file never committed: first-ever build
         raise RefreshBaselineError(
             f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} although it has history "
-            f"(rc={shown.returncode}); the refresh gate cannot run. " + abort_sentence() + " Nothing was written."
+            f"(rc={shown.returncode}); the refresh gate cannot run. " + abort_sentence() + _nothing_written()
         )
     path = root / rel
     if path.exists():
@@ -2294,7 +2337,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         return [], True
     raise RefreshBaselineError(
         f"[FATAL] D42/D25(a)+D71: {path} is missing and there is no git history to say whether this "
-        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. " + abort_sentence() + " Nothing was written."
+        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. " + abort_sentence() + _nothing_written()
     )
 
 
@@ -2484,7 +2527,7 @@ def _check_refresh_merge_authorization(
             "that the user has not approved "
             f"({len(problems)}):{nl}" + nl.join(problems[:25])
             + (f"{nl}..." if len(problems) > 25 else "")
-            + chr(10) + abort_sentence() + " Nothing was written. This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
+            + chr(10) + abort_sentence() + _nothing_written() + " This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
             "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
             f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
             "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
@@ -2543,7 +2586,7 @@ def _check_oecd_lift_precondition(
             "[FATAL] D114 binding precondition: a held OECD-side input differs from HEAD, "
             "but suppression (A3) has not been built and gated: " + why + ". Lifting OECD "
             "without suppression turns the 12 AIID hub rows into permanent merges (29 "
-            "instead of 7). " + abort_sentence() + " Nothing was written. The OECD inputs stay held until a gated "
+            "instead of 7). " + abort_sentence() + _nothing_written() + " The OECD inputs stay held until a gated "
             "suppression mechanism lands (see docs/audits/stage2-ruling-package-2026-10-13.md "
             "section 2(a), A2 Forward risk, and PROGRESS.md D114)."
         )
@@ -2726,6 +2769,7 @@ def resolve_live_targets(
 
 
 def main():
+    _WRITTEN.clear()  # D128: a run starts with nothing written (in-process callers reuse the module)
     # 0) Load the previous output: timestamps, the id-by-key map (so stable
     #    INC-* IDs survive a rebuild), and the monotonic ID counter.
     prev_ts, prev_id_by_key, next_id = _load_prev_state()
@@ -3455,14 +3499,13 @@ def main():
                         removed_terminal.add(f)
                         changed = True
     if deprecations_all:
-        DEPRECATIONS_PATH.write_text(
+        _write_output(
+            DEPRECATIONS_PATH,
             json.dumps(
                 {"deprecations": deprecations_all},
                 indent=2,
                 ensure_ascii=False,
             ),
-            encoding="utf-8",
-            newline="\n",
         )
         print(f"[output] wrote {DEPRECATIONS_PATH.name} ({len(deprecations_all)} entries)")
 
@@ -3487,11 +3530,7 @@ def main():
         "retracted_count": n_retracted,
         "incidents": deduped,
     }
-    (DATA / "incidents.json").write_text(
-        json.dumps(out, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-        newline="\n",
-    )
+    _write_output(DATA / "incidents.json", json.dumps(out, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.json")
 
     # Slim variant — used by the static site for filtering and inline
@@ -3570,11 +3609,7 @@ def main():
         "retracted_count": n_retracted,
         "incidents": [_slim_entry(e) for e in deduped],
     }
-    (DATA / "incidents.min.json").write_text(
-        json.dumps(slim, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-        newline="\n",
-    )
+    _write_output(DATA / "incidents.min.json", json.dumps(slim, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.min.json")
 
     # 6) Print taxonomy coverage summary

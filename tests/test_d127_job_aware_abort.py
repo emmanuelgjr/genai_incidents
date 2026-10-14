@@ -272,8 +272,12 @@ def abort_after_write(src: str, entry: str = "main") -> list[str]:
                     isinstance(a, ast.Constant) and isinstance(a.value, str) and set(a.value) & set("wax+")
                     for a in n.args[1:2] + [k.value for k in n.keywords if k.arg == "mode"]):
                 writes.append(n.lineno)
+            elif isinstance(f, ast.Name) and f.id == "_write_output":
+                writes.append(n.lineno)
             elif isinstance(f, ast.Name) and f.id in capable and f.id != entry:
                 aborts.append((n.lineno, f"call to abort-capable {f.id}()"))
+            if (f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", "")) in _EXITS:
+                aborts.append((n.lineno, "direct exit call"))
         elif (isinstance(n, ast.Raise) and n.exc is not None) or isinstance(n, ast.Assert):
             aborts.append((n.lineno, "direct raise/assert"))
     if not writes:
@@ -296,6 +300,10 @@ _G5_PROBES = {
     "transitive_after_write": (
         'def _inner():\n    raise SystemExit("x")\ndef _outer():\n    _inner()\n'
         'def main():\n    json.dump(1, f)\n    _outer()\n'),
+    "sys_exit_after_write": (
+        'def main():\n    P.write_text("a")\n    sys.exit(2)\n'),
+    "write_output_then_exit": (
+        'def main():\n    _write_output(P, "a")\n    quit()\n'),
     "assert_after_open_w": (
         'def main():\n    open("p", "w")\n    assert 1\n'),
 }
@@ -309,3 +317,196 @@ def test_the_write_ordering_check_fires(name):
 def test_the_write_ordering_check_accepts_abort_before_write():
     ok = 'def _check():\n    raise SystemExit("x")\ndef main():\n    _check()\n    P.write_text("a")\n'
     assert abort_after_write(ok) == []
+
+
+# ---- D128 (user ruling): a stop after any write names what was written ----
+@pytest.fixture(autouse=True)
+def _fresh_written(monkeypatch):
+    monkeypatch.setattr(m, "_WRITTEN", [])
+
+
+PATHS = ["data/incidents.json", "data/incidents.min.json"]
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_catch_all_also_catches_a_non_exception_baseexception(refresh, monkeypatch):
+    """KeyboardInterrupt is a BaseException, not an Exception: `except Exception`
+    would let it escape the sentence."""
+    _env(monkeypatch, refresh)
+    try:
+        with pytest.raises(SystemExit) as ei:
+            _run_with(monkeypatch, KeyboardInterrupt())
+    except KeyboardInterrupt:
+        pytest.fail("KeyboardInterrupt escaped the catch-all")
+    assert "KeyboardInterrupt" in str(ei.value.code) and m.abort_sentence() in str(ei.value.code)
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_sentence_before_any_write_is_the_d127_wording(refresh, monkeypatch):
+    _env(monkeypatch, refresh)
+    assert m.abort_sentence() == (m.REFRESH_DID_NOT_SHIP if refresh else m.NON_REFRESH_REFUSED)
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_sentence_after_a_write_names_files_and_restore_hint(refresh, monkeypatch):
+    _env(monkeypatch, refresh)
+    monkeypatch.setattr(m, "_WRITTEN", list(PATHS))
+    msg = m.abort_sentence()
+    assert "nothing was written" not in msg.lower() and "nothing from this run was written" not in msg
+    assert all(p in msg for p in PATHS)
+    assert "git checkout -- " + " ".join(PATHS) in msg
+    if refresh:
+        assert FULL in msg and "nothing from this run was published" in msg and "AIAAIC" in msg
+    else:
+        assert "PARTIALLY written" in msg
+        assert not any(w in msg for w in ("AIAAIC", "CISA KEV", "CVE rejection sweep", FULL))
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_explicit_refusal_and_catch_all_use_the_write_aware_sentence(refresh, monkeypatch):
+    _env(monkeypatch, refresh)
+    monkeypatch.setattr(m, "_WRITTEN", ["data/incidents.json"])
+    with pytest.raises(m.OecdLiftPreconditionError) as ei:
+        m._check_oecd_lift_precondition(True)
+    assert "data/incidents.json" in str(ei.value) and "nothing was written" not in str(ei.value).lower()
+    with pytest.raises(SystemExit) as ei:
+        _run_with(monkeypatch, KeyError("k"))
+    assert "data/incidents.json" in str(ei.value.code) and "nothing was written" not in str(ei.value.code).lower()
+
+
+def test_write_output_records_before_it_writes(tmp_path, monkeypatch):
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    target = tmp_path / "d"
+    target.mkdir()
+    with pytest.raises(OSError):
+        m._write_output(target, "x")  # a directory: the write itself fails
+    assert m._WRITTEN == ["d"]  # ...and it is still listed (a failed write can leave a partial file)
+    m._write_output(tmp_path / "f.json", "x")
+    m._write_output(tmp_path / "f.json", "y")
+    assert m._WRITTEN == ["d", "f.json"]  # no duplicates
+    assert (tmp_path / "f.json").read_text() == "y"
+
+
+def raw_writes_in_main(src: str) -> tuple[list[int], int]:
+    """(line numbers of raw write calls in main(), count of _write_output calls)."""
+    main = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "main")
+    raw, tracked = [], 0
+    for n in ast.walk(main):
+        if isinstance(n, ast.Call):
+            f = n.func
+            if isinstance(f, ast.Attribute) and f.attr in {"write_text", "write_bytes", "write", "dump"}:
+                raw.append(n.lineno)
+            if isinstance(f, ast.Name) and f.id == "open":
+                raw.append(n.lineno)
+            if isinstance(f, ast.Name) and f.id == "_write_output":
+                tracked += 1
+    return raw, tracked
+
+
+def test_main_writes_only_through_write_output():
+    """Make it impossible to add an untracked write: main() contains no raw write
+    call, and every output goes through _write_output, which records first."""
+    src = Path(m.__file__).read_text(encoding="utf-8")
+    raw, tracked = raw_writes_in_main(src)
+    assert raw == []
+    assert tracked >= 3  # id_deprecations.json, incidents.json, incidents.min.json
+    wo = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "_write_output")
+    appends = [n.lineno for n in ast.walk(wo) if isinstance(n, ast.Call)
+               and isinstance(n.func, ast.Attribute) and n.func.attr == "append"]
+    writes = [n.lineno for n in ast.walk(wo) if isinstance(n, ast.Call)
+              and isinstance(n.func, ast.Attribute) and n.func.attr == "write_text"]
+    assert appends and writes and max(appends) < min(writes)  # recorded BEFORE the write
+
+
+@pytest.mark.parametrize("snippet", [
+    'def main():\n    P.write_text("a")\n',
+    'def main():\n    json.dump(1, f)\n',
+    'def main():\n    open("p", "w")\n',
+])
+def test_raw_write_probe_is_detected(snippet):
+    assert raw_writes_in_main(snippet)[0] != []
+
+
+@pytest.fixture(scope="module")
+def full_tree(tmp_path_factory):
+    """A scratch repo built from the COMMITTED tree (git archive HEAD) with this
+    working tree's scripts/ copied over it, a baseline commit, and legacy rebuilt --
+    so merge_and_dedupe.py runs a real build. data/incidents.min.json is then
+    replaced by a DIRECTORY so the third output write fails (the gate's repro)."""
+    root = tmp_path_factory.mktemp("d128_full")
+    specs = ["scripts", "data", "ingest", "mappings", "schema", "legacy",
+             "docs/audits/WS4-T19-authorized-splits-2026-09-18.json",
+             "docs/audits/ID-silent-ids-appends-2026-10-09.json",
+             "docs/audits/ID-group-ids-appends-2026-10-10.json"]
+    import io
+    import tarfile
+    present = [sp for sp in specs if subprocess.run(["git", "ls-tree", "--name-only", "HEAD", "--", sp],
+                                                    cwd=REPO, capture_output=True).stdout.strip()]
+    tar = subprocess.run(["git", "archive", "--format=tar", "HEAD", "--", *present], cwd=REPO,
+                         check=True, capture_output=True).stdout
+    with tarfile.open(fileobj=io.BytesIO(tar)) as tf:
+        tf.extractall(root, **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
+    shutil.rmtree(root / "scripts")
+    shutil.copytree(REPO / "scripts", root / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    r = subprocess.run([sys.executable, str(root / "scripts" / "parse_existing.py")], cwd=root, env=env,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    assert r.returncode == 0, r.stderr[-500:]
+    for args in (("init", "-q"), ("add", "-A"),
+                 ("-c", "user.email=t@e.x", "-c", "user.name=t", "-c", "commit.gpgsign=false",
+                  "commit", "-q", "-m", "baseline")):
+        subprocess.run(["git", *args], cwd=root, check=True, capture_output=True)
+    (root / "data" / "incidents.min.json").unlink()
+    (root / "data" / "incidents.min.json").mkdir()
+    return root
+
+
+@pytest.mark.parametrize("refresh", [True, False])
+def test_e2e_stop_after_writes_lists_the_files(full_tree, refresh):
+    r = _run(full_tree, refresh)
+    err = r.stderr
+    assert r.returncode != 0
+    assert "wrote data/incidents.json" in r.stdout  # the premise: writes really happened first
+    assert "PermissionError" in err or "IsADirectoryError" in err  # original diagnostic kept
+    assert "data/incidents.json" in err and "data/incidents.min.json" in err
+    assert "git checkout -- " in err
+    assert "nothing was written" not in err.lower() and "nothing from this run was written" not in err
+    if refresh:
+        assert FULL in err and "nothing from this run was published" in err
+    else:
+        assert "PARTIALLY written" in err and FULL not in err
+
+
+def test_no_hardcoded_nothing_was_written_claim_outside_the_sentence_helpers():
+    """A literal 'nothing was written' at an abort site would be false after a write."""
+    tree = ast.parse(Path(m.__file__).read_text(encoding="utf-8"))
+    parents = {c: p for p in ast.walk(tree) for c in ast.iter_child_nodes(p)}
+    bad = []
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Constant) and isinstance(n.value, str) and "nothing was written" in n.value.lower():
+            p = n
+            owner = None
+            while p in parents:
+                p = parents[p]
+                if isinstance(p, ast.FunctionDef):
+                    owner = p.name
+                    break
+                if isinstance(p, ast.Assign) and isinstance(p.targets[0], ast.Name):
+                    owner = p.targets[0].id
+                    break
+            if owner not in {"NON_REFRESH_REFUSED", "_nothing_written", "abort_sentence"}:
+                bad.append((n.lineno, owner))
+    assert bad == []
+
+
+def test_main_starts_a_run_with_nothing_written(tmp_path, monkeypatch):
+    """_WRITTEN is module state: an earlier in-process main() must not make a later
+    refusal claim files were written."""
+    _env(monkeypatch, False)
+    monkeypatch.setattr(m, "_WRITTEN", ["stale/from/an/earlier/run.json"])
+    monkeypatch.setattr(m, "DATA", tmp_path)
+    monkeypatch.setattr(m, "_load_prev_state", lambda: ({}, {}, 1))
+    monkeypatch.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
+    with pytest.raises(SystemExit) as ei:
+        m.main()
+    assert "stale/from" not in str(ei.value) and NON in str(ei.value)
