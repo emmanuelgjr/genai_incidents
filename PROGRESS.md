@@ -63,6 +63,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ D126: **PASS (scoped re-gate on `5a03865c`), MERGED (HEAD^2 = `5a03865c` verified).**
+**Verdict, in the gate's words:** "PASS … DEFECTS: none against the ruling or the brief."
+- **Note:** the specialist's written report for the fix never reached the foreman. The commit was gated as unattested and verified from the tree alone.
+
+**Gate evidence:**
+- **Header comment** (:2098-2108). It now names every class of abort, carries no count, and points to `test_every_abort_in_the_file_carries_the_sentence` as the enumeration.
+- **No behaviour change since `dcbf8953`.** The AST is identical once docstrings and comments are ignored.
+- **All 7 bounce-1 probes now fail the suite on the real file:** helper docstring, dead branch, `raise main()`, wrong-handler assert, assert in a handler, comment in a raise, and `os.abort`.
+- **New probes:** an unsentenced variable message and an unsentenced raise...from cause are both caught.
+- **Controls:** the positive control passes, and the real file is clean.
+- **Checks:** pytest 1349 + 1 xfailed. Built twice, byte-identical. drift rc 0. Data diff empty. No strays.
+
+**Foreman [R] on merged main:** drift rc 0; validate rc 0; test_d121_loud_abort 76 passed; porcelain empty.
+
+**Advisories → register:**
+- **G1, a user ruling.** Uncaught exceptions still abort without the sentence. The proposed fix is a `__main__` wrapper, which would also close the static holes by construction.
+- **G2, a user ruling.** The sentence also fires in PR CI, cve-enrich and atlas-refresh.
+- **G3, the realistic hole.** A nested helper with the same name as a compliant one passes the scanner.
+- **G4, adversarial evasions.** A ternary or `or` in a helper, a local rebind of the constant, and an aliased exit function all get past. A static scan cannot close these; G1 is the backstop.
+- **G5.** The comment says every abort comes "before any output write", but no test checks this. It was hand-verified (first write :3436).
+- **G6.** The ruled-appends shape check was acknowledged in bounce #1.
+
 ### 🔁 D126: **BOUNCE #1 (gate-d126 on `dcbf8953`).**
 **Defects:**
 1. **The header comment is now false** (merge_and_dedupe.py:2096-2106). This is the same form as D121's A1.
