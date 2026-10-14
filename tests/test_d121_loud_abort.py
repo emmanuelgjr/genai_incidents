@@ -7,6 +7,12 @@ import pytest
 
 import merge_and_dedupe as m
 
+@pytest.fixture(autouse=True)
+def _refresh_mode(monkeypatch):
+    """This file pins the REFRESH wording; the other mode is tested in test_d127_*."""
+    monkeypatch.setenv(m.REFRESH_RUN_ENV, "1")
+
+
 PREV = [
     {"id": "INC-1", "title": "A", "source_ids": ["AIID-1"]},
     {"id": "INC-2", "title": "B", "source_ids": ["AIID-2"]},
@@ -34,7 +40,7 @@ def test_oecd_lift_refusal_says_the_whole_refresh_did_not_ship():
 
 
 def test_the_check_fires_if_the_sentence_is_dropped(monkeypatch):
-    monkeypatch.setattr(m, "REFRESH_DID_NOT_SHIP", "")
+    monkeypatch.setattr(m, "abort_sentence", lambda: "")
     with pytest.raises(m.OecdLiftPreconditionError) as ei:
         m._check_oecd_lift_precondition(True)
     assert "THE WHOLE REFRESH DID NOT SHIP" not in str(ei.value)
@@ -59,7 +65,7 @@ def test_every_refusal_raise_site_in_source_carries_the_sentence():
         if isinstance(node, ast.Raise) and isinstance(node.exc, ast.Call):
             f = node.exc.func
             if isinstance(f, ast.Name) and f.id in _REFUSALS:
-                sites.append((node.lineno, "REFRESH_DID_NOT_SHIP" in ast.get_source_segment(src, node)))
+                sites.append((node.lineno, "abort_sentence()" in ast.get_source_segment(src, node)))
     assert len(sites) >= 10, sites  # 2 scoped + 4 approval + 4 baseline
     assert [ln for ln, ok in sites if not ok] == []
 
@@ -172,7 +178,7 @@ def test_each_refusal_path_says_whole_refresh_did_not_ship(trigger, tmp_path, mo
 def test_each_trigger_really_reaches_its_refusal_when_sentence_blanked(trigger, tmp_path, monkeypatch):
     """The trigger must reach a refusal (not some other error): with the sentence
     blanked it still raises, and the sentence is gone."""
-    monkeypatch.setattr(m, "REFRESH_DID_NOT_SHIP", "")
+    monkeypatch.setattr(m, "abort_sentence", lambda: "")
     with pytest.raises(m.RefreshMergeApprovalError) as ei:
         trigger(tmp_path, monkeypatch)
     assert SENTENCE not in str(ei.value)
@@ -190,9 +196,12 @@ ABORT_ALLOWLIST: dict[tuple[str, str], str] = {}
 
 
 def _has_sentence_name(node) -> bool:
-    """True iff an ast.Name REFRESH_DID_NOT_SHIP occurs under `node`. Comments,
-    docstrings and string text are NOT nodes of that kind, so they never count."""
-    return any(isinstance(n, ast.Name) and n.id == "REFRESH_DID_NOT_SHIP" for n in ast.walk(node))
+    """True iff a CALL to abort_sentence() occurs under `node`. Comments,
+    docstrings and string text are NOT nodes of that kind, so they never count; the
+    bare REFRESH_DID_NOT_SHIP constant does not count either (D127: it is the
+    refresh-only wording, so using it directly would lie in every other job)."""
+    return any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "abort_sentence"
+               for n in ast.walk(node))
 
 
 def _returns_of(fn):
@@ -232,12 +241,14 @@ def _abort_findings(src: str) -> list[str]:
         return "<module>"
 
     # a helper is compliant only if it returns something and EVERY return carries the Name
-    helpers = set()
+    # (G3) ...and a NAME is a compliant helper only if EVERY def with that name is
+    # compliant: a non-compliant nested def sharing the name must not borrow it.
+    defs: dict[str, list[bool]] = {}
     for n in ast.walk(tree):
-        if isinstance(n, ast.FunctionDef):
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
             rets = [r for r in _returns_of(n) if r.value is not None]
-            if rets and all(_has_sentence_name(r.value) for r in rets):
-                helpers.add(n.name)
+            defs.setdefault(n.name, []).append(bool(rets) and all(_has_sentence_name(r.value) for r in rets))
+    helpers = {name for name, oks in defs.items() if all(oks)}
 
     def guarded(node) -> bool:
         child, p = node, parents.get(node)
@@ -286,6 +297,7 @@ def test_every_abort_in_the_file_carries_the_sentence():
     ('def f():\n    try:\n        pass\n    except Exception:\n        raise\n', "raise without sentence"),
     ('import sys\ndef f():\n    sys.exit("x")\n', "exit call without sentence"),
     ('def f():\n    assert 1 == 2\n', "unguarded assert"),
+    ('REFRESH_DID_NOT_SHIP = "x"\ndef f():\n    raise SystemExit("x " + REFRESH_DID_NOT_SHIP)\n', "raise without sentence"),
 ])
 def test_the_abort_scanner_fires_on_a_new_abort_without_the_sentence(snippet, expect):
     """Mutation proof: the scanner flags each new un-sentenced abort shape."""
@@ -293,8 +305,8 @@ def test_the_abort_scanner_fires_on_a_new_abort_without_the_sentence(snippet, ex
 
 
 def test_the_abort_scanner_accepts_a_sentenced_abort_and_a_guarded_assert():
-    ok = ('def f():\n    raise SomeNewError("x " + REFRESH_DID_NOT_SHIP)\n'
-          'def g():\n    try:\n        assert 1\n    except Exception:\n        raise SystemExit(REFRESH_DID_NOT_SHIP)\n')
+    ok = ('def f():\n    raise SomeNewError("x " + abort_sentence())\n'
+          'def g():\n    try:\n        assert 1\n    except Exception:\n        raise SystemExit(abort_sentence())\n')
     assert _abort_findings(ok) == []
 
 
@@ -370,7 +382,7 @@ def test_d126_each_newly_covered_abort_says_whole_refresh_did_not_ship(trigger, 
 
 @pytest.mark.parametrize("trigger", D126_TRIGGERS)
 def test_d126_triggers_reach_the_abort_when_sentence_blanked(trigger, tmp_path, monkeypatch):
-    monkeypatch.setattr(m, "REFRESH_DID_NOT_SHIP", "")
+    monkeypatch.setattr(m, "abort_sentence", lambda: "")
     with pytest.raises(SystemExit) as ei:
         trigger(tmp_path, monkeypatch)
     assert SENTENCE not in str(ei.value)
@@ -392,22 +404,26 @@ def test_wellformed_approvals_and_unknown_kinds_unchanged(tmp_path):
 
 _PROBES = {
     "helper_docstring_mentions_sentence": (
-        'def _r(why):\n    """Plain refusal; NOT the REFRESH_DID_NOT_SHIP wording."""\n    return SystemExit(why)\n'
+        'def _r(why):\n    """Plain refusal; NOT the abort_sentence() wording."""\n    return SystemExit(why)\n'
         'def f():\n    raise _r("x")\n', "raise without sentence"),
     "helper_dead_branch": (
-        'def _r(why):\n    if False:\n        return SystemExit(REFRESH_DID_NOT_SHIP)\n    return SystemExit(why)\n'
+        'def _r(why):\n    if False:\n        return SystemExit(abort_sentence())\n    return SystemExit(why)\n'
         'def f():\n    raise _r("x")\n', "raise without sentence"),
     "raise_main_call": (
-        'def main():\n    raise SystemExit(REFRESH_DID_NOT_SHIP)\ndef f():\n    raise main()\n', "raise without sentence"),
+        'def main():\n    raise SystemExit(abort_sentence())\ndef f():\n    raise main()\n', "raise without sentence"),
     "assert_wrong_handler": (
         'def f(d):\n    try:\n        assert d, "no"\n    except KeyError:\n        pass\n', "unguarded assert"),
     "assert_in_handler": (
         'def f(d):\n    try:\n        pass\n    except Exception:\n        assert d\n'
-        '        raise SystemExit(REFRESH_DID_NOT_SHIP)\n', "unguarded assert"),
+        '        raise SystemExit(abort_sentence())\n', "unguarded assert"),
     "assert_handler_plain_reraises": (
         'def f(d):\n    try:\n        assert d\n    except Exception:\n        raise\n', "unguarded assert"),
     "comment_inside_raise": (
         'def f():\n    raise SystemExit(\n        "x"  # REFRESH_DID_NOT_SHIP\n    )\n', "raise without sentence"),
+    "same_name_noncompliant_nested_helper": (
+        'def _r(why):\n    return SystemExit(why + abort_sentence())\n'
+        'def outer():\n    def _r(why):\n        return SystemExit(why)\n    raise _r("x")\n',
+        "raise without sentence"),
     "os_abort": ('import os\ndef f():\n    os.abort()\n', "exit call without sentence"),
 }
 
@@ -419,8 +435,8 @@ def test_the_abort_scanner_flags_each_gate_probe(name):
 
 
 def test_a_compliant_helper_and_a_converting_assert_are_accepted():
-    ok = ('def _r(why):\n    return SystemExit(why + REFRESH_DID_NOT_SHIP)\n'
+    ok = ('def _r(why):\n    return SystemExit(why + abort_sentence())\n'
           'def f():\n    raise _r("x")\n'
           'def g(d):\n    try:\n        assert d\n    except AssertionError:\n'
-          '        raise SystemExit("y" + REFRESH_DID_NOT_SHIP)\n')
+          '        raise SystemExit("y" + abort_sentence())\n')
     assert _abort_findings(ok) == []

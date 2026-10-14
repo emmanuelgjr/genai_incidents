@@ -16,6 +16,8 @@ import json
 import os
 import re
 import subprocess
+import sys
+import traceback
 from pathlib import Path
 from datetime import date, datetime, timezone
 from collections import defaultdict
@@ -1392,10 +1394,10 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
-        raise SystemExit(f"[ruled-appends] {path}: unreadable: {exc} " + REFRESH_DID_NOT_SHIP) from exc
+        raise SystemExit(f"[ruled-appends] {path}: unreadable: {exc} " + abort_sentence()) from exc
     if not isinstance(data, dict) or not isinstance(data.get("entries") or [], list):
         raise SystemExit(
-            f"[ruled-appends] {path}: top level is not an object with an `entries` list. " + REFRESH_DID_NOT_SHIP
+            f"[ruled-appends] {path}: top level is not an object with an `entries` list. " + abort_sentence()
         )
     out: list[dict] = []
     for n, entry in enumerate(data.get("entries") or []):
@@ -1409,7 +1411,7 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
             or set(rec) - _RULED_RECORD_KEYS
         ):
             raise SystemExit(
-                f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r} " + REFRESH_DID_NOT_SHIP
+                f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r} " + abort_sentence()
             )
         out.append(dict(rec))
     return out
@@ -2095,22 +2097,83 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13), widened by D126: fail-closed stays, as a LOUD
-# abort. EVERY abort in this file -- the refresh-gate refusals, the approval
-# loader's refusals (including a malformed signed entry), the ruled-appends
-# SystemExits, SplitAuthorizationError and the legacy-missing guard -- carries
-# this sentence. Every abort here is reachable from main(), which is the refresh
-# path, and each fires before any output write, so the sentence is always true.
-# The enumeration is NOT kept here (a count in a comment goes stale):
-# tests/test_d121_loud_abort.py::test_every_abort_in_the_file_carries_the_sentence
-# scans the AST for every raise / exit call / assert and fails on any that lacks
-# it; a deliberately exempt abort must be added to its ABORT_ALLOWLIST with a
-# written justification.
+# D121 (user ruling 2026-10-13), widened by D126, made job-aware by D127 and
+# write-aware by D128: fail-closed stays, as a LOUD abort. Every stop of this
+# script says so, in wording that is TRUE for the job running it AND for how far
+# the build got. The wording is chosen by (job mode x whether any output file was
+# written before the stop):
+#   * nothing written, weekly refresh (auto-refresh.yml sets GENAI_REFRESH_RUN=1
+#     on its merge step ONLY): REFRESH_DID_NOT_SHIP;
+#   * nothing written, any other job (PR CI, cve-enrich, atlas-refresh, local
+#     `make build`): NON_REFRESH_REFUSED ("nothing was written");
+#   * something written, refresh: the whole refresh did not ship and NOTHING WAS
+#     PUBLISHED (the PR step never runs), but it lists the files already
+#     written and the `git checkout --` restore hint -- it does NOT say nothing
+#     was written;
+#   * something written, other job: "partially written", the files, the hint.
+# Every output file is written through _write_output(), which records the path in
+# _WRITTEN BEFORE the write is attempted (a failed write can leave a truncated
+# file). abort_sentence() reads _WRITTEN and the env at raise time. Two layers
+# carry it: (1) every explicit abort appends abort_sentence() itself; (2)
+# _run_main(), the `__main__` wrapper, is the catch-all: an unexpected exception
+# (traceback kept visible) or a SystemExit with a str / non-zero code that lacks
+# the sentence exits non-zero with it.
+# Guarantees, and where each is checked (counts are NOT kept here -- they go stale):
+#   - every explicit abort carries abort_sentence(): tests/test_d121_loud_abort.py
+#     ::test_every_abort_in_the_file_carries_the_sentence (AST scan);
+#   - every explicit abort reachable from main() is ordered before main()'s first
+#     output write: tests/test_d127_job_aware_abort.py (a hard rule today, so the
+#     "nothing was written" wording is what an explicit refusal normally says);
+#   - an UNEXPECTED stop after a write (OSError, KeyboardInterrupt, a KeyError in
+#     _slim_entry) is covered by the tracking, not by ordering: main() performs
+#     no raw write, only _write_output, and that records before it writes.
+REFRESH_RUN_ENV = "GENAI_REFRESH_RUN"
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
     "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "
     "the AIID snapshot. The cause is the refusal listed here."
 )
+NON_REFRESH_REFUSED = "Build refused; nothing was written. The cause is the refusal listed here."
+_WRITTEN: list[str] = []  # output paths written (or begun) in this process, in order
+
+
+def _rel(path: Path) -> str:
+    try:
+        return Path(path).resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _write_output(path: Path, text: str) -> None:
+    """The ONLY way main() writes an output file: record, then write."""
+    if _rel(path) not in _WRITTEN:
+        _WRITTEN.append(_rel(path))
+    Path(path).write_text(text, encoding="utf-8", newline="\n")
+
+
+def _nothing_written() -> str:
+    """The legacy suffix, only while it is true (D128)."""
+    return "" if _WRITTEN else " Nothing was written."
+
+
+def abort_sentence() -> str:
+    """The job-aware, write-aware abort sentence, evaluated at raise time."""
+    refresh = os.environ.get(REFRESH_RUN_ENV) == "1"
+    if not _WRITTEN:
+        return REFRESH_DID_NOT_SHIP if refresh else NON_REFRESH_REFUSED
+    files = ", ".join(_WRITTEN)
+    hint = f"Restore the working tree with: git checkout -- {' '.join(_WRITTEN)}."
+    if refresh:
+        return (
+            "THE WHOLE REFRESH DID NOT SHIP: this build stopped after writing some outputs, so nothing "
+            "from this run was published -- the PR step never runs: not AIAAIC, not CISA KEV, not the CVE "
+            "rejection sweep or its retractions, and not the AIID snapshot. Files already written in the "
+            f"working tree: {files}. {hint} The cause is the stop listed here."
+        )
+    return (
+        f"Build stopped partway; outputs were PARTIALLY written: {files}. {hint} "
+        "The cause is the stop listed here."
+    )
 
 
 class RefreshMergeApprovalError(SystemExit):
@@ -2152,7 +2215,7 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
         doc = json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, OSError) as exc:
         raise RefreshMergeApprovalError(
-            f"[FATAL] {path} exists but is unreadable ({exc}); refusing to build. " + REFRESH_DID_NOT_SHIP
+            f"[FATAL] {path} exists but is unreadable ({exc}); refusing to build. " + abort_sentence()
         )
     entries = doc.get("entries") if isinstance(doc, dict) else None
     auth = doc.get("authorization") if isinstance(doc, dict) else None
@@ -2163,12 +2226,12 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
         raise RefreshMergeApprovalError(
             f"[FATAL] {path} lists {len(entries)} approved change(s) but has no "
             "`authorization` marker with a decision id and ruled_by == 'user'. "
-            "File presence authorizes nothing. " + REFRESH_DID_NOT_SHIP
+            "File presence authorizes nothing. " + abort_sentence()
         )
     if auth.get("entries_sha256") != _refresh_merge_entries_sha256(entries):
         raise RefreshMergeApprovalError(
             f"[FATAL] {path}: authorization.entries_sha256 does not match its "
-            "entries -- the list was edited after it was ruled on. " + REFRESH_DID_NOT_SHIP
+            "entries -- the list was edited after it was ruled on. " + abort_sentence()
         )
     if Path(path).resolve() == REFRESH_MERGE_APPROVAL_PATH.resolve() and (
         REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256 is None
@@ -2178,14 +2241,14 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
             f"[FATAL] {path}: the entries hash is not the one pinned in code "
             "(REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256). A ruling is recorded by "
             "pinning its hash in the same commit; recomputing the file's own "
-            "hash after an edit is exactly what the pin exists to refuse. " + REFRESH_DID_NOT_SHIP
+            "hash after an edit is exactly what the pin exists to refuse. " + abort_sentence()
         )
     # D126: a signed-but-malformed entry is a refusal, never a raw KeyError /
     # TypeError. Unknown `kind`s are still ignored (unchanged behaviour).
     def _malformed(why: str) -> RefreshMergeApprovalError:
         return RefreshMergeApprovalError(
             f"[FATAL] {path}: a signed approval entry is malformed ({why}); refusing to build. "
-            + REFRESH_DID_NOT_SHIP
+            + abort_sentence()
         )
 
     if not isinstance(entries, list):
@@ -2243,7 +2306,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         except Exception as exc:  # noqa: BLE001 - any failure is the same fail-closed outcome
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: the published baseline ({where}) is missing, empty or "
-                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
+                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. " + abort_sentence() + _nothing_written()
             )
         return inc
 
@@ -2258,14 +2321,14 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} in a shallow (or unreadable) "
                 "repository, so a first build cannot be told from a deleted file; the refresh gate "
-                "cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
+                "cannot run. " + abort_sentence() + _nothing_written()
             )
         hist = _git(root, "log", "--oneline", "-1", "--all", "--", rel)
         if hist.returncode == 0 and not hist.stdout.strip():
             return [], True  # git repo, file never committed: first-ever build
         raise RefreshBaselineError(
             f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} although it has history "
-            f"(rc={shown.returncode}); the refresh gate cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
+            f"(rc={shown.returncode}); the refresh gate cannot run. " + abort_sentence() + _nothing_written()
         )
     path = root / rel
     if path.exists():
@@ -2274,7 +2337,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         return [], True
     raise RefreshBaselineError(
         f"[FATAL] D42/D25(a)+D71: {path} is missing and there is no git history to say whether this "
-        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
+        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. " + abort_sentence() + _nothing_written()
     )
 
 
@@ -2464,7 +2527,7 @@ def _check_refresh_merge_authorization(
             "that the user has not approved "
             f"({len(problems)}):{nl}" + nl.join(problems[:25])
             + (f"{nl}..." if len(problems) > 25 else "")
-            + chr(10) + REFRESH_DID_NOT_SHIP + " Nothing was written. This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
+            + chr(10) + abort_sentence() + _nothing_written() + " This freeze is deliberate (D58/D67/D71, stage 1): a weekly "
             "refresh that reaches this gate fails closed until the user rules. Review the evidence list, then record the "
             f"user's ruling in {approval_path.relative_to(ROOT) if approval_path.is_relative_to(ROOT) else approval_path} "
             "(see docs/audits/D42-refresh-merge-review-2026-10-03.md)."
@@ -2523,7 +2586,7 @@ def _check_oecd_lift_precondition(
             "[FATAL] D114 binding precondition: a held OECD-side input differs from HEAD, "
             "but suppression (A3) has not been built and gated: " + why + ". Lifting OECD "
             "without suppression turns the 12 AIID hub rows into permanent merges (29 "
-            "instead of 7). " + REFRESH_DID_NOT_SHIP + " Nothing was written. The OECD inputs stay held until a gated "
+            "instead of 7). " + abort_sentence() + _nothing_written() + " The OECD inputs stay held until a gated "
             "suppression mechanism lands (see docs/audits/stage2-ruling-package-2026-10-13.md "
             "section 2(a), A2 Forward risk, and PROGRESS.md D114)."
         )
@@ -2654,7 +2717,7 @@ def _check_split_authorization(
         "See docs/audits/WS4-T19-split-evidence-2026-09-18.md and D28 "
         "in PROGRESS.md."
     )
-    raise SplitAuthorizationError("\n".join([*lines, "", REFRESH_DID_NOT_SHIP]))
+    raise SplitAuthorizationError("\n".join([*lines, "", abort_sentence()]))
 
 
 def resolve_live_targets(
@@ -2706,6 +2769,7 @@ def resolve_live_targets(
 
 
 def main():
+    _WRITTEN.clear()  # D128: a run starts with nothing written (in-process callers reuse the module)
     # 0) Load the previous output: timestamps, the id-by-key map (so stable
     #    INC-* IDs survive a rebuild), and the monotonic ID counter.
     prev_ts, prev_id_by_key, next_id = _load_prev_state()
@@ -2732,7 +2796,7 @@ def main():
             "legacy corpus and yields a materially wrong build.\n"
             "If this is deliberate (e.g. a test harness building its own tmp\n"
             "corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1.\n"
-            + REFRESH_DID_NOT_SHIP
+            + abort_sentence()
         )
     if legacy_path.exists():
         legacy = json.loads(legacy_path.read_text(encoding="utf-8")).get("incidents", [])
@@ -3435,14 +3499,13 @@ def main():
                         removed_terminal.add(f)
                         changed = True
     if deprecations_all:
-        DEPRECATIONS_PATH.write_text(
+        _write_output(
+            DEPRECATIONS_PATH,
             json.dumps(
                 {"deprecations": deprecations_all},
                 indent=2,
                 ensure_ascii=False,
             ),
-            encoding="utf-8",
-            newline="\n",
         )
         print(f"[output] wrote {DEPRECATIONS_PATH.name} ({len(deprecations_all)} entries)")
 
@@ -3467,11 +3530,7 @@ def main():
         "retracted_count": n_retracted,
         "incidents": deduped,
     }
-    (DATA / "incidents.json").write_text(
-        json.dumps(out, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-        newline="\n",
-    )
+    _write_output(DATA / "incidents.json", json.dumps(out, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.json")
 
     # Slim variant — used by the static site for filtering and inline
@@ -3550,11 +3609,7 @@ def main():
         "retracted_count": n_retracted,
         "incidents": [_slim_entry(e) for e in deduped],
     }
-    (DATA / "incidents.min.json").write_text(
-        json.dumps(slim, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-        newline="\n",
-    )
+    _write_output(DATA / "incidents.min.json", json.dumps(slim, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.min.json")
 
     # 6) Print taxonomy coverage summary
@@ -3632,5 +3687,26 @@ def merge_into(target: dict, src: dict):
     fill_taxonomy(target)
 
 
+def _run_main() -> None:
+    """D127 catch-all around main(): every stop exits with a message carrying
+    abort_sentence() while keeping the original diagnostic visible. A clean run
+    (no exception, or SystemExit(0/None)) is unchanged."""
+    try:
+        main()
+    except SystemExit as exc:
+        code = exc.code
+        if code is None or code == 0:
+            return
+        if isinstance(code, str):
+            # already carries it -> unchanged text, never twice
+            raise SystemExit(code if abort_sentence() in code else code + " " + abort_sentence()) from exc
+        raise SystemExit(f"[FATAL] exit code {code!r}. " + abort_sentence()) from exc
+    except BaseException as exc:  # unexpected: json.JSONDecodeError, KeyError, KeyboardInterrupt ...
+        traceback.print_exc()
+        raise SystemExit(
+            f"[FATAL] unexpected {type(exc).__name__}: {exc} " + abort_sentence()
+        ) from exc
+
+
 if __name__ == "__main__":
-    main()
+    _run_main()

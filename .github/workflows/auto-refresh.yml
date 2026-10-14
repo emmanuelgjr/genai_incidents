@@ -402,6 +402,10 @@ jobs:
           retention-days: 30
 
       - name: Re-merge + render + validate
+        # D127: the ONLY job that tells merge_and_dedupe.py it is the weekly refresh,
+        # so an abort says "the whole refresh did not ship". Other workflows must not set it.
+        env:
+          GENAI_REFRESH_RUN: "1"
         run: |
           python scripts/parse_existing.py
           python scripts/merge_and_dedupe.py
