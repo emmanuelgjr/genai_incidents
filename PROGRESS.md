@@ -63,6 +63,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 📋 Candidate 1 (legacy-seed references) — detection DONE 2026-10-14, read-only; report `docs/audits/reference-detection-2026-10-14.md`
+- **All 8 brief examples CONFIRMED** (fetched via `ingest.common.fetch_once`): INC-033→INC-03004 (arXiv 2501.01234 = QCD/neutron-star paper), INC-045→INC-03570 and INC-046→INC-03444 (arXiv 2408.00000 / 2407.00000 → 404), INC-041→INC-02922 (risk.net/), INC-036→INC-02454 (reuters.com/legal/ + eff.org/ typed research), INC-037→INC-02353 (msrc root), INC-040→INC-03247 (USENIX Sec '25 landing page), INC-042→INC-04310 (uber engineering-blog index). All original to the initial dataset commit `c105bd7a`.
+- **Premise refuted:** the legacy seed is **176 rows** (source_ids INC-/LEGACY-INC-), not ~3,200.
+- **Counts (distinct rows of 15,784):** R1 shallow/index 146 · R2 arXiv bad 11 · R3 reuse 200 (**not a defect signal**: 18 specific CVE advisory/commit URLs) · R4 research-typed non-paper 1,622 (**weak**; 1,456 AIRI pages) · R5 unsupported figure 25 (legacy only, lower bound) · any 1,959. **Strong subset R1∪R2 = 156 rows, 30 legacy (13 curated, 17 reviewed).** No DOI check (3 DOI URLs in corpus — a gap, not a pass).
+- **Foreman [R]:** read data/incidents.json directly: all 8 ID mappings, URLs and tiers match; `source_ids` INC-/LEGACY-INC- count = 176.
+
+### ⚖ D130 — DRAFT RULING for the user (candidate 1 remediation). NOT DECIDED.
+- **(a) Scope.** A: R1∪R2 strong subset (156 rows), legacy 30 first (**Recommended**). B: legacy seed only (130 rows tripping any rule). C: all 1,959 (R4 is mostly noise; not recommended).
+- **(b) Unsourceable rows.** A: new additive `status: unverified` (treated like retracted in every export, counted in `unverified_count`, kept in full JSON with `status_reason`) — schema change, needs WS3 + a cut. B: keep status, demote to `quality_tier: auto` + curation-override note only.
+- **(c) Replaced references** demoted to `quality_tier: auto` with a curation-override note for user re-review (the brief's rule; demotion only, never promotion). Confirm.
+- **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
+- Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
+
 ### 🔨 D129 — corrupt ingest fails closed: **DISPATCHED 2026-10-14** to a fresh pipeline-engineer on `ws4/d129-corrupt-ingest-2026-10-14` (worktree `C:/repos/gi-wt-d129`, base `af39a62f`). Brief: reuse the D127/D128 abort machinery; corrupt file → job-aware refusal before any write; mutation-proven tests; data diff empty.
 - **Also in flight (read-only, no branch):** candidate-1 reference detection (`docs/audits/reference-detection-2026-10-14.md`, pending). Brief triage of candidates 2-17 committed at `95ae6792` (`docs/audits/brief-triage-2026-10-14.md`).
 - **Note:** at 11:02:57 the D127 gate and the triage agent both received a "fix it" message the foreman did not send; both refused and made no changes (tree verified clean at `af39a62f`).
