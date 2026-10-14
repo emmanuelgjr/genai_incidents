@@ -63,6 +63,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⏸ PAUSED BY THE USER, 2026-10-14: "stop and save progress". Resume from here.
+- **D127 (with the D128 fix):**
+  - The fix is pushed at **`7442b1ad`** on `ws4/d127-abort-wrapper-2026-10-13` (worktree `C:/repos/gi-wt-d127`, clean).
+  - The specialist reports all 3 bounce-1 defects closed by mutation: pytest 1395 + 1 xfailed; build byte-identical; drift rc 0. **This is testimony.**
+  - **The scoped re-gate was STOPPED before it returned a verdict. NOT gated, NOT merged.**
+  - **On resume:** re-dispatch a scoped re-gate of `7442b1ad` against D128 (brief on this board under the D127 bounce #1 and D128 entries). A second bounce escalates to the user.
+- **Deadline:** D127 should merge before the first refresh under D114, Sun 2026-10-18 04:00 UTC. If it does not, main's D126 behaviour is still safe: every explicit abort carries the D121 sentence.
+- **Queued after D127:**
+  - **D129:** a corrupt ingest file fails closed.
+  - **The WS6 a11y tooling upgrade** (puppeteer-core ^25, lighthouse ^13) to clear the 8 Dependabot alerts. See `docs/audits/dependabot-triage-2026-10-13.md`.
+- **Still the user's:**
+  - the OECD email (stage2 package §5);
+  - reviewing and merging Sunday's refresh PR;
+  - register (a) items.
+
 ### ⚖ D128 + D129, USER RULINGS 2026-10-14
 - **D128: a stop after any output write names what was written (Recommended).**
   - The script tracks the output files it has written.
