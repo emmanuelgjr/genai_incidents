@@ -63,6 +63,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D126, USER RULING 2026-10-13: every refresh abort carries the did-not-ship sentence (Recommended).
+- **Covers advisories H1 and H2:**
+  - ruled-appends SystemExit;
+  - SplitAuthorizationError;
+  - the legacy-missing guard;
+  - a malformed signed approval entry, which must raise a proper refusal instead of a raw KeyError.
+- **H3:** the source test is widened to catch any future abort in the refresh path that omits the sentence.
+- **Routing:** pipeline-engineer, then a gate, then merge before Sun 2026-10-18.
+
 ### ✅ Refresh hardening batch: **PASS (gate-harden on `8f4e374c`), MERGED (HEAD^2 = `8f4e374c` verified).**
 **Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none."
 
