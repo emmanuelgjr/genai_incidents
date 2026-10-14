@@ -480,7 +480,9 @@ def cve_disjoint(a: dict, b: dict) -> bool:
 
     Two advisories about *different* CVEs are different incidents no matter
     how similar their reference URLs or templated titles look — weak-key
-    (URL / fuzzy-title) merges must never bridge them (#36). CVE-key and
+    (URL / fuzzy-title) merges must never bridge them (#36). (Aggregate
+    round-up URLs are refused separately by ``is_aggregate_url`` because
+    their rows carry no CVEs and this predicate is vacuous for them, D117.) CVE-key and
     source_id-key merges are unaffected: a shared identity key implies the
     sets are not disjoint or the rows are the same upstream record.
     """
@@ -1769,7 +1771,17 @@ def dedupe_entries(
     sets are disjoint (#36) — UNLESS both sides already co-resided in the
     same previously-published entry (``prior_id_by_key``: cve/source_id →
     previous INC id). The grandfather clause keeps rebuilds of committed
-    data byte-stable; only *new* URL/title bridges are blocked."""
+    data byte-stable; only *new* URL/title bridges are blocked.
+
+    The reference-URL key carries a second refusal (D117): an AGGREGATE URL
+    (``is_aggregate_url``: a publisher round-up page matching
+    ``AGGREGATE_URL_PATTERNS`` / ``AGGREGATE_URL_KEYS``) is cited by many
+    distinct incidents, so sharing one is never a dedupe key, whether or not
+    the CVE sets are disjoint (round-up rows carry no cve_ids, so
+    ``cve_disjoint`` is vacuous for them) -- again unless ``_same_prior``
+    holds. Both the first-hit URL dedupe and the transitive ``_claim`` in
+    ``_reindex`` apply it; CVE and source_id keys and the title key are
+    unaffected by it."""
     prior_id_by_key = prior_id_by_key or {}
 
     def _same_prior(a: dict, b: dict) -> bool:
@@ -1803,7 +1815,10 @@ def dedupe_entries(
         (CVE / source_id / reference URL) already maps to a *different*
         previously-deduped entry, that other entry is transitively absorbed
         into ``target`` and tombstoned so we don't end up with two records
-        for what is really one incident.
+        for what is really one incident. A reference-URL key is a weak key:
+        it does NOT bridge when the CVE sets are disjoint or the URL is an
+        aggregate round-up page (``is_aggregate_url``, D117) unless
+        ``_same_prior`` holds (see ``_claim``).
 
         Claims loop until ``target``'s key set stops changing: merge_into
         reassigns the key lists, so keys absorbed from a claimed entry
@@ -1822,8 +1837,11 @@ def dedupe_entries(
             if (weak and (cve_disjoint(target, other) or is_aggregate_url(key))
                     and not _same_prior(target, other)):
                 # Shared weak key (reference URL) between entries with
-                # disjoint CVE sets — different incidents. Leave the key
-                # with its first owner instead of bridging them (#36).
+                # disjoint CVE sets (#36), OR the key is an aggregate
+                # round-up URL (D117: is_aggregate_url, AGGREGATE_URL_PATTERNS)
+                # that many distinct incidents cite -- different incidents.
+                # Leave the key with its first owner instead of bridging
+                # them, unless _same_prior (grandfathered published co-residents).
                 return
             # Transitive merge: pull other's content into target and retire it.
             merge_into(target, other)
@@ -1871,8 +1889,9 @@ def dedupe_entries(
             _reindex(src_hit)
             continue
         # URL-key dedupe. A URL hit is refused when the CVE sets are
-        # disjoint and the pair isn't grandfathered (#36) — keep scanning,
-        # another reference may point at the right entry.
+        # disjoint (#36) or the URL is an aggregate round-up page (D117:
+        # is_aggregate_url) and the pair isn't grandfathered (_same_prior)
+        # — keep scanning, another reference may point at the right entry.
         url_hit = None
         for r in e.get("references", []):
             u = normalize_url(r.get("url", ""))
@@ -2069,13 +2088,16 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. The two
-# refusals that carry this sentence are the merge/retitle/add/title-edit/content
-# gate (_check_refresh_merge_authorization) and the OECD-lift precondition
-# (_check_oecd_lift_precondition). The approval-file and baseline refusals
-# (RefreshMergeApprovalError raised by _load_refresh_merge_approvals and
-# RefreshBaselineError by _load_gate_baseline) do NOT carry it; they name their
-# own cause and abort the build just as loudly.
+# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. EVERY
+# refresh-gate refusal carries this sentence (hardening batch, advisory A1):
+#   _check_refresh_merge_authorization   the merge/retitle/add/title-edit/content gate
+#   _check_oecd_lift_precondition        the OECD-lift precondition
+#   _load_refresh_merge_approvals        4 refusals (unreadable, unsigned, hash
+#                                        mismatch, hash not pinned in code)
+#   _load_gate_baseline                  4 refusals (unparseable/empty baseline,
+#                                        shallow repo, history-but-no-HEAD file,
+#                                        no git + no baseline)
+# tests/test_d121_loud_abort.py enumerates all 10 and fails if one drops it.
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
     "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "
@@ -2122,7 +2144,7 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
         doc = json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, OSError) as exc:
         raise RefreshMergeApprovalError(
-            f"[FATAL] {path} exists but is unreadable ({exc}); refusing to build."
+            f"[FATAL] {path} exists but is unreadable ({exc}); refusing to build. " + REFRESH_DID_NOT_SHIP
         )
     entries = doc.get("entries") if isinstance(doc, dict) else None
     auth = doc.get("authorization") if isinstance(doc, dict) else None
@@ -2133,12 +2155,12 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
         raise RefreshMergeApprovalError(
             f"[FATAL] {path} lists {len(entries)} approved change(s) but has no "
             "`authorization` marker with a decision id and ruled_by == 'user'. "
-            "File presence authorizes nothing."
+            "File presence authorizes nothing. " + REFRESH_DID_NOT_SHIP
         )
     if auth.get("entries_sha256") != _refresh_merge_entries_sha256(entries):
         raise RefreshMergeApprovalError(
             f"[FATAL] {path}: authorization.entries_sha256 does not match its "
-            "entries -- the list was edited after it was ruled on."
+            "entries -- the list was edited after it was ruled on. " + REFRESH_DID_NOT_SHIP
         )
     if Path(path).resolve() == REFRESH_MERGE_APPROVAL_PATH.resolve() and (
         REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256 is None
@@ -2148,7 +2170,7 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
             f"[FATAL] {path}: the entries hash is not the one pinned in code "
             "(REQUIRED_REFRESH_APPROVAL_ENTRIES_SHA256). A ruling is recorded by "
             "pinning its hash in the same commit; recomputing the file's own "
-            "hash after an edit is exactly what the pin exists to refuse."
+            "hash after an edit is exactly what the pin exists to refuse. " + REFRESH_DID_NOT_SHIP
         )
     out: set[tuple] = set()
     for e in entries:
@@ -2198,7 +2220,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         except Exception as exc:  # noqa: BLE001 - any failure is the same fail-closed outcome
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: the published baseline ({where}) is missing, empty or "
-                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. Nothing was written."
+                f"unparseable ({type(exc).__name__}); the refresh gate cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
             )
         return inc
 
@@ -2213,14 +2235,14 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
             raise RefreshBaselineError(
                 f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} in a shallow (or unreadable) "
                 "repository, so a first build cannot be told from a deleted file; the refresh gate "
-                "cannot run. Nothing was written."
+                "cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
             )
         hist = _git(root, "log", "--oneline", "-1", "--all", "--", rel)
         if hist.returncode == 0 and not hist.stdout.strip():
             return [], True  # git repo, file never committed: first-ever build
         raise RefreshBaselineError(
             f"[FATAL] D42/D25(a)+D71: git cannot show HEAD:{rel} although it has history "
-            f"(rc={shown.returncode}); the refresh gate cannot run. Nothing was written."
+            f"(rc={shown.returncode}); the refresh gate cannot run. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
         )
     path = root / rel
     if path.exists():
@@ -2229,7 +2251,7 @@ def _load_gate_baseline(root: Path | None = None) -> tuple[list[dict], bool]:
         return [], True
     raise RefreshBaselineError(
         f"[FATAL] D42/D25(a)+D71: {path} is missing and there is no git history to say whether this "
-        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. Nothing was written."
+        "is a first build. Set MERGE_ALLOW_FIRST_BUILD=1 only for a genuine first-ever build. " + REFRESH_DID_NOT_SHIP + " Nothing was written."
     )
 
 
