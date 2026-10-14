@@ -63,6 +63,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🚚 Refresh hardening batch: **DISPATCHED** to pipeline-engineer (2026-10-13), branch `ws4/refresh-hardening-2026-10-13` (worktree `C:/repos/gi-wt-hardening`, base `ce819387`).
+- **Scope, all from recorded gate advisories:** D121 A1 (every refresh-gate refusal carries the did-not-ship sentence); R4 (drift-gate test blind spots: render order, `if:` disable); R5 (test the load-bearing provenance reset at auto-refresh.yml ~:322); R1/R2 (check_source_health comments); D117 A1 (aggregate-URL condition in docstrings).
+- **Constraints:** no data change; build byte-identical; drift rc 0; full suite green; every new test proven to fire by mutation.
+- **Why now:** it lands before the first scheduled refresh under D114 (Sun 2026-10-18 04:00 UTC).
+
 ### ✅ Post-lift docs + D124: **MERGED** (tip `f5afdc27`, HEAD^2 verified), closed under D125.
 - **Foreman [R] string check** on the `[Unreleased]` slice: "48ffe0db" ×1, "CC-BY-SA-4.0 AND CC-BY-4.0" ×1, "LicenseRef-upstream-terms" ×1, the D66 text ×1, the D63 text ×1, "404 since 2026-06-07" ×1. NUL 0. The final commit changes CHANGELOG.md only (+7/-5); the other 8 files are the gated set.
 - **On merged main:** drift clean; validate rc 0; **pytest 1273 + 1 xfail**; porcelain clean.
