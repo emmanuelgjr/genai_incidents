@@ -63,6 +63,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ⚖ D127, USER RULING 2026-10-13: catch-all + job-aware wording (Recommended).
+- **G1: a catch-all around `main()`.** Every stop, including an unexpected exception, exits with a message.
+- **G2: job-aware wording.** The weekly refresh sets a flag. In that job the full D121 sentence stays. Every other job (PR CI, cve-enrich, atlas-refresh, local runs) says "build refused; nothing was written".
+- **Tests:** every new behaviour gets a test that has been shown to fail by mutation.
+- **Routing:** a FRESH pipeline-engineer, replacing the old instance under agreement 3 because it lost its report late in a long context. The batch also takes G3 (the nested-helper name collision) and G5 (the before-first-write claim). Then a gate, then merge.
+
 ### ✅ D126: **PASS (scoped re-gate on `5a03865c`), MERGED (HEAD^2 = `5a03865c` verified).**
 **Verdict, in the gate's words:** "PASS … DEFECTS: none against the ruling or the brief."
 - **Note:** the specialist's written report for the fix never reached the foreman. The commit was gated as unattested and verified from the tree alone.
