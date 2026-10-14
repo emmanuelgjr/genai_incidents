@@ -63,6 +63,39 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### ✅ Refresh hardening batch: **PASS (gate-harden on `8f4e374c`), MERGED (HEAD^2 = `8f4e374c` verified).**
+**Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none."
+
+**Gate evidence (fresh clone from origin, by its own route):**
+- **Scope.** 4 files: merge_and_dedupe.py plus 3 tests. The data/, docs/data/ and src/ diff is empty, with no network or model imports added.
+- **D121 A1.**
+  - A line-by-line read of the diff found only message strings, docstrings and comments, with no control-flow change.
+  - The gate enumerated every raise, sys.exit and SystemExit itself. There are exactly 10 refresh-gate refusals.
+  - **The gate blanked the sentence at each of the 10 sites separately.** Each mutation failed the AST test plus exactly that site's own trigger (2 or 3 failures), so the ≥10 floor is meaningful.
+- **R4.** The BASE `problems()` returned [] for step-level `if: false` and for drift-before-render in the same block, so both blind spots were real at main. The gate's own mutations on the branch:
+  - `if: ${{ !cancelled() && false }}` → 3 failed;
+  - drift check moved inside the render block → 3 failed.
+- **R5.** The premise is confirmed: validate.py:440 reads `ingest/_state/source_health.json`.
+  - Reset moved to a new step after validate → 1 failed.
+  - Re-merge/validate step moved ahead of persist → 2 failed.
+- **Item 4 (R1/R2): no edit was correct.** At ce819387 a grep for "monthly" or "retry" returns rc 1, and the revive comment already names all three steps. auto-refresh.yml:116 is accurate past tense.
+- **D117 A1.** The docstrings match the code at :1837 and :1900.
+- **Build.** All 7 steps rc 0. Porcelain and diff --stat are empty after the rebuild, so the build is byte-identical. pytest: 1297 passed + 1 xfailed.
+- No strays in either tree.
+
+**Foreman [R] on merged main:** check_stats_drift rc 0; validate rc 0; the 3 new test files pass (29 tests); porcelain empty.
+
+**Advisories → register:**
+- **H1, a user question.** These refresh aborts still lack the D121 sentence: ruled-appends SystemExit (:1394/:1406), SplitAuthorizationError (:2634), and the legacy-missing guard (:2704). Does D121 cover them?
+- **H2.** A malformed signed approval entry (KeyError at :2178) gives a raw traceback instead of a refusal. Low risk, because the hash is pinned.
+- **H3.** The AST test counts only `raise Name(...)` for the 3 classes. It would miss `raise err`, a new subclass, or a plain SystemExit.
+- **H4.** Drift-gate blind spots remain:
+  - `; exit 0` on the drift line;
+  - `set +e` earlier in the same run block;
+  - job-level `if: ${{ false }}` (this also kills the PR, so it is not a bypass).
+- **H5.** The R5 test is conservative: it flags a semantically fine split of the reset into its own step. Accepted.
+- **H6.** Cosmetic: an over-long docstring line at merge_and_dedupe.py:485.
+
 ### 🚚 Refresh hardening batch: **DISPATCHED** to pipeline-engineer (2026-10-13), branch `ws4/refresh-hardening-2026-10-13` (worktree `C:/repos/gi-wt-hardening`, base `ce819387`).
 - **Scope, all from recorded gate advisories:** D121 A1 (every refresh-gate refusal carries the did-not-ship sentence); R4 (drift-gate test blind spots: render order, `if:` disable); R5 (test the load-bearing provenance reset at auto-refresh.yml ~:322); R1/R2 (check_source_health comments); D117 A1 (aggregate-URL condition in docstrings).
 - **Constraints:** no data change; build byte-identical; drift rc 0; full suite green; every new test proven to fire by mutation.
