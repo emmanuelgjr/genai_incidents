@@ -69,7 +69,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Counts (distinct rows of 15,784):** R1 shallow/index 146 · R2 arXiv bad 11 · R3 reuse 200 (**not a defect signal**: 18 specific CVE advisory/commit URLs) · R4 research-typed non-paper 1,622 (**weak**; 1,456 AIRI pages) · R5 unsupported figure 25 (legacy only, lower bound) · any 1,959. **Strong subset R1∪R2 = 156 rows, 30 legacy (13 curated, 17 reviewed).** No DOI check (3 DOI URLs in corpus — a gap, not a pass).
 - **Foreman [R]:** read data/incidents.json directly: all 8 ID mappings, URLs and tiers match; `source_ids` INC-/LEGACY-INC- count = 176.
 
-### ⚖ D130 — DRAFT RULING for the user (candidate 1 remediation). NOT DECIDED.
+### ⚖ D130, USER RULING 2026-10-14 (candidate 1 remediation)
+- **(a) Scope: A — R1∪R2 strong subset (156 rows), the 30 legacy rows first (Recommended).**
+- **(b) Unsourceable rows: A — new additive `status: unverified`** (treated like retracted in every export, counted in `unverified_count`, kept in full JSON with `status_reason`). Schema change → WS3 schema-architect first, ships in a cut.
+- **(c) Confirmed:** every replaced reference demotes the row to `quality_tier: auto` + curation-override note for user re-review; demotion only, never promotion.
+- **(d) Confirmed:** validate.py hardening lands only after the remediation cleans the rows it would fail.
+- **Queue (serial, after D129):** D130-1 WS3 `unverified` status enum + export/stats treatment (no data rows changed) → D130-2 remediation of the 30 legacy R1∪R2 rows (fetched-and-confirmed URLs only, field-level delta, CORRECTIONS.md entries) → D130-3 remaining 126 rows → D130-4 validate.py hardening. Standing: OECD suppression (A3) still precedes any OECD lift.
+
+### (superseded by the ruling above — kept as the draft record, do not regenerate) D130 — DRAFT RULING for the user (candidate 1 remediation).
 - **(a) Scope.** A: R1∪R2 strong subset (156 rows), legacy 30 first (**Recommended**). B: legacy seed only (130 rows tripping any rule). C: all 1,959 (R4 is mostly noise; not recommended).
 - **(b) Unsourceable rows.** A: new additive `status: unverified` (treated like retracted in every export, counted in `unverified_count`, kept in full JSON with `status_reason`) — schema change, needs WS3 + a cut. B: keep status, demote to `quality_tier: auto` + curation-override note only.
 - **(c) Replaced references** demoted to `quality_tier: auto` with a curation-override note for user re-review (the brief's rule; demotion only, never promotion). Confirm.
