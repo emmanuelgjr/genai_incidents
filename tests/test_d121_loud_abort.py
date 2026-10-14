@@ -176,3 +176,176 @@ def test_each_trigger_really_reaches_its_refusal_when_sentence_blanked(trigger, 
     with pytest.raises(m.RefreshMergeApprovalError) as ei:
         trigger(tmp_path, monkeypatch)
     assert SENTENCE not in str(ei.value)
+
+# ---- D126 (user ruling 2026-10-13): EVERY abort in the build carries the sentence ----
+# Every abort in merge_and_dedupe.py is reachable from main(), which is the
+# refresh path (the weekly refresh runs this same script); each aborts the whole
+# build before any output write, so the sentence is true for all of them and is
+# carried unconditionally (no refresh-mode conditional to get wrong).
+_EXIT_CALLS = {"exit", "quit", "_exit"}  # sys.exit / exit / quit / os._exit
+# Explicit, justified allowlist of aborts exempt from the sentence, keyed by
+# (enclosing function, "raise"|"assert"|exit-call name). EMPTY today: there is no
+# non-refresh abort in the file. Adding an entry needs a written justification.
+ABORT_ALLOWLIST: dict[tuple[str, str], str] = {}
+
+
+def _abort_findings(src: str) -> list[str]:
+    """Return a description of every abort in `src` that lacks the sentence."""
+    tree = ast.parse(src)
+    parents = {c: p for p in ast.walk(tree) for c in ast.iter_child_nodes(p)}
+
+    def enclosing_func(n):
+        while n in parents:
+            n = parents[n]
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                return n.name
+        return "<module>"
+
+    helpers = {n.name for n in ast.walk(tree)
+               if isinstance(n, ast.FunctionDef) and "REFRESH_DID_NOT_SHIP" in ast.get_source_segment(src, n)}
+    bad = []
+    for node in ast.walk(tree):
+        seg = ast.get_source_segment(src, node) or ""
+        where = f"line {getattr(node, 'lineno', '?')} in {enclosing_func(node)}"
+        if isinstance(node, ast.Raise):
+            if (enclosing_func(node), "raise") in ABORT_ALLOWLIST:
+                continue
+            exc = node.exc
+            # a bare `raise`, `raise err`, `raise SomeName` fail by design
+            ok = (isinstance(exc, ast.Call)
+                  and ("REFRESH_DID_NOT_SHIP" in seg
+                       or (isinstance(exc.func, ast.Name) and exc.func.id in helpers)))
+            if not ok:
+                bad.append(f"raise without sentence: {where}: {seg[:60]!r}")
+        elif isinstance(node, ast.Call):
+            f = node.func
+            name = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", "")
+            if (name in _EXIT_CALLS and "REFRESH_DID_NOT_SHIP" not in seg
+                    and (enclosing_func(node), name) not in ABORT_ALLOWLIST):
+                bad.append(f"exit call without sentence: {where}: {seg[:60]!r}")
+        elif isinstance(node, ast.Assert):
+            # only legal as a value check swallowed by an enclosing try/except
+            p, guarded = node, False
+            while p in parents:
+                p = parents[p]
+                if isinstance(p, ast.Try) and p.handlers:
+                    guarded = True
+            if not guarded and (enclosing_func(node), "assert") not in ABORT_ALLOWLIST:
+                bad.append(f"unguarded assert: {where}")
+    return bad
+
+
+def test_every_abort_in_the_file_carries_the_sentence():
+    src = Path(m.__file__).read_text(encoding="utf-8")
+    assert _abort_findings(src) == []
+
+
+@pytest.mark.parametrize("snippet,expect", [
+    ('def f():\n    raise SystemExit("x")\n', "raise without sentence"),
+    ('def f():\n    raise SomeNewError("x")\n', "raise without sentence"),
+    ('def f():\n    err = RuntimeError("x")\n    raise err\n', "raise without sentence"),
+    ('def f():\n    try:\n        pass\n    except Exception:\n        raise\n', "raise without sentence"),
+    ('import sys\ndef f():\n    sys.exit("x")\n', "exit call without sentence"),
+    ('def f():\n    assert 1 == 2\n', "unguarded assert"),
+])
+def test_the_abort_scanner_fires_on_a_new_abort_without_the_sentence(snippet, expect):
+    """Mutation proof: the scanner flags each new un-sentenced abort shape."""
+    assert any(expect in b for b in _abort_findings(snippet))
+
+
+def test_the_abort_scanner_accepts_a_sentenced_abort_and_a_guarded_assert():
+    ok = ('def f():\n    raise SomeNewError("x " + REFRESH_DID_NOT_SHIP)\n'
+          'def g():\n    try:\n        assert 1\n    except Exception:\n        pass\n')
+    assert _abort_findings(ok) == []
+
+
+def _ruled(tmp_path, body):
+    p = tmp_path / "ruled.json"
+    p.write_text(body if isinstance(body, str) else json.dumps(body), encoding="utf-8")
+    return p
+
+
+def _trigger_ruled_unreadable(tmp_path, mp):
+    m._load_ruled_deprecation_appends(_ruled(tmp_path, "{ not json"))
+
+
+def _trigger_ruled_bad_entry(tmp_path, mp):
+    m._load_ruled_deprecation_appends(_ruled(tmp_path, {"entries": [{"record": {"from": "INC-1"}}]}))
+
+
+def _trigger_ruled_not_object(tmp_path, mp):
+    m._load_ruled_deprecation_appends(_ruled(tmp_path, "[1, 2]"))
+
+
+def _trigger_split_unauthorized(tmp_path, mp):
+    m._check_split_authorization({"k1": "INC-1", "k2": "INC-1"},
+                                 [{"id": "INC-1", "source_ids": ["k1"]}, {"id": "INC-9", "source_ids": ["k2"]}],
+                                 tmp_path / "none.json")
+
+
+def _trigger_legacy_missing(tmp_path, mp):
+    mp.setattr(m, "DATA", tmp_path)
+    mp.setattr(m, "_load_prev_state", lambda: ({}, {}, 1))
+    mp.delenv("MERGE_ALLOW_MISSING_LEGACY", raising=False)
+    m.main()
+
+
+def _signed(entries):
+    return {"entries": entries, "authorization": {
+        "decision": "DX", "ruled_by": "user", "entries_sha256": m._refresh_merge_entries_sha256(entries)}}
+
+
+def _malformed(entries):
+    def trig(tmp_path, mp):
+        m._load_refresh_merge_approvals(_approval(tmp_path, _signed(entries)))
+    return trig
+
+
+_MALFORMED = {
+    "missing_from": [{"kind": "merge", "into": "INC-1"}],
+    "missing_into": [{"kind": "merge", "from": "INC-2"}],
+    "retitle_no_id": [{"kind": "retitle"}],
+    "add_no_source_id": [{"kind": "add"}],
+    "content_no_id": [{"kind": "content"}],
+    "non_dict_entry": ["INC-1"],
+    "null_entry": [None],
+    "wrong_type_value": [{"kind": "merge", "from": ["INC-2"], "into": "INC-1"}],
+}
+
+D126_TRIGGERS = [
+    pytest.param(f, id=f.__name__) for f in (
+        _trigger_ruled_unreadable, _trigger_ruled_bad_entry, _trigger_ruled_not_object,
+        _trigger_split_unauthorized, _trigger_legacy_missing)
+] + [pytest.param(_malformed(v), id=f"malformed_{k}") for k, v in _MALFORMED.items()]
+
+
+@pytest.mark.parametrize("trigger", D126_TRIGGERS)
+def test_d126_each_newly_covered_abort_says_whole_refresh_did_not_ship(trigger, tmp_path, monkeypatch):
+    with pytest.raises(SystemExit) as ei:
+        trigger(tmp_path, monkeypatch)
+    msg = str(ei.value)
+    assert SENTENCE in msg, msg[:200]
+    for src in ("AIAAIC", "CISA KEV", "CVE rejection sweep"):
+        assert src in msg
+
+
+@pytest.mark.parametrize("trigger", D126_TRIGGERS)
+def test_d126_triggers_reach_the_abort_when_sentence_blanked(trigger, tmp_path, monkeypatch):
+    monkeypatch.setattr(m, "REFRESH_DID_NOT_SHIP", "")
+    with pytest.raises(SystemExit) as ei:
+        trigger(tmp_path, monkeypatch)
+    assert SENTENCE not in str(ei.value)
+
+
+@pytest.mark.parametrize("k", list(_MALFORMED))
+def test_malformed_signed_entry_is_a_refusal_not_a_raw_exception(k, tmp_path):
+    with pytest.raises(m.RefreshMergeApprovalError):
+        _malformed(_MALFORMED[k])(tmp_path, None)
+
+
+def test_wellformed_approvals_and_unknown_kinds_unchanged(tmp_path):
+    ents = [{"kind": "merge", "from": "A", "into": "B"}, {"kind": "retitle", "id": "C"},
+            {"kind": "add", "source_id": "S"}, {"kind": "content", "id": "D"},
+            {"kind": "future-kind", "x": 1}]
+    got = m._load_refresh_merge_approvals(_approval(tmp_path, _signed(ents)))
+    assert got == {("merge", "A", "B"), ("retitle", "C"), ("add", "S"), ("content", "D")}
