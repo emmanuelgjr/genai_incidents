@@ -482,9 +482,10 @@ def cve_disjoint(a: dict, b: dict) -> bool:
     how similar their reference URLs or templated titles look — weak-key
     (URL / fuzzy-title) merges must never bridge them (#36). (Aggregate
     round-up URLs are refused separately by ``is_aggregate_url`` because
-    their rows carry no CVEs and this predicate is vacuous for them, D117.) CVE-key and
-    source_id-key merges are unaffected: a shared identity key implies the
-    sets are not disjoint or the rows are the same upstream record.
+    their rows carry no CVEs and this predicate is vacuous for them, D117.)
+    CVE-key and source_id-key merges are unaffected: a shared identity key
+    implies the sets are not disjoint or the rows are the same upstream
+    record.
     """
     ca, cb = set(a.get("cve_ids") or []), set(b.get("cve_ids") or [])
     return bool(ca) and bool(cb) and not (ca & cb)
@@ -1391,7 +1392,11 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
-        raise SystemExit(f"[ruled-appends] {path}: unreadable: {exc}") from exc
+        raise SystemExit(f"[ruled-appends] {path}: unreadable: {exc} " + REFRESH_DID_NOT_SHIP) from exc
+    if not isinstance(data, dict) or not isinstance(data.get("entries") or [], list):
+        raise SystemExit(
+            f"[ruled-appends] {path}: top level is not an object with an `entries` list. " + REFRESH_DID_NOT_SHIP
+        )
     out: list[dict] = []
     for n, entry in enumerate(data.get("entries") or []):
         rec = entry.get("record") if isinstance(entry, dict) else None
@@ -1403,7 +1408,9 @@ def _load_ruled_deprecation_appends(path: Path) -> list[dict]:
             or "into" not in rec
             or set(rec) - _RULED_RECORD_KEYS
         ):
-            raise SystemExit(f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r}")
+            raise SystemExit(
+                f"[ruled-appends] {path}: entry {n} is not a valid record: {entry!r} " + REFRESH_DID_NOT_SHIP
+            )
         out.append(dict(rec))
     return out
 
@@ -2088,16 +2095,17 @@ REFRESH_MERGE_APPROVAL_PATH = ROOT / "docs" / "audits" / "D42-approved-refresh-m
 _REFRESH_GATED_PREFIXES = ("OECD-AIM-", "AIID-")
 
 
-# D121 (user ruling 2026-10-13): fail-closed stays, as a LOUD abort. EVERY
-# refresh-gate refusal carries this sentence (hardening batch, advisory A1):
-#   _check_refresh_merge_authorization   the merge/retitle/add/title-edit/content gate
-#   _check_oecd_lift_precondition        the OECD-lift precondition
-#   _load_refresh_merge_approvals        4 refusals (unreadable, unsigned, hash
-#                                        mismatch, hash not pinned in code)
-#   _load_gate_baseline                  4 refusals (unparseable/empty baseline,
-#                                        shallow repo, history-but-no-HEAD file,
-#                                        no git + no baseline)
-# tests/test_d121_loud_abort.py enumerates all 10 and fails if one drops it.
+# D121 (user ruling 2026-10-13), widened by D126: fail-closed stays, as a LOUD
+# abort. EVERY abort in this file -- the refresh-gate refusals, the approval
+# loader's refusals (including a malformed signed entry), the ruled-appends
+# SystemExits, SplitAuthorizationError and the legacy-missing guard -- carries
+# this sentence. Every abort here is reachable from main(), which is the refresh
+# path, and each fires before any output write, so the sentence is always true.
+# The enumeration is NOT kept here (a count in a comment goes stale):
+# tests/test_d121_loud_abort.py::test_every_abort_in_the_file_carries_the_sentence
+# scans the AST for every raise / exit call / assert and fails on any that lacks
+# it; a deliberately exempt abort must be added to its ABORT_ALLOWLIST with a
+# written justification.
 REFRESH_DID_NOT_SHIP = (
     "THE WHOLE REFRESH DID NOT SHIP: this build was refused, so nothing from this run was written "
     "or published -- not AIAAIC, not CISA KEV, not the CVE rejection sweep or its retractions, and not "
@@ -2172,16 +2180,31 @@ def _load_refresh_merge_approvals(path: Path) -> set[tuple]:
             "pinning its hash in the same commit; recomputing the file's own "
             "hash after an edit is exactly what the pin exists to refuse. " + REFRESH_DID_NOT_SHIP
         )
+    # D126: a signed-but-malformed entry is a refusal, never a raw KeyError /
+    # TypeError. Unknown `kind`s are still ignored (unchanged behaviour).
+    def _malformed(why: str) -> RefreshMergeApprovalError:
+        return RefreshMergeApprovalError(
+            f"[FATAL] {path}: a signed approval entry is malformed ({why}); refusing to build. "
+            + REFRESH_DID_NOT_SHIP
+        )
+
+    if not isinstance(entries, list):
+        raise _malformed(f"`entries` is {type(entries).__name__}, not a list")
+    _fields = {"merge": ("from", "into"), "retitle": ("id",), "add": ("source_id",), "content": ("id",)}
     out: set[tuple] = set()
-    for e in entries:
-        if e.get("kind") == "merge":
-            out.add(("merge", e["from"], e["into"]))
-        elif e.get("kind") == "retitle":
-            out.add(("retitle", e["id"]))
-        elif e.get("kind") == "add":
-            out.add(("add", e["source_id"]))
-        elif e.get("kind") == "content":
-            out.add(("content", e["id"]))
+    for n, e in enumerate(entries):
+        if not isinstance(e, dict):
+            raise _malformed(f"entry {n} is {type(e).__name__}, not an object")
+        kind = e.get("kind")
+        if not isinstance(kind, str) or kind not in _fields:
+            continue
+        vals = []
+        for k in _fields[kind]:
+            v = e.get(k)
+            if not isinstance(v, str) or not v:
+                raise _malformed(f"entry {n} (kind {kind!r}) has missing or non-string `{k}`")
+            vals.append(v)
+        out.add((kind, *vals))
     return out
 
 
@@ -2631,7 +2654,7 @@ def _check_split_authorization(
         "See docs/audits/WS4-T19-split-evidence-2026-09-18.md and D28 "
         "in PROGRESS.md."
     )
-    raise SplitAuthorizationError("\n".join(lines))
+    raise SplitAuthorizationError("\n".join([*lines, "", REFRESH_DID_NOT_SHIP]))
 
 
 def resolve_live_targets(
@@ -2708,7 +2731,8 @@ def main():
             "`make merge` / Makefile:11-13. Running it alone silently drops the\n"
             "legacy corpus and yields a materially wrong build.\n"
             "If this is deliberate (e.g. a test harness building its own tmp\n"
-            "corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1."
+            "corpus from ingest/ alone), set MERGE_ALLOW_MISSING_LEGACY=1.\n"
+            + REFRESH_DID_NOT_SHIP
         )
     if legacy_path.exists():
         legacy = json.loads(legacy_path.read_text(encoding="utf-8")).get("incidents", [])
