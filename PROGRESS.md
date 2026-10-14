@@ -83,7 +83,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
-### 🔨 D129 — corrupt ingest fails closed: **DISPATCHED 2026-10-14** to a fresh pipeline-engineer on `ws4/d129-corrupt-ingest-2026-10-14` (worktree `C:/repos/gi-wt-d129`, base `af39a62f`). Brief: reuse the D127/D128 abort machinery; corrupt file → job-aware refusal before any write; mutation-proven tests; data diff empty.
+### ✅ D129: **PASS (gate-d129 on `0bf6c002`), MERGED to main 2026-10-14 (`--no-ff`, HEAD^2 = `0bf6c002`)**
+**Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none." Gate premise correction: branch merge-base is `af39a62f`, not `fd81080b` (the two-dot diff's 951 deletions are main-side board/audit commits; three-dot and merge-tree touch only the 3 files).
+
+**Gate evidence (rerun in a throwaway clone):**
+- Scope: CHANGELOG.md +4, merge_and_dedupe.py, tests/test_d129_corrupt_ingest.py +130; no deletions; merge-tree rc 0 (aa4ae9ec); data/ diff empty.
+- **Control on base code** (`af39a62f` + `ingest/zz_broken.json` = `{"incidents": [`): rc 0, "WARN: failed to parse …", "0 raw → 0 normalized" — the ruled bug reproduced.
+- **Full-tree e2e at `0bf6c002`:** refresh mode rc 1, "[FATAL] cannot parse …zz_broken.json: JSONDecodeError …; refusing to build (the source would silently drop to 0 rows). THE WHOLE REFRESH DID NOT SHIP…"; normal mode rc 1, "Build refused; nothing was written…"; 0 WARN lines; porcelain empty after.
+- Mutations: catch→JSONDecodeError only KILLED (1); abort_sentence→NON_REFRESH_REFUSED KILLED (3); write before ingest KILLED (2); **catch drops OSError SURVIVES** (advisory 1).
+- pytest 1418 passed, 1 xfailed. Build chain twice byte-identical, porcelain empty. drift rc 0. No network/model calls. All 28 ingest files pass (22 lists, 6 non-row dicts with their own loaders/metadata). Test blob has 0 CR bytes (.gitattributes eol=lf).
+
+**Advisories → register:** A1 OSError branch works (verified: directory named dir.json → IngestParseError PermissionError) but has no test; D127 catch-all would still fail closed. **A2 renamed row key (`{"items":[...]}`) still drops a source to 0 rows silently — outside D129 (parseable file) but same harm → DRAFT D131 below.** A3 falsy non-list (`{"incidents": {}}`) loads as []; fold into D131. A4 only first corrupt file reported. A5 weak control test anchor. A6 unguarded legacy_consolidated json.loads (cosmetic; D127 catch-all covers).
+
+### ⚖ D131 — DRAFT RULING for the user (gate-d129 advisory 2). NOT DECIDED.
+- **A (Recommended):** allowlist the known non-row side files (`*.provenance.json`, `cisa_kev.json`, `cve_rejections.json`); any other ingest file that parses but yields 0 rows from a dict (or holds a falsy non-list under incidents/entries/data) refuses with the job-aware sentence. A real `[]` still loads. Plus the OSError test (A1). Small WS4 task.
+- **B:** leave as is; schema drift in a parseable file stays a silent drop.
+
+### (merged — record of dispatch) D129 — corrupt ingest fails closed: **DISPATCHED 2026-10-14** to a fresh pipeline-engineer on `ws4/d129-corrupt-ingest-2026-10-14` (worktree `C:/repos/gi-wt-d129`, base `af39a62f`). Brief: reuse the D127/D128 abort machinery; corrupt file → job-aware refusal before any write; mutation-proven tests; data diff empty.
 - **Also in flight (read-only, no branch):** candidate-1 reference detection (`docs/audits/reference-detection-2026-10-14.md`, pending). Brief triage of candidates 2-17 committed at `95ae6792` (`docs/audits/brief-triage-2026-10-14.md`).
 - **Note:** at 11:02:57 the D127 gate and the triage agent both received a "fix it" message the foreman did not send; both refused and made no changes (tree verified clean at `af39a62f`).
 

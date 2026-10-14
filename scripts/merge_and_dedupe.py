@@ -1132,17 +1132,31 @@ def normalize_entry(raw: dict) -> dict | None:
     return entry
 
 
+class IngestParseError(SystemExit):
+    """An ingest/*.json that cannot be read as a list of source rows (D129)."""
+
+
 def load_source(path: Path) -> list[dict]:
+    """Rows of one ingest/*.json. D129: an unparseable file, or a payload that is
+    not a list of rows, ABORTS (a source silently dropping to 0 rows is the
+    failure). Not an error: a legitimately empty list, and a dict carrying none of
+    incidents/entries/data -- side files in ingest/ (provenance records, the CISA
+    KEV and CVE rejection snapshots) are dicts of that shape and carry no rows."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"  WARN: failed to parse {path}: {e}")
-        return []
+    except (ValueError, OSError) as e:  # ValueError covers JSONDecodeError + UnicodeDecodeError
+        raise IngestParseError(
+            f"[FATAL] cannot parse {path}: {type(e).__name__}: {e}; refusing to build "
+            "(the source would silently drop to 0 rows). " + abort_sentence()
+        )
     if isinstance(data, dict):
-        return data.get("incidents") or data.get("entries") or data.get("data") or []
-    if isinstance(data, list):
-        return data
-    return []
+        data = data.get("incidents") or data.get("entries") or data.get("data") or []
+    if not isinstance(data, list):
+        raise IngestParseError(
+            f"[FATAL] {path} is not a list of rows (top-level or incidents/entries/data is "
+            f"{type(data).__name__}); refusing to build. " + abort_sentence()
+        )
+    return data
 
 
 DEPRECATIONS_PATH = DATA / "id_deprecations.json"

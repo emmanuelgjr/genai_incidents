@@ -7,6 +7,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - a corrupt ingest file now fails the build closed (D129)
+
+- `merge_and_dedupe.py` used to print a WARN for an unparseable `ingest/*.json`, drop that source to 0 rows and exit 0 with its outputs written. It now refuses before any output is written, naming the file and the parse error, with the job-aware abort sentence. A payload that is not a list of rows (a scalar, or `incidents`/`entries`/`data` holding a non-list) is refused the same way. A legitimately empty list, and the dict-shaped side files in `ingest/` that carry no rows (provenance records, CISA KEV, CVE rejections), still load as before. No data change.
+
 ### Added - AIID-side lift of the OECD/AIID freeze (D114): 113 new AIID rows, 169 updated rows (INC-17221 to INC-17333)
 
 - **+113 AIID-only rows, INC-17221 to INC-17333.** All are new AIID incidents the frozen
