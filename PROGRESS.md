@@ -63,6 +63,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **pytest: 949 passed, 1 xfailed, 0 skipped**; porcelain empty.
 - Pushed `e5b04eb7..17529a53`; ls-remote = local.
 
+### 🔨 D129 — corrupt ingest fails closed: **DISPATCHED 2026-10-14** to a fresh pipeline-engineer on `ws4/d129-corrupt-ingest-2026-10-14` (worktree `C:/repos/gi-wt-d129`, base `af39a62f`). Brief: reuse the D127/D128 abort machinery; corrupt file → job-aware refusal before any write; mutation-proven tests; data diff empty.
+- **Also in flight (read-only, no branch):** candidate-1 reference detection (`docs/audits/reference-detection-2026-10-14.md`, pending). Brief triage of candidates 2-17 committed at `95ae6792` (`docs/audits/brief-triage-2026-10-14.md`).
+- **Note:** at 11:02:57 the D127 gate and the triage agent both received a "fix it" message the foreman did not send; both refused and made no changes (tree verified clean at `af39a62f`).
+
 ### ✅ D127 (with D128): **PASS (scoped re-gate gate-d127-r2 on `7442b1ad`), MERGED to main 2026-10-14 (`--no-ff`, HEAD^2 = `7442b1ad`)**
 **Verdict, in the gate's words:** "VERDICT: PASS (D127 scoped re-gate on 7442b1ad; bounce #1 defects 1-3 all closed). DEFECTS: none."
 
