@@ -97,7 +97,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 
 **Advisories → register:** A1 OSError branch works (verified: directory named dir.json → IngestParseError PermissionError) but has no test; D127 catch-all would still fail closed. **A2 renamed row key (`{"items":[...]}`) still drops a source to 0 rows silently — outside D129 (parseable file) but same harm → DRAFT D131 below.** A3 falsy non-list (`{"incidents": {}}`) loads as []; fold into D131. A4 only first corrupt file reported. A5 weak control test anchor. A6 unguarded legacy_consolidated json.loads (cosmetic; D127 catch-all covers).
 
-### ⚖ D131 — DRAFT RULING for the user (gate-d129 advisory 2). NOT DECIDED.
+### ⚖ D131-D134, USER RULINGS 2026-10-14 (gate-d129 advisory 2 + brief-triage decisions)
+- **D131 (Recommended): allowlist the non-row side files, refuse the rest.** Known side files (`*.provenance.json`, `cisa_kev.json`, `cve_rejections.json`) are allowlisted; any other ingest file that parses but yields 0 rows from a dict, or holds a falsy non-list under incidents/entries/data, refuses with the job-aware sentence. A real `[]` still loads. Includes the OSError test (gate-d129 A1). **WS4.**
+- **D132 (Recommended): label non-release counts "2.13.0+main" until the next cut.** stats.json / site build_manifest must not pair a release version with a post-release count; drift check enforces it. **WS6.**
+- **D133 (Recommended): document `owasp_dsgai`** in TAXONOMIES.md + HF card (source, edition, core/companion/experimental) and add it to taxonomy_versions; data unchanged. **WS3/WS6.**
+- **D134: queue four triage items** as separate serial tasks: (i) `load_incidents(include_retracted=False)` default, also excluding `unverified` — public behaviour change in CHANGELOG + package README first paragraph (**WS6**); (ii) SHA-pin the 33 unpinned Actions + add dependabot.yml (**WS4**); (iii) CORRECTIONS.md backfill for the 29 retractions and the OSV licence correction (**WS5**); (iv) split PROGRESS.md by month into the board archive, board files stay at root, CLAUDE.md unchanged (**foreman — board's only writer**).
+- **Queue order (serial):** D130-1 (in flight) → **D131** (refresh safety; ideally before Sun 2026-10-18 04:00 UTC) → D130-2 → D132 → D133 → D134(i) → D130-3 → D134(ii) → D134(iii) → D130-4 → D134(iv). Standing: OECD suppression (A3) precedes any OECD lift.
+
+### (superseded by D131 ruling above — draft record, do not regenerate) D131 — DRAFT RULING (gate-d129 advisory 2).
 - **A (Recommended):** allowlist the known non-row side files (`*.provenance.json`, `cisa_kev.json`, `cve_rejections.json`); any other ingest file that parses but yields 0 rows from a dict (or holds a falsy non-list under incidents/entries/data) refuses with the job-aware sentence. A real `[]` still loads. Plus the OSError test (A1). Small WS4 task.
 - **B:** leave as is; schema drift in a parseable file stays a silent drop.
 
