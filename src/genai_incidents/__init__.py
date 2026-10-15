@@ -175,7 +175,8 @@ def build_manifest() -> dict[str, Any] | None:
     ``None`` when the package was not built by the release pipeline.
 
     Keys: ``commit``, ``built_at``, ``built_at_basis``, ``dirty``, ``version``,
-    ``incident_count``, ``retracted_count``, ``disputed_count``,
+    ``incident_count``, ``retracted_count``, ``unverified_count`` (absent
+    from manifests stamped before it existed), ``disputed_count``,
     ``landmark_count``, ``taxonomy_versions`` (schema:
     ``schema/build_manifest.schema.json`` in the repository). Wheels and sdists
     published to PyPI carry it; a source checkout or editable install does not

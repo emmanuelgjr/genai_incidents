@@ -104,9 +104,11 @@ FORMATTERS: dict[str, Callable[[dict], str]] = {
     # v2.13.0 item 8 (D64): subset / excluded counts, registered so a surface
     # that quotes them is templated and drift-checked like the headline count.
     # `disputed_count` is a SUBSET of incident_count (disputed entries stay
-    # counted); `retracted_count` is OUTSIDE it. Never sum them (invariant 1).
+    # counted); `retracted_count` and (D130) `unverified_count` are OUTSIDE it.
+    # Never sum them (invariant 1).
     "disputed_count": lambda s: _comma_int(s["disputed_count"]),
     "retracted_count": lambda s: _comma_int(s["retracted_count"]),
+    "unverified_count": lambda s: _comma_int(s["unverified_count"]),
     "version": lambda s: str(s["version"]),
     "generated": lambda s: str(s["generated"]),
     "year_min": lambda s: str(s["year_min"]),

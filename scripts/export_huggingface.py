@@ -21,6 +21,7 @@ import json
 import sys
 from pathlib import Path
 
+from entry_status import stands
 from taxonomy_versions import as_text, taxonomy_versions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -115,7 +116,7 @@ Key fields per record (full reference in the data dictionary):
 - `status` — present only on a row that is not standing as published (absence means it stands).
   {disputed} of the rows above carry `status: disputed`: every CVE record they rest on is
   listed by the CVE Program as published but disputed. They are **counted** in the {count}
-  and carry a lowered `confidence`; retracted rows are omitted from this export.
+  and carry a lowered `confidence`; retracted and unverified rows are omitted from this export.
 
 ### Source freshness
 
@@ -227,9 +228,10 @@ def build(out_dir: Path) -> tuple[int, Path]:
     # Rationale in docs/specs/WS6-T9-landmark-distribution-2026-09-18.md sec 4.
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
-    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
-    # their IDs resolve, but are not published into downstream feeds.
-    incidents = [e for e in incidents if e.get("status") != "retracted"]
+    # WS4-T2/D130: retracted (all CVEs REJECTED) and unverified (no confirmed
+    # primary source) entries stay in data/incidents.json so their IDs
+    # resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if stands(e)]
     out_dir.mkdir(parents=True, exist_ok=True)
     jsonl = out_dir / "incidents.jsonl"
     with jsonl.open("w", encoding="utf-8", newline="\n") as fh:
