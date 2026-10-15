@@ -1,7 +1,7 @@
 """Standing test (user ruling D136(b)): ``status: unverified`` on REAL rows of
 every class, through the real build chain, against the real-corpus checks.
 
-``unverified_count`` is 0 in the committed corpus, so every real-corpus test
+``unverified_count`` was 0 in the committed corpus when D130-1 landed, so every real-corpus test
 that derives "standing" rows passes whether or not it excludes unverified.
 That is how D130-1 shipped two such tests unfixed (bounce #1, bounce #2).
 This test closes that gap. In a scratch copy of the committed tree (never
@@ -72,13 +72,16 @@ def pick_rows(rows: list[dict]) -> dict[str, tuple[str, str]]:
     """``{class: (row id, override key)}``. Deterministic: lowest ID first.
     The key must be a source_id carried by exactly one row, so the override
     marks that row and nothing else. Retracted rows are never picked (retracted
-    wins over unverified, so marking one would prove nothing)."""
+    wins over unverified, so marking one would prove nothing), nor are rows
+    already unverified in the control build (D137: once real overrides are
+    committed, re-marking one would prove nothing and break the count)."""
     owners = Counter(s for e in rows for s in e.get("source_ids") or [])
     picked: dict[str, tuple[str, str]] = {}
     used: set[str] = set()
     ordered = sorted(rows, key=lambda e: e["id"])
     for cls, pred in CLASSES.items():
-        cands = [e for e in ordered if pred(e) and e["id"] not in used and e.get("status") != "retracted"]
+        cands = [e for e in ordered if pred(e) and e["id"] not in used
+                 and e.get("status") not in ("retracted", "unverified")]
         if cls == "legacy_seed":
             cands.sort(key=lambda e: "INC-045" not in (e.get("source_ids") or []))
         for e in cands:
@@ -132,8 +135,13 @@ def test_every_class_is_marked_and_kept(marked):
     assert control[picks["landmark"][0]]["tier"] == "landmark"
     assert control[picks["retained"][0]]["source_status"] == "retained"
     assert control[picks["disputed"][0]]["status"] == "disputed"
+    # D137: count against the control build's own unverified rows, which are
+    # nonzero once real D130-2 overrides are committed.
+    n_picked = sum(1 for iid, _ in picks.values() if by_id[iid].get("status") == "unverified")
+    assert n_picked == len(picks) == len(CLASSES)
+    control_unverified = sum(1 for e in control.values() if e.get("status") == "unverified")
     n = sum(1 for e in by_id.values() if e.get("status") == "unverified")
-    assert n == len(picks) == len(CLASSES)
+    assert n == control_unverified + len(picks)
     full = json.loads((root / "data" / "incidents.json").read_text(encoding="utf-8"))
     slim = json.loads((root / "data" / "incidents.min.json").read_text(encoding="utf-8"))
     stats = json.loads((root / "data" / "stats.json").read_text(encoding="utf-8"))
