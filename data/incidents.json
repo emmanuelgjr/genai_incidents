@@ -5,6 +5,7 @@
   "schema": "schema/incident.schema.json",
   "incident_count": 15755,
   "retracted_count": 29,
+  "unverified_count": 0,
   "incidents": [
     {
       "id": "INC-04853",

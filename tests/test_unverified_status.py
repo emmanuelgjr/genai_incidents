@@ -134,15 +134,20 @@ def test_removing_the_override_restores_the_entry(tmp_path, monkeypatch):
     by = {e["cve_ids"][0]: e for e in full["incidents"]}
     assert "status" not in by[UNVERIFIED_CVE]
     assert by[DISPUTED_CVE]["status"] == "disputed"
-    assert "unverified_count" not in full, "emitted only when non-zero"
+    assert full["unverified_count"] == 0, "D135: always emitted, 0 included"
     assert (full["incident_count"], full["retracted_count"]) == (3, 1)
 
 
-def test_no_unverified_rows_leaves_envelope_shape_unchanged(tmp_path, monkeypatch):
+def test_envelope_always_carries_unverified_count(tmp_path, monkeypatch):
+    """D135(1): the key is present even at 0, in both file shapes."""
     data = _build(tmp_path, monkeypatch, overrides={})
     full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))
-    assert list(full) == ["version", "generated", "description", "schema",
-                          "incident_count", "retracted_count", "incidents"]
+    slim = json.loads((data / "incidents.min.json").read_text(encoding="utf-8"))
+    assert list(full) == ["version", "generated", "description", "schema", "incident_count",
+                          "retracted_count", "unverified_count", "incidents"]
+    assert list(slim) == ["version", "generated", "incident_count", "retracted_count",
+                          "unverified_count", "incidents"]
+    assert full["unverified_count"] == slim["unverified_count"] == 0
 
 
 @pytest.mark.parametrize("bad", [
@@ -156,6 +161,42 @@ def test_no_unverified_rows_leaves_envelope_shape_unchanged(tmp_path, monkeypatc
 def test_malformed_status_override_fails_the_build(tmp_path, monkeypatch, bad):
     with pytest.raises(SystemExit, match="status override"):
         _build(tmp_path, monkeypatch, overrides={UNVERIFIED_CVE: {**bad, "_note": "x"}})
+
+
+def test_dangling_status_override_fails_the_build(tmp_path, monkeypatch):
+    """Advisory B: a status override keyed to no row would mark nothing."""
+    ov = {UNVERIFIED_CVE: _override(), "CVE-2099-9999": _override()}
+    with pytest.raises(SystemExit, match="match no entry.*CVE-2099-9999"):
+        _build(tmp_path, monkeypatch, overrides=ov)
+
+
+def test_malformed_override_on_a_dangling_key_is_refused(tmp_path, monkeypatch):
+    """Advisory B: shape is checked for every override, matched or not."""
+    ov = {"CVE-2099-9999": {"status": "retracted", "status_reason": dict(REASON)}}
+    # The shape message, not the dangling-key one: refused for its shape.
+    with pytest.raises(SystemExit, match="must be exactly"):
+        _build(tmp_path, monkeypatch, overrides=ov)
+
+
+def test_override_matching_a_retracted_row_does_not_fail(built):
+    """Matched, not marked: retracted wins and the build still succeeds (a
+    CVE rejection arriving in a weekly refresh must not break the build)."""
+    _, full, _ = built
+    assert {e["cve_ids"][0]: e.get("status") for e in full["incidents"]}[RETRACTED_CVE] == "retracted"
+
+
+def test_unverified_keeps_the_disputed_confidence_lowering(built):
+    """Advisory E: unverified replaces disputed but never raises confidence."""
+    _, full, _ = built
+    by = {e["cve_ids"][0]: e for e in full["incidents"]}
+    assert by[STANDING_CVE]["confidence"] == "medium", "control: the unlowered rule value"
+    assert by[DISPUTED_CVE]["status"] == "unverified"
+    assert by[DISPUTED_CVE]["confidence"] == "low", "lowered one level, as when disputed"
+    assert by[UNVERIFIED_CVE]["confidence"] == "medium", "no disputed CVE: not lowered"
+    raised = {**full, "incidents": [{**e, "confidence": "high"} if e["cve_ids"] == [DISPUTED_CVE] else e
+                                    for e in full["incidents"]]}
+    assert any("has confidence 'high'" in p
+               for p in validate.check_status(raised, {RETRACTED_CVE}, {DISPUTED_CVE}))
 
 
 def test_generic_override_step_never_writes_status():
@@ -209,9 +250,12 @@ def test_validator_counts_and_code():
           "incidents": [row, {"id": "INC-2"}]}
     assert validate.check_status(ok) == []
     assert validate.check_envelope({**ok, "unverified_count": 0})
-    assert validate.check_envelope({k: v for k, v in ok.items() if k != "unverified_count"})
+    missing = {k: v for k, v in ok.items() if k != "unverified_count"}
+    assert any("lacks unverified_count" in p for p in validate.check_envelope(missing))
+    zero = {"incident_count": 1, "retracted_count": 0, "unverified_count": 0, "incidents": [{"id": "x"}]}
+    assert validate.check_envelope(zero) == []
+    assert validate.check_envelope({k: v for k, v in zero.items() if k != "unverified_count"}),         "D135: required even at 0"
     assert validate.check_envelope({**ok, "incident_count": 2}), "unverified row counted"
-    assert validate.check_envelope({"incident_count": 1, "unverified_count": 0, "incidents": [{"id": "x"}]})
     bad = {**ok, "incidents": [{**row, "status_reason": {"code": "cve-rejected", "as_of": "2026-10-14"}}]}
     assert any("no-confirmed-source" in p for p in validate.check_status(bad))
 

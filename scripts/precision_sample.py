@@ -15,7 +15,11 @@ Sampling frame (documented in frame.json, re-derivable)
 * Unit: one row of ``data/incidents.json``.
 * Excluded: ``status == "retracted"`` rows (D44: they are not counted in
   ``incident_count`` and leave every feed export; they are not published
-  claims of inclusion).
+  claims of inclusion), and, for draws made after user ruling D135(3),
+  ``status == "unverified"`` rows on the same grounds (D130). The
+  unverified exclusion is recorded in ``frame.json`` only when it removes a
+  row, so the ratified 2026-10 sample (drawn before the status existed, from
+  data with none) still reproduces byte-for-byte from its pinned blob.
 * Two frames, partitioned by ``tier`` -- the derived field of record
   (``merge_and_dedupe._derive_tier``; DATA_DICTIONARY.md): ``feed`` and
   ``landmark``. The user's brief says "auto" for the first frame. ``tier`` is
@@ -147,8 +151,9 @@ def canonical_sha256(obj) -> str:
 
 def build_frame(incidents: list[dict]) -> tuple[dict, dict[str, list[dict]]]:
     """-> (frame description, stratum -> sorted member rows)."""
-    standing = [e for e in incidents if e.get("status") != "retracted"]
-    excluded = len(incidents) - len(standing)
+    standing = [e for e in incidents if e.get("status") not in ("retracted", "unverified")]
+    excluded = sum(1 for e in incidents if e.get("status") == "retracted")
+    excluded_unverified = sum(1 for e in incidents if e.get("status") == "unverified")
     by_tier: dict[str, list[dict]] = {}
     for e in standing:
         by_tier.setdefault(e.get("tier"), []).append(e)
@@ -205,7 +210,8 @@ def build_frame(incidents: list[dict]) -> tuple[dict, dict[str, list[dict]]]:
         })
     frame = {
         "unit": "one row of data/incidents.json",
-        "exclusions": {"status == retracted": excluded},
+        "exclusions": {"status == retracted": excluded,
+                       **({"status == unverified": excluded_unverified} if excluded_unverified else {})},
         "frame_population": len(standing),
         "tier_population": {t: len(by_tier.get(t, [])) for t in ALLOCATION},
         "tier_allocation": dict(ALLOCATION),

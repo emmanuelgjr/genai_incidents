@@ -1307,11 +1307,28 @@ def _load_cve_disputes() -> dict[str, dict]:
 _CONFIDENCE_DOWN = {"high": "medium", "medium": "low", "low": "low"}
 
 
-def _lower_confidence_if_disputed(e: dict) -> None:
+def _rests_only_on_disputed(e: dict, rejected: dict, disputed: dict) -> bool:
+    """The ``status: disputed`` condition of ``_apply_cve_rejections``: at
+    least one CVE is disputed, every CVE is disputed or rejected, and every
+    source_id is one of those CVEs (no other evidence)."""
+    cves = set(e.get("cve_ids") or [])
+    standing = rejected.keys() | disputed.keys()
+    return bool(cves & disputed.keys()) and cves <= standing and set(e.get("source_ids") or []) <= standing
+
+
+def _lower_confidence_if_disputed(e: dict, rejected: dict | None = None,
+                                  disputed: dict | None = None) -> None:
     """A disputed entry drops ONE confidence level (agent-suggested rule; see
     docs/audits/rejected-cve-sweep-gap-2026-10-09.md). Applied after
-    ``_derive_confidence``; deterministic and self-reversing."""
-    if e.get("status") == "disputed" and e.get("confidence") in _CONFIDENCE_DOWN:
+    ``_derive_confidence``; deterministic and self-reversing.
+
+    D130 advisory E: an entry that would be disputed but is ``unverified``
+    (unverified replaces disputed) keeps the lowering -- marking it
+    unverified must never RAISE its confidence."""
+    lower = e.get("status") == "disputed" or (
+        e.get("status") == "unverified"
+        and _rests_only_on_disputed(e, rejected or {}, disputed or {}))
+    if lower and e.get("confidence") in _CONFIDENCE_DOWN:
         e["confidence"] = _CONFIDENCE_DOWN[e["confidence"]]
 
 
@@ -1352,8 +1369,7 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
             }
             return True
     dhit = sorted(cves & disputed.keys())
-    standing = rejected.keys() | disputed.keys()
-    if dhit and cves <= standing and sources <= standing:
+    if _rests_only_on_disputed(e, rejected, disputed):
         e["status"] = "disputed"
         e["status_reason"] = {
             "code": "cve-disputed",
@@ -1391,6 +1407,27 @@ def _unverified_override(sid: str, ov: dict) -> dict | None:
             f'"as_of": "YYYY-MM-DD"}}; got status={ov.get("status")!r} status_reason={reason!r}. '
             + abort_sentence())
     return {"code": reason["code"], "as_of": reason["as_of"]}
+
+
+def _check_status_overrides(curation: dict[str, dict]) -> list[str]:
+    """Shape-check EVERY status override up front, whether or not its key
+    matches a row (D130-1 advisory B), and return their keys."""
+    return [s for s, ov in curation.items()
+            if isinstance(ov, dict) and _unverified_override(s, ov) is not None]
+
+
+def _check_status_overrides_matched(keys: list[str], rows: list[dict]) -> None:
+    """D130-1 advisory B: a status override whose key is no row's source_id
+    would silently mark nothing. Refuse it. "Matched" is the test, not
+    "marked": a matched row that a later CVE rejection retracts stays
+    retracted (retracted wins) without failing the build, so a weekly
+    refresh cannot be broken by an upstream rejection."""
+    present = {s for e in rows for s in (e.get("source_ids") or [])}
+    dangling = sorted(k for k in keys if k not in present)
+    if dangling:
+        raise SystemExit(
+            f"[curation] {len(dangling)} status override(s) match no entry's source_ids: "
+            f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
 
 
 def _apply_unverified_override(e: dict, curation: dict[str, dict]) -> bool:
@@ -2956,6 +2993,7 @@ def main():
     #     before history stamping, so overridden content fields are part of
     #     the snapshot and an override-set quality_tier is respected in step 5.
     curation = _load_curation_overrides()
+    status_override_keys = _check_status_overrides(curation)
     if curation:
         applied = apply_curation_overrides(surviving, curation)
         print(f"[curation] applied {applied} override(s) from {CURATION_OVERRIDES_PATH.name}")
@@ -3272,7 +3310,7 @@ def main():
         if e["source_status"] == "retained":
             # Same bypass for the D130 unverified decision (step 4g).
             _apply_unverified_override(e, curation or {})
-        _lower_confidence_if_disputed(e)
+        _lower_confidence_if_disputed(e, cve_rejected, cve_disputed)
         if e.get("added"):
             e["first_seen"] = e["added"]
         if e.get("updated"):
@@ -3328,6 +3366,9 @@ def main():
     print(f"[freshness] source_freshness marker on {n_freshness} entr(ies)")
 
     print(f"\n[total]  {len(all_entries)} input -> {len(deduped)} unique")
+    # D130-1 advisory B: after the retained-prior pass, so a decision keyed to
+    # a carried-forward row counts as matched. Before any output is written.
+    _check_status_overrides_matched(status_override_keys, deduped)
 
     # 7) Compute `generated`: today only if anything actually changed since
     #    the previous output; otherwise preserve the previous timestamp so
@@ -3611,12 +3652,10 @@ def main():
         # incident_count + retracted_count + unverified_count == len(incidents).
         "incident_count": len(deduped) - n_retracted - n_unverified,
         "retracted_count": n_retracted,
+        # D130/D135: always emitted, 0 included.
+        "unverified_count": n_unverified,
+        "incidents": deduped,
     }
-    # D130: emitted only when non-zero (absent reads as 0), so the envelope is
-    # byte-unchanged until the first entry is marked unverified.
-    if n_unverified:
-        out["unverified_count"] = n_unverified
-    out["incidents"] = deduped
     _write_output(DATA / "incidents.json", json.dumps(out, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.json")
 
@@ -3694,10 +3733,9 @@ def main():
         "generated": out["generated"],
         "incident_count": out["incident_count"],
         "retracted_count": n_retracted,
+        "unverified_count": n_unverified,
+        "incidents": [_slim_entry(e) for e in deduped],
     }
-    if n_unverified:
-        slim["unverified_count"] = n_unverified
-    slim["incidents"] = [_slim_entry(e) for e in deduped]
     _write_output(DATA / "incidents.min.json", json.dumps(slim, indent=2, ensure_ascii=False))
     print(f"[output] wrote data/incidents.min.json")
 

@@ -49,18 +49,18 @@ def _has_primary_source(entry: dict) -> bool:
 
 def _check_counts(data: dict) -> list[str]:
     """``incident_count + retracted_count + unverified_count == len(incidents)``
-    (WS4-T2; D130). ``unverified_count`` is emitted only when non-zero, so an
-    absent key reads as 0 -- and is then wrong if any entry is unverified."""
+    (WS4-T2; D130). ``unverified_count`` is a required envelope key, 0
+    included (user ruling D135)."""
     incidents = data["incidents"]
     n_ret = sum(1 for e in incidents if e.get("status") == "retracted")
     n_unv = sum(1 for e in incidents if e.get("status") == "unverified")
     problems = []
     if data.get("retracted_count", 0) != n_ret:
         problems.append(f"retracted_count {data.get('retracted_count', 0)} != {n_ret} retracted entries")
-    if data.get("unverified_count", 0) != n_unv:
-        problems.append(f"unverified_count {data.get('unverified_count', 0)} != {n_unv} unverified entries")
-    if "unverified_count" in data and not data["unverified_count"]:
-        problems.append("unverified_count is emitted only when non-zero")
+    if "unverified_count" not in data:
+        problems.append("envelope lacks unverified_count (required, 0 included; D135)")
+    elif data["unverified_count"] != n_unv:
+        problems.append(f"unverified_count {data['unverified_count']} != {n_unv} unverified entries")
     if data.get("incident_count", len(incidents)) + n_ret + n_unv != len(incidents):
         problems.append(
             f"incident_count {data.get('incident_count')} + {n_ret} retracted + {n_unv} unverified "
@@ -102,6 +102,8 @@ def check_status(data: dict, rejected: set[str] | None = None,
       the top); against the snapshot's disputed set, a ``disputed`` entry has
       at least one disputed CVE, and an entry resting only on disputed/rejected
       CVEs that is neither retracted, disputed nor unverified is a violation.
+      An ``unverified`` entry that would otherwise be disputed keeps the
+      disputed confidence lowering (never ``high``).
     """
     problems: list[str] = []
     incidents = data["incidents"]
@@ -128,6 +130,10 @@ def check_status(data: dict, rejected: set[str] | None = None,
             if (cves & disputed and cves <= standing and set(e.get("source_ids") or []) <= standing
                     and e.get("status") not in ("retracted", "disputed", "unverified")):
                 problems.append(f"{e['id']}: rests only on disputed CVE(s) {sorted(cves & disputed)} but is not marked disputed")
+            if (e.get("status") == "unverified" and e.get("confidence") == "high"
+                    and cves & disputed and cves <= standing and set(e.get("source_ids") or []) <= standing):
+                # D130 advisory E: unverified replaces disputed but keeps its lowering.
+                problems.append(f"{e['id']}: unverified entry resting on disputed CVE(s) has confidence 'high'")
         if rejected is not None:
             missed = sorted((cves & rejected) - flagged)
             if missed:
@@ -1010,8 +1016,8 @@ def main():
     if slim_path.exists():
         slim = json.loads(slim_path.read_text(encoding="utf-8"))
         problems += [f"incidents.min.json: {p}" for p in check_envelope(slim)]
-        if (slim.get("incident_count"), slim.get("retracted_count", 0), slim.get("unverified_count", 0)) != (
-                data.get("incident_count"), data.get("retracted_count", 0), data.get("unverified_count", 0)):
+        if (slim.get("incident_count"), slim.get("retracted_count", 0), slim.get("unverified_count")) != (
+                data.get("incident_count"), data.get("retracted_count", 0), data.get("unverified_count")):
             problems.append("incidents.min.json: count envelope differs from incidents.json")
 
     # Source-freshness registry: shape, then the row markers that inherit

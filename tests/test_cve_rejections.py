@@ -104,10 +104,10 @@ def test_validator_fires_on_unretracted_rejected_entry():
     ok = {"id": "INC-1", "cve_ids": ["CVE-2099-0001"], "source_ids": ["CVE-2099-0001"],
           "status": "retracted", "status_reason": {"code": "cve-rejected", "as_of": "2026-10-03"},
           "rejected_cve_ids": ["CVE-2099-0001"]}
-    data = {"incident_count": 0, "retracted_count": 1, "incidents": [ok]}
+    data = {"incident_count": 0, "retracted_count": 1, "unverified_count": 0, "incidents": [ok]}
     assert validate.check_status(data, set(REJ)) == []
     bad = {k: v for k, v in ok.items() if k not in ("status", "status_reason", "rejected_cve_ids")}
-    data = {"incident_count": 1, "incidents": [bad]}
+    data = {"incident_count": 1, "unverified_count": 0, "incidents": [bad]}
     problems = validate.check_status(data, set(REJ))
     assert any("without a rejected_cve_ids flag" in p for p in problems)
     assert any("not retracted" in p for p in problems)
@@ -216,7 +216,7 @@ def test_ingest_survives_nvd_error_on_a_rejected_hit(tmp_path, monkeypatch, caps
 
 
 def test_slim_envelope_corruption_is_caught():
-    slim = {"incident_count": 1, "retracted_count": 1,
+    slim = {"incident_count": 1, "retracted_count": 1, "unverified_count": 0,
             "incidents": [{"id": "INC-1", "status": "retracted"}, {"id": "INC-2"}]}
     assert validate.check_envelope(slim) == []
     slim["incident_count"] = 2  # stale count: retracted entry counted

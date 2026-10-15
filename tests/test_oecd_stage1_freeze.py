@@ -405,7 +405,7 @@ def _fresh_input_passes(root: Path, ingest_name: str, mutate) -> tuple[str, list
 
 def _published_aiid_only(root: Path) -> list[dict]:
     inc = json.loads((root / "data/incidents.json").read_text(encoding="utf-8"))["incidents"]
-    return [e for e in inc if e.get("status") != "retracted" and e.get("aiid_id")
+    return [e for e in inc if e.get("status") not in ("retracted", "unverified") and e.get("aiid_id")
             and not _oecd_ids(e) and len(e["source_ids"]) == 1 and e["source_ids"][0].startswith("AIID-")]
 
 
