@@ -83,6 +83,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D130-2 REPORTED `1860e29d` (2026-10-15) — gate-d130-2 dispatched
+- **Specialist (testimony):** of the 30 legacy rows — **12 fixed** (curated 4, reviewed 8; demoted to auto), **10 unverified** (curated 1, reviewed 9), **2 unchanged on merit** (INC-04142 over-merge artifact → WS4-T19; INC-08181 R1 false positive), **6 deferred for user rulings**: INC-01015/01291/01589/02471/02871 (whole-list `references` override would freeze CVE/GHSA-fed lists of up to 442 refs → needs a `references_remove` mechanism), INC-04207 (demotion drops landmark tier, then a landmark-only `discovery_method` fails validate check 6; overrides can't delete fields).
+- Envelope 15,755 → 15,745, unverified_count 10; 22 rows differ, 0 outside. **Classifier-derived labels on the 12 fixed rows still reflect the OLD descriptions** (classifiers run before overrides) → gate judging. INC-02454 title changed and corpus pinned.
+- **Foreman [R]:** branch on origin at `1860e29d`; data diff = curation_overrides +320 lines, incidents.json, incidents.min.json, stats.json; envelope reads 15745 / 29 / 10.
+
 ### 🔨 D130-2 — remediation of the 30 legacy R1∪R2 rows: **DISPATCHED 2026-10-15** to a fresh pipeline-engineer (WebFetch + ingest/common.py) on `ws1/d130-2-legacy-refs-2026-10-15` (worktree `C:/repos/gi-wt-d130-2`, base `589376db`). Fetched-and-confirmed URLs only; replaced refs demote to auto; unsourceable → unverified via curation override; evidence under docs/audits/reference-audit-2026-10-15/; CORRECTIONS.md per row; per-entity field-level delta with every derived-field change enumerated (WS0-T3 cascade trap); per-ID unverified check. If curation_overrides cannot carry references/description, the specialist STOPS and reports.
 - **D131 post-merge [R] on main `589376db`:** validate rc 0; drift clean; test_d131 + test_d129 + test_d121 + test_d127 `171 passed`; porcelain empty; pushed `a7017c32..589376db`, ls-remote = local.
 
