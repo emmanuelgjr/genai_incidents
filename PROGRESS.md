@@ -83,6 +83,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### ⚖ D137, USER RULING 2026-10-15: **apply the small standing-test fix + foreman re-verify (Recommended).** Specialist fixes pick_rows (skip already-unverified) and counts against control baseline + picks; foreman re-runs the 11-row route + full pytest and a revert-fires check, then merges. Sent to the D130-1 specialist.
+
 ### ⛔ D130-1 at `03f0e91d` — foreman [R] verification under D136 FAILED one check (2026-10-15). Not merged. To the user.
 - **Passed:** string check (exact filter at tests/test_landmark_distribution.py:661 and :673); commit touches tests only (2 files); fire proof in a separate clone — reverting one landmark filter → `1 failed, 8 passed` (test_landmark_count_reproducible_from_min_json).
 - **Foreman's own 11-row route** (clone of `03f0e91d` + 11 committed unverified overrides: INC-03570, INC-01435, INC-07566, INC-02800, INC-08226, INC-04310, INC-02922, INC-03004, INC-02512, INC-02546, INC-02435; build chain all rc 0): counts consistent — 15744 / 29 retracted / 11 unverified / 21 disputed / 2023 landmark (−11, −5 landmark, −1 disputed). Full pytest: **`1 failed, 1458 passed, 1 xfailed`** — FAILED `tests/test_unverified_real_corpus.py::test_every_class_is_marked_and_kept`.
