@@ -2,33 +2,33 @@
 <rect x="0" y="0" width="100%" height="100%" fill="white"/>
 <text x="12" y="18" font-weight="600">OWASP LLM Top 10 (2026) — incident coverage</text>
 <text x="212" y="47" text-anchor="end" fill="#333">LLM01 · Prompt Injection</text>
-<rect x="220" y="36" width="31.7" height="14" fill="#0a58ca" rx="2"><title>Prompt Injection: 547</title></rect>
-<text x="257.7" y="47" fill="#666">547</text>
+<rect x="220" y="36" width="31.4" height="14" fill="#0a58ca" rx="2"><title>Prompt Injection: 543</title></rect>
+<text x="257.4" y="47" fill="#666">543</text>
 <text x="212" y="69" text-anchor="end" fill="#333">LLM02 · Sensitive Information Disclosure</text>
-<rect x="220" y="58" width="62.3" height="14" fill="#0a58ca" rx="2"><title>Sensitive Information Disclosure: 1,076</title></rect>
-<text x="288.3" y="69" fill="#666">1,076</text>
+<rect x="220" y="58" width="62.3" height="14" fill="#0a58ca" rx="2"><title>Sensitive Information Disclosure: 1,075</title></rect>
+<text x="288.3" y="69" fill="#666">1,075</text>
 <text x="212" y="91" text-anchor="end" fill="#333">LLM03 · Excessive Agency</text>
 <rect x="220" y="80" width="45.6" height="14" fill="#0a58ca" rx="2"><title>Excessive Agency: 787</title></rect>
 <text x="271.6" y="91" fill="#666">787</text>
 <text x="212" y="113" text-anchor="end" fill="#333">LLM04 · Supply Chain</text>
-<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,290</title></rect>
-<text x="706.0" y="113" fill="#666">8,290</text>
+<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,289</title></rect>
+<text x="706.0" y="113" fill="#666">8,289</text>
 <text x="212" y="135" text-anchor="end" fill="#333">LLM05 · Data and Model Poisoning</text>
-<rect x="220" y="124" width="11.3" height="14" fill="#0a58ca" rx="2"><title>Data and Model Poisoning: 195</title></rect>
-<text x="237.3" y="135" fill="#666">195</text>
+<rect x="220" y="124" width="11.2" height="14" fill="#0a58ca" rx="2"><title>Data and Model Poisoning: 193</title></rect>
+<text x="237.2" y="135" fill="#666">193</text>
 <text x="212" y="157" text-anchor="end" fill="#333">LLM06 · Unbounded Consumption</text>
-<rect x="220" y="146" width="2.5" height="14" fill="#0a58ca" rx="2"><title>Unbounded Consumption: 44</title></rect>
-<text x="228.5" y="157" fill="#666">44</text>
+<rect x="220" y="146" width="2.4" height="14" fill="#0a58ca" rx="2"><title>Unbounded Consumption: 42</title></rect>
+<text x="228.4" y="157" fill="#666">42</text>
 <text x="212" y="179" text-anchor="end" fill="#333">LLM07 · Misinformation</text>
 <rect x="220" y="168" width="146.0" height="14" fill="#0a58ca" rx="2"><title>Misinformation: 2,522</title></rect>
 <text x="372.0" y="179" fill="#666">2,522</text>
 <text x="212" y="201" text-anchor="end" fill="#333">LLM08 · Hidden Context Exposure</text>
-<rect x="220" y="190" width="42.5" height="14" fill="#0a58ca" rx="2"><title>Hidden Context Exposure: 734</title></rect>
-<text x="268.5" y="201" fill="#666">734</text>
+<rect x="220" y="190" width="42.4" height="14" fill="#0a58ca" rx="2"><title>Hidden Context Exposure: 733</title></rect>
+<text x="268.4" y="201" fill="#666">733</text>
 <text x="212" y="223" text-anchor="end" fill="#333">LLM09 · Vector and Embedding Weaknesses</text>
-<rect x="220" y="212" width="1.4" height="14" fill="#0a58ca" rx="2"><title>Vector and Embedding Weaknesses: 24</title></rect>
-<text x="227.4" y="223" fill="#666">24</text>
+<rect x="220" y="212" width="1.3" height="14" fill="#0a58ca" rx="2"><title>Vector and Embedding Weaknesses: 22</title></rect>
+<text x="227.3" y="223" fill="#666">22</text>
 <text x="212" y="245" text-anchor="end" fill="#333">LLM10 · Improper Output Handling</text>
-<rect x="220" y="234" width="397.1" height="14" fill="#0a58ca" rx="2"><title>Improper Output Handling: 6,859</title></rect>
-<text x="623.1" y="245" fill="#666">6,859</text>
+<rect x="220" y="234" width="397.1" height="14" fill="#0a58ca" rx="2"><title>Improper Output Handling: 6,857</title></rect>
+<text x="623.1" y="245" fill="#666">6,857</text>
 </svg>

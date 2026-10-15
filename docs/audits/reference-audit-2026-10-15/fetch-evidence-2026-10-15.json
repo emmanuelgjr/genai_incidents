@@ -1,0 +1,930 @@
+{
+ "fetched_via": "ingest/common.fetch_once (robots, rate limit, identifying User-Agent)",
+ "checked_pages": [
+  {
+   "url": "https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data",
+   "status": 200,
+   "title": "The lawsuit against Microsoft, GitHub and OpenAI that could change the rules of AI copyright | The Verge",
+   "fetched_at": "2026-10-15T11:35:02Z",
+   "sha256": "02b8d34eee0ecb97353812ba69b311e14d643793c5b80ea6ebbd3f73cf10a7a6",
+   "tokens_matched": [
+    "Copilot",
+    "class action",
+    "software piracy on an unprecedented scale",
+    "open-source code can be reproduced by AI"
+   ]
+  },
+  {
+   "url": "https://embracethered.com/blog/posts/2024/github-copilot-chat-prompt-injection-data-exfiltration/",
+   "status": 200,
+   "title": "GitHub Copilot Chat: From Prompt Injection to Data Exfiltration · Embrace The Red",
+   "fetched_at": "2026-10-15T11:27:44Z",
+   "sha256": "d22a48f8e397e69a3b99b588c5ee08bd828900256d17dd12e0a9aca7baf95075",
+   "tokens_matched": [
+    "GitHub Copilot Chat",
+    "prompt injection",
+    "exfiltrat",
+    "June 12, 2024 - Fix confirmation"
+   ]
+  },
+  {
+   "url": "https://arxiv.org/abs/2409.11445",
+   "status": 200,
+   "title": "[2409.11445] Jailbreaking Large Language Models with Symbolic Mathematics",
+   "fetched_at": "2026-10-15T11:26:59Z",
+   "sha256": "650fe4f3e4320665ba43f6288ea15db91cd38764cd450470645b8f5a618bb373",
+   "tokens_matched": [
+    "MathPrompt",
+    "symbolic mathematics",
+    "73.6",
+    "13 state-of-the-art LLMs"
+   ]
+  },
+  {
+   "url": "https://arxiv.org/abs/2502.12893",
+   "status": 200,
+   "title": "[2502.12893] H-CoT: Hijacking the Chain-of-Thought Safety Reasoning Mechanism to Jailbreak Large Reasoning Models, Including OpenAI o1/o3, DeepSeek-R1, and Gemini 2.0 Flash Thinking",
+   "fetched_at": "2026-10-15T11:27:00Z",
+   "sha256": "4583ff7ce14e7aaf8f3ffa8879f5677d145b2a0562b49701fce9a6c60b3a5b3b",
+   "tokens_matched": [
+    "H-CoT",
+    "OpenAI o1/o3",
+    "chain-of-thought",
+    "98% to below 2%"
+   ]
+  },
+  {
+   "url": "https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432",
+   "status": 200,
+   "title": "COMUNICATO STAMPA - ChatGPT, il Garante privacy chiude l’istruttoria.... - Garante Privacy",
+   "fetched_at": "2026-10-15T11:27:42Z",
+   "sha256": "62e1267c737f4283a724589388572d7e9260858c6344354ae1617d122a321837",
+   "tokens_matched": [
+    "OpenAI",
+    "ChatGPT",
+    "15 milioni",
+    "20 dicembre 2024",
+    "Tribunale di Roma"
+   ]
+  },
+  {
+   "url": "https://natlawreview.com/article/first-bipa-litigation-class-members-receive-equity-clearview-ai",
+   "status": 200,
+   "title": "BIPA Litigation Class Members Receive Equity in Clearview AI",
+   "fetched_at": "2026-10-15T11:31:00Z",
+   "sha256": "ee7c83982557a288365b81aa0356cb96ac76d4b9fee946236623a8cdb4c1229c",
+   "tokens_matched": [
+    "Clearview",
+    "BIPA",
+    "23% equity stake",
+    "March 20, 2025",
+    "60 billion"
+   ]
+  },
+  {
+   "url": "https://www.regulatoryoversight.com/2025/04/51-75m-settlement-in-clearview-ai-biometric-privacy-litigation-illustrates-creative-resolution-for-startups-facing-parallel-litigation-and-enforcement-action/",
+   "status": 200,
+   "title": "$51.75M Settlement in Clearview AI Biometric Privacy Litigation Illustrates Creative Resolution for Startups Facing Parallel Litigation and Enforcement Action | Regulatory Oversight",
+   "fetched_at": "2026-10-15T11:31:06Z",
+   "sha256": "d22dd4ff25664e51d238433184b2309159a5b1686b97dc5249c4d8ae52126c9a",
+   "tokens_matched": [
+    "Clearview",
+    "$51.75 million",
+    "23% equity stake",
+    "BIPA"
+   ]
+  },
+  {
+   "url": "https://www.bbc.com/news/technology-66819174",
+   "status": 200,
+   "title": "TikTok fined €345m over children's data privacy",
+   "fetched_at": "2026-10-15T11:30:58Z",
+   "sha256": "f2775d46de953b404eeedbe38718ccb15f62f7d08c0efa1a0b5ce7c385d04b3b",
+   "tokens_matched": [
+    "TikTok",
+    "345m",
+    "children",
+    "Data Protection Commission",
+    "age verification"
+   ]
+  },
+  {
+   "url": "https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai",
+   "status": 200,
+   "title": "‘It’s destroyed me completely’: Kenyan moderators decry toll of training of AI models | AI (artificial intelligence) | The Guardian",
+   "fetched_at": "2026-10-15T11:31:07Z",
+   "sha256": "0155c63ab3f6700e1a551c24d6e2dcce45a4ab455f588cc02bf7a00bef781265",
+   "tokens_matched": [
+    "Sama",
+    "OpenAI",
+    "Nairobi",
+    "51 moderators",
+    "$1.46 and $3.74"
+   ]
+  },
+  {
+   "url": "https://time.com/6247678/openai-chatgpt-kenya-workers/",
+   "status": 200,
+   "title": "OpenAI Used Kenyan Workers on Less Than $2 Per Hour: Exclusive",
+   "fetched_at": "2026-10-15T11:27:53Z",
+   "sha256": "a0911436f879d9a6664178399583e39933283f13691c8768849ee4cfe16a0bec",
+   "tokens_matched": [
+    "Sama",
+    "OpenAI",
+    "Kenya",
+    "$1.32"
+   ]
+  },
+  {
+   "url": "https://www.404media.co/laion-datasets-removed-stanford-csam-child-abuse/",
+   "status": 200,
+   "title": "Largest Dataset Powering AI Images Removed After Discovery of Child Sexual Abuse Material",
+   "fetched_at": "2026-10-15T11:31:10Z",
+   "sha256": "033d75e3a1ef2bf4f174bff4ebabff20e2ea578c2a337929148a51f12290a661",
+   "tokens_matched": [
+    "LAION-5B",
+    "Stanford",
+    "3,226",
+    "Stable Diffusion",
+    "1,008"
+   ]
+  },
+  {
+   "url": "https://laion.ai/blog/relaion-5b/",
+   "status": 200,
+   "title": "Releasing Re-LAION-5B: transparent iteration on LAION-5B with additional safety fixes | LAION",
+   "fetched_at": "2026-10-15T11:31:09Z",
+   "sha256": "124cb9b9e5d7d670832744a81be233e0b3d5cc02606273d63f446a8397bf5837",
+   "tokens_matched": [
+    "Re-LAION-5B",
+    "Stanford Internet Observatory",
+    "2236 links were removed",
+    "Internet Watch Foundation"
+   ]
+  },
+  {
+   "url": "https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/",
+   "status": 200,
+   "title": "EEOC Releases Technical Document on AI and Title VII | Law and the Workplace",
+   "fetched_at": "2026-10-15T11:31:11Z",
+   "sha256": "0fe9e1e74c44adb5f621fce9cbd3a1fa3b619b14ed0d73c5437596c019bc265d",
+   "tokens_matched": [
+    "EEOC",
+    "Title VII",
+    "Assessing Adverse Impact",
+    "May 18, 2023"
+   ]
+  },
+  {
+   "url": "https://www.bbc.com/news/technology-45809919",
+   "status": 200,
+   "title": "Amazon scrapped 'sexist AI' tool",
+   "fetched_at": "2026-10-15T11:34:59Z",
+   "sha256": "ebb51b221ee6b27615379bfc5f084425c2334d8a63dae369bb47815a1a131b97",
+   "tokens_matched": [
+    "Amazon",
+    "recruitment tool",
+    "women",
+    "2015",
+    "abandoned"
+   ]
+  },
+  {
+   "url": "https://www.darkreading.com/endpoint-security/ai-blackmamba-keylogging-edr-security",
+   "status": 200,
+   "title": "AI-Powered 'BlackMamba' Keylogging Attack Evades Modern EDR Security",
+   "fetched_at": "2026-10-15T11:32:07Z",
+   "sha256": "9126fa5f6ca5eb1ac985a0095fd58956f490d09d4479f774a20826d340754299",
+   "tokens_matched": [
+    "BlackMamba",
+    "HYAS",
+    "polymorphic keylogger",
+    "industry leading",
+    "zero alerts"
+   ]
+  },
+  {
+   "url": "https://www.csoonline.com/article/575487/chatgpt-creates-mutating-malware-that-evades-detection-by-edr.html",
+   "status": 200,
+   "title": "ChatGPT creates mutating malware that evades detection by EDR | CSO Online",
+   "fetched_at": "2026-10-15T11:32:10Z",
+   "sha256": "ae63e083654304854d69aff384918088f7a8b02f4cab67b56e6846ad25828926",
+   "tokens_matched": [
+    "BlackMamba",
+    "HYAS",
+    "EDR",
+    "polymorphic"
+   ]
+  },
+  {
+   "url": "https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/",
+   "status": 200,
+   "title": "Mitigating Skeleton Key, a new type of generative AI jailbreak technique | Microsoft Security Blog",
+   "fetched_at": "2026-10-15T11:32:23Z",
+   "sha256": "df82b875e4fbd0387e557fe9b8fec8437cd0c05c943a70a7026fb57d30a4b3f9",
+   "tokens_matched": [
+    "Skeleton Key",
+    "Llama3-70b-instruct",
+    "GPT 3.5 Turbo",
+    "Claude 3 Opus",
+    "Cohere Commander R Plus"
+   ]
+  },
+  {
+   "url": "https://labs.zenity.io/p/a-copilot-studio-story-discovery-phase-in-ai-agents-f917",
+   "status": 200,
+   "title": "A Copilot Studio Story: Discovery Phase in AI Agents | Zenity Labs",
+   "fetched_at": "2026-10-15T11:32:17Z",
+   "sha256": "3196860346832dfbcc16be4e71a4afdd4b631444b96409973d938d037f9d2c10",
+   "tokens_matched": [
+    "Copilot Studio",
+    "Jun 11, 2025",
+    "prompt injection via triggers"
+   ]
+  },
+  {
+   "url": "https://labs.zenity.io/p/a-copilot-studio-story-2-when-aijacking-leads-to-full-data-exfiltration-bc4a",
+   "status": 200,
+   "title": "A Copilot Studio Story 2: When AIjacking Leads to Full Data Exfiltration | Zenity Labs",
+   "fetched_at": "2026-10-15T11:32:15Z",
+   "sha256": "d3b4ab25c2e9ced4f2d9ac08d5d859be1c8c7a91ae6a77eaac86d984356d79e8",
+   "tokens_matched": [
+    "Copilot Studio",
+    "AIjacking",
+    "Jul 7, 2025",
+    "100 rows of data"
+   ]
+  }
+ ],
+ "other_fetches": [
+  {
+   "url": "https://en.wikipedia.org/wiki/GitHub_Copilot",
+   "status": 200,
+   "title": "GitHub Copilot - Wikipedia",
+   "fetched_at": "2026-10-15T11:26:56Z",
+   "sha256": "b09f283a72588e509a8eb4e16c068629d585341c43cc4673b47764aa139c5006",
+   "error": null,
+   "tokens_matched": [
+    "Doe",
+    "class action",
+    "licen",
+    "open-source",
+    "Copilot"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2310.19156",
+   "status": 200,
+   "title": "[2310.19156] Poisoning Retrieval Corpora by Injecting Adversarial Passages",
+   "fetched_at": "2026-10-15T11:27:01Z",
+   "sha256": "f6b5949f55ccfe2f2fbb0ed91dac7f05fed19714ae98f397c89573c0389045e7",
+   "error": null,
+   "tokens_matched": [
+    "corpus",
+    "adversarial passages",
+    "retriev"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Clearview_AI",
+   "status": 200,
+   "title": "Clearview AI - Wikipedia",
+   "fetched_at": "2026-10-15T11:27:03Z",
+   "sha256": "4a011699b5d8b3360800672742b4cd67a4cc28b5e27cbefd6a38d2ba30272451",
+   "error": null,
+   "tokens_matched": [
+    "BIPA",
+    "settlement",
+    "Illinois",
+    "23"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/",
+   "status": 200,
+   "title": "Examining Malicious Hugging Face ML Models with Silent Backdoor",
+   "fetched_at": "2026-10-15T11:27:46Z",
+   "sha256": "f466e3b1755b70152731f19557e6a7a0a2442b7a53ff37ce6e50ae2c81538cde",
+   "error": null,
+   "tokens_matched": [
+    "Hugging Face",
+    "model card",
+    "JFrog",
+    "malicious"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.wiz.io/blog/the-urgent-need-for-ai-security-guardrails",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:32:40Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "agent"
+   ]
+  },
+  {
+   "url": "https://www.uber.com/blog/michelangelo-machine-learning-platform/",
+   "status": 406,
+   "title": null,
+   "fetched_at": "2026-10-15T11:27:49Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 406: Not Acceptable",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Michelangelo",
+    "feature store",
+    "lineage"
+   ]
+  },
+  {
+   "url": "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:27:50Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "TikTok",
+    "345",
+    "children",
+    "transparency"
+   ]
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/TikTok",
+   "status": 200,
+   "title": "TikTok - Wikipedia",
+   "fetched_at": "2026-10-15T11:27:52Z",
+   "sha256": "8d952d0e733a556ff9c34eaa0d002a0f66598a64cf656ff71846502cb706760b",
+   "error": null,
+   "tokens_matched": [
+    "Project Clover",
+    "345"
+   ],
+   "tokens_unmatched": [
+    "12 billion"
+   ]
+  },
+  {
+   "url": "https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse",
+   "status": 403,
+   "title": null,
+   "fetched_at": "2026-10-15T11:27:55Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 403: Forbidden",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "LAION",
+    "3,000",
+    "CSAM",
+    "Stable Diffusion"
+   ]
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stable_Diffusion",
+   "status": 200,
+   "title": "Stable Diffusion - Wikipedia",
+   "fetched_at": "2026-10-15T11:27:57Z",
+   "sha256": "f49e39c911f8c1e47f45e9608c9a6b1732a6219390fdccd72de1918262dcdcc2",
+   "error": null,
+   "tokens_matched": [
+    "LAION",
+    "Getty",
+    "Stability AI"
+   ],
+   "tokens_unmatched": [
+    "CSAM"
+   ]
+  },
+  {
+   "url": "https://www.eeoc.gov/newsroom/eeoc-releases-new-resource-artificial-intelligence-and-title-vii",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:27:58Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Title VII",
+    "artificial intelligence"
+   ]
+  },
+  {
+   "url": "https://greshake.github.io/",
+   "status": 200,
+   "title": "Prompt Injections are bad, mkay?",
+   "fetched_at": "2026-10-15T11:28:01Z",
+   "sha256": "1a53a472fdf9260736f62e03eaa6328279e8f497ed6fc95c27b4e2e5c90c9f3f",
+   "error": null,
+   "tokens_matched": [
+    "Bing",
+    "indirect prompt injection"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/greshake/llm-security",
+   "status": 200,
+   "title": "GitHub - greshake/llm-security: New ways of breaking app-integrated LLMs · GitHub",
+   "fetched_at": "2026-10-15T11:28:02Z",
+   "sha256": "12ccffa436af98aa799da2e42c1c8ba33e8a72175551b7c4e19561686f4d71c7",
+   "error": null,
+   "tokens_matched": [
+    "indirect",
+    "prompt injection",
+    "Bing"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.dataprotection.ie/en/news-media/press-releases/Data-Protection-Commission-announces-decision-in-TikTok-inquiry",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:28:34Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "TikTok",
+    "345",
+    "children"
+   ]
+  },
+  {
+   "url": "https://www.edpb.europa.eu/news/news/2023/following-edpb-binding-decision-irish-sa-fines-tiktok-345-million-euro_en",
+   "status": 200,
+   "title": "News | European Data Protection Board",
+   "fetched_at": "2026-10-15T11:28:35Z",
+   "sha256": "4f821cd194b67e0c33834290f85e4e0c3d47b0513e34d2ed7c0f169675e934cc",
+   "error": null,
+   "tokens_matched": [
+    "children"
+   ],
+   "tokens_unmatched": [
+    "TikTok",
+    "345"
+   ]
+  },
+  {
+   "url": "https://www.edpb.europa.eu/news/news/2023/edpb-adopts-art-65-binding-decision-tiktok-inquiry_en",
+   "status": 200,
+   "title": "News | European Data Protection Board",
+   "fetched_at": "2026-10-15T11:28:39Z",
+   "sha256": "4f821cd194b67e0c33834290f85e4e0c3d47b0513e34d2ed7c0f169675e934cc",
+   "error": null,
+   "tokens_matched": [
+    "children"
+   ],
+   "tokens_unmatched": [
+    "TikTok",
+    "345"
+   ]
+  },
+  {
+   "url": "https://www.dataprotection.ie/en/news-media/press-releases/DPC-announces-345-million-fine-of-TikTok",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:30:57Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "TikTok",
+    "345",
+    "children",
+    "transparency",
+    "Clover"
+   ]
+  },
+  {
+   "url": "https://iclg.com/news/22418-clearview-ai-usd-51-75-million-class-action-settlement-approved/",
+   "status": 200,
+   "title": "Clearview AI USD 51.75 million class action settlement approved | ICLG",
+   "fetched_at": "2026-10-15T11:31:04Z",
+   "sha256": "8bc5ccd5d7804bcff1dd9f97dac6f702369f42506f04728f3eac2fbf618c956f",
+   "error": null,
+   "tokens_matched": [
+    "Clearview",
+    "51.75",
+    "BIPA"
+   ],
+   "tokens_unmatched": [
+    "equity"
+   ]
+  },
+  {
+   "url": "https://airisk.mit.edu/ai-incidents/450-kenyan-data-annotators-allegedly-exposed-to-graphic",
+   "status": 200,
+   "title": "Kenyan Data Annotators Allegedly Exposed to… – AI Incident 450",
+   "fetched_at": "2026-10-15T11:31:13Z",
+   "sha256": "fc749521ac3e83ee87fb3c809151db67d7a4f17ce07b1f418779f6d3dda302c5",
+   "error": null,
+   "tokens_matched": [
+    "Kenya",
+    "Sama",
+    "annotat"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2307.06865",
+   "status": 200,
+   "title": "[2307.06865] Effective Prompt Extraction from Language Models",
+   "fetched_at": "2026-10-15T11:32:12Z",
+   "sha256": "c989a5189b3ad9cf9f222d37426c135f3711b600ec3ca0e891e2bff3a7068a0f",
+   "error": null,
+   "tokens_matched": [
+    "prompt",
+    "extract",
+    "ChatGPT"
+   ],
+   "tokens_unmatched": [
+    "GPT-4",
+    "Bing"
+   ]
+  },
+  {
+   "url": "https://arxiv.org/abs/2404.16251",
+   "status": 200,
+   "title": "[2404.16251] Prompt Leakage effect and defense strategies for multi-turn LLM interactions",
+   "fetched_at": "2026-10-15T11:32:14Z",
+   "sha256": "abe1561b712a67ec554af3330796645967c800e0a0ea0fd20736890dd9021020",
+   "error": null,
+   "tokens_matched": [
+    "prompt",
+    "leak",
+    "multi-turn"
+   ],
+   "tokens_unmatched": [
+    "GPT-4"
+   ]
+  },
+  {
+   "url": "https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r",
+   "status": 200,
+   "title": "RCE via .code-workspace files using Prompt Injection · Advisory · cursor/cursor · GitHub",
+   "fetched_at": "2026-10-15T11:32:20Z",
+   "sha256": "7cb5dbea7c1a10e3503e906e52e1153a2f1d157224bc9bae6090d3f77b713e3f",
+   "error": null,
+   "tokens_matched": [
+    "code-workspace",
+    "Cursor"
+   ],
+   "tokens_unmatched": [
+    "command"
+   ]
+  },
+  {
+   "url": "https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq",
+   "status": 200,
+   "title": "Remote Code Execution in Cursor CLI via Cursor Agent MCP OAuth2 Communication · Advisory · cursor/cursor · GitHub",
+   "fetched_at": "2026-10-15T11:32:21Z",
+   "sha256": "ccf9b3925daa38c0aef45dd4536f7f08c77d578fe28966e2db5d8844e33d5360",
+   "error": null,
+   "tokens_matched": [
+    "OAuth",
+    "MCP",
+    "Cursor"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://embracethered.com/blog/posts/2023/advanced-plugin-data-exfiltration-trickery/",
+   "status": 200,
+   "title": "Advanced Data Exfiltration Techniques with ChatGPT · Embrace The Red",
+   "fetched_at": "2026-10-15T11:32:25Z",
+   "sha256": "e301ce291b9197a01a03418f1e4296e332dbb3175df840cd56cc36715e4a8953",
+   "error": null,
+   "tokens_matched": [
+    "plugin",
+    "exfiltr",
+    "ChatGPT"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://embracethered.com/blog/posts/2023/chatgpt-webpilot-data-exfil-via-markdown-injection/",
+   "status": 200,
+   "title": "ChatGPT Plugins: Data Exfiltration via Images & Cross Plugin Request Forgery · Embrace The Red",
+   "fetched_at": "2026-10-15T11:32:27Z",
+   "sha256": "d63581ef546db4629722f6e9b3ab6e872f8d8f182661f89f0d6ba07c5da4e89e",
+   "error": null,
+   "tokens_matched": [
+    "WebPilot",
+    "markdown",
+    "exfiltr"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
+   "status": 200,
+   "title": "OpenClaw Security Risks: AI Agent Threats in SaaS",
+   "fetched_at": "2026-10-15T11:32:28Z",
+   "sha256": "3259a87ee96c674af28b9ab6802fbbdd539f2a61d7424f09f258efb0df5d1d67",
+   "error": null,
+   "tokens_matched": [
+    "OpenClaw",
+    "CVE",
+    "63",
+    "341",
+    "ClawHub"
+   ],
+   "tokens_unmatched": [
+    "138"
+   ]
+  },
+  {
+   "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-34267",
+   "status": 200,
+   "title": "NVD - Home",
+   "fetched_at": "2026-10-15T11:32:29Z",
+   "sha256": "36f38fddbea9a0705d846ac0b26f1c2abc12c99d9ec49282b6aa31b8362a16fb",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Flowise"
+   ]
+  },
+  {
+   "url": "https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-5w3r-f6gm-c25w",
+   "status": 200,
+   "title": "Flowise Authenticated Command Execution and Sandbox Bypass via Puppeteer and Playwright Packages · Advisory · FlowiseAI/Flowise · GitHub",
+   "fetched_at": "2026-10-15T11:32:32Z",
+   "sha256": "f870e5e49469c2fd27af1ac0c1fd9ef679358eccbf99af0d9976c124955c8961",
+   "error": null,
+   "tokens_matched": [
+    "Puppeteer",
+    "Playwright",
+    "sandbox"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/langchain-ai/langchain/pull/1119",
+   "status": 200,
+   "title": "Patch LLMMathChain exec vulnerability by zachschillaci27 · Pull Request #1119 · langchain-ai/langchain · GitHub",
+   "fetched_at": "2026-10-15T11:32:34Z",
+   "sha256": "f650dfe61a75185e3e1f9f04d90dcb33c1e70c9d16eee65baf7c77b91b0472d1",
+   "error": null,
+   "tokens_matched": [
+    "exec",
+    "LLMMathChain"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/hwchase17/langchain/issues/1026",
+   "status": 200,
+   "title": "Security concerns · Issue #1026 · langchain-ai/langchain · GitHub",
+   "fetched_at": "2026-10-15T11:32:36Z",
+   "sha256": "a84425db474fb4a16b81aef411e87537f5ecf0f001facf7f37da6982b34b969a",
+   "error": null,
+   "tokens_matched": [
+    "exec",
+    "prompt"
+   ],
+   "tokens_unmatched": [
+    "LLMMathChain"
+   ]
+  },
+  {
+   "url": "https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-10-15T11:32:40Z",
+   "sha256": null,
+   "error": "refusing to fetch https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/: robots.txt di",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "hiring"
+   ]
+  },
+  {
+   "url": "https://www.invicti.com/blog/web-security/prompt-injection-attacks/",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:32:41Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Copilot",
+    "prompt injection"
+   ]
+  },
+  {
+   "url": "https://arxiv.org/abs/2402.07867",
+   "status": 200,
+   "title": "[2402.07867] PoisonedRAG: Knowledge Corruption Attacks to Retrieval-Augmented Generation of Large Language Models",
+   "fetched_at": "2026-10-15T11:33:32Z",
+   "sha256": "f6aae19a3c7dbc1990981b92c97eadb68fa0227a30275e3c3088ea15a2068db3",
+   "error": null,
+   "tokens_matched": [
+    "five",
+    "millions",
+    "PoisonedRAG",
+    "knowledge"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2405.20485",
+   "status": 200,
+   "title": "[2405.20485] Phantom: General Backdoor Attacks on Retrieval Augmented Language Generation",
+   "fetched_at": "2026-10-15T11:33:33Z",
+   "sha256": "8170ec123b438afce8a891defb5c132e9e8e156b52da0a02cba52b436d63c33c",
+   "error": null,
+   "tokens_matched": [
+    "Phantom",
+    "trigger",
+    "Chaudhari",
+    "retriev"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2211.03622",
+   "status": 200,
+   "title": "[2211.03622] Do Users Write More Insecure Code with AI Assistants?",
+   "fetched_at": "2026-10-15T11:33:34Z",
+   "sha256": "e0cb1192fc687c42262a304ddcd38a9a1865b4e5e4779aaaae9d06497eb05f7a",
+   "error": null,
+   "tokens_matched": [
+    "insecure",
+    "AI assistant",
+    "users"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/FlowiseAI/Flowise/pull/5231",
+   "status": 200,
+   "title": "Chore/Disable Available Dep By Default by HenryHengZJ · Pull Request #5231 · FlowiseAI/Flowise · GitHub",
+   "fetched_at": "2026-10-15T11:33:36Z",
+   "sha256": "5ac4540e814cca8d6e7d972c154a965bd540289b05e529a5ce236b6b92f7c706",
+   "error": null,
+   "tokens_matched": [
+    "Puppeteer",
+    "Playwright"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.vulncheck.com/advisories/flowise-auth-command-execution-and-sandbox-bypass-via-puppeteer-and-playwright-packages",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:33:38Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Puppeteer",
+    "Playwright",
+    "ALLOW_BUILTIN_DEP"
+   ]
+  },
+  {
+   "url": "https://github.com/langchain-ai/langchain/releases/tag/langchain-community%3D%3D0.2.9",
+   "status": 200,
+   "title": "Release langchain-community==0.2.9 · langchain-ai/langchain · GitHub",
+   "fetched_at": "2026-10-15T11:33:40Z",
+   "sha256": "3830ac1baf0b91fbeaebca7fff0bde4fc5e9ee50ef775d9342afdeaf31012f84",
+   "error": null,
+   "tokens_matched": [
+    "langchain"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/hwchase17/langchain/issues/814",
+   "status": 200,
+   "title": "Exploiting llm-math (and likely PAL) and suggesting and alternative · Issue #814 · langchain-ai/langchain · GitHub",
+   "fetched_at": "2026-10-15T11:33:42Z",
+   "sha256": "fcc78babcd67249eb11da725ae1947a10eda01feb0a8e123153b75f29a3e75a3",
+   "error": null,
+   "tokens_matched": [
+    "LLMMathChain",
+    "exec"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://depthfirst.com/post/1-click-rce-to-steal-your-moltbot-data-and-keys",
+   "status": 200,
+   "title": "1-Click RCE To Steal Your OpenClaw Data and Keys (CVE-2026-25253) | depthfirst",
+   "fetched_at": "2026-10-15T11:34:25Z",
+   "sha256": "45c35be63988e287ad29d5f8cf2f69d66c52aabe7833a4be5452728f194660e0",
+   "error": null,
+   "tokens_matched": [
+    "OpenClaw",
+    "Moltbot",
+    "RCE"
+   ],
+   "tokens_unmatched": [
+    "8.8"
+   ]
+  },
+  {
+   "url": "https://ethiack.com/news/blog/one-click-rce-moltbot",
+   "status": 200,
+   "title": "One-click RCE on OpenClaw in under 2 hours with an Autonomous Hacking Agent | Ethiack",
+   "fetched_at": "2026-10-15T11:34:28Z",
+   "sha256": "ec113060cbff1d74df666b9081f1b68773524b01558f5d880552ec0735fad73b",
+   "error": null,
+   "tokens_matched": [
+    "Moltbot",
+    "RCE"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/openclaw/openclaw/security/advisories/GHSA-g8p2-7wf7-98mq",
+   "status": 200,
+   "title": "1-Click RCE via Authentication Token Exfiltration From gatewayUrl · Advisory · openclaw/openclaw · GitHub",
+   "fetched_at": "2026-10-15T11:34:32Z",
+   "sha256": "29775e70dd2cefa4b34b864a368a36b89572758ff25eb58d5de3541fbe41c298",
+   "error": null,
+   "tokens_matched": [
+    "8.8",
+    "RCE"
+   ],
+   "tokens_unmatched": [
+    "CVE-2026-25253"
+   ]
+  },
+  {
+   "url": "https://atlas.mitre.org/studies/AML.CS0050",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:34:34Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "OpenClaw",
+    "ClawHub",
+    "skills",
+    "Moltbot"
+   ]
+  },
+  {
+   "url": "https://github.com/advisories/GHSA-r2c6-8jc8-g32w",
+   "status": 200,
+   "title": "Duplicate Advisory: 1-Click RCE via Authentication Token Exfiltration From gatewayUrl · GHSA-r2c6-8jc8-g32w · GitHub Advisory Database · GitHub",
+   "fetched_at": "2026-10-15T11:34:36Z",
+   "sha256": "3cc30e28868ecb54b5402b3a2e3ee6d58f36682426738ad10c13e64dca5a56db",
+   "error": null,
+   "tokens_matched": [
+    "OpenClaw",
+    "CVE"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25253",
+   "status": 200,
+   "title": "NVD - Home",
+   "fetched_at": "2026-10-15T11:34:37Z",
+   "sha256": "00879933c2569a281eb9c76b9b3e8b3f9da3298363ad26a8b98e136d43cc9092",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "OpenClaw",
+    "8.8"
+   ]
+  },
+  {
+   "url": "https://openclaw.ai/blog",
+   "status": 200,
+   "title": "Blog - OpenClaw",
+   "fetched_at": "2026-10-15T11:34:40Z",
+   "sha256": "ad4df85829ea2ef3296a8928a1c46da4d08755ace4cdf437adcea8ae096b7791",
+   "error": null,
+   "tokens_matched": [
+    "OpenClaw"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.eeoc.gov/laws/guidance/select-issues-assessing-adverse-impact-software-algorithms-and-artificial",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-15T11:35:00Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Title VII"
+   ]
+  }
+ ]
+}
