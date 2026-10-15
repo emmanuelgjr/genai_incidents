@@ -83,6 +83,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔨 D131 — zero-row ingest refusal (WS4): **DISPATCHED 2026-10-15** to a fresh pipeline-engineer on `ws4/d131-zero-row-ingest-2026-10-15` (worktree `C:/repos/gi-wt-d131`, base `77aa2ee3`). Target: merged before Sun 2026-10-18 04:00 UTC.
+- **D130-1 post-merge [R] on main `77aa2ee3`:** validate rc 0 ("integrity: no duplicate CVE/source keys; all deprecations resolve."); check_stats_drift clean; test_unverified_status + test_export_integrity + test_landmark_distribution `90 passed, 1 xfailed`; porcelain empty; pushed `763e790e..77aa2ee3`, ls-remote = local.
+- **docs-warden dispatched** on the D130-1 merge (status enum, counts formula, manifest keys).
+
 ### ✅ D130-1: **MERGED to main 2026-10-15 (`--no-ff`, HEAD^2 = `72abe507`)** under D136 (apply verbatim + string check) and D137 (standing-test fix + foreman re-verify). Gate history: BOUNCE #1 (`1dea1b82`), BOUNCE #2 (`7f2a7634`, escalated), foreman [R] failure on `03f0e91d` (escalated), fix `72abe507`.
 **Foreman [R] at `72abe507` (independent route — 11 real rows committed unverified in a scratch clone, code identical to the branch, only data differs):**
 - Counts 15744 / 29 retracted / 11 unverified / 21 disputed / 2023 landmark, consistent in envelope and stats; build chain all rc 0, validate and drift rc 0.
