@@ -83,7 +83,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
-### 🔨 D130-1 — `unverified` status machinery (WS3): **DISPATCHED 2026-10-14** to schema-architect on `ws3/d130-1-unverified-status-2026-10-14` (worktree `C:/repos/gi-wt-d130`, base `e91b61ae`). No data rows change; only intended data delta `unverified_count: 0`; fixture tests mutation-proven at every retracted-handling site.
+### ⚖ D135, USER RULINGS 2026-10-15 (D130-1 specialist's open questions)
+- **(1) Envelope key: ALWAYS.** incidents.json and incidents.min.json (all copies) carry `unverified_count` even when 0. **Not as built** (built: only when non-zero). This is a deliberate, declared incidents.json envelope byte delta; per-row content stays identical. → rework on D130-1.
+- **(2) Precedence accepted (Recommended):** retracted > unverified > disputed.
+- **(3) Precision frame (Recommended):** the ratified sample stays untouched; FUTURE draws exclude `unverified` like `retracted` (precision_sample.py frame uses `stands()` or equivalent). → rework on D130-1.
+- **(4) Manifest schema keeps `unverified_count` REQUIRED (as built, Recommended).**
+- **Routing:** gate-d130-1 is gating `1dea1b82` as built. Its defects (if any) + D135 (1) and (3) go back to the D130-1 specialist together; then a scoped re-gate. D135 changes are ruling-driven rework, not a bounce.
+
+### 🔍 D130-1 — `unverified` status machinery: **REPORTED `1dea1b82`, gate-d130-1 dispatched 2026-10-15.** Original dispatch: (WS3): **DISPATCHED 2026-10-14** to schema-architect on `ws3/d130-1-unverified-status-2026-10-14` (worktree `C:/repos/gi-wt-d130`, base `e91b61ae`). No data rows change; only intended data delta `unverified_count: 0`; fixture tests mutation-proven at every retracted-handling site.
 
 ### ✅ D129: **PASS (gate-d129 on `0bf6c002`), MERGED to main 2026-10-14 (`--no-ff`, HEAD^2 = `0bf6c002`)**
 **Verdict, in the gate's words:** "VERDICT: PASS. DEFECTS: none." Gate premise correction: branch merge-base is `af39a62f`, not `fd81080b` (the two-dot diff's 951 deletions are main-side board/audit commits; three-dot and merge-tree touch only the 3 files).
