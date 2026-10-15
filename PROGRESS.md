@@ -83,6 +83,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D130-1 rework REPORTED `7f2a7634` (2026-10-15): defect 1 fixed + 3 more real-corpus tests; D135(1) envelope key always (one header line per envelope file, 0 row deltas per entity); D135(3) future precision draws exclude unverified (pinned sample still reproduces); advisories A, B (fail-closed shape + "matched" check), D, E (lowering kept). Claims: pytest 1450 + 1 xfailed; 33/33 + M34 mutations killed. **Scoped re-gate sent to gate-d130-1.** Second bounce → user.
+
 ### 🔁 D130-1: **BOUNCE #1 (gate-d130-1 on `1dea1b82`), 2026-10-15.**
 **Defect, in the gate's words:** "tests/test_export_integrity.py:69 `standing = [e for e in raw if e.get("status") != "retracted"]` in test_manifest_counts_agree_with_the_corpus_by_an_independent_path (also :72-74 retracted_count = len(raw)-len(standing); disputed/landmark over that set). Reads the real corpus, so passes only because unverified_count is 0." **Proof:** INC-045 override + full build + full pytest → `1 failed, 1444 passed`, `assert 15754 == 15755`. Fix: exclude both statuses, spelled out independently; assert unverified_count against rows; add it to the tuple at :60.
 
