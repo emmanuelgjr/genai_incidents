@@ -65,10 +65,7 @@ def test_payload_that_is_not_a_list_of_rows_aborts(tmp_path, body):
 
 @pytest.mark.parametrize("body,expect", [
     ([], []),                                    # a legitimately empty list is not an error
-    ({}, []),
-    ({"incidents": []}, []),
-    ({"source": "x", "license": "y"}, []),       # provenance-style side file: no rows, by design
-    ({"vulnerabilities": [{"a": 1}]}, []),       # cisa_kev-style side file
+    ({"incidents": []}, []),                     # D131: side files are now allowlisted by NAME (test_d131)
     ({"entries": [{"a": 1}]}, [{"a": 1}]),
     ([{"a": 1}], [{"a": 1}]),
 ])

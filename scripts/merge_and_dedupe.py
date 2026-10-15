@@ -1136,12 +1136,27 @@ class IngestParseError(SystemExit):
     """An ingest/*.json that cannot be read as a list of source rows (D129)."""
 
 
+# D131: ingest/ files that are dicts BY DESIGN and carry no source rows. Explicit and
+# narrow: exact names plus the *.provenance.json pattern. Any other dict must name a
+# row key, or the build refuses (a source whose row key drifts, e.g. {"items": [...]},
+# would otherwise silently drop to 0 rows).
+INGEST_ROW_KEYS = ("incidents", "entries", "data")
+INGEST_SIDE_FILES = frozenset({"cisa_kev.json", "cve_rejections.json"})  # own loaders: CISA_KEV_PATH, CVE_REJECTIONS_PATH
+
+
+def _is_ingest_side_file(path: Path) -> bool:
+    return path.name in INGEST_SIDE_FILES or path.name.endswith(".provenance.json")
+
+
 def load_source(path: Path) -> list[dict]:
     """Rows of one ingest/*.json. D129: an unparseable file, or a payload that is
     not a list of rows, ABORTS (a source silently dropping to 0 rows is the
-    failure). Not an error: a legitimately empty list, and a dict carrying none of
-    incidents/entries/data -- side files in ingest/ (provenance records, the CISA
-    KEV and CVE rejection snapshots) are dicts of that shape and carry no rows."""
+    failure). D131: a dict must carry a row key (incidents/entries/data) holding a
+    list, except the allowlisted side files (provenance records, CISA KEV, CVE
+    rejections), which carry no rows and return []. A real [] (bare, or under a
+    row key) is a legitimately empty source and loads. A row key holding anything
+    else -- {}, "", 0, null -- refuses; null too, because a feed emitting null
+    instead of a list is a broken source, not an empty one."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, OSError) as e:  # ValueError covers JSONDecodeError + UnicodeDecodeError
@@ -1150,10 +1165,26 @@ def load_source(path: Path) -> list[dict]:
             "(the source would silently drop to 0 rows). " + abort_sentence()
         )
     if isinstance(data, dict):
-        data = data.get("incidents") or data.get("entries") or data.get("data") or []
+        if _is_ingest_side_file(path):
+            return []
+        present = [k for k in INGEST_ROW_KEYS if k in data]
+        if not present:
+            raise IngestParseError(
+                f"[FATAL] {path} is a dict with none of the row keys {'/'.join(INGEST_ROW_KEYS)} "
+                f"(keys: {sorted(data)[:8]}); it would silently load as 0 rows. Refusing to build "
+                "(D131; if this is a new non-row side file, allowlist it in INGEST_SIDE_FILES). "
+                + abort_sentence()
+            )
+        for k in present:
+            if not isinstance(data[k], list):
+                raise IngestParseError(
+                    f"[FATAL] {path}: row key '{k}' is {type(data[k]).__name__}, not a list of rows; "
+                    "refusing to build (D131). " + abort_sentence()
+                )
+        data = next((data[k] for k in present if data[k]), [])
     if not isinstance(data, list):
         raise IngestParseError(
-            f"[FATAL] {path} is not a list of rows (top-level or incidents/entries/data is "
+            f"[FATAL] {path} is not a list of rows (top-level is "
             f"{type(data).__name__}); refusing to build. " + abort_sentence()
         )
     return data
