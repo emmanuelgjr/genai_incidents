@@ -22,6 +22,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from entry_status import stands
 from taxonomy_versions import taxonomy_versions
 
 
@@ -356,6 +357,16 @@ def render_incident_block(e: dict) -> list[str]:
             f"Program (checked {reason.get('as_of', 'n/a')}). Kept so this ID keeps "
             "resolving; not counted as an incident."
         )
+    elif e.get("status") == "unverified":
+        # D130: no confirmed primary source after a documented effort.
+        reason = e.get("status_reason") or {}
+        lines.append("")
+        lines.append(
+            "**UNVERIFIED** -- the references on this entry were found not to be "
+            "sources for it, and no confirmed primary source was found "
+            f"(reviewed {reason.get('as_of', 'n/a')}). Kept so this ID keeps "
+            "resolving; not counted as an incident."
+        )
     elif e.get("status") == "disputed":
         # D64 (v2.13.0 item 8): the CVE records this entry rests on are
         # PUBLISHED but disputed (CNA/ADP `disputed` tag or `** DISPUTED **`
@@ -540,13 +551,13 @@ def render():
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     entries = list(raw["incidents"])
     entries.sort(key=sort_key)
-    # WS4-T2: retracted entries (e.g. every CVE REJECTED) are never deleted, so
+    # WS4-T2/D130: retracted and unverified entries are never deleted, so
     # their IDs keep resolving and they keep a (bannered) card in the year
     # shards -- but they are not incidents that stand, so they are excluded
     # from every count, chart and table. `all_entries` feeds only the shards.
     all_entries = entries
-    entries = [e for e in all_entries if e.get("status") != "retracted"]
-    n_retracted = len(all_entries) - len(entries)
+    entries = [e for e in all_entries if stands(e)]
+    n_retracted = sum(1 for e in all_entries if e.get("status") == "retracted")
 
     # Tiny stats file for the README's live incident-count badge (shields.io
     # dynamic JSON reads it). Kept small so the badge endpoint is fast, and
@@ -555,6 +566,8 @@ def render():
     stats = {
         "incident_count": len(entries),
         "retracted_count": n_retracted,
+        # D130: outside incident_count, like retracted_count.
+        "unverified_count": sum(1 for e in all_entries if e.get("status") == "unverified"),
         # D64: CVE-disputed entries STAY in incident_count (they are standing
         # incidents with lowered confidence); this is a subset count of
         # incident_count, never added to or subtracted from it.
@@ -618,6 +631,9 @@ def render():
     )
     lines.append(
         f"  - retracted (NOT counted; every CVE REJECTED): {stats['retracted_count']:,}"
+    )
+    lines.append(
+        f"  - unverified (NOT counted; no confirmed primary source): {stats['unverified_count']:,}"
     )
     if year_counts:
         latest = max(year_counts)

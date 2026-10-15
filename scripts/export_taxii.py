@@ -34,6 +34,7 @@ import json
 import uuid
 from pathlib import Path
 
+from entry_status import stands
 from export_stix import build_bundle, NS, _owasp_llm_source_name
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -204,9 +205,10 @@ curl -s "{api_root}collections/{COLLECTION_ID}/objects.json" \\
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
-    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
-    # their IDs resolve, but are not published into downstream feeds.
-    incidents = [e for e in incidents if e.get("status") != "retracted"]
+    # WS4-T2/D130: retracted (all CVEs REJECTED) and unverified (no confirmed
+    # primary source) entries stay in data/incidents.json so their IDs
+    # resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if stands(e)]
     n = build(incidents)
     print(f"[taxii] wrote static TAXII-compatible discovery document ({n} objects, 1 collection) "
           f"-> docs/taxii2/  [collection {COLLECTION_ID}]")

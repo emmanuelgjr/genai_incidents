@@ -6,8 +6,8 @@ Two artifacts, one module, so the producers cannot drift apart:
 * ``build_manifest.json`` -- which build this copy of the data came from::
 
       {"commit", "built_at", "built_at_basis", "dirty", "version",
-       "incident_count", "retracted_count", "disputed_count",
-       "landmark_count", "taxonomy_versions"}
+       "incident_count", "retracted_count", "unverified_count",
+       "disputed_count", "landmark_count", "taxonomy_versions"}
 
   Every count and the taxonomy versions are copied from ``data/stats.json``
   (invariant 6: the one count source); only ``commit``/``built_at``/``dirty``
@@ -64,13 +64,13 @@ TREES: dict[str, str] = {
 
 MANIFEST_KEYS = (
     "commit", "built_at", "built_at_basis", "dirty", "version",
-    "incident_count", "retracted_count", "disputed_count", "landmark_count",
-    "taxonomy_versions",
+    "incident_count", "retracted_count", "unverified_count", "disputed_count",
+    "landmark_count", "taxonomy_versions",
 )
 # Copied verbatim from data/stats.json (everything in the manifest but the
 # three build-origin fields).
-STATS_KEYS = ("version", "incident_count", "retracted_count", "disputed_count",
-              "landmark_count", "taxonomy_versions")
+STATS_KEYS = ("version", "incident_count", "retracted_count", "unverified_count",
+              "disputed_count", "landmark_count", "taxonomy_versions")
 
 
 def sha256_of(path: Path) -> str:

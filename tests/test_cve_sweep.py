@@ -184,7 +184,7 @@ def _disp_entry(**kw):
 
 
 def _wrap(*entries):
-    return {"incident_count": len(entries), "retracted_count": 0, "incidents": list(entries)}
+    return {"incident_count": len(entries), "retracted_count": 0, "unverified_count": 0, "incidents": list(entries)}
 
 
 def test_validate_disputed_rules_pass_clean_and_fire_on_corruption():

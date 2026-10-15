@@ -1,6 +1,7 @@
 {
   "incident_count": 15755,
   "retracted_count": 29,
+  "unverified_count": 0,
   "disputed_count": 22,
   "landmark_count": 2028,
   "version": "2.13.0",

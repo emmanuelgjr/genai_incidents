@@ -44,7 +44,7 @@ _INCIDENTS = [
 
 def _real_rows():
     raw = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))
-    return [e for e in raw["incidents"] if e.get("status") != "retracted"]
+    return [e for e in raw["incidents"] if e.get("status") not in ("retracted", "unverified")]
 
 
 def _by_incident(bundle, iid):

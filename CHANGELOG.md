@@ -7,6 +7,14 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Added - `status: unverified` and `unverified_count` (D130, schema machinery only)
+
+- **Additive schema value.** `status` gains `unverified` (with `status_reason.code: no-confirmed-source`) for an entry whose references turn out not to be sources for it and for which no confirmed primary source could be found after a documented effort. It is treated like `retracted`: kept in `data/incidents.json` with its ID resolvable, not counted in `incident_count`, omitted from the site and the STIX/TAXII/MISP/Hugging Face exports. It is set only by a reviewed decision in `data/curation_overrides.json`, never by hand in `data/`.
+- **New count.** `unverified_count` (outside `incident_count`, like `retracted_count`) is in `data/stats.json`, `build_manifest.json`, and the envelope of `data/incidents.json` and every `incidents.min.json` copy. In the envelopes it is **always present, 0 included** (D135), so those files change by one header line each; no entry changes. `INCIDENTS.md` gains an "unverified" line.
+- **Consumer impact.** No entry is unverified yet (`unverified_count` is 0), so no row and no export changes. Later releases may mark rows unverified, and those rows will then drop out of the exports and out of `incident_count`. A consumer that checks `incident_count + retracted_count == len(incidents)` should add `unverified_count`.
+- **Build-manifest schema now requires `unverified_count`.** A v2.13.0 `build_manifest.json` (which lacks the key) fails validation against the new `schema/build_manifest.schema.json`; validate each manifest against the schema shipped with it.
+- **Precision sampling.** Future draws by `scripts/precision_sample.py` exclude unverified rows as they exclude retracted ones (D135); the ratified sample is unchanged and still reproduces from its pinned data.
+
 ### Changed - a corrupt ingest file now fails the build closed (D129)
 
 - `merge_and_dedupe.py` used to print a WARN for an unparseable `ingest/*.json`, drop that source to 0 rows and exit 0 with its outputs written. It now refuses before any output is written, naming the file and the parse error, with the job-aware abort sentence. A payload that is not a list of rows (a scalar, or `incidents`/`entries`/`data` holding a non-list) is refused the same way. A legitimately empty list, and the dict-shaped side files in `ingest/` that carry no rows (provenance records, CISA KEV, CVE rejections), still load as before. No data change.

@@ -110,7 +110,7 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
     """
     stats_path = tmp_path / "stats.json"
     stats_path.write_text(
-        '{"incident_count": 12986, "retracted_count": 0, "disputed_count": 0, '
+        '{"incident_count": 12986, "retracted_count": 0, "unverified_count": 0, "disputed_count": 0, '
         '"landmark_count": 1865, "version": "2.8.0", '
         '"generated": "2026-07-12", "year_min": 1983, "year_max": 2026}',
         encoding="utf-8",
@@ -173,7 +173,7 @@ def _rows():
 
 def test_derive_counts_keeps_disputed_inside_incident_count():
     c = checker.derive_counts(_rows())
-    assert c == {"incident_count": 3, "retracted_count": 1,
+    assert c == {"incident_count": 3, "retracted_count": 1, "unverified_count": 0,
                  "disputed_count": 1, "landmark_count": 1}
     # invariant 1: no combined headline -- the three are never summed anywhere
     assert "standing_count" not in c and "total_count" not in c

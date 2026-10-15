@@ -57,8 +57,8 @@ def _manifest(**kw):
 def test_manifest_matches_stats_json_field_for_field():
     m = _manifest()
     assert ei.validate_manifest(m) == []
-    for k in ("version", "incident_count", "retracted_count", "disputed_count",
-              "landmark_count", "taxonomy_versions"):
+    for k in ("version", "incident_count", "retracted_count", "unverified_count",
+              "disputed_count", "landmark_count", "taxonomy_versions"):
         assert m[k] == STATS[k], k
     assert list(m) == list(ei.MANIFEST_KEYS)
 
@@ -66,10 +66,14 @@ def test_manifest_matches_stats_json_field_for_field():
 def test_manifest_counts_agree_with_the_corpus_by_an_independent_path():
     """Not stats.json -> manifest again: re-derive from the rows."""
     raw = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
-    standing = [e for e in raw if e.get("status") != "retracted"]
+    # Spelled out, not imported from scripts/entry_status.py: this is the
+    # independent path. D130: unverified is outside incident_count too.
+    standing = [e for e in raw if e.get("status") not in ("retracted", "unverified")]
     m = _manifest()
     assert m["incident_count"] == len(standing)
-    assert m["retracted_count"] == len(raw) - len(standing)
+    assert m["retracted_count"] == sum(1 for e in raw if e.get("status") == "retracted")
+    assert m["unverified_count"] == sum(1 for e in raw if e.get("status") == "unverified")
+    assert m["incident_count"] + m["retracted_count"] + m["unverified_count"] == len(raw)
     assert m["disputed_count"] == sum(1 for e in standing if e.get("status") == "disputed")
     assert m["landmark_count"] == sum(1 for e in standing if e.get("tier") == "landmark")
     # D64: disputed stays counted -- it is inside incident_count, not beside it
@@ -317,7 +321,7 @@ def test_misp_omits_review_by_tag_when_the_marker_has_none(tmp_path, monkeypatch
 
 def test_misp_real_feed_marked_incident_set_equals_marked_rows(tmp_path, monkeypatch):
     raw = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
-    rows = [e for e in raw if e.get("status") != "retracted"]
+    rows = [e for e in raw if e.get("status") not in ("retracted", "unverified")]
     marked = {e["id"] for e in rows if e.get("source_freshness")}
     attrs = _misp_attrs(tmp_path, monkeypatch, rows)
     tagged = {t["name"].split('"')[1] for a in attrs for t in a["Tag"]

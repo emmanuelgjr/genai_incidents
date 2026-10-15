@@ -51,6 +51,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from entry_status import stands
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "incidents.min.json"
 DOCS_DATA = ROOT / "docs" / "data"
@@ -79,7 +81,7 @@ CORE_FIELDS = [
     "owasp_llm", "owasp_asi", "cve_ids", "affected", "corpus", "quality_tier",
     "tier", "primary_reference",
     # D64: renderStats() counts status == "disputed" (a subset of the rows,
-    # still counted); retracted rows are already dropped from this payload.
+    # still counted); retracted and unverified rows are already dropped from this payload.
     "status",
 ]
 
@@ -97,8 +99,9 @@ DETAIL_FIELDS = [
 
 def main() -> int:
     payload = json.loads(SRC.read_text(encoding="utf-8"))
-    # WS4-T2: retracted entries are not listed on the site (IDs still resolve in data/).
-    incidents = [e for e in payload["incidents"] if e.get("status") != "retracted"]
+    # WS4-T2/D130: retracted and unverified entries are not listed on the site
+    # (IDs still resolve in data/).
+    incidents = [e for e in payload["incidents"] if stands(e)]
 
     core_incidents = []
     detail_by_year: dict[str, dict[str, dict]] = {}

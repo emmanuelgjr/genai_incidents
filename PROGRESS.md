@@ -83,6 +83,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### ✅ D130-1: **MERGED to main 2026-10-15 (`--no-ff`, HEAD^2 = `72abe507`)** under D136 (apply verbatim + string check) and D137 (standing-test fix + foreman re-verify). Gate history: BOUNCE #1 (`1dea1b82`), BOUNCE #2 (`7f2a7634`, escalated), foreman [R] failure on `03f0e91d` (escalated), fix `72abe507`.
+**Foreman [R] at `72abe507` (independent route — 11 real rows committed unverified in a scratch clone, code identical to the branch, only data differs):**
+- Counts 15744 / 29 retracted / 11 unverified / 21 disputed / 2023 landmark, consistent in envelope and stats; build chain all rc 0, validate and drift rc 0.
+- **Full pytest: 1459 passed, 1 xfailed** (was 1 failed at `03f0e91d`).
+- **Fires:** reverting the pick_rows fix → `1 failed, 8 passed` (test_every_class_is_marked_and_kept). Earlier, reverting one landmark filter → `1 failed, 8 passed` (test_landmark_count_reproducible_from_min_json).
+- String check: exact D136 filter at tests/test_landmark_distribution.py:661 and :673.
+- Specialist (testimony): plain-branch pytest 1459 + 1 xfailed; data diff vs `e91b61ae` = 6 files +1 header line each (incidents.json, 3× incidents.min.json, stats.json, INCIDENTS.md), rows per-entity identical.
+**Post-merge [R] on main:** see commit message checks below in the next board entry.
+**Advisory carried to D130-2:** its gate must assert PER ID that every override target ends up unverified-or-retracted (a key that matches the wrong row can't be caught by counts). The MISP freshness test is self-consistent and can't fire on unverified rows; test_real_exports_drop_every_class covers the exporter instead.
+**Next:** D131 (refresh safety, ideally before Sun 2026-10-18 04:00 UTC); docs-warden on the merged change (counts surface + schema + CHANGELOG).
+
 ### ⚖ D137, USER RULING 2026-10-15: **apply the small standing-test fix + foreman re-verify (Recommended).** Specialist fixes pick_rows (skip already-unverified) and counts against control baseline + picks; foreman re-runs the 11-row route + full pytest and a revert-fires check, then merges. Sent to the D130-1 specialist.
 
 ### ⛔ D130-1 at `03f0e91d` — foreman [R] verification under D136 FAILED one check (2026-10-15). Not merged. To the user.

@@ -49,6 +49,7 @@ import uuid
 from collections import defaultdict
 from pathlib import Path
 
+from entry_status import stands
 from taxonomy_versions import taxonomy_versions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -333,9 +334,10 @@ public disclosures, not active-campaign IOCs (threat level: low).
 def main() -> None:
     raw = json.loads((DATA / "incidents.json").read_text(encoding="utf-8"))
     incidents = raw.get("incidents", [])
-    # WS4-T2: retracted entries (all CVEs REJECTED) stay in data/incidents.json so
-    # their IDs resolve, but are not published into downstream feeds.
-    incidents = [e for e in incidents if e.get("status") != "retracted"]
+    # WS4-T2/D130: retracted (all CVEs REJECTED) and unverified (no confirmed
+    # primary source) entries stay in data/incidents.json so their IDs
+    # resolve, but are not published into downstream feeds.
+    incidents = [e for e in incidents if stands(e)]
     n_events, n_attr = build(incidents)
     print(f"[misp] wrote MISP feed: {n_events} year-events, {n_attr} attributes "
           f"-> docs/misp/")

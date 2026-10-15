@@ -114,6 +114,19 @@ def test_allocation_and_frame():
     assert sum(s["population"] for s in frame["strata"]) == frame["frame_population"]
 
 
+def test_future_draws_exclude_unverified_like_retracted():
+    """D135(3): a draw made after the ruling leaves unverified rows out of the
+    frame and records the exclusion; the ratified sample is untouched (its
+    reproduction from the pinned blob is test_reproduces_from_pinned_blob)."""
+    inc = _synthetic()
+    inc.append({"id": "INC-UNV", "tier": "feed", "status": "unverified", "quality_tier": "auto",
+                "year": 2024, "source_ids": ["CVE-Y"]})
+    frame, sample = ps.draw(inc, 1)
+    assert frame["exclusions"] == {"status == retracted": 1, "status == unverified": 1}
+    assert frame["frame_population"] == len(inc) - 2
+    assert "INC-UNV" not in {e["id"] for e in sample["entries"]}
+
+
 def test_small_family_is_pooled():
     inc = _synthetic()
     inc.append({"id": "INC-AVID1", "tier": "feed", "quality_tier": "auto", "year": 2025, "source_ids": ["AVID-1"]})

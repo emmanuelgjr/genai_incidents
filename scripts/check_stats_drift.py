@@ -237,12 +237,16 @@ def check_other_version_literals(stats: dict, common_src: str, incidents_md: str
 def derive_counts(entries: list[dict]) -> dict:
     """Counts re-derived from a row list, independently of render_markdown.py.
 
-    ``incident_count`` = rows that stand (not retracted); ``disputed_count`` is
-    the subset of those with ``status: disputed`` (D64: still counted)."""
-    standing = [e for e in entries if e.get("status") != "retracted"]
+    ``incident_count`` = rows that stand (neither retracted nor, D130,
+    unverified); ``disputed_count`` is the subset of those with
+    ``status: disputed`` (D64: still counted). Deliberately spelled out here
+    rather than imported from entry_status.py, so this stays an independent
+    derivation of what render_markdown.py writes."""
+    standing = [e for e in entries if e.get("status") not in ("retracted", "unverified")]
     return {
         "incident_count": len(standing),
-        "retracted_count": len(entries) - len(standing),
+        "retracted_count": sum(1 for e in entries if e.get("status") == "retracted"),
+        "unverified_count": sum(1 for e in entries if e.get("status") == "unverified"),
         "disputed_count": sum(1 for e in standing if e.get("status") == "disputed"),
         "landmark_count": sum(1 for e in standing if e.get("tier") == "landmark"),
     }

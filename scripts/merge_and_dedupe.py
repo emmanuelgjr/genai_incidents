@@ -1307,11 +1307,28 @@ def _load_cve_disputes() -> dict[str, dict]:
 _CONFIDENCE_DOWN = {"high": "medium", "medium": "low", "low": "low"}
 
 
-def _lower_confidence_if_disputed(e: dict) -> None:
+def _rests_only_on_disputed(e: dict, rejected: dict, disputed: dict) -> bool:
+    """The ``status: disputed`` condition of ``_apply_cve_rejections``: at
+    least one CVE is disputed, every CVE is disputed or rejected, and every
+    source_id is one of those CVEs (no other evidence)."""
+    cves = set(e.get("cve_ids") or [])
+    standing = rejected.keys() | disputed.keys()
+    return bool(cves & disputed.keys()) and cves <= standing and set(e.get("source_ids") or []) <= standing
+
+
+def _lower_confidence_if_disputed(e: dict, rejected: dict | None = None,
+                                  disputed: dict | None = None) -> None:
     """A disputed entry drops ONE confidence level (agent-suggested rule; see
     docs/audits/rejected-cve-sweep-gap-2026-10-09.md). Applied after
-    ``_derive_confidence``; deterministic and self-reversing."""
-    if e.get("status") == "disputed" and e.get("confidence") in _CONFIDENCE_DOWN:
+    ``_derive_confidence``; deterministic and self-reversing.
+
+    D130 advisory E: an entry that would be disputed but is ``unverified``
+    (unverified replaces disputed) keeps the lowering -- marking it
+    unverified must never RAISE its confidence."""
+    lower = e.get("status") == "disputed" or (
+        e.get("status") == "unverified"
+        and _rests_only_on_disputed(e, rejected or {}, disputed or {}))
+    if lower and e.get("confidence") in _CONFIDENCE_DOWN:
         e["confidence"] = _CONFIDENCE_DOWN[e["confidence"]]
 
 
@@ -1352,14 +1369,91 @@ def _apply_cve_rejections(e: dict, rejected: dict[str, dict],
             }
             return True
     dhit = sorted(cves & disputed.keys())
-    standing = rejected.keys() | disputed.keys()
-    if dhit and cves <= standing and sources <= standing:
+    if _rests_only_on_disputed(e, rejected, disputed):
         e["status"] = "disputed"
         e["status_reason"] = {
             "code": "cve-disputed",
             "as_of": min(disputed[c].get("checked", "") for c in dhit),
         }
     return False
+
+
+_UNVERIFIED_REASON_CODE = "no-confirmed-source"
+_ISO_DAY = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+# Lifecycle keys a curation override may carry. They are NOT written by
+# apply_curation_overrides (step 4d): step 4f re-derives `status` from the
+# CVE snapshot, so the unverified decision is applied after it (step 4g).
+_STATUS_OVERRIDE_KEYS = frozenset({"status", "status_reason"})
+
+
+def _unverified_override(sid: str, ov: dict) -> dict | None:
+    """The ``status_reason`` an override asks for, or ``None`` when the
+    override carries no status. User ruling D130(b): the only status a
+    curation decision may set is ``unverified`` (retracted/disputed are
+    derived from the CVE snapshot). A malformed request fails the build
+    closed: an unverified decision that silently does not apply is the
+    "record looked filed and was not" failure."""
+    if not (_STATUS_OVERRIDE_KEYS & ov.keys()):
+        return None
+    reason = ov.get("status_reason")
+    if (ov.get("status") != "unverified"
+            or not isinstance(reason, dict)
+            or set(reason) != {"code", "as_of"}
+            or reason.get("code") != _UNVERIFIED_REASON_CODE
+            or not _ISO_DAY.match(str(reason.get("as_of") or ""))):
+        raise SystemExit(
+            f"[curation] override {sid!r}: a status override must be exactly "
+            f'"status": "unverified" with "status_reason": {{"code": "{_UNVERIFIED_REASON_CODE}", '
+            f'"as_of": "YYYY-MM-DD"}}; got status={ov.get("status")!r} status_reason={reason!r}. '
+            + abort_sentence())
+    return {"code": reason["code"], "as_of": reason["as_of"]}
+
+
+def _check_status_overrides(curation: dict[str, dict]) -> list[str]:
+    """Shape-check EVERY status override up front, whether or not its key
+    matches a row (D130-1 advisory B), and return their keys."""
+    return [s for s, ov in curation.items()
+            if isinstance(ov, dict) and _unverified_override(s, ov) is not None]
+
+
+def _check_status_overrides_matched(keys: list[str], rows: list[dict]) -> None:
+    """D130-1 advisory B: a status override whose key is no row's source_id
+    would silently mark nothing. Refuse it. "Matched" is the test, not
+    "marked": a matched row that a later CVE rejection retracts stays
+    retracted (retracted wins) without failing the build, so a weekly
+    refresh cannot be broken by an upstream rejection."""
+    present = {s for e in rows for s in (e.get("source_ids") or [])}
+    dangling = sorted(k for k in keys if k not in present)
+    if dangling:
+        raise SystemExit(
+            f"[curation] {len(dangling)} status override(s) match no entry's source_ids: "
+            f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
+
+
+def _apply_unverified_override(e: dict, curation: dict[str, dict]) -> bool:
+    """Step 4g (user ruling D130): mark an entry ``status: unverified`` when a
+    curation override keyed by ANY of its source_ids asks for it. Returns True
+    if the entry ends up unverified.
+
+    Re-derived every build: a stale ``unverified`` is dropped first, so
+    removing the override restores the entry. Precedence: ``retracted`` (the
+    upstream record was withdrawn) wins and is left alone; ``unverified``
+    replaces ``disputed`` (an entry with no confirmed source is not counted,
+    which is the stricter reading). Never touches ``quality_tier``: the D130(c)
+    demotion is a separate override field, and nothing here promotes."""
+    if e.get("status") == "unverified":
+        e.pop("status", None)
+        e.pop("status_reason", None)
+    reason = None
+    for s in e.get("source_ids") or []:
+        ov = curation.get(s)
+        if isinstance(ov, dict):
+            reason = reason or _unverified_override(s, ov)
+    if reason is None or e.get("status") == "retracted":
+        return False
+    e["status"] = "unverified"
+    e["status_reason"] = reason
+    return True
 
 
 def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -> int:
@@ -1371,7 +1465,7 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
         if hit:
             key_sid, ov = hit
             for k, v in ov.items():
-                if k.startswith("_"):
+                if k.startswith("_") or k in _STATUS_OVERRIDE_KEYS:
                     continue
                 # WS4-T12 (D42): a provenance label describes the shipped
                 # TEXT, so apply it only while the entry's description is
@@ -2899,6 +2993,7 @@ def main():
     #     before history stamping, so overridden content fields are part of
     #     the snapshot and an override-set quality_tier is respected in step 5.
     curation = _load_curation_overrides()
+    status_override_keys = _check_status_overrides(curation)
     if curation:
         applied = apply_curation_overrides(surviving, curation)
         print(f"[curation] applied {applied} override(s) from {CURATION_OVERRIDES_PATH.name}")
@@ -2939,6 +3034,13 @@ def main():
             elif e.get("rejected_cve_ids"):
                 n_flag += 1
         print(f"[cve-rejections] {n_ret} retracted, {n_flag} flagged-only, {n_disp} disputed")
+
+    # 4g) D130: `status: unverified` from reviewed curation decisions. After
+    #     4f (which re-derives `status` from scratch) and before history
+    #     stamping, so setting or clearing it bumps `updated` like a retraction.
+    n_unv = sum(1 for e in surviving if _apply_unverified_override(e, curation or {}))
+    if n_unv:
+        print(f"[curation] {n_unv} entr{'y' if n_unv == 1 else 'ies'} marked unverified (D130)")
 
     # 5) Apply stable timestamps + classifiers (quality_tier, corpus).
     for e in surviving:
@@ -3205,7 +3307,10 @@ def main():
             # Retained priors bypass step 4f (carried verbatim from the last
             # build); re-derive so a late rejection still reaches them.
             _apply_cve_rejections(e, cve_rejected, cve_disputed)
-        _lower_confidence_if_disputed(e)
+        if e["source_status"] == "retained":
+            # Same bypass for the D130 unverified decision (step 4g).
+            _apply_unverified_override(e, curation or {})
+        _lower_confidence_if_disputed(e, cve_rejected, cve_disputed)
         if e.get("added"):
             e["first_seen"] = e["added"]
         if e.get("updated"):
@@ -3261,6 +3366,9 @@ def main():
     print(f"[freshness] source_freshness marker on {n_freshness} entr(ies)")
 
     print(f"\n[total]  {len(all_entries)} input -> {len(deduped)} unique")
+    # D130-1 advisory B: after the retained-prior pass, so a decision keyed to
+    # a carried-forward row counts as matched. Before any output is written.
+    _check_status_overrides_matched(status_override_keys, deduped)
 
     # 7) Compute `generated`: today only if anything actually changed since
     #    the previous output; otherwise preserve the previous timestamp so
@@ -3525,6 +3633,7 @@ def main():
 
     # 9) Write outputs
     n_retracted = sum(1 for e in deduped if e.get("status") == "retracted")
+    n_unverified = sum(1 for e in deduped if e.get("status") == "unverified")
     out = {
         "version": "2.13.0",
         "generated": generated,
@@ -3537,11 +3646,14 @@ def main():
             "computed at export time (see docs/TAXONOMIES.md)."
         ),
         "schema": "schema/incident.schema.json",
-        # incident_count counts incidents that stand; retracted entries (WS4-T2)
-        # stay in `incidents` so their IDs keep resolving, but are not counted.
-        # incident_count + retracted_count == len(incidents).
-        "incident_count": len(deduped) - n_retracted,
+        # incident_count counts incidents that stand; retracted (WS4-T2) and
+        # unverified (D130) entries stay in `incidents` so their IDs keep
+        # resolving, but are not counted.
+        # incident_count + retracted_count + unverified_count == len(incidents).
+        "incident_count": len(deduped) - n_retracted - n_unverified,
         "retracted_count": n_retracted,
+        # D130/D135: always emitted, 0 included.
+        "unverified_count": n_unverified,
         "incidents": deduped,
     }
     _write_output(DATA / "incidents.json", json.dumps(out, indent=2, ensure_ascii=False))
@@ -3608,7 +3720,7 @@ def main():
         # freshness signal that reliably reaches them (D8 application spec §4).
         if e.get("source_freshness"):
             item["source_freshness"] = e["source_freshness"]
-        # WS4-T2: a retraction must reach slim-shape consumers too; the flag
+        # WS4-T2: a retraction (or D130 unverified) must reach slim-shape consumers too; the flag
         # and status are conditional (absence = the entry stands).
         if e.get("status"):
             item["status"] = e["status"]
@@ -3621,6 +3733,7 @@ def main():
         "generated": out["generated"],
         "incident_count": out["incident_count"],
         "retracted_count": n_retracted,
+        "unverified_count": n_unverified,
         "incidents": [_slim_entry(e) for e in deduped],
     }
     _write_output(DATA / "incidents.min.json", json.dumps(slim, indent=2, ensure_ascii=False))

@@ -467,6 +467,7 @@ REGISTERED_PRODUCERS = {
     "newly_retracted_report.py": "INTERNAL (refresh-PR body: lists newly retracted entry ids, CVE ids and tier for the reviewer; writes a markdown report, distributes no rows)",
     "precision_sample.py": "INTERNAL (N9 precision audit: writes the 150 sampled rows, each with its `tier`, into docs/audits/precision/<date>/ as an audit record; not a distribution of the corpus)",
     "evaluate_ai_relevance.py": "INTERNAL (N9 follow-up: scores ai_relevance.assess() against human labels; prints a report, writes nothing)",
+    "entry_status.py": "INTERNAL (D130: the shared NOT_STANDING status predicate the exporters filter on; reads no file, writes nothing -- matched only because its docstring names the corpus file)",
 }
 
 # `incidents.core.json` / `detail/<year>.json` are in the pattern because the
@@ -656,7 +657,8 @@ def test_shipped_slim_variants_carry_tier(path):
 def test_shipped_landmark_count_reproducible_from_min_json():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.min.json").read_text(encoding="utf-8"))["incidents"]
-    assert sum(1 for r in rows if r.get("tier") == "landmark") == stats["landmark_count"]
+    # landmark_count counts standing rows only (retracted/unverified excluded).
+    assert sum(1 for r in rows if r.get("tier") == "landmark" and r.get("status") not in ("retracted", "unverified")) == stats["landmark_count"]
 
 
 def test_shipped_landmark_count_is_reproducible_from_the_full_file():
@@ -667,4 +669,5 @@ def test_shipped_landmark_count_is_reproducible_from_the_full_file():
     """
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
-    assert sum(1 for r in rows if r.get("tier") == "landmark") == stats["landmark_count"]
+    # landmark_count counts standing rows only (retracted/unverified excluded).
+    assert sum(1 for r in rows if r.get("tier") == "landmark" and r.get("status") not in ("retracted", "unverified")) == stats["landmark_count"]
