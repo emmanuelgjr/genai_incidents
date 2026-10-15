@@ -83,6 +83,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 📋 docs-warden on D130-1 (`77aa2ee3`), 2026-10-15 — no live contradiction; routed as board notes
+- **F1 incomplete:** README.md:144 (v2.12.0 paragraph, still live) says load_incidents()/slim JSON include retracted rows; silent on unverified and `unverified_count`. → **fold into D134(i)** (load_incidents default change rewrites that README text anyway; correct live text in place, agreement 4).
+- **F2 incomplete (minor):** src/genai_incidents/__init__.py:113-115 docstring and docs/DATA_DICTIONARY.md:243 don't say retracted/unverified rows are included. → **fold into D134(i).**
+- **F3 stale-but-frozen:** docs/releases/v2.12.0.md:46-49 and v2.13.0.md:406-417 recipe `incident_count + retracted_count == len(I)`. Correct for their versions; not a defect. → **cut-checklist note: v2.14.0 notes use `+ unverified_count`; never copy the old recipe forward.**
+- **F4 incomplete:** docs/VERSIONING.md:357 verify step doesn't warn that v2.13.0 manifests fail the new manifest schema (missing `unverified_count`; disclosed in CHANGELOG). → **fold into D132** (WS6, release-vs-main labelling).
+- OK: DATASHEET/site hero, DATA_DICTIONARY status/manifest rows, schemas, INCIDENTS.md, all envelopes/stats, HF card text, exporters. Dated CORRECTIONS.md:19, INCLUSION.md:127,139, NOTICE-DATA are historical records.
+
 ### 🔨 D131 — zero-row ingest refusal (WS4): **DISPATCHED 2026-10-15** to a fresh pipeline-engineer on `ws4/d131-zero-row-ingest-2026-10-15` (worktree `C:/repos/gi-wt-d131`, base `77aa2ee3`). Target: merged before Sun 2026-10-18 04:00 UTC.
 - **D130-1 post-merge [R] on main `77aa2ee3`:** validate rc 0 ("integrity: no duplicate CVE/source keys; all deprecations resolve."); check_stats_drift clean; test_unverified_status + test_export_integrity + test_landmark_distribution `90 passed, 1 xfailed`; porcelain empty; pushed `763e790e..77aa2ee3`, ls-remote = local.
 - **docs-warden dispatched** on the D130-1 merge (status enum, counts formula, manifest keys).
