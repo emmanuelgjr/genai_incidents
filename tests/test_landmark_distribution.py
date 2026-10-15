@@ -657,7 +657,8 @@ def test_shipped_slim_variants_carry_tier(path):
 def test_shipped_landmark_count_reproducible_from_min_json():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.min.json").read_text(encoding="utf-8"))["incidents"]
-    assert sum(1 for r in rows if r.get("tier") == "landmark") == stats["landmark_count"]
+    # landmark_count counts standing rows only (retracted/unverified excluded).
+    assert sum(1 for r in rows if r.get("tier") == "landmark" and r.get("status") not in ("retracted", "unverified")) == stats["landmark_count"]
 
 
 def test_shipped_landmark_count_is_reproducible_from_the_full_file():
@@ -668,4 +669,5 @@ def test_shipped_landmark_count_is_reproducible_from_the_full_file():
     """
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
-    assert sum(1 for r in rows if r.get("tier") == "landmark") == stats["landmark_count"]
+    # landmark_count counts standing rows only (retracted/unverified excluded).
+    assert sum(1 for r in rows if r.get("tier") == "landmark" and r.get("status") not in ("retracted", "unverified")) == stats["landmark_count"]
