@@ -83,6 +83,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### ✅ D131: **PASS (gate-d131 on `77c14678`), MERGED to main 2026-10-15 (`--no-ff`, HEAD^2 = `77c14678`)** — ahead of the Sun 2026-10-18 04:00 UTC refresh.
+**Verdict, in the gate's words:** "VERDICT: PASS (gate D131, commit 77c14678). DEFECTS: none."
+**Gate evidence:** scope 4 files (CHANGELOG +4, merge_and_dedupe +41/−9, test_d129 +1/−4, test_d131 +130), no data/ paths, merge-tree clean, no network/model imports. pytest `1485 passed, 1 xfailed`. Build twice: 451 output hashes identical, porcelain empty, drift rc 0. Real tree by own route (load_source vs json.load per file): 22 row files exact, **6** side files → [] (report's "5" is testimony error; code and tests cover all 6). **Control vs branch, full real tree, both modes:** base `{"items":[row]}`, `{"incidents":{}}`, `{"incidents":null}` → rc 0, "0 raw → 0 normalized" (silent drop); branch → rc 1, [FATAL] names file, exactly one sentence of the right mode, no data file changed; `{"incidents":[]}` loads (as ruled). D129 test removals justified, coverage moved to test_d131. Gate's own mutations M1–M7 all killed (M5/M6 abort_sentence drops: 8/5 failed); M8 (stricter side-file variant) passes all tests (→ A2). Shared trees HEAD attached, porcelain empty.
+**Advisories → DRAFT D138 for the user:** A1 `{"incidents":[],"items":[row]}` still silently drops (empty legacy key + drifted key) — exposure hypothetical today (all 22 row files are bare lists). A2 `*.provenance.json` pattern: a dict-shaped provenance-named file holding a non-empty row key drops silently. A3 pre-existing: `{"incidents":[A],"entries":[B]}` loads A, drops B; a side-file name with a LIST payload loads as rows.
+
+### ⚖ D138 — DRAFT RULING for the user (gate-d131 advisories A1–A3). NOT DECIDED.
+- **A (Recommended):** one small WS4 follow-up closing all three: refuse when a dict yields 0 rows while any other key holds a non-empty list (A1); a side file holding any row key with a non-empty list refuses (A2); refuse when more than one row key is non-empty, and a side-file name with a list payload refuses (A3). Queue after the current serial items.
+- **B:** close A1 only (the exact D131 failure shape); register A2/A3.
+- **C:** register all three; no task (exposure hypothetical: all row files are bare lists).
+
 ### 📋 docs-warden on D130-1 (`77aa2ee3`), 2026-10-15 — no live contradiction; routed as board notes
 - **F1 incomplete:** README.md:144 (v2.12.0 paragraph, still live) says load_incidents()/slim JSON include retracted rows; silent on unverified and `unverified_count`. → **fold into D134(i)** (load_incidents default change rewrites that README text anyway; correct live text in place, agreement 4).
 - **F2 incomplete (minor):** src/genai_incidents/__init__.py:113-115 docstring and docs/DATA_DICTIONARY.md:243 don't say retracted/unverified rows are included. → **fold into D134(i).**
@@ -90,7 +100,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **F4 incomplete:** docs/VERSIONING.md:357 verify step doesn't warn that v2.13.0 manifests fail the new manifest schema (missing `unverified_count`; disclosed in CHANGELOG). → **fold into D132** (WS6, release-vs-main labelling).
 - OK: DATASHEET/site hero, DATA_DICTIONARY status/manifest rows, schemas, INCIDENTS.md, all envelopes/stats, HF card text, exporters. Dated CORRECTIONS.md:19, INCLUSION.md:127,139, NOTICE-DATA are historical records.
 
-### 🔨 D131 — zero-row ingest refusal (WS4): **DISPATCHED 2026-10-15** to a fresh pipeline-engineer on `ws4/d131-zero-row-ingest-2026-10-15` (worktree `C:/repos/gi-wt-d131`, base `77aa2ee3`). Target: merged before Sun 2026-10-18 04:00 UTC.
+### (merged — dispatch record) D131 — zero-row ingest refusal (WS4): **DISPATCHED 2026-10-15** to a fresh pipeline-engineer on `ws4/d131-zero-row-ingest-2026-10-15` (worktree `C:/repos/gi-wt-d131`, base `77aa2ee3`). Target: merged before Sun 2026-10-18 04:00 UTC.
 - **D130-1 post-merge [R] on main `77aa2ee3`:** validate rc 0 ("integrity: no duplicate CVE/source keys; all deprecations resolve."); check_stats_drift clean; test_unverified_status + test_export_integrity + test_landmark_distribution `90 passed, 1 xfailed`; porcelain empty; pushed `763e790e..77aa2ee3`, ls-remote = local.
 - **docs-warden dispatched** on the D130-1 merge (status enum, counts formula, manifest keys).
 

@@ -15,6 +15,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 - **Build-manifest schema now requires `unverified_count`.** A v2.13.0 `build_manifest.json` (which lacks the key) fails validation against the new `schema/build_manifest.schema.json`; validate each manifest against the schema shipped with it.
 - **Precision sampling.** Future draws by `scripts/precision_sample.py` exclude unverified rows as they exclude retracted ones (D135); the ratified sample is unchanged and still reproduces from its pinned data.
 
+### Changed - an ingest file that yields 0 rows from a dict now fails the build closed (D131)
+
+- `merge_and_dedupe.py` used to load any dict lacking `incidents`/`entries`/`data` as 0 rows, so a source whose row key drifted (`{"items": [...]}`) silently dropped out with exit 0, and `{"incidents": {}}`/`""` counted as empty. It now refuses, with the job-aware abort sentence, unless the file is an allowlisted side file (`*.provenance.json`, `cisa_kev.json`, `cve_rejections.json`); a row key holding a non-list (`{}`, `""`, `0`, `null`) refuses too. A real `[]`, bare or under a row key, still loads. Also adds the missing test for the unreadable-file (OSError) branch. No data change.
+
 ### Changed - a corrupt ingest file now fails the build closed (D129)
 
 - `merge_and_dedupe.py` used to print a WARN for an unparseable `ingest/*.json`, drop that source to 0 rows and exit 0 with its outputs written. It now refuses before any output is written, naming the file and the parse error, with the job-aware abort sentence. A payload that is not a list of rows (a scalar, or `incidents`/`entries`/`data` holding a non-list) is refused the same way. A legitimately empty list, and the dict-shaped side files in `ingest/` that carry no rows (provenance records, CISA KEV, CVE rejections), still load as before. No data change.
