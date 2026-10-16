@@ -45,11 +45,17 @@ def main():
             out["rows"][rid] = diff
             if rid not in TARGET:
                 out["unintended"].append(rid)
+    sb = json.loads(subprocess.run(["git", "show", f"{BASE}:data/stats.json"], cwd=REPO, check=True, capture_output=True).stdout.decode("utf-8"))
+    sa = json.loads((REPO / "data" / "stats.json").read_text(encoding="utf-8"))
+    out["stats"] = {k: [sb.get(k), sa.get(k)] for k in sorted(set(sb) | set(sa)) if sb.get(k) != sa.get(k)}
+    expected_stats = {"generated", "incident_count", "unverified_count", "landmark_count"}
+    out["unintended_stats"] = sorted(set(out["stats"]) - expected_stats)
     text = json.dumps(out, indent=1, ensure_ascii=False)
     if "--json" in sys.argv:
         Path(sys.argv[sys.argv.index("--json") + 1]).write_text(text + "\n", encoding="utf-8", newline="\n")
     print("entries", out["entry_count"], "id_set_equal", out["id_set_equal"], "rows changed", len(out["rows"]),
-          "unintended", out["unintended"])
+          "unintended", out["unintended"], "stats", {k: v for k, v in out["stats"].items() if not isinstance(v[0], (dict, list))},
+          "unintended_stats", out["unintended_stats"])
     print("envelope", {k: v for k, v in out["envelope"].items()})
     fields = {}
     for rid, d in out["rows"].items():
@@ -57,7 +63,7 @@ def main():
             fields.setdefault(f, []).append(rid)
     for f, ids in sorted(fields.items()):
         print(f, len(ids))
-    return 1 if out["unintended"] or not out["id_set_equal"] else 0
+    return 1 if out["unintended"] or out["unintended_stats"] or not out["id_set_equal"] else 0
 
 
 if __name__ == "__main__":

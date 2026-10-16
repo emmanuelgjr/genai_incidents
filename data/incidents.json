@@ -1,6 +1,6 @@
 {
   "version": "2.13.0",
-  "generated": "2026-10-15",
+  "generated": "2026-10-16",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
   "incident_count": 15745,
@@ -481,7 +481,7 @@
       "source_ids": [
         "INC-008"
       ],
-      "title": "GitHub Copilot reproduces verbatim licensed code and embedded secrets",
+      "title": "GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses",
       "date": "2023-01",
       "year": 2023,
       "category": "research-demonstrated",
@@ -538,11 +538,6 @@
       ],
       "references": [
         {
-          "title": "Do Users Write More Insecure Code with AI Assistants? — NYU / Stanford (2022)",
-          "url": "https://arxiv.org/abs/2211.03622",
-          "type": "research"
-        },
-        {
           "title": "The lawsuit against Microsoft, GitHub and OpenAI that could change the rules of AI copyright - The Verge (2022-11-08)",
           "url": "https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data",
           "type": "news"
@@ -556,7 +551,7 @@
         "code-generation"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0007",
         "AML.TA0010"
@@ -568,7 +563,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03876",
@@ -1489,7 +1484,7 @@
         "tool-abuse"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005",
@@ -1509,7 +1504,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-01288",
@@ -1986,10 +1981,10 @@
       "date": "2024-05",
       "year": 2024,
       "category": "research-demonstrated",
-      "description": "The security researcher behind the Embrace The Red blog reported that the GitHub Copilot Chat extension for VS Code was vulnerable to data exfiltration via prompt injection when analyzing untrusted source code. Copilot Chat interpreted and rendered markdown returned by the LLM, including images, so carefully crafted instructions in a source code file could make the LLM return image links that are retrieved automatically, with information from the chat context appended as a query parameter. Reported to GitHub on 2024-02-25, the fix (Copilot Chat no longer renders markdown images) was confirmed on 2024-06-12 and the write-up published on 2024-06-14.",
+      "description": "Security researchers demonstrated prompt injection attacks against GitHub Copilot's workspace and chat features via malicious content in repository files. An attacker contributes a file (README.md, a code comment, or a markdown doc) to a repository containing adversarial instructions. When a developer uses Copilot Chat or Copilot Workspace on that repository — asking it to explain code, suggest changes, or generate a PR — Copilot reads the file as context and executes the injected instructions. Demonstrated impacts include: exfiltrating repository secrets referenced in the context window, generating malicious code as a \"suggestion,\" and misleading developers about code functionality. The attack is zero-interaction for the attacker — it triggers on normal developer Copilot usage.",
       "attack_vector": "adversarial-input",
-      "affected": "GitHub Copilot Chat VS Code extension (before the June 2024 fix)",
-      "impact": "Chat-context data could be exfiltrated to an attacker-controlled server through automatically retrieved markdown images when a developer analyzed a file containing attacker instructions",
+      "affected": "GitHub Copilot Chat and Copilot Workspace — any developer using AI features on a repository containing adversarial content; particularly high risk for open-source contributors reviewing third-party repos",
+      "impact": "Secret exfiltration from developer context window; malicious code generation disguised as legitimate suggestions; developer trust in AI coding assistant undermined; supply chain risk via poisoned open-source repository content",
       "severity": "High",
       "owasp_llm": [
         "LLM01",
@@ -2061,9 +2056,9 @@
       ],
       "references": [
         {
-          "title": "GitHub Copilot Chat: From Prompt Injection to Data Exfiltration - Embrace The Red (2024-06-14)",
-          "url": "https://embracethered.com/blog/posts/2024/github-copilot-chat-prompt-injection-data-exfiltration/",
-          "type": "research"
+          "title": "Prompt Injection via GitHub Copilot Workspace — security research (2024)",
+          "url": "https://github.com/advisories",
+          "type": "advisory"
         },
         {
           "title": "GitHub Copilot prompt injection research findings (2024)",
@@ -2080,7 +2075,7 @@
         "supply-chain"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0003",
         "AML.TA0005",
@@ -2089,14 +2084,19 @@
         "AML.TA0012",
         "AML.TA0015"
       ],
-      "quality_tier": "auto",
+      "status": "unverified",
+      "status_reason": {
+        "code": "no-confirmed-source",
+        "as_of": "2026-10-15"
+      },
+      "quality_tier": "reviewed",
       "corpus": "security",
       "tier": "feed",
       "source_count": 1,
-      "confidence": "low",
+      "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03484",
@@ -2292,7 +2292,7 @@
         "frontier-models"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0011",
@@ -2306,7 +2306,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03967",
@@ -2841,7 +2841,7 @@
         "2025"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0003",
         "AML.TA0005",
@@ -2856,7 +2856,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-02465",
@@ -2967,7 +2967,7 @@
         "INC-035",
         "INC-050"
       ],
-      "title": "Italy Garante orders ChatGPT GDPR enforcement — consent and data minimization failures",
+      "title": "Italy Garante closes ChatGPT investigation: EUR 15 million fine and six-month communication campaign for OpenAI",
       "date": "2025-03",
       "year": 2025,
       "category": "real-world",
@@ -3031,11 +3031,6 @@
           "title": "ChatGPT, il Garante privacy chiude l'istruttoria (press release) - Garante per la protezione dei dati personali (2024-12-20)",
           "url": "https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432",
           "type": "regulatory"
-        },
-        {
-          "title": "noyb files GDPR complaints against OpenAI over ChatGPT — noyb (2024)",
-          "url": "https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint",
-          "type": "advisory"
         }
       ],
       "tags": [
@@ -3056,7 +3051,7 @@
         "right-to-erasure"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005"
@@ -3068,7 +3063,7 @@
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-02454",
@@ -3161,7 +3156,7 @@
         "training-data"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "quality_tier": "auto",
       "corpus": "ai-harm",
       "tier": "landmark",
@@ -3169,7 +3164,7 @@
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-02353",
@@ -3250,7 +3245,7 @@
         "2025"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0001",
         "AML.TA0003",
@@ -3269,7 +3264,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-02703",
@@ -3364,7 +3359,7 @@
         "2025"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0003",
         "AML.TA0004",
@@ -3382,7 +3377,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03247",
@@ -3463,7 +3458,7 @@
         "2025"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0010"
       ],
@@ -3479,7 +3474,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-02922",
@@ -3572,7 +3567,7 @@
         "2025"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0011",
@@ -3591,7 +3586,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-04310",
@@ -3661,7 +3656,7 @@
         "2024"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "status": "unverified",
       "status_reason": {
         "code": "no-confirmed-source",
@@ -3674,14 +3669,14 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-04955",
       "source_ids": [
         "INC-043"
       ],
-      "title": "TikTok EU data localization enforcement — Project Clover + EUR 345M GDPR fine",
+      "title": "TikTok fined EUR 345 million by Ireland's Data Protection Commission over children's data handling",
       "date": "2023-09",
       "year": 2023,
       "category": "real-world",
@@ -3734,11 +3729,6 @@
       ],
       "references": [
         {
-          "title": "Irish DPC fines TikTok EUR 345M — DPC decision (2023)",
-          "url": "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok",
-          "type": "advisory"
-        },
-        {
           "title": "TikTok fined 345m euro over children's data privacy - BBC News (2023-09-15)",
           "url": "https://www.bbc.com/news/technology-66819174",
           "type": "news"
@@ -3754,7 +3744,7 @@
         "real-world"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005"
@@ -3766,7 +3756,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-04179",
@@ -3774,7 +3764,7 @@
         "INC-044",
         "INC-048"
       ],
-      "title": "Scale AI / Sama contractor data exposure — third-party AI labeling workforce privacy violations",
+      "title": "Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations",
       "date": "2024-01",
       "year": 2024,
       "category": "real-world",
@@ -3860,11 +3850,6 @@
           "title": "'It's destroyed me completely': Kenyan moderators decry toll of training of AI models - The Guardian (2023-08-02)",
           "url": "https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai",
           "type": "news"
-        },
-        {
-          "title": "Character.AI lawsuit after teen's death — NYT (2024)",
-          "url": "https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html",
-          "type": "news"
         }
       ],
       "tags": [
@@ -3886,7 +3871,7 @@
         "worker-exploitation"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0003",
         "AML.TA0004",
@@ -3902,7 +3887,7 @@
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03570",
@@ -3982,7 +3967,7 @@
         "2024"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0001",
         "AML.TA0003",
@@ -4001,7 +3986,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03444",
@@ -4090,7 +4075,7 @@
         "2024"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0001",
         "AML.TA0005",
@@ -4109,7 +4094,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03579",
@@ -4228,7 +4213,7 @@
       "source_ids": [
         "INC-049"
       ],
-      "title": "Stability AI synthetic CSAM generation — training data and output safety failures",
+      "title": "LAION-5B training dataset withdrawn after Stanford study finds suspected CSAM; Re-LAION-5B released",
       "date": "2024-04",
       "year": 2024,
       "category": "real-world",
@@ -4291,11 +4276,6 @@
       ],
       "references": [
         {
-          "title": "Stanford Internet Observatory: LAION-5B CSAM findings (2023)",
-          "url": "https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse",
-          "type": "research"
-        },
-        {
           "title": "Largest Dataset Powering AI Images Removed After Discovery of Child Sexual Abuse Material - 404 Media (2023-12-20)",
           "url": "https://www.404media.co/laion-datasets-removed-stanford-csam-child-abuse/",
           "type": "news"
@@ -4318,7 +4298,7 @@
         "2024"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0004"
       ],
@@ -4329,7 +4309,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03822",
@@ -5503,7 +5483,7 @@
         "image-generation"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0001",
         "AML.TA0003",
@@ -5523,7 +5503,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03552",
@@ -5708,7 +5688,7 @@
         "system-prompt"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-05-30",
       "mitre_atlas_tactics": [
         "AML.TA0000",
         "AML.TA0005",
@@ -5716,11 +5696,6 @@
         "AML.TA0010",
         "AML.TA0011"
       ],
-      "status": "unverified",
-      "status_reason": {
-        "code": "no-confirmed-source",
-        "as_of": "2026-10-15"
-      },
       "quality_tier": "curated",
       "corpus": "security",
       "tier": "landmark",
@@ -5728,7 +5703,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-05-30"
     },
     {
       "id": "INC-04344",
@@ -6542,11 +6517,6 @@
           "title": "EEOC Releases Technical Document on AI and Title VII - Law and the Workplace (2023-05-23)",
           "url": "https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/",
           "type": "legal"
-        },
-        {
-          "title": "AI hiring bias settlement patterns",
-          "url": "https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/",
-          "type": "news"
         }
       ],
       "tags": [
@@ -6558,7 +6528,7 @@
         "training-data"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0001",
         "AML.TA0003",
@@ -6572,7 +6542,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03955",
@@ -6661,7 +6631,7 @@
         "offensive-ai"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0003",
         "AML.TA0005",
@@ -6676,7 +6646,7 @@
       "confidence": "low",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-04263",
@@ -9608,7 +9578,7 @@
         "INC-105",
         "LEGACY-INC-00149"
       ],
-      "title": "Microsoft Copilot Studio agents public by default — unauthorized data exfiltration",
+      "title": "Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-data exfiltration (Zenity Labs)",
       "date": "2025-06-01",
       "year": 2025,
       "category": "real-world",
@@ -9680,11 +9650,6 @@
           "type": "research"
         },
         {
-          "title": "MITRE ATLAS — AML.CS0037",
-          "url": "https://atlas.mitre.org/studies/AML.CS0037",
-          "type": "research"
-        },
-        {
           "title": "AgentFlayer: Discovery Phase of AI Agents in Copilot Studio",
           "url": "https://labs.zenity.io/p/a-copilot-studio-story-discovery-phase-in-ai-agents-f917",
           "type": "research"
@@ -9704,7 +9669,7 @@
         "tool-misuse"
       ],
       "added": "2026-05-11",
-      "updated": "2026-10-15",
+      "updated": "2026-10-16",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005",
@@ -9722,7 +9687,7 @@
       "confidence": "medium",
       "source_status": "active",
       "first_seen": "2026-05-11",
-      "last_seen": "2026-10-15"
+      "last_seen": "2026-10-16"
     },
     {
       "id": "INC-03152",

@@ -10,7 +10,7 @@
  "envelope": {
   "generated": [
    "2026-10-13",
-   "2026-10-15"
+   "2026-10-16"
   ],
   "incident_count": [
    15755,
@@ -25,7 +25,7 @@
   "INC-02353": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -40,7 +40,7 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-02454": {
@@ -62,7 +62,7 @@
    ],
    "last_seen": [
     "2026-05-29",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "curated",
@@ -100,13 +100,13 @@
    ],
    "updated": [
     "2026-05-29",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-02703": {
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -121,7 +121,7 @@
    ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-02774": {
@@ -143,7 +143,7 @@
    ],
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "curated",
@@ -172,11 +172,6 @@
       "title": "ChatGPT, il Garante privacy chiude l'istruttoria (press release) - Garante per la protezione dei dati personali (2024-12-20)",
       "url": "https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432",
       "type": "regulatory"
-     },
-     {
-      "title": "noyb files GDPR complaints against OpenAI over ChatGPT — noyb (2024)",
-      "url": "https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint",
-      "type": "advisory"
      }
     ]
    ],
@@ -184,9 +179,13 @@
     "landmark",
     "feed"
    ],
+   "title": [
+    "Italy Garante orders ChatGPT GDPR enforcement — consent and data minimization failures",
+    "Italy Garante closes ChatGPT investigation: EUR 15 million fine and six-month communication campaign for OpenAI"
+   ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-02899": {
@@ -208,7 +207,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "curated",
@@ -244,11 +243,6 @@
       "type": "research"
      },
      {
-      "title": "MITRE ATLAS — AML.CS0037",
-      "url": "https://atlas.mitre.org/studies/AML.CS0037",
-      "type": "research"
-     },
-     {
       "title": "AgentFlayer: Discovery Phase of AI Agents in Copilot Studio",
       "url": "https://labs.zenity.io/p/a-copilot-studio-story-discovery-phase-in-ai-agents-f917",
       "type": "research"
@@ -259,15 +253,19 @@
     "landmark",
     "feed"
    ],
+   "title": [
+    "Microsoft Copilot Studio agents public by default — unauthorized data exfiltration",
+    "Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-data exfiltration (Zenity Labs)"
+   ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-02922": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -282,7 +280,7 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03004": {
@@ -304,7 +302,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -328,13 +326,13 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03247": {
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -349,13 +347,13 @@
    ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03444": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -370,13 +368,13 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03447": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -391,7 +389,7 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03472": {
@@ -413,7 +411,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -442,23 +440,18 @@
       "title": "EEOC Releases Technical Document on AI and Title VII - Law and the Workplace (2023-05-23)",
       "url": "https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/",
       "type": "legal"
-     },
-     {
-      "title": "AI hiring bias settlement patterns",
-      "url": "https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/",
-      "type": "news"
      }
     ]
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03491": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -473,13 +466,13 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03570": {
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -494,63 +487,28 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03810": {
-   "affected": [
-    "GitHub Copilot Chat and Copilot Workspace — any developer using AI features on a repository containing adversarial content; particularly high risk for open-source contributors reviewing third-party repos",
-    "GitHub Copilot Chat VS Code extension (before the June 2024 fix)"
-   ],
-   "confidence": [
-    "high",
-    "low"
-   ],
-   "description": [
-    "Security researchers demonstrated prompt injection attacks against GitHub Copilot's workspace and chat features via malicious content in repository files. An attacker contributes a file (README.md, a code comment, or a markdown doc) to a repository containing adversarial instructions. When a developer uses Copilot Chat or Copilot Workspace on that repository — asking it to explain code, suggest changes, or generate a PR — Copilot reads the file as context and executes the injected instructions. Demonstrated impacts include: exfiltrating repository secrets referenced in the context window, generating malicious code as a \"suggestion,\" and misleading developers about code functionality. The attack is zero-interaction for the attacker — it triggers on normal developer Copilot usage.",
-    "The security researcher behind the Embrace The Red blog reported that the GitHub Copilot Chat extension for VS Code was vulnerable to data exfiltration via prompt injection when analyzing untrusted source code. Copilot Chat interpreted and rendered markdown returned by the LLM, including images, so carefully crafted instructions in a source code file could make the LLM return image links that are retrieved automatically, with information from the chat context appended as a query parameter. Reported to GitHub on 2024-02-25, the fix (Copilot Chat no longer renders markdown images) was confirmed on 2024-06-12 and the write-up published on 2024-06-14."
-   ],
-   "impact": [
-    "Secret exfiltration from developer context window; malicious code generation disguised as legitimate suggestions; developer trust in AI coding assistant undermined; supply chain risk via poisoned open-source repository content",
-    "Chat-context data could be exfiltrated to an attacker-controlled server through automatically retrieved markdown images when a developer analyzed a file containing attacker instructions"
-   ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
-   "quality_tier": [
-    "reviewed",
-    "auto"
+   "status": [
+    null,
+    "unverified"
    ],
-   "references": [
-    [
-     {
-      "title": "Prompt Injection via GitHub Copilot Workspace — security research (2024)",
-      "url": "https://github.com/advisories",
-      "type": "advisory"
-     },
-     {
-      "title": "GitHub Copilot prompt injection research findings (2024)",
-      "url": "https://www.invicti.com/blog/web-security/prompt-injection-attacks/",
-      "type": "research"
-     }
-    ],
-    [
-     {
-      "title": "GitHub Copilot Chat: From Prompt Injection to Data Exfiltration - Embrace The Red (2024-06-14)",
-      "url": "https://embracethered.com/blog/posts/2024/github-copilot-chat-prompt-injection-data-exfiltration/",
-      "type": "research"
-     },
-     {
-      "title": "GitHub Copilot prompt injection research findings (2024)",
-      "url": "https://www.invicti.com/blog/web-security/prompt-injection-attacks/",
-      "type": "research"
-     }
-    ]
+   "status_reason": [
+    null,
+    {
+     "code": "no-confirmed-source",
+     "as_of": "2026-10-15"
+    }
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03955": {
@@ -572,7 +530,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -601,7 +559,7 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-03972": {
@@ -623,7 +581,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -647,28 +605,7 @@
    ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
-   ]
-  },
-  "INC-04067": {
-   "last_seen": [
-    "2026-05-30",
-    "2026-10-15"
-   ],
-   "status": [
-    null,
-    "unverified"
-   ],
-   "status_reason": [
-    null,
-    {
-     "code": "no-confirmed-source",
-     "as_of": "2026-10-15"
-    }
-   ],
-   "updated": [
-    "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-04179": {
@@ -690,7 +627,7 @@
    ],
    "last_seen": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "curated",
@@ -724,11 +661,6 @@
       "title": "'It's destroyed me completely': Kenyan moderators decry toll of training of AI models - The Guardian (2023-08-02)",
       "url": "https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai",
       "type": "news"
-     },
-     {
-      "title": "Character.AI lawsuit after teen's death — NYT (2024)",
-      "url": "https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html",
-      "type": "news"
      }
     ]
    ],
@@ -736,9 +668,13 @@
     "landmark",
     "feed"
    ],
+   "title": [
+    "Scale AI / Sama contractor data exposure — third-party AI labeling workforce privacy violations",
+    "Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations"
+   ],
    "updated": [
     "2026-10-06",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-04221": {
@@ -760,7 +696,7 @@
    ],
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -781,11 +717,6 @@
     ],
     [
      {
-      "title": "Stanford Internet Observatory: LAION-5B CSAM findings (2023)",
-      "url": "https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse",
-      "type": "research"
-     },
-     {
       "title": "Largest Dataset Powering AI Images Removed After Discovery of Child Sexual Abuse Material - 404 Media (2023-12-20)",
       "url": "https://www.404media.co/laion-datasets-removed-stanford-csam-child-abuse/",
       "type": "news"
@@ -797,15 +728,19 @@
      }
     ]
    ],
+   "title": [
+    "Stability AI synthetic CSAM generation — training data and output safety failures",
+    "LAION-5B training dataset withdrawn after Stanford study finds suspected CSAM; Re-LAION-5B released"
+   ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-04310": {
    "last_seen": [
     "2026-05-29",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "status": [
     null,
@@ -820,7 +755,7 @@
    ],
    "updated": [
     "2026-05-29",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-04653": {
@@ -842,7 +777,7 @@
    ],
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -863,20 +798,19 @@
     ],
     [
      {
-      "title": "Do Users Write More Insecure Code with AI Assistants? — NYU / Stanford (2022)",
-      "url": "https://arxiv.org/abs/2211.03622",
-      "type": "research"
-     },
-     {
       "title": "The lawsuit against Microsoft, GitHub and OpenAI that could change the rules of AI copyright - The Verge (2022-11-08)",
       "url": "https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data",
       "type": "news"
      }
     ]
    ],
+   "title": [
+    "GitHub Copilot reproduces verbatim licensed code and embedded secrets",
+    "GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses"
+   ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   },
   "INC-04955": {
@@ -898,7 +832,7 @@
    ],
    "last_seen": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ],
    "quality_tier": [
     "reviewed",
@@ -919,22 +853,40 @@
     ],
     [
      {
-      "title": "Irish DPC fines TikTok EUR 345M — DPC decision (2023)",
-      "url": "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok",
-      "type": "advisory"
-     },
-     {
       "title": "TikTok fined 345m euro over children's data privacy - BBC News (2023-09-15)",
       "url": "https://www.bbc.com/news/technology-66819174",
       "type": "news"
      }
     ]
    ],
+   "title": [
+    "TikTok EU data localization enforcement — Project Clover + EUR 345M GDPR fine",
+    "TikTok fined EUR 345 million by Ireland's Data Protection Commission over children's data handling"
+   ],
    "updated": [
     "2026-05-30",
-    "2026-10-15"
+    "2026-10-16"
    ]
   }
  },
- "unintended": []
+ "unintended": [],
+ "stats": {
+  "generated": [
+   "2026-10-13",
+   "2026-10-16"
+  ],
+  "incident_count": [
+   15755,
+   15745
+  ],
+  "landmark_count": [
+   2028,
+   2025
+  ],
+  "unverified_count": [
+   0,
+   10
+  ]
+ },
+ "unintended_stats": []
 }

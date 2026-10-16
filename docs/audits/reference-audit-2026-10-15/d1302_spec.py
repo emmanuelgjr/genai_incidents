@@ -456,3 +456,58 @@ DEFERRED_LABEL_REASON = ("ruling D130(c) demotion to auto removes tier=landmark;
                          "(curation entry INC-030) then fails validate.py check 6, and the override mechanism cannot delete the label. "
                          "Row left unchanged; the planned change (remove the arXiv 2402.06627 reference, correct the model list from the "
                          "Microsoft post) is recorded in the spec for when the conflict is ruled on.")
+
+
+# =====================================================================================================
+# REV2 (bounce #1 rework, 2026-10-15). Applied on top of the definitions above; the original text is kept.
+# =====================================================================================================
+# 1. INC-03810 -> UNVERIFIED: the Embrace The Red Copilot Chat post is the sole reference of INC-03808, and
+#    "Workspace" is absent from it, so the re-pointing duplicated another incident. Reverted.
+_r = FIXED.pop("INC-03810")
+UNVERIFIED["INC-03810"] = dict(key="INC-025", effort=[
+    "Row cites github.com/advisories (global advisory index, R1) and invicti.com/blog/web-security/prompt-injection-attacks/ (HTTP 404).",
+    "The Embrace The Red Copilot Chat post (fetched 2026-10-15) is a different, already-recorded incident: it is the sole reference of INC-03808 "
+    "(RES-etr-github-copilot-chat-2024), and the word \"Workspace\" does not occur in it. The first tranche re-pointed this row at it; reverted (bounce #1, defect 1).",
+    "Discovery query (Brave, retry 2026-10-15): \"GitHub Copilot Workspace prompt injection repository README exfiltrate secrets\" -> CSO Online and Orca "
+    "RoguePilot (Copilot in Codespaces, a later and different finding), Reddit threads, vendor guides; none documents a 2024 Copilot Workspace "
+    "injection via README/comment files.",
+    "Outcome: no confirmed source names the Copilot Workspace incident. Row is marked unverified; references and quality_tier untouched."])
+
+# 2. INC-04067 -> NOT unverified: sourced by ARXIV-2403.06634 + ATLAS Carlini (no other row carries it). Over-merge only.
+UNVERIFIED.pop("INC-04067")
+UNCHANGED["INC-04067"] = (
+    "Not unverified. The row is sourced: its source_ids include ARXIV-2403.06634 and ATLAS-RESEARCH-Carlini-NN-Stealing, i.e. \"Stealing Part of a "
+    "Production Language Model\", which no other row carries. What is wrong is an over-merge: the legacy INC-065 \"GPT-4 system prompt extraction toolkit\" "
+    "narrative (Base64/ROT13/role-play; no source found: Zhang & Ippolito 2307.06865 and Agarwal 2404.16251 fetched, neither describes it) was merged "
+    "into the model-stealing row. Splitting is a WS4-T19 question; row left byte-identical (the first tranche's unverified override is removed).")
+
+# 3. Titles re-derived from the confirmed sources; 5. unconfirmed kept references dropped from the whole-list overrides.
+FIXED["INC-02899"]["title"] = "Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-data exfiltration (Zenity Labs)"
+FIXED["INC-04179"]["title"] = "Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations"
+FIXED["INC-04955"]["title"] = "TikTok fined EUR 345 million by Ireland's Data Protection Commission over children's data handling"
+FIXED["INC-04653"]["title"] = "GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses"
+FIXED["INC-04221"]["title"] = "LAION-5B training dataset withdrawn after Stanford study finds suspected CSAM; Re-LAION-5B released"
+FIXED["INC-02774"]["title"] = "Italy Garante closes ChatGPT investigation: EUR 15 million fine and six-month communication campaign for OpenAI"
+_drops = {
+    "INC-04653": ("https://arxiv.org/abs/2211.03622", "fetched 2026-10-15 (\"Do Users Write More Insecure Code with AI Assistants?\"): a user study of insecure code, does not name this incident; dropped"),
+    "INC-03472": ("https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/", "robots.txt refuses our UA, cannot be confirmed; dropped"),
+    "INC-04955": ("https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok", "HTTP 404 via common.py; dropped"),
+    "INC-02899": ("https://atlas.mitre.org/studies/AML.CS0037", "HTTP 404 via common.py; dropped"),
+    "INC-02774": ("https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint", "a 2024 noyb complaint about false information, a different matter from the Garante decision; not confirmed to name this incident; dropped"),
+    "INC-04221": ("https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse", "HTTP 403 to our UA via common.py, cannot be confirmed; dropped (the Stanford study is reported by the retained 404 Media and LAION pages)"),
+    "INC-04179": ("https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html", "NYT Character.AI lawsuit: unrelated to this incident; dropped"),
+}
+for _rid, (_u, _why) in _drops.items():
+    FIXED[_rid]["replace"][_u] = []
+    FIXED[_rid]["also_dropped"] = list(FIXED[_rid]["also_dropped"]) + [f"kept-but-unconfirmed reference {_u}: {_why}"]
+# Retained references with this-session fetch evidence (EVIDENCE above): INC-04179 TIME + Guardian; INC-02899 both Zenity posts;
+# every other kept reference is a newly written, fetched one.
+
+# 6. Discovery retry (bounce #1 advisory c), 2026-10-15/16: Brave search was retried six times for INC-03447, 02703 and 04310 and returned HTTP 429
+#    each time (one unrelated Brave query succeeded earlier, for INC-03810); DuckDuckGo shows a bot challenge. Substitute checks run through common.py:
+UNVERIFIED["INC-03447"]["effort"].append(
+    "Retry: https://www.usenix.org/conference/usenixsecurity24 fetched again (HTTP 200, title \"USENIX Security '24 | USENIX\"): conference landing page, contains neither \"privilege\" nor \"agent\". Brave retries returned HTTP 429. Outcome unchanged.")
+UNVERIFIED["INC-02703"]["effort"].append(
+    "Retry: https://huggingface.co/blog/security (HTTP 404) and https://jfrog.com/blog/ (HTTP 200, blog index, no \"model card\") fetched; Brave retries returned HTTP 429. Outcome unchanged.")
+UNVERIFIED["INC-04310"]["effort"].append(
+    "Retry: the Wayback copy https://web.archive.org/web/2024/https://www.uber.com/blog/michelangelo-machine-learning-platform/ (fetched via common.py; discovery only, not written to the corpus) is the 2017 post \"Meet Michelangelo: Uber's Machine Learning Platform\"; it mentions feature stores but contains none of \"audit\", \"lineage\" or \"30\", so it does not describe the audit in the row. Brave retries returned HTTP 429. Outcome unchanged.")

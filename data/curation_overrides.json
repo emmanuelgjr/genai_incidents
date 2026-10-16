@@ -749,39 +749,16 @@
       "quality_tier": "auto",
       "references": [
         {
-          "title": "Do Users Write More Insecure Code with AI Assistants? — NYU / Stanford (2022)",
-          "url": "https://arxiv.org/abs/2211.03622",
-          "type": "research"
-        },
-        {
           "title": "The lawsuit against Microsoft, GitHub and OpenAI that could change the rules of AI copyright - The Verge (2022-11-08)",
           "url": "https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data",
           "type": "news"
         }
       ],
+      "title": "GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses",
       "description": "GitHub Copilot, GitHub's AI coding assistant unveiled in June 2021, is trained on public code repositories, many of them published with open-source licenses. A proposed class action lawsuit against Microsoft, GitHub and OpenAI (reported by The Verge on 2022-11-08) alleges that the creation of Copilot relies on \"software piracy on an unprecedented scale\"; the key question in the lawsuit is whether open-source code can be reproduced by AI without attached licenses.",
       "impact": "License compliance questions over open-source code reproduced by an AI coding assistant; proposed class action lawsuit filed",
       "affected": "GitHub Copilot users and the authors of open-source code used to train it",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://githubcopilotlitigation.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
-    },
-    "INC-025": {
-      "quality_tier": "auto",
-      "references": [
-        {
-          "title": "GitHub Copilot Chat: From Prompt Injection to Data Exfiltration - Embrace The Red (2024-06-14)",
-          "url": "https://embracethered.com/blog/posts/2024/github-copilot-chat-prompt-injection-data-exfiltration/",
-          "type": "research"
-        },
-        {
-          "title": "GitHub Copilot prompt injection research findings (2024)",
-          "url": "https://www.invicti.com/blog/web-security/prompt-injection-attacks/",
-          "type": "research"
-        }
-      ],
-      "description": "The security researcher behind the Embrace The Red blog reported that the GitHub Copilot Chat extension for VS Code was vulnerable to data exfiltration via prompt injection when analyzing untrusted source code. Copilot Chat interpreted and rendered markdown returned by the LLM, including images, so carefully crafted instructions in a source code file could make the LLM return image links that are retrieved automatically, with information from the chat context appended as a query parameter. Reported to GitHub on 2024-02-25, the fix (Copilot Chat no longer renders markdown images) was confirmed on 2024-06-12 and the write-up published on 2024-06-14.",
-      "impact": "Chat-context data could be exfiltrated to an attacker-controlled server through automatically retrieved markdown images when a developer analyzed a file containing attacker instructions",
-      "affected": "GitHub Copilot Chat VS Code extension (before the June 2024 fix)",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://github.com/advisories. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://githubcopilotlitigation.com/, https://arxiv.org/abs/2211.03622. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-027": {
       "quality_tier": "auto",
@@ -818,17 +795,13 @@
           "title": "ChatGPT, il Garante privacy chiude l'istruttoria (press release) - Garante per la protezione dei dati personali (2024-12-20)",
           "url": "https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432",
           "type": "regulatory"
-        },
-        {
-          "title": "noyb files GDPR complaints against OpenAI over ChatGPT — noyb (2024)",
-          "url": "https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint",
-          "type": "advisory"
         }
       ],
+      "title": "Italy Garante closes ChatGPT investigation: EUR 15 million fine and six-month communication campaign for OpenAI",
       "description": "On 2024-12-20 the Italian data protection authority (Garante per la protezione dei dati personali) announced that it had closed its investigation of OpenAI's ChatGPT service, opened in March 2023, with a corrective and sanctioning decision and a fine of EUR 15 million, calculated also taking into account the company's cooperative attitude. The Garante found that OpenAI had not notified it of the data breach suffered in March 2023, had processed users' personal data to train ChatGPT without first identifying an adequate legal basis, had breached the principle of transparency and the related information obligations, and had provided no age-verification mechanism, exposing children under 13 to responses inappropriate to their development. It ordered OpenAI to run a six-month institutional communication campaign on radio, television, newspapers and the internet, and passed the case file to the Irish DPC as lead supervisory authority. The Garante's page now notes that decision No. 755 of 2 November 2024 was temporarily removed from its website after judgment No. 4153/2026 of the Tribunal of Rome (published 2026-03-18) upheld OpenAI's opposition to it.",
       "impact": "EUR 15 million fine and a six-month communication campaign ordered against OpenAI (decision of 2 November 2024, announced 2024-12-20); the decision was later opposed successfully before the Tribunal of Rome",
       "affected": "OpenAI / ChatGPT (Italy; case referred to the Irish DPC as lead supervisory authority)",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.garanteprivacy.it/, https://iapp.org/news/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.garanteprivacy.it/, https://iapp.org/news/, https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-036": {
       "quality_tier": "auto",
@@ -855,20 +828,16 @@
       "quality_tier": "auto",
       "references": [
         {
-          "title": "Irish DPC fines TikTok EUR 345M — DPC decision (2023)",
-          "url": "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok",
-          "type": "advisory"
-        },
-        {
           "title": "TikTok fined 345m euro over children's data privacy - BBC News (2023-09-15)",
           "url": "https://www.bbc.com/news/technology-66819174",
           "type": "news"
         }
       ],
+      "title": "TikTok fined EUR 345 million by Ireland's Data Protection Commission over children's data handling",
       "description": "On 2023-09-15 Ireland's Data Protection Commission (DPC) fined TikTok EUR 345 million under the GDPR for how the app handled children's data in 2020, particularly around age verification and privacy settings. The DPC found that TikTok had not been transparent enough with children about its privacy settings and that accounts made by users aged 13 to 17 were public by default on registration, which the Data Protection Commissioner said infringed the GDPR's data-protection-by-design-and-by-default requirements. TikTok was given three months to bring its data processing into compliance and said it respectfully disagreed with the decision, particularly the level of the fine.",
       "impact": "EUR 345 million GDPR fine, at the time the biggest TikTok had received from regulators; three months to bring data processing into compliance",
       "affected": "TikTok / ByteDance; users aged 13 to 17 whose accounts were public by default in 2020",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.reuters.com/technology/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.reuters.com/technology/, https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-044": {
       "quality_tier": "auto",
@@ -882,26 +851,17 @@
           "title": "'It's destroyed me completely': Kenyan moderators decry toll of training of AI models - The Guardian (2023-08-02)",
           "url": "https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai",
           "type": "news"
-        },
-        {
-          "title": "Character.AI lawsuit after teen's death — NYT (2024)",
-          "url": "https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html",
-          "type": "news"
         }
       ],
+      "title": "Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations",
       "description": "TIME and The Guardian reported on the working conditions of data labelers and content moderators employed by Sama, a California-headquartered data annotation company, on OpenAI's behalf in Nairobi, Kenya. TIME (2023-01-18) reported that Sama data labelers were paid a take-home wage of between around $1.32 and $2 per hour, depending on seniority and performance. The Guardian (2023-08-02) reported that the 51 moderators in Nairobi working on Sama's OpenAI account reviewed texts, and some images, depicting graphic scenes of violence, self-harm, murder, rape, necrophilia and child abuse, and that in a petition they allege psychological trauma, low pay and abrupt dismissal; a Sama spokesperson said workers were paid between $1.46 and $3.74 an hour.",
       "impact": "Alleged psychological trauma, low pay and abrupt dismissal for annotation workers in an AI training supply chain; pay reported as $1.32-$2/hour (TIME) and $1.46-$3.74/hour (Sama statement to The Guardian)",
       "affected": "Sama content moderators and data labelers in Nairobi, Kenya working on OpenAI's account",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.theguardian.com/technology/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.theguardian.com/technology/, https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-049": {
       "quality_tier": "auto",
       "references": [
-        {
-          "title": "Stanford Internet Observatory: LAION-5B CSAM findings (2023)",
-          "url": "https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse",
-          "type": "research"
-        },
         {
           "title": "Largest Dataset Powering AI Images Removed After Discovery of Child Sexual Abuse Material - 404 Media (2023-12-20)",
           "url": "https://www.404media.co/laion-datasets-removed-stanford-csam-child-abuse/",
@@ -913,10 +873,11 @@
           "type": "reference"
         }
       ],
+      "title": "LAION-5B training dataset withdrawn after Stanford study finds suspected CSAM; Re-LAION-5B released",
       "description": "In December 2023 a Stanford Internet Observatory study, reported by 404 Media, found 3,226 suspected instances of child sexual abuse material (CSAM), 1,008 of which were externally validated, in LAION-5B, the machine learning dataset used by Stable Diffusion and other major AI products. LAION took LAION-5B and LAION-400M down temporarily out of an abundance of caution to ensure they were safe before republishing. On 2024-08-30 LAION released Re-LAION-5B, cleaned of known links to suspected CSAM using hash lists from the Internet Watch Foundation and the Canadian Center for Child Protection, in which 2236 links were removed.",
       "impact": "Suspected CSAM links found in a web-scale training dataset used for image-generation models; the dataset was withdrawn and later re-released with known links removed",
       "affected": "LAION-5B and LAION-400M, and models trained on them such as Stable Diffusion",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.bbc.co.uk/news/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.bbc.co.uk/news/, https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-074": {
       "quality_tier": "auto",
@@ -930,17 +891,12 @@
           "title": "EEOC Releases Technical Document on AI and Title VII - Law and the Workplace (2023-05-23)",
           "url": "https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/",
           "type": "legal"
-        },
-        {
-          "title": "AI hiring bias settlement patterns",
-          "url": "https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/",
-          "type": "news"
         }
       ],
       "description": "In 2018 Reuters reported, and the BBC summarized on 2018-10-10, that Amazon had scrapped an experimental machine-learning recruitment tool that scored candidates from one to five stars: by 2015 it was clear the system was not rating candidates in a gender-neutral way because it was built on CVs submitted to the firm mostly by men, and it penalised CVs that included the word \"women\"; the program was edited to be neutral to the term but could not be relied on, and the project was abandoned. On 2023-05-18 the US EEOC released technical assistance on assessing adverse impact in software, algorithms and AI used in employment selection procedures under Title VII, stating that an employer can be held responsible for an algorithmic selection procedure that has an adverse impact even if the tool is designed or administered by a software vendor.",
       "impact": "Gender bias in an automated hiring tool led to its abandonment; EEOC technical assistance (May 2023) on disparate impact of algorithmic selection tools",
       "affected": "Job candidates, particularly women applying through automated CV screening",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.eeoc.gov/ai. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://www.eeoc.gov/ai, https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-075": {
       "quality_tier": "auto",
@@ -970,20 +926,16 @@
           "type": "research"
         },
         {
-          "title": "MITRE ATLAS — AML.CS0037",
-          "url": "https://atlas.mitre.org/studies/AML.CS0037",
-          "type": "research"
-        },
-        {
           "title": "AgentFlayer: Discovery Phase of AI Agents in Copilot Studio",
           "url": "https://labs.zenity.io/p/a-copilot-studio-story-discovery-phase-in-ai-agents-f917",
           "type": "research"
         }
       ],
+      "title": "Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-data exfiltration (Zenity Labs)",
       "description": "Zenity Labs researchers reported that Microsoft Copilot Studio agents were vulnerable to prompt injection via triggers (reported to MSRC on 2025-02-21; Microsoft confirmed the behaviour on 2025-03-13 and issued a fix on 2025-04-24). In a two-part write-up (2025-06-11 discovery phase, 2025-07-07 exfiltration phase) they showed how an attacker could discover a customer-service agent's knowledge sources and tools and then use prompt injection (\"AIjacking\") to exfiltrate the agent's knowledge-source data, about 100 rows of data in a single iteration, and customer records reachable through the agent's connected tools.",
       "impact": "Data exfiltration from a Copilot Studio agent's knowledge sources and connected customer-data tools through prompt injection",
       "affected": "Microsoft Copilot Studio agents with knowledge sources and customer-data tools",
-      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://labs.zenity.io/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
+      "_note": "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review. Replaced/removed reference(s): https://labs.zenity.io/, https://atlas.mitre.org/studies/AML.CS0037. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-10-15/."
     },
     "INC-019": {
       "status": "unverified",
@@ -991,7 +943,7 @@
         "code": "no-confirmed-source",
         "as_of": "2026-10-15"
       },
-      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites Wiz (\"AI agents and privilege escalation risks in cloud environments\") and USENIX Security '24 (conference landing page). https://www.wiz.io/blog/the-urgent-need-for-ai-security-guardrails fetched via common.py 2026-10-15: HTTP 404. USENIX '24 landing page (R1) names no paper. Discovery queries: Brave \"Wiz AI agent cloud IAM privilege escalation prompt injection read-only administrator\" - rate-limited (HTTP 429), no result obtained (tried twice); arXiv API all:\"privilege escalation\" AND all:agents AND all:IAM AND all:cloud -> 0 results. The attack chain (iam:AttachRolePolicy from a read-only role in AWS, Azure and GCP) is not named by any fetched page. Outcome: no confirmed source names this incident."
+      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites Wiz (\"AI agents and privilege escalation risks in cloud environments\") and USENIX Security '24 (conference landing page). https://www.wiz.io/blog/the-urgent-need-for-ai-security-guardrails fetched via common.py 2026-10-15: HTTP 404. USENIX '24 landing page (R1) names no paper. Discovery queries: Brave \"Wiz AI agent cloud IAM privilege escalation prompt injection read-only administrator\" - rate-limited (HTTP 429), no result obtained (tried twice); arXiv API all:\"privilege escalation\" AND all:agents AND all:IAM AND all:cloud -> 0 results. The attack chain (iam:AttachRolePolicy from a read-only role in AWS, Azure and GCP) is not named by any fetched page. Outcome: no confirmed source names this incident. Retry: https://www.usenix.org/conference/usenixsecurity24 fetched again (HTTP 200, title \"USENIX Security '24 | USENIX\"): conference landing page, contains neither \"privilege\" nor \"agent\". Brave retries returned HTTP 429. Outcome unchanged."
     },
     "INC-037": {
       "status": "unverified",
@@ -1007,7 +959,7 @@
         "code": "no-confirmed-source",
         "as_of": "2026-10-15"
       },
-      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites jfrog.com/blog/ (blog index) and huggingface.co/blog/security (index-segments). Fetched https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/ (2026-10-15): JFrog's malicious-model research. It concerns code execution on model LOAD (pickle payload) and mentions a model card only in passing (a card warning not to download a model); it does not describe code execution on model-card rendering or unverifiable self-reported safety claims, so it is a different finding and was not substituted. Discovery query (arXiv API): all:\"model card\" AND all:\"code execution\" AND all:\"Hugging Face\" -> 0 results; Brave query on the same topic was rate-limited (HTTP 429). Outcome: no confirmed source names the described model-card attack."
+      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites jfrog.com/blog/ (blog index) and huggingface.co/blog/security (index-segments). Fetched https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/ (2026-10-15): JFrog's malicious-model research. It concerns code execution on model LOAD (pickle payload) and mentions a model card only in passing (a card warning not to download a model); it does not describe code execution on model-card rendering or unverifiable self-reported safety claims, so it is a different finding and was not substituted. Discovery query (arXiv API): all:\"model card\" AND all:\"code execution\" AND all:\"Hugging Face\" -> 0 results; Brave query on the same topic was rate-limited (HTTP 429). Outcome: no confirmed source names the described model-card attack. Retry: https://huggingface.co/blog/security (HTTP 404) and https://jfrog.com/blog/ (HTTP 200, blog index, no \"model card\") fetched; Brave retries returned HTTP 429. Outcome unchanged."
     },
     "INC-040": {
       "status": "unverified",
@@ -1031,7 +983,7 @@
         "code": "no-confirmed-source",
         "as_of": "2026-10-15"
       },
-      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites uber.com/blog/engineering/ (blog section index; fetch returns HTTP 406 for our UA). Candidate https://www.uber.com/blog/michelangelo-machine-learning-platform/ also returns HTTP 406 via common.py (2026-10-15), so no Uber page can be fetched and none can be confirmed to name an audit of 30+ feature stores; no URL may be written without a fetch. Discovery query (Brave): \"Uber Michelangelo audit 30 feature stores data lineage fragmentation\" - rate-limited (HTTP 429), no result obtained. Outcome: no confirmed source names this incident."
+      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites uber.com/blog/engineering/ (blog section index; fetch returns HTTP 406 for our UA). Candidate https://www.uber.com/blog/michelangelo-machine-learning-platform/ also returns HTTP 406 via common.py (2026-10-15), so no Uber page can be fetched and none can be confirmed to name an audit of 30+ feature stores; no URL may be written without a fetch. Discovery query (Brave): \"Uber Michelangelo audit 30 feature stores data lineage fragmentation\" - rate-limited (HTTP 429), no result obtained. Outcome: no confirmed source names this incident. Retry: the Wayback copy https://web.archive.org/web/2024/https://www.uber.com/blog/michelangelo-machine-learning-platform/ (fetched via common.py; discovery only, not written to the corpus) is the 2017 post \"Meet Michelangelo: Uber's Machine Learning Platform\"; it mentions feature stores but contains none of \"audit\", \"lineage\" or \"30\", so it does not describe the audit in the row. Brave retries returned HTTP 429. Outcome unchanged."
     },
     "INC-045": {
       "status": "unverified",
@@ -1057,13 +1009,13 @@
       },
       "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites arxiv.org/abs/2311.16090 = \"Self-correcting LLM-controlled Diffusion Models\" (R2 title-no-overlap; wrong paper). Discovery queries (arXiv API): all:\"safety checker\" AND all:\"text-to-image\" AND all:bypass -> adversarial/jailbreak papers on text-to-image safeguards (e.g. MMA-Diffusion 2311.17516, 2404.02928) none of which concern CSAM-classifier evasion; all:CSAM AND all:classifier AND all:adversarial -> 0 results. Outcome: no confirmed source names adversarial evasion of CSAM-detection classifiers via negative prompts and LoRA models."
     },
-    "INC-065": {
+    "INC-025": {
       "status": "unverified",
       "status_reason": {
         "code": "no-confirmed-source",
         "as_of": "2026-10-15"
       },
-      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites arxiv.org/abs/2403.06634 = \"Stealing Part of a Production Language Model\" (a model-extraction paper). That paper is the genuine reference of the row's merged source ARXIV-2403.06634, not of the invented \"GPT-4 system prompt extraction toolkit\" (Base64/ROT13/role-play) narrative of INC-065, so the row is an over-merge in addition to an unsupported description. Discovery query (Brave): \"system prompt extraction attacks GPT-4 arxiv prompt leakage multi-turn Base64\" -> Zhang & Ippolito 2307.06865 \"Effective Prompt Extraction from Language Models\" (fetched: no GPT-4, no toolkit) and Agarwal et al. 2404.16251 (fetched: no GPT-4); neither describes a published toolkit. Outcome: no confirmed source names the described toolkit. References left unchanged (the arXiv paper remains the reference of source ARXIV-2403.06634). Over-merge reported for WS4-T19."
+      "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites github.com/advisories (global advisory index, R1) and invicti.com/blog/web-security/prompt-injection-attacks/ (HTTP 404). The Embrace The Red Copilot Chat post (fetched 2026-10-15) is a different, already-recorded incident: it is the sole reference of INC-03808 (RES-etr-github-copilot-chat-2024), and the word \"Workspace\" does not occur in it. The first tranche re-pointed this row at it; reverted (bounce #1, defect 1). Discovery query (Brave, retry 2026-10-15): \"GitHub Copilot Workspace prompt injection repository README exfiltrate secrets\" -> CSO Online and Orca RoguePilot (Copilot in Codespaces, a later and different finding), Reddit threads, vendor guides; none documents a 2024 Copilot Workspace injection via README/comment files. Outcome: no confirmed source names the Copilot Workspace incident. Row is marked unverified; references and quality_tier untouched."
     }
   }
 }

@@ -75,6 +75,13 @@ w("")
 w(f"Base 589376db vs this branch's build: entry count {delta['entry_count'][0]} -> {delta['entry_count'][1]}; ID set equal: {delta['id_set_equal']}; "
   f"rows with any difference: {len(delta['rows'])} (= {len(fx)} fixed + {len(un)} unverified); rows outside those with any difference: {len(delta['unintended'])}.")
 w("Envelope: " + "; ".join(f"`{k}` {v[0]} -> {v[1]}" for k, v in delta["envelope"].items()) + ". (`generated` is the build date stamp.)")
+w("Headline counts in `data/stats.json` (and the doc surfaces templated from it, e.g. the README cells) that moved: " + "; ".join(f"`{k}` {v[0]} -> {v[1]}" for k, v in delta["stats"].items()) + f"; stats keys outside this declared set: {len(delta['unintended_stats'])}.")
+unv_n = len(un)
+w(f"- `incident_count` -15,755 -> 15,745: exactly the {unv_n} unverified rows ({', '.join(sorted(un))}); `unverified_count` 0 -> {unv_n}.")
+dem = sorted(r for r in fx if base[r]['quality_tier'] == 'curated' and delta['rows'][r].get('tier'))
+w(f"- `landmark_count` {delta['stats']['landmark_count'][0]} -> {delta['stats']['landmark_count'][1]}: the {len(dem)} curated rows demoted to auto that leave the landmark tier ({', '.join(dem)}); INC-02454 is also demoted but its corpus is pinned to `ai-harm` (base value), which keeps it landmark. No unverified row is landmark.")
+w("- `generated` is the build date stamp. `retracted_count`, `disputed_count`, version and year range are unchanged.")
+w("")
 w("Full per-row before/after: `delta-2026-10-15.json`. Enumerated fields:")
 w("")
 w("| field | rows | kind | justification |")
@@ -84,12 +91,12 @@ kinds = {
     "description": ("intended", "re-derived from the fetched source; unsupported figures dropped"),
     "impact": ("intended", "restated the dropped figures/claims; rewritten from the same source"),
     "affected": ("intended", "restated the dropped figures/claims; rewritten from the same source"),
-    "title": ("intended", "title carried an unsupported figure (INC-02454 \"$50M\" and a bias claim)"),
+    "title": ("intended", "title asserted claims the confirmed source does not support (bounce #1 defect 3); re-derived from the source so title and description agree"),
     "quality_tier": ("intended", "ruling D130(c): every replaced reference demotes to auto; never promoted"),
     "status": ("intended", "D130(b)/D130-1: unverified"),
     "status_reason": ("intended", "D130-1: {code: no-confirmed-source, as_of: 2026-10-15}"),
-    "updated": ("derived", "history stamp: content changed on 2026-10-15"),
-    "last_seen": ("derived", "history stamp: content changed on 2026-10-15"),
+    "updated": ("derived", "history stamp: content changed (build date)"),
+    "last_seen": ("derived", "history stamp: content changed (build date)"),
     "confidence": ("derived", "`_derive_confidence`: curated/reviewed -> high; a single auto-tier source with no CVE -> low/medium. Follows quality_tier only"),
     "tier": ("derived", "`_derive_tier`: curated -> landmark; demoted curated rows without aiid_id / ai-harm corpus become feed. Follows quality_tier only"),
 }
@@ -144,6 +151,7 @@ for rid in ids_all:
             w(f"  - matched tokens linking the page to the entry: {', '.join(p['tokens_matched'])}")
         if not [u for u in new_urls]:
             w("- chosen: none needed; the equivalent verified reference(s) already on the row are kept (fetched this session; see the evidence table)")
+        w("- references after (each fetched this session; see the evidence table): " + "; ".join(r["url"] for r in delta["rows"][rid]["references"][1]))
         w(f"- description before: {e['description']}")
         w(f"- description after: {spec['description']}")
         w(f"- impact before: {e.get('impact')}")
@@ -176,9 +184,10 @@ for rid in ids_all:
 w("## Other findings (not changed; outside the R1/R2 scope)")
 w("")
 w("- Broken or unfetchable references seen while checking, left as found: `dataprotection.ie` TikTok press-release URLs (HTTP 404), `atlas.mitre.org/studies/AML.CS0037` and `.../AML.CS0050` (HTTP 404), `invicti.com/blog/web-security/prompt-injection-attacks/` (HTTP 404), `reuters.com/technology/ai-hiring-bias-settlements-2024/` (robots-refused), the Stanford SIO page (HTTP 403 to our UA), `vulncheck.com` Flowise advisory (HTTP 404).")
-w("- Titles that still assert claims no fetched source supports (title edits were limited to unsupported FIGURES): INC-04653 (\"embedded secrets\"), INC-03810 (\"Copilot Workspace\"), INC-04955 (\"Project Clover\"), INC-04179 (\"Scale AI\"), INC-04221 (\"Stability AI synthetic CSAM generation\"), INC-02899 (\"public by default\").")
-w("- `date` fields that disagree with the fetched sources, left as found (outside the intended-delta list): INC-02774 (2025-03; decision announced 2024-12-20), INC-03004 (2025-01; paper 2025-02-18), INC-03972 (2024-10; paper 2024-09-17).")
+w("- Titles of the corrected rows were re-derived from the confirmed sources (bounce #1, defect 3); the unverified rows keep their titles.")
+w("- `date` fields that disagree with the fetched sources, left as found (outside the intended-delta list; queued): INC-02774 (2025-03; decision announced 2024-12-20), INC-03004 (2025-01; paper 2025-02-18), INC-03972 (2024-10; paper 2024-09-17).")
 w("- Discovery note, unverified: a search-result snippet claimed a July 2026 Seventh Circuit vacatur of the Clearview settlement. No fetched source confirms it, so it is not in the description; worth a check before any release statement about INC-02454.")
-w("- Over-merges noticed (a WS4-T19 question, not decided here): INC-04142 (AgentDojo merged into RAG poisoning) and INC-04067 (Carlini model-stealing paper merged into a system-prompt-extraction narrative).")
+w("- Legacy over-merges to report for WS4-T19 (not decided here): INC-04142 (AgentDojo merged into RAG poisoning), INC-04067 (Carlini model-stealing merged into a system-prompt-extraction narrative), INC-02454 (INC-036 + INC-039), INC-02774 (INC-035 + INC-050), INC-04179 (INC-044 + INC-048).")
+w("- Queued, not in this task: stale classifier labels on the corrected rows (task D130-2L, user-ruled); the five frozen feed-merged rows via a `references_remove` override after D139-M; the `date` mismatches above (follow-up).")
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 print("\n".join(L))

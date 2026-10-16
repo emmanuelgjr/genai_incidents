@@ -925,6 +925,78 @@
    "tokens_unmatched": [
     "Title VII"
    ]
+  },
+  {
+   "url": "https://web.archive.org/web/2024/https://www.uber.com/blog/michelangelo-machine-learning-platform/",
+   "status": 200,
+   "title": "Meet Michelangelo: Uber's Machine Learning Platform | Uber Blog",
+   "fetched_at": "2026-10-16T01:00:09Z",
+   "sha256": "8ee329c8cee8559fd51699a1f439b65be5f913791eac3b7412a6ee5f26d3528f",
+   "error": null,
+   "tokens_matched": [
+    "Michelangelo",
+    "feature store"
+   ],
+   "tokens_unmatched": [
+    "audit",
+    "lineage",
+    "30"
+   ]
+  },
+  {
+   "url": "https://web.archive.org/web/2024/https://huggingface.co/blog/security",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-16T01:00:12Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: NOT FOUND",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "model card",
+    "code execution"
+   ]
+  },
+  {
+   "url": "https://huggingface.co/blog/security",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-10-16T01:00:19Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "model card",
+    "code execution",
+    "pickle",
+    "JFrog"
+   ]
+  },
+  {
+   "url": "https://jfrog.com/blog/",
+   "status": 200,
+   "title": "From the Frog's mouth - JFrog Blog",
+   "fetched_at": "2026-10-16T01:00:21Z",
+   "sha256": "7f325c4b360f8b71f419f070a8c21bce922309b243432231e26be59d8a148d7d",
+   "error": null,
+   "tokens_matched": [
+    "Hugging Face"
+   ],
+   "tokens_unmatched": [
+    "model card"
+   ]
+  },
+  {
+   "url": "https://www.usenix.org/conference/usenixsecurity24",
+   "status": 200,
+   "title": "USENIX Security '24 | USENIX",
+   "fetched_at": "2026-10-16T01:00:22Z",
+   "sha256": "b788c00fdf62ca55b3f5a3595a56cc9420839771903844b5680d0ad787815fa7",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "privilege",
+    "agent"
+   ]
   }
  ]
 }

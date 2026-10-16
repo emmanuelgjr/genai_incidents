@@ -58,6 +58,8 @@ for rid, sp in S.FIXED.items():
     for f in ("title", "corpus"):
         if sp.get(f) or f in sp.get("pin", {}):
             chk(r[f] == (sp.get(f) or sp["pin"][f]), f"{rid} {f} wrong")
+    for ref in r["references"]:
+        chk(ref["url"] in S.EVIDENCE, f"{rid} keeps {ref['url']} with no this-session fetch evidence")
     for u in (x for olds in sp["replace"].values() for x in olds):
         chk(any(ref["url"] == u for ref in r["references"]), f"{rid} lacks {u}")
     for old in sp["replace"]:

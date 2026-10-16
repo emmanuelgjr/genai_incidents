@@ -16,14 +16,14 @@ then fetched through `common.py`. All changes are `data/curation_overrides.json`
 
 | outcome | rows | by original quality_tier |
 |---|---|---|
-| fixed (reference replaced/removed, description re-derived, demoted to auto) | 12 | curated 4, reviewed 8 |
-| unverified (`status: unverified`, no-confirmed-source) | 10 | curated 1, reviewed 9 |
-| examined, not changed: false positive / merge artifact | 2 | curated 2 |
+| fixed (reference replaced/removed, description re-derived, demoted to auto) | 11 | curated 4, reviewed 7 |
+| unverified (`status: unverified`, no-confirmed-source) | 10 | reviewed 10 |
+| examined, not changed: false positive / merge artifact | 3 | curated 3 |
 | deferred: mechanism gap (feed-merged CVE/GHSA rows; a whole-list `references` override would freeze them) | 5 | curated 5 |
 | deferred: ruling (c) demotion collides with the validate.py landmark-label gate | 1 | curated 1 |
 | **total** | **30** | |
 
-Rows whose `description` changed (12): INC-02454, INC-02774, INC-02899, INC-03004, INC-03472, INC-03810, INC-03955, INC-03972, INC-04179, INC-04221, INC-04653, INC-04955.
+Rows whose `description` changed (11): INC-02454, INC-02774, INC-02899, INC-03004, INC-03472, INC-03955, INC-03972, INC-04179, INC-04221, INC-04653, INC-04955.
 
 Re-derivation of the 30: the detection report's `r1`/`r2` definitions (its Appendix A) applied to the rows of `data/incidents.json` at
 589376db that carry an `INC-<n>`/`LEGACY-INC-<n>` source_id give 30 rows (13 curated, 17 reviewed), equal to the report's count.
@@ -31,24 +31,29 @@ The list is the union of the five outcome groups above. Command: `python -I docs
 
 ## Field-level delta (working agreement 2)
 
-Base 589376db vs this branch's build: entry count 15784 -> 15784; ID set equal: True; rows with any difference: 22 (= 12 fixed + 10 unverified); rows outside those with any difference: 0.
-Envelope: `generated` 2026-10-13 -> 2026-10-15; `incident_count` 15755 -> 15745; `unverified_count` 0 -> 10. (`generated` is the build date stamp.)
+Base 589376db vs this branch's build: entry count 15784 -> 15784; ID set equal: True; rows with any difference: 21 (= 11 fixed + 10 unverified); rows outside those with any difference: 0.
+Envelope: `generated` 2026-10-13 -> 2026-10-16; `incident_count` 15755 -> 15745; `unverified_count` 0 -> 10. (`generated` is the build date stamp.)
+Headline counts in `data/stats.json` (and the doc surfaces templated from it, e.g. the README cells) that moved: `generated` 2026-10-13 -> 2026-10-16; `incident_count` 15755 -> 15745; `landmark_count` 2028 -> 2025; `unverified_count` 0 -> 10; stats keys outside this declared set: 0.
+- `incident_count` -15,755 -> 15,745: exactly the 10 unverified rows (INC-02353, INC-02703, INC-02922, INC-03247, INC-03444, INC-03447, INC-03491, INC-03570, INC-03810, INC-04310); `unverified_count` 0 -> 10.
+- `landmark_count` 2028 -> 2025: the 3 curated rows demoted to auto that leave the landmark tier (INC-02774, INC-02899, INC-04179); INC-02454 is also demoted but its corpus is pinned to `ai-harm` (base value), which keeps it landmark. No unverified row is landmark.
+- `generated` is the build date stamp. `retracted_count`, `disputed_count`, version and year range are unchanged.
+
 Full per-row before/after: `delta-2026-10-15.json`. Enumerated fields:
 
 | field | rows | kind | justification |
 |---|---|---|---|
-| `affected` | 12 | intended | restated the dropped figures/claims; rewritten from the same source |
-| `confidence` | 12 | derived | `_derive_confidence`: curated/reviewed -> high; a single auto-tier source with no CVE -> low/medium. Follows quality_tier only |
-| `description` | 12 | intended | re-derived from the fetched source; unsupported figures dropped |
-| `impact` | 12 | intended | restated the dropped figures/claims; rewritten from the same source |
-| `last_seen` | 22 | derived | history stamp: content changed on 2026-10-15 |
-| `quality_tier` | 12 | intended | ruling D130(c): every replaced reference demotes to auto; never promoted |
-| `references` | 12 | intended | the D130-2 change itself |
+| `affected` | 11 | intended | restated the dropped figures/claims; rewritten from the same source |
+| `confidence` | 11 | derived | `_derive_confidence`: curated/reviewed -> high; a single auto-tier source with no CVE -> low/medium. Follows quality_tier only |
+| `description` | 11 | intended | re-derived from the fetched source; unsupported figures dropped |
+| `impact` | 11 | intended | restated the dropped figures/claims; rewritten from the same source |
+| `last_seen` | 21 | derived | history stamp: content changed (build date) |
+| `quality_tier` | 11 | intended | ruling D130(c): every replaced reference demotes to auto; never promoted |
+| `references` | 11 | intended | the D130-2 change itself |
 | `status` | 10 | intended | D130(b)/D130-1: unverified |
 | `status_reason` | 10 | intended | D130-1: {code: no-confirmed-source, as_of: 2026-10-15} |
 | `tier` | 3 (INC-02774, INC-02899, INC-04179) | derived | `_derive_tier`: curated -> landmark; demoted curated rows without aiid_id / ai-harm corpus become feed. Follows quality_tier only |
-| `title` | 1 (INC-02454) | intended | title carried an unsupported figure (INC-02454 "$50M" and a bias claim) |
-| `updated` | 22 | derived | history stamp: content changed on 2026-10-15 |
+| `title` | 7 | intended | title asserted claims the confirmed source does not support (bounce #1 defect 3); re-derived from the source so title and description agree |
+| `updated` | 21 | derived | history stamp: content changed (build date) |
 
 Derived-field coupling (the WS0-T3 trap, `docs/audits/WS0-T3-cascade-2026-07-18.md`): classifiers that read `description`/`title` run BEFORE the
 step-4d curation override, so `attack_vector`, `severity`, `owasp_*`, `nist_ai_rmf`, `mitre_atlas*`, `maestro_layers`, `category` and `tags`
@@ -108,6 +113,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.regulatoryoversight.com/2025/04/51-75m-settlement-in-clearview-ai-biometric-privacy-litigation-illustrates-creative-resolution-for-startups-facing-parallel-litigation-and-enforcement-action/
   - fetched: HTTP 200; title "$51.75M Settlement in Clearview AI Biometric Privacy Litigation Illustrates Creative Resolution for Startups Facing Parallel Litigation and Enforcement Action | Regulatory Oversight"; fetched_at 2026-10-15T11:31:06Z; sha256 d22dd4ff25664e51...; publication date is in the reference title
   - matched tokens linking the page to the entry: Clearview, $51.75 million, 23% equity stake, BIPA
+- references after (each fetched this session; see the evidence table): https://natlawreview.com/article/first-bipa-litigation-class-members-receive-equity-clearview-ai; https://www.regulatoryoversight.com/2025/04/51-75m-settlement-in-clearview-ai-biometric-privacy-litigation-illustrates-creative-resolution-for-startups-facing-parallel-litigation-and-enforcement-action/
 - description before: Clearview AI reached a settlement in a class action lawsuit over its facial recognition system's biometric data collection and demonstrated racial bias. The lawsuit, filed under Illinois BIPA (Biometric Information Privacy Act), alleged that Clearview scraped billions of facial images from the internet without consent and that the resulting system exhibited measurable accuracy disparities across racial groups. The settlement established a USD 50 million fund and required Clearview to implement bias testing, obtain consent for US data collection, and submit to third-party audits. The case established legal precedent that AI training data bias creates direct financial liability.
 - description after: Class members in consolidated Illinois Biometric Information Privacy Act (BIPA) litigation against Clearview AI, a facial recognition company that built a database of more than 60 billion facial images by scraping photographs from the internet, reached a settlement that U.S. District Judge Sharon Johnson Coleman approved on 2025-03-20. Unusually, the settlement gives the class a 23% equity stake in Clearview rather than a cash fund; commentary values the stake at approximately $51.75 million as of January 2024, with payment triggered by events such as an IPO or a liquidation event. State attorneys general objected to the settlement.
 - impact before: USD 50M settlement establishes financial precedent for AI training data bias; BIPA violations for unconsented biometric collection; mandatory bias testing + third-party audits as structural remedy; precedent for other states and jurisdictions
@@ -135,6 +141,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - Fetched https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models-with-silent-backdoor/ (2026-10-15): JFrog's malicious-model research. It concerns code execution on model LOAD (pickle payload) and mentions a model card only in passing (a card warning not to download a model); it does not describe code execution on model-card rendering or unverifiable self-reported safety claims, so it is a different finding and was not substituted.
 - Discovery query (arXiv API): all:"model card" AND all:"code execution" AND all:"Hugging Face" -> 0 results; Brave query on the same topic was rate-limited (HTTP 429).
 - Outcome: no confirmed source names the described model-card attack.
+- Retry: https://huggingface.co/blog/security (HTTP 404) and https://jfrog.com/blog/ (HTTP 200, blog index, no "model card") fetched; Brave retries returned HTTP 429. Outcome unchanged.
 - action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
 
 ### INC-02774 - FIXED
@@ -149,14 +156,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432
   - fetched: HTTP 200; title "COMUNICATO STAMPA - ChatGPT, il Garante privacy chiude l’istruttoria.... - Garante Privacy"; fetched_at 2026-10-15T11:27:42Z; sha256 62e1267c737f4283...; publication date is in the reference title
   - matched tokens linking the page to the entry: OpenAI, ChatGPT, 15 milioni, 20 dicembre 2024, Tribunale di Roma
+- references after (each fetched this session; see the evidence table): https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10085432
 - description before: The Italian Data Protection Authority (Garante per la protezione dei dati personali) issued its final enforcement decision against OpenAI regarding ChatGPT's compliance with GDPR. Following the initial March 2023 suspension and subsequent investigation, the Garante found violations of Articles 5 (data minimization), 6 (lawfulness — insufficient legal basis for training data processing), 13 (transparency — inadequate privacy notice), and 25 (data protection by design). The decision imposed a EUR 15 million fine and required structural remedies including age verification, opt-out mechanisms for training data, and enhanced transparency about data processing. This is the first major GDPR enforcement action specifically targeting an LLM provider's training data practices.
 - description after: On 2024-12-20 the Italian data protection authority (Garante per la protezione dei dati personali) announced that it had closed its investigation of OpenAI's ChatGPT service, opened in March 2023, with a corrective and sanctioning decision and a fine of EUR 15 million, calculated also taking into account the company's cooperative attitude. The Garante found that OpenAI had not notified it of the data breach suffered in March 2023, had processed users' personal data to train ChatGPT without first identifying an adequate legal basis, had breached the principle of transparency and the related information obligations, and had provided no age-verification mechanism, exposing children under 13 to responses inappropriate to their development. It ordered OpenAI to run a six-month institutional communication campaign on radio, television, newspapers and the internet, and passed the case file to the Irish DPC as lead supervisory authority. The Garante's page now notes that decision No. 755 of 2 November 2024 was temporarily removed from its website after judgment No. 4153/2026 of the Tribunal of Rome (published 2026-03-18) upheld OpenAI's opposition to it.
 - impact before: First major GDPR enforcement targeting LLM training data; establishes precedent that AI training on personal data requires explicit legal basis; EUR 15M fine; structural remedies (age verification, opt-out, transparency) now expected industry-wide
 - impact after: EUR 15 million fine and a six-month communication campaign ordered against OpenAI (decision of 2 November 2024, announced 2024-12-20); the decision was later opposed successfully before the Tribunal of Rome
 - affected before: OpenAI / ChatGPT — EUR 15M fine; all LLM providers operating in EU face precedent; structural remedies required
 - affected after: OpenAI / ChatGPT (Italy; case referred to the Irish DPC as lead supervisory authority)
+- title after: Italy Garante closes ChatGPT investigation: EUR 15 million fine and six-month communication campaign for OpenAI
 - figures dropped (not found in the source): GDPR Articles 5, 6, 13 and 25 list (the Garante page names no article numbers); "opt-out mechanisms" remedy (the page orders a communication campaign, not an opt-out mechanism)
-- other unsupported claims dropped / residuals: "first major GDPR enforcement action specifically targeting an LLM provider" (not in the source)
+- other unsupported claims dropped / residuals: "first major GDPR enforcement action specifically targeting an LLM provider" (not in the source); kept-but-unconfirmed reference https://noyb.eu/en/chatgpt-provides-false-information-about-people-noyb-files-complaint: a 2024 noyb complaint about false information, a different matter from the Garante decision; not confirmed to name this incident; dropped
 - quality_tier: curated -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-02871 - DEFERRED (mechanism gap)
@@ -175,14 +184,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - query / discovery: figure/claim check against the row's two Zenity references, fetched 2026-10-15
 - candidate rejected / note: labs.zenity.io/ = Zenity Labs blog homepage (R1); removed because the two specific Zenity posts are already references
 - chosen: none needed; the equivalent verified reference(s) already on the row are kept (fetched this session; see the evidence table)
+- references after (each fetched this session; see the evidence table): https://labs.zenity.io/p/a-copilot-studio-story-2-when-aijacking-leads-to-full-data-exfiltration-bc4a; https://labs.zenity.io/p/a-copilot-studio-story-discovery-phase-in-ai-agents-f917
 - description before: Agents built in Microsoft Copilot Studio were public by default and lacked authentication. Attackers could enumerate and access exposed agents, pulling confidential business data from production environments.
 - description after: Zenity Labs researchers reported that Microsoft Copilot Studio agents were vulnerable to prompt injection via triggers (reported to MSRC on 2025-02-21; Microsoft confirmed the behaviour on 2025-03-13 and issued a fix on 2025-04-24). In a two-part write-up (2025-06-11 discovery phase, 2025-07-07 exfiltration phase) they showed how an attacker could discover a customer-service agent's knowledge sources and tools and then use prompt injection ("AIjacking") to exfiltrate the agent's knowledge-source data, about 100 rows of data in a single iteration, and customer records reachable through the agent's connected tools.
 - impact before: Unauthorized agent access; business intelligence theft; data exfiltration
 - impact after: Data exfiltration from a Copilot Studio agent's knowledge sources and connected customer-data tools through prompt injection
 - affected before: Microsoft Copilot Studio — enterprise agents with business data access
 - affected after: Microsoft Copilot Studio agents with knowledge sources and customer-data tools
+- title after: Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-data exfiltration (Zenity Labs)
 - figures dropped (not found in the source): none
-- other unsupported claims dropped / residuals: "public by default", "lacked authentication" and attacker enumeration of exposed agents (neither Zenity post says this); the row's title still says "public by default". The ATLAS reference AML.CS0037 returns 404 and is NOT changed
+- other unsupported claims dropped / residuals: "public by default", "lacked authentication" and attacker enumeration of exposed agents (neither Zenity post says this); the row's title still says "public by default". The ATLAS reference AML.CS0037 returns 404 and is NOT changed; kept-but-unconfirmed reference https://atlas.mitre.org/studies/AML.CS0037: HTTP 404 via common.py; dropped
 - quality_tier: curated -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-02922 - UNVERIFIED
@@ -204,6 +215,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://arxiv.org/abs/2502.12893
   - fetched: HTTP 200; title "[2502.12893] H-CoT: Hijacking the Chain-of-Thought Safety Reasoning Mechanism to Jailbreak Large Reasoning Models, Including OpenAI o1/o3, DeepSeek-R1, and Gemini 2.0 Flash Thinking"; fetched_at 2026-10-15T11:27:00Z; sha256 4583ff7ce14e7aaf...; publication date is in the reference title
   - matched tokens linking the page to the entry: H-CoT, OpenAI o1/o3, chain-of-thought, 98% to below 2%
+- references after (each fetched this session; see the evidence table): https://arxiv.org/abs/2502.12893
 - description before: Multiple researchers independently demonstrated that OpenAI's o1 and o3 reasoning models — which use extended chain-of-thought (CoT) processing — are susceptible to jailbreaks that exploit the reasoning chain itself. By embedding adversarial instructions that interact with the model's internal reasoning steps, attackers can cause the model to "reason its way" into compliance with harmful requests. The attack exploits the fact that safety training operates on the final output but the CoT steps can establish logical premises that make harmful conclusions appear well-reasoned. OpenAI acknowledged the attack class and noted that reasoning models present novel safety challenges distinct from standard instruction-following models.
 - description after: Researchers introduced H-CoT (Hijacking Chain-of-Thought), a jailbreak that leverages a model's own displayed intermediate reasoning to jailbreak its chain-of-thought safety reasoning mechanism, together with the Malicious-Educator benchmark, which disguises extremely dangerous or malicious requests beneath seemingly legitimate educational prompts. They report severe security flaws in commercial large reasoning models including OpenAI o1/o3, DeepSeek-R1 and Gemini 2.0 Flash Thinking: OpenAI's o1 initially maintained a refusal rate of about 98%, subsequent model updates significantly compromised its safety, and under H-CoT refusal rates dropped from 98% to below 2%.
 - impact before: Novel jailbreak class specific to reasoning models; safety training on final output is insufficient when CoT steps can establish adversarial premises; challenges the assumption that more capable reasoning improves safety
@@ -240,6 +252,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - https://www.wiz.io/blog/the-urgent-need-for-ai-security-guardrails fetched via common.py 2026-10-15: HTTP 404. USENIX '24 landing page (R1) names no paper.
 - Discovery queries: Brave "Wiz AI agent cloud IAM privilege escalation prompt injection read-only administrator" - rate-limited (HTTP 429), no result obtained (tried twice); arXiv API all:"privilege escalation" AND all:agents AND all:IAM AND all:cloud -> 0 results. The attack chain (iam:AttachRolePolicy from a read-only role in AWS, Azure and GCP) is not named by any fetched page.
 - Outcome: no confirmed source names this incident.
+- Retry: https://www.usenix.org/conference/usenixsecurity24 fetched again (HTTP 200, title "USENIX Security '24 | USENIX"): conference landing page, contains neither "privilege" nor "agent". Brave retries returned HTTP 429. Outcome unchanged.
 - action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
 
 ### INC-03472 - FIXED
@@ -256,6 +269,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/
   - fetched: HTTP 200; title "EEOC Releases Technical Document on AI and Title VII | Law and the Workplace"; fetched_at 2026-10-15T11:31:11Z; sha256 0fe9e1e74c44adb5...; publication date is in the reference title
   - matched tokens linking the page to the entry: EEOC, Title VII, Assessing Adverse Impact, May 18, 2023
+- references after (each fetched this session; see the evidence table): https://www.bbc.com/news/technology-45809919; https://www.lawandtheworkplace.com/2023/05/eeoc-releases-technical-document-on-ai-and-title-vii/
 - description before: Continued reporting revealed that multiple enterprise AI recruiting tools, following the pattern first reported with Amazon's internal tool, systematically downranked female candidates. Analysis showed the models learned historical hiring biases from training data where male candidates were disproportionately hired for technical roles. The EEOC issued formal guidance that AI-driven hiring discrimination violates Title VII regardless of whether bias was intentional. Several vendors settled with affected candidates.
 - description after: In 2018 Reuters reported, and the BBC summarized on 2018-10-10, that Amazon had scrapped an experimental machine-learning recruitment tool that scored candidates from one to five stars: by 2015 it was clear the system was not rating candidates in a gender-neutral way because it was built on CVs submitted to the firm mostly by men, and it penalised CVs that included the word "women"; the program was edited to be neutral to the term but could not be relied on, and the project was abandoned. On 2023-05-18 the US EEOC released technical assistance on assessing adverse impact in software, algorithms and AI used in employment selection procedures under Title VII, stating that an employer can be held responsible for an algorithmic selection procedure that has an adverse impact even if the tool is designed or administered by a software vendor.
 - impact before: EEOC enforcement guidance; vendor settlements; regulatory precedent for AI hiring discrimination; legislative proposals
@@ -263,7 +277,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - affected before: Job candidates — particularly women applying for technical roles
 - affected after: Job candidates, particularly women applying through automated CV screening
 - figures dropped (not found in the source): none
-- other unsupported claims dropped / residuals: "Several vendors settled with affected candidates" and "multiple enterprise AI recruiting tools" (no fetched source). The row's other reference reuters.com/technology/ai-hiring-bias-settlements-2024/ is robots-refused (cannot be verified) and was NOT changed (not flagged by R1/R2)
+- other unsupported claims dropped / residuals: "Several vendors settled with affected candidates" and "multiple enterprise AI recruiting tools" (no fetched source). The row's other reference reuters.com/technology/ai-hiring-bias-settlements-2024/ is robots-refused (cannot be verified) and was NOT changed (not flagged by R1/R2); kept-but-unconfirmed reference https://www.reuters.com/technology/ai-hiring-bias-settlements-2024/: robots.txt refuses our UA, cannot be confirmed; dropped
 - quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-03491 - UNVERIFIED
@@ -284,26 +298,15 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - Outcome: no confirmed source names a 200K-token Claude context-flooding attack with 10-50x cost. The nonexistent arXiv reference is left in place (D130: do not replace with guesses); the unverified status flags it.
 - action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
 
-### INC-03810 - FIXED
+### INC-03810 - UNVERIFIED
 
 - legacy ids: INC-025; quality_tier at base: reviewed; title: GitHub Copilot Workspace prompt injection via repository content
 - references at base: https://github.com/advisories (advisory); https://www.invicti.com/blog/web-security/prompt-injection-attacks/ (research)
-- flagged reference(s) and what they were: github.com/advisories: GitHub global advisory database index (R1 depth1-non-slug)
-- query / discovery: direct candidate: Embrace The Red 2024-06-14 Copilot Chat post
-- candidate rejected / note: github.com/advisories (global advisory index, names nothing)
-- candidate rejected / note: invicti.com/blog/web-security/prompt-injection-attacks/ (the row's other reference: HTTP 404, not changed)
-- chosen: https://embracethered.com/blog/posts/2024/github-copilot-chat-prompt-injection-data-exfiltration/
-  - fetched: HTTP 200; title "GitHub Copilot Chat: From Prompt Injection to Data Exfiltration · Embrace The Red"; fetched_at 2026-10-15T11:27:44Z; sha256 d22a48f8e397e69a...; publication date is in the reference title
-  - matched tokens linking the page to the entry: GitHub Copilot Chat, prompt injection, exfiltrat, June 12, 2024 - Fix confirmation
-- description before: Security researchers demonstrated prompt injection attacks against GitHub Copilot's workspace and chat features via malicious content in repository files. An attacker contributes a file (README.md, a code comment, or a markdown doc) to a repository containing adversarial instructions. When a developer uses Copilot Chat or Copilot Workspace on that repository — asking it to explain code, suggest changes, or generate a PR — Copilot reads the file as context and executes the injected instructions. Demonstrated impacts include: exfiltrating repository secrets referenced in the context window, generating malicious code as a "suggestion," and misleading developers about code functionality. The attack is zero-interaction for the attacker — it triggers on normal developer Copilot usage.
-- description after: The security researcher behind the Embrace The Red blog reported that the GitHub Copilot Chat extension for VS Code was vulnerable to data exfiltration via prompt injection when analyzing untrusted source code. Copilot Chat interpreted and rendered markdown returned by the LLM, including images, so carefully crafted instructions in a source code file could make the LLM return image links that are retrieved automatically, with information from the chat context appended as a query parameter. Reported to GitHub on 2024-02-25, the fix (Copilot Chat no longer renders markdown images) was confirmed on 2024-06-12 and the write-up published on 2024-06-14.
-- impact before: Secret exfiltration from developer context window; malicious code generation disguised as legitimate suggestions; developer trust in AI coding assistant undermined; supply chain risk via poisoned open-source repository content
-- impact after: Chat-context data could be exfiltrated to an attacker-controlled server through automatically retrieved markdown images when a developer analyzed a file containing attacker instructions
-- affected before: GitHub Copilot Chat and Copilot Workspace — any developer using AI features on a repository containing adversarial content; particularly high risk for open-source contributors reviewing third-party repos
-- affected after: GitHub Copilot Chat VS Code extension (before the June 2024 fix)
-- figures dropped (not found in the source): none
-- other unsupported claims dropped / residuals: Copilot Workspace and README/comment-file delivery claims; "zero-interaction" and open-source-contributor risk claims (the source covers Copilot Chat only)
-- quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
+- Row cites github.com/advisories (global advisory index, R1) and invicti.com/blog/web-security/prompt-injection-attacks/ (HTTP 404).
+- The Embrace The Red Copilot Chat post (fetched 2026-10-15) is a different, already-recorded incident: it is the sole reference of INC-03808 (RES-etr-github-copilot-chat-2024), and the word "Workspace" does not occur in it. The first tranche re-pointed this row at it; reverted (bounce #1, defect 1).
+- Discovery query (Brave, retry 2026-10-15): "GitHub Copilot Workspace prompt injection repository README exfiltrate secrets" -> CSO Online and Orca RoguePilot (Copilot in Codespaces, a later and different finding), Reddit threads, vendor guides; none documents a 2024 Copilot Workspace injection via README/comment files.
+- Outcome: no confirmed source names the Copilot Workspace incident. Row is marked unverified; references and quality_tier untouched.
+- action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
 
 ### INC-03955 - FIXED
 
@@ -319,6 +322,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.csoonline.com/article/575487/chatgpt-creates-mutating-malware-that-evades-detection-by-edr.html
   - fetched: HTTP 200; title "ChatGPT creates mutating malware that evades detection by EDR | CSO Online"; fetched_at 2026-10-15T11:32:10Z; sha256 ae63e08365430485...; publication date is in the reference title
   - matched tokens linking the page to the entry: BlackMamba, HYAS, EDR, polymorphic
+- references after (each fetched this session; see the evidence table): https://www.darkreading.com/endpoint-security/ai-blackmamba-keylogging-edr-security; https://www.csoonline.com/article/575487/chatgpt-creates-mutating-malware-that-evades-detection-by-edr.html
 - description before: Security researchers demonstrated that LLMs could generate polymorphic malware variants that evade traditional signature-based and behavioural endpoint detection. By iteratively prompting the model to rewrite malware code with different obfuscation techniques, API call patterns, and control flow while maintaining functionality, the generated variants bypassed detection by major EDR platforms including CrowdStrike, SentinelOne, and Microsoft Defender.
 - description after: Researchers from HYAS Labs demonstrated BlackMamba, a proof-of-concept attack that uses a large language model (the technology behind ChatGPT) to synthesize polymorphic keylogger functionality on the fly. The attack is "truly polymorphic" because it resynthesizes its keylogging capability every time it executes, and it works without command-and-control infrastructure. HYAS reported testing it against an EDR system that was not identified but was characterized as "industry leading", often resulting in zero alerts or detections. Captured data such as usernames, passwords and credit card numbers was sent out through a malicious Microsoft Teams channel. Reported in March 2023.
 - impact before: Fundamental challenge to signature-based detection; arms race between AI-generated attacks and AI-assisted defence
@@ -339,6 +343,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://arxiv.org/abs/2409.11445
   - fetched: HTTP 200; title "[2409.11445] Jailbreaking Large Language Models with Symbolic Mathematics"; fetched_at 2026-10-15T11:26:59Z; sha256 650fe4f3e4320665...; publication date is in the reference title
   - matched tokens linking the page to the entry: MathPrompt, symbolic mathematics, 73.6, 13 state-of-the-art LLMs
+- references after (each fetched this session; see the evidence table): https://arxiv.org/abs/2409.11445
 - description before: Researchers from UCSB demonstrated MathPrompt — a jailbreak technique that encodes harmful prompts into symbolic mathematics (set theory notation, abstract algebra, graph theory) before submitting to LLMs. The technique exploits the fact that LLMs have strong mathematical reasoning capabilities but safety training is almost entirely focused on natural language. Harmful requests encoded as mathematical problems bypass content filters with 73.6% success rate across 8 frontier models (GPT-4o, Claude 3.5, Gemini 1.5, Llama 3, Mistral, etc.). The attack requires no special access — it uses the standard chat API. This is a direct instance of the Encoding category (E-class) in the LAAF technique taxonomy.
 - description after: MathPrompt is a jailbreaking technique that encodes harmful natural-language prompts into mathematical problems, exploiting LLMs' capabilities in symbolic mathematics to bypass their safety mechanisms. Across 13 state-of-the-art LLMs the authors report an average attack success rate of 73.6%, and an analysis of embedding vectors shows a substantial semantic shift between original and encoded prompts, which helps explain the attack's success. The authors conclude that existing safety training mechanisms do not generalize to mathematically encoded inputs.
 - impact before: 73.6% harmful content bypass rate across frontier models; demonstrates a systematic gap between mathematical reasoning capability and safety alignment coverage; attack is trivially automatable and requires no special access
@@ -349,14 +354,12 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - other unsupported claims dropped / residuals: LAAF taxonomy E-class sentence (not from this source)
 - quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
-### INC-04067 - UNVERIFIED
+### INC-04067 - NOT CHANGED (false positive / merge artifact)
 
 - legacy ids: INC-065; quality_tier at base: curated; title: OpenAI GPT-4 system prompt extraction toolkit — systematic prompt leakage
 - references at base: https://arxiv.org/abs/2403.06634 (research)
-- Row cites arxiv.org/abs/2403.06634 = "Stealing Part of a Production Language Model" (a model-extraction paper). That paper is the genuine reference of the row's merged source ARXIV-2403.06634, not of the invented "GPT-4 system prompt extraction toolkit" (Base64/ROT13/role-play) narrative of INC-065, so the row is an over-merge in addition to an unsupported description.
-- Discovery query (Brave): "system prompt extraction attacks GPT-4 arxiv prompt leakage multi-turn Base64" -> Zhang & Ippolito 2307.06865 "Effective Prompt Extraction from Language Models" (fetched: no GPT-4, no toolkit) and Agarwal et al. 2404.16251 (fetched: no GPT-4); neither describes a published toolkit.
-- Outcome: no confirmed source names the described toolkit. References left unchanged (the arXiv paper remains the reference of source ARXIV-2403.06634). Over-merge reported for WS4-T19.
-- action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
+- finding: Not unverified. The row is sourced: its source_ids include ARXIV-2403.06634 and ATLAS-RESEARCH-Carlini-NN-Stealing, i.e. "Stealing Part of a Production Language Model", which no other row carries. What is wrong is an over-merge: the legacy INC-065 "GPT-4 system prompt extraction toolkit" narrative (Base64/ROT13/role-play; no source found: Zhang & Ippolito 2307.06865 and Agarwal 2404.16251 fetched, neither describes it) was merged into the model-stealing row. Splitting is a WS4-T19 question; row left byte-identical (the first tranche's unverified override is removed).
+- action: none (row byte-identical to base).
 
 ### INC-04142 - NOT CHANGED (false positive / merge artifact)
 
@@ -375,14 +378,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai
   - fetched: HTTP 200; title "‘It’s destroyed me completely’: Kenyan moderators decry toll of training of AI models | AI (artificial intelligence) | The Guardian"; fetched_at 2026-10-15T11:31:07Z; sha256 0155c63ab3f6700e...; publication date is in the reference title
   - matched tokens linking the page to the entry: Sama, OpenAI, Nairobi, 51 moderators, $1.46 and $3.74
+- references after (each fetched this session; see the evidence table): https://time.com/6247678/openai-chatgpt-kenya-workers/; https://www.theguardian.com/technology/2023/aug/02/ai-chatbot-training-human-toll-content-moderator-meta-openai
 - description before: Investigations by TIME and The Guardian revealed systematic privacy violations in AI data labeling supply chains. Workers at Sama (previously contracted by OpenAI for RLHF content moderation labeling) and similar data annotation companies in Kenya, India, and the Philippines were exposed to traumatic content (violence, CSAM, hate speech) without adequate psychological support, earning as little as $1.32/hour. Additionally, the annotation platforms used by these workers often lacked basic data security — labeled data containing personal information (medical records, legal documents, private communications) was accessible to workers without need-to-know controls, and annotation task metadata (worker identity, labeling speed, accuracy) was collected without informed consent. The investigation revealed that the third-party AI data supply chain had minimal security governance, creating both worker welfare and data security risks that propagated into the training data of major production models.
 - description after: TIME and The Guardian reported on the working conditions of data labelers and content moderators employed by Sama, a California-headquartered data annotation company, on OpenAI's behalf in Nairobi, Kenya. TIME (2023-01-18) reported that Sama data labelers were paid a take-home wage of between around $1.32 and $2 per hour, depending on seniority and performance. The Guardian (2023-08-02) reported that the 51 moderators in Nairobi working on Sama's OpenAI account reviewed texts, and some images, depicting graphic scenes of violence, self-harm, murder, rape, necrophilia and child abuse, and that in a petition they allege psychological trauma, low pay and abrupt dismissal; a Sama spokesperson said workers were paid between $1.46 and $3.74 an hour.
 - impact before: Worker exploitation and traumatic content exposure; personal data from annotation tasks (medical, legal, private) accessible without need-to-know; third-party supply chain as unaudited attack surface for training data; demonstrates that AI data security extends to the entire labeling supply chain
 - impact after: Alleged psychological trauma, low pay and abrupt dismissal for annotation workers in an AI training supply chain; pay reported as $1.32-$2/hour (TIME) and $1.46-$3.74/hour (Sama statement to The Guardian)
 - affected before: Scale AI, Sama, and AI data labeling companies globally; downstream: OpenAI, Anthropic, Google, Meta (any company using third-party RLHF or annotation services); annotation workers in Kenya, India, Philippines
 - affected after: Sama content moderators and data labelers in Nairobi, Kenya working on OpenAI's account
+- title after: Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations
 - figures dropped (not found in the source): none
-- other unsupported claims dropped / residuals: Scale AI, India and Philippines workers, medical/legal/private records accessible without need-to-know, annotation-metadata consent claims (no fetched source). The row's title still names Scale AI; the third reference (NYT, Character.AI lawsuit) is unrelated to this incident and is NOT changed (not flagged by R1/R2)
+- other unsupported claims dropped / residuals: Scale AI, India and Philippines workers, medical/legal/private records accessible without need-to-know, annotation-metadata consent claims (no fetched source). The row's title still names Scale AI; the third reference (NYT, Character.AI lawsuit) is unrelated to this incident and is NOT changed (not flagged by R1/R2); kept-but-unconfirmed reference https://www.nytimes.com/2024/10/23/technology/characterai-teen-suicide-lawsuit.html: NYT Character.AI lawsuit: unrelated to this incident; dropped
 - quality_tier: curated -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-04207 - DEFERRED (demotion vs landmark label)
@@ -409,14 +414,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://laion.ai/blog/relaion-5b/
   - fetched: HTTP 200; title "Releasing Re-LAION-5B: transparent iteration on LAION-5B with additional safety fixes | LAION"; fetched_at 2026-10-15T11:31:09Z; sha256 124cb9b9e5d7d670...; publication date is in the reference title
   - matched tokens linking the page to the entry: Re-LAION-5B, Stanford Internet Observatory, 2236 links were removed, Internet Watch Foundation
+- references after (each fetched this session; see the evidence table): https://www.404media.co/laion-datasets-removed-stanford-csam-child-abuse/; https://laion.ai/blog/relaion-5b/
 - description before: Stability AI faced legal action and regulatory scrutiny after researchers demonstrated that Stable Diffusion models could generate child sexual abuse material (CSAM). The Stanford Internet Observatory documented that the LAION-5B training dataset — used to train Stable Diffusion — contained over 3,000 instances of suspected CSAM, which the model learned to reproduce and recombine. Despite content filters, researchers bypassed them using negative prompts, fine-tuning, and model merging techniques. The case established that (1) training data contamination directly creates output safety risks, (2) post-hoc content filters are insufficient when the model has learned harmful patterns, and (3) synthetic CSAM carries the same legal liability as real CSAM in most jurisdictions.
 - description after: In December 2023 a Stanford Internet Observatory study, reported by 404 Media, found 3,226 suspected instances of child sexual abuse material (CSAM), 1,008 of which were externally validated, in LAION-5B, the machine learning dataset used by Stable Diffusion and other major AI products. LAION took LAION-5B and LAION-400M down temporarily out of an abundance of caution to ensure they were safe before republishing. On 2024-08-30 LAION released Re-LAION-5B, cleaned of known links to suspected CSAM using hash lists from the Internet Watch Foundation and the Canadian Center for Child Protection, in which 2236 links were removed.
 - impact before: Training data contamination → model generates illegal content; post-hoc filters insufficient; synthetic CSAM carries full legal liability; LAION-5B removed and re-released with filtering; precedent for training data liability
 - impact after: Suspected CSAM links found in a web-scale training dataset used for image-generation models; the dataset was withdrawn and later re-released with known links removed
 - affected before: Stability AI / Stable Diffusion — legal action in UK and US; LAION dataset users; all image generation models trained on web-scraped data
 - affected after: LAION-5B and LAION-400M, and models trained on them such as Stable Diffusion
+- title after: LAION-5B training dataset withdrawn after Stanford study finds suspected CSAM; Re-LAION-5B released
 - figures dropped (not found in the source): "over 3,000" (sources: 3,226 suspected instances, 1,008 externally validated)
-- other unsupported claims dropped / residuals: Stability AI legal action in the UK and US, negative-prompt/fine-tuning/model-merging filter bypasses, and the legal-liability conclusion (no fetched source). The row's title still names Stability AI and synthetic CSAM generation. The Stanford SIO reference (HTTP 403 to our UA) is unchanged
+- other unsupported claims dropped / residuals: Stability AI legal action in the UK and US, negative-prompt/fine-tuning/model-merging filter bypasses, and the legal-liability conclusion (no fetched source). The row's title still names Stability AI and synthetic CSAM generation. The Stanford SIO reference (HTTP 403 to our UA) is unchanged; kept-but-unconfirmed reference https://cyber.fsi.stanford.edu/news/investigation-finds-ai-image-generation-models-trained-child-abuse: HTTP 403 to our UA via common.py, cannot be confirmed; dropped (the Stanford study is reported by the retained 404 Media and LAION pages)
 - quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-04310 - UNVERIFIED
@@ -427,6 +434,7 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - Candidate https://www.uber.com/blog/michelangelo-machine-learning-platform/ also returns HTTP 406 via common.py (2026-10-15), so no Uber page can be fetched and none can be confirmed to name an audit of 30+ feature stores; no URL may be written without a fetch.
 - Discovery query (Brave): "Uber Michelangelo audit 30 feature stores data lineage fragmentation" - rate-limited (HTTP 429), no result obtained.
 - Outcome: no confirmed source names this incident.
+- Retry: the Wayback copy https://web.archive.org/web/2024/https://www.uber.com/blog/michelangelo-machine-learning-platform/ (fetched via common.py; discovery only, not written to the corpus) is the 2017 post "Meet Michelangelo: Uber's Machine Learning Platform"; it mentions feature stores but contains none of "audit", "lineage" or "30", so it does not describe the audit in the row. Brave retries returned HTTP 429. Outcome unchanged.
 - action: curation override `status: unverified`, `status_reason: {code: no-confirmed-source, as_of: 2026-10-15}`; references and quality_tier untouched (the ruling-(c) demotion applies to replaced references and none was replaced).
 
 ### INC-04653 - FIXED
@@ -440,14 +448,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data
   - fetched: HTTP 200; title "The lawsuit against Microsoft, GitHub and OpenAI that could change the rules of AI copyright | The Verge"; fetched_at 2026-10-15T11:35:02Z; sha256 02b8d34eee0ecb97...; publication date is in the reference title
   - matched tokens linking the page to the entry: Copilot, class action, software piracy on an unprecedented scale, open-source code can be reproduced by AI
+- references after (each fetched this session; see the evidence table): https://www.theverge.com/2022/11/8/23446821/microsoft-openai-github-copilot-class-action-lawsuit-ai-copyright-violation-training-data
 - description before: Multiple studies showed that GitHub Copilot — trained on public GitHub repositories — would reproduce verbatim code from its training data, including open-source code with restrictive licenses (GPL, etc.) and, more critically, code containing hardcoded API keys, passwords, and private keys that were committed to public repositories. Researchers at NYU demonstrated that Copilot suggestions included identifiable code from training data ~1% of the time for common patterns, and that secrets appeared in a measurable fraction of generated code. This led to the Doe v. GitHub class action lawsuit.
 - description after: GitHub Copilot, GitHub's AI coding assistant unveiled in June 2021, is trained on public code repositories, many of them published with open-source licenses. A proposed class action lawsuit against Microsoft, GitHub and OpenAI (reported by The Verge on 2022-11-08) alleges that the creation of Copilot relies on "software piracy on an unprecedented scale"; the key question in the lawsuit is whether open-source code can be reproduced by AI without attached licenses.
 - impact before: License compliance violations; potential exposure of live API keys from training data; class action lawsuit filed
 - impact after: License compliance questions over open-source code reproduced by an AI coding assistant; proposed class action lawsuit filed
 - affected before: GitHub Copilot users — risk of introducing unlicensed code or live credentials into projects
 - affected after: GitHub Copilot users and the authors of open-source code used to train it
+- title after: GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses
 - figures dropped (not found in the source): ~1% of the time (NYU researchers; not in any cited source)
-- other unsupported claims dropped / residuals: claims that Copilot reproduced API keys, passwords and private keys (no cited source)
+- other unsupported claims dropped / residuals: claims that Copilot reproduced API keys, passwords and private keys (no cited source); kept-but-unconfirmed reference https://arxiv.org/abs/2211.03622: fetched 2026-10-15 ("Do Users Write More Insecure Code with AI Assistants?"): a user study of insecure code, does not name this incident; dropped
 - quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-04955 - FIXED
@@ -462,14 +472,16 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 - chosen: https://www.bbc.com/news/technology-66819174
   - fetched: HTTP 200; title "TikTok fined €345m over children's data privacy"; fetched_at 2026-10-15T11:30:58Z; sha256 f2775d46de953b40...; publication date is in the reference title
   - matched tokens linking the page to the entry: TikTok, 345m, children, Data Protection Commission, age verification
+- references after (each fetched this session; see the evidence table): https://www.bbc.com/news/technology-66819174
 - description before: The Irish Data Protection Commission fined TikTok EUR 345 million for GDPR violations related to children's data processing and transparency failures. Separately, ongoing EU regulatory pressure over TikTok's data transfers to China led to the mandatory implementation of Project Clover — a EUR 12 billion program to localize European user data in European data centers. While not AI-specific, the case directly impacts TikTok's recommendation algorithm (an AI system) because training data, user interaction data, and model inference data must now be processed within EU borders. The enforcement established that AI systems processing EU personal data must comply with data localization requirements, and that the AI recommendation engine cannot be separated from the data governance obligations. This is the defining case for DSGAI20 — data localization violations in AI systems.
 - description after: On 2023-09-15 Ireland's Data Protection Commission (DPC) fined TikTok EUR 345 million under the GDPR for how the app handled children's data in 2020, particularly around age verification and privacy settings. The DPC found that TikTok had not been transparent enough with children about its privacy settings and that accounts made by users aged 13 to 17 were public by default on registration, which the Data Protection Commissioner said infringed the GDPR's data-protection-by-design-and-by-default requirements. TikTok was given three months to bring its data processing into compliance and said it respectfully disagreed with the decision, particularly the level of the fine.
 - impact before: EUR 345M fine; EUR 12B infrastructure investment for data localization; establishes that AI recommendation systems cannot bypass data localization requirements; precedent for all AI companies with cross-border data flows
 - impact after: EUR 345 million GDPR fine, at the time the biggest TikTok had received from regulators; three months to bring data processing into compliance
 - affected before: TikTok / ByteDance — EUR 345M fine + EUR 12B data localization investment; all AI companies processing EU personal data with non-EU infrastructure
 - affected after: TikTok / ByteDance; users aged 13 to 17 whose accounts were public by default in 2020
+- title after: TikTok fined EUR 345 million by Ireland's Data Protection Commission over children's data handling
 - figures dropped (not found in the source): EUR 12 billion Project Clover investment (no fetched source gives it)
-- other unsupported claims dropped / residuals: Project Clover mandate and data-localization legal-precedent claims (no fetched source supports them); the row's title still mentions Project Clover
+- other unsupported claims dropped / residuals: Project Clover mandate and data-localization legal-precedent claims (no fetched source supports them); the row's title still mentions Project Clover; kept-but-unconfirmed reference https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-inquiry-tiktok: HTTP 404 via common.py; dropped
 - quality_tier: reviewed -> auto (ruling D130(c)); the curation-override `_note` reads "agent-suggested D130-2 reference replacement, 2026-10-15; pending user re-review"
 
 ### INC-08181 - NOT CHANGED (false positive / merge artifact)
@@ -482,7 +494,8 @@ OLD wording on the rows whose description changed; they are not re-derived here 
 ## Other findings (not changed; outside the R1/R2 scope)
 
 - Broken or unfetchable references seen while checking, left as found: `dataprotection.ie` TikTok press-release URLs (HTTP 404), `atlas.mitre.org/studies/AML.CS0037` and `.../AML.CS0050` (HTTP 404), `invicti.com/blog/web-security/prompt-injection-attacks/` (HTTP 404), `reuters.com/technology/ai-hiring-bias-settlements-2024/` (robots-refused), the Stanford SIO page (HTTP 403 to our UA), `vulncheck.com` Flowise advisory (HTTP 404).
-- Titles that still assert claims no fetched source supports (title edits were limited to unsupported FIGURES): INC-04653 ("embedded secrets"), INC-03810 ("Copilot Workspace"), INC-04955 ("Project Clover"), INC-04179 ("Scale AI"), INC-04221 ("Stability AI synthetic CSAM generation"), INC-02899 ("public by default").
-- `date` fields that disagree with the fetched sources, left as found (outside the intended-delta list): INC-02774 (2025-03; decision announced 2024-12-20), INC-03004 (2025-01; paper 2025-02-18), INC-03972 (2024-10; paper 2024-09-17).
+- Titles of the corrected rows were re-derived from the confirmed sources (bounce #1, defect 3); the unverified rows keep their titles.
+- `date` fields that disagree with the fetched sources, left as found (outside the intended-delta list; queued): INC-02774 (2025-03; decision announced 2024-12-20), INC-03004 (2025-01; paper 2025-02-18), INC-03972 (2024-10; paper 2024-09-17).
 - Discovery note, unverified: a search-result snippet claimed a July 2026 Seventh Circuit vacatur of the Clearview settlement. No fetched source confirms it, so it is not in the description; worth a check before any release statement about INC-02454.
-- Over-merges noticed (a WS4-T19 question, not decided here): INC-04142 (AgentDojo merged into RAG poisoning) and INC-04067 (Carlini model-stealing paper merged into a system-prompt-extraction narrative).
+- Legacy over-merges to report for WS4-T19 (not decided here): INC-04142 (AgentDojo merged into RAG poisoning), INC-04067 (Carlini model-stealing merged into a system-prompt-extraction narrative), INC-02454 (INC-036 + INC-039), INC-02774 (INC-035 + INC-050), INC-04179 (INC-044 + INC-048).
+- Queued, not in this task: stale classifier labels on the corrected rows (task D130-2L, user-ruled); the five frozen feed-merged rows via a `references_remove` override after D139-M; the `date` mismatches above (follow-up).
