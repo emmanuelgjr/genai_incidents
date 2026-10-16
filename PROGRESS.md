@@ -83,6 +83,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D130-2 rework REPORTED `56c2f9b0` (2026-10-16 UTC) — scoped re-gate sent to gate-d130-2. Second bounce → user.
+- Specialist (testimony): fixed 11 / unverified 10 (INC-03810 now unverified, re-pointing reverted) / unchanged 9 (INC-04067 restored byte-identical); 7 titles re-derived; stats delta declared (incident 15,755→15,745, unverified 0→10, landmark 2,028→2,025); every kept ref must have this-session fetch evidence (7 dropped); full pytest 1485 + 1 xfailed at the committed tree.
+- **Foreman [R]:** data at `56c2f9b0`: INC-03810 unverified/reviewed; INC-04067 status none, curated; stats 15745 / 10 / 2025.
+
 ### 🔁 D130-2: **BOUNCE #1 (gate-d130-2 on `1860e29d`), 2026-10-15.**
 **Defects, in the gate's words (summarised):**
 1. **INC-03810 now duplicates INC-03808.** New ref is the Embrace The Red Copilot Chat post, already INC-03808's sole reference; the rewritten description is that incident; "Workspace" absent from the page (gate fetch_once); title still "Copilot Workspace". No own-incident source → D130(b) unverified, not re-pointing.
