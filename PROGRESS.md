@@ -83,6 +83,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 📋 USER RE-REVIEW PACKAGE committed 2026-10-16: `docs/audits/user-re-review-package-2026-10-16.md` (agent-assembled; decisions are the user's)
+- 21 rows (11 fixed, 10 unverified) with blank decision columns; gate-flagged items (INC-02454 corpus pin, DSGAI01 on INC-04653, INC-02899 MAESTRO/mitigations echo, `consent` inconsistency, date mismatches, over-merges); 9 unchanged rows. Scribe had no shell — claims cited file:line from audits/board.
+- **Foreman [R]:** against data/incidents.json on main: all 11 fixed rows quality_tier auto with no status; all 10 unverified rows status unverified (0 mismatches); tiers/corpus as the package states (INC-02454 and INC-03472 landmark/ai-harm; the rest feed/security).
+
 ### 🔨 D139-M — references_remove + field-clear override mechanisms (WS4): **DISPATCHED 2026-10-16** to pipeline-engineer on `ws4/d139m-override-mechanisms-2026-10-16` (worktree `C:/repos/gi-wt-d139m`, base `bc6d1c43`). Mechanisms only, data diff empty; fail closed on a listed URL not present; scratch preview on INC-01015 / INC-04207.
 - **D130-2L post-merge [R] on main `bc6d1c43`:** validate rc 0; drift clean; lint-atlas OK (71 ids); porcelain empty; pushed `bc4a9b4b..bc6d1c43`, ls-remote = local. No headline counts moved → no docs-warden run.
 
