@@ -36,6 +36,12 @@ jobs:
         run: pytest tests -q
 
       - name: Re-merge from ingest sources
+        # D140: the checkout already contains any override this PR/push adds, so
+        # HEAD as the baseline would make the retained-row URL check vacuous.
+        # HEAD^1 is the PR base on the pull_request merge commit and the previous
+        # tip of main on a push (both parents are present: fetch-depth 0).
+        env:
+          GENAI_OVERRIDE_BASELINE: HEAD^1
         run: |
           python scripts/parse_existing.py
           python scripts/merge_and_dedupe.py

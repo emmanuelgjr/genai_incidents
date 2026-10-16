@@ -1545,6 +1545,9 @@ def _check_delete_overrides(curation: dict[str, dict]) -> list[str]:
     return keys
 
 
+OVERRIDE_BASELINE_ENV = "GENAI_OVERRIDE_BASELINE"
+
+
 def _head_removed_urls(key_sid: str) -> frozenset:
     """The ``references_remove`` URLs the COMMITTED overrides at git HEAD list
     under this same key (D140). Per key and per URL: re-keying a URL makes it
@@ -1556,22 +1559,33 @@ def _head_removed_urls(key_sid: str) -> frozenset:
     fails closed exactly as D71 does, because "not in HEAD" cannot then be told
     from "HEAD unreadable" and would silently weaken the check.
 
-    Which commit that is: locally HEAD is the last commit, so an override you
-    have just added (uncommitted) is NEW and strict. In the weekly refresh the
-    build runs on a checkout of main BEFORE the refresh commit, so HEAD is the
-    merged state. In PR CI (validate.yml) and on push the checkout already
-    contains the override, so it is "in HEAD": the rule is VACUOUS there and
-    bites only at the authoring build, before the override is committed."""
+    The baseline revision is ``$GENAI_OVERRIDE_BASELINE`` when set, else HEAD.
+    Locally HEAD is the last commit, so an override you have just added
+    (uncommitted) is NEW and strict. The weekly refresh builds on main BEFORE its
+    commit, so HEAD is the merged state. CI checks out a commit that already
+    contains the override, so validate.yml sets the variable to HEAD^1 (the PR
+    base / previous main); with HEAD there the rule would be vacuous. A set
+    variable that does not resolve fails closed, never falls back to HEAD."""
     root = CURATION_OVERRIDES_PATH.parent.parent
     rel = CURATION_OVERRIDES_PATH.relative_to(root).as_posix()
-    if not (root / ".git").exists():
+    rev = os.environ.get(OVERRIDE_BASELINE_ENV)
+    if rev is not None:
+        ok = (root / ".git").exists() and _git(
+            root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}").returncode == 0
+        if not ok:
+            raise SystemExit(
+                f"[FATAL] D140: {OVERRIDE_BASELINE_ENV}={rev!r} does not resolve to a commit "
+                "(or there is no git metadata), so the override baseline cannot be read. Unset it "
+                "to use HEAD, or fix the revision. " + abort_sentence())
+    elif not (root / ".git").exists():
         return frozenset()
-    shown = _git(root, "show", f"HEAD:{rel}")
+    rev = rev if rev is not None else "HEAD"
+    shown = _git(root, "show", f"{rev}:{rel}")
     if shown.returncode != 0:
         shallow = _git(root, "rev-parse", "--is-shallow-repository")
         if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
             raise SystemExit(
-                f"[FATAL] D140: git cannot show HEAD:{rel} in a shallow (or unreadable) repository, "
+                f"[FATAL] D140: git cannot show {rev}:{rel} in a shallow (or unreadable) repository, "
                 "so a references_remove override on a retained row cannot be checked against what is "
                 "committed. " + abort_sentence())
         return frozenset()  # complete history, file not in HEAD: everything is new
@@ -1582,7 +1596,7 @@ def _head_removed_urls(key_sid: str) -> frozenset:
         return frozenset()
     except (ValueError, UnicodeDecodeError) as exc:
         raise SystemExit(
-            f"[FATAL] D140: HEAD:{rel} is unparseable ({type(exc).__name__}); refusing to build. "
+            f"[FATAL] D140: {rev}:{rel} is unparseable ({type(exc).__name__}); refusing to build. "
             + abort_sentence()) from exc
 
 

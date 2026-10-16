@@ -312,3 +312,70 @@ def test_active_row_abort_names_the_row():
     with pytest.raises(SystemExit) as ei:
         _apply([r], {"references_remove": ["https://nope.example.test/q"]})
     assert f"(row {[SID]}" in str(ei.value)
+
+
+# ----- GENAI_OVERRIDE_BASELINE: the CI baseline (a "merge" commit already holds the override) -----
+
+def _rev_parse(root, rev):
+    import subprocess
+    return subprocess.run(["git", "rev-parse", rev], cwd=root, check=True, capture_output=True).stdout.decode().strip()
+
+
+def _ci_repo(tmp_path, monkeypatch):
+    """A tmp repo shaped like a PR merge checkout: HEAD^1 = base WITHOUT the
+    override, HEAD = a commit that adds a references_remove for a URL the
+    retained row never had. Returns (data, ingest) with the row already retained-ready."""
+    monkeypatch.delenv(m.OVERRIDE_BASELINE_ENV, raising=False)
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"_note": "base"})
+    _git_commit(tmp_path, "data/curation_overrides.json")           # base
+    _write_overrides(data, {"references_remove": [GONE]})
+    _git_commit(tmp_path, "data/curation_overrides.json", init=False)  # the "merge" commit
+    return data, ingest
+
+
+def test_ci_baseline_head_is_vacuous_and_head_parent_is_strict(tmp_path, monkeypatch):
+    data, ingest = _ci_repo(tmp_path, monkeypatch)
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, "HEAD")  # what CI did before: vacuous
+    assert _drop_upstream(data, ingest)["CVE-2025-0003"]["source_status"] == "retained"
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, "HEAD^1")
+    with pytest.raises(SystemExit) as ei:
+        m.main()
+    assert "not on the row" in str(ei.value)
+
+
+def test_baseline_unset_is_head(tmp_path, monkeypatch):
+    data, ingest = _ci_repo(tmp_path, monkeypatch)
+    assert _drop_upstream(data, ingest)["CVE-2025-0003"]["source_status"] == "retained"
+
+
+def test_baseline_rev_containing_the_url_passes(tmp_path, monkeypatch):
+    data, ingest = _ci_repo(tmp_path, monkeypatch)
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, _rev_parse(tmp_path, "HEAD"))
+    assert _drop_upstream(data, ingest)["CVE-2025-0003"]["source_status"] == "retained"
+
+
+def test_baseline_rev_lacking_the_url_aborts(tmp_path, monkeypatch):
+    data, ingest = _ci_repo(tmp_path, monkeypatch)
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, _rev_parse(tmp_path, "HEAD^1"))
+    with pytest.raises(SystemExit):
+        _drop_upstream(data, ingest)
+
+
+@pytest.mark.parametrize("bad", ["no-such-rev", "", "HEAD~99"])
+def test_unresolvable_baseline_fails_closed_not_to_head(tmp_path, monkeypatch, bad):
+    data, ingest = _ci_repo(tmp_path, monkeypatch)
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, bad)
+    with pytest.raises(SystemExit) as ei:
+        _drop_upstream(data, ingest)
+    assert "D140" in str(ei.value) and "does not resolve" in str(ei.value)
+    assert str(ei.value).endswith(m.abort_sentence())
+
+
+def test_baseline_set_without_git_fails_closed(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"references_remove": [GONE]})
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, "HEAD^1")
+    with pytest.raises(SystemExit) as ei:
+        _drop_upstream(data, ingest)
+    assert "does not resolve" in str(ei.value)

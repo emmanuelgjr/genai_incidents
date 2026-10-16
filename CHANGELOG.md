@@ -9,7 +9,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ### Added - curation-override mechanisms `references_remove` and `fields_clear` (D139(a)/(b), mechanisms only)
 
-- `data/curation_overrides.json` entries can now remove a named reference URL (exact match, upstream additions survive, order kept) or clear an optional label field (`discovery_method`, `reversibility_class`, `mitre_atlas_tactics`). Both fail the build closed on a stale or malformed request. No data row uses either yet and no output changes; see `docs/DATA_DICTIONARY.md`.
+- `data/curation_overrides.json` entries can now remove a named reference URL (exact match, upstream additions survive, order kept) or clear an optional label field (`discovery_method`, `reversibility_class`, `mitre_atlas_tactics`). Both fail the build closed on a stale or malformed request. On a retained row a `references_remove` URL new since the baseline revision (`HEAD`, or `GENAI_OVERRIDE_BASELINE`; PR CI uses `HEAD^1`) must be present on the row (D140). No data row uses either yet and no output changes; see `docs/DATA_DICTIONARY.md`.
 
 ### Changed - labels re-derived on the 11 rows D130-2 corrected (D130-2L, ruling D139(c)): 9 rows relabelled
 
