@@ -83,6 +83,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 📋 docs-warden on D130-2 (`05ff1e75`), 2026-10-16 — no count contradictions; explanation gaps routed
+- **F1 medium:** README.md:144 Latest-release paragraph says counts "unchanged from v2.12.0"; headline now 15,745 / 2,025 vs tagged 15,637 / 1,915. → **fold into D132** (release-vs-main labelling; re-tense "as of release" with released counts, live surface corrected in place).
+- **F2 medium:** README never mentions `unverified`/`retracted`; consumer sees `incident_count` ≠ len(min.json) by 39 with no README explanation. → **fold into D134(i)** (package README/README first-paragraph rewrite for include_retracted).
+- **F3 medium:** DATASHEET Composition/Limitations silent on retracted/unverified and on legacy-seed sourcing quality. → **NEW BOARD NOTE → WS5** (governance-scribe docs task; queue after D134(i)).
+- **F4 low:** HF card omits what `unverified` means; quality_tier "filter by vetting level" uncaveated. → **fold into D133** (HF card edit).
+- **F6 low-medium:** unverified rows keep curated/reviewed quality_tier; filtering on quality_tier alone includes unsourced rows. → **with F3 (WS5 note beside quality_tier definition)**; schema-architect consulted if a rule is wanted.
+- **F7 low:** `generated` 2026-10-16 — **foreman [R]:** `date -u` at build time read Fri Oct 16 01:11 UTC; it is UTC rollover, not a clock bug. Closed.
+- F5 DATA_DICTIONARY consistent.
+
 ### 🔨 D130-2L — relabel the 11 re-sourced rows (WS2): **DISPATCHED 2026-10-16** to label-scientist on `ws2/d130-2l-relabel-2026-10-16` (worktree `C:/repos/gi-wt-d130-2l`, base `05ff1e75`). Find each label's origin (seed vs classifier), re-derive deterministically where possible, apply through curation overrides; delta only on the 11 rows' label fields.
 - **D130-2 post-merge [R] on main `05ff1e75`:** validate rc 0; drift clean; unverified/integrity/landmark tests `90 passed, 1 xfailed`; stats 15745 / 29 retracted / 10 unverified / 2025 landmark; porcelain empty; pushed `3bc0e99a..05ff1e75`, ls-remote = local. Standing real-corpus test running on main (first run with real unverified rows).
 - **docs-warden dispatched** on the D130-2 merge.
