@@ -34,8 +34,8 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 
 | Severity | Count |
 |---|---:|
-| Critical | 2,715 |
-| High | 6,008 |
+| Critical | 2,714 |
+| High | 6,009 |
 | Medium | 6,547 |
 | Low | 475 |
 
@@ -80,13 +80,13 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 | Code | Name | Count |
 |---|---|---:|
 | LLM01 | Prompt Injection | 543 |
-| LLM02 | Sensitive Information Disclosure | 1,075 |
-| LLM03 | Excessive Agency | 787 |
-| LLM04 | Supply Chain | 8,289 |
+| LLM02 | Sensitive Information Disclosure | 1,074 |
+| LLM03 | Excessive Agency | 786 |
+| LLM04 | Supply Chain | 8,288 |
 | LLM05 | Data and Model Poisoning | 193 |
 | LLM06 | Unbounded Consumption | 43 |
-| LLM07 | Misinformation | 2,522 |
-| LLM08 | Hidden Context Exposure | 733 |
+| LLM07 | Misinformation | 2,521 |
+| LLM08 | Hidden Context Exposure | 732 |
 | LLM09 | Vector and Embedding Weaknesses | 22 |
 | LLM10 | Improper Output Handling | 6,856 |
 
@@ -96,32 +96,32 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 |---|---|---:|
 | ASI01 | Agent Goal Hijack | 458 |
 | ASI02 | Tool Misuse & Exploitation | 729 |
-| ASI03 | Identity & Privilege Abuse | 2,404 |
+| ASI03 | Identity & Privilege Abuse | 2,403 |
 | ASI04 | Agentic Supply Chain Vulnerabilities | 8,103 |
 | ASI05 | Unexpected Code Execution (RCE) | 5,849 |
 | ASI06 | Memory & Context Poisoning | 139 |
-| ASI07 | Insecure Inter-Agent Communication | 26 |
+| ASI07 | Insecure Inter-Agent Communication | 25 |
 | ASI08 | Cascading Failures | 783 |
-| ASI09 | Human-Agent Trust Exploitation | 2,744 |
+| ASI09 | Human-Agent Trust Exploitation | 2,743 |
 | ASI10 | Rogue Agents | 460 |
 
 ### Top MITRE ATLAS Techniques
 
 | Technique | Count |
 |---|---:|
-| `AML.T0010` | 8,329 |
-| `AML.T0050` | 6,956 |
-| `AML.T0048.003` | 2,744 |
-| `AML.T0115.001` | 2,522 |
-| `AML.T0012` | 2,404 |
-| `AML.T0048` | 1,928 |
-| `AML.T0053` | 1,395 |
-| `AML.T0057` | 1,079 |
-| `AML.T0056` | 733 |
+| `AML.T0010` | 8,328 |
+| `AML.T0050` | 6,954 |
+| `AML.T0048.003` | 2,743 |
+| `AML.T0115.001` | 2,521 |
+| `AML.T0012` | 2,403 |
+| `AML.T0048` | 1,927 |
+| `AML.T0053` | 1,394 |
+| `AML.T0057` | 1,078 |
+| `AML.T0056` | 732 |
 | `AML.T0051` | 631 |
-| `AML.T0049` | 579 |
-| `AML.T0024` | 363 |
-| `AML.T0010.001` | 321 |
+| `AML.T0049` | 577 |
+| `AML.T0024` | 361 |
+| `AML.T0010.001` | 320 |
 | `AML.T0020` | 197 |
 | `AML.T0066` | 149 |
 
@@ -8602,7 +8602,7 @@ All **15,745** incidents in a single table, newest-first. Each `INC-*****` link 
 | 8,469 | 2025-06-05 | [`INC-02241`](docs/incidents/2025.md#inc-02241) | Reported AI-Aided Development of Explosive Devices by Long Island Resident Michael Gann | High | LLM03, LLM10 | ASI02, ASI10 |  |
 | 8,470 | 2025-06-04 | [`INC-02336`](docs/incidents/2025.md#inc-02336) | Argentine Court Reportedly Annuls Criminal Conviction After Judge Allegedly Used ChatGPT to Draft Ruling With… | Medium | LLM02, LLM07 | ASI03, ASI09 |  |
 | 8,471 | 2025-06-03 | [`INC-02798`](docs/incidents/2025.md#inc-02798) | LAMEHUG: Malware Leveraging Dynamic AI-Generated Commands | High |  |  |  |
-| 8,472 | 2025-06-01 | [`INC-02899`](docs/incidents/2025.md#inc-02899) | Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-d… | Critical | LLM01, LLM02, LLM03 | ASI01, ASI02, ASI03, ASI07, ASI09 |  |
+| 8,472 | 2025-06-01 | [`INC-02899`](docs/incidents/2025.md#inc-02899) | Microsoft Copilot Studio agent hijacked through prompt injection (AIjacking): knowledge-source and customer-d… | Critical | LLM01, LLM02, LLM03 | ASI01, ASI02, ASI09 |  |
 | 8,473 | 2025-06-01 | [`INC-03370`](docs/incidents/2025.md#inc-03370) | Whirlpool Reportedly Used AI-Altered Footage of North Carolina State Senator DeAndrea Salvador in Brazilian A… | High | LLM07 | ASI09 |  |
 | 8,474 | 2025-06 | [`INC-10425`](docs/incidents/2025.md#inc-10425) | @haxtheweb/haxcms-nodejs Iframe Phishing vulnerability | Medium | LLM04 | ASI03, ASI04 | `CVE-2025-49139` |
 | 8,475 | 2025-06 | [`INC-02135`](docs/incidents/2025.md#inc-02135) | A binary in the BoKS Server Agent component of Fortra's Core Privileged Access Manager (BoKS) on versions 7.2… | Medium | LLM04 | ASI04 | `CVE-2025-5141` |
@@ -11035,7 +11035,7 @@ All **15,745** incidents in a single table, newest-first. Each `INC-*****` link 
 | 10,902 | 2024-01 | [`INC-11274`](docs/incidents/2024.md#inc-11274) | react-query-streamed-hydration Cross-site Scripting vulnerability | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2024-24558` |
 | 10,903 | 2024-01 | [`INC-11286`](docs/incidents/2024.md#inc-11286) | readthedocs-sphinx-search vulnerable to cross-site scripting when including search results from malicious pro… | Medium | LLM04 | ASI04 |  |
 | 10,904 | 2024-01 | [`INC-11270`](docs/incidents/2024.md#inc-11270) | runc vulnerable to container breakout through process.cwd trickery and leaked fds | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2024-21626` |
-| 10,905 | 2024-01 | [`INC-04179`](docs/incidents/2024.md#inc-04179) | Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations | Critical | LLM03, LLM04, LLM07 | ASI09 |  |
+| 10,905 | 2024-01 | [`INC-04179`](docs/incidents/2024.md#inc-04179) | Sama data labelers and content moderators in Kenya on OpenAI's account: low pay and trauma allegations | High |  |  |  |
 | 10,906 | 2024-01 | [`INC-15063`](docs/incidents/2024.md#inc-15063) | Segfault in paddle.dot (CVE-2023-38676) | Medium | LLM04 | ASI04 | `CVE-2023-38676` |
 | 10,907 | 2024-01 | [`INC-15170`](docs/incidents/2024.md#inc-15170) | Segfault in paddle.mode | Medium | LLM04 | ASI04 | `CVE-2023-38678` |
 | 10,908 | 2024-01 | [`INC-15070`](docs/incidents/2024.md#inc-15070) | Segfault in paddle.nextafter (CVE-2023-52302) | Medium | LLM04 | ASI04 | `CVE-2023-52302` |
@@ -12063,7 +12063,7 @@ All **15,745** incidents in a single table, newest-first. Each `INC-*****` link 
 | 11,930 | 2023-01 | [`INC-11677`](docs/incidents/2023.md#inc-11677) | Dromara Hutool Deserialization of Untrusted Data vulnerability | Critical | LLM04, LLM10 | ASI04, ASI05 | `CVE-2023-24162` |
 | 11,931 | 2023-01 | [`INC-11679`](docs/incidents/2023.md#inc-11679) | Fix for arbitrary file deletion in customer media allows for remote code execution | High | LLM04 | ASI04 | `CVE-2021-21395`, `CVE-2021-41143` |
 | 11,932 | 2023-01 | [`INC-11691`](docs/incidents/2023.md#inc-11691) | gatsby-transformer-remark has possible unsanitized JavaScript code injection | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2023-22491` |
-| 11,933 | 2023-01 | [`INC-04653`](docs/incidents/2023.md#inc-04653) | GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses | High | LLM02, LLM08 |  |  |
+| 11,933 | 2023-01 | [`INC-04653`](docs/incidents/2023.md#inc-04653) | GitHub Copilot: proposed class action over reproduction of open-source code without attached licenses | High |  |  |  |
 | 11,934 | 2023-01 | [`INC-11698`](docs/incidents/2023.md#inc-11698) | Gravitee API Management contains Path Traversal | High | LLM04, LLM10 | ASI04, ASI05 | `CVE-2019-25075`, `CVE-2022-38723` |
 | 11,935 | 2023-01 | [`INC-11695`](docs/incidents/2023.md#inc-11695) | Http4s improperly parses User-Agent and Server headers | High | LLM04 | ASI04 | `CVE-2023-22465` |
 | 11,936 | 2023-01 | [`INC-11699`](docs/incidents/2023.md#inc-11699) | httparty has multipart/form-data request tampering vulnerability | Medium | LLM04 | ASI04 | `CVE-2024-22049` |

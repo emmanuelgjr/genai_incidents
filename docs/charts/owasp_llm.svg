@@ -5,14 +5,14 @@
 <rect x="220" y="36" width="31.4" height="14" fill="#0a58ca" rx="2"><title>Prompt Injection: 543</title></rect>
 <text x="257.4" y="47" fill="#666">543</text>
 <text x="212" y="69" text-anchor="end" fill="#333">LLM02 · Sensitive Information Disclosure</text>
-<rect x="220" y="58" width="62.3" height="14" fill="#0a58ca" rx="2"><title>Sensitive Information Disclosure: 1,075</title></rect>
-<text x="288.3" y="69" fill="#666">1,075</text>
+<rect x="220" y="58" width="62.2" height="14" fill="#0a58ca" rx="2"><title>Sensitive Information Disclosure: 1,074</title></rect>
+<text x="288.2" y="69" fill="#666">1,074</text>
 <text x="212" y="91" text-anchor="end" fill="#333">LLM03 · Excessive Agency</text>
-<rect x="220" y="80" width="45.6" height="14" fill="#0a58ca" rx="2"><title>Excessive Agency: 787</title></rect>
-<text x="271.6" y="91" fill="#666">787</text>
+<rect x="220" y="80" width="45.5" height="14" fill="#0a58ca" rx="2"><title>Excessive Agency: 786</title></rect>
+<text x="271.5" y="91" fill="#666">786</text>
 <text x="212" y="113" text-anchor="end" fill="#333">LLM04 · Supply Chain</text>
-<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,289</title></rect>
-<text x="706.0" y="113" fill="#666">8,289</text>
+<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,288</title></rect>
+<text x="706.0" y="113" fill="#666">8,288</text>
 <text x="212" y="135" text-anchor="end" fill="#333">LLM05 · Data and Model Poisoning</text>
 <rect x="220" y="124" width="11.2" height="14" fill="#0a58ca" rx="2"><title>Data and Model Poisoning: 193</title></rect>
 <text x="237.2" y="135" fill="#666">193</text>
@@ -20,15 +20,15 @@
 <rect x="220" y="146" width="2.5" height="14" fill="#0a58ca" rx="2"><title>Unbounded Consumption: 43</title></rect>
 <text x="228.5" y="157" fill="#666">43</text>
 <text x="212" y="179" text-anchor="end" fill="#333">LLM07 · Misinformation</text>
-<rect x="220" y="168" width="146.0" height="14" fill="#0a58ca" rx="2"><title>Misinformation: 2,522</title></rect>
-<text x="372.0" y="179" fill="#666">2,522</text>
+<rect x="220" y="168" width="146.0" height="14" fill="#0a58ca" rx="2"><title>Misinformation: 2,521</title></rect>
+<text x="372.0" y="179" fill="#666">2,521</text>
 <text x="212" y="201" text-anchor="end" fill="#333">LLM08 · Hidden Context Exposure</text>
-<rect x="220" y="190" width="42.4" height="14" fill="#0a58ca" rx="2"><title>Hidden Context Exposure: 733</title></rect>
-<text x="268.4" y="201" fill="#666">733</text>
+<rect x="220" y="190" width="42.4" height="14" fill="#0a58ca" rx="2"><title>Hidden Context Exposure: 732</title></rect>
+<text x="268.4" y="201" fill="#666">732</text>
 <text x="212" y="223" text-anchor="end" fill="#333">LLM09 · Vector and Embedding Weaknesses</text>
 <rect x="220" y="212" width="1.3" height="14" fill="#0a58ca" rx="2"><title>Vector and Embedding Weaknesses: 22</title></rect>
 <text x="227.3" y="223" fill="#666">22</text>
 <text x="212" y="245" text-anchor="end" fill="#333">LLM10 · Improper Output Handling</text>
-<rect x="220" y="234" width="397.0" height="14" fill="#0a58ca" rx="2"><title>Improper Output Handling: 6,856</title></rect>
-<text x="623.0" y="245" fill="#666">6,856</text>
+<rect x="220" y="234" width="397.1" height="14" fill="#0a58ca" rx="2"><title>Improper Output Handling: 6,856</title></rect>
+<text x="623.1" y="245" fill="#666">6,856</text>
 </svg>
