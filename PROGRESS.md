@@ -14,6 +14,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⏸ PAUSED BY THE USER, 2026-10-16 (second pause): "save memory and will continue next section". Resume from here.
+- **In flight — D139-M** at **`56d6b4cd`** on `ws4/d139m-override-mechanisms-2026-10-16` (worktree `C:/repos/gi-wt-d139m`). **BOUNCE #4 recorded below; NOT merged.** Library code correct on all real-corpus cases.
+- **OPEN USER DECISION (asked, not answered)** — how to finish:
+  1. (Recommended) push fallback → `::error::` + exit 1 (fail closed per D141), fix the workflow comment / DATA_DICTIONARY push row / CHANGELOG; add a step-6c clear-after-refresh test shown to fail under the M6 mutation; **foreman verifies** (string check + gate's two repros + full pytest), then merge — no fifth full gate.
+  2. Keep the HEAD^1 fallback with a warning (rare new-branch / force-push), document it, add the test; foreman verifies; merge.
+  3. Fix both, then a fifth fresh full gate.
+- Queue after D139-M unchanged (see the 2026-10-16 resume entry above / D139 queue): D132 → D133 → D134(i) → D138 → D130-3 → D134(ii) → D134(iii) → WS5 DATASHEET note → D130-4 → D134(iv).
+- Main unchanged since `bc6d1c43` except board/audit commits: 15,745 standing / 29 retracted / 10 unverified / 2,025 landmark.
+
 ### ⛔ D139-M: **BOUNCE #4 (fresh full gate, gate-d139m-r4 on `56d6b4cd`), 2026-10-16 — ESCALATED to the user.** Library code correct on every real-corpus case; both defects small.
 **Defects (gate, summarised):**
 1. **validate.yml push fallback contradicts D141 fail-closed.** Any push `before` not a commit in the clone (all-zero, absent SHA, empty) silently becomes HEAD^1 with a ::warning::, so [FATAL] D140 can never fire from push CI. Gate ran the block in bash: 000…0, deadbeef…, '' → HEAD^1, rc 0. With HEAD^1 the bounce-#3 typo passes (typo commit + unrelated commit: old-tip base rc 1, HEAD^1 rc 0). Workflow comment and DATA_DICTIONARY push row are false. Fix: `::error::` + exit 1 (or pass the raw value so [FATAL] D140 fires), correct comment/DATA_DICTIONARY/CHANGELOG — or a user ruling keeping the fallback.
