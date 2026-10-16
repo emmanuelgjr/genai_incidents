@@ -83,6 +83,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D130-2L REPORTED `26926687` (2026-10-16) — gate-d130-2l dispatched
+- Specialist (testimony): 9 of 11 rows relabelled (INC-03955/03972 recompute identical). Labels are seed data; stale causes = 3 over-merges (INC-02454, 02774, 04179) + a substring bug (attack-vector hint "rce" matches "enforcement"). Build's own label code re-run with wrong-incident seeds dropped; 4 agent-suggested judgement calls; severity only INC-04179 Critical→High; control reproduces base labels and is shown to fail. Delta 9 rows, label fields only; stats/README unchanged; `[]` now present for empty maestro_layers (3) / mitre_atlas_tactics (4). pytest 1485 + 1 xfailed.
+- **Foreman [R]:** branch on origin at `26926687`; data: INC-02774 privacy-violation/High; INC-04179 other/High, tags no longer carry nyt/character-ai; INC-04955 privacy-violation.
+- **Follow-ups reported (not done):** rce substring bug on 3 more rows (INC-02549, 04263, 02186) → whole-word match in parse_existing (WS4); over-merged rows still carry other incident's source_ids/mitigations → WS4-T19; stale date/year on INC-02774, 03472, 03955, 04221, 04653; severity on 4 rows awaits WS2-T5; **LLM07 (2026 = Misinformation) → AML.T0058/T0115.001 mapping looks like a 2025-numbering leftover, corpus-wide** → WS2.
+
 ### 📋 docs-warden on D130-2 (`05ff1e75`), 2026-10-16 — no count contradictions; explanation gaps routed
 - **F1 medium:** README.md:144 Latest-release paragraph says counts "unchanged from v2.12.0"; headline now 15,745 / 2,025 vs tagged 15,637 / 1,915. → **fold into D132** (release-vs-main labelling; re-tense "as of release" with released counts, live surface corrected in place).
 - **F2 medium:** README never mentions `unverified`/`retracted`; consumer sees `incident_count` ≠ len(min.json) by 39 with no README explanation. → **fold into D134(i)** (package README/README first-paragraph rewrite for include_retracted).
