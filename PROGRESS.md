@@ -83,6 +83,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D139-M rework REPORTED `721932e7` (2026-10-16) — scoped re-gate sent to gate-d139m. Second bounce → user.
+- Specialist (testimony): matched check moved after 6c over `deduped`; retained priors: references_remove skips already-absent URLs (active rows stay strict), fields_clear re-applied after refresh_atlas_codes, `updated` bumps only on net change; defect-2 test now clears a field a source really carries; two-source same-URL fixture; 40 tests, pytest 1525 + 1 xfailed; data diff empty.
+- **Foreman [R]:** branch on origin at `721932e7`; `_check_delete_overrides_matched` defined :1605 and called :3549; `_reapply_delete_overrides_retained` defined :1595 and called :3352.
+
 ### 🔁 D139-M: **BOUNCE #1 (gate-d139m on `c7ec421a`), 2026-10-16.**
 **Defects, in the gate's words (summarised):**
 1. **Retained-row abort.** If upstream drops a row carrying `references_remove`/`fields_clear`, the build aborts although retention (step 6c) still publishes the row: the dangling check runs at 4d over `surviving` only. D130-1's `_check_status_overrides_matched` deliberately runs after the retained pass over `deduped`. Proven with a two-build fixture in both parametrisations: "[curation] 1 references_remove/fields_clear override(s) matched no entry: CVE-2025-0003 … Build refused". A routine Sunday refresh would break on an ordinary upstream drop; the message is false; its remedy throws away the durable decision. Fix shape: matched check after 6c over `deduped`; decide retained semantics (verbatim prior already has the removal → re-apply would hit "URL not on row"; re-apply `fields_clear` AFTER `refresh_atlas_codes`, which union-adds tactics on retained priors and would undo a tactics clear); two-build retained test per key.
