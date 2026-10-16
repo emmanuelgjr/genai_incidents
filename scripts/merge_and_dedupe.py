@@ -1545,61 +1545,101 @@ def _check_delete_overrides(curation: dict[str, dict]) -> list[str]:
     return keys
 
 
-def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = False) -> bool:
-    """Apply one row's references_remove / fields_clear (shape already checked).
-    Returns True if the row changed.
+def _head_removed_urls(key_sid: str) -> frozenset:
+    """The ``references_remove`` URLs the COMMITTED overrides at git HEAD list
+    under this same key (D140). Per key and per URL: re-keying a URL makes it
+    new again. Empty (everything is new, i.e. strict) when the overrides file is
+    not in HEAD, there is no git metadata, or the key/field is absent there.
 
-    ``retained=True`` is for a prior carried verbatim by step 6c: it was published
-    with the removal already applied, so a listed URL that is absent is the
-    expected state and is skipped (only a still-present one is removed). Active
-    rows keep the strict check. The empty-row refusal applies to both.
+    The baseline is HEAD for the same reason as D71's (`_load_gate_baseline`):
+    what is published, not the working tree. A shallow or unreadable repository
+    fails closed exactly as D71 does, because "not in HEAD" cannot then be told
+    from "HEAD unreadable" and would silently weaken the check.
+
+    Which commit that is: locally HEAD is the last commit, so an override you
+    have just added (uncommitted) is NEW and strict. In the weekly refresh the
+    build runs on a checkout of main BEFORE the refresh commit, so HEAD is the
+    merged state. In PR CI (validate.yml) and on push the checkout already
+    contains the override, so it is "in HEAD": the rule is VACUOUS there and
+    bites only at the authoring build, before the override is committed."""
+    root = CURATION_OVERRIDES_PATH.parent.parent
+    rel = CURATION_OVERRIDES_PATH.relative_to(root).as_posix()
+    if not (root / ".git").exists():
+        return frozenset()
+    shown = _git(root, "show", f"HEAD:{rel}")
+    if shown.returncode != 0:
+        shallow = _git(root, "rev-parse", "--is-shallow-repository")
+        if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
+            raise SystemExit(
+                f"[FATAL] D140: git cannot show HEAD:{rel} in a shallow (or unreadable) repository, "
+                "so a references_remove override on a retained row cannot be checked against what is "
+                "committed. " + abort_sentence())
+        return frozenset()  # complete history, file not in HEAD: everything is new
+    try:
+        urls = json.loads(shown.stdout.decode("utf-8"))["overrides"][key_sid]["references_remove"]
+        return frozenset(u for u in urls if isinstance(u, str))
+    except (KeyError, TypeError):
+        return frozenset()
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise SystemExit(
+            f"[FATAL] D140: HEAD:{rel} is unparseable ({type(exc).__name__}); refusing to build. "
+            + abort_sentence()) from exc
+
+
+def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = False) -> None:
+    """Apply one row's references_remove / fields_clear (shape already checked).
 
     references_remove: exact string match on `url` (no case, trailing-slash or
-    scheme folding: a near-miss URL is a different reference, and a listed URL
-    that is absent means the upstream URL changed or the decision was never
-    applied, so the build fails closed). Every occurrence is removed; surviving
-    references keep their order. A row must keep at least one reference.
+    scheme folding: a near-miss URL is a different reference). Every occurrence
+    is removed; surviving references keep their order. A row must keep at least
+    one reference.
+
+    A listed URL that is not on the row aborts the build, with one exception
+    (D140). On a ``retained`` prior (carried verbatim by step 6c, published with
+    the removal already applied) a URL that the committed overrides at HEAD
+    already list under the same key is accepted as removed earlier. A URL NEW
+    since HEAD must be present, retained or not: otherwise a typo added while
+    the row is retained would pass forever.
 
     fields_clear: removing an already-absent field is a no-op. The goal state
     (field absent) holds, and failing would make the override impossible to
     retire after the value's own source (often an earlier override) goes away."""
-    changed = False
     urls = ov.get(_REFS_REMOVE_KEY)
     if urls:
         refs = e.get("references") or []
         have = {r.get("url") for r in refs if isinstance(r, dict)}
         missing = [u for u in urls if u not in have]
-        if missing and not retained:
+        if missing and retained:
+            missing = [u for u in missing if u not in _head_removed_urls(key_sid)]
+        if missing:
             raise SystemExit(
-                f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} lists "
-                f"{len(missing)} URL(s) not on the row: {missing}. The upstream URL changed or the "
-                "removal never applied; re-check the row and fix the override. " + abort_sentence())
+                f"[curation] override {key_sid!r} (row {e.get('id') or e.get('source_ids')}"
+                f"{', retained' if retained else ''}): {_REFS_REMOVE_KEY} lists "
+                f"{len(missing)} URL(s) not on the row: {missing}. The upstream URL changed, the URL is "
+                "mistyped, or (retained row) it was never in the committed overrides; re-check the row and "
+                "fix the override. " + abort_sentence())
         kept = [r for r in refs if not (isinstance(r, dict) and r.get("url") in urls)]
         if not kept:
             raise SystemExit(
-                f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} would leave the "
+                f"[curation] override {key_sid!r} (row {e.get('id') or e.get('source_ids')}): "
+                f"{_REFS_REMOVE_KEY} would leave the "
                 "row with no references; a row must keep at least one. " + abort_sentence())
-        changed = len(kept) != len(refs)
         e["references"] = kept
     for f in ov.get(_CLEAR_KEY) or []:
-        if f in e:
-            changed = True
-            del e[f]
-    return changed
+        e.pop(f, None)
 
 
 def _first_curation_hit(e: dict, curation: dict[str, dict]):
     return next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
 
 
-def _reapply_delete_overrides_retained(prior: dict, curation: dict[str, dict]) -> bool:
+def _reapply_delete_overrides_retained(prior: dict, curation: dict[str, dict]) -> None:
     """Step 6c: a retained prior bypasses step 4d, so re-apply the deleting keys
     (and ONLY those) after refresh_atlas_codes, which union-adds
     mitre_atlas_tactics and would otherwise undo a tactics clear."""
     hit = _first_curation_hit(prior, curation)
-    if not hit or not (_DELETE_OVERRIDE_KEYS & hit[1].keys()):
-        return False
-    return _apply_delete_overrides(prior, hit[0], hit[1], retained=True)
+    if hit and _DELETE_OVERRIDE_KEYS & hit[1].keys():
+        _apply_delete_overrides(prior, hit[0], hit[1], retained=True)
 
 
 def _check_delete_overrides_matched(keys: list[str], curation: dict[str, dict], rows: list[dict]) -> None:

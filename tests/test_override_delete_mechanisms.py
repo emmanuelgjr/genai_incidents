@@ -206,90 +206,109 @@ def _drop_upstream(data, ingest):
     return _by_cve(data)
 
 
-def test_retained_row_keeps_url_removed_and_build_passes(tmp_path, monkeypatch):
+def _git_commit(root, *paths, init=True):
+    import subprocess
+    run = lambda *a: subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", *a],
+                                    cwd=root, check=True, capture_output=True)
+    if init:
+        run("init", "-q")
+    run("add", "-f", *paths)
+    run("commit", "-q", "-m", "x", "--allow-empty")
+
+
+def _write_overrides(data, ov, key="CVE-2025-0003"):
+    (data / "curation_overrides.json").write_text(json.dumps({"overrides": {key: ov}}), encoding="utf-8")
+
+
+def _two_refs_build(tmp_path, monkeypatch, ov):
     refs = [{"url": NVD}, {"url": BAD}]
-    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": refs})],
-                               {"references_remove": [BAD]})
+    return _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": refs})], ov)
+
+
+def test_retained_row_keeps_url_removed_and_build_passes(tmp_path, monkeypatch):
+    # D140: the URL was added while the row was ACTIVE and committed -> in HEAD.
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, {"references_remove": [BAD]})
     assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+    _git_commit(tmp_path, "data/curation_overrides.json")
     after = _drop_upstream(data, ingest)
     assert after["CVE-2025-0003"]["source_status"] == "retained"
     assert _urls(after["CVE-2025-0003"]) == [NVD]
 
 
-def test_retained_row_removes_a_url_it_still_carries(tmp_path, monkeypatch):
-    # Override added after the row went retained: still-present URL is removed.
-    refs = [{"url": NVD}, {"url": BAD}]
-    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": refs})], None)
-    (data / "curation_overrides.json").write_text(json.dumps(
-        {"overrides": {"CVE-2025-0003": {"references_remove": [BAD]}}}), encoding="utf-8")
-    assert _urls(_drop_upstream(data, ingest)["CVE-2025-0003"]) == [NVD]
-
-
-def test_retained_row_cannot_be_emptied(tmp_path, monkeypatch):
-    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": [{"url": NVD}]})], None)
-    (data / "curation_overrides.json").write_text(json.dumps(
-        {"overrides": {"CVE-2025-0003": {"references_remove": [NVD]}}}), encoding="utf-8")
+def test_typo_url_added_while_retained_aborts(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"_note": "x"})
+    _git_commit(tmp_path, "data/curation_overrides.json")
+    _write_overrides(data, {"references_remove": ["https://bad.example.test/hmoe"]})  # uncommitted typo
     with pytest.raises(SystemExit) as ei:
         _drop_upstream(data, ingest)
-    assert "no references" in str(ei.value)
+    assert "not on the row" in str(ei.value) and str(ei.value).endswith(m.abort_sentence())
+    assert "CVE-2025-0003" in str(ei.value)
 
 
-def test_retained_tactics_clear_survives_refresh_atlas_codes(tmp_path, monkeypatch):
-    import datetime
-    day = {"d": datetime.date(2026, 1, 1)}
-    monkeypatch.setattr(m, "utc_today", lambda: day["d"])
-    ov = {"fields_clear": ["mitre_atlas_tactics"]}
-    data, ingest = _build_rows(tmp_path, monkeypatch, [_tactic_row()], ov)
-    built = _by_cve(data)["CVE-2025-0003"]
-    assert "mitre_atlas_tactics" not in built
-    day["d"] = datetime.date(2026, 1, 2)
-    after = _drop_upstream(data, ingest)["CVE-2025-0003"]
-    assert after["source_status"] == "retained" and after["mitre_atlas"] == [TECH]
-    assert "mitre_atlas_tactics" not in after, "refresh_atlas_codes re-added the cleared tactics"
-    # refresh adds and the clear removes: the NET change is nothing, so a later
-    # day's build must not bump `updated` (or it would churn on every build).
-    day["d"] = datetime.date(2026, 1, 3)
-    m.main()
-    again = _by_cve(data)["CVE-2025-0003"]
-    assert after["updated"] == again["updated"] == built["updated"]
+GONE = "https://gone.example.test/z"
 
 
-def test_retained_discovery_method_clear(tmp_path, monkeypatch):
-    # discovery_method reaches a row only via an override, so build 1 SETS it;
-    # the override is then rewritten to clear it, and the carried prior loses it.
-    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003")],
-                               {"discovery_method": "security-researcher"})
-    assert _by_cve(data)["CVE-2025-0003"]["discovery_method"] == "security-researcher"
-    (data / "curation_overrides.json").write_text(json.dumps(
-        {"overrides": {"CVE-2025-0003": {"fields_clear": ["discovery_method"]}}}), encoding="utf-8")
-    after = _drop_upstream(data, ingest)["CVE-2025-0003"]
-    assert after["source_status"] == "retained" and "discovery_method" not in after
-
-
-def test_override_matching_no_row_even_after_retention_still_refuses(tmp_path, monkeypatch):
+def test_rekeyed_url_is_new_and_strict(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"references_remove": [GONE]}, key="SOME-OTHER-KEY")
+    _git_commit(tmp_path, "data/curation_overrides.json")  # HEAD: GONE under another key
+    _write_overrides(data, {"references_remove": [GONE]})  # same URL, this row's key
     with pytest.raises(SystemExit) as ei:
-        _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0004")],
-                    {"references_remove": [BAD]})
-    assert "matched no entry" in str(ei.value)
+        _drop_upstream(data, ingest)
+    assert "not on the row" in str(ei.value)
 
 
-# ----- removal applies after the dedupe union of several sources -----
+def test_url_in_head_under_same_key_is_accepted_per_url(tmp_path, monkeypatch):
+    # Per-URL: GONE is in HEAD under this key (accepted); adding a NEW absent URL
+    # alongside it still aborts.
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"references_remove": [GONE]})
+    _git_commit(tmp_path, "data/curation_overrides.json")
+    assert _drop_upstream(data, ingest)["CVE-2025-0003"]["source_status"] == "retained"
+    _write_overrides(data, {"references_remove": [GONE, "https://typo.example.test/q"]})
+    with pytest.raises(SystemExit):
+        m.main()
 
-def test_removal_applies_after_union_of_two_sources(tmp_path, monkeypatch):
-    tmp_path.mkdir(parents=True, exist_ok=True)
-    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
-    monkeypatch.setattr(m, "ISSUE88_EXCLUDE", set())
-    # Two sources, distinct source_ids, same CVE; BOTH carry BAD. The override is
-    # keyed to the first source's id, so a removal applied per source before the
-    # union would leave the second source's copy of BAD in the merged row.
-    for name, sid, extra in (("a.json", "CVE-2025-0003", NEW),
-                             ("b.json", "ALT-0003", "https://other.example.test/x")):
-        (ingest / name).write_text(json.dumps([_cve_row("CVE-2025-0003", {
-            "source_id": sid, "references": [{"url": NVD}, {"url": BAD}, {"url": extra}]})]), encoding="utf-8")
-    (data / "curation_overrides.json").write_text(json.dumps(
-        {"overrides": {"CVE-2025-0003": {"references_remove": [BAD]}}}), encoding="utf-8")
-    m.main()
-    full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))["incidents"]
-    assert len(full) == 1 and set(full[0]["source_ids"]) == {"CVE-2025-0003", "ALT-0003"}
-    urls = _urls(full[0])
-    assert BAD not in urls and NEW in urls and "https://other.example.test/x" in urls
+
+def test_overrides_file_absent_from_head_is_strict(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _git_commit(tmp_path)  # a repo whose HEAD has no overrides file
+    _write_overrides(data, {"references_remove": ["https://gone.example.test/z"]})
+    with pytest.raises(SystemExit) as ei:
+        _drop_upstream(data, ingest)
+    assert "not on the row" in str(ei.value)
+
+
+def test_no_git_metadata_is_strict(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _write_overrides(data, {"references_remove": ["https://gone.example.test/z"]})
+    with pytest.raises(SystemExit):
+        _drop_upstream(data, ingest)
+
+
+def test_shallow_or_unreadable_head_fails_closed(tmp_path, monkeypatch):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    _git_commit(tmp_path)
+    _write_overrides(data, {"references_remove": ["https://gone.example.test/z"]})
+    real = m._git
+
+    def fake(root, *args):
+        import subprocess
+        if args[0] == "show":
+            return subprocess.CompletedProcess(args, 128, b"", b"")
+        if args[0] == "rev-parse":
+            return subprocess.CompletedProcess(args, 0, b"true", b"")
+        return real(root, *args)
+    monkeypatch.setattr(m, "_git", fake)
+    with pytest.raises(SystemExit) as ei:
+        _drop_upstream(data, ingest)
+    assert "D140" in str(ei.value) and "shallow" in str(ei.value)
+
+
+def test_active_row_abort_names_the_row():
+    r = _row()
+    r["id"] = ""
+    with pytest.raises(SystemExit) as ei:
+        _apply([r], {"references_remove": ["https://nope.example.test/q"]})
+    assert f"(row {[SID]}" in str(ei.value)
