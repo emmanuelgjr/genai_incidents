@@ -1545,8 +1545,14 @@ def _check_delete_overrides(curation: dict[str, dict]) -> list[str]:
     return keys
 
 
-def _apply_delete_overrides(e: dict, key_sid: str, ov: dict) -> None:
+def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = False) -> bool:
     """Apply one row's references_remove / fields_clear (shape already checked).
+    Returns True if the row changed.
+
+    ``retained=True`` is for a prior carried verbatim by step 6c: it was published
+    with the removal already applied, so a listed URL that is absent is the
+    expected state and is skipped (only a still-present one is removed). Active
+    rows keep the strict check. The empty-row refusal applies to both.
 
     references_remove: exact string match on `url` (no case, trailing-slash or
     scheme folding: a near-miss URL is a different reference, and a listed URL
@@ -1557,12 +1563,13 @@ def _apply_delete_overrides(e: dict, key_sid: str, ov: dict) -> None:
     fields_clear: removing an already-absent field is a no-op. The goal state
     (field absent) holds, and failing would make the override impossible to
     retire after the value's own source (often an earlier override) goes away."""
+    changed = False
     urls = ov.get(_REFS_REMOVE_KEY)
     if urls:
         refs = e.get("references") or []
         have = {r.get("url") for r in refs if isinstance(r, dict)}
         missing = [u for u in urls if u not in have]
-        if missing:
+        if missing and not retained:
             raise SystemExit(
                 f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} lists "
                 f"{len(missing)} URL(s) not on the row: {missing}. The upstream URL changed or the "
@@ -1572,26 +1579,58 @@ def _apply_delete_overrides(e: dict, key_sid: str, ov: dict) -> None:
             raise SystemExit(
                 f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} would leave the "
                 "row with no references; a row must keep at least one. " + abort_sentence())
+        changed = len(kept) != len(refs)
         e["references"] = kept
     for f in ov.get(_CLEAR_KEY) or []:
-        e.pop(f, None)
+        if f in e:
+            changed = True
+            del e[f]
+    return changed
+
+
+def _first_curation_hit(e: dict, curation: dict[str, dict]):
+    return next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
+
+
+def _reapply_delete_overrides_retained(prior: dict, curation: dict[str, dict]) -> bool:
+    """Step 6c: a retained prior bypasses step 4d, so re-apply the deleting keys
+    (and ONLY those) after refresh_atlas_codes, which union-adds
+    mitre_atlas_tactics and would otherwise undo a tactics clear."""
+    hit = _first_curation_hit(prior, curation)
+    if not hit or not (_DELETE_OVERRIDE_KEYS & hit[1].keys()):
+        return False
+    return _apply_delete_overrides(prior, hit[0], hit[1], retained=True)
+
+
+def _check_delete_overrides_matched(keys: list[str], curation: dict[str, dict], rows: list[dict]) -> None:
+    """A references_remove/fields_clear override that lands on no FINAL row
+    (retained priors included, so call after step 6c) would silently remove
+    nothing. A key shadowed by an earlier-listed key on every row it matches
+    counts as unmatched."""
+    used = set()
+    for e in rows:
+        hit = _first_curation_hit(e, curation)
+        if hit:
+            used.add(hit[0])
+    dangling = sorted(k for k in keys if k not in used)
+    if dangling:
+        raise SystemExit(
+            f"[curation] {len(dangling)} references_remove/fields_clear override(s) matched no entry: "
+            f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
 
 
 def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -> int:
     """Step 4d: apply durable curation overrides, keyed by ANY member
     source_id. Returns the number of entries touched.
 
-    Every references_remove / fields_clear override must land on a row; one
-    that matches none (or is shadowed by an earlier-listed key on every row it
-    matches) fails the build closed."""
-    delete_keys = _check_delete_overrides(curation)  # before any row is touched
+    The "must land on a row" check for references_remove / fields_clear is
+    _check_delete_overrides_matched, run in main() after step 6c."""
+    _check_delete_overrides(curation)  # before any row is touched
     applied = 0
-    used: set[str] = set()
     for e in surviving:
         hit = next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
         if hit:
             key_sid, ov = hit
-            used.add(key_sid)
             for k, v in ov.items():
                 if k.startswith("_") or k in _STATUS_OVERRIDE_KEYS or k in _DELETE_OVERRIDE_KEYS:
                     continue
@@ -1609,11 +1648,6 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
             # and any `references` set has assembled it.
             _apply_delete_overrides(e, key_sid, ov)
             applied += 1
-    dangling = sorted(s for s in delete_keys if s not in used)
-    if dangling:
-        raise SystemExit(
-            f"[curation] {len(dangling)} references_remove/fields_clear override(s) matched no entry: "
-            f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
     return applied
 
 
@@ -3130,6 +3164,7 @@ def main():
     #     the snapshot and an override-set quality_tier is respected in step 5.
     curation = _load_curation_overrides()
     status_override_keys = _check_status_overrides(curation)
+    delete_override_keys = _check_delete_overrides(curation)
     if curation:
         applied = apply_curation_overrides(surviving, curation)
         print(f"[curation] applied {applied} override(s) from {CURATION_OVERRIDES_PATH.name}")
@@ -3309,7 +3344,13 @@ def main():
         prior["source_status"] = "retained"  # carried after all sources dropped it
         # Carried verbatim, so it would bypass the pinned-ATLAS translation and
         # tactic links applied to fresh rows; apply that (and only that) here.
-        if refresh_atlas_codes(prior):
+        before = json.dumps(prior, sort_keys=True)
+        refresh_atlas_codes(prior)
+        # D139: AFTER refresh_atlas_codes, which would re-add a cleared tactic.
+        # `updated` moves on the NET change, so an add-then-clear that nets to
+        # nothing does not bump it on every build.
+        _reapply_delete_overrides_retained(prior, curation or {})
+        if json.dumps(prior, sort_keys=True) != before:
             prior["updated"] = today_str
         surviving.append(prior)
         covered_keys.update(keys)
@@ -3505,6 +3546,7 @@ def main():
     # D130-1 advisory B: after the retained-prior pass, so a decision keyed to
     # a carried-forward row counts as matched. Before any output is written.
     _check_status_overrides_matched(status_override_keys, deduped)
+    _check_delete_overrides_matched(delete_override_keys, curation or {}, deduped)
 
     # 7) Compute `generated`: today only if anything actually changed since
     #    the previous output; otherwise preserve the previous timestamp so

@@ -108,9 +108,15 @@ def test_removal_and_clear_change_the_content_snapshot():
 
 
 def test_dangling_key_refuses():
+    cur = {"CVE-9999-0000": {"references_remove": [A]}}
     with pytest.raises(SystemExit) as ei:
-        m.apply_curation_overrides([_row()], {"CVE-9999-0000": {"references_remove": [A]}})
+        m._check_delete_overrides_matched(m._check_delete_overrides(cur), cur, [_row()])
     assert "matched no entry" in str(ei.value)
+
+
+def test_key_matching_a_row_is_not_dangling():
+    cur = {SID: {"references_remove": [A]}}
+    m._check_delete_overrides_matched(m._check_delete_overrides(cur), cur, [_row()])
 
 
 def test_malformed_override_refuses_even_when_unmatched():
@@ -157,12 +163,133 @@ def test_build_aborts_when_upstream_stops_carrying_the_url(tmp_path, monkeypatch
     assert "not on the row" in str(ei.value)
 
 
-def test_build_clear_removes_field_from_output(tmp_path, monkeypatch):
-    row = _build(tmp_path, monkeypatch, [NVD], {"fields_clear": ["discovery_method"]})
-    assert "discovery_method" not in row
+# ----- field clear through the build, on a field the source really carries -----
+
+TECH = "AML.T0000"
+TAC = m._ATLAS_TECHNIQUE_TACTICS[TECH]
 
 
-def test_instruction_keys_are_not_copied_onto_the_row():
-    r = _row(discovery_method="other")
-    _apply([r], {"references_remove": [A], "fields_clear": ["discovery_method"]})
-    assert "references_remove" not in r and "fields_clear" not in r
+def _tactic_row(cve="CVE-2025-0003"):
+    return _cve_row(cve, {"mitre_atlas": [TECH], "mitre_atlas_tactics": list(TAC)})
+
+
+def _build_rows(tmp_path, monkeypatch, rows, override):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    monkeypatch.setattr(m, "ISSUE88_EXCLUDE", set())
+    (ingest / "src.json").write_text(json.dumps(rows), encoding="utf-8")
+    if override is not None:
+        (data / "curation_overrides.json").write_text(
+            json.dumps({"overrides": {"CVE-2025-0003": override}}), encoding="utf-8")
+    m.main()
+    return data, ingest
+
+
+def _by_cve(data):
+    full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    return {e["cve_ids"][0]: e for e in full}
+
+
+def test_build_clear_removes_a_field_the_source_carries(tmp_path, monkeypatch):
+    control = _by_cve(_build_rows(tmp_path / "c", monkeypatch, [_tactic_row()], None)[0])
+    assert control["CVE-2025-0003"]["mitre_atlas_tactics"], "control: the source row carries the field"
+    row = _by_cve(_build_rows(tmp_path / "o", monkeypatch, [_tactic_row()],
+                              {"fields_clear": ["mitre_atlas_tactics"]})[0])["CVE-2025-0003"]
+    assert "mitre_atlas_tactics" not in row and row["mitre_atlas"] == [TECH]
+
+
+# ----- retained rows: upstream drops a row that carries a delete override -----
+
+def _drop_upstream(data, ingest):
+    (ingest / "src.json").write_text(json.dumps([_cve_row("CVE-2025-0004")]), encoding="utf-8")
+    m.main()
+    return _by_cve(data)
+
+
+def test_retained_row_keeps_url_removed_and_build_passes(tmp_path, monkeypatch):
+    refs = [{"url": NVD}, {"url": BAD}]
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": refs})],
+                               {"references_remove": [BAD]})
+    assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+    after = _drop_upstream(data, ingest)
+    assert after["CVE-2025-0003"]["source_status"] == "retained"
+    assert _urls(after["CVE-2025-0003"]) == [NVD]
+
+
+def test_retained_row_removes_a_url_it_still_carries(tmp_path, monkeypatch):
+    # Override added after the row went retained: still-present URL is removed.
+    refs = [{"url": NVD}, {"url": BAD}]
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": refs})], None)
+    (data / "curation_overrides.json").write_text(json.dumps(
+        {"overrides": {"CVE-2025-0003": {"references_remove": [BAD]}}}), encoding="utf-8")
+    assert _urls(_drop_upstream(data, ingest)["CVE-2025-0003"]) == [NVD]
+
+
+def test_retained_row_cannot_be_emptied(tmp_path, monkeypatch):
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003", {"references": [{"url": NVD}]})], None)
+    (data / "curation_overrides.json").write_text(json.dumps(
+        {"overrides": {"CVE-2025-0003": {"references_remove": [NVD]}}}), encoding="utf-8")
+    with pytest.raises(SystemExit) as ei:
+        _drop_upstream(data, ingest)
+    assert "no references" in str(ei.value)
+
+
+def test_retained_tactics_clear_survives_refresh_atlas_codes(tmp_path, monkeypatch):
+    import datetime
+    day = {"d": datetime.date(2026, 1, 1)}
+    monkeypatch.setattr(m, "utc_today", lambda: day["d"])
+    ov = {"fields_clear": ["mitre_atlas_tactics"]}
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_tactic_row()], ov)
+    built = _by_cve(data)["CVE-2025-0003"]
+    assert "mitre_atlas_tactics" not in built
+    day["d"] = datetime.date(2026, 1, 2)
+    after = _drop_upstream(data, ingest)["CVE-2025-0003"]
+    assert after["source_status"] == "retained" and after["mitre_atlas"] == [TECH]
+    assert "mitre_atlas_tactics" not in after, "refresh_atlas_codes re-added the cleared tactics"
+    # refresh adds and the clear removes: the NET change is nothing, so a later
+    # day's build must not bump `updated` (or it would churn on every build).
+    day["d"] = datetime.date(2026, 1, 3)
+    m.main()
+    again = _by_cve(data)["CVE-2025-0003"]
+    assert after["updated"] == again["updated"] == built["updated"]
+
+
+def test_retained_discovery_method_clear(tmp_path, monkeypatch):
+    # discovery_method reaches a row only via an override, so build 1 SETS it;
+    # the override is then rewritten to clear it, and the carried prior loses it.
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0003")],
+                               {"discovery_method": "security-researcher"})
+    assert _by_cve(data)["CVE-2025-0003"]["discovery_method"] == "security-researcher"
+    (data / "curation_overrides.json").write_text(json.dumps(
+        {"overrides": {"CVE-2025-0003": {"fields_clear": ["discovery_method"]}}}), encoding="utf-8")
+    after = _drop_upstream(data, ingest)["CVE-2025-0003"]
+    assert after["source_status"] == "retained" and "discovery_method" not in after
+
+
+def test_override_matching_no_row_even_after_retention_still_refuses(tmp_path, monkeypatch):
+    with pytest.raises(SystemExit) as ei:
+        _build_rows(tmp_path, monkeypatch, [_cve_row("CVE-2025-0004")],
+                    {"references_remove": [BAD]})
+    assert "matched no entry" in str(ei.value)
+
+
+# ----- removal applies after the dedupe union of several sources -----
+
+def test_removal_applies_after_union_of_two_sources(tmp_path, monkeypatch):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    monkeypatch.setattr(m, "ISSUE88_EXCLUDE", set())
+    # Two sources, distinct source_ids, same CVE; BOTH carry BAD. The override is
+    # keyed to the first source's id, so a removal applied per source before the
+    # union would leave the second source's copy of BAD in the merged row.
+    for name, sid, extra in (("a.json", "CVE-2025-0003", NEW),
+                             ("b.json", "ALT-0003", "https://other.example.test/x")):
+        (ingest / name).write_text(json.dumps([_cve_row("CVE-2025-0003", {
+            "source_id": sid, "references": [{"url": NVD}, {"url": BAD}, {"url": extra}]})]), encoding="utf-8")
+    (data / "curation_overrides.json").write_text(json.dumps(
+        {"overrides": {"CVE-2025-0003": {"references_remove": [BAD]}}}), encoding="utf-8")
+    m.main()
+    full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    assert len(full) == 1 and set(full[0]["source_ids"]) == {"CVE-2025-0003", "ALT-0003"}
+    urls = _urls(full[0])
+    assert BAD not in urls and NEW in urls and "https://other.example.test/x" in urls
