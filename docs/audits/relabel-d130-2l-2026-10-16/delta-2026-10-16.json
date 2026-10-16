@@ -1,0 +1,694 @@
+{
+ "base": "05ff1e75",
+ "entry_count": [
+  15784,
+  15784
+ ],
+ "id_set_equal": true,
+ "envelope": {},
+ "rows": {
+  "INC-02454": {
+   "maestro_layers": [
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Biased training data — scraping without consent introduced demographic representation gaps"
+     },
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "impact",
+      "notes": "Model outputs showed measurable racial accuracy disparities"
+     },
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "blind-spot",
+      "notes": "No bias testing or compliance review before deployment"
+     }
+    ],
+    []
+   ],
+   "owasp_dsgai": [
+    [
+     "DSGAI05",
+     "DSGAI09",
+     "DSGAI12",
+     "DSGAI13",
+     "DSGAI14",
+     "DSGAI17",
+     "DSGAI21"
+    ],
+    [
+     "DSGAI09",
+     "DSGAI13",
+     "DSGAI14",
+     "DSGAI17"
+    ]
+   ],
+   "tags": [
+    [
+     "2025",
+     "bias",
+     "bipa",
+     "class-action",
+     "clearview-ai",
+     "consent",
+     "copyright",
+     "data-ownership",
+     "facial-recognition",
+     "fair-use",
+     "litigation",
+     "nyt",
+     "openai",
+     "real-world",
+     "training-data"
+    ],
+    [
+     "2025",
+     "bipa",
+     "class-action",
+     "clearview-ai",
+     "consent",
+     "facial-recognition",
+     "real-world"
+    ]
+   ]
+  },
+  "INC-02774": {
+   "attack_vector": [
+    "rce",
+    "privacy-violation"
+   ],
+   "mitre_atlas": [
+    [
+     "AML.T0049",
+     "AML.T0050"
+    ],
+    []
+   ],
+   "mitre_atlas_tactics": [
+    [
+     "AML.TA0004",
+     "AML.TA0005"
+    ],
+    []
+   ],
+   "nist_ai_rmf": [
+    [
+     "MANAGE-2.3",
+     "MEASURE-2.7"
+    ],
+    [
+     "MAP-4.1",
+     "MEASURE-2.10"
+    ]
+   ],
+   "owasp_dsgai": [
+    [
+     "DSGAI02",
+     "DSGAI11",
+     "DSGAI14",
+     "DSGAI15",
+     "DSGAI16",
+     "DSGAI21"
+    ],
+    [
+     "DSGAI02",
+     "DSGAI14",
+     "DSGAI15",
+     "DSGAI16",
+     "DSGAI21"
+    ]
+   ],
+   "tags": [
+    [
+     "2024",
+     "2025",
+     "chatgpt",
+     "consent",
+     "data-minimization",
+     "data-retention",
+     "garante",
+     "gdpr",
+     "machine-unlearning",
+     "noyb",
+     "openai",
+     "privacy",
+     "real-world",
+     "regulatory",
+     "right-to-erasure"
+    ],
+    [
+     "2025",
+     "chatgpt",
+     "garante",
+     "gdpr",
+     "openai",
+     "privacy",
+     "real-world",
+     "regulatory"
+    ]
+   ]
+  },
+  "INC-02899": {
+   "attack_vector": [
+    "auth-bypass",
+    "prompt-injection"
+   ],
+   "maestro_layers": [
+    [
+     {
+      "layer": "L4",
+      "label": "Deployment & Infrastructure",
+      "role": "origin",
+      "notes": "Default public exposure with no authentication"
+     },
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "impact",
+      "notes": "Confidential business data exfiltrated via exposed agents"
+     }
+    ],
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "impact",
+      "notes": "Confidential business data exfiltrated via exposed agents"
+     }
+    ]
+   ],
+   "mitre_atlas": [
+    [
+     "AML.T0012",
+     "AML.T0024",
+     "AML.T0048",
+     "AML.T0048.003",
+     "AML.T0051",
+     "AML.T0051.001",
+     "AML.T0053",
+     "AML.T0055",
+     "AML.T0057",
+     "AML.T0085.001"
+    ],
+    [
+     "AML.T0048",
+     "AML.T0048.003",
+     "AML.T0051",
+     "AML.T0051.001",
+     "AML.T0053",
+     "AML.T0057",
+     "AML.T0085.001"
+    ]
+   ],
+   "mitre_atlas_tactics": [
+    [
+     "AML.TA0004",
+     "AML.TA0005",
+     "AML.TA0009",
+     "AML.TA0010",
+     "AML.TA0011",
+     "AML.TA0012",
+     "AML.TA0013",
+     "AML.TA0015"
+    ],
+    [
+     "AML.TA0005",
+     "AML.TA0009",
+     "AML.TA0010",
+     "AML.TA0011",
+     "AML.TA0012",
+     "AML.TA0015"
+    ]
+   ],
+   "nist_ai_rmf": [
+    [
+     "GOVERN-1.1",
+     "GOVERN-1.4",
+     "MANAGE-2.1",
+     "MAP-3.5",
+     "MAP-4.1",
+     "MEASURE-2.10",
+     "MEASURE-2.7"
+    ],
+    [
+     "MANAGE-2.1",
+     "MAP-3.5",
+     "MEASURE-2.10",
+     "MEASURE-2.7"
+    ]
+   ],
+   "owasp_asi": [
+    [
+     "ASI01",
+     "ASI02",
+     "ASI03",
+     "ASI07",
+     "ASI09"
+    ],
+    [
+     "ASI01",
+     "ASI02",
+     "ASI09"
+    ]
+   ],
+   "tags": [
+    [
+     "agentic",
+     "atlas",
+     "authentication",
+     "case-study",
+     "copilot-studio",
+     "data-exfiltration",
+     "default-public",
+     "enterprise",
+     "prompt-injection",
+     "research",
+     "tool-misuse"
+    ],
+    [
+     "agentic",
+     "atlas",
+     "case-study",
+     "copilot-studio",
+     "data-exfiltration",
+     "enterprise",
+     "prompt-injection",
+     "research",
+     "tool-misuse"
+    ]
+   ]
+  },
+  "INC-03004": {
+   "attack_vector": [
+    "adversarial-input",
+    "jailbreak"
+   ]
+  },
+  "INC-03472": {
+   "maestro_layers": [
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training data encoded historical hiring bias (male-dominated technical roles)"
+     },
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "propagation",
+      "notes": "Model learned and amplified gender bias from training data distribution"
+     },
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "impact",
+      "notes": "Title VII violations; EEOC enforcement; class action settlements"
+     }
+    ],
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training data encoded historical hiring bias (male-dominated technical roles)"
+     },
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "propagation",
+      "notes": "Model learned and amplified gender bias from training data distribution"
+     }
+    ]
+   ]
+  },
+  "INC-04179": {
+   "attack_vector": [
+    "supply-chain",
+    "other"
+   ],
+   "maestro_layers": [
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Labeling pipeline exposed sensitive data to workers without access controls"
+     },
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "blind-spot",
+      "notes": "Third-party vendor security governance absent — no audit of annotation platform security"
+     },
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "impact",
+      "notes": "Tainted/traumatic labeling environment affects RLHF quality → model alignment"
+     }
+    ],
+    []
+   ],
+   "mitre_atlas": [
+    [
+     "AML.T0010",
+     "AML.T0010.001",
+     "AML.T0010.003",
+     "AML.T0048",
+     "AML.T0048.001",
+     "AML.T0048.003",
+     "AML.T0053",
+     "AML.T0115.001"
+    ],
+    []
+   ],
+   "mitre_atlas_tactics": [
+    [
+     "AML.TA0003",
+     "AML.TA0004",
+     "AML.TA0005",
+     "AML.TA0011",
+     "AML.TA0012",
+     "AML.TA0015"
+    ],
+    []
+   ],
+   "nist_ai_rmf": [
+    [
+     "GOVERN-3.2",
+     "GOVERN-6.1",
+     "GOVERN-6.2",
+     "MANAGE-2.4",
+     "MANAGE-4.3",
+     "MAP-3.5",
+     "MAP-4.1",
+     "MEASURE-2.5",
+     "MEASURE-2.8"
+    ],
+    []
+   ],
+   "owasp_asi": [
+    [
+     "ASI09"
+    ],
+    []
+   ],
+   "owasp_dsgai": [
+    [
+     "DSGAI13",
+     "DSGAI14",
+     "DSGAI16",
+     "DSGAI19"
+    ],
+    []
+   ],
+   "owasp_llm": [
+    [
+     "LLM03",
+     "LLM04",
+     "LLM07"
+    ],
+    []
+   ],
+   "severity": [
+    "Critical",
+    "High"
+   ],
+   "tags": [
+    [
+     "2025",
+     "ai-companion",
+     "annotation",
+     "character-ai",
+     "data-labeling",
+     "engagement-optimization",
+     "minors",
+     "privacy",
+     "real-world",
+     "replika",
+     "rlhf",
+     "self-harm",
+     "supply-chain",
+     "third-party",
+     "trust-exploitation",
+     "worker-exploitation"
+    ],
+    [
+     "annotation",
+     "data-labeling",
+     "real-world",
+     "supply-chain",
+     "third-party",
+     "worker-exploitation"
+    ]
+   ]
+  },
+  "INC-04221": {
+   "maestro_layers": [
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training dataset (LAION-5B) contained CSAM — data operations contamination"
+     },
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "impact",
+      "notes": "Model learned to generate CSAM from contaminated training data"
+     },
+     {
+      "layer": "L5",
+      "label": "Evaluation & Observability",
+      "role": "blind-spot",
+      "notes": "Pre-training data screening insufficient to detect all CSAM"
+     },
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "impact",
+      "notes": "Legal liability for synthetic CSAM identical to real CSAM"
+     }
+    ],
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training dataset (LAION-5B) contained CSAM — data operations contamination"
+     },
+     {
+      "layer": "L5",
+      "label": "Evaluation & Observability",
+      "role": "blind-spot",
+      "notes": "Pre-training data screening insufficient to detect all CSAM"
+     }
+    ]
+   ],
+   "tags": [
+    [
+     "stability-ai",
+     "csam",
+     "synthetic-data",
+     "training-data",
+     "laion",
+     "content-safety",
+     "legal-liability",
+     "real-world",
+     "2024"
+    ],
+    [
+     "stability-ai",
+     "csam",
+     "training-data",
+     "laion",
+     "content-safety",
+     "real-world",
+     "2024"
+    ]
+   ]
+  },
+  "INC-04653": {
+   "category": [
+    "research-demonstrated",
+    "real-world"
+   ],
+   "maestro_layers": [
+    [
+     {
+      "layer": "L1",
+      "label": "Foundation Models",
+      "role": "origin",
+      "notes": "Model memorised and reproduced training data including secrets — insufficient data governance during training"
+     },
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training corpus included repositories with embedded credentials; no secrets scanning before training ingestion"
+     },
+     {
+      "layer": "L5",
+      "label": "Evaluation & Observability",
+      "role": "blind-spot",
+      "notes": "No memorisation detection or output scanning for secrets in generated suggestions"
+     }
+    ],
+    []
+   ],
+   "mitre_atlas": [
+    [
+     "AML.T0024",
+     "AML.T0056",
+     "AML.T0057",
+     "AML.T0067"
+    ],
+    []
+   ],
+   "mitre_atlas_tactics": [
+    [
+     "AML.TA0007",
+     "AML.TA0010"
+    ],
+    []
+   ],
+   "nist_ai_rmf": [
+    [
+     "GOVERN-1.1",
+     "MEASURE-2.10",
+     "MEASURE-2.7"
+    ],
+    []
+   ],
+   "owasp_dsgai": [
+    [
+     "DSGAI01",
+     "DSGAI07"
+    ],
+    [
+     "DSGAI01"
+    ]
+   ],
+   "owasp_llm": [
+    [
+     "LLM02",
+     "LLM08"
+    ],
+    []
+   ],
+   "tags": [
+    [
+     "memorisation",
+     "training-data",
+     "secrets",
+     "copyright",
+     "code-generation"
+    ],
+    [
+     "memorisation",
+     "training-data",
+     "copyright",
+     "code-generation"
+    ]
+   ]
+  },
+  "INC-04955": {
+   "attack_vector": [
+    "rce",
+    "privacy-violation"
+   ],
+   "maestro_layers": [
+    [
+     {
+      "layer": "L2",
+      "label": "Data Operations",
+      "role": "origin",
+      "notes": "Training and inference data transferred across jurisdictions without adequate safeguards"
+     },
+     {
+      "layer": "L4",
+      "label": "Deployment & Infrastructure",
+      "role": "impact",
+      "notes": "Infrastructure must be relocated — EUR 12B Project Clover"
+     },
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "origin",
+      "notes": "GDPR non-compliance — EUR 345M fine + structural remedies"
+     }
+    ],
+    [
+     {
+      "layer": "L6",
+      "label": "Security & Compliance",
+      "role": "origin",
+      "notes": "GDPR non-compliance — EUR 345M fine + structural remedies"
+     }
+    ]
+   ],
+   "mitre_atlas": [
+    [
+     "AML.T0049",
+     "AML.T0050"
+    ],
+    []
+   ],
+   "mitre_atlas_tactics": [
+    [
+     "AML.TA0004",
+     "AML.TA0005"
+    ],
+    []
+   ],
+   "nist_ai_rmf": [
+    [
+     "MANAGE-2.3",
+     "MEASURE-2.7"
+    ],
+    [
+     "MAP-4.1",
+     "MEASURE-2.10"
+    ]
+   ],
+   "owasp_dsgai": [
+    [
+     "DSGAI14",
+     "DSGAI16",
+     "DSGAI20",
+     "DSGAI21"
+    ],
+    [
+     "DSGAI14",
+     "DSGAI16",
+     "DSGAI21"
+    ]
+   ],
+   "tags": [
+    [
+     "tiktok",
+     "data-localization",
+     "gdpr",
+     "project-clover",
+     "children-data",
+     "cross-border",
+     "real-world"
+    ],
+    [
+     "tiktok",
+     "gdpr",
+     "children-data",
+     "real-world"
+    ]
+   ]
+  }
+ },
+ "stats_changed": {}
+}
