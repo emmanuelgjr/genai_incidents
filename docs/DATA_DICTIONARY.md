@@ -163,6 +163,23 @@ built it must treat a retired source as expected: the live counter stamps AIRI
 `retired` over `stale` each run, D108, while the registry keeps `stale`.) The counter itself is never the thing that
 ships.
 
+## Curation-override keys that delete (D139)
+
+`data/curation_overrides.json` entries normally *set* a field. Two keys remove
+instead; both are instructions, never copied onto the row, re-applied on every
+build, and checked up front even when their key matches no row. Any failure
+aborts the build (nothing is written).
+
+| Key | Effect | The build fails when |
+|---|---|---|
+| `"references_remove": ["<url>", ...]` | Drops those URLs from the row's references after they are assembled from all sources; remaining references keep their order and upstream additions survive. Matching is **exact string** equality on `url` (no trailing-slash, case or scheme folding: a near-miss is a different reference); every occurrence is removed. | a listed URL is not on the row (upstream changed it, or the removal never applied); the row would be left with no reference; the override also carries `references`; the list is empty, has duplicates, or has a non-string or whitespace-padded item; its key is no entry's `source_id` |
+| `"fields_clear": ["<field>", ...]` | Removes the field from the row. Clearing an already-absent field is a no-op (the goal state holds, and the override stays retirable once the value's own source goes away). A JSON `null` value is **not** a clear. | a field is not in the allowlist (`discovery_method`, `reversibility_class`, `mitre_atlas_tactics`: optional labels that are in the content-field set, so a change bumps `updated`); the same override also sets that field; the list is empty or has duplicates; its key is no entry's `source_id` |
+
+`id`, `status`, `quality_tier`, required schema fields and `references` can never
+be cleared: demote through the `quality_tier` override, use `references_remove`
+for references. `maestro_layers` is not clearable because it is not a content
+field (a change would not bump `updated`).
+
 ## Reproducing the landmark count
 
 README tells readers to cite the **landmark** count rather than the full

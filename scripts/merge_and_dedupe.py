@@ -1487,16 +1487,113 @@ def _apply_unverified_override(e: dict, curation: dict[str, dict]) -> bool:
     return True
 
 
+# D139(a)/(b): two override keys that DELETE rather than set. Both are
+# instructions, not field values, so apply_curation_overrides never copies
+# them onto the row.
+#   references_remove: ["<url>", ...]  drop these URLs from the row's assembled
+#       references, every build, leaving upstream additions intact (a
+#       `references` override would instead freeze the whole list).
+#   fields_clear: ["<field>", ...]     remove these fields from the row.
+# Clearing is a named list, NOT JSON null: null is a legal value for some
+# fields and would make "set to nothing" indistinguishable from a typo.
+_REFS_REMOVE_KEY = "references_remove"
+_CLEAR_KEY = "fields_clear"
+_DELETE_OVERRIDE_KEYS = frozenset({_REFS_REMOVE_KEY, _CLEAR_KEY})
+# Optional, non-identity label fields. Required schema fields, `id`, `status`,
+# `quality_tier` (demote through the quality_tier override) and `references`
+# (use references_remove) are deliberately absent. maestro_layers is absent too:
+# it is not in _CONTENT_FIELDS, so clearing it would not bump `updated`.
+_CLEARABLE_FIELDS = frozenset({
+    "discovery_method", "reversibility_class", "mitre_atlas_tactics",
+})
+
+
+def _check_delete_overrides(curation: dict[str, dict]) -> list[str]:
+    """Shape-check EVERY references_remove / fields_clear override up front,
+    whether or not its key matches a row, and return the keys that carry one."""
+    keys = []
+    for sid, ov in curation.items():
+        if not isinstance(ov, dict) or not (_DELETE_OVERRIDE_KEYS & ov.keys()):
+            continue
+        problems = []
+        if _REFS_REMOVE_KEY in ov:
+            urls = ov[_REFS_REMOVE_KEY]
+            if (not isinstance(urls, list) or not urls
+                    or not all(isinstance(u, str) and u.strip() and u == u.strip() for u in urls)
+                    or len(set(urls)) != len(urls)):
+                problems.append(f"{_REFS_REMOVE_KEY} must be a non-empty list of distinct, "
+                                f"URL strings with no surrounding whitespace; got {urls!r}")
+            if "references" in ov:
+                problems.append(f"{_REFS_REMOVE_KEY} and `references` cannot be combined "
+                                "(one edits the list, the other replaces it)")
+        if _CLEAR_KEY in ov:
+            fields = ov[_CLEAR_KEY]
+            if (not isinstance(fields, list) or not fields
+                    or not all(isinstance(f, str) for f in fields)
+                    or len(set(fields)) != len(fields)):
+                problems.append(f"{_CLEAR_KEY} must be a non-empty list of distinct field names; got {fields!r}")
+            else:
+                bad = sorted(set(fields) - _CLEARABLE_FIELDS)
+                if bad:
+                    problems.append(f"{_CLEAR_KEY} may only name {sorted(_CLEARABLE_FIELDS)}; got {bad}")
+                both = sorted(set(fields) & ov.keys())
+                if both:
+                    problems.append(f"{_CLEAR_KEY} names {both}, which the same override also sets")
+        if problems:
+            raise SystemExit(f"[curation] override {sid!r}: " + "; ".join(problems) + ". " + abort_sentence())
+        keys.append(sid)
+    return keys
+
+
+def _apply_delete_overrides(e: dict, key_sid: str, ov: dict) -> None:
+    """Apply one row's references_remove / fields_clear (shape already checked).
+
+    references_remove: exact string match on `url` (no case, trailing-slash or
+    scheme folding: a near-miss URL is a different reference, and a listed URL
+    that is absent means the upstream URL changed or the decision was never
+    applied, so the build fails closed). Every occurrence is removed; surviving
+    references keep their order. A row must keep at least one reference.
+
+    fields_clear: removing an already-absent field is a no-op. The goal state
+    (field absent) holds, and failing would make the override impossible to
+    retire after the value's own source (often an earlier override) goes away."""
+    urls = ov.get(_REFS_REMOVE_KEY)
+    if urls:
+        refs = e.get("references") or []
+        have = {r.get("url") for r in refs if isinstance(r, dict)}
+        missing = [u for u in urls if u not in have]
+        if missing:
+            raise SystemExit(
+                f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} lists "
+                f"{len(missing)} URL(s) not on the row: {missing}. The upstream URL changed or the "
+                "removal never applied; re-check the row and fix the override. " + abort_sentence())
+        kept = [r for r in refs if not (isinstance(r, dict) and r.get("url") in urls)]
+        if not kept:
+            raise SystemExit(
+                f"[curation] override {key_sid!r} ({e.get('id')}): {_REFS_REMOVE_KEY} would leave the "
+                "row with no references; a row must keep at least one. " + abort_sentence())
+        e["references"] = kept
+    for f in ov.get(_CLEAR_KEY) or []:
+        e.pop(f, None)
+
+
 def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -> int:
     """Step 4d: apply durable curation overrides, keyed by ANY member
-    source_id. Returns the number of entries touched."""
+    source_id. Returns the number of entries touched.
+
+    Every references_remove / fields_clear override must land on a row; one
+    that matches none (or is shadowed by an earlier-listed key on every row it
+    matches) fails the build closed."""
+    delete_keys = _check_delete_overrides(curation)  # before any row is touched
     applied = 0
+    used: set[str] = set()
     for e in surviving:
         hit = next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
         if hit:
             key_sid, ov = hit
+            used.add(key_sid)
             for k, v in ov.items():
-                if k.startswith("_") or k in _STATUS_OVERRIDE_KEYS:
+                if k.startswith("_") or k in _STATUS_OVERRIDE_KEYS or k in _DELETE_OVERRIDE_KEYS:
                     continue
                 # WS4-T12 (D42): a provenance label describes the shipped
                 # TEXT, so apply it only while the entry's description is
@@ -1508,7 +1605,15 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
                 if k in ("description_provenance", "description_source") and key_sid not in (e.get("description") or ""):
                     continue
                 e[k] = v
+            # After the set-keys, so removal sees the row as every source
+            # and any `references` set has assembled it.
+            _apply_delete_overrides(e, key_sid, ov)
             applied += 1
+    dangling = sorted(s for s in delete_keys if s not in used)
+    if dangling:
+        raise SystemExit(
+            f"[curation] {len(dangling)} references_remove/fields_clear override(s) matched no entry: "
+            f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
     return applied
 
 

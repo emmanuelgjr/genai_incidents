@@ -7,6 +7,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Added - curation-override mechanisms `references_remove` and `fields_clear` (D139(a)/(b), mechanisms only)
+
+- `data/curation_overrides.json` entries can now remove a named reference URL (exact match, upstream additions survive, order kept) or clear an optional label field (`discovery_method`, `reversibility_class`, `mitre_atlas_tactics`). Both fail the build closed on a stale or malformed request. No data row uses either yet and no output changes; see `docs/DATA_DICTIONARY.md`.
+
 ### Changed - labels re-derived on the 11 rows D130-2 corrected (D130-2L, ruling D139(c)): 9 rows relabelled
 
 - **What moved.** The D130-2 rows kept labels written for their old text. They are now recomputed by the build's own label code on the corrected text and sources, as `data/curation_overrides.json` entries (agent-suggested, pending user re-review). 9 rows change: INC-02454, INC-02774, INC-02899, INC-03004, INC-03472, INC-04179, INC-04221, INC-04653, INC-04955. INC-03955 and INC-03972 recompute to their existing labels.
