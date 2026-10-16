@@ -83,6 +83,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔨 D130-2L — relabel the 11 re-sourced rows (WS2): **DISPATCHED 2026-10-16** to label-scientist on `ws2/d130-2l-relabel-2026-10-16` (worktree `C:/repos/gi-wt-d130-2l`, base `05ff1e75`). Find each label's origin (seed vs classifier), re-derive deterministically where possible, apply through curation overrides; delta only on the 11 rows' label fields.
+- **D130-2 post-merge [R] on main `05ff1e75`:** validate rc 0; drift clean; unverified/integrity/landmark tests `90 passed, 1 xfailed`; stats 15745 / 29 retracted / 10 unverified / 2025 landmark; porcelain empty; pushed `3bc0e99a..05ff1e75`, ls-remote = local. Standing real-corpus test running on main (first run with real unverified rows).
+- **docs-warden dispatched** on the D130-2 merge.
+- **USER RE-REVIEW PACKAGE pending (D130(c)):** the 21 agent-suggested changes in docs/audits/reference-audit-2026-10-15/ + CORRECTIONS.md; include INC-02454's corpus pin.
+
 ### ✅ D130-2: **PASS (scoped re-gate, gate-d130-2 on `56c2f9b0`), MERGED to main 2026-10-16 (`--no-ff`, HEAD^2 = `56c2f9b0`).** First real data change under D130.
 **Verdict, in the gate's words:** "VERDICT: PASS (D130-2 re-gate, commit 56c2f9b0). DEFECTS: none. All five bounce-#1 defects are closed, checked by my own route … I did not run their delta.py or verify.py."
 **Outcome (30 legacy R1∪R2 rows):** fixed 11 (INC-02454, 02774, 02899, 03004, 03472, 03955, 03972, 04179, 04221, 04653, 04955; curated 4 / reviewed 7; demoted to auto) · unverified 10 (INC-02353, 02703, 02922, 03247, 03444, 03447, 03491, 03570, 03810, 04310; all reviewed) · unchanged 9 (INC-04142, 04067, 08181; deferred INC-01015, 01291, 01589, 02471, 02871, 04207 → D139). **Description changed: the 11 fixed rows.**
