@@ -1548,56 +1548,114 @@ def _check_delete_overrides(curation: dict[str, dict]) -> list[str]:
 OVERRIDE_BASELINE_ENV = "GENAI_OVERRIDE_BASELINE"
 
 
-def _head_removed_urls(key_sid: str) -> frozenset:
-    """The ``references_remove`` URLs the COMMITTED overrides at git HEAD list
-    under this same key (D140). Per key and per URL: re-keying a URL makes it
-    new again. Empty (everything is new, i.e. strict) when the overrides file is
-    not in HEAD, there is no git metadata, or the key/field is absent there.
+_BASELINE_CACHE: dict = {}
 
-    The baseline is HEAD for the same reason as D71's (`_load_gate_baseline`):
-    what is published, not the working tree. A shallow or unreadable repository
-    fails closed exactly as D71 does, because "not in HEAD" cannot then be told
-    from "HEAD unreadable" and would silently weaken the check.
 
-    The baseline revision is ``$GENAI_OVERRIDE_BASELINE`` when set, else HEAD.
-    Locally HEAD is the last commit, so an override you have just added
-    (uncommitted) is NEW and strict. The weekly refresh builds on main BEFORE its
-    commit, so HEAD is the merged state. CI checks out a commit that already
-    contains the override, so validate.yml sets the variable to HEAD^1 (the PR
-    base / previous main); with HEAD there the rule would be vacuous. A set
-    variable that does not resolve fails closed, never falls back to HEAD."""
-    root = CURATION_OVERRIDES_PATH.parent.parent
-    rel = CURATION_OVERRIDES_PATH.relative_to(root).as_posix()
+def _override_root() -> Path:
+    return CURATION_OVERRIDES_PATH.parent.parent
+
+
+def _resolve_override_baseline() -> str | None:
+    """The baseline revision for the D140/D141 retained-row check, resolved
+    EAGERLY on every build (main() calls this before step 4d), so a bad
+    ``$GENAI_OVERRIDE_BASELINE`` fails closed even on a corpus with no retained
+    row to check. Returns None only when the variable is unset and there is no
+    git metadata (everything is then new: strict); otherwise the rev, HEAD by
+    default. A SET variable that is empty, does not resolve to a commit, or has
+    no git metadata aborts with ``[FATAL] D140``; it never falls back to HEAD."""
+    root = _override_root()
     rev = os.environ.get(OVERRIDE_BASELINE_ENV)
-    if rev is not None:
-        ok = (root / ".git").exists() and _git(
-            root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}").returncode == 0
-        if not ok:
-            raise SystemExit(
-                f"[FATAL] D140: {OVERRIDE_BASELINE_ENV}={rev!r} does not resolve to a commit "
-                "(or there is no git metadata), so the override baseline cannot be read. Unset it "
-                "to use HEAD, or fix the revision. " + abort_sentence())
-    elif not (root / ".git").exists():
-        return frozenset()
-    rev = rev if rev is not None else "HEAD"
+    if rev is None:
+        return "HEAD" if (root / ".git").exists() else None
+    ok = (root / ".git").exists() and _git(
+        root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}").returncode == 0
+    if not ok:
+        raise SystemExit(
+            f"[FATAL] D140: {OVERRIDE_BASELINE_ENV}={rev!r} does not resolve to a commit "
+            "(or there is no git metadata), so the override baseline cannot be read. Unset it "
+            "to use HEAD, or fix the revision. " + abort_sentence())
+    return rev
+
+
+def _baseline_blob(rel: str) -> bytes | None:
+    """``<baseline>:<rel>``, or None when the file is not in the baseline (or
+    there is no baseline). A shallow or unreadable repository fails closed as
+    D71 does: "not in the baseline" cannot then be told from "unreadable"."""
+    rev = _resolve_override_baseline_cached()
+    if rev is None:
+        return None
+    root = _override_root()
     shown = _git(root, "show", f"{rev}:{rel}")
-    if shown.returncode != 0:
-        shallow = _git(root, "rev-parse", "--is-shallow-repository")
-        if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
-            raise SystemExit(
-                f"[FATAL] D140: git cannot show {rev}:{rel} in a shallow (or unreadable) repository, "
-                "so a references_remove override on a retained row cannot be checked against what is "
-                "committed. " + abort_sentence())
-        return frozenset()  # complete history, file not in HEAD: everything is new
+    if shown.returncode == 0:
+        return shown.stdout
+    shallow = _git(root, "rev-parse", "--is-shallow-repository")
+    if shallow.returncode != 0 or shallow.stdout.strip() != b"false":
+        raise SystemExit(
+            f"[FATAL] D140: git cannot show {rev}:{rel} in a shallow (or unreadable) repository, "
+            "so a references_remove override on a retained row cannot be checked against what is "
+            "committed. " + abort_sentence())
+    return None  # complete history, file not in the baseline
+
+
+def _resolve_override_baseline_cached_reset() -> None:
+    """Eager, once per build: resolve (and so validate) the baseline revision
+    whether or not any retained row will need it."""
+    _BASELINE_CACHE.clear()
+    _BASELINE_CACHE["rev"] = _resolve_override_baseline()
+
+
+def _resolve_override_baseline_cached() -> str | None:
+    if "rev" not in _BASELINE_CACHE:
+        _BASELINE_CACHE["rev"] = _resolve_override_baseline()
+    return _BASELINE_CACHE["rev"]
+
+
+def _baseline_json(rel: str):
+    key = ("json", rel)
+    if key not in _BASELINE_CACHE:
+        raw = _baseline_blob(rel)
+        doc = None
+        if raw is not None:
+            try:
+                doc = json.loads(raw.decode("utf-8"))
+            except (ValueError, UnicodeDecodeError) as exc:
+                raise SystemExit(
+                    f"[FATAL] D140: {_BASELINE_CACHE.get('rev')}:{rel} is unparseable "
+                    f"({type(exc).__name__}); refusing to build. " + abort_sentence()) from exc
+        _BASELINE_CACHE[key] = doc
+    return _BASELINE_CACHE[key]
+
+
+def _baseline_removed_urls(key_sid: str) -> frozenset:
+    """(b) The ``references_remove`` URLs the baseline's committed overrides list
+    under this same key. Per key and per URL: re-keying makes a URL new again."""
+    rel = CURATION_OVERRIDES_PATH.relative_to(_override_root()).as_posix()
     try:
-        urls = json.loads(shown.stdout.decode("utf-8"))["overrides"][key_sid]["references_remove"]
+        urls = _baseline_json(rel)["overrides"][key_sid]["references_remove"]
         return frozenset(u for u in urls if isinstance(u, str))
     except (KeyError, TypeError):
         return frozenset()
-    except (ValueError, UnicodeDecodeError) as exc:
-        raise SystemExit(
-            f"[FATAL] D140: {rev}:{rel} is unparseable ({type(exc).__name__}); refusing to build. "
-            + abort_sentence()) from exc
+
+
+def _baseline_row_urls(row_id) -> frozenset:
+    """(a) The reference URLs this row carries in the baseline's
+    data/incidents.json (the published rows), keyed by the row's `id`. Ids are
+    stable and a retained prior is carried verbatim under its published id, so
+    the id identifies the same row; source_ids can be re-keyed by a merge. The
+    large file is read and indexed once per build, and only when a retained row
+    has a missing listed URL. A row absent from the baseline gives no URLs."""
+    key = ("rows",)
+    if key not in _BASELINE_CACHE:
+        rel = INCIDENTS_BASELINE_REL
+        doc = _baseline_json(rel)
+        rows = doc.get("incidents") if isinstance(doc, dict) else None
+        _BASELINE_CACHE[key] = {
+            r.get("id"): frozenset(x.get("url") for x in (r.get("references") or []) if isinstance(x, dict))
+            for r in (rows or []) if isinstance(r, dict)}
+    return _BASELINE_CACHE[key].get(row_id, frozenset())
+
+
+INCIDENTS_BASELINE_REL = "data/incidents.json"
 
 
 def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = False) -> None:
@@ -1609,11 +1667,13 @@ def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = Fa
     one reference.
 
     A listed URL that is not on the row aborts the build, with one exception
-    (D140). On a ``retained`` prior (carried verbatim by step 6c, published with
-    the removal already applied) a URL that the committed overrides at HEAD
-    already list under the same key is accepted as removed earlier. A URL NEW
-    since HEAD must be present, retained or not: otherwise a typo added while
-    the row is retained would pass forever.
+    (D141). On a ``retained`` prior (carried verbatim by step 6c from the
+    working-tree data/incidents.json, so a removal made by an earlier build is
+    already in it) a missing URL is accepted only if (a) the same row (by id)
+    carries it in <baseline>:data/incidents.json, i.e. this change removes it, or
+    (b) <baseline>:data/curation_overrides.json already lists it under the same
+    key, i.e. it was removed earlier. Otherwise (a typo, a URL that was never
+    there) it aborts, so such a mistake cannot pass forever.
 
     fields_clear: removing an already-absent field is a no-op. The goal state
     (field absent) holds, and failing would make the override impossible to
@@ -1624,13 +1684,15 @@ def _apply_delete_overrides(e: dict, key_sid: str, ov: dict, retained: bool = Fa
         have = {r.get("url") for r in refs if isinstance(r, dict)}
         missing = [u for u in urls if u not in have]
         if missing and retained:
-            missing = [u for u in missing if u not in _head_removed_urls(key_sid)]
+            on_row = _baseline_row_urls(e.get("id"))
+            earlier = _baseline_removed_urls(key_sid)
+            missing = [u for u in missing if u not in on_row and u not in earlier]
         if missing:
             raise SystemExit(
                 f"[curation] override {key_sid!r} (row {e.get('id') or e.get('source_ids')}"
                 f"{', retained' if retained else ''}): {_REFS_REMOVE_KEY} lists "
                 f"{len(missing)} URL(s) not on the row: {missing}. The upstream URL changed, the URL is "
-                "mistyped, or (retained row) it was never in the committed overrides; re-check the row and "
+                "mistyped, or (retained row) it is on the row in neither the baseline data nor the baseline overrides; re-check the row and "
                 "fix the override. " + abort_sentence())
         kept = [r for r in refs if not (isinstance(r, dict) and r.get("url") in urls)]
         if not kept:
@@ -3217,6 +3279,7 @@ def main():
     #     before history stamping, so overridden content fields are part of
     #     the snapshot and an override-set quality_tier is respected in step 5.
     curation = _load_curation_overrides()
+    _resolve_override_baseline_cached_reset()
     status_override_keys = _check_status_overrides(curation)
     delete_override_keys = _check_delete_overrides(curation)
     if curation:

@@ -36,13 +36,28 @@ jobs:
         run: pytest tests -q
 
       - name: Re-merge from ingest sources
-        # D140: the checkout already contains any override this PR/push adds, so
-        # HEAD as the baseline would make the retained-row URL check vacuous.
-        # HEAD^1 is the PR base on the pull_request merge commit and the previous
-        # tip of main on a push (both parents are present: fetch-depth 0).
+        # D140/D141: the checkout already contains any override this change adds, so
+        # the baseline for the retained-row URL check must be the state BEFORE it:
+        # the PR base (HEAD^1 of the pull_request merge commit), or for a push the
+        # previous tip of main (github.event.before; HEAD^1 would be wrong for a
+        # multi-commit fast-forward push). A new-branch push (all-zero SHA) or a
+        # force-push whose old tip is gone from the clone falls back to HEAD^1
+        # with a visible warning; any other unresolvable value fails the build
+        # inside merge_and_dedupe.py.
         env:
-          GENAI_OVERRIDE_BASELINE: HEAD^1
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
         run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="HEAD^1"
+          else
+            base="$PUSH_BEFORE"
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]                || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+              echo "::warning::push baseline '${base}' is not a commit in this clone (new branch or force-push); falling back to HEAD^1 for the override baseline"
+              base="HEAD^1"
+            fi
+          fi
+          export GENAI_OVERRIDE_BASELINE="$base"
           python scripts/parse_existing.py
           python scripts/merge_and_dedupe.py
 

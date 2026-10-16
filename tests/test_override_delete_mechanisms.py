@@ -11,6 +11,11 @@ import merge_and_dedupe as m
 from tests.test_cve_rejections import _cve_row
 from tests.test_merge_and_dedupe import _setup_tmp_repo
 
+@pytest.fixture(autouse=True)
+def _no_ambient_baseline(monkeypatch):
+    monkeypatch.delenv(m.OVERRIDE_BASELINE_ENV, raising=False)
+
+
 A, B, C, D = (f"https://example.test/{x}" for x in "abcd")
 SID = "CVE-2025-0001"
 
@@ -379,3 +384,134 @@ def test_baseline_set_without_git_fails_closed(tmp_path, monkeypatch):
     with pytest.raises(SystemExit) as ei:
         _drop_upstream(data, ingest)
     assert "does not resolve" in str(ei.value)
+
+
+# ----- D141: a legitimate retained removal; PR / squash / ff-push topologies; eager baseline -----
+
+FILES = ("data/curation_overrides.json", "data/incidents.json")
+
+
+def _commit_state(tmp_path, init=False):
+    _git_commit(tmp_path, *FILES, init=init)
+
+
+def _legit_removal_repo(tmp_path, monkeypatch):
+    """base = published data carrying BAD, no override. Returns (data, ingest)."""
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    assert BAD in _urls(_by_cve(data)["CVE-2025-0003"])
+    _write_overrides(data, {"_note": "base"})
+    _commit_state(tmp_path, init=True)
+    return data, ingest
+
+
+def test_legit_retained_removal_passes_before_and_after_commit(tmp_path, monkeypatch):
+    data, ingest = _legit_removal_repo(tmp_path, monkeypatch)
+    _write_overrides(data, {"references_remove": [BAD]})
+    first = _drop_upstream(data, ingest)["CVE-2025-0003"]
+    assert first["source_status"] == "retained" and _urls(first) == [NVD]
+    # build 2 BEFORE commit: the prior (working tree) no longer has BAD; HEAD's data does -> (a)
+    m.main()
+    assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+    # after commit: HEAD data lacks BAD; HEAD overrides list it -> (b)
+    _commit_state(tmp_path)
+    m.main()
+    assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+
+
+def test_typo_on_retained_row_still_aborts_with_data_baseline(tmp_path, monkeypatch):
+    data, ingest = _legit_removal_repo(tmp_path, monkeypatch)
+    _write_overrides(data, {"references_remove": ["https://bad.example.test/hmoe"]})
+    with pytest.raises(SystemExit):
+        _drop_upstream(data, ingest)
+
+
+def _merge_topology(tmp_path, monkeypatch, base_has_url, urls_in_override):
+    """base commit (data with/without BAD, no override) -> 'merge' commit (override
+    added, data without BAD). Returns (data, ingest)."""
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
+    if not base_has_url:
+        # the published base data does not carry BAD either
+        full = json.loads((data / "incidents.json").read_text(encoding="utf-8"))
+        for e in full["incidents"]:
+            e["references"] = [r for r in e["references"] if r["url"] != BAD]
+        (data / "incidents.json").write_text(json.dumps(full), encoding="utf-8")
+    _write_overrides(data, {"_note": "base"})
+    _commit_state(tmp_path, init=True)
+    _write_overrides(data, {"references_remove": urls_in_override})
+    return data, ingest
+
+
+def _merge_commit_then_build(data, ingest, tmp_path, monkeypatch, baseline):
+    (ingest / "src.json").write_text(json.dumps([_cve_row("CVE-2025-0004")]), encoding="utf-8")
+    m.main()                      # the author's build; row goes retained, removal applied
+    _commit_state(tmp_path)       # the "merge" commit
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, baseline)
+    m.main()                      # CI re-merge on the merge checkout
+
+
+def test_pr_merge_topology_base_data_has_url_passes(tmp_path, monkeypatch):
+    data, ingest = _merge_topology(tmp_path, monkeypatch, True, [BAD])
+    _merge_commit_then_build(data, ingest, tmp_path, monkeypatch, "HEAD^1")
+    assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+
+
+def test_pr_merge_topology_base_data_lacks_url_aborts(tmp_path, monkeypatch):
+    data, ingest = _merge_topology(tmp_path, monkeypatch, False, [BAD])
+    (ingest / "src.json").write_text(json.dumps([_cve_row("CVE-2025-0004")]), encoding="utf-8")
+    with pytest.raises(SystemExit) as ei:
+        m.main()   # BAD is on neither the row, the base data, nor the base overrides
+    assert "not on the row" in str(ei.value)
+
+
+def test_squash_push_baseline_is_head_parent(tmp_path, monkeypatch):
+    # a squash push is the same shape as the PR merge commit: one commit, HEAD^1 = old main
+    data, ingest = _merge_topology(tmp_path, monkeypatch, True, [BAD])
+    _merge_commit_then_build(data, ingest, tmp_path, monkeypatch, "HEAD^1")
+    assert _urls(_by_cve(data)["CVE-2025-0003"]) == [NVD]
+
+
+def test_multi_commit_ff_push_needs_event_before(tmp_path, monkeypatch):
+    # old main tip c1; push = c2 (override, with a TYPO) + c3 (board commit).
+    # HEAD^1 = c2 already lists the typo: vacuous. github.event.before = c1: strict.
+    data, ingest = _merge_topology(tmp_path, monkeypatch, True, ["https://bad.example.test/hmoe"])
+    c1 = _rev_parse(tmp_path, "HEAD")
+    (ingest / "src.json").write_text(json.dumps([_cve_row("CVE-2025-0004")]), encoding="utf-8")
+    _git_commit(tmp_path, *FILES, init=False)          # c2: override committed
+    (tmp_path / "board.txt").write_text("b", encoding="utf-8")
+    _git_commit(tmp_path, "board.txt", init=False)     # c3
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, "HEAD^1")
+    m.main()                                           # vacuous: c2 already has the typo
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, c1)
+    with pytest.raises(SystemExit):
+        m.main()
+
+
+@pytest.mark.parametrize("bad", ["nope", ""])
+def test_baseline_is_resolved_eagerly_with_no_retained_case(tmp_path, monkeypatch, bad):
+    data, ingest = _two_refs_build(tmp_path, monkeypatch, None)  # no override, no retained row
+    _write_overrides(data, {"_note": "x"})
+    _git_commit(tmp_path, *FILES)
+    monkeypatch.setenv(m.OVERRIDE_BASELINE_ENV, bad)
+    with pytest.raises(SystemExit) as ei:
+        m.main()
+    assert "D140" in str(ei.value) and "does not resolve" in str(ei.value)
+
+
+def test_baseline_url_on_a_different_row_does_not_count(tmp_path, monkeypatch):
+    # BAD sits on row 0005 in the baseline data but never on row 0003: keyed by id.
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    data, ingest = _setup_tmp_repo(tmp_path, monkeypatch)
+    monkeypatch.setattr(m, "ISSUE88_EXCLUDE", set())
+    (ingest / "src.json").write_text(json.dumps([
+        _cve_row("CVE-2025-0003", {"references": [{"url": NVD}]}),
+        _cve_row("CVE-2025-0005", {"references": [{"url": "https://nvd.nist.gov/vuln/detail/CVE-2025-0005"}, {"url": BAD}]}),
+    ]), encoding="utf-8")
+    _write_overrides(data, {"_note": "base"}, key="CVE-2025-0099")
+    m.main()
+    _git_commit(tmp_path, *FILES)
+    _write_overrides(data, {"references_remove": [BAD]})
+    (ingest / "src.json").write_text(json.dumps([
+        _cve_row("CVE-2025-0005", {"references": [{"url": "https://nvd.nist.gov/vuln/detail/CVE-2025-0005"}, {"url": BAD}]}),
+    ]), encoding="utf-8")
+    with pytest.raises(SystemExit):
+        m.main()
