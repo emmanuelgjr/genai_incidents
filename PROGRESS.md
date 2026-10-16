@@ -83,6 +83,10 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### 🔍 D139-M REPORTED `c7ec421a` (2026-10-16) — gate-d139m dispatched
+- Specialist (testimony): `references_remove` (exact URL, fail-closed on absent/empty/combined/malformed, order kept) and `fields_clear` (named list; allowlist discovery_method, reversibility_class, mitre_atlas_tactics; set+clear refused; absent → no-op). 33 tests; pytest 1518 + 1 xfailed; data diff empty. Scratch preview: INC-01015 443→442 refs; INC-04207 demotion also flips tier landmark→feed, confidence high→medium (larger D130-3 delta than framed).
+- **Premise correction (foreman [R] confirmed):** INC-04207's `discovery_method` comes only from its own INC-030 curation override (`"discovery_method": "security-researcher"`), so D130-3 can drop that line; `fields_clear` has no live consumer today. The INC-030 override note cites the Microsoft Skeleton Key blog — a candidate real source for D130-3.
+
 ### 📋 USER RE-REVIEW PACKAGE committed 2026-10-16: `docs/audits/user-re-review-package-2026-10-16.md` (agent-assembled; decisions are the user's)
 - 21 rows (11 fixed, 10 unverified) with blank decision columns; gate-flagged items (INC-02454 corpus pin, DSGAI01 on INC-04653, INC-02899 MAESTRO/mitigations echo, `consent` inconsistency, date mismatches, over-merges); 9 unchanged rows. Scribe had no shell — claims cited file:line from audits/board.
 - **Foreman [R]:** against data/incidents.json on main: all 11 fixed rows quality_tier auto with no status; all 10 unverified rows status unverified (0 mismatches); tiers/corpus as the package states (INC-02454 and INC-03472 landmark/ai-harm; the rest feed/security).
