@@ -83,6 +83,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **(d) validate.py hardening** (domain roots fail; arXiv/DOI title match vs cached metadata) lands only after (a) cleans the rows it would fail. Confirm order.
 - Note: arXiv export API is robots-disallowed for our UA; the detection used arxiv.org/abs pages.
 
+### ⚖ D139, USER RULINGS 2026-10-15 (D130-2 deferrals)
+- **(a) Add a `references_remove` override (Recommended):** a new key that removes named URLs from a row's references while leaving upstream additions intact. Small WS4 mechanism task, gated; then D130-3 fixes INC-01015, 01291, 01589, 02471, 02871.
+- **(b) Overrides may clear a field (Recommended):** small mechanism letting an override null out a field (here INC-04207's landmark-only `discovery_method`), then demote INC-04207 per D130(c). Can share the WS4 task with (a).
+- **(c) Stale classifier labels: merge D130-2 if the gate passes, then re-label as the NEXT task (Recommended).** A label-scientist task re-derives taxonomy/severity/attack_vector etc. for the 12 fixed rows from their new descriptions, before D132.
+- **Queue (serial):** D130-2 (gating) → **D130-2L** re-label 12 rows (WS2) → **D139-M** references_remove + field-clear mechanism (WS4) → D132 → D133 → D134(i) → D138 → D130-3 (remaining 126 rows + the 6 deferred) → D134(ii) → D134(iii) → D130-4 → D134(iv).
+
 ### 🔍 D130-2 REPORTED `1860e29d` (2026-10-15) — gate-d130-2 dispatched
 - **Specialist (testimony):** of the 30 legacy rows — **12 fixed** (curated 4, reviewed 8; demoted to auto), **10 unverified** (curated 1, reviewed 9), **2 unchanged on merit** (INC-04142 over-merge artifact → WS4-T19; INC-08181 R1 false positive), **6 deferred for user rulings**: INC-01015/01291/01589/02471/02871 (whole-list `references` override would freeze CVE/GHSA-fed lists of up to 442 refs → needs a `references_remove` mechanism), INC-04207 (demotion drops landmark tier, then a landmark-only `discovery_method` fails validate check 6; overrides can't delete fields).
 - Envelope 15,755 → 15,745, unverified_count 10; 22 rows differ, 0 outside. **Classifier-derived labels on the 12 fixed rows still reflect the OLD descriptions** (classifiers run before overrides) → gate judging. INC-02454 title changed and corpus pinned.
