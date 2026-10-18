@@ -3,7 +3,7 @@
     "consecutive_failures": 0,
     "last_attempt": "2026-10-09",
     "last_outcome": "success",
-    "last_success": "2026-10-13",
+    "last_success": "2026-10-18",
     "status": "ok"
   },
   "airi_navigator": {
@@ -11,18 +11,20 @@
     "last_attempt": "2026-10-13",
     "last_outcome": "failure",
     "last_success": "2026-05-31",
-    "status": "stale"
+    "retired_on": "2026-10-13",
+    "retired_reason": "D108: www.airi-navigator.com has returned 404 since 2026-05-31; source retired, existing rows retained; revisit only if the site returns",
+    "status": "retired"
   },
   "cisa_kev": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-13",
+    "last_success": "2026-10-18",
     "status": "ok"
   },
   "oecd_aim": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-13",
+    "last_success": "2026-10-18",
     "status": "ok"
   }
 }
