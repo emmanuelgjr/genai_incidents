@@ -3,7 +3,7 @@
     "consecutive_failures": 0,
     "last_attempt": "2026-10-09",
     "last_outcome": "success",
-    "last_success": "2026-10-18",
+    "last_success": "2026-10-25",
     "status": "ok"
   },
   "airi_navigator": {
@@ -18,13 +18,13 @@
   "cisa_kev": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-18",
+    "last_success": "2026-10-25",
     "status": "ok"
   },
   "oecd_aim": {
     "consecutive_failures": 0,
     "last_outcome": "success",
-    "last_success": "2026-10-18",
+    "last_success": "2026-10-25",
     "status": "ok"
   }
 }
