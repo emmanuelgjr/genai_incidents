@@ -47762,5 +47762,266 @@
     "tags": [
       "aiid"
     ]
+  },
+  {
+    "source_id": "AIID-1748",
+    "aiid_id": 1748,
+    "title": "Fraud Ring in Greece Allegedly Used AI-Cloned Relatives' Voices to Steal Money and Valuables",
+    "date": "2026-09-18",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1748: Fraud Ring in Greece Allegedly Used AI-Cloned Relatives' Voices to Steal Money and Valuables. Alleged deployer/developer: Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Fraud Ring In Attica Greece, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Fraud Ring In Attica Greece, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM07"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [
+      "AML.T0048"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1748",
+        "url": "https://incidentdatabase.ai/cite/1748/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1749",
+    "aiid_id": 1749,
+    "title": "Scammers Allegedly Used an AI-Cloned Lawyer's Voice to Defraud Italian Private Bank Fideuram",
+    "date": "2026-02-23",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1749: Scammers Allegedly Used an AI-Cloned Lawyer's Voice to Defraud Italian Private Bank Fideuram. Alleged deployer/developer: Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Scammers Targeting Fideuram, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Scammers Targeting Fideuram, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers",
+    "severity": "Critical",
+    "owasp_llm": [
+      "LLM07"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [
+      "AML.T0048"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1749",
+        "url": "https://incidentdatabase.ai/cite/1749/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1751",
+    "aiid_id": 1751,
+    "title": "Anthropic AI Agent Reportedly Submitted a Fabricated Homicide Tip to Police in Philadelphia",
+    "date": "2026-07-18",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1751: Anthropic AI Agent Reportedly Submitted a Fabricated Homicide Tip to Police in Philadelphia. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Anthropic, Large Language Model Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Anthropic, Large Language Model Developers",
+    "severity": "Medium",
+    "owasp_llm": [],
+    "owasp_asi": [],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIID incident #1751",
+        "url": "https://incidentdatabase.ai/cite/1751/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1753",
+    "aiid_id": 1753,
+    "title": "Scammers Reportedly Used Deepfake Videos to Blackmail a TikTok User Posting About Bhutan",
+    "date": "2024-01-27",
+    "year": 2024,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1753: Scammers Reportedly Used Deepfake Videos to Blackmail a TikTok User Posting About Bhutan. Alleged deployer/developer: Deepfake Creators, Deepfake Technology Developers, Extortionists, Scammers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Synthetic Video Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Deepfake Creators, Deepfake Technology Developers, Extortionists, Scammers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Synthetic Video Generation Technology Developers",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM07"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [
+      "AML.T0048"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1753",
+        "url": "https://incidentdatabase.ai/cite/1753/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1754",
+    "aiid_id": 1754,
+    "title": "California Health System Allegedly Used an AI Medical Scribe to Record Patients Without Consent",
+    "date": "2025-11-26",
+    "year": 2025,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1754: California Health System Allegedly Used an AI Medical Scribe to Record Patients Without Consent. Alleged deployer/developer: Abridge, Ai Enabled Healthcare System Developers, Ai Transcription Technology Developers, Healthcare Institutions, Medical Personnel, Sharp Healthcare, Sharp Rees Stealy Medical Group. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Abridge, Ai Enabled Healthcare System Developers, Ai Transcription Technology Developers, Healthcare Institutions, Medical Personnel, Sharp Healthcare, Sharp Rees Stealy Medical Group",
+    "severity": "Medium",
+    "owasp_llm": [],
+    "owasp_asi": [],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIID incident #1754",
+        "url": "https://incidentdatabase.ai/cite/1754/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1755",
+    "aiid_id": 1755,
+    "title": "Woman in Kyrgyzstan Alleged a Former Classmate Used an AI Bot to Create a Nude Image From Her Instagram Photo",
+    "date": "2026-07-12",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1755: Woman in Kyrgyzstan Alleged a Former Classmate Used an AI Bot to Create a Nude Image From Her Instagram Photo. Alleged deployer/developer: Chynybek Aaliev, Deepfake Creators, Deepfake Technology Developers, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Chynybek Aaliev, Deepfake Creators, Deepfake Technology Developers, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers",
+    "severity": "Medium",
+    "owasp_llm": [],
+    "owasp_asi": [],
+    "mitre_atlas": [],
+    "references": [
+      {
+        "title": "AIID incident #1755",
+        "url": "https://incidentdatabase.ai/cite/1755/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1758",
+    "aiid_id": 1758,
+    "title": "Scammers Reportedly Used AI Images of Former Papua New Guinea Television Host in Sexualized Posts and Fake Giveaways",
+    "date": "2026-07-21",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1758: Scammers Reportedly Used AI Images of Former Papua New Guinea Television Host in Sexualized Posts and Fake Giveaways. Alleged deployer/developer: Cybercriminals, Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Scammers Impersonating Jennifer Baing, Scammers In Papua New Guinea, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Cybercriminals, Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Scammers, Scammers Impersonating Jennifer Baing, Scammers In Papua New Guinea, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Technology Developers",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM07"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [
+      "AML.T0048"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1758",
+        "url": "https://incidentdatabase.ai/cite/1758/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1761",
+    "aiid_id": 1761,
+    "title": "Haines City, Florida, Police Officer Allegedly Used Flock License-Plate Reader System to Track Estranged Wife",
+    "date": "2026-08-10",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1761: Haines City, Florida, Police Officer Allegedly Used Flock License-Plate Reader System to Track Estranged Wife. Alleged deployer/developer: Automated License Plate Reader (alpr) Developers, Christopher Goodson, Flock Safety, Law Enforcement, Police Departments, Police Departments In The United States, Police Officers, Stalkers, Surveillance Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "rce",
+    "affected": "Automated License Plate Reader (alpr) Developers, Christopher Goodson, Flock Safety, Law Enforcement, Police Departments, Police Departments In The United States, Police Officers, Stalkers, Surveillance Technology Developers",
+    "severity": "High",
+    "owasp_llm": [
+      "LLM10"
+    ],
+    "owasp_asi": [
+      "ASI05"
+    ],
+    "mitre_atlas": [
+      "AML.T0050"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1761",
+        "url": "https://incidentdatabase.ai/cite/1761/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
+  },
+  {
+    "source_id": "AIID-1762",
+    "aiid_id": 1762,
+    "title": "Man in Touba, Senegal, Allegedly Used AI Voice Alteration to Impersonate a Woman and Collect Intimate Images",
+    "date": "2026-02-16",
+    "year": 2026,
+    "category": "real-world",
+    "description": "AI Incident Database (AIID) entry #1762: Man in Touba, Senegal, Allegedly Used AI Voice Alteration to Impersonate a Woman and Collect Intimate Images. Alleged deployer/developer: Ai Voice Conversion Technology Developers, Cybercriminals, Deepfake Creators, Deepfake Technology Developers, Extortionists, Online Impersonators, Scammers, Scammers In Senegal, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+    "attack_vector": "other",
+    "affected": "Ai Voice Conversion Technology Developers, Cybercriminals, Deepfake Creators, Deepfake Technology Developers, Extortionists, Online Impersonators, Scammers, Scammers In Senegal, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers",
+    "severity": "Medium",
+    "owasp_llm": [
+      "LLM07"
+    ],
+    "owasp_asi": [
+      "ASI09"
+    ],
+    "mitre_atlas": [
+      "AML.T0048"
+    ],
+    "references": [
+      {
+        "title": "AIID incident #1762",
+        "url": "https://incidentdatabase.ai/cite/1762/",
+        "type": "report"
+      }
+    ],
+    "tags": [
+      "aiid"
+    ]
   }
 ]

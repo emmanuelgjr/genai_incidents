@@ -1,6 +1,6 @@
 {
-  "catalogVersion": "2026.10.08",
-  "count": 1739,
+  "catalogVersion": "2026.10.23",
+  "count": 1756,
   "vulnerabilities": {
     "CVE-2002-0367": {
       "dateAdded": "2022-03-03",
@@ -6166,6 +6166,10 @@
       "dateAdded": "2026-04-13",
       "knownRansomwareCampaignUse": "Known"
     },
+    "CVE-2025-61624": {
+      "dateAdded": "2026-10-16",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
     "CVE-2025-61757": {
       "dateAdded": "2025-11-21",
       "knownRansomwareCampaignUse": "Unknown"
@@ -6290,6 +6294,10 @@
       "dateAdded": "2026-05-06",
       "knownRansomwareCampaignUse": "Unknown"
     },
+    "CVE-2026-0322": {
+      "dateAdded": "2026-10-14",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
     "CVE-2026-0770": {
       "dateAdded": "2026-07-21",
       "knownRansomwareCampaignUse": "Unknown"
@@ -6302,12 +6310,44 @@
       "dateAdded": "2026-10-02",
       "knownRansomwareCampaignUse": "Unknown"
     },
+    "CVE-2026-102764": {
+      "dateAdded": "2026-10-16",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
     "CVE-2026-104286": {
       "dateAdded": "2026-10-01",
       "knownRansomwareCampaignUse": "Unknown"
     },
+    "CVE-2026-104935": {
+      "dateAdded": "2026-10-13",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-105133": {
+      "dateAdded": "2026-10-14",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-105134": {
+      "dateAdded": "2026-10-14",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
     "CVE-2026-10520": {
       "dateAdded": "2026-06-11",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-106931": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-110447": {
+      "dateAdded": "2026-10-23",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-110936": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-114625": {
+      "dateAdded": "2026-10-23",
       "knownRansomwareCampaignUse": "Unknown"
     },
     "CVE-2026-11645": {
@@ -6460,6 +6500,10 @@
     },
     "CVE-2026-21533": {
       "dateAdded": "2026-02-10",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-21589": {
+      "dateAdded": "2026-10-15",
       "knownRansomwareCampaignUse": "Unknown"
     },
     "CVE-2026-21643": {
@@ -6842,6 +6886,10 @@
       "dateAdded": "2026-09-30",
       "knownRansomwareCampaignUse": "Unknown"
     },
+    "CVE-2026-76519": {
+      "dateAdded": "2026-10-14",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
     "CVE-2026-8037": {
       "dateAdded": "2026-08-07",
       "knownRansomwareCampaignUse": "Unknown"
@@ -6956,6 +7004,26 @@
     },
     "CVE-2026-9586": {
       "dateAdded": "2026-09-02",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-96652": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-96654": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-96655": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-96656": {
+      "dateAdded": "2026-10-20",
+      "knownRansomwareCampaignUse": "Unknown"
+    },
+    "CVE-2026-96951": {
+      "dateAdded": "2026-10-13",
       "knownRansomwareCampaignUse": "Unknown"
     }
   }
