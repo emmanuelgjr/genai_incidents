@@ -47,7 +47,63 @@ def test_check_fires_when_step_missing_or_misplaced_or_blocking():
     assert any("continue-on-error" in p for p in check_aiid_step(blocking))
     # misplaced: AIID step after the merge step
     moved = good.replace(
-        "      - name: Refresh AIID snapshot (sanctioned bulk channel)\n        id: ingest_aiid\n        run: python scripts/ingest_aiid_snapshot.py\n        continue-on-error: true\n",
+        "      - name: Refresh AIID snapshot (sanctioned bulk channel)\n        timeout-minutes: 15\n        id: ingest_aiid\n        run: python scripts/ingest_aiid_snapshot.py\n        continue-on-error: true\n",
         "",
     ) + "\n      - name: late\n        id: ingest_aiid\n        run: python scripts/ingest_aiid_snapshot.py\n        continue-on-error: true\n"
     assert any("before the merge" in p for p in check_aiid_step(moved))
+
+
+# ---------------------------------------------------------------------------
+# D142 (2026-10-28): the scheduled refresh was cancelled at the 60-minute job
+# limit on 2026-10-18 and 2026-10-25. Measured need on 10-25 was ~63 min
+# (OECD 50.8 + tests 7.6 + ~4 other). These checks pin the budget arithmetic and
+# the "a hang fails at its own step" rule.
+
+MEASURED_NEED_MIN = 63        # 2026-10-25 run, sum of the refresh job's step times
+OECD_MEASURED_MIN = 51        # 2026-10-18 / 10-25
+TESTS_MEASURED_MIN = 8        # 2026-10-25 (7.6) and 10-18 (>=7.8)
+HEADROOM = 1.5
+
+
+def check_refresh_budget(text: str) -> list[str]:
+    import yaml
+
+    wf = yaml.safe_load(text)
+    job = wf["jobs"]["refresh"]
+    problems = []
+    if job.get("timeout-minutes", 0) < MEASURED_NEED_MIN * HEADROOM:
+        problems.append(
+            f"refresh job timeout {job.get('timeout-minutes')} min is under {HEADROOM}x the "
+            f"measured {MEASURED_NEED_MIN} min need")
+    for s in job["steps"]:
+        name = s.get("name")
+        if name is None:
+            continue  # unnamed `uses:` steps: checkout, setup-python (seconds; the job cap covers them)
+        if "timeout-minutes" not in s:
+            problems.append(f"step {name!r} has no step-level timeout-minutes")
+    by = {s.get("name"): s for s in job["steps"]}
+    oecd = by.get("Refresh OECD AI Incidents Monitor", {})
+    if oecd.get("timeout-minutes", 0) < OECD_MEASURED_MIN * 1.2:
+        problems.append("OECD step timeout is under 1.2x its measured duration")
+    tests = by.get("Unit tests", {})
+    if tests.get("timeout-minutes", 0) < TESTS_MEASURED_MIN * 2:
+        problems.append("Unit tests step timeout is under 2x its measured duration")
+    if "pytest tests -q" not in (tests.get("run") or ""):
+        problems.append("the refresh path must still run the full suite (no -k / --deselect)")
+    return problems
+
+
+def test_refresh_job_budget_and_step_timeouts():
+    assert check_refresh_budget(WORKFLOW.read_text(encoding="utf-8")) == []
+
+
+def test_refresh_budget_check_fires():
+    good = WORKFLOW.read_text(encoding="utf-8")
+    # the pre-D142 limit
+    assert check_refresh_budget(good.replace("timeout-minutes: 100", "timeout-minutes: 60", 1))
+    # a step with its cap stripped (the PR step, where the 10-25 run was killed)
+    marker = "      - name: Open / update refresh PR\n        timeout-minutes: 10\n"
+    head, tail = good.split(marker, 1)
+    assert check_refresh_budget(head + "      - name: Open / update refresh PR\n" + tail)
+    # tests narrowed
+    assert check_refresh_budget(good.replace("run: pytest tests -q", "run: pytest tests/test_x.py", 1))
