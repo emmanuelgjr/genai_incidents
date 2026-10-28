@@ -14,6 +14,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⛔ D132 **BOUNCE #1** (gate-d132 on `14d053b6`), 2026-10-28 — redispatched to the same specialist
+**Defects, in the gate's words (summarised):**
+1. **The site header still reads "Dataset v2.13.0 · … · 15,745 incidents"** (AC1; D132 names the site).
+   - docs/app.js:1015-1017 loads `data/incidents.core.json`. scripts/gen_docs_core_data.py:118-122 copies only the plain `version` and drops `version_label`, so app.js:1116 always falls back to the plain version.
+   - core.json is a gitignored Pages product, and neither the drift check nor any test covers it.
+2. **The VERSIONING cut order fails:** `mark_release` before the build exits rc 1 (`tag v2.14.0 data/incidents.json says version '2.13.0'`), because it reads the committed tree. The working order is build → commit → mark_release → rebuild (gate-simulated; the label goes plain and drift is clean).
+**Gate evidence:**
+- **Full pytest 1555 passed + 1 xfailed** (the specialist's figure was only inferred).
+- Release digest re-derived with the gate's own canonicaliser = the marker's 2e6519a0… The tag's rows counted by hand give 15,637 / 29 / 22 disputed / 1,915, matching the marker and the tag's stats.json. Per entity: 118 IDs only at HEAD, 0 only at the tag, 205 shared rows changed.
+- The marker reproduces byte-identically from mark_release.
+- Two rebuilds are byte-identical to the committed tree.
+- The manifest and the HF card both show `2.13.0+main`.
+- Of 9 own mutations, 7 fire. M1 (marker count edit) is caught only by the tag test, which skips in a shallow clone. M9 (stats.last_release edit) is caught by validate.yml re-render + porcelain.
+- The README re-tensing is true (v2.12.0 → v2.13.0: 0 added, 0 removed). The F4 claim is true. AC5 met. merge-tree clean.
+**Advisories, with the foreman's routing:**
+- A1: document that marker counts are only tag-checked. → **fold into the fix.**
+- A2: `version` in incidents.json/slim stays plain beside post-release counts. → **foreman ruling:** `version` = the release line, `version_label` = the data state; document this in DATA_DICTIONARY; incidents.json unchanged. *(The user may revisit.)*
+- A3: the README "headline counts are for main" sentence goes false at a cut. → add it to the cut checklist.
+- A4: DATA_DICTIONARY lacks `version_label`, `last_release` and data/last_release.json. → **fold into the fix.**
+- A5: re-run the site integrity/meta checks + dead-filters after the fix. → **fold into the fix.**
+
 ### 🔍 D132 REPORTED `14d053b6` (2026-10-28) — gate-d132 dispatched
 - **Specialist (testimony):**
   - Design: a committed marker `data/last_release.json` holds the version, date, released counts and the `rows_sha256` of the release's rows. `scripts/mark_release.py` writes it at each cut.
