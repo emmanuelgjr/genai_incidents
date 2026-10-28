@@ -43,7 +43,7 @@ Every incident in [`data/incidents.json`](../data/incidents.json) follows
 |---|---|---|
 | `owasp_llm` | enum[] | OWASP Top 10 for LLM Apps 2026 — `LLM01`–`LLM10`. Codes were renumbered from the 2025 edition on 2026-08-17; see [TAXONOMIES.md](TAXONOMIES.md#owasp-top-10-for-llm-applications-2026) for the crosswalk. |
 | `owasp_asi` | enum[] | OWASP Top 10 for Agentic Applications (ASI) — `ASI01`–`ASI10`. |
-| `owasp_dsgai` | string[] | OWASP Data Security for GenAI codes (`DSGAInn`, companion). |
+| `owasp_dsgai` | string[] | OWASP GenAI Data Security Risks & Mitigations 2026 codes (`DSGAI01`-`DSGAI21`, companion; seed-assigned and sparse, empty means not mapped). Vocabulary: `mappings/owasp_dsgai_2026.json`; see [`TAXONOMIES.md`](TAXONOMIES.md). |
 | `nist_ai_rmf` | string[] | NIST AI RMF subcategories, e.g. `MEASURE-2.7`, `MAP-3.5`. |
 | `mitre_atlas` | string[] | MITRE ATLAS technique ids, e.g. `AML.T0051`, `AML.T0048.003`. |
 | `mitre_atlas_tactics` | string[] | ATLAS tactic ids, e.g. `AML.TA0011` (Impact). Derived from techniques (subtechniques inherit the parent's). |

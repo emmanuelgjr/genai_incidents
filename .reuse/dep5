@@ -123,6 +123,20 @@ Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
  NOTICE-DATA and docs/SOURCE_LICENSES.md section 3.6, and
  docs/audits/item9-owasp-asi-2026-source-check-2026-10-12.md.
 
+Files: mappings/owasp_dsgai_2026.json
+Copyright: OWASP Gen AI Security Project (risk codes and titles)
+ 2026 Emmanuel G. Jr. and contributors (file structure)
+License: CC-BY-SA-4.0 AND CC-BY-4.0
+Comment: Carve-out from the "data/* INCIDENTS.md mappings/*" stanza above
+ (this stanza must stay AFTER it: in dep5 the last matching stanza wins).
+ The codes DSGAI01-DSGAI21 and the 21 short risk titles are from "OWASP
+ GenAI Data Security Risks & Mitigations 2026", OWASP Gen AI Security
+ Project - Data Security Initiative,
+ https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/,
+ and are licensed CC BY-SA 4.0. No OWASP description text is carried.
+ Added by D133 (same treatment as the D80 ASI carve-out above); the
+ licence call is the project owner's to confirm.
+
 Files: mappings/owasp_llm_top10_2026.json mappings/owasp_llm_top10_2025.json mappings/owasp_llm_2025_to_2026.json
 Copyright: OWASP GenAI Security Project, OWASP Foundation (risk codes, names and
  description and scope text taken from, or following, the OWASP Top 10 for

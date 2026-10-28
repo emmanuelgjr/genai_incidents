@@ -7,6 +7,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Added - `owasp_dsgai` documented and given a committed vocabulary (D133; data unchanged)
+
+- **What.** `docs/TAXONOMIES.md` gains a section for `owasp_dsgai`: source (OWASP GenAI Data Security Risks & Mitigations 2026, CC BY-SA 4.0), edition, tier (companion, not one of the six counted taxonomies), how codes are assigned (seed-assigned, not computed), the 21-code title table with corpus counts, and the command that derives them. The new `mappings/owasp_dsgai_2026.json` is the controlled vocabulary; `tests/test_owasp_dsgai_vocab.py` fails if a row carries a code outside it (all 21 corpus codes are in it; a planted `DSGAI99` fails the check). `.reuse/dep5` and `NOTICE-DATA` carry the CC BY-SA 4.0 attribution, as for the ASI mapping.
+- **Hugging Face card.** Lists `owasp_dsgai` with its tier, says what `status: unverified` means, and the intro now reads "six taxonomies (four core, one companion, one experimental)" in line with the README.
+- **Not done.** `taxonomy_versions.owasp_dsgai` is not added: `schema/build_manifest.schema.json` closes that object (`additionalProperties: false`), so it needs a schema change by the schema owner first. No data file changed.
+
 ### Changed - non-release counts are labelled `<release>+main` (D132)
 
 - **What.** `data/stats.json` `version`, the build manifest, `INCIDENTS.md`, the HF card, the README badge cell and the site header now read `2.13.0+main` while the data differs from v2.13.0, and the plain version only when it is exactly the release's. Before, `version: 2.13.0` sat beside post-release counts (15,745 standing / 10 unverified / 2,025 landmark vs the released 15,637 / 0 / 1,915). `data/stats.json` gains a `last_release` object (the released version, date, counts, `rows_sha256`); the README "Latest release" paragraph states the released counts through it. The README sentence "the counts above are unchanged from v2.12.0" was false for `main` and is re-tensed to the release.

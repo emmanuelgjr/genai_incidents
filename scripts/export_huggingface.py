@@ -63,7 +63,7 @@ configs:
 agentic-AI systems: vulnerability disclosures (the largest category), real-world incidents,
 research demonstrations, threat reports and red-team findings. Topics include prompt
 injection, jailbreaks, data exfiltration, deepfakes, model and supply-chain compromise,
-agent hijacking, and AI-enabled harms — cross-mapped to six taxonomies. Dataset version `{version}`.
+agent hijacking, and AI-enabled harms — cross-mapped to six taxonomies (four core, one companion, one experimental). Dataset version `{version}`.
 
 Every applicable incident is tagged with four core taxonomies:
 
@@ -76,6 +76,7 @@ Plus, where available:
 
 - **MAESTRO** architectural layers (`L1`–`L7`) — companion, carried where the upstream source provides it
 - **VERIS 1.4.1** crosswalk (`veris:*` tags) — experimental, computed at export time from `attack_vector`, not a stored per-incident field
+- **OWASP GenAI Data Security Risks & Mitigations 2026** (`owasp_dsgai`, `DSGAI01`–`DSGAI21`) — companion code set (OWASP, CC BY-SA 4.0), a stored per-incident field not counted among the six; sparse (seed-assigned, populated on well under 1% of rows), so an empty `owasp_dsgai` means "not mapped". Codes and titles: `mappings/owasp_dsgai_2026.json`
 
 ## Quickstart
 
@@ -117,6 +118,9 @@ Key fields per record (full reference in the data dictionary):
   {disputed} of the rows above carry `status: disputed`: every CVE record they rest on is
   listed by the CVE Program as published but disputed. They are **counted** in the {count}
   and carry a lowered `confidence`; retracted and unverified rows are omitted from this export.
+  `status: unverified` means the row has no confirmed source (the maintainers could not confirm
+  its references support it): it is excluded from the incident count, left out of this export,
+  and kept in the full JSON on GitHub.
 
 ### Source freshness
 
