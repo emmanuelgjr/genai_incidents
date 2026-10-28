@@ -67,7 +67,7 @@ def test_deleting_the_steps_makes_the_check_fail():
     t = WF.read_text(encoding="utf-8")
     assert "python scripts/render_docs_stats.py\n" in t
     assert problems(t.replace("          python scripts/render_docs_stats.py\n", "")) == ["render_docs_stats.py never runs"]
-    gate = "      - name: Doc surfaces match stats.json (invariant 6)\n        run: python scripts/check_stats_drift.py\n"
+    gate = "      - name: Doc surfaces match stats.json (invariant 6)\n        timeout-minutes: 5\n        run: python scripts/check_stats_drift.py\n"
     assert gate in t
     assert "check_stats_drift.py never runs" in problems(t.replace(gate, ""))
     assert problems(t.replace(gate, "").replace("pytest tests -q", "pytest tests -q\n          python scripts/check_stats_drift.py")) == []  # control: a step before the PR passes
@@ -77,7 +77,7 @@ def test_deleting_the_steps_makes_the_check_fail():
 def test_r4_each_blind_spot_mutation_makes_the_check_fail():
     """R4: (a) render order inside ONE run block, (b) an `if:` that disables the gate."""
     t = WF.read_text(encoding="utf-8")
-    gate = "      - name: Doc surfaces match stats.json (invariant 6)\n        run: python scripts/check_stats_drift.py\n"
+    gate = "      - name: Doc surfaces match stats.json (invariant 6)\n        timeout-minutes: 5\n        run: python scripts/check_stats_drift.py\n"
     assert gate in t
     # (a) drift check placed BEFORE render_docs_stats inside the same run block
     block = "          python scripts/render_docs_stats.py\n"

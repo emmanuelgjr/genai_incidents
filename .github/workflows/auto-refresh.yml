@@ -32,7 +32,7 @@ jobs:
   #
   # WHY A SEPARATE JOB (BOUNCE #1, docs/audits/rejected-cve-sweep-gap-2026-10-09.md
   # addendum 2026-10-09b): the OECD step alone takes 25-51 min and the refresh
-  # job's limit is 60, so a sweep step inside it could be cancelled with the
+  # job's limit was 60 (100 since D142), so a sweep step inside it could be cancelled with the
   # job -- losing the health-counter persistence, the re-merge, the tests, the
   # PR and the sweep's own snapshot. Here the sweep has its own 60-minute
   # limit; it is capped by wall clock (--max-seconds 2400) so it stops cleanly
@@ -99,7 +99,18 @@ jobs:
 
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # D142 (2026-10-28): was 60, and the 2026-10-18 and 2026-10-25 scheduled runs
+    # were CANCELLED at exactly 60 min. Measured wall clock of this job:
+    # 10-13 (last success) 40.6 min; 10-25 would have needed about 63 min
+    # (OECD fetch 50.8 + tests 7.6 + about 4 other). Two legitimate growth causes:
+    # (1) OECD step 34.7 -> 50.8 min: the newest-3000 sitemap window no longer
+    # contains any legacy numeric-slug URLs (skipped 1154 on 10-13, 0 on 10-25),
+    # so the fetch set went 1846 -> 3000 pages at the 1 req/s floor; 3000 is the
+    # OECD_AIM_LIMIT cap, so ~50 min is now the ceiling, not a trend. (2) Unit
+    # tests 4.3 -> 7.6 min as the suite grew. 100 min = 1.6x the 63 min need.
+    # Every step that can hang has its own timeout-minutes below, so a hang
+    # fails fast at the step instead of consuming this budget.
+    timeout-minutes: 100
     needs: cve-sweep
     # run even when the sweep job failed or was skipped: it is not a gate
     if: ${{ !cancelled() }}
@@ -110,6 +121,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
+        timeout-minutes: 10
         run: pip install -r requirements.txt
 
       # D108 (2026-10-13): the AIRI Navigator source is RETIRED. Its last
@@ -120,6 +132,7 @@ jobs:
       # held/restored by hold_pair_inputs.py. Revisit only if the site returns.
 
       - name: Refresh AIAAIC sheet
+        timeout-minutes: 10
         id: ingest_aiaaic
         env:
           AIAAIC_ACCEPT_YIELD_DROP: ${{ github.event.inputs.accept_aiaaic_yield_drop == 'true' && '1' || '' }}
@@ -141,6 +154,7 @@ jobs:
       # merge step is gated by D42's build-time guard, so a snapshot that
       # newly links already-published entries cannot reach a PR unreviewed.
       - name: Refresh AIID snapshot (sanctioned bulk channel)
+        timeout-minutes: 15
         id: ingest_aiid
         run: python scripts/ingest_aiid_snapshot.py
         continue-on-error: true
@@ -158,6 +172,7 @@ jobs:
       # is read AND written by ingest_oecd_aim.py itself, so it must land on
       # disk before that step runs, not after.
       - name: Restore OECD skip-probe rotation cursor from refresh-state branch
+        timeout-minutes: 5
         run: |
           STATE_FILE="ingest/_state/skip_probe_state.json"
           mkdir -p "$(dirname "$STATE_FILE")"
@@ -174,6 +189,7 @@ jobs:
           fi
 
       - name: Refresh OECD AI Incidents Monitor
+        timeout-minutes: 65
         id: ingest_oecd
         env:
           OECD_AIM_LIMIT: ${{ github.event.inputs.oecd_aim_limit || '3000' }}
@@ -197,6 +213,7 @@ jobs:
       # end-of-job pattern (see that step's comment for the same rationale
       # applied to source_health.json).
       - name: Check OECD skip-rule sampling probe
+        timeout-minutes: 5
         id: skip_probe
         continue-on-error: true
         # Only when the ingest step itself completed cleanly -- if it failed
@@ -209,6 +226,7 @@ jobs:
         run: python scripts/ingest_oecd_aim.py --check-probe
 
       - name: Refresh CISA KEV catalog
+        timeout-minutes: 10
         id: ingest_kev
         run: python scripts/ingest_cisa_kev.py
         continue-on-error: true
@@ -218,6 +236,7 @@ jobs:
       # just last week's cache and the PR would ship silent staleness. Surface
       # per-source outcomes and abort in the nothing-refreshed case.
       - name: Ingest result summary
+        timeout-minutes: 5
         env:
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
           OECD: ${{ steps.ingest_oecd.outcome }}
@@ -270,6 +289,7 @@ jobs:
       # intact while making the counter durable without an unattended write
       # to `main` itself (main has no branch protection — see WS4-T7).
       - name: Restore source health counters from refresh-state branch
+        timeout-minutes: 5
         run: |
           STATE_FILE="ingest/_state/source_health.json"
           if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
@@ -285,6 +305,7 @@ jobs:
           fi
 
       - name: Source health check (consecutive-failure tracking)
+        timeout-minutes: 5
         id: health
         continue-on-error: true
         env:
@@ -307,6 +328,7 @@ jobs:
       # merging can no longer strand it (see the tripwire workflow that
       # comments on such PRs: .github/workflows/refresh-pr-closed-tripwire.yml).
       - name: Persist source health counters to refresh-state branch
+        timeout-minutes: 5
         run: |
           set -e
           STATE_FILE="ingest/_state/source_health.json"
@@ -327,6 +349,7 @@ jobs:
       # dir) so it lands as its own commit on `refresh-state`, then the
       # same "exclude from the data-review PR" reset.
       - name: Persist OECD skip-probe state to refresh-state branch
+        timeout-minutes: 5
         run: |
           set -e
           STATE_FILE="ingest/_state/skip_probe_state.json"
@@ -353,6 +376,7 @@ jobs:
       # job's tree before the merge reads ingest/cve_rejections.json. Missing
       # artifact (sweep job died before upload) = keep the committed snapshot.
       - name: Download CVE sweep output
+        timeout-minutes: 5
         uses: actions/download-artifact@v4
         with:
           name: cve-sweep-output
@@ -360,6 +384,7 @@ jobs:
         continue-on-error: true
 
       - name: Apply CVE sweep output
+        timeout-minutes: 5
         run: |
           if [ -f sweep-out/cve_rejections.json ]; then
             cp sweep-out/cve_rejections.json ingest/cve_rejections.json
@@ -390,9 +415,11 @@ jobs:
       # applies a standing AIID class while every held input is at HEAD, and
       # refuses any OECD lift without a gated suppression mechanism.
       - name: Hold OECD/AIID pair inputs at their committed versions
+        timeout-minutes: 5
         run: python scripts/hold_pair_inputs.py --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
       - name: Upload held OECD/AIID inputs (D42 review path)
+        timeout-minutes: 5
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -402,6 +429,7 @@ jobs:
           retention-days: 30
 
       - name: Re-merge + render + validate
+        timeout-minutes: 15
         # D127: the ONLY job that tells merge_and_dedupe.py it is the weekly refresh,
         # so an abort says "the whole refresh did not ship". Other workflows must not set it.
         env:
@@ -419,14 +447,17 @@ jobs:
       # whose counts moved but whose doc surfaces did not follow fails here,
       # before any PR is opened. Mirrors `make build` + `make check-stats-drift`.
       - name: Doc surfaces match stats.json (invariant 6)
+        timeout-minutes: 5
         run: python scripts/check_stats_drift.py
 
       # Hard gate: the same suite that runs on every PR/push. A regression in the
       # refreshed data or generated outputs blocks the PR instead of shipping it.
       - name: Unit tests
+        timeout-minutes: 25
         run: pytest tests -q
 
       - name: Show summary
+        timeout-minutes: 5
         run: |
           echo "::group::Diff stats"
           git diff --stat || true
@@ -440,6 +471,7 @@ jobs:
       # and label the PR `needs-ruling` when any of them is a landmark entry or
       # more than 10 are retracted. See scripts/newly_retracted_report.py.
       - name: Newly retracted entries report
+        timeout-minutes: 10
         id: retracted
         # D60 "never block": a failure here must not skip the PR. The script
         # below already has a fallback; continue-on-error is the belt to that
@@ -519,6 +551,7 @@ jobs:
       # D123: the full, untruncated AIID change report (the PR body carries a
       # capped copy). Never blocks the refresh.
       - name: Upload full AIID change report
+        timeout-minutes: 5
         if: always()
         continue-on-error: true
         uses: actions/upload-artifact@v4
@@ -531,9 +564,11 @@ jobs:
       # D123: GitHub rejects a PR body over 65,536 characters, which would make
       # create-pull-request fail instead of failing soft. Cap the assembled body.
       - name: Cap PR body size
+        timeout-minutes: 5
         run: python scripts/cap_pr_body.py "$RUNNER_TEMP/pr-body.md"
 
       - name: Ensure needs-ruling label exists
+        timeout-minutes: 5
         if: steps.retracted.outputs.needs_ruling != 'false'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -544,9 +579,11 @@ jobs:
       # this fails the run, before any PR is opened, if a held path differs
       # from HEAD or stash content is anywhere in the tree (PR #101, 2026-10-13).
       - name: Guard - no held path or stash content in the work tree
+        timeout-minutes: 5
         run: python scripts/hold_pair_inputs.py --check-clean --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
       - name: Open / update refresh PR
+        timeout-minutes: 10
         id: cpr
         # Pinned to a full commit SHA (v7) for supply-chain safety; bump
         # deliberately rather than tracking a mutable tag.
@@ -563,6 +600,7 @@ jobs:
       # A later CLEAN run updating the same open PR must not leave a stale
       # needs-ruling label from an earlier run. Only on an explicit 'false'.
       - name: Remove stale needs-ruling label
+        timeout-minutes: 5
         if: steps.retracted.outputs.needs_ruling == 'false' && steps.cpr.outputs.pull-request-number != ''
         env:
           GH_TOKEN: ${{ github.token }}
@@ -583,6 +621,7 @@ jobs:
       # D66/WS4-T9: `always()` so a failed earlier step (a merge gate abort, a
       # test failure) cannot skip this and silence a source that is dead.
       - name: Enforce source health
+        timeout-minutes: 5
         if: ${{ always() && steps.health.outcome == 'failure' }}
         run: |
           echo "::error::A source has failed 3+ consecutive weekly refreshes (see 'Source health check' step above). Failing this run on purpose so it cannot be mistaken for success."
@@ -595,6 +634,7 @@ jobs:
       # notification fires) without having blocked the PR that carries this
       # week's actually-good data.
       - name: Enforce OECD skip-rule sampling probe
+        timeout-minutes: 5
         if: ${{ always() && steps.skip_probe.outcome == 'failure' }}
         run: |
           echo "::error::The OECD AIM skip-rule sampling probe found at least one legacy numeric-slug URL that now returns a real incident body (see 'Check OECD skip-rule sampling probe' step above for which one). is_numeric_slug()'s skip rule is dropping real incidents and needs attention before the next scheduled crawl. Failing this run on purpose so it cannot be mistaken for success."
