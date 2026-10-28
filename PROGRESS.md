@@ -14,6 +14,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ▶ D132 DISPATCHED 2026-10-28 (WS6, distribution-engineer)
+- Branch `ws6/d132-release-vs-main-labels-2026-10-28`, worktree `C:/repos/gi-wt-d132`, from `4b75717e`.
+- Scope: D132 ruling, folding in warden F1 (README Latest-release paragraph re-tensed with released counts) and F4 (a VERSIONING warning that v2.13.0 manifests lack `unverified_count`), plus a VERSIONING "+main" note.
+- The release-vs-main determination must be deterministic, with no network and no dependence on tags in a shallow clone.
+- The drift check must be shown to fire.
+
 ### ✅ D142 **DONE — MERGED to main 2026-10-28** (gate PASS on `91cd44ca`; advisories A1+A2 fixed at `85474350`).
 - **A1+A2 fix (specialist, testimony):**
   - The "Unit tests" run line must now equal `pytest tests -q` exactly.
