@@ -14,6 +14,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D132 REPORTED `14d053b6` (2026-10-28) — gate-d132 dispatched
+- **Specialist (testimony):**
+  - Design: a committed marker `data/last_release.json` holds the version, date, released counts and the `rows_sha256` of the release's rows. `scripts/mark_release.py` writes it at each cut.
+  - `scripts/release_label.py` labels the build: the plain version if the rows' digest matches the marker's, otherwise `<v>+main`.
+  - Drift check: a 7th failure mode, plus a "forgot mark_release" check against the CHANGELOG heading.
+  - Slim JSON gets a `version_label` field. Package version strings stay plain (PEP 440).
+  - README F1 re-tensed with released counts 15,637 / 29 / 1,915. VERSIONING gets the F4 warning and a +main section. CHANGELOG updated.
+  - 23 files changed.
+  - **Full pytest NOT completed on the final tree** ("1555 inferred") → the gate was told to run it.
+- **Foreman [R]:**
+  - origin = `14d053b6`; porcelain clean.
+  - `git diff 4b75717e -- data/incidents.json` is empty.
+  - stats.json version = `2.13.0+main`.
+
 ### ▶ D132 DISPATCHED 2026-10-28 (WS6, distribution-engineer)
 - Branch `ws6/d132-release-vs-main-labels-2026-10-28`, worktree `C:/repos/gi-wt-d132`, from `4b75717e`.
 - Scope: D132 ruling, folding in warden F1 (README Latest-release paragraph re-tensed with released counts) and F4 (a VERSIONING warning that v2.13.0 manifests lack `unverified_count`), plus a VERSIONING "+main" note.
