@@ -14,6 +14,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D132 bounce-#1 fixes REPORTED `01355874` (2026-10-28) — scoped re-gate by the reviewer that bounced it (D55/D56 pattern)
+- **Specialist (testimony):**
+  - Defect 1: core.json now carries `version_label`. check_dead_filters (a11y.yml) and the drift check both fail on a plain core label; fire proof on the real tree; a new test.
+  - Defect 2: VERSIONING order is now build → commit → mark_release → build → commit; the cut simulation to 2.14.0 came out clean.
+  - A1–A4 documented. Full pytest **1556 passed + 1 xfailed (measured).**
+  - axe/Lighthouse were not run.
+- **Foreman [R]:**
+  - origin = `01355874`; porcelain clean.
+  - Read the gen_docs_core_data.py diff: `version_label` is added to core_payload.
+
 ### ⛔ D132 **BOUNCE #1** (gate-d132 on `14d053b6`), 2026-10-28 — redispatched to the same specialist
 **Defects, in the gate's words (summarised):**
 1. **The site header still reads "Dataset v2.13.0 · … · 15,745 incidents"** (AC1; D132 names the site).
