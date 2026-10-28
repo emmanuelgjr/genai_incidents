@@ -183,7 +183,7 @@ aborts the build (nothing is written).
 | weekly refresh (`auto-refresh.yml`) | `HEAD` = the merged `main` it checked out, before the refresh commit | removals already merged are accepted by rule (b); a hand edit in the job is strict |
 | `atlas-refresh.yml`, `cve-enrich.yml` | `HEAD` (variable unset), same reasoning | as above |
 | PR CI (`validate.yml`, `pull_request`) | `HEAD^1`, the PR base of the merge commit | what the PR adds is new, so it must satisfy (a) or (b) against the base |
-| push to `main` (`validate.yml`) | `github.event.before`, the previous tip of `main` (correct for a multi-commit fast-forward push, where `HEAD^1` would already hold the override). A new-branch push (all-zero SHA) or a force-push whose old tip is gone from the clone falls back to `HEAD^1` with a visible `::warning::` | as PR CI |
+| push to `main` (`validate.yml`) | `github.event.before`, the previous tip of `main` (correct for a multi-commit fast-forward push, where `HEAD^1` would already hold the override). There is no fallback: a new-branch push (all-zero SHA), a force-push whose old tip is gone from the clone, or an empty/missing `before` SHA makes the job fail with an `::error::` (fail closed, D141) | as PR CI |
 
 The never-empty rule applies to retained rows too, and active rows keep the strict check. `fields_clear` runs after the pinned-ATLAS refresh that union-adds `mitre_atlas_tactics`, so a tactics clear holds; `updated` moves only on the net change. The "matches no entry" check runs after retention, so an upstream drop of a row never breaks the build.
 

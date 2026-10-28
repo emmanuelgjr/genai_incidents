@@ -240,6 +240,22 @@ def test_retained_row_keeps_url_removed_and_build_passes(tmp_path, monkeypatch):
     assert _urls(after["CVE-2025-0003"]) == [NVD]
 
 
+def test_clear_survives_refresh_atlas_codes_on_a_retained_row(tmp_path, monkeypatch):
+    # Bounce-#1 regression guard: step 6c runs refresh_atlas_codes on the carried
+    # row, which RE-ADDS the pinned tactics for its techniques. fields_clear must be
+    # re-applied AFTER that call; applied before it, the cleared tactic comes back.
+    data, ingest = _build_rows(tmp_path, monkeypatch, [_tactic_row()],
+                               {"fields_clear": ["mitre_atlas_tactics"]})
+    built = _by_cve(data)["CVE-2025-0003"]
+    assert "mitre_atlas_tactics" not in built and built["mitre_atlas"] == [TECH]
+    # control: refresh alone WOULD restore the tactic on this very row
+    probe = copy.deepcopy(built)
+    assert m.refresh_atlas_codes(probe) and probe["mitre_atlas_tactics"] == sorted(TAC)
+    after = _drop_upstream(data, ingest)["CVE-2025-0003"]
+    assert after["source_status"] == "retained"
+    assert "mitre_atlas_tactics" not in after and after["mitre_atlas"] == [TECH]
+
+
 def test_typo_url_added_while_retained_aborts(tmp_path, monkeypatch):
     data, ingest = _two_refs_build(tmp_path, monkeypatch, None)
     _write_overrides(data, {"_note": "x"})
