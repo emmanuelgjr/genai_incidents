@@ -81,7 +81,7 @@ count equal still flips the label.
 
 | Surface | Carries |
 |---|---|
-| `data/stats.json` `version`, build manifest `version`, `INCIDENTS.md`, README badge cell, HF card, `version_label` in the slim `incidents.min.json` (site header) | the label (`2.13.0+main` between cuts) |
+| `data/stats.json` `version`, build manifest `version`, `INCIDENTS.md`, README badge cell, HF card, `version_label` in the slim `incidents.min.json` and in the site's `incidents.core.json` (derived from the slim file; the site header reads the core payload) | the label (`2.13.0+main` between cuts) |
 | README "Latest release" paragraph (`stats:release_*` markers) | the **released** version, date and counts (`stats.json` `last_release`), never the live ones |
 | `pyproject.toml`, `.zenodo.json`, `CITATION.cff`, `USER_AGENT`, `"version"` in `data/incidents.json` | the plain release version. They name a release line, not a data state; PEP 440 treats `2.13.0+main` as a local version that PyPI rejects and pip ranks above `2.13.0`, so the package version is deliberately **not** suffixed. |
 

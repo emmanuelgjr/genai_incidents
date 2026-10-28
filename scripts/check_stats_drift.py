@@ -356,7 +356,7 @@ def main() -> int:
         surfaces[rel + " version_label"] = json.loads(read(rel)).get("version_label")
     core = ROOT / "docs" / "data" / "incidents.core.json"
     if core.exists():  # gitignored Pages product: checked wherever it has been built
-        surfaces["docs/data/incidents.core.json version_label"] = json.loads(
+        surfaces["docs/data/incidents.core.json version_label (or regenerate it: make docs-data)"] = json.loads(
             core.read_text(encoding="utf-8")).get("version_label")
     all_errors.extend(check_release_label(stats, rows, changelog, surfaces))
     all_errors.extend(check_latest_release(read("README.md"), stats, changelog))

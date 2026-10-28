@@ -41,6 +41,13 @@ jobs:
           cp data/incidents.min.json docs/data/incidents.min.json
       - name: Split into a trimmed core payload + lazy per-year detail shards (WS6-T5, scale)
         run: python scripts/gen_docs_core_data.py
+      # D132 re-gate A6: gate the served core payload BEFORE it is uploaded.
+      # check_dead_filters is chosen over check_stats_drift because it reads only
+      # what this job has built (core.json, stats.json, index.html) and is the
+      # payload gate a11y.yml already runs; it fails on a core version_label that
+      # pairs a release version with post-release counts (and on dead filters).
+      - name: Gate the served core payload (D132 label + dead filters)
+        run: python scripts/check_dead_filters.py
       - name: Generate STIX 2.1 bundle for download
         run: python scripts/export_stix.py
       - name: Generate static TAXII-compatible discovery document
