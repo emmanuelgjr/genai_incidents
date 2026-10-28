@@ -63,6 +63,7 @@ MEASURED_NEED_MIN = 63        # 2026-10-25 run, sum of the refresh job's step ti
 OECD_MEASURED_MIN = 51        # 2026-10-18 / 10-25
 TESTS_MEASURED_MIN = 8        # 2026-10-25 (7.6) and 10-18 (>=7.8)
 HEADROOM = 1.5
+OTHER_MEASURED_MIN = 4.5      # see check_refresh_budget
 
 
 def check_refresh_budget(text: str) -> list[str]:
@@ -88,8 +89,15 @@ def check_refresh_budget(text: str) -> list[str]:
     tests = by.get("Unit tests", {})
     if tests.get("timeout-minutes", 0) < TESTS_MEASURED_MIN * 2:
         problems.append("Unit tests step timeout is under 2x its measured duration")
-    if "pytest tests -q" not in (tests.get("run") or ""):
-        problems.append("the refresh path must still run the full suite (no -k / --deselect)")
+    if (tests.get("run") or "").strip() != "pytest tests -q":
+        problems.append("the refresh path must run exactly `pytest tests -q` (no -k / --deselect / -m / --ignore / path selectors)")
+    # A1/A2 (D142 gate advisory): the sum of the step caps that dominate the job
+    # plus the measured remainder must fit inside the job cap, so bumping one
+    # step cap later cannot silently invert the budget.
+    # OTHER_MEASURED_MIN = ~4.5 min: job total ~63 min minus OECD 50.8 minus tests 7.6
+    # (runs 38366793761 and 40178341113, 2026-10-13 / 2026-10-25 step timings).
+    if oecd.get("timeout-minutes", 0) + tests.get("timeout-minutes", 0) + OTHER_MEASURED_MIN >= job.get("timeout-minutes", 0):
+        problems.append("OECD cap + tests cap + measured other time must be below the job cap")
     return problems
 
 
@@ -107,3 +115,11 @@ def test_refresh_budget_check_fires():
     assert check_refresh_budget(head + "      - name: Open / update refresh PR\n" + tail)
     # tests narrowed
     assert check_refresh_budget(good.replace("run: pytest tests -q", "run: pytest tests/test_x.py", 1))
+    # narrowing variants must each fire (the old substring guard passed the first two)
+    for narrowed in ("pytest tests -q -k aiid", "pytest tests -q --deselect tests/test_x.py::t",
+                     "pytest tests -q -m fast", "pytest tests -q --ignore=tests/slow"):
+        assert check_refresh_budget(good.replace("run: pytest tests -q", "run: " + narrowed, 1)), narrowed
+    # raising the OECD cap 65 -> 75 inverts the budget (75 + 25 + 4.5 >= 100)
+    head, tail = good.split("name: Refresh OECD AI Incidents Monitor\n        timeout-minutes: 65", 1)
+    assert any("must be below the job cap" in x for x in check_refresh_budget(
+        head + "name: Refresh OECD AI Incidents Monitor\n        timeout-minutes: 75" + tail))
