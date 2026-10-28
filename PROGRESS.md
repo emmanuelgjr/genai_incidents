@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🟡 D142 — gate PASS (gate-d142 on `91cd44ca`), 2026-10-28; advisories A1+A2 sent back for fixing BEFORE merge (foreman, following the user's D52 preference; Sunday 11-01 leaves time)
+**Verdict, in the gate's words:** "PASS ... DEFECTS: none. I re-derived everything below myself. The specialist's root cause, timings and fix all match."
+**Gate evidence (re-derived independently):**
+- Timing table: 10-13 OECD 34.7 / tests 4.3 / job 40.6; 10-18 OECD 50.8 / tests cancelled at 7.8 / 60.3; 10-25 OECD 50.8 / tests 7.6 / 60.0. The 10-25 run needed ≈60.5 min, not 63.
+- The 10-13 baseline was a **workflow_dispatch** with OECD_AIM_LIMIT 3000, so it is a valid baseline.
+- OECD log: "skipping 1154/3000" on 10-13, then "0/3000" on 10-18 and 10-25. That works out to 1.02–1.13 s/page.
+- Test-suite growth: 1206 tests in 255 s → 1481 tests in 455 s.
+- The yml diff is timeout lines + comments only. data/scripts/ingest diff is empty.
+- Budget: worst case 94.5 min (65 + 25 + 4.5) < 100.
+- The budget check fired on 4 of 5 independent mutations.
+- actionlint rc 0. **Full pytest on 91cd44ca: 1546 passed, 1 xfailed.** merge-tree clean.
+- Confirmed: PRs created with GITHUB_TOKEN get no validate.yml run (PR #102 check rollup), so the refresh job's own suite is the only full run.
+**Advisories:**
+- A1: the narrowing guard is a substring test and passes `-k aiid` / `--deselect`, while its message claims otherwise (agreement 6, form (a)). → **fix before merge.**
+- A2: no assertion that the OECD cap + the tests cap + other steps stay under the job cap. → **fix before merge.**
+- A3: stale "60" comments at scripts/ingest_oecd_aim.py:141 and scripts/migrate_oecd_description_reduction.py:10. → WS4 note (docs/releases/v2.10.0.md:142 is a dated record, so leave it).
+- A4: the OECD time is pinned at ≈51 min (no skip savings left).
+- A5: **the real proof is the Sun 2026-11-01 scheduled run.** Foreman to check its step times and that a PR opened.
+
 ### 🔍 D142 REPORTED `91cd44ca` (2026-10-28) — gate-d142 dispatched
 - **Specialist (testimony):**
   - **Root cause: two growths, no hang.** Total need is ≈63 min against the 60-min cap.
