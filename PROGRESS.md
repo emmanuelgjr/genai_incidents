@@ -14,6 +14,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D139-M bounce-#4 fixes REPORTED `f5f841ce` (2026-10-28) — SCOPED re-gate dispatched (gate-d139m-r5)
+- Specialist (testimony): validate.yml push fallback → `::error::` + exit 1 (also split the collapsed one-line continuation into three `\`-joined lines); comment, DATA_DICTIONARY push row, CHANGELOG corrected; rc 1 for before = 40 zeros / deadbeef×5 / '', rc 0 for a real parent; new test `test_clear_survives_refresh_atlas_codes_on_a_retained_row` (with a non-vacuity control) 1 passed → 1 failed under the move mutation → 1 passed restored; pytest 1544 passed + 1 xfailed; data diff empty.
+- **Foreman [R]:** origin branch = `f5f841ce`; worktree clean; `git diff --stat 56d6b4cd..HEAD` = 4 files (+28/-9), `-- data` empty; read the validate.yml diff: fallback removed, `exit 1` present.
+- Gate told to take a different route (YAML-parsed run block in a throwaway clone; its own mutations).
+
 ### 📝 2026-10-28 user notes + foreman finding
 - **OECD follow-up:** user: "OECD has not responded, let's move on." No further outreach queued. D114 still binds: OECD suppression (A3) must be built and gated before any OECD lift, so OECD data stays frozen.
 - **21-row re-review package** (`docs/audits/user-re-review-package-2026-10-16.md`): presented to the user in chat 2026-10-28 for review now; decisions to be recorded here when returned.
