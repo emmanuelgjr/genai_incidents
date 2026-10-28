@@ -145,7 +145,7 @@ def test_envelope_always_carries_unverified_count(tmp_path, monkeypatch):
     slim = json.loads((data / "incidents.min.json").read_text(encoding="utf-8"))
     assert list(full) == ["version", "generated", "description", "schema", "incident_count",
                           "retracted_count", "unverified_count", "incidents"]
-    assert list(slim) == ["version", "generated", "incident_count", "retracted_count",
+    assert list(slim) == ["version", "version_label", "generated", "incident_count", "retracted_count",
                           "unverified_count", "incidents"]
     assert full["unverified_count"] == slim["unverified_count"] == 0
 

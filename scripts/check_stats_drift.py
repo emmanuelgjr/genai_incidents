@@ -1,7 +1,7 @@
 """CI gate for invariant 6: docs pull counts from ``data/stats.json``;
 hardcoded totals fail CI (WS6-T2).
 
-Six independent failure modes, all checked:
+Seven independent failure modes, all checked:
 
 1. **Marked drift** — a ``<!-- stats:KEY -->...<!-- /stats:KEY -->`` span (or
    a ``<!-- stats:KEY:line -->`` line marker) whose current value no longer
@@ -25,6 +25,9 @@ Six independent failure modes, all checked:
    ``USER_AGENT`` and ``INCIDENTS.md`` ``**Version:**`` vs ``stats.json``.
 6. **HF card template** — placeholders present, no hardcoded totals or version literals.
 
+7. **Release vs main (D132)** -- no surface may pair a plain release version with
+   counts that differ from that release's (see ``scripts/release_label.py``).
+
 Run: ``python scripts/check_stats_drift.py``. Exits 1 with every offending
 line printed on any failure; exits 0 (silent, one summary line) if every
 surface is clean.
@@ -37,6 +40,7 @@ import re
 import sys
 import tomllib
 
+from release_label import SUFFIX, base_version, rows_digest
 from stats_docs_lib import (
     DOC_SURFACES,
     FORMATTERS,
@@ -115,8 +119,8 @@ def check_unmarked_totals(path, text: str) -> list[str]:
 
 LATEST_HEADING_RE = re.compile(r"^##\s+\S*\s*Latest release\s*$", re.MULTILINE)
 LATEST_LINE_RE = re.compile(
-    r"\*\*(?:<!--\s*stats:version\s*-->)?(?P<version>\d+\.\d+\.\d+)"
-    r"(?:<!--\s*/stats:version\s*-->)?\s*[—–-]+\s*released\s+(?P<date>\d{4}-\d{2}-\d{2})"
+    r"\*\*(?:<!--\s*stats:(?:release_)?version\s*-->)?(?P<version>\d+\.\d+\.\d+)"
+    r"(?:<!--\s*/stats:(?:release_)?version\s*-->)?\s*[—–-]+\s*released\s+(?:<!--\s*stats:release_date\s*-->)?(?P<date>\d{4}-\d{2}-\d{2})"
 )
 CHANGELOG_TOP_RE = re.compile(
     r"^##\s+\[(?P<version>\d+\.\d+\.\d+)\]\s*[—–-]+\s*(?P<date>\d{4}-\d{2}-\d{2})",
@@ -142,9 +146,10 @@ def check_latest_release(readme: str, stats: dict, changelog: str) -> list[str]:
         return ["CHANGELOG.md: no released '## [X.Y.Z] - YYYY-MM-DD' heading found"]
     cl_version, cl_date = top
     errors = []
-    if str(stats["version"]) != cl_version:
+    if base_version(str(stats["version"])) != cl_version:
         errors.append(
-            f"data/stats.json version {stats['version']!r} != top released "
+            f"data/stats.json version {stats['version']!r} (base "
+            f"{base_version(str(stats['version']))!r}) != top released "
             f"CHANGELOG heading {cl_version!r}"
         )
     h = LATEST_HEADING_RE.search(readme)
@@ -172,7 +177,7 @@ def check_version_metadata(stats: dict, pyproject: str, zenodo: str, citation: s
                            changelog: str) -> list[str]:
     """Version/date literals in packaging + citation metadata must equal stats.json
     (and CITATION date-released the top CHANGELOG date)."""
-    want = str(stats["version"])
+    want = base_version(str(stats["version"]))  # packaging names the release line, never +main
     errors = []
     try:
         pv = tomllib.loads(pyproject).get("project", {}).get("version")
@@ -222,15 +227,16 @@ def check_hf_card_template(card: str) -> list[str]:
 def check_other_version_literals(stats: dict, common_src: str, incidents_md: str) -> list[str]:
     """ingest/common.py's USER_AGENT and INCIDENTS.md's ``**Version:**`` line both
     carry the dataset version as a literal and must equal stats.json."""
-    want = str(stats["version"])
+    want = base_version(str(stats["version"]))
     errors = []
     # anchored to the assignment: comments elsewhere quote historical versions
     m = re.search(r'^USER_AGENT\s*=\s*\(?\s*"genai_incidents/(\d+\.\d+\.\d+)', common_src, re.MULTILINE)
     if not m or m.group(1) != want:
         errors.append(f"ingest/common.py USER_AGENT version {m.group(1) if m else None!r} != stats {want!r}")
     m = re.search(r"^- \*\*Version:\*\*\s*(\S+)", incidents_md, re.MULTILINE)
-    if not m or m.group(1) != want:
-        errors.append(f"INCIDENTS.md **Version:** {m.group(1) if m else None!r} != stats {want!r}")
+    # INCIDENTS.md sits beside live counts, so it carries the full label (D132)
+    if not m or m.group(1) != str(stats["version"]):
+        errors.append(f"INCIDENTS.md **Version:** {m.group(1) if m else None!r} != stats {stats['version']!r}")
     return errors
 
 
@@ -272,6 +278,55 @@ def check_stats_vs_corpus(stats: dict, full_entries: list[dict],
     return errors
 
 
+_RELEASE_COUNT_KEYS = ("incident_count", "retracted_count", "unverified_count",
+                       "disputed_count", "landmark_count")
+
+
+def check_release_label(stats: dict, rows: list[dict], changelog: str,
+                        surfaces: dict[str, str | None]) -> list[str]:
+    """D132: no surface may pair a RELEASE version with POST-release counts.
+
+    * ``stats.last_release`` (the committed marker) must name the top released
+      CHANGELOG version (catches a cut that forgot ``mark_release.py``).
+    * A PLAIN ``stats.version`` is allowed only when the rows are byte-for-byte
+      the release's rows (digest) AND every count equals the release's count.
+    * A ``+main`` ``stats.version`` is allowed only when the rows really differ.
+    * Every other version-carrying surface (``surfaces``: name -> version string
+      it shows beside counts) must equal ``stats.version`` exactly.
+    """
+    errors = []
+    lr = stats.get("last_release")
+    if not lr:
+        return ["data/stats.json has no last_release object (run scripts/render_markdown.py)"]
+    top = changelog_top_release(changelog)
+    if top and lr.get("version") != top[0]:
+        errors.append(f"data/last_release.json is {lr.get('version')!r} but the top released "
+                      f"CHANGELOG heading is {top[0]!r} -- run scripts/mark_release.py at the cut")
+    label = str(stats["version"])
+    plain = not label.endswith(SUFFIX)
+    same_rows = rows_digest(rows) == lr.get("rows_sha256")
+    if base_version(label) != lr.get("version"):
+        errors.append(f"data/stats.json version {label!r} is not based on the last release {lr.get('version')!r}")
+    if plain:
+        if not same_rows:
+            errors.append(f"data/stats.json version {label!r} is a plain release version but the rows "
+                          f"differ from release {lr.get('version')}'s -- it must read "
+                          f"'{lr.get('version')}{SUFFIX}' (D132)")
+        for k in _RELEASE_COUNT_KEYS:
+            if stats.get(k) != lr.get(k):
+                errors.append(f"data/stats.json pairs plain {label!r} with {k}={stats.get(k)!r}; "
+                              f"release {lr.get('version')} had {lr.get(k)!r} (D132)")
+    elif same_rows:
+        errors.append(f"data/stats.json version {label!r} says +main but the rows equal release "
+                      f"{lr.get('version')}'s -- it must be the plain version")
+    for name, shown in surfaces.items():
+        if shown != label:
+            errors.append(f"{name} shows version {shown!r} beside counts but data/stats.json says "
+                          f"{label!r} (D132: a surface must not pair a release version with "
+                          f"post-release counts)")
+    return errors
+
+
 def main() -> int:
     stats = load_stats()
     all_errors: list[str] = []
@@ -294,6 +349,12 @@ def main() -> int:
         return (ROOT / rel).read_text(encoding="utf-8")
 
     changelog = read("CHANGELOG.md")
+    rows = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    surfaces: dict[str, str | None] = {}
+    for rel in ("data/incidents.min.json", "docs/data/incidents.min.json",
+                "src/genai_incidents/data/incidents.min.json"):
+        surfaces[rel + " version_label"] = json.loads(read(rel)).get("version_label")
+    all_errors.extend(check_release_label(stats, rows, changelog, surfaces))
     all_errors.extend(check_latest_release(read("README.md"), stats, changelog))
     all_errors.extend(check_version_metadata(
         stats, read("pyproject.toml"), read(".zenodo.json"), read("CITATION.cff"), changelog))

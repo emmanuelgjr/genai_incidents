@@ -251,7 +251,7 @@ def build(out_dir: Path) -> tuple[int, Path]:
                 f"{n}/{disputed} -- run scripts/render_markdown.py")
     size_cat = ("n<1K" if n < 1_000 else "1K<n<10K" if n < 10_000
                 else "10K<n<100K" if n < 100_000 else "100K<n<1M")
-    card = CARD.format(count=f"{n:,}", disputed=f"{disputed:,}", version=raw.get("version", "?"),
+    card = CARD.format(count=f"{n:,}", disputed=f"{disputed:,}", version=(st.get("version") if stats_path.exists() else None) or raw.get("version", "?"),
                        size_cat=size_cat, repo="emmanuelgjr/genai-incidents",
                        taxonomy_versions=as_text(taxonomy_versions()))
     (out_dir / "README.md").write_text(card, encoding="utf-8", newline="\n")

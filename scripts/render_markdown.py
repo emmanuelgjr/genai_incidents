@@ -24,6 +24,7 @@ from pathlib import Path
 
 from entry_status import stands
 from taxonomy_versions import taxonomy_versions
+from release_label import load_marker, version_label
 
 
 def utc_today() -> date:
@@ -563,6 +564,9 @@ def render():
     # dynamic JSON reads it). Kept small so the badge endpoint is fast, and
     # regenerated every build so it never drifts from the dataset.
     years = sorted({e.get("year") for e in entries if e.get("year")})
+    # D132: "<release>+main" while the rows differ from the last release's rows.
+    last_release = load_marker()
+    label = version_label(raw["incidents"], last_release)
     stats = {
         "incident_count": len(entries),
         "retracted_count": n_retracted,
@@ -573,13 +577,16 @@ def render():
         # incident_count, never added to or subtracted from it.
         "disputed_count": sum(1 for e in entries if e.get("status") == "disputed"),
         "landmark_count": sum(1 for e in entries if e.get("tier") == "landmark"),
-        "version": raw.get("version", ""),
+        "version": label,
         "generated": raw.get("generated", ""),
         "year_min": years[0] if years else None,
         "year_max": years[-1] if years else None,
         # Versions of the pinned taxonomies the corpus codes belong to, derived
         # from mappings/*.json by scripts/taxonomy_versions.py (never literals).
         "taxonomy_versions": taxonomy_versions(),
+        # D132: the last release's own figures, so a surface can state them
+        # without pairing them with post-release counts.
+        "last_release": last_release,
     }
     _write_lf(DATA / "stats.json", json.dumps(stats, indent=2))
 
@@ -623,7 +630,7 @@ def render():
         "crosswalk computed at export time. See docs/TAXONOMIES.md for the full picture."
     )
     lines.append("")
-    lines.append(f"- **Version:** {raw.get('version','1.0.0')}")
+    lines.append(f"- **Version:** {label}")
     lines.append(f"- **Generated:** {raw.get('generated', str(utc_today()))}")
     lines.append(f"- **Total incidents:** **{len(entries):,}**")
     lines.append(
