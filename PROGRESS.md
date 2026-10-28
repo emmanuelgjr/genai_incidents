@@ -14,6 +14,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 📋 docs-warden on D132 (`2773b4eb`), 2026-10-28 — 0 high/medium; 2 low
+- **Drift check:** clean. No plain "2.13.0" sits beside post-release counts anywhere; "+main" appears only beside main counts. VERSIONING, CHANGELOG and DATA_DICTIONARY agree. The slim/marker/stats counts are consistent (15,745 + 29 + 10 = 15,784).
+- **F1 low:** the CHANGELOG [Unreleased] "status: unverified" entry's Consumer-impact bullet says "No entry is unverified yet (unverified_count is 0)". That is false on main (10). The D130-2 entry hedges it. → **governance-scribe note: add a one-clause dated pointer before the next cut** (it can ride with D134(iii)).
+- **F2 low:** the HF card template (scripts/export_huggingface.py:~66) says "cross-mapped to six taxonomies" without "four core". → **fold into D133** (HF card edit).
+- **Not covered:** the live Pages site / HF hub (network). The release-time check covers them.
+
+### ▶ D133 DISPATCHED 2026-10-28 (WS6, distribution-engineer) — document `owasp_dsgai`
+- Branch `ws6/d133-owasp-dsgai-docs-2026-10-28`, worktree `C:/repos/gi-wt-d133`.
+- Folds in:
+  - an HF card note on what `unverified` means (warden D130-2 F4);
+  - the DSGAI01 vocabulary (re-review §5.2);
+  - warden D132 F2.
+
 ### ✅ D132 **DONE — MERGED to main 2026-10-28** (gate PASS on `01355874` after bounce #1; A6–A8 fixed at `ecc298d2`)
 - **A6–A8 fixes (specialist, testimony):**
   - A6: pages.yml now runs `check_dead_filters.py` after core.json is generated and before the exports, upload and deploy. A pre-existing dead filter now also blocks a deploy; it passes today.
