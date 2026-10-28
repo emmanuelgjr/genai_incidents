@@ -2,6 +2,7 @@
   "atlas": "2026.09",
   "capec": null,
   "owasp_asi": "2026",
+  "owasp_dsgai": "2026",
   "owasp_llm": "2026",
   "veris": "1.4.1"
 }

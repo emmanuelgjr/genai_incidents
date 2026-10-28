@@ -90,6 +90,7 @@ def test_manifest_schema_fires_on_a_bad_manifest():
         (lambda m: m.update(disputed_count=-1), "disputed_count"),
         (lambda m: m.update(extra=1), "extra"),
         (lambda m: m["taxonomy_versions"].pop("atlas"), "atlas"),
+        (lambda m: m["taxonomy_versions"].pop("owasp_dsgai"), "owasp_dsgai"),  # D133: required
     ):
         bad = copy.deepcopy(good)
         mutate(bad)

@@ -6,7 +6,7 @@ ASI 2026 re-pin) flows into stats.json, the STIX bundle, the MISP manifest, the
 Hugging Face card and the pip package without touching any of them.
 
     {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
-     "capec": null, "veris": "1.4.1"}
+     "capec": null, "veris": "1.4.1", "owasp_dsgai": "2026"}
 
 Sources:
 
@@ -21,6 +21,9 @@ Sources:
                 release), so the honest value today is ``null``, not a guess;
                 ``scripts/build_cwe_capec.py`` is the place to start recording it.
 * veris      -- ``mappings/veris.json``                  ``version``
+* owasp_dsgai -- ``mappings/owasp_dsgai_2026.json``      ``version`` (companion
+                code set; added after v2.13.0 under user ruling D133. MAESTRO
+                and NIST AI RMF are not pinned here: neither was ruled in)
 
 Offline, stdlib-only: imported by the deterministic build.
 """
@@ -40,6 +43,7 @@ SOURCES = (
     ("owasp_asi", "owasp_asi_top10.json", "version"),
     ("capec", "cwe_capec.json", "capec_version"),
     ("veris", "veris.json", "version"),
+    ("owasp_dsgai", "owasp_dsgai_2026.json", "version"),
 )
 
 
