@@ -14,7 +14,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
-### ⏸ PAUSED BY THE USER, 2026-10-16 (second pause): "save memory and will continue next section". Resume from here.
+### ▶ RESUMED BY THE USER, 2026-10-28 ("read memory and keep building"); PAUSED marker below kept as the record.
+- **D139-M bounce-#4 finish, foreman decision under "keep building" (revisable by the user):** option 1 (Recommended) — push fallback → `::error::` + exit 1 (fail closed per D141); correct the workflow comment, DATA_DICTIONARY push row and CHANGELOG; add a step-6c clear-after-refresh test shown to fail under the M6 mutation. **Strengthened per agreement 6 and the user's stricter bounce rulings (D52/D53):** besides the foreman's own re-derivation, a fresh red-reviewer gets a SCOPED re-gate on the two bounce-#4 defects only (not a fifth full gate).
+- Dispatched: pipeline-engineer on `ws4/d139m-override-mechanisms-2026-10-16` (worktree `C:/repos/gi-wt-d139m`) from `56d6b4cd`.
+
+### (pause record) ⏸ PAUSED BY THE USER, 2026-10-16 (second pause): "save memory and will continue next section". Resume from here.
 - **In flight — D139-M** at **`56d6b4cd`** on `ws4/d139m-override-mechanisms-2026-10-16` (worktree `C:/repos/gi-wt-d139m`). **BOUNCE #4 recorded below; NOT merged.** Library code correct on all real-corpus cases.
 - **OPEN USER DECISION (asked, not answered)** — how to finish:
   1. (Recommended) push fallback → `::error::` + exit 1 (fail closed per D141), fix the workflow comment / DATA_DICTIONARY push row / CHANGELOG; add a step-6c clear-after-refresh test shown to fail under the M6 mutation; **foreman verifies** (string check + gate's two repros + full pytest), then merge — no fifth full gate.
