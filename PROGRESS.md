@@ -14,6 +14,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D142 **DONE — MERGED to main 2026-10-28** (gate PASS on `91cd44ca`; advisories A1+A2 fixed at `85474350`).
+- **A1+A2 fix (specialist, testimony):**
+  - The "Unit tests" run line must now equal `pytest tests -q` exactly.
+  - A new inequality: OECD cap + tests cap + 4.5 min < job cap (94.5 < 100).
+  - Fire-test mutations added: -k, --deselect, -m, --ignore, and OECD cap 75.
+  - One file changed; full pytest 1546 passed + 1 xfailed.
+- **Foreman [R], with a different route (my own mutations):**
+  - The branch on origin is `85474350`.
+  - Baseline: 4 passed.
+  - Mutation `pytest tests -q tests/test_auto_refresh_workflow.py` (path narrowing): 1 failed.
+  - Mutation job cap 100 → 90: 1 failed.
+  - Restored: 4 passed. Porcelain clean.
+- **Follow-up:** check that the **Sun 2026-11-01 scheduled run** fits its step times and opens a refresh PR. The PR is the user's to review.
+- **Docs-warden:** not needed. No counts, claims, licensing, taxonomy or version strings changed.
+
 ### 🟡 D142 — gate PASS (gate-d142 on `91cd44ca`), 2026-10-28; advisories A1+A2 sent back for fixing BEFORE merge (foreman, following the user's D52 preference; Sunday 11-01 leaves time)
 **Verdict, in the gate's words:** "PASS ... DEFECTS: none. I re-derived everything below myself. The specialist's root cause, timings and fix all match."
 **Gate evidence (re-derived independently):**
