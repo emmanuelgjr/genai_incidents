@@ -11,7 +11,7 @@
     "built_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$", "description": "RFC 3339 UTC. See `built_at_basis`."},
     "built_at_basis": {"enum": ["commit-date", "source-date-epoch"], "description": "What `built_at` was taken from. Never the wall clock."},
     "dirty": {"type": "boolean", "description": "True when a tracked file differed from `commit` at build time (a local build). Release builds are false."},
-    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "Dataset version (stats.json `version`)."},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(\\+main)?$", "description": "Dataset version label (stats.json `version`): the plain release version only when the data is exactly that release's; `<release>+main` between cuts (D132)."},
     "incident_count": {"type": "integer", "minimum": 0, "description": "Entries that stand (retracted and unverified excluded; disputed included)."},
     "retracted_count": {"type": "integer", "minimum": 0, "description": "Retracted entries: not in incident_count."},
     "unverified_count": {"type": "integer", "minimum": 0, "description": "Entries with status unverified (user ruling D130: no confirmed primary source): not in incident_count. Added after v2.13.0; manifests from v2.13.0 lack it."},

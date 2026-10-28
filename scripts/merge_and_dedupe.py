@@ -4023,8 +4023,12 @@ def main():
             item["rejected_cve_ids"] = e["rejected_cve_ids"]
         return item
 
+    from release_label import version_label  # D132
     slim = {
         "version": out["version"],
+        # D132: "<release>+main" while rows differ from the last release's;
+        # the site shows this beside the counts. `version` stays the base.
+        "version_label": version_label(json.loads(json.dumps(out["incidents"]))),
         "generated": out["generated"],
         "incident_count": out["incident_count"],
         "retracted_count": n_retracted,

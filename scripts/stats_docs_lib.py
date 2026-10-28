@@ -109,7 +109,15 @@ FORMATTERS: dict[str, Callable[[dict], str]] = {
     "disputed_count": lambda s: _comma_int(s["disputed_count"]),
     "retracted_count": lambda s: _comma_int(s["retracted_count"]),
     "unverified_count": lambda s: _comma_int(s["unverified_count"]),
+    # D132: `version` is the label ("2.13.0+main" between cuts); the
+    # `release_*` keys state the LAST RELEASE's own figures (stats.last_release)
+    # and never move until the next cut.
     "version": lambda s: str(s["version"]),
+    "release_version": lambda s: str(s["last_release"]["version"]),
+    "release_date": lambda s: str(s["last_release"]["released"]),
+    "release_incident_count": lambda s: _comma_int(s["last_release"]["incident_count"]),
+    "release_retracted_count": lambda s: _comma_int(s["last_release"]["retracted_count"]),
+    "release_landmark_count": lambda s: _comma_int(s["last_release"]["landmark_count"]),
     "generated": lambda s: str(s["generated"]),
     "year_min": lambda s: str(s["year_min"]),
     "year_max": lambda s: str(s["year_max"]),

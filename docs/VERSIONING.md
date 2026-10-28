@@ -59,6 +59,38 @@ exactly one live in-body anchor link in their own opening paragraph —
 caught at gate review, not by this file. Run both checks as part of step
 1's gate, not just once at drafting time.
 
+## The `+main` label (D132)
+
+Ruling D132 (2026-10-14): no surface pairs a **release** version with
+**post-release** counts. Between cuts `data/stats.json` `version`, the build
+manifest, the HF card, `INCIDENTS.md`, the site header and the README badge cell
+read `<last-release>+main` (today `2.13.0+main`). At a cut the suffix is dropped:
+the version becomes the new release and is plain again.
+
+**How the build knows, with no network, no model and no git.**
+`data/last_release.json` is a committed marker (written by
+`scripts/mark_release.py` at each cut) holding the release version, date, the
+released counts and `rows_sha256`, a digest of the release's `incidents` rows.
+`scripts/release_label.py` hashes the current rows the same way: equal -> plain
+version; different -> `<version>+main`. It is **not** `git describe`, because a
+shallow CI clone has no tags and the same commit would then build to different
+bytes. The digest covers the rows, not the counts, so a change that keeps every
+count equal still flips the label.
+
+**What carries which string.**
+
+| Surface | Carries |
+|---|---|
+| `data/stats.json` `version`, build manifest `version`, `INCIDENTS.md`, README badge cell, HF card, `version_label` in the slim `incidents.min.json` and in the site's `incidents.core.json` (derived from the slim file; the site header reads the core payload) | the label (`2.13.0+main` between cuts) |
+| README "Latest release" paragraph (`stats:release_*` markers) | the **released** version, date and counts (`stats.json` `last_release`), never the live ones |
+| `pyproject.toml`, `.zenodo.json`, `CITATION.cff`, `USER_AGENT`, `"version"` in `data/incidents.json` | the plain release version. They name a release line, not a data state; PEP 440 treats `2.13.0+main` as a local version that PyPI rejects and pip ranks above `2.13.0`, so the package version is deliberately **not** suffixed. |
+
+`scripts/check_stats_drift.py` fails if a plain version sits beside counts that
+differ from the release's, if `+main` is claimed while the rows equal the
+release's, if `last_release.json` does not name the top released CHANGELOG
+version (a cut that forgot `mark_release.py`), or if a version-carrying surface
+disagrees with `stats.json`.
+
 ## The release-cut checklist
 
 1. **Release notes written and gated *before* the cut.** The notes file
@@ -113,9 +145,31 @@ caught at gate review, not by this file. Run both checks as part of step
    `## [Unreleased]` above it) — the top *released* heading is what the
    check treats as the current version and release date; (ii) update the
    README `## 🚨 Latest release` lead line to
-   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date.
+   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date. Also re-read the sentence
+   "The headline counts at the top of this page are for `main` and are labelled with the `+main`
+   version suffix; they have grown since this release": it is **false at a cut** (the headline
+   counts are then the release's) and must be removed or re-tensed in the same edit (D132).
 
-3. **Rebuild with `make build` — never hand-edit `data/stats.json` or
+3. **Build, commit, mark the release, rebuild (D132).** The order matters
+   because `scripts/mark_release.py` reads `data/incidents.json` from a
+   **committed** revision (`git show <rev>:data/incidents.json`), **not the
+   working tree**, and refuses a revision whose header `version` is not the one
+   being cut (`tag v2.14.0 data/incidents.json says version '2.13.0'`):
+   (a) after the step-2 bumps, run `make build`; (b) commit the result (the
+   rows and the bumped header); (c) run
+   `python scripts/mark_release.py --tag v<version> --rev HEAD` (before the tag
+   exists; afterwards the default `--rev` is the tag); (d) run `make build`
+   again so `stats.json` and every labelled surface drop the `+main` suffix;
+   (e) commit `data/last_release.json` and the regenerated outputs (rows are
+   unchanged, so the digest stays valid). Until (c) the label reads
+   `<old release>+main` and the step-4 drift check fails by design. After step 6
+   `tests/test_release_label.py` re-derives the marker from the tag itself.
+   *Limit:* `check_stats_drift.py` cannot validate the marker's counts or digest
+   without the tag (e.g. a hand-edited `incident_count` in the marker passes
+   it); only that test catches this, and it skips where tags are not fetched
+   (shallow clones). `validate.yml` uses `fetch-depth: 0`, so CI runs it.
+   Step (a)'s `make build` is the full pipeline described next, and so is (d):
+   **Rebuild with `make build` — never hand-edit `data/stats.json` or
    `data/incidents.json`, and never run only half the pipeline.** The
    `Makefile` target is `build: merge render render-docs-stats validate` —
    `merge` alone (`parse_existing.py` + `merge_and_dedupe.py`) is **not**
@@ -359,6 +413,15 @@ caught at gate review, not by this file. Run both checks as part of step
    `build_manifest.json`'s `commit` must be the commit the tag points at
    (`git rev-parse v<version>^{commit}`), and its counts must equal
    `data/stats.json` at that tag.
+
+   **Known failure for v2.13.0 manifests:** the `build_manifest.json` attached to
+   the v2.13.0 Release lacks `unverified_count` (added afterwards under D130), so it
+   **fails the current `schema/build_manifest.schema.json`** (`unverified_count` is
+   required) and `export_integrity.py verify` will report it. That is expected and
+   disclosed in CHANGELOG; do not "fix" the old asset. The v2.13.0 manifest's
+   `version` is the plain `2.13.0`, which is correct for it. From the next cut on,
+   the manifest validates and carries a plain version only if the data is exactly
+   that release's.
 
    **Wait for `status: "completed"` before reading `conclusion` — do not
    run the check above immediately after step 7.** Both workflows are

@@ -1113,7 +1113,7 @@ async function init() {
     });
 
     els.meta.textContent =
-      `Dataset v${payload.version || '?'} · generated ${payload.generated || '?'} · ${fmtNum(DATA.length)} incidents`;
+      `Dataset v${payload.version_label || payload.version || '?'} · generated ${payload.generated || '?'} · ${fmtNum(DATA.length)} incidents`;
 
     rerender();
     loadIntegrityNote();

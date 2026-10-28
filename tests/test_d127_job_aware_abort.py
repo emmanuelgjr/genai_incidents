@@ -120,6 +120,7 @@ def tree(tmp_path_factory):
     for f in (REPO / "ingest").glob("*.py"):
         shutil.copy(f, root / "ingest" / f.name)
     (root / "data").mkdir()
+    shutil.copy(REPO / "data" / "last_release.json", root / "data" / "last_release.json")  # D132
     return root
 
 
@@ -448,6 +449,8 @@ def full_tree(tmp_path_factory):
         tf.extractall(root, **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
     shutil.rmtree(root / "scripts")
     shutil.copytree(REPO / "scripts", root / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
+    (root / "data").mkdir(exist_ok=True)
+    shutil.copy(REPO / "data" / "last_release.json", root / "data" / "last_release.json")  # D132
     env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     r = subprocess.run([sys.executable, str(root / "scripts" / "parse_existing.py")], cwd=root, env=env,
                        capture_output=True, text=True, encoding="utf-8", errors="replace")

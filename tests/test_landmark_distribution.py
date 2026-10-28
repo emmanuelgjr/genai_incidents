@@ -445,6 +445,8 @@ REGISTERED_PRODUCERS = {
     ),
     # -- read the corpus, distribute nothing derived from it --
     "validate.py": "INTERNAL (schema + landmark-label gate)",
+    "release_label.py": "INTERNAL (D132 release-vs-main version label; hashes rows, distributes only the label)",
+    "mark_release.py": "INTERNAL (D132 cut-time writer of data/last_release.json)",
     "check_dead_filters.py": "INTERNAL (CI gate over the served payload)",
     "audit_cve_bridge.py": "INTERNAL (audit report)",
     "make_og_image.py": "INTERNAL (renders counts into an image, no per-row fields)",

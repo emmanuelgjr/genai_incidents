@@ -142,6 +142,17 @@ def test_planted_stale_count_is_caught_end_to_end(tmp_path, monkeypatch):
     (tmp_path / "src" / "genai_incidents" / "data").mkdir(parents=True)
     (tmp_path / "src" / "genai_incidents" / "data" / "incidents.min.json").write_text(
         json.dumps({"incidents": rows}), encoding="utf-8")
+    # D132 fixtures: the rows ARE the 2.8.0 release's, so the label is plain.
+    import release_label as rl
+    lr = {"version": "2.8.0", "released": "2026-07-12", "tag": "v2.8.0",
+          "rows_sha256": rl.rows_digest(rows), **rl.derive_counts(rows)}
+    st = json.loads(stats_path.read_text(encoding="utf-8")); st["last_release"] = lr
+    stats_path.write_text(json.dumps(st), encoding="utf-8")
+    for rel in ("data/incidents.min.json", "docs/data/incidents.min.json",
+                "src/genai_incidents/data/incidents.min.json"):
+        f = tmp_path / rel
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps({"version_label": "2.8.0", "incidents": rows}), encoding="utf-8")
     monkeypatch.setattr(lib, "STATS_PATH", stats_path)
     monkeypatch.setattr(lib, "DOC_SURFACES", [surface])
     monkeypatch.setattr(checker, "DOC_SURFACES", [surface])
