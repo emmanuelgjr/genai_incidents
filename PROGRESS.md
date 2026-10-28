@@ -14,6 +14,41 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D139-M **DONE — gate PASS (scoped re-gate r5 on `f5f841ce`), MERGED to main 2026-10-28.**
+**Verdict, in the gate's words:** "PASS ... DEFECTS: none. Both bounce-#4 defects are fixed, and I found nothing else that moved. I checked the brief's premises and found none of them wrong."
+**Gate evidence (different route from the specialist, agreement 6):**
+- Diff = 4 files; `git diff 56d6b4cd..f5f841ce -- data scripts` = 0 bytes.
+- Defect 1: the run block was extracted with PyYAML and run as GitHub does (`bash --noprofile --norc -eo pipefail`) in a throwaway clone, using the REAL parse/merge scripts.
+  - push with an ancestor: rc 0.
+  - push with an absent SHA / all zeros / unset / '' / a tree SHA / a blob SHA: each `::error::`, rc 1.
+  - pull_request with an empty or all-zero `before`: rc 0 (base HEAD^1).
+  - The exported var is consumed: a bad SHA gives `[FATAL] D140`, rc 1.
+  - Four real builds were byte-identical to the committed data.
+  - The comment, DATA_DICTIONARY and CHANGELOG match the behaviour.
+- Defect 2: the gate used its own 5 mutations (delete / copy / empty curation / move-before / refresh-twice). The new test kills all 5 and is the ONLY killer of move-before and refresh-twice. Its in-test control proves it is not vacuous.
+- `merge-tree` vs origin/main is clean; pytest 1544 passed + 1 xfailed.
+**Advisories (queued, not blocking):**
+- A1: the validate.yml checkout comment (lines 18-22) "No other step in this job reads git history" is now false → WS4 one-line follow-up.
+- A2: **accepted consequence of D141:** a force-push to main, or main's creation, turns validate.yml red by design.
+- A3: no automated test runs the workflow shell block → WS4 follow-up.
+**Foreman [R]:**
+- `git status --porcelain` empty in both trees (no strays).
+- Merge `a6e82dcd`: 6 files; the data delta is the `curation_overrides.json` `_doc` line only, which is expected and matches gates r3/r4. `incidents.json` is untouched.
+
+### ⚖ D143, USER RULING 2026-10-28 — 21-row re-review package (`docs/audits/user-re-review-package-2026-10-16.md`)
+- **Rows 1–11 (fixed: INC-02454, 02774, 02899, 03004, 03472, 03955, 03972, 04179, 04221, 04653, 04955):** user "update" = **accept + fix open items**.
+  - The D130-2 references/text and the D130-2L labels stand as built, including judgement calls 1–4 as the agent chose them.
+  - **No quality_tier promotion** (an accept never promotes).
+  - **Gated follow-up D143-F**, to be scoped to the package's open items:
+    - (a) `date`/`year` corrections on the 9 lagging rows (§5.5);
+    - (b) severities set for dropped claims (INC-02899, 04221, 04653, 04955);
+    - (c) leftover mitigations / source_ids / MAESTRO note from the merged incidents (INC-02454, 02774, 02899, 04179; §5.3/§5.6). These interact with the WS4-T19 splits.
+  - The foreman scopes ownership when the task is dispatched.
+- **Rows 12–21 (unverified: INC-02353, 02703, 02922, 03247, 03444, 03447, 03491, 03570, 03810, 04310):** user "leave out of the count and archive" → clarified as **keep `status: unverified`** (already in effect).
+  - The rows stay out of `incident_count`, stay in the full JSON, and are never deleted.
+  - A source found later can restore a row.
+- The "pending user re-review" notes on these 21 overrides are to be updated to record D143. That happens only through a gated task: fold it into D143-F.
+
 ### 🔍 D139-M bounce-#4 fixes REPORTED `f5f841ce` (2026-10-28) — SCOPED re-gate dispatched (gate-d139m-r5)
 - Specialist (testimony): validate.yml push fallback → `::error::` + exit 1 (also split the collapsed one-line continuation into three `\`-joined lines); comment, DATA_DICTIONARY push row, CHANGELOG corrected; rc 1 for before = 40 zeros / deadbeef×5 / '', rc 0 for a real parent; new test `test_clear_survives_refresh_atlas_codes_on_a_retained_row` (with a non-vacuity control) 1 passed → 1 failed under the move mutation → 1 passed restored; pytest 1544 passed + 1 xfailed; data diff empty.
 - **Foreman [R]:** origin branch = `f5f841ce`; worktree clean; `git diff --stat 56d6b4cd..HEAD` = 4 files (+28/-9), `-- data` empty; read the validate.yml diff: fallback removed, `exit 1` present.
