@@ -163,6 +163,35 @@ built it must treat a retired source as expected: the live counter stamps AIRI
 `retired` over `stale` each run, D108, while the registry keeps `stale`.) The counter itself is never the thing that
 ships.
 
+## Curation-override keys that delete (D139)
+
+`data/curation_overrides.json` entries normally *set* a field. Two keys remove
+instead; both are instructions, never copied onto the row, re-applied on every
+build, and checked up front even when their key matches no row. Any failure
+aborts the build (nothing is written).
+
+| Key | Effect | The build fails when |
+|---|---|---|
+| `"references_remove": ["<url>", ...]` | Drops those URLs from the row's references after they are assembled from all sources; remaining references keep their order and upstream additions survive. Matching is **exact string** equality on `url` (no trailing-slash, case or scheme folding: a near-miss is a different reference); every occurrence is removed. | a listed URL is not on the row (upstream changed it, or it is mistyped), with the one retained-row exception below; the row would be left with no reference; the override also carries `references`; the list is empty, has duplicates, or has a non-string or whitespace-padded item; its key is no entry's `source_id` |
+| `"fields_clear": ["<field>", ...]` | Removes the field from the row. Clearing an already-absent field is a no-op (the goal state holds, and the override stays retirable once the value's own source goes away). A JSON `null` value is **not** a clear. | a field is not in the allowlist (`discovery_method`, `reversibility_class`, `mitre_atlas_tactics`: optional labels that are in the content-field set, so a change bumps `updated`); the same override also sets that field; the list is empty or has duplicates; its key is no entry's `source_id` |
+
+**Retained rows (step 6c, user rulings D140 and D141).** A row whose upstream source dropped it is carried forward verbatim from the working-tree `data/incidents.json`, so it bypasses the normal override step; both keys are re-applied to it afterwards. For `references_remove` on a retained row, a listed URL that is not on the row is accepted only if (a) the same row (matched by `id`, which is stable) carries it in `<baseline>:data/incidents.json`, i.e. this change removes it, or (b) `<baseline>:data/curation_overrides.json` already lists that exact URL under the same key, i.e. it was removed earlier. Anything else (a mistyped URL, one that was never there) fails the build, so it cannot pass forever. The test is per URL and per key: re-keying a URL makes it new again, and a URL on a different row does not count. When the baseline has no such file, there is no git metadata, or the key is not in it, nothing is accepted (strict); a shallow or unreadable repository fails closed, as the D71 baseline does. `data/incidents.json` at the baseline is large; it is read once, and only when a retained row has a missing listed URL. The baseline revision is `$GENAI_OVERRIDE_BASELINE` when set, otherwise `HEAD`. It is resolved on every build, before any row is looked at: a set variable that is empty, does not resolve to a commit, or has no git metadata fails the build with `[FATAL] D140`, never falling back to `HEAD`. Per job:
+
+| Job | Baseline | Effect |
+|---|---|---|
+| local build | `HEAD` (last commit) | an override you have just added is new; rule (a) lets a correct removal pass a second build before you commit |
+| weekly refresh (`auto-refresh.yml`) | `HEAD` = the merged `main` it checked out, before the refresh commit | removals already merged are accepted by rule (b); a hand edit in the job is strict |
+| `atlas-refresh.yml`, `cve-enrich.yml` | `HEAD` (variable unset), same reasoning | as above |
+| PR CI (`validate.yml`, `pull_request`) | `HEAD^1`, the PR base of the merge commit | what the PR adds is new, so it must satisfy (a) or (b) against the base |
+| push to `main` (`validate.yml`) | `github.event.before`, the previous tip of `main` (correct for a multi-commit fast-forward push, where `HEAD^1` would already hold the override). There is no fallback: a new-branch push (all-zero SHA), a force-push whose old tip is gone from the clone, or an empty/missing `before` SHA makes the job fail with an `::error::` (fail closed, D141) | as PR CI |
+
+The never-empty rule applies to retained rows too, and active rows keep the strict check. `fields_clear` runs after the pinned-ATLAS refresh that union-adds `mitre_atlas_tactics`, so a tactics clear holds; `updated` moves only on the net change. The "matches no entry" check runs after retention, so an upstream drop of a row never breaks the build.
+
+`id`, `status`, `quality_tier`, required schema fields and `references` can never
+be cleared: demote through the `quality_tier` override, use `references_remove`
+for references. `maestro_layers` is not clearable because it is not a content
+field (a change would not bump `updated`).
+
 ## Reproducing the landmark count
 
 README tells readers to cite the **landmark** count rather than the full

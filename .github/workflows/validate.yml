@@ -36,7 +36,31 @@ jobs:
         run: pytest tests -q
 
       - name: Re-merge from ingest sources
+        # D140/D141: the checkout already contains any override this change adds, so
+        # the baseline for the retained-row URL check must be the state BEFORE it:
+        # the PR base (HEAD^1 of the pull_request merge commit), or for a push the
+        # previous tip of main (github.event.before; HEAD^1 would be wrong for a
+        # multi-commit fast-forward push). FAIL CLOSED: if the push `before` SHA is
+        # empty, all-zero (new branch), or not a commit in this clone (force-push
+        # whose old tip is gone), this step fails with an ::error:: and does NOT
+        # fall back to HEAD^1. Any other unresolvable value fails inside
+        # merge_and_dedupe.py ([FATAL] D140).
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
         run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="HEAD^1"
+          else
+            base="$PUSH_BEFORE"
+            if [ -z "$base" ] \
+               || [ "$base" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+              echo "::error::push baseline '${base}' is empty, all-zero, or not a commit in this clone (new branch, force-push, or missing before SHA); refusing to fall back to HEAD^1 (D141 fail-closed)"
+              exit 1
+            fi
+          fi
+          export GENAI_OVERRIDE_BASELINE="$base"
           python scripts/parse_existing.py
           python scripts/merge_and_dedupe.py
 
