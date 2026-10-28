@@ -268,6 +268,13 @@ python scripts/validate.py   # shape + cross-record rules; "integrity: ... all d
 python -m pytest -q tests/test_resolve_id_status.py
 ```
 
+## Version labels (D132)
+
+- `version` (top-level of `data/incidents.json` and the slim `incidents.min.json`): the plain **release-line** version (e.g. `2.13.0`). It does not change between cuts, so it is not a data-state marker.
+- `version_label` (slim `incidents.min.json` and the site's `incidents.core.json`): the **data state**. Equal to `version` only when `incidents` are exactly the last release's rows; otherwise `<release>+main` (e.g. `2.13.0+main`). The site header prints it beside the counts.
+- `data/stats.json` `version`: the same label. `data/stats.json` `last_release`: the last release's own `version`, `released` date, `tag`, `rows_sha256` (digest of its `incidents` rows) and counts (`incident_count`, `retracted_count`, `unverified_count`, `disputed_count`, `landmark_count`).
+- `data/last_release.json`: the committed source of `last_release`, written at each cut by `scripts/mark_release.py`. Rule, cut order and limits: [`VERSIONING.md`](VERSIONING.md#the-main-label-d132).
+
 ## Access
 - **Python:** `pip install genai-incidents` → `load_incidents()`, `query(...)`, `by_id()`, `by_cve()`, `resolve_id()`, `resolve_id_group()` (all live successors of a retired id, a list; `load_deprecations()` values are `str | list[str]`), `resolve_id_status(id, release=None)` (a typed `IdStatus`: `live`, `successor`, `group`, `release-dependent`, `pre-tombstone`, `withdrawn` or `unknown`; v2.13.0).
 - **Hugging Face:** `load_dataset("emmanuelgjr/genai-incidents")` (JSONL projection).

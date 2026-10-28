@@ -145,12 +145,31 @@ disagrees with `stats.json`.
    `## [Unreleased]` above it) — the top *released* heading is what the
    check treats as the current version and release date; (ii) update the
    README `## 🚨 Latest release` lead line to
-   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date.
+   `**X.Y.Z — released YYYY-MM-DD.**` with the same version and date. Also re-read the sentence
+   "The headline counts at the top of this page are for `main` and are labelled with the `+main`
+   version suffix; they have grown since this release": it is **false at a cut** (the headline
+   counts are then the release's) and must be removed or re-tensed in the same edit (D132).
 
-3. **Run `python scripts/mark_release.py --tag v<version> --rev HEAD` first** (D132): it rewrites
-   `data/last_release.json` from the cut commit's rows, so the next rebuild drops the `+main`
-   suffix. After step 6 `tests/test_release_label.py` re-derives the marker from the tag itself.
-   Then **rebuild with `make build` — never hand-edit `data/stats.json` or
+3. **Build, commit, mark the release, rebuild (D132).** The order matters
+   because `scripts/mark_release.py` reads `data/incidents.json` from a
+   **committed** revision (`git show <rev>:data/incidents.json`), **not the
+   working tree**, and refuses a revision whose header `version` is not the one
+   being cut (`tag v2.14.0 data/incidents.json says version '2.13.0'`):
+   (a) after the step-2 bumps, run `make build`; (b) commit the result (the
+   rows and the bumped header); (c) run
+   `python scripts/mark_release.py --tag v<version> --rev HEAD` (before the tag
+   exists; afterwards the default `--rev` is the tag); (d) run `make build`
+   again so `stats.json` and every labelled surface drop the `+main` suffix;
+   (e) commit `data/last_release.json` and the regenerated outputs (rows are
+   unchanged, so the digest stays valid). Until (c) the label reads
+   `<old release>+main` and the step-4 drift check fails by design. After step 6
+   `tests/test_release_label.py` re-derives the marker from the tag itself.
+   *Limit:* `check_stats_drift.py` cannot validate the marker's counts or digest
+   without the tag (e.g. a hand-edited `incident_count` in the marker passes
+   it); only that test catches this, and it skips where tags are not fetched
+   (shallow clones). `validate.yml` uses `fetch-depth: 0`, so CI runs it.
+   Step (a)'s `make build` is the full pipeline described next, and so is (d):
+   **Rebuild with `make build` — never hand-edit `data/stats.json` or
    `data/incidents.json`, and never run only half the pipeline.** The
    `Makefile` target is `build: merge render render-docs-stats validate` —
    `merge` alone (`parse_existing.py` + `merge_and_dedupe.py`) is **not**

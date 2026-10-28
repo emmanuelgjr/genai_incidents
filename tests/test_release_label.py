@@ -92,3 +92,26 @@ def test_committed_tree_label_matches_build():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     rows = json.loads((ROOT / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
     assert stats["version"] == rl.version_label(rows)
+
+
+def test_core_payload_carries_version_label(tmp_path, monkeypatch):
+    """Defect 1 of the D132 gate: the site reads incidents.core.json, whose builder
+    used to drop version_label. Input that fails it: a slim file with a label
+    whose core output lacks/changes it."""
+    import gen_docs_core_data as g
+    src = tmp_path / "min.json"
+    src.write_text(json.dumps({"version": "2.13.0", "version_label": "2.13.0+main",
+                               "generated": "x", "incidents": [{"id": "INC-1", "year": 2024}]}),
+                   encoding="utf-8")
+    out = tmp_path / "d"
+    monkeypatch.setattr(g, "SRC", src)
+    monkeypatch.setattr(g, "DOCS_DATA", out)
+    monkeypatch.setattr(g, "CORE_OUT", out / "incidents.core.json")
+    monkeypatch.setattr(g, "DETAIL_DIR", out / "detail")
+    g.main()
+    core = json.loads((out / "incidents.core.json").read_text(encoding="utf-8"))
+    assert core["version_label"] == "2.13.0+main"
+    # and the drift check rejects a plain label on the core surface
+    new = ROWS + [{"id": "INC-3", "status": None}]
+    assert checker.check_release_label(_stats("2.13.0+main", new), new, CL,
+                                       {"core": "2.13.0"})

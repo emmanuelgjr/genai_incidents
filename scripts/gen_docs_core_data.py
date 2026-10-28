@@ -117,6 +117,9 @@ def main() -> int:
 
     core_payload = {
         "version": payload.get("version"),
+        # D132: the site header shows this beside the counts ("<release>+main"
+        # between cuts); `version` stays the plain release line.
+        "version_label": payload.get("version_label"),
         "generated": payload.get("generated"),
         "incident_count": len(core_incidents),
         "incidents": core_incidents,

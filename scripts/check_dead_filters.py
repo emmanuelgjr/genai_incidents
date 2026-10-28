@@ -131,6 +131,15 @@ def main() -> int:
     payload = json.loads(CORE_JSON.read_text(encoding="utf-8"))
     incidents = payload["incidents"]
 
+    # D132: the site header prints payload.version_label beside the counts; it
+    # must equal data/stats.json's label (never a plain release version).
+    want = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))["version"]
+    if payload.get("version_label") != want:
+        print(f"::error::{CORE_JSON.name} version_label is {payload.get('version_label')!r} but "
+              f"data/stats.json says {want!r} -- the site header would pair a release version "
+              f"with post-release counts (D132). Re-run scripts/gen_docs_core_data.py.", file=sys.stderr)
+        return 1
+
     selects = discover_selects()
     if not selects:
         print("::error::no <select> elements found inside .filters -- discovery is broken", file=sys.stderr)
