@@ -14,6 +14,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D142 REPORTED `91cd44ca` (2026-10-28) — gate-d142 dispatched
+- **Specialist (testimony):**
+  - **Root cause: two growths, no hang.** Total need is ≈63 min against the 60-min cap.
+  - The OECD AIM fetch went 34.7 → 50.8 min. The newest-3000 sitemap window no longer holds legacy numeric-slug URLs ("skipping 1154/3000" on 10-13 vs "skipping 0/3000" on 10-25), so all 3,000 pages are fetched at 1 req/s. 3,000 is the OECD_AIM_LIMIT cap, so this is a ceiling.
+  - Unit tests went 4.3 → 7.6 min.
+  - **Fix:** refresh job timeout 60 → 100, plus a step timeout on every named step (OECD 65, tests 25, PR 10, …).
+  - New budget test, with a fire test.
+  - 3 files changed; data/scripts untouched.
+  - **No full pytest on the final tree** — the gate was asked to run it.
+- **Foreman [R]:**
+  - origin = `91cd44ca`; 3 files (+101/-5); porcelain clean.
+  - The 10-25 run 40178341113 has the OECD step 09:15:47→10:06:33 (50.8 min) and unit tests 10:07:15→10:14:51 (7.6 min). Both match.
+- **Open question for the user (raised by the specialist, D114-adjacent; NOT decided):**
+  - Because of D114, the OECD pair is held at its committed version. So the ~51-min fetch only feeds the D42 review artifact, the skip-probe and the source-health counter: about 80% of the job time.
+  - The options are a separate job, or a lower OECD_AIM_LIMIT, which would bring the refresh to ≈12 min.
+  - Raise this with the user after D142 merges.
+
 ### ▶ D142 DISPATCHED 2026-10-28 (WS4, pipeline-engineer) — weekly refresh exceeds the 60-min job timeout
 - Branch `ws4/d142-refresh-timeout-2026-10-28` (worktree `C:/repos/gi-wt-d142`, from `4e61da4d`).
 - **Ordering, foreman decision (revisable):** D142 goes ahead of D132 because it is time-sensitive. The next scheduled refresh is Sun 2026-11-01, and two have been lost already. This follows the D131 precedent ("ideally before Sunday").
