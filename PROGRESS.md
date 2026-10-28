@@ -14,6 +14,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ▶ D142 DISPATCHED 2026-10-28 (WS4, pipeline-engineer) — weekly refresh exceeds the 60-min job timeout
+- Branch `ws4/d142-refresh-timeout-2026-10-28` (worktree `C:/repos/gi-wt-d142`, from `4e61da4d`).
+- **Ordering, foreman decision (revisable):** D142 goes ahead of D132 because it is time-sensitive. The next scheduled refresh is Sun 2026-11-01, and two have been lost already. This follows the D131 precedent ("ideally before Sunday").
+- Brief: prove the root cause with per-step timings (the 10-13 success vs the 10-18 and 10-25 failures); fix the cause rather than only raising the limit; give step-level timeouts to anything that can hang; leave the D127/D129/D131/D114/D108/D141 safety rulings intact; never open a real refresh PR from a test dispatch.
+- **Queue after D142:** D132 (+warden F1/F4) → D133 → D134(i) → D138 → D130-3 → **D143-F** (re-review open items; it interacts with WS4-T19) → D134(ii) → D134(iii) → WS5 DATASHEET note → D130-4 → D134(iv).
+- Small WS4 follow-ups from gate r5: validate.yml checkout comment (A1); a test of the workflow shell block (A3).
+
 ### ✅ D139-M **DONE — gate PASS (scoped re-gate r5 on `f5f841ce`), MERGED to main 2026-10-28.**
 **Verdict, in the gate's words:** "PASS ... DEFECTS: none. Both bounce-#4 defects are fixed, and I found nothing else that moved. I checked the brief's premises and found none of them wrong."
 **Gate evidence (different route from the specialist, agreement 6):**
