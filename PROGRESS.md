@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 ATLAS bounce-#1 fixes REPORTED `8503c6dd` (2026-10-29) — scoped re-gate by gate-atlas
+- **Specialist (testimony):**
+  - D1: per-entry counts 379/135.
+  - D2: D151 is implemented in apply_curation_overrides; the new test fails on the old code; INC-02899 loses TA0010.
+  - D3: the file size is updated.
+  - A1: a retained-tactic check in lint_atlas_ids.py, one-directional. It flags exactly INC-02899 on the 4cef2a4e data and 0/15,784 on the tip.
+  - A2: CORRECTIONS row added.
+  - origin/main merged again (no conflicts); lint, drift and the independent check pass.
+  - The full suite was still running at report time.
+- **Foreman [R]:**
+  - audit:15 reads 379/135;
+  - SOURCE_LICENSES:332 reads 1,154,660;
+  - CORRECTIONS:47 has the row;
+  - INC-02899 tactics are [TA0005, TA0009, TA0011, TA0012, TA0015], without TA0010;
+  - porcelain clean; ls-remote = 8503c6dd.
+
 - **Main CI on the D146-1 merge `cbdfc43b`: Validate success** (3.12 23:06:09→23:20:23Z, about 14 min; 3.13 green).
 
 ### 🔁 ATLAS 2026.10 BOUNCE #1 (gate-atlas on `4cef2a4e`), 2026-10-29 — in-progress
