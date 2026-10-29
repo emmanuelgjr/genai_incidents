@@ -77,6 +77,7 @@ Plus, where available:
 - **MAESTRO** architectural layers (`L1`–`L7`) — companion, carried where the upstream source provides it
 - **VERIS 1.4.1** crosswalk (`veris:*` tags) — experimental, computed at export time from `attack_vector`, not a stored per-incident field
 - **OWASP GenAI Data Security Risks & Mitigations 2026** (`owasp_dsgai`, `DSGAI01`–`DSGAI21`) — companion code set (OWASP, CC BY-SA 4.0), a stored per-incident field not counted among the six; sparse (seed-assigned, populated on well under 1% of rows), so an empty `owasp_dsgai` means "not mapped". Codes and titles: `mappings/owasp_dsgai_2026.json`
+  The 21 DSGAI titles are CC BY-SA 4.0 (OWASP Foundation; [legalcode](https://creativecommons.org/licenses/by-sa/4.0/legalcode)); attribution is in `NOTICE-DATA`.
 
 ## Quickstart
 
