@@ -14,6 +14,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ ATLAS 2026.10 refresh **DONE — MERGED to main 2026-10-29** (re-gate PASS on `8503c6dd`; gate-prescribed text edits at `9ed208a0`, verified by the foreman)
+- **Foreman [R] on `9ed208a0`** (`8503c6dd..9ed208a0` = 3 files, 3+/3−; no data):
+  - CORRECTIONS.md has the same line multiset as before, and the 2026-10-29 row is now at :15, the top of the table above 2026-10-16;
+  - the "pinning a subset" reason is at lint_atlas_ids.py:73 and in the delta audit at :22;
+  - worktree porcelain clean; ls-remote = 9ed208a0.
+- **Specialist:** lint OK; test_atlas_refresh 38 passed; full suite on 8503c6dd 1579 passed + 1 xfailed.
+- **Effect:**
+  - pin 2026.09→2026.10; REVISIONS row 3;
+  - 1,744 entries re-mapped by 5 translations (4 from the release notes, 1 by D149);
+  - a new retained-tactic lint;
+  - the curation-override translation and tactic re-derivation (D151);
+  - the monthly atlas-refresh test no longer hard-codes the file name.
+  - **The Tue 11-03 cron should now be a no-op** (fetch_atlas.is_unchanged). Check it on 11-03.
+- **Follow-ups:**
+  - **label-scientist:** the D149 semantic re-target (4 rows; T0144 or T0005.* candidates) and the old ids still emitted by scrape_aiid.py:159 and parse_existing heuristics;
+  - methods.md:116 at the next cut;
+  - **docs-warden next** (version strings and taxonomy pins changed; also covers D133-W).
+
 ### 🟡 ATLAS 2026.10, scoped re-gate **PASS** (gate-atlas on `8503c6dd`), 2026-10-29; two tiny pre-merge edits routed (D52)
 **VERDICT: PASS. DEFECTS: none.**
 **Evidence (gate):**
