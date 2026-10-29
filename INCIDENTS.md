@@ -4,7 +4,7 @@ A consolidated, machine-readable index of GenAI and agentic AI security incident
 Every applicable entry is mapped to four core taxonomies — **OWASP LLM Top 10 (2026)**, **OWASP Top 10 for Agentic Applications**, **NIST AI RMF**, and **MITRE ATLAS** — plus a companion **MAESTRO** mapping where the source provides it and an experimental **VERIS 1.4.1** crosswalk computed at export time. See docs/TAXONOMIES.md for the full picture.
 
 - **Version:** 2.13.0+main
-- **Generated:** 2026-10-16
+- **Generated:** 2026-10-29
 - **Total incidents:** **15,745**
   - of which CVE-disputed (counted; confidence lowered): 22
   - retracted (NOT counted; every CVE REJECTED): 29
@@ -116,11 +116,11 @@ Auto-generated from the current dataset. SVGs live under [`docs/charts/`](docs/c
 | `AML.T0012` | 2,403 |
 | `AML.T0048` | 1,927 |
 | `AML.T0053` | 1,394 |
-| `AML.T0057` | 1,078 |
-| `AML.T0056` | 732 |
+| `AML.T0085.002` | 1,078 |
+| `AML.T0085.003` | 732 |
 | `AML.T0051` | 631 |
 | `AML.T0049` | 577 |
-| `AML.T0024` | 361 |
+| `AML.T0024` | 364 |
 | `AML.T0010.001` | 320 |
 | `AML.T0020` | 197 |
 | `AML.T0066` | 149 |

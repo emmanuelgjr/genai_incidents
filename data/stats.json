@@ -5,11 +5,11 @@
   "disputed_count": 22,
   "landmark_count": 2025,
   "version": "2.13.0+main",
-  "generated": "2026-10-16",
+  "generated": "2026-10-29",
   "year_min": 1983,
   "year_max": 2026,
   "taxonomy_versions": {
-    "atlas": "2026.09",
+    "atlas": "2026.10",
     "owasp_llm": "2026",
     "owasp_asi": "2026",
     "capec": null,

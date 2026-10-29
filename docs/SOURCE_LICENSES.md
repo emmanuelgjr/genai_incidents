@@ -321,7 +321,7 @@ HTTP fetch of the latest release from
 text-pointer chain to `dist/v6/ATLAS-<release>.yaml`), through `ingest/common.py`
 (robots.txt check, per-host rate limit, identifying User-Agent). It is not in the
 deterministic build: `make build` only reads the committed copy. The verbatim release
-is committed as `ingest/atlas/ATLAS-<release>.yaml` (currently 2026.09) with
+is committed as `ingest/atlas/ATLAS-<release>.yaml` (currently 2026.10) with
 `ingest/atlas/ATLAS.provenance.json` (sha256, URL, pointer chain, retrieval date);
 `scripts/atlas_pin.py` derives `mappings/mitre_atlas.json` from it. Run monthly by
 `.github/workflows/atlas-refresh.yml`; an unchanged release writes nothing.

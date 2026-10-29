@@ -1760,6 +1760,12 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
                 if k in ("description_provenance", "description_source") and key_sid not in (e.get("description") or ""):
                     continue
                 e[k] = v
+                if k == "mitre_atlas" and isinstance(v, list):
+                    # A curated code list is written against the release current
+                    # when it was curated; carry it through the same pinned-release
+                    # id translation as every other row (ATLAS 2026.10: the
+                    # override on the AIjacking row still named AML.T0057).
+                    e[k] = sorted({_ATLAS_TRANSLATIONS.get(t, t) for t in v})
             # After the set-keys, so removal sees the row as every source
             # and any `references` set has assembled it.
             _apply_delete_overrides(e, key_sid, ov)

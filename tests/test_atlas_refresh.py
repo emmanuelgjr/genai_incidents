@@ -197,6 +197,11 @@ def test_fetch_atlas_has_no_direct_network_calls():
     assert "urlopen" not in src and "requests" not in src and "from ingest.common import fetch_once" in src
 
 
+# The committed snapshot's file name comes from its provenance, so these tests
+# survive every monthly re-pin instead of failing the refresh PR's own pytest run.
+_COMMITTED = json.loads((ROOT / "ingest" / "atlas" / "ATLAS.provenance.json").read_text(encoding="utf-8"))["file"]
+
+
 def _fake_upstream(monkeypatch, tmp_path, body: bytes):
     """Point fetch_atlas at a scratch snapshot dir and a fake upstream serving `body`."""
     snap = tmp_path / "atlas"
@@ -204,8 +209,8 @@ def _fake_upstream(monkeypatch, tmp_path, body: bytes):
     monkeypatch.setattr(fetch_atlas, "PROVENANCE", snap / "ATLAS.provenance.json")
     bodies = {
         fetch_atlas.RAW_BASE + "ATLAS-latest.yaml": b"v6/ATLAS-latest.yaml",
-        fetch_atlas.RAW_BASE + "v6/ATLAS-latest.yaml": b"ATLAS-2026.09.yaml",
-        fetch_atlas.RAW_BASE + "v6/ATLAS-2026.09.yaml": body,
+        fetch_atlas.RAW_BASE + "v6/ATLAS-latest.yaml": _COMMITTED.encode(),
+        fetch_atlas.RAW_BASE + "v6/" + _COMMITTED: body,
     }
     monkeypatch.setattr(fetch_atlas, "fetch_once", lambda url, timeout=60: (bodies[url], None))
     monkeypatch.setattr(sys, "argv", ["fetch_atlas.py"])
@@ -218,7 +223,7 @@ def _snapshot_state(snap: Path) -> dict:
 
 def test_fetch_same_release_is_a_true_noop(tmp_path, monkeypatch, capsys):
     """Unchanged upstream => nothing written, not even a fresh `fetched` date."""
-    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    body = (ROOT / "ingest" / "atlas" / _COMMITTED).read_bytes()
     snap = _fake_upstream(monkeypatch, tmp_path, body)
     assert fetch_atlas.main() == 0                      # first pull writes
     prov = json.loads((snap / "ATLAS.provenance.json").read_text(encoding="utf-8"))
@@ -232,7 +237,7 @@ def test_fetch_same_release_is_a_true_noop(tmp_path, monkeypatch, capsys):
 
 def test_fetch_changed_bytes_same_version_is_not_a_noop(tmp_path, monkeypatch):
     """The no-op must fire only on a matching sha: a re-issued file is rewritten."""
-    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    body = (ROOT / "ingest" / "atlas" / _COMMITTED).read_bytes()
     snap = _fake_upstream(monkeypatch, tmp_path, body)
     assert fetch_atlas.main() == 0
     before = _snapshot_state(snap)
@@ -243,12 +248,12 @@ def test_fetch_changed_bytes_same_version_is_not_a_noop(tmp_path, monkeypatch):
 
 def test_fetch_noop_requires_snapshot_file_intact(tmp_path, monkeypatch):
     """Provenance sha matching is not enough if the committed file was altered."""
-    body = (ROOT / "ingest" / "atlas" / "ATLAS-2026.09.yaml").read_bytes()
+    body = (ROOT / "ingest" / "atlas" / _COMMITTED).read_bytes()
     snap = _fake_upstream(monkeypatch, tmp_path, body)
     assert fetch_atlas.main() == 0
-    (snap / "ATLAS-2026.09.yaml").write_bytes(body + b"#tamper\n")
+    (snap / _COMMITTED).write_bytes(body + b"#tamper\n")
     assert fetch_atlas.main() == 0
-    assert (snap / "ATLAS-2026.09.yaml").read_bytes() == body   # restored from upstream
+    assert (snap / _COMMITTED).read_bytes() == body   # restored from upstream
 
 
 def test_atlas_pin_refuses_to_overwrite_existing_report(tmp_path, monkeypatch, capsys):
@@ -408,3 +413,29 @@ def test_entry_delta_refuses_to_overwrite_existing_dated_audit(tmp_path, monkeyp
     assert atlas_entry_delta.main() == 2
     assert "REFUSING to overwrite" in capsys.readouterr().err
     assert out.read_text(encoding="utf-8") == "EXISTING DATED RECORD\n"
+
+
+# ------------------------------------------- override-pinned ATLAS codes ----
+
+def test_curation_override_mitre_atlas_is_translated(monkeypatch):
+    """A curated mitre_atlas list is carried through the pinned-release id
+    translation (ATLAS 2026.10: the AIjacking row's override named AML.T0057).
+    Without it the deprecated id survives the merge and the lint fails."""
+    import merge_and_dedupe as md
+    monkeypatch.setattr(md, "_ATLAS_TRANSLATIONS", {"AML.T0057": "AML.T0085.002"})
+    row = {"id": "INC-X", "source_ids": ["S-1"], "mitre_atlas": ["AML.T0051"]}
+    md.apply_curation_overrides([row], {"S-1": {"mitre_atlas": ["AML.T0057", "AML.T0051"]}})
+    assert row["mitre_atlas"] == ["AML.T0051", "AML.T0085.002"]
+    # And the negative: with no translation entry the id is left alone.
+    monkeypatch.setattr(md, "_ATLAS_TRANSLATIONS", {})
+    md.apply_curation_overrides([row], {"S-1": {"mitre_atlas": ["AML.T0057"]}})
+    assert row["mitre_atlas"] == ["AML.T0057"]
+
+
+def test_current_translations_cover_every_deprecated_id_in_use():
+    """Every id the pin marks deprecated has a translation, and every
+    translation target is live (the 2026.10 release retired five ids)."""
+    pin = json.loads((ROOT / "mappings" / "mitre_atlas.json").read_text(encoding="utf-8"))["techniques"]
+    tr = json.loads((ROOT / "mappings" / "atlas_id_translations.json").read_text(encoding="utf-8"))["translations"]
+    for old in ("AML.T0024.000", "AML.T0024.001", "AML.T0024.002", "AML.T0056", "AML.T0057"):
+        assert old in tr and "deprecated" not in pin[tr[old]["to"]]

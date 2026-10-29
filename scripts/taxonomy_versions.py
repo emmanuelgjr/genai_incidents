@@ -73,6 +73,9 @@ REVISIONS = (
     # 2 -- D133: owasp_dsgai added
     {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
      "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026"},
+    # 3 -- ATLAS 2026.10 re-pin
+    {"atlas": "2026.10", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026"},
 )
 
 
