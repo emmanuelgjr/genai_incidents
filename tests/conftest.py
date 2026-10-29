@@ -71,3 +71,43 @@ def _stub_refresh_gate(request, monkeypatch):
     import merge_and_dedupe as m
 
     monkeypatch.setattr(m, "_run_refresh_gate", lambda *a, **k: None)
+
+
+class NetworkAccessAttempted(AssertionError):
+    pass
+
+
+@pytest.fixture(autouse=True)
+def _no_real_network(monkeypatch):
+    """D145: no in-process test may reach the real network. Name resolution and
+    non-loopback connects raise NetworkAccessAttempted (an AssertionError that
+    names the host), so a test that is silently networked fails loudly instead
+    of depending on whatever upstream publishes today. Subprocess tests are
+    separate processes and are unaffected."""
+    import socket
+
+    real_gai = socket.getaddrinfo
+    real_connect = socket.socket.connect
+    real_connect_ex = socket.socket.connect_ex
+    loopback = {"localhost", "127.0.0.1", "::1", "", None}
+
+    def gai(host, *a, **k):
+        if host not in loopback:
+            raise NetworkAccessAttempted(f"network access attempted: DNS lookup of {host!r}")
+        return real_gai(host, *a, **k)
+
+    def _guard(addr):
+        if isinstance(addr, tuple) and addr and addr[0] not in loopback:
+            raise NetworkAccessAttempted(f"network access attempted: connect to {addr!r}")
+
+    def connect(self, addr):
+        _guard(addr)
+        return real_connect(self, addr)
+
+    def connect_ex(self, addr):
+        _guard(addr)
+        return real_connect_ex(self, addr)
+
+    monkeypatch.setattr(socket, "getaddrinfo", gai)
+    monkeypatch.setattr(socket.socket, "connect", connect)
+    monkeypatch.setattr(socket.socket, "connect_ex", connect_ex)
