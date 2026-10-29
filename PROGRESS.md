@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D146-1 BOUNCE #2 (gate-d146 on `100202b1`), 2026-10-29 — **ESCALATED to the user** (protocol: two bounces)
+**VERDICT: BOUNCE (#2).** All 3 bounce-#1 defects are fixed; both new defects are in the D147 add-on.
+**DEFECTS:**
+1. **The D147 warning text is false in the common case.**
+   - "this run's finalize job will show red" is wrong. When AIAAIC fails alone, the abort check exits 1 only at ok=0, and check_source_health only warns below 3 consecutive failures. So in AIAAIC's 1st and 2nd failing weeks the run is green while the PR says it is red.
+   - The test pins the false phrase.
+   - "KEV, CVE sweep, AIID and retraction changes … are still fresh" is unconditional, and false when those steps also failed.
+   - **Root cause: the foreman's own wording.** The D147 brief and the user question both said "finalize will show red", unverified against check_source_health semantics.
+2. **The D147 tests miss two breakages; each passes all 18 workflow tests:**
+   - N4: delete the missing-file fallback. The PR-body step then dies in every normal week, continue-on-error hides it, and the PR gets an empty body.
+   - N3: write the warning to the work tree instead of RUNNER_TEMP. The warning is lost and a stray file is committed.
+   - Violates agreement 6.
+**Verified OK:**
+- The gate's M1-M12 each fail at least one test; N1 (keyed on .conclusion) fails too.
+- The warning is keyed on `steps.ingest_aiaaic.outcome`, placed before the PR-body step, and appended to (bash -e simulated both cases, rc 0); it survives truncation.
+- Comments, TESTS_MEASURED_MIN 10.8, budget arithmetic and the budget check all fire; A1 and B6 are in.
+- Merge 79f92a00: **1575 passed, 1 xfailed, 517.12s**; data/ 0 lines; LF; actionlint rc 0.
+**Advisory:** the A1 text says "confirm with one live workflow_dispatch", but D148-2 ruled that out, and no normal run exercises a job-level timeout. The text should say A1 stays unverified until a real job-level timeout happens.
+
 - **Step-7 note (D133-W, merged at `30c22401`):** the docs-warden pass for D133-W's licensing-text change is **folded into the docs-warden sweep after the ATLAS 2026.10 merge**, which also changes taxonomy and version strings. Meanwhile the gate's stale-"four" sweep (proven to fire: 5→0) covered the surfaces the warden had flagged.
 
 ### ✅ D133-W **DONE — MERGED to main 2026-10-29** (gate PASS on `0c6fee9c`, first review)
