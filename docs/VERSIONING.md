@@ -419,8 +419,12 @@ disagrees with `stats.json`.
    **fails the current `schema/build_manifest.schema.json`** (`unverified_count` is
    required) and `export_integrity.py verify` will report it. It also lacks
    `taxonomy_versions.owasp_dsgai` (added afterwards under D133, also required), a
-   second reason it fails. A consumer validating an old manifest against the
-   current schema should expect both errors and nothing else. That is expected and
+   second reason it fails, and `taxonomy_versions.maestro` and
+   `taxonomy_versions.nist_ai_rmf` (added afterwards under D146-2, both required),
+   a third. A consumer validating an old manifest against the current schema
+   should expect exactly these four missing-key errors and nothing else. Any
+   manifest stamped after D133 but before D146-2 fails on the two D146-2 keys
+   alone. That is expected and
    disclosed in CHANGELOG; do not "fix" the old asset. The v2.13.0 manifest's
    `version` is the plain `2.13.0`, which is correct for it. From the next cut on,
    the manifest validates and carries a plain version only if the data is exactly

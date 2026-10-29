@@ -86,6 +86,8 @@ Failure-mode catalog focused on **agentic** systems — agents with planning loo
 
 Source: <https://www.nist.gov/itl/ai-risk-management-framework>
 
+Edition pinned here: **1.0**, NIST AI 100-1 of January 2023 (`mappings/nist_ai_rmf.json`: field `version` is `1.0`, field `edition` is the descriptive "AI 100-1, January 2023"; the machine-readable value is `taxonomy_versions.nist_ai_rmf` in `data/stats.json`).
+
 Risk-management framework, not a failure catalog. Four functions:
 
 | Function | Description |
@@ -137,6 +139,8 @@ See `mappings/mitre_atlas.json` (pinned at ATLAS v2026.10; the machine-readable 
 Source: <https://genai.owasp.org/resource/genai-security-project-maestro/>
 
 Companion model that describes **where in the AI/agent architecture** an incident originates, impacts, or could be controlled. Used by the legacy `incidents.json` source and preserved on those entries.
+
+Edition pinned here: **1.0** (`mappings/maestro_layers.json`, field `version`; the machine-readable value is `taxonomy_versions.maestro` in `data/stats.json`).
 
 | Layer | Name |
 |---|---|
