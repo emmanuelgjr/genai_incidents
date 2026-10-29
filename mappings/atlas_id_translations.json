@@ -20,6 +20,31 @@
       "to": "AML.T0015",
       "since": "2026.09",
       "basis": "AML.T0015.001 is not defined in ATLAS 2026.06 or 2026.09 (AML.T0015 'Evade AI Model' has no subtechniques); it entered the corpus via the AVID ingest. Mapped to its parent, the conservative choice. Pre-existing defect surfaced by the refresh lint, not caused by the 2026.09 release."
+    },
+    "AML.T0024.000": {
+      "to": "AML.T0137.000",
+      "since": "2026.10",
+      "basis": "ATLAS v2026.10 release notes (github.com/mitre-atlas/atlas-data releases, tag v2026.10): 'Training Data Information from AI Models: Infer Membership' (AML.T0137.000) is 'moved from Exfiltration via AI Inference API: Infer Training Data Membership (AML.T0024.000)'. Tactic coverage of the target is inherited from AML.T0137 (derived at merge)."
+    },
+    "AML.T0024.001": {
+      "to": "AML.T0137.002",
+      "since": "2026.10",
+      "basis": "ATLAS v2026.10 release notes (github.com/mitre-atlas/atlas-data releases, tag v2026.10): 'Training Data Information from AI Models: Invert AI Model' (AML.T0137.002) is 'moved from Exfiltration via AI Inference API: Invert AI Model (AML.T0024.001)'."
+    },
+    "AML.T0056": {
+      "to": "AML.T0085.003",
+      "since": "2026.10",
+      "basis": "ATLAS v2026.10 release notes (github.com/mitre-atlas/atlas-data releases, tag v2026.10): 'Data from AI Services: System Instructions' (AML.T0085.003) is 'moved from Extract LLM System Prompt (AML.T0056)'. Tactic changes Exfiltration (AML.TA0010) -> Collection (AML.TA0009) with the move; declared in the 2026-10-29 delta."
+    },
+    "AML.T0057": {
+      "to": "AML.T0085.002",
+      "since": "2026.10",
+      "basis": "ATLAS v2026.10 release notes (github.com/mitre-atlas/atlas-data releases, tag v2026.10): 'Data from AI Services: Conversation Context and Memory' (AML.T0085.002) is 'moved from LLM Data Leakage (AML.T0057)'. Tactic changes Exfiltration (AML.TA0010) -> Collection (AML.TA0009) with the move; declared in the 2026-10-29 delta."
+    },
+    "AML.T0024.002": {
+      "to": "AML.T0024",
+      "since": "2026.10",
+      "basis": "No successor stated in the ATLAS v2026.10 release notes (AML.T0024.000 and AML.T0024.001 were moved to AML.T0137.x; 'Extract AI Model' was not). Mapped to the still-defined parent AML.T0024 'Exfiltration via AI Inference API' (tactic AML.TA0010, defined in the 2026.10 YAML) as a conservative generalisation (AML.T0015.001 -> AML.T0015 precedent). Semantic re-target pending label-scientist review (D149)."
     }
   }
 }

@@ -1735,6 +1735,18 @@ def _check_delete_overrides_matched(keys: list[str], curation: dict[str, dict], 
             f"{', '.join(dangling)}. Re-key each to a live source_id or remove it. " + abort_sentence())
 
 
+def _atlas_tactics_of(techniques) -> set[str]:
+    """Tactics the pinned release links these techniques to (subtechniques
+    inherit their parent's), the same derivation fill_taxonomy uses."""
+    out: set[str] = set()
+    for t in techniques:
+        tac = _ATLAS_TECHNIQUE_TACTICS.get(t)
+        if not tac and t.count(".") >= 2:
+            tac = _ATLAS_TECHNIQUE_TACTICS.get(t.rsplit(".", 1)[0])
+        out.update(tac or ())
+    return out
+
+
 def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -> int:
     """Step 4d: apply durable curation overrides, keyed by ANY member
     source_id. Returns the number of entries touched.
@@ -1747,6 +1759,7 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
         hit = next(((s, curation[s]) for s in (e.get("source_ids") or []) if s in curation), None)
         if hit:
             key_sid, ov = hit
+            ov_tactics_rederive = False
             for k, v in ov.items():
                 if k.startswith("_") or k in _STATUS_OVERRIDE_KEYS or k in _DELETE_OVERRIDE_KEYS:
                     continue
@@ -1760,6 +1773,20 @@ def apply_curation_overrides(surviving: list[dict], curation: dict[str, dict]) -
                 if k in ("description_provenance", "description_source") and key_sid not in (e.get("description") or ""):
                     continue
                 e[k] = v
+                if k == "mitre_atlas" and isinstance(v, list):
+                    # A curated code list is written against the release current
+                    # when it was curated; carry it through the same pinned-release
+                    # id translation as every other row (ATLAS 2026.10: the
+                    # override on the AIjacking row still named AML.T0057).
+                    translated = sorted({_ATLAS_TRANSLATIONS.get(t, t) for t in v})
+                    if translated != sorted(set(v)):
+                        # D151: the pinned tactics were derived from the pre-
+                        # translation techniques, so re-derive them (only here;
+                        # an override with no translated id keeps them as pinned).
+                        ov_tactics_rederive = True
+                    e[k] = translated
+            if ov_tactics_rederive and "mitre_atlas_tactics" in ov:
+                e["mitre_atlas_tactics"] = sorted(_atlas_tactics_of(e["mitre_atlas"]))
             # After the set-keys, so removal sees the row as every source
             # and any `references` set has assembled it.
             _apply_delete_overrides(e, key_sid, ov)

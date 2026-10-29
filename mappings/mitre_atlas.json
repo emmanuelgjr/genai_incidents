@@ -1,7 +1,7 @@
 {
   "framework": "MITRE ATLAS (Adversarial Threat Landscape for AI Systems)",
-  "version": "2026.09",
-  "release_date": "2026-09-15",
+  "version": "2026.10",
+  "release_date": "2026-10-28",
   "url": "https://atlas.mitre.org/",
   "tactics": {
     "AML.TA0000": {
@@ -106,19 +106,20 @@
       ]
     },
     "AML.T0005": {
-      "name": "Create Proxy AI Model",
+      "name": "Replicate AI Model Behavior",
       "tactics": [
-        "AML.TA0001"
+        "AML.TA0001",
+        "AML.TA0003"
       ]
     },
     "AML.T0005.000": {
-      "name": "Train Proxy via Gathered AI Artifacts"
+      "name": "Replicate Behavior from Gathered AI Artifacts"
     },
     "AML.T0005.001": {
-      "name": "Train Proxy via Replication"
+      "name": "Replicate Behavior from Model Outputs"
     },
     "AML.T0005.002": {
-      "name": "Use Pre-Trained Model"
+      "name": "Adapt Existing Model to Replicate Behavior"
     },
     "AML.T0006": {
       "name": "Active Scanning",
@@ -176,7 +177,7 @@
       }
     },
     "AML.T0010": {
-      "name": "AI Supply Chain Compromise",
+      "name": "Supply Chain Compromise",
       "tactics": [
         "AML.TA0004"
       ]
@@ -185,13 +186,13 @@
       "name": "Hardware"
     },
     "AML.T0010.001": {
-      "name": "AI Software"
+      "name": "Software"
     },
     "AML.T0010.002": {
-      "name": "Data"
+      "name": "Data Repository"
     },
     "AML.T0010.003": {
-      "name": "Model"
+      "name": "Model Repository"
     },
     "AML.T0010.004": {
       "name": "Container Registry"
@@ -281,6 +282,9 @@
     "AML.T0017.002": {
       "name": "AI Agent Tools"
     },
+    "AML.T0017.003": {
+      "name": "Malware"
+    },
     "AML.T0018": {
       "name": "Manipulate AI Model",
       "tactics": [
@@ -329,13 +333,25 @@
       ]
     },
     "AML.T0024.000": {
-      "name": "Infer Training Data Membership"
+      "name": "Infer Training Data Membership",
+      "deprecated": {
+        "since": "2026.10",
+        "note": "absent from ATLAS 2026.10; retained so entries that still reference it resolve, until translated (mappings/atlas_id_translations.json)"
+      }
     },
     "AML.T0024.001": {
-      "name": "Invert AI Model"
+      "name": "Invert AI Model",
+      "deprecated": {
+        "since": "2026.10",
+        "note": "absent from ATLAS 2026.10; retained so entries that still reference it resolve, until translated (mappings/atlas_id_translations.json)"
+      }
     },
     "AML.T0024.002": {
-      "name": "Extract AI Model"
+      "name": "Extract AI Model",
+      "deprecated": {
+        "since": "2026.10",
+        "note": "absent from ATLAS 2026.10; retained so entries that still reference it resolve, until translated (mappings/atlas_id_translations.json)"
+      }
     },
     "AML.T0025": {
       "name": "Exfiltration via Cyber Means",
@@ -552,13 +568,21 @@
       "name": "Extract LLM System Prompt",
       "tactics": [
         "AML.TA0010"
-      ]
+      ],
+      "deprecated": {
+        "since": "2026.10",
+        "note": "absent from ATLAS 2026.10; retained so entries that still reference it resolve, until translated (mappings/atlas_id_translations.json)"
+      }
     },
     "AML.T0057": {
       "name": "LLM Data Leakage",
       "tactics": [
         "AML.TA0010"
-      ]
+      ],
+      "deprecated": {
+        "since": "2026.10",
+        "note": "absent from ATLAS 2026.10; retained so entries that still reference it resolve, until translated (mappings/atlas_id_translations.json)"
+      }
     },
     "AML.T0058": {
       "name": "Publish Poisoned Models",
@@ -768,6 +792,12 @@
     },
     "AML.T0085.001": {
       "name": "AI Agent Tools"
+    },
+    "AML.T0085.002": {
+      "name": "Conversation Context and Memory"
+    },
+    "AML.T0085.003": {
+      "name": "System Instructions"
     },
     "AML.T0086": {
       "name": "Exfiltration via AI Agent Tool Invocation",
@@ -1106,10 +1136,89 @@
       "tactics": [
         "AML.TA0007"
       ]
+    },
+    "AML.T0135": {
+      "name": "Outputs from AI Models",
+      "tactics": [
+        "AML.TA0009"
+      ]
+    },
+    "AML.T0136": {
+      "name": "Exfiltration via AI User Interface",
+      "tactics": [
+        "AML.TA0010"
+      ]
+    },
+    "AML.T0137": {
+      "name": "Training Data Information from AI Models",
+      "tactics": [
+        "AML.TA0009"
+      ]
+    },
+    "AML.T0137.000": {
+      "name": "Infer Membership"
+    },
+    "AML.T0137.001": {
+      "name": "Infer Properties"
+    },
+    "AML.T0137.002": {
+      "name": "Invert AI Model"
+    },
+    "AML.T0137.003": {
+      "name": "Extract Memorized Data"
+    },
+    "AML.T0138": {
+      "name": "Indicator Removal",
+      "tactics": [
+        "AML.TA0007"
+      ]
+    },
+    "AML.T0139": {
+      "name": "Compromise Accounts",
+      "tactics": [
+        "AML.TA0003"
+      ]
+    },
+    "AML.T0140": {
+      "name": "Centralized AI Service Request Routing",
+      "tactics": [
+        "AML.TA0007"
+      ]
+    },
+    "AML.T0141": {
+      "name": "AI Service Request Metadata Sanitization",
+      "tactics": [
+        "AML.TA0007"
+      ]
+    },
+    "AML.T0142": {
+      "name": "Event Triggered Execution",
+      "tactics": [
+        "AML.TA0006"
+      ]
+    },
+    "AML.T0143": {
+      "name": "LLM Prompt Propagation",
+      "tactics": [
+        "AML.TA0015"
+      ]
+    },
+    "AML.T0144": {
+      "name": "Recover AI Model Internals",
+      "tactics": [
+        "AML.TA0008",
+        "AML.TA0009"
+      ]
+    },
+    "AML.T0145": {
+      "name": "Poison AI Agent Learning Environment",
+      "tactics": [
+        "AML.TA0006"
+      ]
     }
   },
   "case_studies_url": "https://atlas.mitre.org/studies",
-  "note": "Technique list is current as of MITRE ATLAS v2026.09 (mitre-atlas/atlas-data dist/v6/ATLAS-2026.09.yaml, committed verbatim under ingest/atlas/ with a sha256 in ingest/atlas/ATLAS.provenance.json); subtechniques use the .NNN suffix. Derived by scripts/atlas_pin.py -- do not hand-edit. Ids absent from the release are RETAINED with a `deprecated` marker (never deleted); scripts/lint_atlas_ids.py fails on any corpus/mapping id that is absent from or deprecated in this pin. Mechanical id translations for superseded ids live in mappings/atlas_id_translations.json.",
+  "note": "Technique list is current as of MITRE ATLAS v2026.10 (mitre-atlas/atlas-data dist/v6/ATLAS-2026.10.yaml, committed verbatim under ingest/atlas/ with a sha256 in ingest/atlas/ATLAS.provenance.json); subtechniques use the .NNN suffix. Derived by scripts/atlas_pin.py -- do not hand-edit. Ids absent from the release are RETAINED with a `deprecated` marker (never deleted); scripts/lint_atlas_ids.py fails on any corpus/mapping id that is absent from or deprecated in this pin. Mechanical id translations for superseded ids live in mappings/atlas_id_translations.json.",
   "technique_tactics_note": "Each top-level technique entry carries its ATLAS tactic id(s) under `tactics` (the release's `achieves` relationships); subtechniques inherit the parent's.",
-  "atlas_data_version": "2026.09"
+  "atlas_data_version": "2026.10"
 }

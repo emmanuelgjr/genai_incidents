@@ -100,8 +100,18 @@ def compute(before_path: Path, after_path: Path, old_pin: dict | None, new_pin: 
             for tac in sorted(atc - btc):
                 srcs = sorted(t for t in at if tac in _tactics_for([t], new_links)
                               and tac not in _tactics_for([t], old_links))
-                reasons.append(f"{tac} added via new link from {', '.join(srcs)}" if srcs
-                               else f"{tac} added (UNEXPLAINED)")
+                # A translation target carries its own tactic links: the tactic the
+                # entry gains is the target's, relative to the id it replaced.
+                moved_to = sorted(f"{x} -> {t}" for x in bt - at for t in [trans.get(x)]
+                                  if t in at and tac in _tactics_for([t], new_links)
+                                  and tac not in _tactics_for([x], old_links))
+                if srcs:
+                    reasons.append(f"{tac} added via new link from {', '.join(srcs)}")
+                elif moved_to:
+                    reasons.append(f"{tac} added: tactic of the translation target ({'; '.join(moved_to)}), "
+                                   "not of the id it replaced")
+                else:
+                    reasons.append(f"{tac} added (UNEXPLAINED)")
             changed.append({"id": eid, "fields": declared,
                             "mitre_atlas_before": sorted(bt), "mitre_atlas_after": sorted(at),
                             "tactics_before": sorted(btc), "tactics_after": sorted(atc),
