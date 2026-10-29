@@ -324,6 +324,9 @@ def test_handoff_checks_fire():
 
 WARN_STEP = "PR body warning - AIAAIC refresh failed"
 WARN_FILE = "aiaaic-failed-warning.md"
+WARN_TEXT = (
+    "> **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons."
+)
 
 
 def warning_problems(doc: dict) -> list[str]:
@@ -339,14 +342,17 @@ def warning_problems(doc: dict) -> list[str]:
     cond = str(w.get("if", ""))
     if "steps.ingest_aiaaic.outcome" not in cond or "!= 'success'" not in cond:
         out.append("the warning must be conditional on the refresh job's own AIAAIC outcome != success")
-    for needle in ("AIAAIC", "FAILED", "last week's", "finalize job will show red", "still fresh", WARN_FILE):
-        if needle not in str(w.get("run", "")):
-            out.append(f"the warning step lacks {needle!r}")
+    if f'echo "{WARN_TEXT}"' not in str(w.get("run", "")):
+        out.append("the warning step must echo EXACTLY the ruled text (D150)")
+    if f'> "$RUNNER_TEMP/{WARN_FILE}"' not in str(w.get("run", "")):
+        out.append("the warning file must be written under $RUNNER_TEMP, not the work tree (N3)")
     run = str(steps[bi].get("run", ""))
     first = run.find('cat "$RUNNER_TEMP/' + WARN_FILE + '" > "$RUNNER_TEMP/pr-body.md"')
     body = run.find("Automated weekly refresh of external sources.")
     if first < 0 or not first < run.find("<<'BODY'") < body:
         out.append("the PR-body step must start the body from the warning file, before the body text")
+    if '2>/dev/null || : > "$RUNNER_TEMP/pr-body.md"' not in run:
+        out.append("the PR-body step must fall back to an empty body when no warning file exists (N4)")
     if 'cat >> "$RUNNER_TEMP/pr-body.md" <<' not in run:
         out.append("the body text must APPEND, or it would overwrite the warning")
     return out
@@ -377,7 +383,11 @@ def test_warning_checks_fire():
     # body step does not start from the warning file
     assert mut(lambda st, w, b: b.__setitem__("run", b["run"].replace(WARN_FILE, "other.md", 1)))
     # warning text hollowed out
-    assert mut(lambda st, w, b: w.__setitem__("run", w["run"].replace("finalize job will show red", "x", 1)))
+    assert mut(lambda st, w, b: w.__setitem__("run", w["run"].replace("check this run's summary", "x", 1)))
+    # N4: the missing-file fallback deleted (every successful week would fail the step)
+    assert mut(lambda st, w, b: b.__setitem__("run", b["run"].replace(' 2>/dev/null || : > "$RUNNER_TEMP/pr-body.md"', "", 1)))
+    # N3: the warning file written into the work tree instead of $RUNNER_TEMP
+    assert mut(lambda st, w, b: w.__setitem__("run", w["run"].replace('> "$RUNNER_TEMP/aiaaic-failed-warning.md"', '> aiaaic-failed-warning.md', 1)))
 
 
 def test_pr_body_says_the_held_artifact_is_attached_by_the_oecd_job_and_may_come_later():

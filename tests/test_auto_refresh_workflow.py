@@ -88,7 +88,8 @@ def check_refresh_budget(text: str) -> list[str]:
     the run concluded "cancelled". If so, a job-level timeout of oecd-fetch or
     refresh means finalize (counter, cursor persist) does not run that week.
     The step caps below exist so a hang fails at its step first; the job caps
-    are only backstops. Confirm with one live workflow_dispatch.
+    are only backstops. Unverified until a needed job actually hits its job-level
+    timeout; no scheduled or dispatched run exercises this (no live dispatch, D148-2).
     """
     import yaml
 

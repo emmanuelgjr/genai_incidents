@@ -448,7 +448,7 @@ jobs:
         if: ${{ steps.ingest_aiaaic.outcome != 'success' }}
         run: |
           {
-            echo "> **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's, and this run's finalize job will show red. KEV, CVE sweep, AIID and retraction changes in this PR are still fresh."
+            echo "> **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons."
             echo
           } > "$RUNNER_TEMP/aiaaic-failed-warning.md"
 
@@ -624,7 +624,8 @@ jobs:
   # level, finalize may not run: the counter and cursor are then not updated that
   # week and the run is red/cancelled. Step caps are set well below the job caps
   # so a hang normally fails at its step instead. Design deliberately unchanged;
-  # confirm with one live workflow_dispatch before relying on it.
+  # unverified until a needed job actually hits its job-level timeout; no scheduled
+  # or dispatched run exercises this (no live dispatch, D148-2).
   finalize:
     runs-on: ubuntu-latest
     timeout-minutes: 15
