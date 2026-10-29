@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🟡 ATLAS 2026.10, scoped re-gate **PASS** (gate-atlas on `8503c6dd`), 2026-10-29; two tiny pre-merge edits routed (D52)
+**VERDICT: PASS. DEFECTS: none.**
+**Evidence (gate):**
+- Merge dfaa659d (8503c6dd + 48baa34a): **full suite 1579 passed, 1 xfailed, 8m41s**.
+- Regeneration is byte-reproducible; LF.
+- **D1:** the per-entry recount gives 379/135. The audit's 13-row pattern table matches the gate's own patterns and sums to 1744.
+- **D151:**
+  - The only data delta vs 4cef2a4e is INC-02899's tactics.
+  - Two-directional derivation against the raw 2026.10 YAML gives **15,784/15,784**, against 15,783 on 4cef2a4e; main against 2026.09 also gives 15,784.
+  - Scope probe through apply_curation_overrides: an override with no translated id keeps its tactics (TA0010 included); one with a translated id is re-derived; a tactics-only override is untouched.
+- **Fire proofs:** the old merge_and_dedupe fails the D151 test; the old lint fails the lint test; the lint on 4cef2a4e data fails "stale tactic: INC-02899 carries TA0010" (rc 1); the tip gives rc 0.
+- **D3:** matches a re-fetch. **A2:** accurate.
+**Advisories:**
+1. **Fix before merge:** CORRECTIONS.md is newest-first, but the new row sits at :47.
+2. The one-directional reason is incomplete: an override pinning a subset of the derived tactics also narrows them. Reword.
+3. An override pinning a translated mitre_atlas with no tactics key keeps the existing tactics. There is no live instance, and the new lint would catch one.
+4. Label-scientist follow-ups; the methods paper at the next cut.
+**Routing:** atlas-2610 moves the row (content byte-identical) and rewords the reason; no data change. The foreman verifies by string or diff check and merges, with no further gate (both edits are text-only and the gate prescribed them).
+
 ### 🔍 ATLAS bounce-#1 fixes REPORTED `8503c6dd` (2026-10-29) — scoped re-gate by gate-atlas
 - **Specialist (testimony):**
   - D1: per-entry counts 379/135.
