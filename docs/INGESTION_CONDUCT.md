@@ -372,7 +372,7 @@ not random, sampling was chosen). A violation (a legacy numeric-slug URL
 that now returns a real incident body — `REASON_OK`) fails the scheduled
 workflow run loudly on the first occurrence, via its own dedicated gate
 (`--check-probe` / "Check OECD skip-rule sampling probe" + "Enforce OECD
-skip-rule sampling probe" in `.github/workflows/auto-refresh.yml`) —
+skip-rule sampling probe", both in the `oecd-fetch` job of `.github/workflows/auto-refresh.yml` since D146-1) —
 deliberately **not** routed through `ingest/_state/source_health.json`'s
 3-consecutive-failures smoothing (WS4-T9), because a skip-rule violation is
 a deterministic correctness signal about data loss, not ordinary
@@ -508,7 +508,7 @@ that introduces it** (invariants 5 and 10).
 
 `scripts/persist_refresh_state.sh:66`'s own `git clone` (invoked from
 `.github/workflows/auto-refresh.yml`'s "Persist source health counters to
-refresh-state branch" step, persisting `ingest/_state/source_health.json`
+refresh-state branch" step (in the workflow's `finalize` job since D146-1, the single writer of that branch), persisting `ingest/_state/source_health.json`
 to the `refresh-state` branch — extracted out of that workflow step into
 this script 2026-09-14 so it is testable without a live GitHub repo; see
 `tests/test_persist_refresh_state.py`) and

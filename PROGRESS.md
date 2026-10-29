@@ -14,6 +14,98 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 ATLAS 2026.10 BOUNCE #1 (gate-atlas on `4cef2a4e`), 2026-10-29 — in-progress
+**VERDICT: BOUNCE (#1).** Three small defects. The data, translations, exports and tests hold up.
+**DEFECTS:**
+1. **Audit count wrong** (delta audit :15). It says "396 OECD / 144 AIID", but those are source-id counts. Per entry it is **379 / 135**, and INC-07386 alone has 11 OECD sids. The audit itself declares that it counts entries.
+2. **INC-02899 keeps TA0010 with no supporting technique.** The override pins mitre_atlas, which is now translated, and mitre_atlas_tactics, which is not.
+   - Main: 15,784/15,784 rows have tactics derivable from the 2026.09 YAML. Branch: 15,783.
+   - The CHANGELOG claim "lose TA0010 where nothing else achieves it" is false for this row.
+   - The row is disclosed in the audit's pattern table.
+3. **SOURCE_LICENSES:332 is stale:** "841,482-byte for 2026.09"; the 2026.10 file is 1,154,660 bytes.
+**Evidence (gate, by independent routes):**
+- **Fetch:** sha and bytes match a fresh curl.
+- **Release diff and translations:**
+  - the release diff, from the gate's own parse of the raw YAML, matches the claim;
+  - the translations match the release-notes text; all targets are defined; append-only holds.
+- **Per-entry delta, from a hard-coded table + raw-YAML tactics:**
+  - 1,744 changed; the ID set and order are identical;
+  - fields moved: mitre_atlas 1744, tactics 1742, updated/last_seen 1744, nothing else;
+  - 74 rows carry both T0056 and T0057;
+  - no removed id remains; 0 undefined ids.
+- **Regeneration:** byte-reproducible; a T0024.002 re-target in scratch changes the data, so the check fires.
+- **Fixes:**
+  - delta-tool fix (2): fires on 2 planted unexplained changes, and real data gives 0;
+  - fix (1)'s test fails on the old code;
+  - fix (3) is minimal.
+- **Exports:**
+  - STIX: 65306→65304 objects; removed techniques are dropped, not revoked, per the exporter rule since the 2026.09 refresh;
+  - modified-moved = content-changed (0 objects changed without moving);
+  - MISP 32/34 files, TAXII 2.
+- **D114:** no ingest/ change outside ingest/atlas. The 10-06 refresh moved ATLAS fields on 1,511 OECD rows, so this is within precedent.
+- **Full pytest** on 4cef2a4e + 5f6a7db5: **1570 passed, 1 xfailed**. All LF; the 10-06 audit is untouched.
+**Advisories:**
+- methods.md:116 is not live (it tracks the CITATION release); update it at the next cut.
+- Add a "retained tactic still derivable" check: it is the blind spot that let D2 through both the tool and the specialist's independent script.
+- A CORRECTIONS row for D149.
+- Label-scientist follow-ups.
+**⚖ D151, FOREMAN RULING (D2):** when the translation table changes an override's pinned mitre_atlas, **re-derive that row's pinned tactics** from the translated techniques, in that case only.
+- Basis: the override note says the tactics were rule-derived, not judged by a person.
+- Rewording the CHANGELOG instead would leave the corpus's one non-derivable row in place.
+- INC-02899 is pending user re-review (D143-F), and this does not pre-empt it.
+**Routing:** atlas-2610 fixes D1–D3 plus advisories A1 (the derivability check, proven to fire on 4cef2a4e) and A2 (CORRECTIONS row), per D52. The same gate then re-checks the scoped changes plus the suite.
+
+### ✅ D146-1 **DONE — MERGED to main 2026-10-29** (scoped re-check PASS on `81a4ba08` after bounce #2 → D150)
+**VERDICT (gate-d146): PASS. DEFECTS: none.**
+**Evidence (gate):**
+1. Every claim in the D150 text was verified against the code:
+   - ingest_aiaaic_sheet.py writes only after all checks pass;
+   - DEFAULT_THRESHOLD is 3 (no --threshold is passed); stale is ≥3 consecutive and anything below only warns;
+   - the abort check exits 1 only at ok=0, and a dead oecd-fetch job counts as failure;
+   - no other refresh-job path turns an AIAAIC failure red;
+   - "other checks" holds: probe, other sources stale, D42 gate, tests.
+   - Strictly, the data is "the committed copy", which may be older than last week; that is the user's verbatim wording, not raised.
+2. N3 and N4 each fail `test_pr_body_warns_at_the_top_when_aiaac_failed`. The gate's own N6 ("3 weeks"→"2 weeks") fails the exact-text check, and M1–M12 and N1 still fire.
+3. The A1 wording is accurate.
+4. Scope is 3 files, +19/−7, and nothing else. The ruled text occurs once; the stale phrases occur 0 times.
+5. Merge dfcf40dc (51fad5c4 + 81a4ba08): **1575 passed, 1 xfailed, 523.36s**; data/ 0 lines; LF; actionlint rc 0.
+**Advisory → follow-up (test-only; merged without it so the change lands before Sunday):** nothing ties the "3 weeks" in the PR text to DEFAULT_THRESHOLD. Add a test asserting the text contains f"{DEFAULT_THRESHOLD} weeks".
+**Foreman:** strays check found main tree and worktree porcelain empty.
+**Sun 11-01 04:00 UTC run is the live test (D148-2). Check that:**
+- the jobs are parallel as designed;
+- finalize ran;
+- the job outputs are populated, so the health table shows real outcomes rather than all-failure;
+- the cursor artifact was handed over;
+- `held-oecd-aiid-inputs` is attached;
+- refresh-state has at most one counter commit;
+- step times are within budget;
+- the PR body is correct.
+The gate-d146 checklist is the reference for these checks.
+**Docs-warden:** not dispatched. No counts, licensing text, taxonomy lists or version strings changed (workflow, tests and an INGESTION_CONDUCT pointer only).
+
+### 🔍 ATLAS 2026.10 refresh REPORTED `4cef2a4e` (2026-10-29) — gate-atlas dispatched (fresh reviewer)
+- **Specialist (testimony):**
+  - **Pin:** 2026.10, sha ac41ee9f…e142d; REVISIONS row 3 added.
+  - **Translations, counted per entry:**
+    - T0057→T0085.002: 1082 entries;
+    - T0056→T0085.003: 733;
+    - T0024.001→T0137.002: 3;
+    - T0024.000→T0137.000: 0;
+    - T0024.002→T0024: 4 (D149). T0024 is still defined ("Exfiltration via AI Inference API", TA0010).
+  - **Delta:** 1,744 entries changed, 14,040 identical; the ID set is identical; UNEXPLAINED 0. An independent YAML check shows 0 violations, and a planted control fails 1082 entries.
+  - **Exports:** STIX identity date moves; 47 attack-patterns redated; 4 removed, 3 added, 4 renamed; 1,739 incident objects and 5,613 relationships change.
+  - **Checks:** lint OK, validate OK, drift clean.
+  - **Pytest pre-merge:** 1569 passed, 1 failed (oecd_stage1_freeze, against the uncommitted HEAD; passes after the commit). **Post-merge only a 145-test subset was run.** origin/main was merged in with no conflicts.
+  - **3 scope additions, each a fixed defect:**
+    1. curation overrides now translate mitre_atlas (INC-02899's D130-2L override pinned T0057);
+    2. atlas_entry_delta.py attributes tactics gained via a translation target (it had reported 1739 false UNEXPLAINED);
+    3. test_atlas_refresh.py no longer hard-codes ATLAS-2026.09.yaml, which would otherwise have failed every monthly refresh PR.
+  - **Live docs:** SOURCE_LICENSES and TAXONOMIES "2026.09"→"2026.10" in place; README only the stats:generated marker. docs/paper/genai-incidents-methods.md:116 was left alone for the foreman.
+- **Specialist's questions:**
+  - D114: 396 changed entries have an OECD source id, and only their ATLAS fields + updated/last_seen moved. **Foreman view:** derived taxonomy codes are not an OECD lift, provided the held inputs are byte-identical. The gate verifies this against the 10-06 precedent.
+  - Heuristics in scrape_aiid.py and parse_existing.py still emit the old ids → label-scientist follow-up, alongside the T0024.002 re-target.
+- **The agent needed a re-prompt:** it was idle 19:02→22:54Z with the whole rebuild uncommitted.
+
 ### 🔍 D146-1 D150 fixes REPORTED `81a4ba08` (2026-10-29) — foreman string check PASS; scoped re-check by gate-d146
 - **Specialist (testimony):**
   - 3 files, +19/−7.
