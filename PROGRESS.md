@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D133 **DONE — MERGED to main 2026-10-29** (re-gate PASS on `9061e62d` after bounce #1)
+**VERDICT (gate-d133, scoped re-gate): PASS. DEFECTS: none.** The verdict was delayed: the gate needed a second ping.
+**Evidence (gate):**
+- Scratch merge b663ba0c (9061e62d into a1b9f538); main moved by board commits only.
+- `87ee725c..9061e62d`: 7 files, +59/−5, nothing in data/ or src/, all LF.
+- **Full suite 1568 passed, 1 xfailed in 547.51s**, rc 0 (1566 + the 2 A5 tests).
+- **D1:** check_unmarked_totals on TAXONOMIES returns [] (it fired on 87ee725c); drift clean.
+- **D2:** the only SOURCE_LICENSES change is `title`→`name`; NOTICE-DATA and dep5 untouched.
+- **A2:** a veris 9.9 re-pin with no REVISIONS row gives render/validate/lint rc 0, export_stix/misp rc 1, and fails test_current_pins_are_registered. The new wording is exact.
+- **A1:** the checklist line is accurate, escaping matches, actionlint rc 0, and no ATLAS runbook exists (confirmed).
+- **A5:** the recount test fires on the gate's own 4 mutations (doc 29→30, doc 162→163, corpus DSGAI18 dropped from INC-03247, doc row deleted).
+- **L1:** the HF README diff is exactly the one line; the legalcode URL returns 200; 0 titles in the card; jsonl byte-identical.
+**Advisories:** the "planted-drift" A5 test is weak (it never runs the comparison and pins the literal 29): optional follow-up. Local timing is not evidence against the CI cap.
+**Foreman:** strays check: main tree and the gi-wt-d133 worktree porcelain are empty; `merge-tree` rc 0 against main.
+- **Next:** docs-warden (licensing text and taxonomy lists changed, protocol step 7). Then D146-2 (MAESTRO/NIST pins + REVISIONS rows) and the ATLAS 2026.10 refresh with its REVISIONS row before the Tue 11-03 cron.
+
 ### ⚖ D148, USER RULINGS 2026-10-29 (D146-1 bounce #1 escalations)
 1. **State saves: "Accept: PR opens, run red (Recommended)".** In the new design, cursor/source-health restore and persist failures no longer withhold the refresh PR; finalize turns the run red. Old behaviour: 8 scheduled runs (07-26 to 09-13) lost their PR at persist.
 2. **Live test: "Skip it; Sunday is the test (Recommended)"**, which **supersedes D147-2**. The gate showed that a dispatch is not side-effect-free: it opens/updates a real refresh PR, force-pushes the refresh-state counters and advances the cursor, which the foreman had not disclosed when D147-2 was asked. **No dispatch.** After the merge, the foreman checks the Sun 11-01 04:00 UTC run:
