@@ -31,10 +31,12 @@ jobs:
   # rejection is a modification); the rotation budget re-checks the stalest ids.
   #
   # WHY A SEPARATE JOB (BOUNCE #1, docs/audits/rejected-cve-sweep-gap-2026-10-09.md
-  # addendum 2026-10-09b): the OECD step alone takes 25-51 min and the refresh
-  # job's limit was 60 (100 since D142), so a sweep step inside it could be cancelled with the
+  # addendum 2026-10-09b): the OECD step alone took 25-51 min and the refresh
+  # job's limit was then 60, so a sweep step inside it could be cancelled with the
   # job -- losing the health-counter persistence, the re-merge, the tests, the
-  # PR and the sweep's own snapshot. Here the sweep has its own 60-minute
+  # PR and the sweep's own snapshot. (Since D146-1 the OECD fetch is its own
+  # `oecd-fetch` job and the refresh job's limit is 40; the sweep stays separate.)
+  # Here the sweep has its own 60-minute
   # limit; it is capped by wall clock (--max-seconds 2400) so it stops cleanly
   # and writes its snapshot and log; and its output reaches the refresh job as
   # an artifact uploaded with `if: always()`.
@@ -97,23 +99,164 @@ jobs:
           # scope for no gain.
           retention-days: 14
 
+  # D146-1 (2026-10-29): the OECD fetch runs in its OWN job so the refresh job is
+  # neither blocked nor bounded by it. The fetch takes about 51 min (3000 pages at
+  # the 1 req/s floor) and, under D114, its bytes never reach the merge: the OECD
+  # inputs are held at their committed versions. What the fetch still feeds is
+  # (1) the D42 review artifact, (2) the skip-rule sampling probe and its
+  # rotation cursor, and (3) the source-health counter's `oecd_aim` outcome.
+  # This job owns (1) and (2) and hands (3) and the cursor to the `finalize`
+  # job, the single writer of the `refresh-state` branch. The refresh job does
+  # NOT list this job in `needs:`.
+  #
+  # Failure semantics are as before: the fetch step is continue-on-error and its
+  # step outcome (not the job result, which would hide it) is the job output the
+  # health counter reads; a probe violation fails THIS job loudly on the first
+  # occurrence (last step), without touching the refresh PR.
+  oecd-fetch:
+    runs-on: ubuntu-latest
+    # Step cap 65 (D142: measured 50.8 min, 1.3x) + ~3 min of other steps = 68;
+    # 80 leaves the post-fetch steps (probe check, stash, uploads, enforce) room
+    # to run after a fetch that hits its own step cap.
+    timeout-minutes: 80
+    # Reads the repo and the refresh-state branch only. Artifact uploads use the
+    # runner's ACTIONS_RUNTIME_TOKEN, not GITHUB_TOKEN.
+    permissions:
+      contents: read
+    outputs:
+      # Step outcome, not job result: the fetch step is continue-on-error, so the
+      # job result is `success` even when it failed.
+      oecd_outcome: ${{ steps.ingest_oecd.outcome }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        timeout-minutes: 10
+        run: pip install -r requirements.txt
+
+      # WS4-T17: is_numeric_slug()'s skip rule (WS4-T13) rests on a premise
+      # -- every legacy numeric-slug page fails the body-shape check -- that
+      # stops being observable the moment those URLs are never fetched. The
+      # probe below samples a small, ROTATING slice of the skipped set each
+      # run (see run_skip_sampling_probe()'s docstring in
+      # scripts/ingest_oecd_aim.py); its rotation cursor must be durable
+      # across runs (D5), so it is restored here BEFORE the ingest step that
+      # consumes/advances it. This job only READS refresh-state; the advanced
+      # cursor is uploaded below and persisted by the finalize job.
+      - name: Restore OECD skip-probe rotation cursor from refresh-state branch
+        timeout-minutes: 5
+        run: |
+          STATE_FILE="ingest/_state/skip_probe_state.json"
+          mkdir -p "$(dirname "$STATE_FILE")"
+          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
+            git fetch --quiet origin refresh-state
+            if git cat-file -e "origin/refresh-state:${STATE_FILE}" 2>/dev/null; then
+              git show "origin/refresh-state:${STATE_FILE}" > "$STATE_FILE"
+              echo "::notice::Restored $STATE_FILE from refresh-state branch."
+            else
+              echo "::notice::refresh-state branch exists but has no $STATE_FILE yet; probe starts a fresh rotation cursor."
+            fi
+          else
+            echo "::notice::refresh-state branch does not exist yet; probe starts a fresh rotation cursor."
+          fi
+
+      - name: Refresh OECD AI Incidents Monitor
+        timeout-minutes: 65
+        id: ingest_oecd
+        env:
+          OECD_AIM_LIMIT: ${{ github.event.inputs.oecd_aim_limit || '3000' }}
+        run: python scripts/ingest_oecd_aim.py
+        continue-on-error: true
+
+      # WS4-T17: a SEPARATE gate from the ingest step above on purpose -- see
+      # check_probe_state_for_violations()'s docstring
+      # (scripts/ingest_oecd_aim.py). A skip-rule violation (a legacy
+      # numeric-slug URL that now returns a real incident body) is a
+      # deterministic correctness signal, not third-party flakiness, and
+      # must fail the RUN loudly on the FIRST occurrence rather than being
+      # smoothed by source_health.json's 3-consecutive-failures threshold
+      # (WS4-T9). `continue-on-error: true` (recorded via `id: skip_probe`)
+      # so the uploads below still run; the loud, job-ending failure happens
+      # in the "Enforce OECD skip-rule sampling probe" step at the very end.
+      - name: Check OECD skip-rule sampling probe
+        timeout-minutes: 5
+        id: skip_probe
+        continue-on-error: true
+        # Only when the ingest step itself completed cleanly -- if it failed
+        # for an unrelated reason (e.g. the sitemap fetch itself errored)
+        # main() never reached the probe section, so the persisted state is
+        # from a PRIOR run and checking it here would attribute a possibly-
+        # stale finding to this run. An ingest failure is already covered by
+        # source_health.json's own 3-consecutive-failures accounting (finalize).
+        if: steps.ingest_oecd.outcome == 'success'
+        run: python scripts/ingest_oecd_aim.py --check-probe
+
+      # D114: the fresh OECD bytes never reach the merge. Stash them (and restore
+      # the tree to HEAD) with the same script the refresh job uses, and upload
+      # the stash for the D42 review path. The artifact name is the one the PR
+      # body cites. Stash dir under runner.temp, never in the work tree.
+      - name: Stash fresh OECD bytes for the D42 review path
+        timeout-minutes: 5
+        if: always()
+        run: python scripts/hold_pair_inputs.py --stash-dir "$RUNNER_TEMP/held-pair-inputs"
+
+      - name: Upload held OECD/AIID inputs (D42 review path)
+        timeout-minutes: 5
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: held-oecd-aiid-inputs
+          path: ${{ runner.temp }}/held-pair-inputs
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Hand the advanced rotation cursor to the finalize job (the single
+      # refresh-state writer). if: always() so a failed or timed-out fetch still
+      # hands over whatever cursor is on disk, as the in-job persist did before.
+      # The file legitimately may not exist (first run, nothing skipped).
+      - name: Upload OECD skip-probe rotation cursor
+        timeout-minutes: 5
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oecd-skip-probe-state
+          path: ingest/_state/skip_probe_state.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # WS4-T17: same end-of-job pattern as the finalize job's "Enforce source
+      # health": a violation fails this job (so the run ends red and GitHub's
+      # failed-scheduled-workflow notification fires) without having blocked the
+      # PR that carries this week's actually-good data.
+      - name: Enforce OECD skip-rule sampling probe
+        timeout-minutes: 5
+        if: ${{ always() && steps.skip_probe.outcome == 'failure' }}
+        run: |
+          echo "::error::The OECD AIM skip-rule sampling probe found at least one legacy numeric-slug URL that now returns a real incident body (see 'Check OECD skip-rule sampling probe' step above for which one). is_numeric_slug()'s skip rule is dropping real incidents and needs attention before the next scheduled crawl. Failing this run on purpose so it cannot be mistaken for success."
+          exit 1
+
   refresh:
     runs-on: ubuntu-latest
-    # D142 (2026-10-28): was 60, and the 2026-10-18 and 2026-10-25 scheduled runs
-    # were CANCELLED at exactly 60 min. Measured wall clock of this job:
-    # 10-13 (last success) 40.6 min; 10-25 would have needed about 63 min
-    # (OECD fetch 50.8 + tests 7.6 + about 4 other). Two legitimate growth causes:
-    # (1) OECD step 34.7 -> 50.8 min: the newest-3000 sitemap window no longer
-    # contains any legacy numeric-slug URLs (skipped 1154 on 10-13, 0 on 10-25),
-    # so the fetch set went 1846 -> 3000 pages at the 1 req/s floor; 3000 is the
-    # OECD_AIM_LIMIT cap, so ~50 min is now the ceiling, not a trend. (2) Unit
-    # tests 4.3 -> 7.6 min as the suite grew. 100 min = 1.6x the 63 min need.
+    # D142 (2026-10-28) raised this 60 -> 100 because the OECD fetch (50.8 min)
+    # shared the job. D146-1 (2026-10-29) moved the fetch to the `oecd-fetch` job,
+    # so this job no longer waits for it: its measured need is the old 63 min
+    # minus the OECD step, about 12 min then; with the CI-measured tests time of
+    # 10.8 min (Validate on main, run 40921156247) about 15 min (tests 10.8 + about
+    # 4.5 other). 40 min = more than 2.5x that, and above the tests cap (25) + other.
     # Every step that can hang has its own timeout-minutes below, so a hang
     # fails fast at the step instead of consuming this budget.
-    timeout-minutes: 100
+    timeout-minutes: 40
     needs: cve-sweep
     # run even when the sweep job failed or was skipped: it is not a gate
     if: ${{ !cancelled() }}
+    # Step outcomes the finalize job feeds to the source-health counter and the
+    # summary. Step outcome, not job result: these steps are continue-on-error.
+    outputs:
+      aiaaic_outcome: ${{ steps.ingest_aiaaic.outcome }}
+      kev_outcome: ${{ steps.ingest_kev.outcome }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -159,72 +302,6 @@ jobs:
         run: python scripts/ingest_aiid_snapshot.py
         continue-on-error: true
 
-      # WS4-T17: is_numeric_slug()'s skip rule (WS4-T13) rests on a premise
-      # -- every legacy numeric-slug page fails the body-shape check -- that
-      # stops being observable the moment those URLs are never fetched. The
-      # probe below samples a small, ROTATING slice of the skipped set each
-      # run (see run_skip_sampling_probe()'s docstring in
-      # scripts/ingest_oecd_aim.py); its rotation cursor must be durable
-      # across runs the same way the source-health counter is (D5), so it's
-      # restored here BEFORE the ingest step that consumes/advances it, and
-      # persisted below alongside source_health.json. Unlike source_health.json
-      # (only read by the "Source health check" step further down), this one
-      # is read AND written by ingest_oecd_aim.py itself, so it must land on
-      # disk before that step runs, not after.
-      - name: Restore OECD skip-probe rotation cursor from refresh-state branch
-        timeout-minutes: 5
-        run: |
-          STATE_FILE="ingest/_state/skip_probe_state.json"
-          mkdir -p "$(dirname "$STATE_FILE")"
-          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
-            git fetch --quiet origin refresh-state
-            if git cat-file -e "origin/refresh-state:${STATE_FILE}" 2>/dev/null; then
-              git show "origin/refresh-state:${STATE_FILE}" > "$STATE_FILE"
-              echo "::notice::Restored $STATE_FILE from refresh-state branch."
-            else
-              echo "::notice::refresh-state branch exists but has no $STATE_FILE yet; probe starts a fresh rotation cursor."
-            fi
-          else
-            echo "::notice::refresh-state branch does not exist yet; probe starts a fresh rotation cursor."
-          fi
-
-      - name: Refresh OECD AI Incidents Monitor
-        timeout-minutes: 65
-        id: ingest_oecd
-        env:
-          OECD_AIM_LIMIT: ${{ github.event.inputs.oecd_aim_limit || '3000' }}
-        run: python scripts/ingest_oecd_aim.py
-        continue-on-error: true
-
-      # WS4-T17: a SEPARATE gate from the ingest step above on purpose -- see
-      # check_probe_state_for_violations()'s docstring
-      # (scripts/ingest_oecd_aim.py). A skip-rule violation (a legacy
-      # numeric-slug URL that now returns a real incident body) is a
-      # deterministic correctness signal, not third-party flakiness, and
-      # must fail the RUN loudly on the FIRST occurrence rather than being
-      # smoothed by source_health.json's 3-consecutive-failures threshold
-      # (WS4-T9). `continue-on-error: true` here (recorded via `id:
-      # skip_probe`) so a violation doesn't skip the rest of this job --
-      # the merge/render/validate/tests/PR steps below still need to run
-      # normally; a skip-rule violation says nothing about whether THIS
-      # week's actually-kept data is good. The loud, job-ending failure
-      # happens in the "Enforce OECD skip-rule sampling probe" step at the
-      # very end, mirroring "Enforce source health"'s own established
-      # end-of-job pattern (see that step's comment for the same rationale
-      # applied to source_health.json).
-      - name: Check OECD skip-rule sampling probe
-        timeout-minutes: 5
-        id: skip_probe
-        continue-on-error: true
-        # Only when the ingest step itself completed cleanly -- if it failed
-        # for an unrelated reason (e.g. the sitemap fetch itself errored)
-        # main() never reached the probe section, so the persisted state is
-        # from a PRIOR run and checking it here would attribute a possibly-
-        # stale finding to this run. An ingest failure is already covered by
-        # source_health.json's own 3-consecutive-failures accounting below.
-        if: steps.ingest_oecd.outcome == 'success'
-        run: python scripts/ingest_oecd_aim.py --check-probe
-
       - name: Refresh CISA KEV catalog
         timeout-minutes: 10
         id: ingest_kev
@@ -232,144 +309,33 @@ jobs:
         continue-on-error: true
 
       # The ingest steps are continue-on-error so one flaky source doesn't
-      # block the others — but if ALL of them failed, the "refreshed" data is
-      # just last week's cache and the PR would ship silent staleness. Surface
-      # per-source outcomes and abort in the nothing-refreshed case.
+      # block the others. D146-1: the OECD fetch is a separate job that this job
+      # does not wait for, so its outcome is not known here. The "all sources
+      # failed" abort that used to live in this step (AIAAIC and OECD both
+      # failed) moved to the finalize job's "Abort check", which sees both
+      # outcomes and fails the run loudly; the PR is no longer withheld for it.
       - name: Ingest result summary
         timeout-minutes: 5
         env:
           AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
-          OECD: ${{ steps.ingest_oecd.outcome }}
           CVE_SWEEP: ${{ needs.cve-sweep.outputs.sweep_outcome || needs.cve-sweep.result }}
           AIID: ${{ steps.ingest_aiid.outcome }}
         run: |
           {
-            echo "### Source refresh results"
+            echo "### Source refresh results (refresh job)"
             echo "| Source | Outcome |"
             echo "|---|---|"
             echo "| AIRI Navigator | retired 2026-10-13 (D108); existing rows retained |"
             echo "| AIAAIC sheet | $AIAAIC |"
-            echo "| OECD AI Incidents Monitor | $OECD |"
-            echo "| CVE rejection/dispute sweep (separate job; not counted toward the all-failed abort) | $CVE_SWEEP |"
+            echo "| OECD AI Incidents Monitor | separate job (oecd-fetch); outcome in the finalize job summary |"
+            echo "| CVE rejection/dispute sweep (separate job) | $CVE_SWEEP |"
             echo "| AIID snapshot | $AIID |"
           } | tee -a "$GITHUB_STEP_SUMMARY"
-          ok=0
-          total=2  # AIAAIC + OECD (AIRI retired, D108)
-          [ "$AIAAIC" = "success" ] && ok=$((ok+1))
-          [ "$OECD" = "success" ] && ok=$((ok+1))
-          if [ "$ok" -eq 0 ]; then
-            echo "::error::Every source refresh failed — the data would be stale. Aborting instead of opening a misleading refresh PR."
-            exit 1
-          fi
           if [ "$AIID" != "success" ]; then
             echo "::warning::AIID snapshot refresh failed -- ingest/aiid_full.json is last week's snapshot; OECD rows citing newer AIID ids will be unlinked-to-snapshot (WS4-T14)."
           fi
-          if [ "$ok" -lt "$total" ]; then
-            echo "::warning::Only $ok of $total sources refreshed — the PR will carry last week's data for the failed source(s)."
-          fi
-
-      # WS4-T9: the check above only catches "everything failed on the SAME
-      # run". A single source that fails every week forever (AIRI Navigator,
-      # dead since 2026-06-07) sails through it silently as long as at least
-      # one other source succeeds, and the job keeps reporting overall
-      # "success" — so nobody watching the repo is ever notified. This step
-      # tracks CONSECUTIVE failures per source in
-      # ingest/_state/source_health.json.
-      #
-      # D5: the counter this check reads/writes must be durable independent
-      # of the data-review PR below (see the KNOWN LIMITATION this fixed:
-      # PRs #2/#18/#25 in this repo's history were closed unmerged and
-      # superseded, silently eating the counter). So immediately before
-      # this step, restore the counter from the long-lived `refresh-state`
-      # branch — not from whatever's on `main` or sitting in an open PR —
-      # and immediately after, persist it back there (see the two steps
-      # below). `refresh-state` is machine-state-only: never merged into
-      # `main`, not human-reviewed, force-pushed every run, documented as
-      # unreviewed-by-design. This keeps "everything on main is reviewed"
-      # intact while making the counter durable without an unattended write
-      # to `main` itself (main has no branch protection — see WS4-T7).
-      - name: Restore source health counters from refresh-state branch
-        timeout-minutes: 5
-        run: |
-          STATE_FILE="ingest/_state/source_health.json"
-          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
-            git fetch --quiet origin refresh-state
-            if git cat-file -e "origin/refresh-state:${STATE_FILE}" 2>/dev/null; then
-              git show "origin/refresh-state:${STATE_FILE}" > "$STATE_FILE"
-              echo "::notice::Restored $STATE_FILE from refresh-state branch."
-            else
-              echo "::notice::refresh-state branch exists but has no $STATE_FILE yet; using in-repo copy."
-            fi
-          else
-            echo "::notice::refresh-state branch does not exist yet; using in-repo copy (branch created on first push below)."
-          fi
-
-      - name: Source health check (consecutive-failure tracking)
-        timeout-minutes: 5
-        id: health
-        continue-on-error: true
-        env:
-          # D108: airi_navigator is deliberately absent. The checker stamps it
-          # `retired` from its own RETIRED_SOURCES list, whatever the restored state says.
-          AIAAIC: ${{ steps.ingest_aiaaic.outcome }}
-          OECD: ${{ steps.ingest_oecd.outcome }}
-          KEV: ${{ steps.ingest_kev.outcome }}
-        run: |
-          python scripts/check_source_health.py \
-            --outcomes-json "{\"aiaaic_sheet\": \"$AIAAIC\", \"oecd_aim\": \"$OECD\", \"cisa_kev\": \"$KEV\"}" \
-            --summary-file "$GITHUB_STEP_SUMMARY"
-
-      # D5, continued: push the just-updated counter to `refresh-state` via
-      # a throwaway clone (so this can never touch the working tree that's
-      # about to become the data-review PR below), then reset the working
-      # copy back to what's committed on `main` — no diff, nothing left for
-      # `create-pull-request` to pick up. `refresh-state` is now the single
-      # source of truth for the counter, so a data-review PR closed without
-      # merging can no longer strand it (see the tripwire workflow that
-      # comments on such PRs: .github/workflows/refresh-pr-closed-tripwire.yml).
-      - name: Persist source health counters to refresh-state branch
-        timeout-minutes: 5
-        run: |
-          set -e
-          STATE_FILE="ingest/_state/source_health.json"
-
-          bash scripts/persist_refresh_state.sh \
-            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
-            "$STATE_FILE" \
-            "/tmp/refresh-state-clone"
-
-          # Exclude the counter from the data-review PR (refresh-state,
-          # above, is now the single source of truth): reset the
-          # working-tree copy back to whatever's committed on `main`.
-          git checkout -- "$STATE_FILE" 2>/dev/null || rm -f "$STATE_FILE"
-
-      # WS4-T17: same D5 durability pattern, applied to the skip-probe
-      # rotation cursor written/advanced by ingest_oecd_aim.py above -- a
-      # separate persist_refresh_state.sh invocation (own throwaway clone
-      # dir) so it lands as its own commit on `refresh-state`, then the
-      # same "exclude from the data-review PR" reset.
-      - name: Persist OECD skip-probe state to refresh-state branch
-        timeout-minutes: 5
-        run: |
-          set -e
-          STATE_FILE="ingest/_state/skip_probe_state.json"
-
-          # The file may legitimately not exist yet: the very first run ever,
-          # on a crawl window where nothing was skipped this time (no
-          # numeric-slug URLs in the window -- see ingest_oecd_aim.py main()'s
-          # "nothing skipped this run" branch), so run_skip_sampling_probe()
-          # was never called and never wrote it. persist_refresh_state.sh
-          # itself errors on a missing file (nothing to persist), so skip the
-          # call entirely rather than failing this step for a state file that
-          # simply hasn't been created yet.
-          if [ -f "$STATE_FILE" ]; then
-            bash scripts/persist_refresh_state.sh \
-              "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
-              "$STATE_FILE" \
-              "/tmp/refresh-state-clone-probe"
-            git checkout -- "$STATE_FILE" 2>/dev/null || rm -f "$STATE_FILE"
-          else
-            echo "::notice::$STATE_FILE does not exist yet (nothing skipped this run); nothing to persist."
+          if [ "$AIAAIC" != "success" ]; then
+            echo "::warning::AIAAIC sheet refresh failed -- the PR will carry last week's AIAAIC data."
           fi
 
       # v2.13.0 item 3: bring the sweep job's snapshot and dated log into this
@@ -414,16 +380,23 @@ jobs:
       # LIFTED and no longer restored here; only the OECD side is held. The gate
       # applies a standing AIID class while every held input is at HEAD, and
       # refuses any OECD lift without a gated suppression mechanism.
+      # D146-1: the OECD fetch no longer runs in this job (see `oecd-fetch`), so
+      # this tree already carries the committed OECD bytes and the stash below is
+      # normally empty. The restore, the gate's own re-check and the --check-clean
+      # guard before the PR step stay exactly as they were: nothing in this job can
+      # lift OECD, and a revived AIRI or any other pair input is still held. The
+      # fresh OECD bytes for the D42 review are the `held-oecd-aiid-inputs`
+      # artifact uploaded by the oecd-fetch job.
       - name: Hold OECD/AIID pair inputs at their committed versions
         timeout-minutes: 5
         run: python scripts/hold_pair_inputs.py --stash-dir "$RUNNER_TEMP/held-pair-inputs"
 
-      - name: Upload held OECD/AIID inputs (D42 review path)
+      - name: Upload refresh-job hold stash (normally empty; the OECD bytes are in the oecd-fetch job artifact)
         timeout-minutes: 5
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: held-oecd-aiid-inputs
+          name: held-refresh-job-pair-inputs
           path: ${{ runner.temp }}/held-pair-inputs
           if-no-files-found: warn
           retention-days: 30
@@ -466,6 +439,19 @@ jobs:
           python -c "import json; d=json.load(open('data/incidents.json')); print('total:', d['incident_count']); print('generated:', d['generated'])"
           echo "::endgroup::"
 
+      # D147: the finalize job's all-sources-failed abort can no longer withhold
+      # the PR, so when this job's own AIAAIC step did not succeed the PR body
+      # must say so at the top. Written to a file here (step-level `if`, this
+      # job's own step outcome) and put first in the body by the next step.
+      - name: PR body warning - AIAAIC refresh failed
+        timeout-minutes: 5
+        if: ${{ steps.ingest_aiaaic.outcome != 'success' }}
+        run: |
+          {
+            echo "> **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons."
+            echo
+          } > "$RUNNER_TEMP/aiaaic-failed-warning.md"
+
       # v2.13.0 item 3 / D60: flag, don't block. List every entry this build
       # newly retracts (retracted here, not retracted on main) in the PR body,
       # and label the PR `needs-ruling` when any of them is a landmark entry or
@@ -480,7 +466,8 @@ jobs:
         # anything other than an explicit 'false' as "needs a ruling".
         continue-on-error: true
         run: |
-          cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
+          cat "$RUNNER_TEMP/aiaaic-failed-warning.md" > "$RUNNER_TEMP/pr-body.md" 2>/dev/null || : > "$RUNNER_TEMP/pr-body.md"
+          cat >> "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources. This PR carries the
           AIAAIC sheet, the CISA KEV catalog, the CVE rejection sweep (with
           the D60 retractions) and the AIID snapshot (lifted under D114); the
@@ -502,7 +489,8 @@ jobs:
           class (D114); merges and retitles that absorb ids still need per-item
           approval. Any OECD lift is refused until suppression is built and
           gated (D114 binding precondition). The fresh OECD bytes are in the
-          run's `held-oecd-aiid-inputs` artifact for the D42 review.
+          run's `held-oecd-aiid-inputs` artifact (D42 review), attached by the
+          oecd-fetch job; it may appear after this PR opens.
 
           Review the diff before merging — flag any unexpected mass deletions
           or large taxonomy shifts. Schema validation and the full unit-test
@@ -607,35 +595,167 @@ jobs:
           PR: ${{ steps.cpr.outputs.pull-request-number }}
         run: gh pr edit "$PR" --remove-label needs-ruling || true
 
-      # Runs LAST (after the PR is already opened, carrying whatever sources
-      # did refresh — the source-health counter itself lives on
-      # `refresh-state`, not this PR, per D5 above) so a persistently-dead
-      # source never blocks the sources that ARE working — but the workflow
-      # RUN itself still ends red and GitHub's own failed-scheduled-workflow
-      # notification fires. This is the "can no longer pass a refresh as a
-      # warning" gate from WS4-T9: a source stays loud every single week
-      # until it recovers, or someone pauses it with a reason AND an expiry
-      # (`paused_until`) in ingest/_state/source_health.json — an expired,
-      # malformed, or absurdly-far-future pause is not honored (see
-      # scripts/check_source_health.py).
-      # D66/WS4-T9: `always()` so a failed earlier step (a merge gate abort, a
-      # test failure) cannot skip this and silence a source that is dead.
+  # D146-1: the SINGLE WRITER of the `refresh-state` branch. Runs after both the
+  # refresh job and the OECD job so it sees every source's outcome, but nothing
+  # in the refresh PR path waits for it: the PR is opened inside `refresh`.
+  # Having one writer is the race-free design: persist_refresh_state.sh does a
+  # read-modify-write of one file and force-pushes, so two jobs persisting
+  # (or even one job per file, both force-pushing the same branch) could lose
+  # each other's commit. Here the two persists run sequentially in one job.
+  #
+  # WS4-T9: the "all sources failed" check (the Abort check step below, in this
+  # job since D146-1) only catches "everything failed on the SAME run". A single source that fails every week
+  # forever sails through it as long as another source succeeds. This job
+  # tracks CONSECUTIVE failures per source in ingest/_state/source_health.json
+  # and ends the run red when one is dead (see scripts/check_source_health.py).
+  #
+  # D5: the counter must be durable independent of the data-review PR (PRs
+  # #2/#18/#25 were closed unmerged and silently ate it). So it is restored from
+  # the long-lived `refresh-state` branch, updated, and persisted back there.
+  # `refresh-state` is machine-state-only: never merged into `main`, not
+  # human-reviewed, force-pushed every run, documented as unreviewed-by-design.
+  # This job has no PR work tree to protect, so unlike the old in-refresh steps
+  # it does not reset the state files afterwards.
+  #
+  # UNVERIFIED GitHub semantics (A1, gate-d146): whether `!cancelled()` here
+  # still runs when a NEEDED job hits its job-level timeout-minutes. On 2026-10-25
+  # a job-level timeout skipped even always() steps and the run concluded
+  # "cancelled". If oecd-fetch (cap 80) or refresh (cap 40) times out at the JOB
+  # level, finalize may not run: the counter and cursor are then not updated that
+  # week and the run is red/cancelled. Step caps are set well below the job caps
+  # so a hang normally fails at its step instead. Design deliberately unchanged;
+  # unverified until a needed job actually hits its job-level timeout; no scheduled
+  # or dispatched run exercises this (no live dispatch, D148-2).
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [refresh, oecd-fetch]
+    # a failed or skipped upstream job is exactly when the counter matters
+    if: ${{ !cancelled() }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Restore source health counters from refresh-state branch
+        timeout-minutes: 5
+        run: |
+          STATE_FILE="ingest/_state/source_health.json"
+          if git ls-remote --exit-code --heads origin refresh-state >/dev/null 2>&1; then
+            git fetch --quiet origin refresh-state
+            if git cat-file -e "origin/refresh-state:${STATE_FILE}" 2>/dev/null; then
+              git show "origin/refresh-state:${STATE_FILE}" > "$STATE_FILE"
+              echo "::notice::Restored $STATE_FILE from refresh-state branch."
+            else
+              echo "::notice::refresh-state branch exists but has no $STATE_FILE yet; using in-repo copy."
+            fi
+          else
+            echo "::notice::refresh-state branch does not exist yet; using in-repo copy (branch created on first push below)."
+          fi
+
+      - name: Source health check (consecutive-failure tracking)
+        timeout-minutes: 5
+        id: health
+        continue-on-error: true
+        env:
+          # D108: airi_navigator is deliberately absent. The checker stamps it
+          # `retired` from its own RETIRED_SOURCES list, whatever the restored state says.
+          # An output that is missing because its job died or timed out is a
+          # FAILED source, never a skipped one: `|| 'failure'`.
+          AIAAIC: ${{ needs.refresh.outputs.aiaaic_outcome || 'failure' }}
+          OECD: ${{ needs.oecd-fetch.outputs.oecd_outcome || 'failure' }}
+          KEV: ${{ needs.refresh.outputs.kev_outcome || 'failure' }}
+        run: |
+          python scripts/check_source_health.py \
+            --outcomes-json "{\"aiaaic_sheet\": \"$AIAAIC\", \"oecd_aim\": \"$OECD\", \"cisa_kev\": \"$KEV\"}" \
+            --summary-file "$GITHUB_STEP_SUMMARY"
+
+      - name: Persist source health counters to refresh-state branch
+        timeout-minutes: 5
+        run: |
+          set -e
+          bash scripts/persist_refresh_state.sh \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            "ingest/_state/source_health.json" \
+            "/tmp/refresh-state-clone"
+
+      # WS4-T17: same D5 durability pattern for the skip-probe rotation cursor
+      # advanced by the oecd-fetch job, handed over as an artifact. A separate
+      # persist_refresh_state.sh invocation (own throwaway clone dir) so it lands
+      # as its own commit on `refresh-state`.
+      - name: Download OECD skip-probe rotation cursor
+        timeout-minutes: 5
+        uses: actions/download-artifact@v4
+        with:
+          name: oecd-skip-probe-state
+          path: oecd-probe-state
+        continue-on-error: true
+
+      - name: Persist OECD skip-probe state to refresh-state branch
+        timeout-minutes: 5
+        run: |
+          set -e
+          STATE_FILE="ingest/_state/skip_probe_state.json"
+
+          # The file may legitimately not exist: the very first run ever, on a
+          # crawl window where nothing was skipped (no numeric-slug URLs -- see
+          # ingest_oecd_aim.py main()'s "nothing skipped this run" branch), or
+          # the OECD job died before uploading. persist_refresh_state.sh itself
+          # errors on a missing file, so skip the call rather than failing this
+          # step for a state file that simply is not there.
+          if [ -f oecd-probe-state/skip_probe_state.json ]; then
+            mkdir -p "$(dirname "$STATE_FILE")"
+            cp oecd-probe-state/skip_probe_state.json "$STATE_FILE"
+            bash scripts/persist_refresh_state.sh \
+              "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+              "$STATE_FILE" \
+              "/tmp/refresh-state-clone-probe"
+          else
+            echo "::notice::No skip-probe state handed over (nothing skipped this run, or the OECD job did not upload); nothing to persist."
+          fi
+
+      # The legacy "all sources failed" abort (AIAAIC and OECD both failed),
+      # moved here from the refresh job's summary step because only this job
+      # sees both outcomes. It can no longer withhold the PR (the PR is already
+      # open by now); it ends the run red instead.
+      - name: Abort check (every source refresh failed)
+        timeout-minutes: 5
+        if: ${{ always() }}
+        env:
+          AIAAIC: ${{ needs.refresh.outputs.aiaaic_outcome || 'failure' }}
+          OECD: ${{ needs.oecd-fetch.outputs.oecd_outcome || 'failure' }}
+        run: |
+          {
+            echo "### Source refresh results (final)"
+            echo "| Source | Outcome |"
+            echo "|---|---|"
+            echo "| AIAAIC sheet | $AIAAIC |"
+            echo "| OECD AI Incidents Monitor | $OECD |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          ok=0
+          total=2  # AIAAIC + OECD (AIRI retired, D108)
+          [ "$AIAAIC" = "success" ] && ok=$((ok+1))
+          [ "$OECD" = "success" ] && ok=$((ok+1))
+          if [ "$ok" -eq 0 ]; then
+            echo "::error::Every source refresh failed -- the data would be stale. The refresh PR may already be open with last week's AIAAIC data; do not merge it as a refresh. Failing this run on purpose."
+            exit 1
+          fi
+          if [ "$ok" -lt "$total" ]; then
+            echo "::warning::Only $ok of $total sources refreshed -- the PR carries last week's data for the failed source(s)."
+          fi
+
+      # Runs LAST so a persistently-dead source never blocks the sources that ARE
+      # working -- but the workflow RUN itself still ends red and GitHub's own
+      # failed-scheduled-workflow notification fires. A source stays loud every
+      # single week until it recovers, or someone pauses it with a reason AND an
+      # expiry (`paused_until`) in ingest/_state/source_health.json -- an
+      # expired, malformed, or absurdly-far-future pause is not honored (see
+      # scripts/check_source_health.py). `always()` so a failed earlier step
+      # cannot skip this and silence a dead source.
       - name: Enforce source health
         timeout-minutes: 5
         if: ${{ always() && steps.health.outcome == 'failure' }}
         run: |
           echo "::error::A source has failed 3+ consecutive weekly refreshes (see 'Source health check' step above). Failing this run on purpose so it cannot be mistaken for success."
-          exit 1
-
-      # WS4-T17: same end-of-job pattern as "Enforce source health" above,
-      # for the SEPARATE reason explained on the "Check OECD skip-rule
-      # sampling probe" step: a violation must fail this run's overall
-      # conclusion loudly (GitHub's own failed-scheduled-workflow
-      # notification fires) without having blocked the PR that carries this
-      # week's actually-good data.
-      - name: Enforce OECD skip-rule sampling probe
-        timeout-minutes: 5
-        if: ${{ always() && steps.skip_probe.outcome == 'failure' }}
-        run: |
-          echo "::error::The OECD AIM skip-rule sampling probe found at least one legacy numeric-slug URL that now returns a real incident body (see 'Check OECD skip-rule sampling probe' step above for which one). is_numeric_slug()'s skip rule is dropping real incidents and needs attention before the next scheduled crawl. Failing this run on purpose so it cannot be mistaken for success."
           exit 1
