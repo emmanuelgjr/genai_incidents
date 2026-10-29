@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D149, FOREMAN RULING 2026-10-29 (ATLAS 2026.10 refresh, step 4 stop)
+- **Specialist report (testimony), WIP at `e1e2384e`, pushed:**
+  - Fetch: version 2026.10, sha256 ac41ee9f…e142d, 1,154,660 bytes, format 6.1.0. The scan shows 0 hits.
+  - Release diff: +18 techniques, 5 removed, 8 renamed (T0005*, T0010*); T0005 gains TA0003.
+  - Removed ids in the corpus, counted per entry: T0024.001 3, T0024.002 4, T0056 733, T0057 1082, T0024.000 0.
+  - The upstream release notes state 4 moves, now added to the translation table:
+    - T0024.000→T0137.000;
+    - T0024.001→T0137.002;
+    - T0056→T0085.003;
+    - T0057→T0085.002.
+  - T0056 and T0057 move from TA0010 to TA0009, so about 1.8k entries change tactic.
+- **Ruling:** AML.T0024.002 "Extract AI Model" (INC-04855, INC-06373, INC-07224, INC-05595) has no stated successor. Map it to its still-defined **parent AML.T0024**, on the T0015.001→T0015 precedent: a conservative generalisation, not a semantic guess. The specialist first confirms from the YAML that T0024 is still defined.
+- **Follow-up → label-scientist (after the merge):**
+  - re-target the 4 rows if T0144 or T0005.* fits better;
+  - scripts/scrape_aiid.py:159 still emits T0024.002 (the translation table covers it at merge).
+
 ### 📋 docs-warden on D133 (`6fa029ca`), 2026-10-29: 2 high, 1 med, 1 low
 - **F1 HIGH:** README.md:423 Licensing says "**Four** mapping files are CC BY-SA 4.0 in part" and lists ASI + 3 LLM files. dep5 now has **five** (+ owasp_dsgai_2026.json), and README never mentions DSGAI.
 - **F2 HIGH:** CONTRIBUTING.md:46 lists four OWASP carve-out files and omits owasp_dsgai_2026.json, so contributors are told the wrong set of files sits outside the MIT/CC-BY grant.
