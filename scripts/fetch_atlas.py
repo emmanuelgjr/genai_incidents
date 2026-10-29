@@ -53,9 +53,14 @@ POINTER = "ATLAS-latest.yaml"
 RELEASE_FILE_RE = re.compile(r"^ATLAS-(\d{4}\.\d{2}(?:\.\d+)?)\.yaml$")
 
 
-def resolve_pointer(fetch=fetch_once) -> tuple[list[str], str]:
+def resolve_pointer(fetch=None) -> tuple[list[str], str]:
     """Follow the text-pointer chain from dist/ATLAS-latest.yaml to a release
-    path relative to dist/. Returns (chain, release_relpath)."""
+    path relative to dist/. Returns (chain, release_relpath).
+
+    `fetch` defaults to the module's fetch_once looked up at CALL time (not bound
+    as a default argument), so patching fetch_atlas.fetch_once reaches it (D145)."""
+    if fetch is None:
+        fetch = fetch_once
     path = POINTER
     chain: list[str] = []
     for _ in range(4):
