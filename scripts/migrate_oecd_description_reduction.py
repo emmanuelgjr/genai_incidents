@@ -7,7 +7,7 @@ own sitemap and can never be re-fetched again by the normal ingest path --
 without a costly, CI-infeasible full re-ingest (E21 §5.4: the live sitemap
 holds 10,000 incident URLs, ``ingest/_cache/oecd_aim/`` is empty and
 gitignored, and a cold OECD_AIM_LIMIT=0 pass has a ~167-minute floor against
-``auto-refresh.yml``'s 60-minute timeout).
+the 65-minute OECD fetch step timeout in ``auto-refresh.yml``'s ``oecd-fetch`` job; 60 minutes when this was written).
 
 For each row in each target file:
   1. captures the row's CURRENT (pre-reduction) ``description`` as the

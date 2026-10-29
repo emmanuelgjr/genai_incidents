@@ -138,7 +138,8 @@ def load_sitemap() -> list[str]:
 # worker threads) for zero possible yield. Skipping it BEFORE the fetch
 # (not after, the way the REASON_NO_BODY_SHAPE bucket already silently
 # absorbed it) turns wasted requests into headroom against the workflow's
-# `timeout-minutes: 60` (`.github/workflows/auto-refresh.yml`) and, in the
+# `timeout-minutes: 65` on the fetch step of the `oecd-fetch` job
+# (`.github/workflows/auto-refresh.yml`; 60 when this was written, 65 since D142) and, in the
 # same direction, reduces load on a third-party host (Invariant 5 conduct).
 #
 # The rule is deliberately narrow -- match ONLY a slug that is entirely
