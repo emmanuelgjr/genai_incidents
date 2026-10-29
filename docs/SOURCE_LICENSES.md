@@ -455,7 +455,7 @@ phrase "absorbs fine-tuning subversion", `LLM05` and `LLM06` near-verbatim
 
 ### 3.8 OWASP GenAI Data Security Risks & Mitigations 2026 (DSGAI), OWASP Gen AI Security Project — added 2026-10-28 (D133; licence treatment ruled D144, 2026-10-28)
 *Used by:* `mappings/owasp_dsgai_2026.json` (the controlled vocabulary for the
-per-entry `owasp_dsgai` field; 21 codes `DSGAI01`-`DSGAI21`, a short `title` per
+per-entry `owasp_dsgai` field; 21 codes `DSGAI01`-`DSGAI21`, a short `name` per
 code). The titles are reproduced in `docs/TAXONOMIES.md`; the codes also appear as
 field values in `data/incidents.json` and its renderings (`docs/DATA_DICTIONARY.md`,
 HF card text in `scripts/export_huggingface.py`). No title is carried in

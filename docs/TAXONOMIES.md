@@ -162,7 +162,7 @@ Source: *OWASP GenAI Data Security Risks & Mitigations 2026*, OWASP Gen AI Secur
 
 **How codes are assigned.** Provenance, not a rule: the codes arrive from the original seed file (`legacy/incidents.json`, its `owasp_entries` array, which `scripts/parse_existing.py` splits into `owasp_llm`, `owasp_asi` and `owasp_dsgai`) and were assigned by hand there (the seed was committed 2026-05-12, after the OWASP guide was published). No ingester and no description classifier writes this field. Rows relabelled by the D130-2L re-derivation had codes removed by the D130-2L relabel overrides (see CHANGELOG), so a code that survived on such a row was kept deliberately, while a code on a row that was never re-reviewed is the seed's judgement and has not been independently re-checked against the incident text. Treat it as a hint, not an assessment. The field is a plain array (`^DSGAI[0-9]{2}$` in `schema/incident.schema.json`), and a test (`tests/test_owasp_dsgai_vocab.py`) fails if any row carries a code that is not in the vocabulary below.
 
-**Coverage in the corpus** (as of this commit): 75 rows carry at least one code (162 code assignments; 69 standing rows, 6 `unverified`), out of 15,784 rows. Derive it with:
+**Coverage in the corpus** (as of this commit): 75 rows carry at least one code (162 code assignments; 69 standing rows, 6 `unverified`). Derive it with:
 
 ```bash
 python -c "import json,collections; d=json.load(open('data/incidents.json',encoding='utf-8')); d=d.get('incidents',d) if isinstance(d,dict) else d; c=collections.Counter(x for e in d for x in e.get('owasp_dsgai') or []); print(sum(1 for e in d if e.get('owasp_dsgai')), sum(c.values()), sorted(c.items()))"

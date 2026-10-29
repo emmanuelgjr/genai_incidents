@@ -178,6 +178,7 @@ jobs:
             echo "- [ ] Every id removed upstream has an entry in \`mappings/atlas_id_translations.json\` (or the lint failure above is understood and resolved)."
             echo "- [ ] Untouched entries are reported byte-identical and only \`updated\`/\`last_seen\` moved on changed ones."
             echo "- [ ] The suspicious-content scan shows zero hits (or each hit is explained)."
+            echo "- [ ] If the ATLAS pin changed, a row for the new ATLAS version was appended to \`REVISIONS\` in \`scripts/taxonomy_versions.py\` (append-only); otherwise the STIX/MISP exports and pytest fail."
             echo "- [ ] The lint / validate / pytest outcomes in the table above are green (this PR was opened with GITHUB_TOKEN, so the validate.yml CI matrix did not run; close and reopen the PR to trigger it before merging)."
             echo
             echo "Recreated from current \`main\` on every run: **merge promptly**, or close it and re-run"

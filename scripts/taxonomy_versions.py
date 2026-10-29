@@ -63,8 +63,9 @@ def taxonomy_versions(mappings: Path = MAPPINGS) -> dict[str, str | None]:
 # ``revision - 1`` to their exporter-version stamp, so a change to
 # ``taxonomy_versions`` moves exactly the objects whose content it changes.
 # Changing any pin (or adding a taxonomy) without appending a row here makes
-# ``tv_revision()`` raise, so the build fails loudly instead of publishing a
-# changed object under an unchanged ``modified``/``timestamp``. Append only.
+# ``tv_revision()`` raise, so the STIX/MISP exports and pytest fail loudly
+# (``validate`` and ``make build`` do not) instead of publishing a changed
+# object under an unchanged ``modified``/``timestamp``. Append only.
 REVISIONS = (
     # 1 -- v2.13.0: five taxonomies
     {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
