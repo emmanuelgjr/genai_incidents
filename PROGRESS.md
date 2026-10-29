@@ -14,6 +14,13 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🟢 Main CI GREEN again on `d4ce9e50` (D145 merge), 2026-10-29
+- **Validate run 40885879498: success.**
+  - validate (3.12): 13:51:57→14:06:13Z, about 14m16s for the whole job.
+  - validate (3.13): 13:51:57→14:05:45Z.
+- The previous run, on ea0af04a, failed.
+- **D145 A2 answered from CI, not locally:** the whole Validate job, tests included, is about 14 min. That is well under D142's 25-min tests-step cap. The refresh job's own test step is still to be read on the Sun 11-01 run.
+
 ### ▶ D133 FULL GATE DISPATCHED 2026-10-29 (gate-d133 on `87ee725c`)
 - The suite runs on the merge of the branch into main `d4ce9e50` (scratch clone), so the D145-fixed tests count.
 - **Brief asks for:**
