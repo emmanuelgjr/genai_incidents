@@ -14,6 +14,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+- **Main CI on the ATLAS merge `eecb3fb0`: Validate success** (3.12 23:33:12→23:47:48Z, about 15 min; 3.13 green).
+
 ### 📋 docs-warden after ATLAS 2026.10 + D133-W (`eecb3fb0`), 2026-10-29: 0 high, 1 med, 2 low
 - **F1 MED:** docs/TAXONOMIES.md ~:117-122. The "Key LLM-era techniques" table still lists AML.T0056 and AML.T0057 as current: both have been deprecated since 2026.10 and 0 entries carry them, and the page says "pinned at v2026.10" (:130) just below. → **folded into D146-2** (schema-architect is editing TAXONOMIES anyway); W1 is "successor ids, names taken from the pin".
 - **F2 LOW:** the deprecation notes in mappings/mitre_atlas.json say "retained so entries that still reference it resolve, until translated", which is no longer true once translated. The fix belongs in the template in scripts/atlas_pin.py, not in the JSON. → **queued follow-up, pipeline-engineer.**
