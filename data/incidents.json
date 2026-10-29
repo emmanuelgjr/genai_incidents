@@ -9481,7 +9481,6 @@
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0009",
-        "AML.TA0010",
         "AML.TA0011",
         "AML.TA0012",
         "AML.TA0015"

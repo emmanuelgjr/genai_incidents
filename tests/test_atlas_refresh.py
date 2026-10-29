@@ -439,3 +439,34 @@ def test_current_translations_cover_every_deprecated_id_in_use():
     tr = json.loads((ROOT / "mappings" / "atlas_id_translations.json").read_text(encoding="utf-8"))["translations"]
     for old in ("AML.T0024.000", "AML.T0024.001", "AML.T0024.002", "AML.T0056", "AML.T0057"):
         assert old in tr and "deprecated" not in pin[tr[old]["to"]]
+
+
+def test_override_translation_rederives_pinned_tactics_only_when_translated(monkeypatch):
+    """D151: when translation changes an override's pinned mitre_atlas, its pinned
+    mitre_atlas_tactics are re-derived from the translated techniques (INC-02899
+    otherwise keeps AML.TA0010 with nothing achieving it). An override with no
+    translated technique keeps its pinned tactics untouched."""
+    import merge_and_dedupe as md
+    monkeypatch.setattr(md, "_ATLAS_TRANSLATIONS", {"AML.T0057": "AML.T0085.002"})
+    monkeypatch.setattr(md, "_ATLAS_TECHNIQUE_TACTICS",
+                        {"AML.T0085": ["AML.TA0009"], "AML.T0051": ["AML.TA0005"]})
+    row = {"id": "INC-X", "source_ids": ["S-1"]}
+    md.apply_curation_overrides([row], {"S-1": {
+        "mitre_atlas": ["AML.T0051", "AML.T0057"],
+        "mitre_atlas_tactics": ["AML.TA0005", "AML.TA0010"]}})
+    assert row["mitre_atlas_tactics"] == ["AML.TA0005", "AML.TA0009"]
+    keep = {"id": "INC-Y", "source_ids": ["S-2"]}
+    md.apply_curation_overrides([keep], {"S-2": {
+        "mitre_atlas": ["AML.T0051"], "mitre_atlas_tactics": ["AML.TA0005", "AML.TA0010"]}})
+    assert keep["mitre_atlas_tactics"] == ["AML.TA0005", "AML.TA0010"]
+
+
+def test_lint_fires_on_retained_tactic_no_technique_achieves(tmp_path, capsys):
+    """A1: a real tactic id that nothing on the row achieves (the INC-02899 shape:
+    TA0010 left behind after T0057 -> T0085.002)."""
+    root = _scratch(tmp_path)
+    _plant(root, mitre_atlas=["AML.T0085.002"], mitre_atlas_tactics=["AML.TA0009", "AML.TA0010"])
+    assert lint_atlas_ids.main(["--root", str(root), "--skip-pin-integrity"]) == 1
+    assert "stale tactic" in capsys.readouterr().out
+    _plant(root, mitre_atlas=["AML.T0085.002"], mitre_atlas_tactics=["AML.TA0009"])
+    assert lint_atlas_ids.main(["--root", str(root), "--skip-pin-integrity"]) == 0

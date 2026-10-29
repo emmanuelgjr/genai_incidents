@@ -63,6 +63,35 @@ def collect_ids(root: Path) -> dict[str, list[str]]:
     return found
 
 
+def stale_tactics(root: Path, pin: dict) -> list[str]:
+    """Check 4: every tactic on a row must be achieved by one of the row's
+    techniques in the pin (subtechniques inherit their parent's). A retained
+    tactic nothing achieves is a stale code that survived a re-pin (the union
+    in fill_taxonomy only adds; a curation override can pin one). Lives here,
+    not in the one-off delta report, so it runs on every build and every PR.
+    One-directional on purpose: a row MISSING a derivable tactic is legal
+    (`fields_clear` may remove the field)."""
+    techs = pin.get("techniques") or {}
+
+    def derived(ids) -> set[str]:
+        out: set[str] = set()
+        for t in ids:
+            tac = (techs.get(t) or {}).get("tactics")
+            if not tac and t.count(".") >= 2:
+                tac = (techs.get(t.rsplit(".", 1)[0]) or {}).get("tactics")
+            out.update(tac or ())
+        return out
+
+    inc = json.loads((root / "data" / "incidents.json").read_text(encoding="utf-8"))["incidents"]
+    out = []
+    for e in inc:
+        extra = set(e.get("mitre_atlas_tactics") or []) - derived(e.get("mitre_atlas") or [])
+        if extra:
+            out.append(f"stale tactic: {e.get('id', '?')} carries {sorted(extra)} that none of its "
+                       f"techniques achieves in pinned ATLAS {pin.get('version')}")
+    return out
+
+
 def pin_integrity(root: Path, pin: dict) -> list[str]:
     problems: list[str] = []
     prov_path = root / "ingest" / "atlas" / "ATLAS.provenance.json"
@@ -100,6 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     bad = atlas_pin.lint_ids(pin, set(found))
     problems = [f"{i}: {why} (at {', '.join(found[i][:3])}{' ...' if len(found[i]) > 3 else ''}; "
                 f"{len(found[i])} occurrence(s))" for i, why in bad]
+    problems += stale_tactics(a.root, pin)
     if not a.skip_pin_integrity:
         problems += pin_integrity(a.root, pin)
     if problems:
@@ -108,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
             print("  - " + p)
         return 1
     print(f"[lint-atlas] OK: {len(found)} distinct AML.* ids checked against pinned ATLAS "
-          f"{pin.get('version')}; none absent or deprecated; pin matches committed snapshot.")
+          f"{pin.get('version')}; none absent or deprecated; every retained tactic is achieved by a technique; pin matches committed snapshot.")
     return 0
 
 
