@@ -14,6 +14,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D150, USER RULING 2026-10-29 (D146-1 bounce #2): "Apply verbatim + string check (Recommended)"
+- **Warning text, applied verbatim:**
+  > **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons.
+- **Foreman correction, disclosed to the user:** the last sentence of the previewed text said "the run turns red only if every source failed or a source has failed 3 weeks running". That was also inaccurate:
+  - other things turn the run red too (the skip-probe violation, failed steps);
+  - "every source" in the abort check means AIAAIC + OECD only.
+  - The foreman read auto-refresh.yml:741/760 and check_source_health.py (DEFAULT_THRESHOLD 3) and tightened the sentence to the verified conditions.
+- **Also in the fix:** N3/N4 counter-cases, each proven to fire; the A1 text now says it stays unverified until a real job-level timeout (no dispatch, D148-2).
+- **Check:** the foreman string-checks the exact text; gate-d146 re-runs only those checks plus the suite.
+
 ### 🔁 D146-1 BOUNCE #2 (gate-d146 on `100202b1`), 2026-10-29 — **ESCALATED to the user** (protocol: two bounces)
 **VERDICT: BOUNCE (#2).** All 3 bounce-#1 defects are fixed; both new defects are in the D147 add-on.
 **DEFECTS:**
