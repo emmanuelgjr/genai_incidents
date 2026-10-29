@@ -232,3 +232,63 @@ def test_each_consumer_check_fires():
                   and "held" in str((s.get("with") or {}).get("name")))
         up["with"]["name"] = "held-oecd-aiid-inputs"
     assert any("duplicate artifact names" in p for p in _mutate(dup_artifact))
+
+
+# ---- D147: the PR body warns at the TOP when the AIAAIC step did not succeed ----
+
+WARN_STEP = "PR body warning - AIAAIC refresh failed"
+WARN_FILE = "aiaaic-failed-warning.md"
+
+
+def warning_problems(doc: dict) -> list[str]:
+    out = []
+    steps = doc["jobs"]["refresh"]["steps"]
+    wi = _idx(steps, lambda s: s.get("name") == WARN_STEP)
+    bi = _idx(steps, lambda s: s.get("id") == "retracted")
+    if wi is None or bi is None:
+        return ["missing the warning step or the PR-body step (id retracted)"]
+    if not wi < bi:
+        out.append("the warning step must run before the PR-body step")
+    w = steps[wi]
+    cond = str(w.get("if", ""))
+    if "steps.ingest_aiaaic.outcome" not in cond or "!= 'success'" not in cond:
+        out.append("the warning must be conditional on the refresh job's own AIAAIC outcome != success")
+    for needle in ("AIAAIC", "FAILED", "last week's", "finalize job will show red", "still fresh", WARN_FILE):
+        if needle not in str(w.get("run", "")):
+            out.append(f"the warning step lacks {needle!r}")
+    run = str(steps[bi].get("run", ""))
+    first = run.find('cat "$RUNNER_TEMP/' + WARN_FILE + '" > "$RUNNER_TEMP/pr-body.md"')
+    body = run.find("Automated weekly refresh of external sources.")
+    if first < 0 or not first < run.find("<<'BODY'") < body:
+        out.append("the PR-body step must start the body from the warning file, before the body text")
+    if 'cat >> "$RUNNER_TEMP/pr-body.md" <<' not in run:
+        out.append("the body text must APPEND, or it would overwrite the warning")
+    return out
+
+
+def test_pr_body_warns_at_the_top_when_aiaac_failed():
+    assert warning_problems(_doc()) == []
+
+
+def test_warning_checks_fire():
+    def mut(fn):
+        doc = _doc()
+        steps = doc["jobs"]["refresh"]["steps"]
+        fn(steps, next(s for s in steps if s.get("name") == WARN_STEP),
+           next(s for s in steps if s.get("id") == "retracted"))
+        return warning_problems(yaml.safe_load(yaml.safe_dump(doc)))
+
+    # condition inverted: the warning would show on SUCCESS
+    assert mut(lambda st, w, b: w.__setitem__("if", w["if"].replace("!=", "==")))
+    # condition removed
+    assert mut(lambda st, w, b: w.pop("if"))
+    # wired to another step's outcome
+    assert mut(lambda st, w, b: w.__setitem__("if", "${{ steps.ingest_kev.outcome != 'success' }}"))
+    # warning step after the body step
+    assert mut(lambda st, w, b: (st.remove(w), st.append(w)))
+    # body text overwrites the warning
+    assert mut(lambda st, w, b: b.__setitem__("run", b["run"].replace('cat >> "$RUNNER_TEMP/pr-body.md" <<', 'cat > "$RUNNER_TEMP/pr-body.md" <<', 1)))
+    # body step does not start from the warning file
+    assert mut(lambda st, w, b: b.__setitem__("run", b["run"].replace(WARN_FILE, "other.md", 1)))
+    # warning text hollowed out
+    assert mut(lambda st, w, b: w.__setitem__("run", w["run"].replace("finalize job will show red", "x", 1)))

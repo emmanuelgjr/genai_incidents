@@ -436,6 +436,19 @@ jobs:
           python -c "import json; d=json.load(open('data/incidents.json')); print('total:', d['incident_count']); print('generated:', d['generated'])"
           echo "::endgroup::"
 
+      # D147: the finalize job's all-sources-failed abort can no longer withhold
+      # the PR, so when this job's own AIAAIC step did not succeed the PR body
+      # must say so at the top. Written to a file here (step-level `if`, this
+      # job's own step outcome) and put first in the body by the next step.
+      - name: PR body warning - AIAAIC refresh failed
+        timeout-minutes: 5
+        if: ${{ steps.ingest_aiaaic.outcome != 'success' }}
+        run: |
+          {
+            echo "> **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's, and this run's finalize job will show red. KEV, CVE sweep, AIID and retraction changes in this PR are still fresh."
+            echo
+          } > "$RUNNER_TEMP/aiaaic-failed-warning.md"
+
       # v2.13.0 item 3 / D60: flag, don't block. List every entry this build
       # newly retracts (retracted here, not retracted on main) in the PR body,
       # and label the PR `needs-ruling` when any of them is a landmark entry or
@@ -450,7 +463,9 @@ jobs:
         # anything other than an explicit 'false' as "needs a ruling".
         continue-on-error: true
         run: |
-          cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
+          # D147: the AIAAIC-failed warning (if the step above wrote one) goes first.
+          cat "$RUNNER_TEMP/aiaaic-failed-warning.md" > "$RUNNER_TEMP/pr-body.md" 2>/dev/null || : > "$RUNNER_TEMP/pr-body.md"
+          cat >> "$RUNNER_TEMP/pr-body.md" <<'BODY'
           Automated weekly refresh of external sources. This PR carries the
           AIAAIC sheet, the CISA KEV catalog, the CVE rejection sweep (with
           the D60 retractions) and the AIID snapshot (lifted under D114); the
