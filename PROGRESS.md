@@ -14,6 +14,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D146-1 D150 fixes REPORTED `81a4ba08` (2026-10-29) — foreman string check PASS; scoped re-check by gate-d146
+- **Specialist (testimony):**
+  - 3 files, +19/−7.
+  - The ruled text is pinned by a string check.
+  - N4 (the fallback deleted) and N3 (the warning written to the work tree) each fail `test_pr_body_warns_at_the_top_when_aiaac_failed`; the file was restored byte-identical (cmp).
+  - A1 wording replaced in both places.
+  - 178 workflow tests passed; actionlint rc 0.
+- **Foreman [R] string check:**
+  - the exact ruled text occurs **1×** in auto-refresh.yml (:451);
+  - "will show red", "still fresh" and "confirm with one live workflow_dispatch" occur **0×** in the workflow and both test files;
+  - the workflow diff is exactly the echo line and the A1 comment;
+  - porcelain clean; ls-remote = 81a4ba08.
+
 ### ⚖ D150, USER RULING 2026-10-29 (D146-1 bounce #2): "Apply verbatim + string check (Recommended)"
 - **Warning text, applied verbatim:**
   > **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons.
