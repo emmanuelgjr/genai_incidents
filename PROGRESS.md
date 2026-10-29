@@ -14,6 +14,47 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 ATLAS 2026.10 BOUNCE #1 (gate-atlas on `4cef2a4e`), 2026-10-29 — in-progress
+**VERDICT: BOUNCE (#1).** Three small defects. The data, translations, exports and tests hold up.
+**DEFECTS:**
+1. **Audit count wrong** (delta audit :15). It says "396 OECD / 144 AIID", but those are source-id counts. Per entry it is **379 / 135**, and INC-07386 alone has 11 OECD sids. The audit itself declares that it counts entries.
+2. **INC-02899 keeps TA0010 with no supporting technique.** The override pins mitre_atlas, which is now translated, and mitre_atlas_tactics, which is not.
+   - Main: 15,784/15,784 rows have tactics derivable from the 2026.09 YAML. Branch: 15,783.
+   - The CHANGELOG claim "lose TA0010 where nothing else achieves it" is false for this row.
+   - The row is disclosed in the audit's pattern table.
+3. **SOURCE_LICENSES:332 is stale:** "841,482-byte for 2026.09"; the 2026.10 file is 1,154,660 bytes.
+**Evidence (gate, by independent routes):**
+- **Fetch:** sha and bytes match a fresh curl.
+- **Release diff and translations:**
+  - the release diff, from the gate's own parse of the raw YAML, matches the claim;
+  - the translations match the release-notes text; all targets are defined; append-only holds.
+- **Per-entry delta, from a hard-coded table + raw-YAML tactics:**
+  - 1,744 changed; the ID set and order are identical;
+  - fields moved: mitre_atlas 1744, tactics 1742, updated/last_seen 1744, nothing else;
+  - 74 rows carry both T0056 and T0057;
+  - no removed id remains; 0 undefined ids.
+- **Regeneration:** byte-reproducible; a T0024.002 re-target in scratch changes the data, so the check fires.
+- **Fixes:**
+  - delta-tool fix (2): fires on 2 planted unexplained changes, and real data gives 0;
+  - fix (1)'s test fails on the old code;
+  - fix (3) is minimal.
+- **Exports:**
+  - STIX: 65306→65304 objects; removed techniques are dropped, not revoked, per the exporter rule since the 2026.09 refresh;
+  - modified-moved = content-changed (0 objects changed without moving);
+  - MISP 32/34 files, TAXII 2.
+- **D114:** no ingest/ change outside ingest/atlas. The 10-06 refresh moved ATLAS fields on 1,511 OECD rows, so this is within precedent.
+- **Full pytest** on 4cef2a4e + 5f6a7db5: **1570 passed, 1 xfailed**. All LF; the 10-06 audit is untouched.
+**Advisories:**
+- methods.md:116 is not live (it tracks the CITATION release); update it at the next cut.
+- Add a "retained tactic still derivable" check: it is the blind spot that let D2 through both the tool and the specialist's independent script.
+- A CORRECTIONS row for D149.
+- Label-scientist follow-ups.
+**⚖ D151, FOREMAN RULING (D2):** when the translation table changes an override's pinned mitre_atlas, **re-derive that row's pinned tactics** from the translated techniques, in that case only.
+- Basis: the override note says the tactics were rule-derived, not judged by a person.
+- Rewording the CHANGELOG instead would leave the corpus's one non-derivable row in place.
+- INC-02899 is pending user re-review (D143-F), and this does not pre-empt it.
+**Routing:** atlas-2610 fixes D1–D3 plus advisories A1 (the derivability check, proven to fire on 4cef2a4e) and A2 (CORRECTIONS row), per D52. The same gate then re-checks the scoped changes plus the suite.
+
 ### ✅ D146-1 **DONE — MERGED to main 2026-10-29** (scoped re-check PASS on `81a4ba08` after bounce #2 → D150)
 **VERDICT (gate-d146): PASS. DEFECTS: none.**
 **Evidence (gate):**
