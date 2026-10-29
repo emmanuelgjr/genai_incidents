@@ -14,6 +14,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D145 PASS `a2d4c47e` (2026-10-29, gate-d145, first review) — merged to main
+- **VERDICT: PASS. DEFECTS: none.**
+- **Foreman's 20-min concern REFUTED by the gate:** back-to-back on this machine, fix a2d4c47e 1556 passed + 1 xfailed in **1185.32s**; base a29ddbee 3 failed + 1553 passed + 1 xfailed in **1165.36s** (+20s, ~1.7%, noise). The slowest-30 lists are near-identical. The machine is ~20 min today whatever the code; yesterday's 509s was environmental. The guard raises AssertionError (not OSError), so the robust_fetch/conditional_fetch retry loops cannot catch it or back off.
+- **Evidence (gate, by its own routes):**
+  1. 2×2 matrix (old/new fetch_atlas × with/without guard) on the 3 tests. Old, no guard: 3 failed, `KeyError: '.../dist/v6/ATLAS-2026.10.yaml'` (real network, 25.71s). Old + guard: 3 failed, `NetworkAccessAttempted: DNS lookup of 'raw.githubusercontent.com'` (1.23s). New ± guard: 3 passed. Root cause: `def resolve_pointer(fetch=fetch_once)` bound at import.
+  2. Production behaviour unchanged: main() passes no argument; the only other caller (tests/test_atlas_refresh.py:191) passes a lambda. Diff = scripts/fetch_atlas.py +7/−2, tests/conftest.py +40.
+  3. Own AST scan of callable defaults across scripts/ ingest/ src/ tests/, **proven to fire** (prints `resolve_pointer fetch_once` on a29ddbee); zero callable network defaults on a2d4c47e.
+  4. Guard proven to fire: DNS, connect, connect_ex, create_connection, IPv6 connect all raise; loopback (127.0.0.1, localhost) still works.
+  5. Vacuous-pass check: an instrumented guard logged every construction (proven to fire); the full suite under it, 1556 passed + 1 xfailed in 1189.05s, **created no log**, so no test swallows the guard.
+  6. `git merge-tree --write-tree origin/main a2d4c47e` rc 0; data/ diff empty.
+  7. ATLAS 2026.10 not ingested (only ATLAS-2026.09.yaml in tree).
+- **Advisories (non-blocking, queued as small follow-ups):**
+  - **A1:** guard gaps: UDP `sendto` is unguarded; the loopback set is exact strings (127.0.0.2 and bytes hosts count as non-loopback); subprocess tests are uncovered. Suggest patching sendto and using `ipaddress.ip_address(...).is_loopback`.
+  - **A2:** don't cite local timings against D142's 25-min tests cap; read this commit's CI Validate time.
+  - **A3:** two guards now overlap (test_ingest_wave12.py `_no_network` + conftest); consolidate later.
+- **Strays:** main tree and worktree porcelain empty (foreman, before recording).
+- **Next:** confirm main Validate goes green; then the full D133 gate.
+
 ### 🔍 D145 REPORTED `a2d4c47e` (2026-10-29) — gate-d145 dispatched
 - **Specialist (testimony):**
   - **Diagnosis confirmed.** With the new guard on the old code, the 3 tests fail with "network access attempted: DNS lookup of 'raw.githubusercontent.com'".
