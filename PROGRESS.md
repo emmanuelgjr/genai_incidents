@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D146-1 bounce-#1 fixes + D147 warning REPORTED `100202b1` (2026-10-29) — scoped re-gate by gate-d146
+- **Specialist (testimony):**
+  - **8cafe0df: the D147 PR-body warning.** A separate conditional step, `if: steps.ingest_aiaaic.outcome != 'success'`, writes the warning file; the PR-body step starts from it and appends. 7 mutation counter-cases; fires when `!=` is flipped to `==`.
+  - **100202b1, D1:** `handoff_problems`. M1–M6 were each applied to the real workflow and each fails `test_handoff_from_refresh_and_oecd_to_finalize_is_pinned`; the file is restored byte-identical.
+  - **100202b1, D3:** comments fixed; TESTS_MEASURED_MIN 10.8; REFRESH_MEASURED_NEED_MIN 15. The budget holds: 25 ≥ 21.6, and 25+4.5 < 40.
+  - **100202b1, A1 and B6:** A1 documented; B6 PR-body wording added and pinned by a test.
+  - Results: 178 workflow tests passed; actionlint clean.
+  - Local quirk: actionlint hangs on Windows when a run script is over ~4 KB.
+- **Foreman [R]:** porcelain clean; ls-remote = 100202b1; the data/ diff from 1346e9b2 is empty; test_auto_refresh_workflow.py:65 has 10.8; yml:493 carries the B6 wording.
+- The gate was told: D147-1, D148-1 (its defect 2 accepted) and D148-2 (no live dispatch; its A4 closed).
+
 ### 🔍 D133-W REPORTED `0c6fee9c` (2026-10-29; license-auditor edits, committed by the foreman) — gate-d133 dispatched
 - **License-auditor (testimony):** the "four mapping files" enumeration appeared on **6 live surfaces**, not 2. Fixed to five, adding owasp_dsgai_2026.json, in README:423, CONTRIBUTING:46, DATASHEET:130-137, CITATION.cff:44-47, .zenodo.json:4 and the HF card template (export_huggingface.py:197-200).
 - **README sentence:** the DSGAI file is CC BY-SA 4.0 for the 21 codes and short titles, and CC BY 4.0 for the project's citation and provenance block. The auditor checked the file's contents before wording it.
