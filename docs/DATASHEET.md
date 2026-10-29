@@ -127,14 +127,16 @@ review, and the Heuristic labels bullet below for known gaps.
   exceptions: `title`'s in `NOTICE-DATA`; `description`'s in
   [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)'s OECD AIM
   summary-of-outcomes row (§1.5 covers the full licensing analysis).
-- **Four mapping files are CC BY-SA 4.0 in part.** `mappings/owasp_asi_top10.json`
-  (OWASP ASI codes and risk names), `mappings/owasp_llm_top10_2026.json`,
+- **Five mapping files are CC BY-SA 4.0 in part.** `mappings/owasp_asi_top10.json`
+  (OWASP ASI codes and risk names), `mappings/owasp_dsgai_2026.json` (the 21
+  OWASP DSGAI codes and short risk titles; no OWASP description text),
+  `mappings/owasp_llm_top10_2026.json`,
   `mappings/owasp_llm_top10_2025.json` and the crosswalk
   `mappings/owasp_llm_2025_to_2026.json` (OWASP LLM codes, names and description
   or scope text) are each `CC-BY-SA-4.0 AND CC-BY-4.0`. The OWASP LLM description
   and scope text is scheduled to be paraphrased in the next release; it has not
   been yet. See `NOTICE-DATA` and [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)
-  §3.6 and §3.7.
+  §3.6, §3.7 and §3.8.
 - **Two rows carried OWASP Gen AI round-up text (CC BY-SA 4.0) up to and including
   v2.13.0.** The descriptions of `INC-02646` and `INC-03233` were rewritten in the
   project's own wording on 2026-10-13 (D97); earlier releases still carry the

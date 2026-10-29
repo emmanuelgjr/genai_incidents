@@ -43,4 +43,4 @@ Map each entry to the four core per-incident taxonomy fields below, **where appr
 
 ## License
 
-By contributing, you agree to license your contributions under the project's dual license: code under MIT, data under CC-BY-4.0. Two groups of files do not follow that grant and are governed by `.reuse/dep5` instead: drop-ins under `ingest/` (upstream terms), and the OWASP carve-out mapping files (`mappings/owasp_asi_top10.json`, `mappings/owasp_llm_top10_2026.json`, `mappings/owasp_llm_top10_2025.json`, `mappings/owasp_llm_2025_to_2026.json`, each `CC-BY-SA-4.0 AND CC-BY-4.0`). See `NOTICE-DATA`.
+By contributing, you agree to license your contributions under the project's dual license: code under MIT, data under CC-BY-4.0. Two groups of files do not follow that grant and are governed by `.reuse/dep5` instead: drop-ins under `ingest/` (upstream terms), and the OWASP carve-out mapping files (`mappings/owasp_asi_top10.json`, `mappings/owasp_dsgai_2026.json`, `mappings/owasp_llm_top10_2026.json`, `mappings/owasp_llm_top10_2025.json`, `mappings/owasp_llm_2025_to_2026.json`, each `CC-BY-SA-4.0 AND CC-BY-4.0`). See `NOTICE-DATA`.
