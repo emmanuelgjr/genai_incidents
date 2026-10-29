@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🚨 D145 HOTFIX DISPATCHED 2026-10-29 (WS4, P0): **main CI red** — Validate failed on push `a29ddbee` (it passed 10-28)
+- **Failing tests:** 3 in tests/test_atlas_refresh.py, each a KeyError on `.../dist/v6/ATLAS-2026.10.yaml`. They fail on main as well, not only on the D133 branch.
+- **Foreman [R] diagnosis:**
+  - scripts/fetch_atlas.py:55 `def resolve_pointer(fetch=fetch_once)` binds the REAL fetcher as a default argument.
+  - So the test monkeypatch never reaches it, and the pointer chain has been resolved over the **live network**: the tests were never hermetic (an agreement-6 form-(a) shape).
+  - MITRE has published **ATLAS 2026.10**, so the live pointer now names a release the fake upstream does not serve.
+- **Brief:** confirm the diagnosis; fix the call-time lookup; find the same pattern elsewhere; add a network guard and prove it fires; do NOT ingest 2026.10 (atlas-refresh's job). Worktree `C:/repos/gi-wt-d145`.
+- **Parallel with D133**, foreman decision: the hotfix touches no D133 files, and main red blocks every merge.
+- **Queue:** ATLAS 2026.10 refresh, via atlas-refresh / WS2, after D145.
+
+### ▶ D133 licensing part dispatched 2026-10-29 (license-auditor, per D144)
+- **Timestamp-fix report `67bb0480` (testimony):**
+  - An append-only `REVISIONS` registry in taxonomy_versions.py, so an unregistered pin change fails the build.
+  - STIX: only the identity `modified` moves (.001Z → .002Z).
+  - MISP: all 31 events move by 1 s.
+  - Measured: the objects whose content changed and the objects whose timestamp moved are the same set (1 STIX object; 31 MISP events).
+  - 5 new tests; 3 fail against the old exporters.
+  - pytest 1563 + 1 xfailed; 3 failed = the D145 ATLAS tests, which fail on main too (foreman confirmed on main).
+
 ### ⚖ D144, USER RULINGS 2026-10-28 (D133 escalations)
 - **Licensing: follow D80/D83 + audit (Recommended).**
   - Keep the CC BY-SA 4.0 carve-out as built: the `.reuse/dep5` stanza for `mappings/owasp_dsgai_2026.json`, and a NOTICE-DATA attribution covering the 21 OWASP DSGAI titles wherever they are reproduced.
