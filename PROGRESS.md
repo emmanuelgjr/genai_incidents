@@ -14,6 +14,47 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D148, USER RULINGS 2026-10-29 (D146-1 bounce #1 escalations)
+1. **State saves: "Accept: PR opens, run red (Recommended)".** In the new design, cursor/source-health restore and persist failures no longer withhold the refresh PR; finalize turns the run red. Old behaviour: 8 scheduled runs (07-26 to 09-13) lost their PR at persist.
+2. **Live test: "Skip it; Sunday is the test (Recommended)"**, which **supersedes D147-2**. The gate showed that a dispatch is not side-effect-free: it opens/updates a real refresh PR, force-pushes the refresh-state counters and advances the cursor, which the foreman had not disclosed when D147-2 was asked. **No dispatch.** After the merge, the foreman checks the Sun 11-01 04:00 UTC run:
+   - finalize ran;
+   - the job outputs were populated;
+   - the cursor was handed over;
+   - the held-oecd-aiid-inputs artifact exists;
+   - step times are within the budgets.
+
+### 🔁 D146-1 BOUNCE #1 (gate-d146 on `41902fff`), 2026-10-29 — in-progress
+**VERDICT: BOUNCE (bounce #1).** The gate found the restructure sound and bounced it for 3 cheap gaps; none of them concerns the A/B/C choice.
+**DEFECTS:**
+1. Tests miss the refresh→finalize hand-off. Each of these passes all 13 workflow tests:
+   - M1: delete the refresh `outputs:` block. AIAAIC/KEV then count as failed every week and the run goes red after 3 weeks.
+   - M2: finalize `if: cancelled()`. test_oecd_fetch_job.py:103 only does a substring check.
+   - M3: drop `|| 'failure'` from AIAAIC. It is tested for OECD only.
+   - Violates criterion 5 and agreement 6.
+2. An undeclared behaviour change: the restore/persist failures no longer withhold the PR (persist_refresh_state.sh records 8 runs, 07-26 to 09-13, that failed at persist). → **user, D148-1: accepted.**
+3. Stale comment at auto-refresh.yml:588 ("in `refresh`").
+**Behaviour diffs:**
+- B1: (A) implemented as described.
+- B3: counters persist in all-failed weeks (stricter).
+- B4: if refresh dies before ingest, AIAAIC/KEV count as failed.
+- B6: the PR cites the held artifact before oecd-fetch attaches it.
+- B7: the PR lands ~35 min into the run (it still waits for cve-sweep at 22.8 min), down from ~63.
+**Evidence:**
+- Full suite on scratch merge 4a5ae09f (467903db + 41902fff): **1558 passed, 1 xfailed, 517.56s**.
+- actionlint rc 0; LF; data/ 0 lines.
+- Single writer: the persist script is called only at yml:650/682 (finalize); runs are serialised by the concurrency group.
+- These mutations fire: abort-if removed, refresh cap 29, oecd job 68, OECD step 61, contents:write, refresh needs oecd-fetch.
+- Budget re-derived via the API (run 40178341113, 10-25): refresh outside OECD is ~9-10 min; OECD 50.8, so the 65 cap is 1.28x.
+- Validate on main 1346e9b2 (run 40921156247): tests 10.8 min on 3.12.
+- `'' || 'failure'` evaluates to 'failure'.
+**Advisories:**
+- A1: unverified whether finalize's `!cancelled()` runs after a needed job hits its job-level timeout (on 10-25 a job timeout skipped always() steps; the run concluded "cancelled").
+- A2: test the raw refresh-state push, the cursor-download continue-on-error and the upload if-no-files-found.
+- A3: set TESTS_MEASURED_MIN to 10.8; the cve-sweep header comment is stale.
+- A4: live dispatch is not side-effect-free → D148-2.
+**Routing:** the specialist fixes D1 (M1–M3 + A2's M4–M6, each with a fire proof), D3, A3, documents A1 and declares B6 in the PR body, alongside the D147-1 PR-body AIAAIC warning. Re-gate by gate-d146, scoped.
+- **The gate could not write a report file** (its role forbids it); the full verdict is in its message, summarised here.
+
 ### ⚖ D147, USER RULINGS 2026-10-29 (D146-1 escalations)
 1. **Refresh abort: "Red run + flagged PR (Recommended)".**
    - **Background:**
