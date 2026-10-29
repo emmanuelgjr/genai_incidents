@@ -14,6 +14,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D133 bounce-#1 fixes REPORTED `9061e62d` (2026-10-29) — scoped re-gate by gate-d133
+- **Specialist (testimony):**
+  - c456ae3f: D1 clause dropped (check_unmarked_totals → []); D2 `title`→`name`; A2 wording (exports + pytest, not validate/make build); A1 atlas-refresh checklist line (actionlint clean; no live ATLAS runbook exists); A5 two tests, with a fire proof (DSGAI01 29→28 fails).
+  - 9061e62d: L1 (D146-3), a one-line HF card CC BY-SA 4.0 legalcode + NOTICE-DATA pointer; the README export diff is exactly that line.
+  - data/ and src/ diff empty.
+- **Foreman [R] (tree read):**
+  - "15,784" is absent from TAXONOMIES; SOURCE_LICENSES:458 reads `name`; the atlas-refresh.yml:181 REVISIONS line is present; export_huggingface.py:80 has the legalcode line.
+  - Porcelain clean; ls-remote = 9061e62d.
+  - The specialist's own suite run was stopped: the gate measures on the merge with D145 instead.
+
 ### ▶ D146-1 DISPATCHED 2026-10-29 (WS4, pipeline-engineer) — OECD fetch into its own job
 - Branch `ws4/d146-oecd-fetch-job-2026-10-29`, worktree `C:/repos/gi-wt-d146`. Runs alongside the D133 fixes (no file overlap).
 - **Brief:**
