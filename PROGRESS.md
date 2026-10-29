@@ -14,6 +14,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D133 BOUNCE #1 (gate-d133 on `87ee725c`, merge tested as 5342f27d onto fbc2a783), 2026-10-29 — in-progress
+**VERDICT: BOUNCE (bounce #1).** Two small text defects; everything else clean. The gate needed one re-prompt: it went idle for ~3h after its suite and sent the verdict when asked.
+**DEFECTS:**
+1. docs/TAXONOMIES.md:165 hardcodes the corpus total "out of 15,784 rows" (invariant 6). Proven with the repo's own `check_stats_drift.check_unmarked_totals`: it returns [] on main and "TAXONOMIES.md:165: hardcoded total '15,784' found outside any stats marker" on the merge. CI misses it only because TAXONOMIES.md is not in DOC_SURFACES. Fix: drop the clause or use a stats marker.
+2. docs/SOURCE_LICENSES.md §3.8 "Used by" says the mapping file has a short `title` per code; the field is `name` (NOTICE-DATA is right).
+**Evidence (gate, by its own routes):**
+- Full suite on the merge: **1566 passed, 1 xfailed in 1183.99s**, rc 0.
+- C1: dsgai_entries.json fetched 13:53:40Z, blob e4be4a8e… (the same blob the docs cite). All 21 id/name pairs match the mapping file and the TAXONOMIES table, 0 diffs. The resource page title, the date (Mar 17/18 across timezones) and the CC BY-SA 4.0 footer were verified verbatim.
+- C2, recounted in Node rather than Python: 75 rows / 162 assignments (69 with no status + 6 unverified); all 21 per-code counts match.
+- C3/C6: a fresh regeneration on both clones leaves porcelain empty; incidents.json is byte-identical; the committed delta is exactly the owasp_dsgai key in stats.json and in the package taxonomy_versions.json.
+- Export per-object comparison:
+  - STIX: of 65,306 ids, the set with changed content = the set with a moved `modified` = {identity}.
+  - TAXII: only that object changed.
+  - MISP: on all 31 events, the set with changed content = the set with a moved timestamp, +1 s; one tag appended.
+  - HF: jsonl byte-identical; README = the 4 intended edits.
+  - No undeclared deltas; deterministic.
+- Fire proofs: old exporters (3 fail), DSGAI08 removed, schema required removed, stats key removed (validate rc 1), and an unregistered veris re-pin (export ValueError).
+- Docs: eleven sources counted; dep5 order; companion tier everywhere; "six (four core, one companion, one experimental)" matches README; README, badge and SVG untouched; LF; porcelain empty.
+**Advisories:**
+- A1: REVISIONS × atlas-refresh.yml. The next monthly run will re-pin ATLAS 2026.10 without a REVISIONS row, so its PR shows "pytest: failure". That fails safe, but the workflow's PR checklist and the ATLAS runbook don't mention REVISIONS.
+- A2: CHANGELOG/docstring say an unregistered pin "fails the build". It actually fails the exports and pytest, not `make build`.
+- A3: the HF card says "sparse … well under 1%" rather than 75/162. The gate judges that compliant: the export omits unverified rows (69 exported), and the card is drift-checked. **Foreman ruling:** compliant with D144's intent (low coverage stated; a literal would be wrong on that surface). No change.
+- A4: "Sensitive Data Leakage" appears in INCIDENTS.md only inside a CVE title. No action.
+- A5: the 75/162 and per-code counts in TAXONOMIES are not drift-checked; a cheap test could pin them.
+**Routing (user preference D52: fix advisories before merge):** distribution-engineer on the same branch fixes D1, D2, A2, A5 and A1 (a REVISIONS line in the atlas-refresh PR checklist + the ATLAS runbook). Re-gate by the same reviewer, scoped: string checks + check_unmarked_totals on TAXONOMIES + the new test's fire proof + suite.
+
 ### 🟢 Main CI GREEN again on `d4ce9e50` (D145 merge), 2026-10-29
 - **Validate run 40885879498: success.**
   - validate (3.12): 13:51:57→14:06:13Z, about 14m16s for the whole job.
