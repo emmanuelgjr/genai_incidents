@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 📋 docs-warden after ATLAS 2026.10 + D133-W (`eecb3fb0`), 2026-10-29: 0 high, 1 med, 2 low
+- **F1 MED:** docs/TAXONOMIES.md ~:117-122. The "Key LLM-era techniques" table still lists AML.T0056 and AML.T0057 as current: both have been deprecated since 2026.10 and 0 entries carry them, and the page says "pinned at v2026.10" (:130) just below. → **folded into D146-2** (schema-architect is editing TAXONOMIES anyway); W1 is "successor ids, names taken from the pin".
+- **F2 LOW:** the deprecation notes in mappings/mitre_atlas.json say "retained so entries that still reference it resolve, until translated", which is no longer true once translated. The fix belongs in the template in scripts/atlas_pin.py, not in the JSON. → **queued follow-up, pipeline-engineer.**
+- **F3 LOW:** docs/paper/genai-incidents-methods.md:116 "ATLAS v2026.09". It is defensible because the draft tracks the CITATION release (:4), but the line itself carries no qualifier. → **queued, governance-scribe:** add "(as of v2.13.0)" or update at the next cut.
+- **Clean:**
+  - the ATLAS version is 2026.10 on every live surface; REVISIONS rows 1-2 unchanged;
+  - the remaining 2026.09 strings are historical;
+  - TA0010→TA0009 is described consistently;
+  - counts and the 2.13.0+main label agree;
+  - no "four mapping files" left; CORRECTIONS ordering is correct;
+  - the CHANGELOG, D133 entry and atlas-refresh checklist agree on the REVISIONS failure mode.
+- **Not covered:**
+  - Pages and the HF hub;
+  - the D146-1 CHANGELOG entry was not read line by line;
+  - the gitignored local docs/data STIX file is stale but not a repo surface.
+
 ### ▶ 2026-10-29 dispatches after the ATLAS merge (main `eecb3fb0`)
 - **docs-warden** (warden-atlas): step 7 for ATLAS (version strings, taxonomy pins) and the folded D133-W pass.
 - **D146-2** (WS3 schema-architect, `d1462-pins`): add MAESTRO and NIST AI RMF to taxonomy_versions, with:
