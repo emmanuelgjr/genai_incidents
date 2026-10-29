@@ -56,6 +56,37 @@ def taxonomy_versions(mappings: Path = MAPPINGS) -> dict[str, str | None]:
     return out
 
 
+# Registry of every set of pinned versions ever published, oldest first. The
+# position (1-based) is the *taxonomy revision*: the STIX ``identity`` object
+# (the only STIX object that carries ``x_taxonomy_versions``) and every MISP
+# event (each carries the ``genai-incidents:taxonomy-*`` machinetags) add
+# ``revision - 1`` to their exporter-version stamp, so a change to
+# ``taxonomy_versions`` moves exactly the objects whose content it changes.
+# Changing any pin (or adding a taxonomy) without appending a row here makes
+# ``tv_revision()`` raise, so the build fails loudly instead of publishing a
+# changed object under an unchanged ``modified``/``timestamp``. Append only.
+REVISIONS = (
+    # 1 -- v2.13.0: five taxonomies
+    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1"},
+    # 2 -- D133: owasp_dsgai added
+    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026"},
+)
+
+
+def tv_revision(tv: dict[str, str | None] | None = None) -> int:
+    """1-based index of ``tv`` (default: current) in ``REVISIONS``; raises if absent."""
+    tv = tv if tv is not None else taxonomy_versions()
+    for n, rev in enumerate(REVISIONS, 1):
+        if rev == tv:
+            return n
+    raise ValueError(
+        f"taxonomy_versions {tv} is not in taxonomy_versions.REVISIONS: append it "
+        "(append only) so the STIX identity `modified` and the MISP event "
+        "timestamps move with it")
+
+
 def as_text(tv: dict[str, str | None] | None = None) -> str:
     """Human-readable single line, e.g. for the Hugging Face card."""
     tv = tv if tv is not None else taxonomy_versions()
