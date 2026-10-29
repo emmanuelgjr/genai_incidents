@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ▶ D133 FULL GATE DISPATCHED 2026-10-29 (gate-d133 on `87ee725c`)
+- The suite runs on the merge of the branch into main `d4ce9e50` (scratch clone), so the D145-fixed tests count.
+- **Brief asks for:**
+  - a per-file/per-field delta built from main vs the merge;
+  - the 21 titles checked against the primary OWASP source;
+  - a per-object STIX/MISP timestamp comparison;
+  - fire proofs for the required key and REVISIONS;
+  - cross-doc consistency (companion tier, 75/162/21, "six (four core, one companion, one experimental)", eleven sources);
+  - the D144 rulings applied.
+- **D145 merged:** main `ea0af04a..d4ce9e50` (ls-remote verified). The branch was also pushed. Validate on `d4ce9e50` was queued when this was written.
+
 ### ✅ D145 PASS `a2d4c47e` (2026-10-29, gate-d145, first review) — merged to main
 - **VERDICT: PASS. DEFECTS: none.**
 - **Foreman's 20-min concern REFUTED by the gate:** back-to-back on this machine, fix a2d4c47e 1556 passed + 1 xfailed in **1185.32s**; base a29ddbee 3 failed + 1553 passed + 1 xfailed in **1165.36s** (+20s, ~1.7%, noise). The slowest-30 lists are near-identical. The machine is ~20 min today whatever the code; yesterday's 509s was environmental. The guard raises AssertionError (not OSError), so the robust_fetch/conditional_fetch retry loops cannot catch it or back off.
