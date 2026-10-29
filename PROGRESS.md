@@ -14,6 +14,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D133-W **DONE — MERGED to main 2026-10-29** (gate PASS on `0c6fee9c`, first review)
+**VERDICT (gate-d133): PASS. DEFECTS: none.** The verdict was delayed again: it needed one ping.
+**Evidence (gate):**
+- Scratch merge 406421f2 (0c6fee9c into e9f48253): **full suite 1568 passed, 1 xfailed, 621.26s**, rc 0, including the tests that pin the HF card, CITATION and zenodo text.
+- The diff is exactly the 7 files, all LF; no dated record touched.
+- The dsgai file was parsed by the gate: 21 × {id, name} plus a project citation block, and no OWASP description text. That matches README, DATASHEET and dep5.
+- **The stale-"four" sweep fires:** 5 hits on main (.zenodo.json:4, CITATION.cff:44, README:423, DATASHEET:130, export_huggingface.py:197) and 0 live hits on the merge. A second route agrees: every licence enumeration that names the llm crosswalk also names dsgai.
+- HF export: the README diff is the four-to-five sentence only; jsonl byte-identical; 0 titles; drift clean; validate rc 0.
+- .zenodo.json and CITATION.cff parse. cffconvert is not installed, so no CFF schema check was run.
+- Row 9 is accurate against D144 and D146-3. The §3.8 header date matches its Date-checked cell. No README table row was added.
+**Advisories:**
+- A1: one overlong line in the CITATION.cff abstract (cosmetic; the folded scalar parses identically).
+- A2: install or run cffconvert in CI if CFF schema validity should count as a check.
+**Foreman:** strays check found main tree and worktree porcelain empty before recording.
+
 ### 🔍 D146-1 bounce-#1 fixes + D147 warning REPORTED `100202b1` (2026-10-29) — scoped re-gate by gate-d146
 - **Specialist (testimony):**
   - **8cafe0df: the D147 PR-body warning.** A separate conditional step, `if: steps.ingest_aiaaic.outcome != 'success'`, writes the warning file; the PR-body step starts from it and appends. 7 mutation counter-cases; fires when `!=` is flipped to `==`.
