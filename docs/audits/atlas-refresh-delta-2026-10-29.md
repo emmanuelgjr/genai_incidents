@@ -19,7 +19,7 @@ ATLAS pin 2026.09 -> 2026.10. Before = `origin/main:data/incidents.json (6fa029c
 **Tool change in this refresh.** `scripts/atlas_entry_delta.py` previously labelled `AML.TA0009` "UNEXPLAINED" when it arrived through a translation target's own links (1,739 false UNEXPLAINED on the first run); it now attributes such a tactic to the translation target. Every changed entry below has a stated reason; UNEXPLAINED count 0.
 
 
-**Retained-tactic check (new, `scripts/lint_atlas_ids.py`).** Every tactic on every row must be achieved by one of its techniques in the pin (subtechniques inherit their parent). It lives in the lint, not this one-off report, so it runs on every build and PR. It is one-directional (extra tactics fail; a row missing a derivable tactic does not, because `fields_clear` may legitimately remove the field). On the previous branch tip (4cef2a4e) it flags exactly `INC-02899`; on the fixed tip 0 of 15,784 rows are flagged (and 0 are missing a derivable tactic).
+**Retained-tactic check (new, `scripts/lint_atlas_ids.py`).** Every tactic on every row must be achieved by one of its techniques in the pin (subtechniques inherit their parent). It lives in the lint, not this one-off report, so it runs on every build and PR. It is one-directional (extra tactics fail; a row missing a derivable tactic does not, because curation may legitimately narrow tactics (`fields_clear`, or an override pinning a subset of the derived tactics)). On the previous branch tip (4cef2a4e) it flags exactly `INC-02899`; on the fixed tip 0 of 15,784 rows are flagged (and 0 are missing a derivable tactic).
 
 ## Entry count and ID set
 

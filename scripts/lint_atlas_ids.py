@@ -70,7 +70,7 @@ def stale_tactics(root: Path, pin: dict) -> list[str]:
     in fill_taxonomy only adds; a curation override can pin one). Lives here,
     not in the one-off delta report, so it runs on every build and every PR.
     One-directional on purpose: a row MISSING a derivable tactic is legal
-    (`fields_clear` may remove the field)."""
+    (curation may narrow tactics: `fields_clear`, or an override pinning a subset of the derived tactics)."""
     techs = pin.get("techniques") or {}
 
     def derived(ids) -> set[str]:
