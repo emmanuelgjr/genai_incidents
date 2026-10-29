@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D145 REPORTED `a2d4c47e` (2026-10-29) — gate-d145 dispatched
+- **Specialist (testimony):**
+  - **Diagnosis confirmed.** With the new guard on the old code, the 3 tests fail with "network access attempted: DNS lookup of 'raw.githubusercontent.com'".
+  - **Fix:** `resolve_pointer(fetch=None)` now looks the fetcher up at call time.
+  - **Guard:** a new autouse `_no_real_network` fixture in tests/conftest.py blocks non-loopback DNS/connect for ALL in-process tests. Subprocess tests are not covered.
+  - **Pattern search:** only one instance of the pattern in scripts/ and ingest/.
+  - **Diff:** 2 files; data/ unchanged.
+  - **Full pytest:** 1556 passed + 1 xfailed, **in 20 min**.
+  - **ATLAS 2026.10 confirmed out** (pointer chain); not ingested.
+- **Foreman concern sent to the gate:** 20 min vs ~8.5 min yesterday. If the guard causes this, D142's 25-min tests-step cap is at risk. Gate to measure base vs fix back-to-back, and to check that no test now passes vacuously by catching the guard's AssertionError.
+
 ### 🔍 D133 licensing part committed `87ee725c` (2026-10-29; license-auditor edits, committed by the foreman)
 - **License-auditor (testimony):** **CC BY-SA 4.0 confirmed** from three primary pages fetched 2026-10-29:
   - the OWASP resource page footer;
