@@ -14,6 +14,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D147, USER RULINGS 2026-10-29 (D146-1 escalations)
+1. **Refresh abort: "Red run + flagged PR (Recommended)".**
+   - **Background:**
+     - The old "all sources failed" abort is untracked (commit 9801b6bf, 2026-06-09, pre-D-numbers): AIAAIC and OECD both fail → no PR.
+     - It can't see OECD once OECD runs in parallel, and OECD can't make a PR fresher under D114 anyway.
+   - **Ruling:** the predicate moves to the `finalize` job (red run, specialist's option A). The PR stays open, **plus** the refresh PR body carries a conditional warning line when AIAAIC failed (its data is last week's; KEV/CVE/AIID/retractions are still fresh).
+   - Rejected: B (withhold the PR on AIAAIC failure alone) and C (refresh waits for OECD; the 51-min block returns).
+2. **Live test: "Yes, PR auto-closed (Recommended)".** After the gate PASSes, the foreman runs one workflow_dispatch with oecd_aim_limit=10 and closes any resulting refresh PR unmerged, labelled as a test.
+
+### 🔍 D146-1 REPORTED `41902fff` (2026-10-29) — gate-d146 dispatched
+- **Specialist (testimony; full report in the session scratchpad, summarised here):**
+  - **Jobs:** cve-sweep unchanged; new **oecd-fetch**, parallel, no needs, contents:read; refresh still needs only cve-sweep; new **finalize** with needs [refresh, oecd-fetch] and !cancelled().
+  - **Consumers:** the specialist mapped every consumer of the OECD step (fetch, cursor restore, probe check/enforce, health outcome via a STEP-outcome job output defaulting to failure, D42 artifact, summary, abort).
+  - **refresh-state single writer = finalize:** a test enforces it. Side effect: the counters now also update in weeks when the refresh aborts (stricter).
+  - **Timeouts:** refresh job 100→**40**; OECD step 65; oecd-fetch job 80; finalize 15.
+  - **check_refresh_budget:** re-structured; fires on OECD 65→80 and on refresh 40→29.
+  - **Tests:** new test_oecd_fetch_job.py (14 mutation cases; fires when finalize needs only [refresh]); 3 workflow tests retargeted.
+  - **Comments and docs:** stale "60" comments fixed; INGESTION_CONDUCT gets 2 pointers.
+  - **Results:** full pytest 1558 passed + 1 xfailed (8:41); actionlint clean; data/ unchanged.
+  - **Open risks:** the GitHub-side semantics can't be tested offline (job outputs on timeout, artifact steps on cancel, a missing cursor file); the ~12-min refresh figure is derived, not measured; total wall clock is still ~55 min (only the PR is decoupled).
+- **The PR-body AIAAIC warning (D147-1) has been sent to the specialist** as a follow-up commit; gate-d146 was told to include it.
+- **D133 re-gate:** the verdict is overdue (the suite started 17:28Z); one ping sent at ~17:58Z.
+
 ### 🔍 D133 bounce-#1 fixes REPORTED `9061e62d` (2026-10-29) — scoped re-gate by gate-d133
 - **Specialist (testimony):**
   - c456ae3f: D1 clause dropped (check_unmarked_totals → []); D2 `title`→`name`; A2 wording (exports + pytest, not validate/make build); A1 atlas-refresh checklist line (actionlint clean; no live ATLAS runbook exists); A5 two tests, with a fire proof (DSGAI01 29→28 fails).
