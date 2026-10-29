@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D144, USER RULINGS 2026-10-28 (D133 escalations)
+- **Licensing: follow D80/D83 + audit (Recommended).**
+  - Keep the CC BY-SA 4.0 carve-out as built: the `.reuse/dep5` stanza for `mappings/owasp_dsgai_2026.json`, and a NOTICE-DATA attribution covering the 21 OWASP DSGAI titles wherever they are reproduced.
+  - **license-auditor** adds the docs/SOURCE_LICENSES.md section and fixes NOTICE-DATA's "ten upstream sources" count. This goes through the D133 gate.
+- **Headline: keep "six taxonomies" (Recommended).** owasp_dsgai is described as a **companion** field with low coverage (75 rows / 162 assignments) in TAXONOMIES and the HF card. README, badge and SVG are unchanged.
+
+### 🔍 D133 progress (2026-10-28/29) — NOT gated yet
+- **WS6 part `fccc156c` (distribution-engineer, testimony):**
+  - Source: "OWASP GenAI Data Security Risks & Mitigations 2026" (CC BY-SA 4.0). The resource page is dated 2026-03-17.
+  - The 21 titles were taken from OWASP's own repo file `dsgai_entries.json`, because the PDF is behind a form. This is disclosed.
+  - Tier: companion.
+  - New `mappings/owasp_dsgai_2026.json` + 3 tests (fire proof: removing DSGAI08 fails 2 tests). All 21 corpus codes are in the list.
+  - Corpus: 162 assignments on 75 rows (the brief's "168" was a text match).
+  - HF card: unverified explanation added; "six taxonomies (four core, one companion, one experimental)".
+  - pytest 1559 + 1 xfailed.
+  - Stopped on criterion 3 because it needs a schema change.
+- **WS3 part `856c6a0a` (schema-architect, testimony):**
+  - `owasp_dsgai` is **required** in `taxonomy_versions`; the build emits "2026". Without that the check could never fail (same rule as `unverified_count`).
+  - v2.13.0 manifests now fail on 2 keys; VERSIONING documents this.
+  - Fire proofs: removing the SOURCES row fails 17 tests; removing it from schema `required` fails 2.
+  - Committed delta: `data/stats.json` +1 field, and the package `taxonomy_versions.json`. All 245 other hashed files unchanged; `incidents.json` unchanged.
+  - pytest 1561 + 1 xfailed.
+  - Brief premises refuted: there is no packaged manifest schema copy; MAESTRO and NIST are not in taxonomy_versions (an asymmetry, now documented).
+- **Pre-merge defect found by schema-architect (WS6):**
+  - The STIX identity `modified` and all 31 MISP event timestamps do not move although their content changes (new taxonomy pin / machinetag). Dedupe-by-timestamp consumers would miss the change.
+  - → **distribution-engineer on this branch next.** The export_stix docstring still lists five taxonomies.
+- **Next on this branch (serial):** WS6 timestamp fix → license-auditor SOURCE_LICENSES/NOTICE-DATA → one full gate of D133.
+
 ### 📋 docs-warden on D132 (`2773b4eb`), 2026-10-28 — 0 high/medium; 2 low
 - **Drift check:** clean. No plain "2.13.0" sits beside post-release counts anywhere; "+main" appears only beside main counts. VERSIONING, CHANGELOG and DATA_DICTIONARY agree. The slim/marker/stats counts are consistent (15,745 + 29 + 10 = 15,784).
 - **F1 low:** the CHANGELOG [Unreleased] "status: unverified" entry's Consumer-impact bullet says "No entry is unverified yet (unverified_count is 0)". That is false on main (10). The D130-2 entry hedges it. → **governance-scribe note: add a one-clause dated pointer before the next cut** (it can ride with D134(iii)).
