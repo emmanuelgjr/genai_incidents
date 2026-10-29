@@ -14,6 +14,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ D146, USER RULINGS 2026-10-29: "go with your recommendations on 1-3"
+1. **OECD fetch cost: move the OECD fetch into its own job** in auto-refresh.yml, so the main refresh no longer waits ~51 min on a source that D114 holds frozen.
+   - The review artifact, skip-probe, source-health and rotation-cursor duties are all preserved.
+   - D114 still binds: no OECD lift.
+   - → **WS4 pipeline-engineer, D146-1**, now, in its own worktree (no file overlap with D133).
+   - Target: merged before Sun 11-01 04:00 UTC if it gates cleanly. If not, main's current 100-min setup is safe.
+2. **MAESTRO + NIST: add both to taxonomy_versions** with registered editions (REVISIONS rows).
+   - → **D146-2**, after D133 merges (same files).
+3. **D133 open licensing risks: accept per precedent.**
+   - The question of whether the titles are copyrightable stays undecided, as D80 left it.
+   - The `owasp_dsgai` code values stay under CC BY 4.0, attributed but not carved out (the ASI precedent).
+   - The PDF licence page stays unread; this is disclosed.
+   - **Add the HF card legalcode/NOTICE-DATA pointer** → folded into the D133 bounce-#1 fixes (sent to d133-fix).
+- **Plan:** after D133 merges, the foreman runs the ATLAS 2026.10 refresh (with its REVISIONS row) before the monthly cron on Tue 11-03, so the user gets a clean refresh PR rather than a red automatic one.
+
 ### 🔁 D133 BOUNCE #1 (gate-d133 on `87ee725c`, merge tested as 5342f27d onto fbc2a783), 2026-10-29 — in-progress
 **VERDICT: BOUNCE (bounce #1).** Two small text defects; everything else clean. The gate needed one re-prompt: it went idle for ~3h after its suite and sent the verdict when asked.
 **DEFECTS:**
