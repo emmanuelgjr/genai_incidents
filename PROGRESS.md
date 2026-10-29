@@ -14,6 +14,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+- **Step-7 note (D133-W, merged at `30c22401`):** the docs-warden pass for D133-W's licensing-text change is **folded into the docs-warden sweep after the ATLAS 2026.10 merge**, which also changes taxonomy and version strings. Meanwhile the gate's stale-"four" sweep (proven to fire: 5→0) covered the surfaces the warden had flagged.
+
 ### ✅ D133-W **DONE — MERGED to main 2026-10-29** (gate PASS on `0c6fee9c`, first review)
 **VERDICT (gate-d133): PASS. DEFECTS: none.** The verdict was delayed again: it needed one ping.
 **Evidence (gate):**
