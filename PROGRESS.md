@@ -14,6 +14,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D133-W REPORTED `0c6fee9c` (2026-10-29; license-auditor edits, committed by the foreman) — gate-d133 dispatched
+- **License-auditor (testimony):** the "four mapping files" enumeration appeared on **6 live surfaces**, not 2. Fixed to five, adding owasp_dsgai_2026.json, in README:423, CONTRIBUTING:46, DATASHEET:130-137, CITATION.cff:44-47, .zenodo.json:4 and the HF card template (export_huggingface.py:197-200).
+- **README sentence:** the DSGAI file is CC BY-SA 4.0 for the 21 codes and short titles, and CC BY 4.0 for the project's citation and provenance block. The auditor checked the file's contents before wording it.
+- **SOURCE_LICENSES:**
+  - escalation-table row 9 for DSGAI (the table already lists rulings, rows 6-8 being D97/D96/D98);
+  - the §3.8 header keeps "added 2026-10-28" and adds "licence terms fetched and checked 2026-10-29".
+- **Left alone:** the dated records (CORRECTIONS, CHANGELOG, audits, releases), NOTICE-DATA and dep5 (already correct), and the README tier table (D144).
+- **Foreman [R]:** porcelain showed exactly 7 files before the commit; all LF in the index; `.zenodo.json` json.load OK; CITATION.cff yaml OK; the grep for "four mapping|four OWASP" on the touched surfaces is empty; ls-remote = 0c6fee9c.
+
 ### ⚖ D149, FOREMAN RULING 2026-10-29 (ATLAS 2026.10 refresh, step 4 stop)
 - **Specialist report (testimony), WIP at `e1e2384e`, pushed:**
   - Fetch: version 2026.10, sha256 ac41ee9f…e142d, 1,154,660 bytes, format 6.1.0. The scan shows 0 hits.
