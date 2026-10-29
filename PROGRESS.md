@@ -14,6 +14,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D133 licensing part committed `87ee725c` (2026-10-29; license-auditor edits, committed by the foreman)
+- **License-auditor (testimony):** **CC BY-SA 4.0 confirmed** from three primary pages fetched 2026-10-29:
+  - the OWASP resource page footer;
+  - the repo README;
+  - the repo LICENSE ("Copyright (c) OWASP Foundation").
+  - GitHub's API reports NOASSERTION. That is a detector artefact: the LICENSE file is a short summary that GitHub's detector doesn't match.
+  - The titles file carries no terms of its own. The PDF licence page is unread (behind a form).
+- **Edits:**
+  - NOTICE-DATA: Changes statement, publisher, date and coverage list; source count **ten → eleven**, counted from the "carry an obligation" sentence.
+  - dep5 stanza completed (OWASP Foundation copyright; D144 recorded).
+  - SOURCE_LICENSES §3.8 added.
+  - TAXONOMIES: legalcode link.
+- **Open risks surfaced for the user (not decided):**
+  - (1) whether the titles are copyrightable is not decided (same as D80);
+  - (2) the `owasp_dsgai` code VALUES in incidents.json stay under CC BY 4.0, attributed but not carved out (same as ASI);
+  - (3) the HF card lacks a legalcode/NOTICE-DATA pointer (codes only; low risk; optional WS6 one-liner);
+  - (4) the PDF licence page is unread.
+- **Foreman [R]:**
+  - porcelain before the commit showed exactly the 4 files;
+  - committed blobs are LF (`git ls-files --eol`);
+  - origin = `87ee725c`.
+- **The full D133 gate waits for the D145 merge**, so its suite can run green.
+
 ### 🚨 D145 HOTFIX DISPATCHED 2026-10-29 (WS4, P0): **main CI red** — Validate failed on push `a29ddbee` (it passed 10-28)
 - **Failing tests:** 3 in tests/test_atlas_refresh.py, each a KeyError on `.../dist/v6/ATLAS-2026.10.yaml`. They fail on main as well, not only on the D133 branch.
 - **Foreman [R] diagnosis:**
