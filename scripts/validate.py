@@ -748,12 +748,14 @@ def check_freshness_completeness(data: dict, registry: dict) -> list[str]:
     return problems
 
 
-_TAXONOMY_KEYS = ("atlas", "owasp_llm", "owasp_asi", "capec", "veris", "owasp_dsgai")
+_TAXONOMY_KEYS = ("atlas", "owasp_llm", "owasp_asi", "capec", "veris", "owasp_dsgai",
+                  "maestro", "nist_ai_rmf")
 
 
 def check_taxonomy_versions(stats: dict, derived: dict) -> list[str]:
     """data/stats.json must carry ``taxonomy_versions`` (one key per pinned
-    taxonomy in ``_TAXONOMY_KEYS``; ``owasp_dsgai`` added under D133) and it must equal the value derived from
+    taxonomy in ``_TAXONOMY_KEYS``; ``owasp_dsgai`` added under D133, ``maestro``
+    and ``nist_ai_rmf`` under D146-2) and it must equal the value derived from
     mappings/*.json right now -- a stale stats.json (mapping re-pinned, build
     not re-run) fails here instead of publishing the wrong version."""
     tv = stats.get("taxonomy_versions")
