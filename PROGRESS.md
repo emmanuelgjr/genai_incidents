@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ▶ D146-1 DISPATCHED 2026-10-29 (WS4, pipeline-engineer) — OECD fetch into its own job
+- Branch `ws4/d146-oecd-fetch-job-2026-10-29`, worktree `C:/repos/gi-wt-d146`. Runs alongside the D133 fixes (no file overlap).
+- **Brief:**
+  - every consumer of the OECD step is preserved (summary, source-health, probe, cursor, D42 artifact);
+  - no race on refresh-state;
+  - the D114 hold is unchanged;
+  - the timeouts and check_refresh_budget are re-budgeted, with a fire proof;
+  - the stale "60" comments are fixed;
+  - no live dispatch.
+- **D133 bounce-#1 fixes:** the HF legalcode/NOTICE-DATA pointer was added as item L1 (D146-3).
+
 ### ⚖ D146, USER RULINGS 2026-10-29: "go with your recommendations on 1-3"
 1. **OECD fetch cost: move the OECD fetch into its own job** in auto-refresh.yml, so the main refresh no longer waits ~51 min on a source that D114 holds frozen.
    - The review artifact, skip-probe, source-health and rotation-cursor duties are all preserved.
