@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D146-1 **DONE — MERGED to main 2026-10-29** (scoped re-check PASS on `81a4ba08` after bounce #2 → D150)
+**VERDICT (gate-d146): PASS. DEFECTS: none.**
+**Evidence (gate):**
+1. Every claim in the D150 text was verified against the code:
+   - ingest_aiaaic_sheet.py writes only after all checks pass;
+   - DEFAULT_THRESHOLD is 3 (no --threshold is passed); stale is ≥3 consecutive and anything below only warns;
+   - the abort check exits 1 only at ok=0, and a dead oecd-fetch job counts as failure;
+   - no other refresh-job path turns an AIAAIC failure red;
+   - "other checks" holds: probe, other sources stale, D42 gate, tests.
+   - Strictly, the data is "the committed copy", which may be older than last week; that is the user's verbatim wording, not raised.
+2. N3 and N4 each fail `test_pr_body_warns_at_the_top_when_aiaac_failed`. The gate's own N6 ("3 weeks"→"2 weeks") fails the exact-text check, and M1–M12 and N1 still fire.
+3. The A1 wording is accurate.
+4. Scope is 3 files, +19/−7, and nothing else. The ruled text occurs once; the stale phrases occur 0 times.
+5. Merge dfcf40dc (51fad5c4 + 81a4ba08): **1575 passed, 1 xfailed, 523.36s**; data/ 0 lines; LF; actionlint rc 0.
+**Advisory → follow-up (test-only; merged without it so the change lands before Sunday):** nothing ties the "3 weeks" in the PR text to DEFAULT_THRESHOLD. Add a test asserting the text contains f"{DEFAULT_THRESHOLD} weeks".
+**Foreman:** strays check found main tree and worktree porcelain empty.
+**Sun 11-01 04:00 UTC run is the live test (D148-2). Check that:**
+- the jobs are parallel as designed;
+- finalize ran;
+- the job outputs are populated, so the health table shows real outcomes rather than all-failure;
+- the cursor artifact was handed over;
+- `held-oecd-aiid-inputs` is attached;
+- refresh-state has at most one counter commit;
+- step times are within budget;
+- the PR body is correct.
+The gate-d146 checklist is the reference for these checks.
+**Docs-warden:** not dispatched. No counts, licensing text, taxonomy lists or version strings changed (workflow, tests and an INGESTION_CONDUCT pointer only).
+
 ### 🔍 ATLAS 2026.10 refresh REPORTED `4cef2a4e` (2026-10-29) — gate-atlas dispatched (fresh reviewer)
 - **Specialist (testimony):**
   - **Pin:** 2026.10, sha ac41ee9f…e142d; REVISIONS row 3 added.
