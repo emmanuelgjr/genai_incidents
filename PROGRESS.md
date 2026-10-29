@@ -14,6 +14,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 📋 docs-warden on D133 (`6fa029ca`), 2026-10-29: 2 high, 1 med, 1 low
+- **F1 HIGH:** README.md:423 Licensing says "**Four** mapping files are CC BY-SA 4.0 in part" and lists ASI + 3 LLM files. dep5 now has **five** (+ owasp_dsgai_2026.json), and README never mentions DSGAI.
+- **F2 HIGH:** CONTRIBUTING.md:46 lists four OWASP carve-out files and omits owasp_dsgai_2026.json, so contributors are told the wrong set of files sits outside the MIT/CC-BY grant.
+- **F3 MED:** the README tier table omits owasp_dsgai, while TAXONOMIES, the HF card, DATASHEET:152 and DATA_DICTIONARY:46 carry it. **Foreman ruling:** intentional per D144 (README headline and table unchanged); only the licence bullet (F1) names DSGAI. No table row.
+- **F4 LOW:** the SOURCE_LICENSES escalation summary (~:618-640) has no DSGAI row (perhaps intentional: D144 was a ruling). The §3.8 header says "added 2026-10-28" but cites a 2026-10-29 fetch.
+- **Clean:** taxonomy_versions keys on every surface; eleven sources; tier words; counts and labels (15,745 / 10 / 2.13.0+main); the REVISIONS failure wording.
+- **Not covered:** live Pages and the HF hub.
+- **Routing → D133-W (license-auditor)**, worktree `C:/repos/gi-wt-d133w`, branch `ws0/d133w-dsgai-licence-surfaces-2026-10-29`. It covers F1, F2 and F4, plus a grep of the other live surfaces. The foreman commits for it (the agent has no Bash). Gate before merge.
+
 ### ▶ 2026-10-29 dispatches after the D133 merge (main `6fa029ca`)
 - **docs-warden** (warden-d133): step 7, because licensing text and taxonomy lists changed.
 - **ATLAS 2026.10 refresh** (WS4, pipeline-engineer, `atlas-2610`):
