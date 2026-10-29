@@ -13,7 +13,8 @@
     "owasp_llm": "2026",
     "owasp_asi": "2026",
     "capec": null,
-    "veris": "1.4.1"
+    "veris": "1.4.1",
+    "owasp_dsgai": "2026"
   },
   "last_release": {
     "version": "2.13.0",

@@ -453,6 +453,32 @@ phrase "absorbs fine-tuning subversion", `LLM05` and `LLM06` near-verbatim
 | Retrieval method | **Positive finding.** WebFetch (markdown conversion, small-model summary) of the README, landing page, `2026/final` directory listing and four source files; WebFetch of the GitHub REST API URL for the structured `license` field (null). Quotes in the "earlier reading" are as the tool returned them, not raw bytes. **Update 2026-10-13:** the raw-text check was done by red-reviewer (curl and `pdftotext`; `docs/audits/licensing-overlap-measurements-2026-10-13.md`, Q1), which also confirmed the licence evidence: the 2026 PDF licence page reads "This document is licensed under Creative Commons, CC BY-SA 4.0"; Zenodo record 22109015 gives `cc-by-sa-4.0`; the repository README states CC BY-SA 4.0; the 2025 pages carry the site footer "Creative Commons Attribution-ShareAlike v4.0". That closes the "PDF licence page not read" gap in the License cell. |
 | Non-English / facts-only | English. |
 
+### 3.8 OWASP GenAI Data Security Risks & Mitigations 2026 (DSGAI), OWASP Gen AI Security Project — added 2026-10-28 (D133; licence treatment ruled D144, 2026-10-28)
+*Used by:* `mappings/owasp_dsgai_2026.json` (the controlled vocabulary for the
+per-entry `owasp_dsgai` field; 21 codes `DSGAI01`-`DSGAI21`, a short `name` per
+code). The titles are reproduced in `docs/TAXONOMIES.md`; the codes also appear as
+field values in `data/incidents.json` and its renderings (`docs/DATA_DICTIONARY.md`,
+HF card text in `scripts/export_huggingface.py`). No title is carried in
+`docs/app.js`, `INCIDENTS.md` or the HF card (repo grep 2026-10-29). Not ingested by
+any script. Publication: "OWASP GenAI Data Security Risks & Mitigations 2026", OWASP
+Gen AI Security Project - Data Security Initiative, resource page dated 2026-03-17,
+<https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/>.
+Titles were taken from the `name` field of OWASP's repository file
+`data_validation/reference_data/dsgai_entries.json` in
+`GenAI-Security-Project/GenAI-Data-Security-Initiative` (the PDF is behind a form
+and was not read). No OWASP description or mitigation text is carried.
+
+| Field | Value |
+|---|---|
+| License | **CC BY-SA 4.0, stated in three places (WebFetch, 2026-10-29; positive findings).** (1) Resource page footer, `https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/`: *"Unless otherwise specified, all content on the site is Creative Commons Attribution-ShareAlike v4.0 and provided without"* [warranty; tool truncated], *"Copyright © 2025 OWASP Foundation, Inc."* (2) Repository README, `https://github.com/GenAI-Security-Project/GenAI-Data-Security-Initiative`, License section: *"All materials produced by this initiative are licensed under"* CC BY-SA 4.0, with a licence badge. (3) Repository `LICENSE` file, `https://raw.githubusercontent.com/GenAI-Security-Project/GenAI-Data-Security-Initiative/main/LICENSE` (27 lines): *"Creative Commons Attribution-ShareAlike 4.0 International. Copyright (c) OWASP Foundation"*, a plain-language summary (not the full legal code) naming Attribution and ShareAlike, linking `https://creativecommons.org/licenses/by-sa/4.0/legalcode`. **Discrepancy noted, not a conflict:** the GitHub REST API (`api.github.com/repos/GenAI-Security-Project/GenAI-Data-Security-Initiative`, structured JSON) returns `license: Other / NOASSERTION`, because the LICENSE file is a short custom summary that GitHub's detector does not match to the SPDX text; the file and README state CC BY-SA 4.0 in prose. `dsgai_entries.json` itself has no licence, source or copyright field, so it carries no terms of its own beyond the repository licence. **Not read:** the licence page of the whitepaper PDF (behind a form). |
+| Scrape-permitted | N/A. Hand-transcribed into the mapping file; no automated fetch of the site. |
+| Redistribute-verbatim | **Codes and titles only, with attribution.** The 21 codes and 21 short titles are reproduced verbatim from OWASP's repository file. No OWASP prose is reproduced. |
+| Relicense-compatible | **NO** for any OWASP prose (share-alike conflicts with the CC-BY-4.0 data grant; none is carried). The codes and titles are carried under OWASP's own CC BY-SA 4.0 grant via a file-level carve-out (`.reuse/dep5` stanza for `mappings/owasp_dsgai_2026.json`), not folded into the CC-BY-4.0 grant. Whether short titles are copyrightable at all was not decided; the attribution and carve-out apply either way (same as D80). |
+| Action | **(b) share-alike, honored by carve-out + attribution (D144, following D80/D83).** Attribution paragraph in `NOTICE-DATA` (title, publisher, URL, licence + legalcode link, Changes statement, covering the titles wherever reproduced); carve-out stanza in `.reuse/dep5`; licence text at `LICENSES/CC-BY-SA-4.0.txt` (D84). |
+| Date-checked | 2026-10-29 |
+| Retrieval method | **Positive finding.** WebFetch (markdown conversion, small-model summary), so quotes are as the tool returned them, not raw bytes; GitHub API fetched for the structured `license` field. Because the finding is positive, truncation cannot have manufactured it; a raw-HTML re-check of the footer is optional. |
+| Non-English / facts-only | English. |
+
 ---
 
 ## 4. Academic red-team benchmarks (hand-curated citations)

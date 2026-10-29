@@ -6,7 +6,7 @@ ASI 2026 re-pin) flows into stats.json, the STIX bundle, the MISP manifest, the
 Hugging Face card and the pip package without touching any of them.
 
     {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
-     "capec": null, "veris": "1.4.1"}
+     "capec": null, "veris": "1.4.1", "owasp_dsgai": "2026"}
 
 Sources:
 
@@ -21,6 +21,9 @@ Sources:
                 release), so the honest value today is ``null``, not a guess;
                 ``scripts/build_cwe_capec.py`` is the place to start recording it.
 * veris      -- ``mappings/veris.json``                  ``version``
+* owasp_dsgai -- ``mappings/owasp_dsgai_2026.json``      ``version`` (companion
+                code set; added after v2.13.0 under user ruling D133. MAESTRO
+                and NIST AI RMF are not pinned here: neither was ruled in)
 
 Offline, stdlib-only: imported by the deterministic build.
 """
@@ -40,6 +43,7 @@ SOURCES = (
     ("owasp_asi", "owasp_asi_top10.json", "version"),
     ("capec", "cwe_capec.json", "capec_version"),
     ("veris", "veris.json", "version"),
+    ("owasp_dsgai", "owasp_dsgai_2026.json", "version"),
 )
 
 
@@ -50,6 +54,38 @@ def taxonomy_versions(mappings: Path = MAPPINGS) -> dict[str, str | None]:
         v = raw.get(field)
         out[key] = None if v is None else str(v)
     return out
+
+
+# Registry of every set of pinned versions ever published, oldest first. The
+# position (1-based) is the *taxonomy revision*: the STIX ``identity`` object
+# (the only STIX object that carries ``x_taxonomy_versions``) and every MISP
+# event (each carries the ``genai-incidents:taxonomy-*`` machinetags) add
+# ``revision - 1`` to their exporter-version stamp, so a change to
+# ``taxonomy_versions`` moves exactly the objects whose content it changes.
+# Changing any pin (or adding a taxonomy) without appending a row here makes
+# ``tv_revision()`` raise, so the STIX/MISP exports and pytest fail loudly
+# (``validate`` and ``make build`` do not) instead of publishing a changed
+# object under an unchanged ``modified``/``timestamp``. Append only.
+REVISIONS = (
+    # 1 -- v2.13.0: five taxonomies
+    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1"},
+    # 2 -- D133: owasp_dsgai added
+    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026"},
+)
+
+
+def tv_revision(tv: dict[str, str | None] | None = None) -> int:
+    """1-based index of ``tv`` (default: current) in ``REVISIONS``; raises if absent."""
+    tv = tv if tv is not None else taxonomy_versions()
+    for n, rev in enumerate(REVISIONS, 1):
+        if rev == tv:
+            return n
+    raise ValueError(
+        f"taxonomy_versions {tv} is not in taxonomy_versions.REVISIONS: append it "
+        "(append only) so the STIX identity `modified` and the MISP event "
+        "timestamps move with it")
 
 
 def as_text(tv: dict[str, str | None] | None = None) -> str:

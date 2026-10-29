@@ -1,6 +1,6 @@
 # Taxonomies
 
-This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS), a companion MAESTRO architectural-layer mapping, and an experimental VERIS 1.4.1 crosswalk. They don't compete — they describe **different facets** of the same incident.
+This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026, OWASP Top 10 for Agentic Applications, NIST AI RMF, MITRE ATLAS), a companion MAESTRO architectural-layer mapping, and an experimental VERIS 1.4.1 crosswalk. A further companion code set, OWASP GenAI Data Security Risks and Mitigations 2026 (`owasp_dsgai`), is carried in the data but is not counted among the six. They don't compete — they describe **different facets** of the same incident.
 
 ## Quick chooser
 
@@ -11,6 +11,7 @@ This dataset maps incidents to six taxonomies: four core (OWASP LLM Top 10 2026,
 | What organizational risk function should respond? | **NIST AI RMF** |
 | What adversary tactic/technique was used? | **MITRE ATLAS** |
 | Where in the architecture did it originate / impact? | **MAESTRO** (companion) |
+| What data was exposed, poisoned or mishandled? | **OWASP GenAI Data Security (DSGAI)** (companion, sparse) |
 | Does response get paged or queued — could the closing action be undone? | **Reversibility class** (landmark tier) |
 | Which detection investment surfaced it? | **Discovery method** (landmark tier) |
 
@@ -148,6 +149,52 @@ Companion model that describes **where in the AI/agent architecture** an inciden
 | L7 | Human Factors & UX |
 
 The `role` field on a MAESTRO mapping indicates whether the layer was the `origin`, `impact`, `blind-spot`, `control`, `amplifier`, or `propagation` vector.
+
+---
+
+## OWASP GenAI Data Security Risks and Mitigations (DSGAI) (companion)
+
+Source: *OWASP GenAI Data Security Risks & Mitigations 2026*, OWASP Gen AI Security Project, Data Security Initiative, resource page dated 2026-03-17: <https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/>. Edition pinned here: **2026** (`mappings/owasp_dsgai_2026.json`, field `version`; the machine-readable value is `taxonomy_versions.owasp_dsgai` in `data/stats.json`). Licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/legalcode) (the OWASP site states CC BY-SA 4.0 for its content, and the initiative repository carries the same licence); the codes `DSGAI01`-`DSGAI21` and the 21 short risk titles below are reproduced from OWASP and attributed to it, no description text is carried. See `NOTICE-DATA`.
+
+**How the titles were confirmed (fetched 2026-10-28).** The whitepaper PDF sits behind a download form and was not read. The titles are taken from OWASP's own repository file [`data_validation/reference_data/dsgai_entries.json`](https://github.com/GenAI-Security-Project/GenAI-Data-Security-Initiative/blob/main/data_validation/reference_data/dsgai_entries.json) in the `GenAI-Security-Project/GenAI-Data-Security-Initiative` repository (blob `e4be4a8eefe58f994adb36497c45b32bc141d392`, last changed 2026-03-24), whose `SOURCES.md` labels it "OWASP GenAI Data Security Risks and Mitigations 2026"; the repository README lists the same 21 entries. The edition is therefore confirmed from the primary organisation's repository and resource page, not from the PDF.
+
+**Tier: companion.** Same tier as MAESTRO, for the same reasons: the codes are not computed by any classifier in this repository (they are not derived by `parse_existing.py` or `merge_and_dedupe.py` beyond passing them through and unioning them on a merge), they are not contributor-set (see CONTRIBUTING.md), and they are populated on a small minority of rows, so a missing `owasp_dsgai` means "not mapped", never "no data-security risk". It is not core (core fields are populated across the corpus by a rule or a source mapping) and it is not experimental (it is a stored per-incident field, not an export-time crosswalk like VERIS). It is carried in the data but is **not** one of the six taxonomies counted in the README headline.
+
+**How codes are assigned.** Provenance, not a rule: the codes arrive from the original seed file (`legacy/incidents.json`, its `owasp_entries` array, which `scripts/parse_existing.py` splits into `owasp_llm`, `owasp_asi` and `owasp_dsgai`) and were assigned by hand there (the seed was committed 2026-05-12, after the OWASP guide was published). No ingester and no description classifier writes this field. Rows relabelled by the D130-2L re-derivation had codes removed by the D130-2L relabel overrides (see CHANGELOG), so a code that survived on such a row was kept deliberately, while a code on a row that was never re-reviewed is the seed's judgement and has not been independently re-checked against the incident text. Treat it as a hint, not an assessment. The field is a plain array (`^DSGAI[0-9]{2}$` in `schema/incident.schema.json`), and a test (`tests/test_owasp_dsgai_vocab.py`) fails if any row carries a code that is not in the vocabulary below.
+
+**Coverage in the corpus** (as of this commit): 75 rows carry at least one code (162 code assignments; 69 standing rows, 6 `unverified`). Derive it with:
+
+```bash
+python -c "import json,collections; d=json.load(open('data/incidents.json',encoding='utf-8')); d=d.get('incidents',d) if isinstance(d,dict) else d; c=collections.Counter(x for e in d for x in e.get('owasp_dsgai') or []); print(sum(1 for e in d if e.get('owasp_dsgai')), sum(c.values()), sorted(c.items()))"
+```
+
+All 21 vocabulary codes occur; no corpus code is outside the vocabulary. The per-code count in the table is the number of rows carrying it (standing and `unverified` together).
+
+| Code | Title (OWASP, 2026) | Rows |
+|---|---|---|
+| `DSGAI01` | Sensitive Data Leakage | 29 |
+| `DSGAI02` | Agent Identity & Credential Exposure | 8 |
+| `DSGAI03` | Shadow AI & Unsanctioned Data Flows | 5 |
+| `DSGAI04` | Data, Model & Artifact Poisoning | 11 |
+| `DSGAI05` | Data Integrity & Validation Failures | 10 |
+| `DSGAI06` | Tool, Plugin & Agent Data Exchange Risks | 3 |
+| `DSGAI07` | Data Governance, Lifecycle & Classification for AI Systems | 3 |
+| `DSGAI08` | Non-Compliance & Regulatory Violations | 18 |
+| `DSGAI09` | Multimodal Capture & Cross-Channel Data Leakage | 8 |
+| `DSGAI10` | Synthetic Data, Anonymization & Transformation Pitfalls | 5 |
+| `DSGAI11` | Cross-Context & Multi-User Conversation Bleed | 5 |
+| `DSGAI12` | Unsafe Natural-Language Data Gateways (LLM-to-SQL/Graph) | 2 |
+| `DSGAI13` | Vector Store Platform Data Security | 7 |
+| `DSGAI14` | Excessive Telemetry & Monitoring Leakage | 9 |
+| `DSGAI15` | Over-Broad Context Windows & Prompt Over-Sharing | 7 |
+| `DSGAI16` | Endpoint & Browser Assistant Overreach | 4 |
+| `DSGAI17` | Data Availability & Resilience Failures in AI Pipelines | 12 |
+| `DSGAI18` | Inference & Data Reconstruction | 2 |
+| `DSGAI19` | Human-in-the-Loop & Labeler Overexposure | 7 |
+| `DSGAI20` | Model Exfiltration & IP Replication | 3 |
+| `DSGAI21` | Disinformation & Integrity Attacks via Data Poisoning | 4 |
+
+**Use it when:** you want the data-layer view of an incident (what data was exposed, poisoned, leaked or mishandled), alongside the LLM and agent-layer views. **Do not use it** as a complete data-security classification: it is sparse and was seeded, not computed.
 
 ---
 

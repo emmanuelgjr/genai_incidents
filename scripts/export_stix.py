@@ -11,7 +11,7 @@ Modelling:
   - each distinct CVE -> a `vulnerability` SDO;
   - `relationship` SDOs link incidents to the techniques/CVEs they involve;
   - one `identity` SDO ("genai_incidents") carries `x_taxonomy_versions`, the
-    pinned versions of the taxonomies (ATLAS, OWASP Top 10 for LLM Applications, OWASP Top 10 for Agentic Applications, CAPEC, VERIS)
+    pinned versions of the taxonomies (ATLAS, OWASP Top 10 for LLM Applications, OWASP Top 10 for Agentic Applications, CAPEC, VERIS, OWASP GenAI Data Security)
     that the x_* mapping properties refer to.
 
 All STIX ids are derived deterministically (UUIDv5 over a fixed namespace),
@@ -39,7 +39,7 @@ import uuid
 from pathlib import Path
 
 from entry_status import stands
-from taxonomy_versions import taxonomy_versions
+from taxonomy_versions import taxonomy_versions, tv_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -109,19 +109,22 @@ def _ts(date_str: str) -> str:
     return f"{s}T00:00:00.000Z"
 
 
-def _ts_v(date_str: str) -> str:
+def _ts_v(date_str: str, version: int | None = None) -> str:
     """`_ts` with the exporter version in the millisecond field: the `modified`
-    timestamp for a given `updated` date."""
-    if not 0 <= EXPORTER_VERSION <= 999:
-        raise ValueError(f"EXPORTER_VERSION {EXPORTER_VERSION} does not fit in 3 ms digits")
-    return _ts(date_str)[:-4] + f"{EXPORTER_VERSION:03d}Z"
+    timestamp for a given `updated` date. ``version`` defaults to
+    EXPORTER_VERSION; the `identity` object passes EXPORTER_VERSION plus its
+    taxonomy revision offset (see `_modified`)."""
+    v = EXPORTER_VERSION if version is None else version
+    if not 0 <= v <= 999:
+        raise ValueError(f"exporter version {v} does not fit in 3 ms digits")
+    return _ts(date_str)[:-4] + f"{v:03d}Z"
 
 
-def _modified(created: str, *date_strs: str) -> str:
+def _modified(created: str, *date_strs: str, version: int | None = None) -> str:
     """Latest versioned timestamp among ``date_strs``, never earlier than
     ``created`` (STIX 2.1: modified >= created). RFC 3339 UTC strings of fixed
     width compare lexicographically."""
-    return max([created] + [_ts_v(d) for d in date_strs if d])
+    return max([created] + [_ts_v(d, version) for d in date_strs if d])
 
 
 def _taxonomy_dates() -> list[str]:
@@ -216,9 +219,14 @@ def build_bundle(incidents: list[dict]) -> dict:
         # Dataset-level object: moves whenever any incident or pinned taxonomy
         # date moves (over-bumping one object is the safe direction; the ASI /
         # VERIS / CAPEC pins carry no date of their own).
+        # Its ms field also carries the taxonomy revision offset
+        # (taxonomy_versions.REVISIONS): a change to `x_taxonomy_versions`
+        # moves this object's `modified` and no other (tv_revision() raises
+        # on an unregistered change).
         "modified": _modified(EPOCH, *tax_dates,
                               *[i.get("updated") or i.get("added") or i.get("date") or ""
-                                for i in incidents]),
+                                for i in incidents],
+                              version=EXPORTER_VERSION + tv_revision() - 1),
         "name": "genai_incidents", "identity_class": "system",
         "x_taxonomy_versions": taxonomy_versions(),
     })

@@ -24,21 +24,23 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, ten upstream sources carry an obligation
+As of this writing, eleven upstream sources carry an obligation
 detailed in full below: MITRE ATLAS and garak (Apache License 2.0
 text), the CVE Program and AVID (notices that must accompany copies),
 the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
-for its codes and risk names), the OWASP Top 10 for LLM Applications
-and the OWASP Gen AI incident round-ups (CC BY-SA 4.0 attribution; see
-the two OWASP paragraphs below), the AIAAIC Repository, the AI Incident
-Database (AIID), and the OECD AI Incidents and Hazards Monitor (AIM).
+for its codes and risk names), the OWASP GenAI Data Security Risks and
+Mitigations (DSGAI; CC BY-SA 4.0 attribution for its codes and titles),
+the OWASP Top 10 for LLM Applications and the OWASP Gen AI incident
+round-ups (CC BY-SA 4.0 attribution; see the OWASP paragraphs below),
+the AIAAIC Repository, the AI Incident Database (AIID), and the OECD AI
+Incidents and Hazards Monitor (AIM).
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here, the
 per-source sections of docs/SOURCE_LICENSES.md are the authoritative
 account and take precedence over this file falling behind it. (Its
 "Summary of outcomes requiring escalation" table lists only the
 sources with an escalation, not every source with an obligation, and
-is not an enumeration of the ten above.)
+is not an enumeration of the eleven above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -142,6 +144,30 @@ mappings/owasp_asi_top10.json is carved out of the CC BY
 OWASP row, section 3.6, of docs/SOURCE_LICENSES.md). The OWASP-* rows
 of ingest/avid_owasp_incidents.json are a different use of OWASP
 material and are covered by the round-up paragraph below.
+
+OWASP GenAI Data Security Risks and Mitigations (DSGAI). The codes
+DSGAI01-DSGAI21 and the 21 short risk titles in
+mappings/owasp_dsgai_2026.json (reproduced in docs/TAXONOMIES.md) are
+from "OWASP GenAI Data Security Risks & Mitigations 2026" (resource page
+dated 2026-03-17) by the OWASP Gen AI Security Project - Data Security
+Initiative, OWASP Foundation,
+https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/,
+licensed under CC BY-SA 4.0,
+https://creativecommons.org/licenses/by-sa/4.0/legalcode. Changes: the
+codes and the 21 titles are reproduced unmodified (the titles were taken
+from the "name" field of OWASP's repository file
+data_validation/reference_data/dsgai_entries.json, GenAI-Security-Project/
+GenAI-Data-Security-Initiative, not from the PDF, which sits behind a
+form); OWASP's risk descriptions and mitigations are not reproduced, and no
+OWASP description text is carried. This attribution covers the codes and
+titles wherever they are reproduced: mappings/owasp_dsgai_2026.json,
+docs/TAXONOMIES.md, and, as codes only, the owasp_dsgai values in
+data/incidents.json and the files rendered or exported from it
+(docs/DATA_DICTIONARY.md, the Hugging Face dataset card). The titles
+appear only in the mapping file and docs/TAXONOMIES.md.
+mappings/owasp_dsgai_2026.json is carved out of the CC BY 4.0 grant for
+this material (CC BY-SA 4.0; see .reuse/dep5 and the OWASP DSGAI row,
+section 3.8, of docs/SOURCE_LICENSES.md; decision D144).
 
 OWASP Top 10 for Large Language Model Applications (LLM Top 10). The
 risk codes LLM01-LLM10, the risk names, and the description and scope text
@@ -295,18 +321,19 @@ docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
 The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
-ten sources above. With AIAAIC and AIID, it is one of the three
+eleven sources above. With AIAAIC and AIID, it is one of the three
 whose row text this project could not simply carry under the source's
 own licence grant. For each of the three, the text was either reduced
 to structural facts and a link, or its retained title was analysed as
 a separate copyright question (open for AIAAIC and AIM; resolved for
-AIID). For six of the other seven (MITRE ATLAS, garak, the CVE
-Program, AVID, the OWASP Top 10 for Agentic Applications and the OWASP
-Top 10 for LLM Applications), the grant covers the material reproduced
+AIID). For seven of the other eight (MITRE ATLAS, garak, the CVE
+Program, AVID, the OWASP Top 10 for Agentic Applications, OWASP GenAI
+Data Security Risks and Mitigations and the OWASP Top 10 for LLM
+Applications), the grant covers the material reproduced
 (for the OWASP mapping files, subject to the carve-outs above), and the
 obligation is attribution or a notice that accompanies copies (CVE- and
 AVID-derived rows also carry a row-level content_license marker). The
-seventh, the OWASP Gen AI incident round-ups, is an exception: two
+eighth, the OWASP Gen AI incident round-ups, is an exception: two
 shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
 up to and including v2.13.0 and were rewritten from their primary sources
 on 2026-10-13 (decision D97); see the round-up paragraph above.

@@ -280,8 +280,33 @@ def test_taxonomy_versions_derived_from_mappings_not_literals(tmp_path):
 def test_stats_json_carries_taxonomy_versions():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     assert stats["taxonomy_versions"] == tvmod.taxonomy_versions()
-    assert set(stats["taxonomy_versions"]) == {"atlas", "owasp_llm", "owasp_asi", "capec", "veris"}
+    assert set(stats["taxonomy_versions"]) == {"atlas", "owasp_llm", "owasp_asi", "capec", "veris",
+                                               "owasp_dsgai"}
     assert stats["taxonomy_versions"]["atlas"] == atlas_pin.load_pin()["version"]
+
+
+def test_stats_json_taxonomy_versions_carries_owasp_dsgai():
+    """D133: the built stats.json pins the companion OWASP DSGAI edition.
+
+    Independent route: the expected value is read straight from the mapping
+    file, not from scripts/taxonomy_versions.py, so dropping the SOURCES row
+    and rebuilding fails here as well as in the equality test above."""
+    stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
+    pin = json.loads((ROOT / "mappings" / "owasp_dsgai_2026.json").read_text(encoding="utf-8"))
+    assert "owasp_dsgai" in stats["taxonomy_versions"], "stats.json taxonomy_versions lacks owasp_dsgai"
+    assert stats["taxonomy_versions"]["owasp_dsgai"] == pin["version"] == "2026"
+    assert "owasp_dsgai" in tvmod.taxonomy_versions(), "scripts/taxonomy_versions.py SOURCES lacks owasp_dsgai"
+    pkg = json.loads((ROOT / "src" / "genai_incidents" / "data" / "taxonomy_versions.json")
+                     .read_text(encoding="utf-8"))
+    assert pkg.get("owasp_dsgai") == "2026"
+
+
+def test_build_manifest_schema_requires_owasp_dsgai():
+    """D133: required, not optional, so a manifest that drops it fails."""
+    schema = json.loads((ROOT / "schema" / "build_manifest.schema.json").read_text(encoding="utf-8"))
+    tv = schema["properties"]["taxonomy_versions"]
+    assert "owasp_dsgai" in tv["required"] and "owasp_dsgai" in tv["properties"]
+    assert set(tv["required"]) == set(validate._TAXONOMY_KEYS) == {k for k, _, _ in tvmod.SOURCES}
 
 
 def test_validate_check_taxonomy_versions_fires():
@@ -291,6 +316,8 @@ def test_validate_check_taxonomy_versions_fires():
     stale = dict(good, atlas="2026.06")
     assert validate.check_taxonomy_versions({"taxonomy_versions": stale}, good)        # stale
     assert validate.check_taxonomy_versions({"taxonomy_versions": dict(good, extra="x")}, good)
+    no_dsgai = {k: v for k, v in good.items() if k != "owasp_dsgai"}
+    assert validate.check_taxonomy_versions({"taxonomy_versions": no_dsgai}, good)    # D133 key dropped
 
 
 def test_stix_bundle_carries_x_taxonomy_versions():

@@ -1,0 +1,100 @@
+{
+  "framework": "OWASP GenAI Data Security Risks and Mitigations",
+  "version": "2026",
+  "url": "https://genai.owasp.org/resource/owasp-genai-data-security-risks-mitigations-2026/",
+  "citation": {
+    "title": "OWASP GenAI Data Security Risks & Mitigations 2026",
+    "edition": "2026 (resource page dated 2026-03-17)",
+    "publisher": "OWASP Gen AI Security Project - Data Security Initiative",
+    "license": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/legalcode)",
+    "reproduced": "Only the codes DSGAI01-DSGAI21 and the 21 short risk titles are reproduced from OWASP. No description text is carried.",
+    "titles_taken_from": "https://github.com/GenAI-Security-Project/GenAI-Data-Security-Initiative/blob/main/data_validation/reference_data/dsgai_entries.json (blob e4be4a8eefe58f994adb36497c45b32bc141d392; last changed 2026-03-24), fetched 2026-10-28. OWASP's own SOURCES.md labels that file 'OWASP GenAI Data Security Risks and Mitigations 2026'. The whitepaper PDF itself is behind a form and was not read, so the titles are confirmed against OWASP's repository, not the PDF.",
+    "status_in_this_dataset": "companion"
+  },
+  "entries": [
+    {
+      "id": "DSGAI01",
+      "name": "Sensitive Data Leakage"
+    },
+    {
+      "id": "DSGAI02",
+      "name": "Agent Identity & Credential Exposure"
+    },
+    {
+      "id": "DSGAI03",
+      "name": "Shadow AI & Unsanctioned Data Flows"
+    },
+    {
+      "id": "DSGAI04",
+      "name": "Data, Model & Artifact Poisoning"
+    },
+    {
+      "id": "DSGAI05",
+      "name": "Data Integrity & Validation Failures"
+    },
+    {
+      "id": "DSGAI06",
+      "name": "Tool, Plugin & Agent Data Exchange Risks"
+    },
+    {
+      "id": "DSGAI07",
+      "name": "Data Governance, Lifecycle & Classification for AI Systems"
+    },
+    {
+      "id": "DSGAI08",
+      "name": "Non-Compliance & Regulatory Violations"
+    },
+    {
+      "id": "DSGAI09",
+      "name": "Multimodal Capture & Cross-Channel Data Leakage"
+    },
+    {
+      "id": "DSGAI10",
+      "name": "Synthetic Data, Anonymization & Transformation Pitfalls"
+    },
+    {
+      "id": "DSGAI11",
+      "name": "Cross-Context & Multi-User Conversation Bleed"
+    },
+    {
+      "id": "DSGAI12",
+      "name": "Unsafe Natural-Language Data Gateways (LLM-to-SQL/Graph)"
+    },
+    {
+      "id": "DSGAI13",
+      "name": "Vector Store Platform Data Security"
+    },
+    {
+      "id": "DSGAI14",
+      "name": "Excessive Telemetry & Monitoring Leakage"
+    },
+    {
+      "id": "DSGAI15",
+      "name": "Over-Broad Context Windows & Prompt Over-Sharing"
+    },
+    {
+      "id": "DSGAI16",
+      "name": "Endpoint & Browser Assistant Overreach"
+    },
+    {
+      "id": "DSGAI17",
+      "name": "Data Availability & Resilience Failures in AI Pipelines"
+    },
+    {
+      "id": "DSGAI18",
+      "name": "Inference & Data Reconstruction"
+    },
+    {
+      "id": "DSGAI19",
+      "name": "Human-in-the-Loop & Labeler Overexposure"
+    },
+    {
+      "id": "DSGAI20",
+      "name": "Model Exfiltration & IP Replication"
+    },
+    {
+      "id": "DSGAI21",
+      "name": "Disinformation & Integrity Attacks via Data Poisoning"
+    }
+  ]
+}

@@ -50,7 +50,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from entry_status import stands
-from taxonomy_versions import taxonomy_versions
+from taxonomy_versions import taxonomy_versions, tv_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -94,7 +94,8 @@ def _year_epoch(year: int) -> str:
 
 def _event_timestamp(year: int, incidents: list[dict]) -> str:
     """Unix-seconds stamp (string): newest `updated` among the event's incidents
-    (falling back to `added`, then the year's Jan 1) + EXPORTER_VERSION seconds."""
+    (falling back to `added`, then the year's Jan 1) + EXPORTER_VERSION seconds
+    + (taxonomy revision - 1) seconds."""
     best = 0
     for e in incidents:
         d = (e.get("updated") or e.get("added") or "").strip()
@@ -105,7 +106,9 @@ def _event_timestamp(year: int, incidents: list[dict]) -> str:
             continue
     if not best:
         best = int(_year_epoch(year))
-    return str(best + EXPORTER_VERSION)
+    # + (taxonomy revision - 1): the version machinetags are on every event,
+    # so a change to taxonomy_versions must move every timestamp (REVISIONS).
+    return str(best + EXPORTER_VERSION + tv_revision() - 1)
 
 
 def _freshness_tags(e: dict) -> list[dict]:

@@ -20,13 +20,14 @@
     "taxonomy_versions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["atlas", "owasp_llm", "owasp_asi", "capec", "veris"],
+      "required": ["atlas", "owasp_llm", "owasp_asi", "capec", "veris", "owasp_dsgai"],
       "properties": {
         "atlas": {"type": ["string", "null"]},
         "owasp_llm": {"type": ["string", "null"]},
         "owasp_asi": {"type": ["string", "null"]},
         "capec": {"type": ["string", "null"]},
-        "veris": {"type": ["string", "null"]}
+        "veris": {"type": ["string", "null"]},
+        "owasp_dsgai": {"type": ["string", "null"], "description": "Edition of the companion OWASP GenAI Data Security Risks and Mitigations code set (mappings/owasp_dsgai_2026.json `version`). Added after v2.13.0 (user ruling D133); manifests from v2.13.0 lack it."}
       }
     }
   }
