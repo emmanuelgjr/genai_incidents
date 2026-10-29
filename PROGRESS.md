@@ -14,6 +14,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 ATLAS 2026.10 refresh REPORTED `4cef2a4e` (2026-10-29) — gate-atlas dispatched (fresh reviewer)
+- **Specialist (testimony):**
+  - **Pin:** 2026.10, sha ac41ee9f…e142d; REVISIONS row 3 added.
+  - **Translations, counted per entry:**
+    - T0057→T0085.002: 1082 entries;
+    - T0056→T0085.003: 733;
+    - T0024.001→T0137.002: 3;
+    - T0024.000→T0137.000: 0;
+    - T0024.002→T0024: 4 (D149). T0024 is still defined ("Exfiltration via AI Inference API", TA0010).
+  - **Delta:** 1,744 entries changed, 14,040 identical; the ID set is identical; UNEXPLAINED 0. An independent YAML check shows 0 violations, and a planted control fails 1082 entries.
+  - **Exports:** STIX identity date moves; 47 attack-patterns redated; 4 removed, 3 added, 4 renamed; 1,739 incident objects and 5,613 relationships change.
+  - **Checks:** lint OK, validate OK, drift clean.
+  - **Pytest pre-merge:** 1569 passed, 1 failed (oecd_stage1_freeze, against the uncommitted HEAD; passes after the commit). **Post-merge only a 145-test subset was run.** origin/main was merged in with no conflicts.
+  - **3 scope additions, each a fixed defect:**
+    1. curation overrides now translate mitre_atlas (INC-02899's D130-2L override pinned T0057);
+    2. atlas_entry_delta.py attributes tactics gained via a translation target (it had reported 1739 false UNEXPLAINED);
+    3. test_atlas_refresh.py no longer hard-codes ATLAS-2026.09.yaml, which would otherwise have failed every monthly refresh PR.
+  - **Live docs:** SOURCE_LICENSES and TAXONOMIES "2026.09"→"2026.10" in place; README only the stats:generated marker. docs/paper/genai-incidents-methods.md:116 was left alone for the foreman.
+- **Specialist's questions:**
+  - D114: 396 changed entries have an OECD source id, and only their ATLAS fields + updated/last_seen moved. **Foreman view:** derived taxonomy codes are not an OECD lift, provided the held inputs are byte-identical. The gate verifies this against the 10-06 precedent.
+  - Heuristics in scrape_aiid.py and parse_existing.py still emit the old ids → label-scientist follow-up, alongside the T0024.002 re-target.
+- **The agent needed a re-prompt:** it was idle 19:02→22:54Z with the whole rebuild uncommitted.
+
 ### 🔍 D146-1 D150 fixes REPORTED `81a4ba08` (2026-10-29) — foreman string check PASS; scoped re-check by gate-d146
 - **Specialist (testimony):**
   - 3 files, +19/−7.
