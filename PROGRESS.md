@@ -14,6 +14,120 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D146-1 D150 fixes REPORTED `81a4ba08` (2026-10-29) — foreman string check PASS; scoped re-check by gate-d146
+- **Specialist (testimony):**
+  - 3 files, +19/−7.
+  - The ruled text is pinned by a string check.
+  - N4 (the fallback deleted) and N3 (the warning written to the work tree) each fail `test_pr_body_warns_at_the_top_when_aiaac_failed`; the file was restored byte-identical (cmp).
+  - A1 wording replaced in both places.
+  - 178 workflow tests passed; actionlint rc 0.
+- **Foreman [R] string check:**
+  - the exact ruled text occurs **1×** in auto-refresh.yml (:451);
+  - "will show red", "still fresh" and "confirm with one live workflow_dispatch" occur **0×** in the workflow and both test files;
+  - the workflow diff is exactly the echo line and the A1 comment;
+  - porcelain clean; ls-remote = 81a4ba08.
+
+### ⚖ D150, USER RULING 2026-10-29 (D146-1 bounce #2): "Apply verbatim + string check (Recommended)"
+- **Warning text, applied verbatim:**
+  > **WARNING: the AIAAIC sheet refresh FAILED this week.** The AIAAIC data in this PR is last week's. The other sources (KEV, CVE sweep, AIID, retractions) refreshed separately; check this run's summary for their outcomes before merging. An AIAAIC failure turns the run red only once it has failed 3 weeks running or OECD also failed this week; other checks can turn it red for their own reasons.
+- **Foreman correction, disclosed to the user:** the last sentence of the previewed text said "the run turns red only if every source failed or a source has failed 3 weeks running". That was also inaccurate:
+  - other things turn the run red too (the skip-probe violation, failed steps);
+  - "every source" in the abort check means AIAAIC + OECD only.
+  - The foreman read auto-refresh.yml:741/760 and check_source_health.py (DEFAULT_THRESHOLD 3) and tightened the sentence to the verified conditions.
+- **Also in the fix:** N3/N4 counter-cases, each proven to fire; the A1 text now says it stays unverified until a real job-level timeout (no dispatch, D148-2).
+- **Check:** the foreman string-checks the exact text; gate-d146 re-runs only those checks plus the suite.
+
+### 🔁 D146-1 BOUNCE #2 (gate-d146 on `100202b1`), 2026-10-29 — **ESCALATED to the user** (protocol: two bounces)
+**VERDICT: BOUNCE (#2).** All 3 bounce-#1 defects are fixed; both new defects are in the D147 add-on.
+**DEFECTS:**
+1. **The D147 warning text is false in the common case.**
+   - "this run's finalize job will show red" is wrong. When AIAAIC fails alone, the abort check exits 1 only at ok=0, and check_source_health only warns below 3 consecutive failures. So in AIAAIC's 1st and 2nd failing weeks the run is green while the PR says it is red.
+   - The test pins the false phrase.
+   - "KEV, CVE sweep, AIID and retraction changes … are still fresh" is unconditional, and false when those steps also failed.
+   - **Root cause: the foreman's own wording.** The D147 brief and the user question both said "finalize will show red", unverified against check_source_health semantics.
+2. **The D147 tests miss two breakages; each passes all 18 workflow tests:**
+   - N4: delete the missing-file fallback. The PR-body step then dies in every normal week, continue-on-error hides it, and the PR gets an empty body.
+   - N3: write the warning to the work tree instead of RUNNER_TEMP. The warning is lost and a stray file is committed.
+   - Violates agreement 6.
+**Verified OK:**
+- The gate's M1-M12 each fail at least one test; N1 (keyed on .conclusion) fails too.
+- The warning is keyed on `steps.ingest_aiaaic.outcome`, placed before the PR-body step, and appended to (bash -e simulated both cases, rc 0); it survives truncation.
+- Comments, TESTS_MEASURED_MIN 10.8, budget arithmetic and the budget check all fire; A1 and B6 are in.
+- Merge 79f92a00: **1575 passed, 1 xfailed, 517.12s**; data/ 0 lines; LF; actionlint rc 0.
+**Advisory:** the A1 text says "confirm with one live workflow_dispatch", but D148-2 ruled that out, and no normal run exercises a job-level timeout. The text should say A1 stays unverified until a real job-level timeout happens.
+
+- **Step-7 note (D133-W, merged at `30c22401`):** the docs-warden pass for D133-W's licensing-text change is **folded into the docs-warden sweep after the ATLAS 2026.10 merge**, which also changes taxonomy and version strings. Meanwhile the gate's stale-"four" sweep (proven to fire: 5→0) covered the surfaces the warden had flagged.
+
+### ✅ D133-W **DONE — MERGED to main 2026-10-29** (gate PASS on `0c6fee9c`, first review)
+**VERDICT (gate-d133): PASS. DEFECTS: none.** The verdict was delayed again: it needed one ping.
+**Evidence (gate):**
+- Scratch merge 406421f2 (0c6fee9c into e9f48253): **full suite 1568 passed, 1 xfailed, 621.26s**, rc 0, including the tests that pin the HF card, CITATION and zenodo text.
+- The diff is exactly the 7 files, all LF; no dated record touched.
+- The dsgai file was parsed by the gate: 21 × {id, name} plus a project citation block, and no OWASP description text. That matches README, DATASHEET and dep5.
+- **The stale-"four" sweep fires:** 5 hits on main (.zenodo.json:4, CITATION.cff:44, README:423, DATASHEET:130, export_huggingface.py:197) and 0 live hits on the merge. A second route agrees: every licence enumeration that names the llm crosswalk also names dsgai.
+- HF export: the README diff is the four-to-five sentence only; jsonl byte-identical; 0 titles; drift clean; validate rc 0.
+- .zenodo.json and CITATION.cff parse. cffconvert is not installed, so no CFF schema check was run.
+- Row 9 is accurate against D144 and D146-3. The §3.8 header date matches its Date-checked cell. No README table row was added.
+**Advisories:**
+- A1: one overlong line in the CITATION.cff abstract (cosmetic; the folded scalar parses identically).
+- A2: install or run cffconvert in CI if CFF schema validity should count as a check.
+**Foreman:** strays check found main tree and worktree porcelain empty before recording.
+
+### 🔍 D146-1 bounce-#1 fixes + D147 warning REPORTED `100202b1` (2026-10-29) — scoped re-gate by gate-d146
+- **Specialist (testimony):**
+  - **8cafe0df: the D147 PR-body warning.** A separate conditional step, `if: steps.ingest_aiaaic.outcome != 'success'`, writes the warning file; the PR-body step starts from it and appends. 7 mutation counter-cases; fires when `!=` is flipped to `==`.
+  - **100202b1, D1:** `handoff_problems`. M1–M6 were each applied to the real workflow and each fails `test_handoff_from_refresh_and_oecd_to_finalize_is_pinned`; the file is restored byte-identical.
+  - **100202b1, D3:** comments fixed; TESTS_MEASURED_MIN 10.8; REFRESH_MEASURED_NEED_MIN 15. The budget holds: 25 ≥ 21.6, and 25+4.5 < 40.
+  - **100202b1, A1 and B6:** A1 documented; B6 PR-body wording added and pinned by a test.
+  - Results: 178 workflow tests passed; actionlint clean.
+  - Local quirk: actionlint hangs on Windows when a run script is over ~4 KB.
+- **Foreman [R]:** porcelain clean; ls-remote = 100202b1; the data/ diff from 1346e9b2 is empty; test_auto_refresh_workflow.py:65 has 10.8; yml:493 carries the B6 wording.
+- The gate was told: D147-1, D148-1 (its defect 2 accepted) and D148-2 (no live dispatch; its A4 closed).
+
+### 🔍 D133-W REPORTED `0c6fee9c` (2026-10-29; license-auditor edits, committed by the foreman) — gate-d133 dispatched
+- **License-auditor (testimony):** the "four mapping files" enumeration appeared on **6 live surfaces**, not 2. Fixed to five, adding owasp_dsgai_2026.json, in README:423, CONTRIBUTING:46, DATASHEET:130-137, CITATION.cff:44-47, .zenodo.json:4 and the HF card template (export_huggingface.py:197-200).
+- **README sentence:** the DSGAI file is CC BY-SA 4.0 for the 21 codes and short titles, and CC BY 4.0 for the project's citation and provenance block. The auditor checked the file's contents before wording it.
+- **SOURCE_LICENSES:**
+  - escalation-table row 9 for DSGAI (the table already lists rulings, rows 6-8 being D97/D96/D98);
+  - the §3.8 header keeps "added 2026-10-28" and adds "licence terms fetched and checked 2026-10-29".
+- **Left alone:** the dated records (CORRECTIONS, CHANGELOG, audits, releases), NOTICE-DATA and dep5 (already correct), and the README tier table (D144).
+- **Foreman [R]:** porcelain showed exactly 7 files before the commit; all LF in the index; `.zenodo.json` json.load OK; CITATION.cff yaml OK; the grep for "four mapping|four OWASP" on the touched surfaces is empty; ls-remote = 0c6fee9c.
+
+### ⚖ D149, FOREMAN RULING 2026-10-29 (ATLAS 2026.10 refresh, step 4 stop)
+- **Specialist report (testimony), WIP at `e1e2384e`, pushed:**
+  - Fetch: version 2026.10, sha256 ac41ee9f…e142d, 1,154,660 bytes, format 6.1.0. The scan shows 0 hits.
+  - Release diff: +18 techniques, 5 removed, 8 renamed (T0005*, T0010*); T0005 gains TA0003.
+  - Removed ids in the corpus, counted per entry: T0024.001 3, T0024.002 4, T0056 733, T0057 1082, T0024.000 0.
+  - The upstream release notes state 4 moves, now added to the translation table:
+    - T0024.000→T0137.000;
+    - T0024.001→T0137.002;
+    - T0056→T0085.003;
+    - T0057→T0085.002.
+  - T0056 and T0057 move from TA0010 to TA0009, so about 1.8k entries change tactic.
+- **Ruling:** AML.T0024.002 "Extract AI Model" (INC-04855, INC-06373, INC-07224, INC-05595) has no stated successor. Map it to its still-defined **parent AML.T0024**, on the T0015.001→T0015 precedent: a conservative generalisation, not a semantic guess. The specialist first confirms from the YAML that T0024 is still defined.
+- **Follow-up → label-scientist (after the merge):**
+  - re-target the 4 rows if T0144 or T0005.* fits better;
+  - scripts/scrape_aiid.py:159 still emits T0024.002 (the translation table covers it at merge).
+
+### 📋 docs-warden on D133 (`6fa029ca`), 2026-10-29: 2 high, 1 med, 1 low
+- **F1 HIGH:** README.md:423 Licensing says "**Four** mapping files are CC BY-SA 4.0 in part" and lists ASI + 3 LLM files. dep5 now has **five** (+ owasp_dsgai_2026.json), and README never mentions DSGAI.
+- **F2 HIGH:** CONTRIBUTING.md:46 lists four OWASP carve-out files and omits owasp_dsgai_2026.json, so contributors are told the wrong set of files sits outside the MIT/CC-BY grant.
+- **F3 MED:** the README tier table omits owasp_dsgai, while TAXONOMIES, the HF card, DATASHEET:152 and DATA_DICTIONARY:46 carry it. **Foreman ruling:** intentional per D144 (README headline and table unchanged); only the licence bullet (F1) names DSGAI. No table row.
+- **F4 LOW:** the SOURCE_LICENSES escalation summary (~:618-640) has no DSGAI row (perhaps intentional: D144 was a ruling). The §3.8 header says "added 2026-10-28" but cites a 2026-10-29 fetch.
+- **Clean:** taxonomy_versions keys on every surface; eleven sources; tier words; counts and labels (15,745 / 10 / 2.13.0+main); the REVISIONS failure wording.
+- **Not covered:** live Pages and the HF hub.
+- **Routing → D133-W (license-auditor)**, worktree `C:/repos/gi-wt-d133w`, branch `ws0/d133w-dsgai-licence-surfaces-2026-10-29`. It covers F1, F2 and F4, plus a grep of the other live surfaces. The foreman commits for it (the agent has no Bash). Gate before merge.
+
+### ▶ 2026-10-29 dispatches after the D133 merge (main `6fa029ca`)
+- **docs-warden** (warden-d133): step 7, because licensing text and taxonomy lists changed.
+- **ATLAS 2026.10 refresh** (WS4, pipeline-engineer, `atlas-2610`):
+  - Branch `ws4/atlas-2026-10-refresh-2026-10-29`, worktree `C:/repos/gi-wt-atlas`.
+  - It mirrors the atlas-refresh.yml steps locally, plus a REVISIONS row and a per-entry delta audit `docs/audits/atlas-refresh-delta-2026-10-29.md`.
+  - Target: merged before the Tue 11-03 cron, so that run is a no-op.
+  - It runs alongside D146-1 (no file overlap: auto-refresh.yml/tests vs ingest/atlas, mappings, taxonomy_versions and data).
+- **D146-1:** the specialist is mid-edit (worktree has uncommitted changes to auto-refresh.yml and test_oecd_fetch_job.py). gate-d146 is waiting for the new tip.
+- **Queued:** D146-2 (MAESTRO/NIST pins) after the ATLAS refresh, since both edit taxonomy_versions/REVISIONS.
+
 ### ✅ D133 **DONE — MERGED to main 2026-10-29** (re-gate PASS on `9061e62d` after bounce #1)
 **VERDICT (gate-d133, scoped re-gate): PASS. DEFECTS: none.** The verdict was delayed: the gate needed a second ping.
 **Evidence (gate):**
