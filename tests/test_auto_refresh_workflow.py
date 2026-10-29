@@ -59,12 +59,12 @@ def test_check_fires_when_step_missing_or_misplaced_or_blocking():
 # fetch into its own `oecd-fetch` job. These checks pin the budget arithmetic of
 # BOTH jobs and the "a hang fails at its own step" rule.
 
-REFRESH_MEASURED_NEED_MIN = 12   # 2026-10-25 job total 63 min minus the OECD step 50.8
+REFRESH_MEASURED_NEED_MIN = 15   # tests 10.8 (CI-measured) + other ~4.5
 OECD_MEASURED_MIN = 51           # 2026-10-18 / 10-25
 OECD_JOB_OTHER_MIN = 3           # install + restore + probe + stash + uploads
-TESTS_MEASURED_MIN = 8           # 2026-10-25 (7.6) and 10-18 (>=7.8)
+TESTS_MEASURED_MIN = 10.8        # CI-measured: Validate on main, run 40921156247, py3.12 (was 7.6 on 10-25)
 HEADROOM = 1.5
-OTHER_MEASURED_MIN = 4.5         # refresh job total minus tests (12.1 - 7.6)
+OTHER_MEASURED_MIN = 4.5         # refresh job total minus tests (63 - 50.8 OECD - 7.6 tests on 10-25, rounded up)
 OECD_STEP = "Refresh OECD AI Incidents Monitor"
 
 
@@ -80,6 +80,16 @@ def _missing_step_caps(job: dict, label: str) -> list[str]:
 
 
 def check_refresh_budget(text: str) -> list[str]:
+    """Budget arithmetic for the refresh, oecd-fetch and finalize jobs.
+
+    NOT checked, because it cannot be known offline (A1): whether the finalize
+    job's `!cancelled()` still runs after a NEEDED job hits its job-level
+    timeout. On 2026-10-25 a job-level timeout skipped even always() steps and
+    the run concluded "cancelled". If so, a job-level timeout of oecd-fetch or
+    refresh means finalize (counter, cursor persist) does not run that week.
+    The step caps below exist so a hang fails at its step first; the job caps
+    are only backstops. Confirm with one live workflow_dispatch.
+    """
     import yaml
 
     wf = yaml.safe_load(text)

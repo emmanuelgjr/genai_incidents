@@ -234,6 +234,92 @@ def test_each_consumer_check_fires():
     assert any("duplicate artifact names" in p for p in _mutate(dup_artifact))
 
 
+# ---- gate-d146 bounce 1: the refresh -> finalize hand-off and the refresh-state writer ----
+
+
+def handoff_problems(doc: dict) -> list[str]:
+    out = []
+    jobs = doc["jobs"]
+    refresh, oecd, fin = jobs["refresh"], jobs["oecd-fetch"], jobs["finalize"]
+    # M1: the refresh job must export the outcomes finalize feeds to the health counter
+    outs = refresh.get("outputs") or {}
+    for k, step_id in (("aiaaic_outcome", "ingest_aiaaic"), ("kev_outcome", "ingest_kev")):
+        if outs.get(k) != "${{ steps.%s.outcome }}" % step_id:
+            out.append(f"refresh output {k} must be the STEP outcome of {step_id}")
+    # M2: parse the exact expression, not a substring
+    if str(fin.get("if", "")).strip() != "${{ !cancelled() }}":
+        out.append("finalize must run with exactly `${{ !cancelled() }}`")
+    # M3: every hand-off value finalize reads must default to failure
+    seen = 0
+    for s in fin["steps"]:
+        for k, v in (s.get("env") or {}).items():
+            v = str(v)
+            if "needs." in v and ".outputs." in v:
+                seen += 1
+                if not v.rstrip().rstrip("}").rstrip().endswith("|| 'failure'"):
+                    out.append(f"finalize env {k} reads a job output without `|| 'failure'`: {v}")
+    if seen < 5:  # health: AIAAIC, OECD, KEV; abort check: AIAAIC, OECD
+        out.append(f"finalize reads only {seen} job outputs; expected the 5 hand-offs")
+    # M4: no raw push to refresh-state (or any push) outside finalize
+    for jn, job in jobs.items():
+        for s in job.get("steps", []):
+            r = str(s.get("run", ""))
+            if jn != "finalize" and ("git push" in r or "persist_refresh_state.sh" in r):
+                out.append(f"job {jn!r} step {s.get('name')!r} pushes; finalize must be the only writer")
+    # M5: the cursor download must not fail the job when the artifact is missing
+    dl = next((s for s in fin["steps"] if (s.get("with") or {}).get("name") == "oecd-skip-probe-state"), None)
+    if dl is None or dl.get("continue-on-error") is not True:
+        out.append("the cursor download must be continue-on-error (no artifact is a normal week)")
+    # M6: a missing cursor file (nothing skipped) must not fail the upload
+    up = next((s for s in oecd["steps"] if (s.get("with") or {}).get("name") == "oecd-skip-probe-state"), None)
+    if up is None or (up.get("with") or {}).get("if-no-files-found") != "ignore":
+        out.append("the cursor upload must be if-no-files-found: ignore")
+    return out
+
+
+def test_handoff_from_refresh_and_oecd_to_finalize_is_pinned():
+    assert handoff_problems(_doc()) == []
+
+
+def test_handoff_checks_fire():
+    def mut(fn):
+        doc = _doc()
+        fn(doc)
+        return handoff_problems(yaml.safe_load(yaml.safe_dump(doc)))
+
+    def fin_steps(d):
+        return d["jobs"]["finalize"]["steps"]
+
+    def health(d):
+        return next(s for s in fin_steps(d) if "check_source_health.py" in str(s.get("run", "")))
+
+    # M1: refresh outputs deleted
+    assert mut(lambda d: d["jobs"]["refresh"].pop("outputs"))
+    assert mut(lambda d: d["jobs"]["refresh"]["outputs"].pop("kev_outcome"))
+    # M2: finalize `if: cancelled()` (the substring the old check accepted)
+    assert mut(lambda d: d["jobs"]["finalize"].__setitem__("if", "${{ cancelled() }}"))
+    assert mut(lambda d: d["jobs"]["finalize"].pop("if"))
+    # M3: AIAAIC / KEV defaults dropped (health step and abort step)
+    assert mut(lambda d: health(d)["env"].__setitem__("AIAAIC", "${{ needs.refresh.outputs.aiaaic_outcome }}"))
+    assert mut(lambda d: health(d)["env"].__setitem__("KEV", "${{ needs.refresh.outputs.kev_outcome }}"))
+    abort = lambda d: next(s for s in fin_steps(d) if "Every source refresh failed" in str(s.get("run", "")))  # noqa: E731
+    assert mut(lambda d: abort(d)["env"].__setitem__("AIAAIC", "${{ needs.refresh.outputs.aiaaic_outcome }}"))
+    # M4: a raw git push to refresh-state in another job
+    assert mut(lambda d: d["jobs"]["oecd-fetch"]["steps"].append(
+        {"name": "p", "run": "git push --force origin HEAD:refresh-state"}))
+    assert mut(lambda d: d["jobs"]["refresh"]["steps"].append(
+        {"name": "p", "run": "git push origin HEAD:refresh-state"}))
+    # M5: cursor download loses continue-on-error
+    def m5(d):
+        next(s for s in fin_steps(d) if (s.get("with") or {}).get("name") == "oecd-skip-probe-state").pop("continue-on-error")
+    assert mut(m5)
+    # M6: cursor upload fails when the file is absent
+    def m6(d):
+        next(s for s in d["jobs"]["oecd-fetch"]["steps"]
+             if (s.get("with") or {}).get("name") == "oecd-skip-probe-state")["with"]["if-no-files-found"] = "error"
+    assert mut(m6)
+
+
 # ---- D147: the PR body warns at the TOP when the AIAAIC step did not succeed ----
 
 WARN_STEP = "PR body warning - AIAAIC refresh failed"
@@ -292,3 +378,11 @@ def test_warning_checks_fire():
     assert mut(lambda st, w, b: b.__setitem__("run", b["run"].replace(WARN_FILE, "other.md", 1)))
     # warning text hollowed out
     assert mut(lambda st, w, b: w.__setitem__("run", w["run"].replace("finalize job will show red", "x", 1)))
+
+
+def test_pr_body_says_the_held_artifact_is_attached_by_the_oecd_job_and_may_come_later():
+    text = WF.read_text(encoding="utf-8")
+    body = text.split("Automated weekly refresh of external sources.", 1)[1].split("BODY", 1)[0]
+    assert "held-oecd-aiid-inputs" in body
+    flat = " ".join(body.split())
+    assert "attached by the oecd-fetch job" in flat and "may appear after this PR opens" in flat
