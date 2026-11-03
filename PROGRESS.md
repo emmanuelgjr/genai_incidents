@@ -14,6 +14,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D146-2 GATE PASS (gate-d1462 on `746d55e5`, merge tested as `ede938b2` onto `c3c01433`), 2026-11-03 — merge HELD for PR #103 ordering
+**VERDICT: PASS (first gate, 0 defects).** The gate went idle after its suite once and sent the verdict when re-prompted.
+- Foreman strays check: `gi-wt-d1462` porcelain empty; ls-remote = `746d55e5`.
+- **Merge held:** PR #103 (weekly refresh, open) also changes data/stats.json and docs/DATASHEET.md. Merging D146-2 first would conflict or stale it and need a ~52-min re-run. The order is the user's call.
+**Evidence the gate measured** (its own scripts; scratch clones base=eecb3fb0, merged=c3c01433+746d55e5):
+1. Pins: nist_ai_rmf.json changes only `version` and adds `edition`; codes and assignments untouched. maestro_layers.json "1.0" unchanged. The build re-run in both clones left porcelain empty, so the committed data/stats.json and taxonomy_versions.json are build output. data/stats.json gains only the maestro/nist_ai_rmf keys; all other data/*.json are byte-identical.
+2. REVISIONS: b[:3]==a; b[3]=={**a[2], maestro, nist_ai_rmf}; revision 4.
+3. Schema fires: dropping either key, or maestro as a number, errors. The real v2.13.0 release manifest gives exactly 4 errors (maestro, nist_ai_rmf, owasp_dsgai, unverified_count), matching the "exactly four" claim.
+4. Per-object exports: STIX 65,304 objects, same ID set, 1 changed (identity `modified` .003→.004Z + 2 x_taxonomy_versions keys). TAXII has the same change. MISP: 31/31 events change only by the 2 tags appended in order and timestamp +1 s. HF incidents.jsonl is byte-identical. Undeclared deltas: none.
+5. data/incidents.json byte-identical; 15,784 entries, ID set equal; id_deprecations unchanged.
+6. check_stats_drift clean. W1 table matches mitre_atlas.json + translations. The CHANGELOG figures match the measurement.
+7. Full suite on the merge: 1594 passed, 1 xfailed (585 s). Gate mutations: M1 schema required drop → 3 failed; M2 maestro 1.1 unregistered → 8 failed + 11 errors.
+8. A second build/export is byte-identical (deterministic).
+**Advisories → queued follow-ups:**
+- A1: TAXONOMIES.md:270 ShadowLeak example still names AML.T0057; it should be AML.T0085.002. The dated v2.10.0 SVGs can stay. → schema-architect, small.
+- A2: MAESTRO "1.0" is the repo's own mapping-file version (since c105bd7a). No upstream numbered edition is cited, and TAXONOMIES:142 says so honestly. **User question:** does "registered editions" mean upstream editions? If so, add a provenance note.
+- A3: REVISIONS append-only is not enforced; the gate's M3, which rewrote row 2, passed 83 tests. Pre-existing. → a frozen-digest test over REVISIONS[:-1].
+- A4: VERSIONING.md:493-500 export-field table lacks the `+ revision − 1` term; its "bump EXPORTER_VERSION" rule is superseded by REVISIONS for pins (since D133). → docs follow-up.
+- A5: out-of-brief edits, harmless: a docstring example corrected to 2026.10, and the [Unreleased] D133 CHANGELOG line re-tensed.
+
 ### ✅ 2026-11-03 foreman checks [R]: Sun 11-01 live test of D146-1 PASSED · Tue 11-03 ATLAS cron no-op
 - **Run 41299717180 (schedule, success, 51m30s).** cve-sweep and oecd-fetch both started 10:57:26; refresh 11:19:31→11:34:37 (after cve-sweep only); finalize 11:48:39→11:48:53 (after both).
   - **PR #103 opened 11:34:29, 14 min before OECD finished**: the decoupling works.
