@@ -14,6 +14,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-03 foreman checks [R]: Sun 11-01 live test of D146-1 PASSED · Tue 11-03 ATLAS cron no-op
+- **Run 41299717180 (schedule, success, 51m30s).** cve-sweep and oecd-fetch both started 10:57:26; refresh 11:19:31→11:34:37 (after cve-sweep only); finalize 11:48:39→11:48:53 (after both).
+  - **PR #103 opened 11:34:29, 14 min before OECD finished**: the decoupling works.
+  - finalize health table shows real outcomes: aiaaic_sheet / cisa_kev / oecd_aim all `success`, 0 consecutive failures (not the `|| 'failure'` default).
+  - `oecd-skip-probe-state` artifact uploaded and downloaded by finalize; cursor unchanged → `::notice::... unchanged this run; refresh-state left as-is`.
+  - Artifacts: oecd-skip-probe-state, held-oecd-aiid-inputs, held-refresh-job-pair-inputs, cve-sweep-output, aiid-change-report.
+  - refresh-state: exactly one commit this run (`ee13ff54` 11:48:50, source health counters); no cursor commit.
+  - Step times: OECD fetch 50m (cap 65), Unit tests 12m (refresh cap 40), CVE sweep 21m. Within budget.
+  - PR body: no AIAAIC warning (AIAAIC succeeded, correct); held-artifact text says it may appear after the PR opens (true here).
+  - **PR #103 is the user's to review** (25 files, +29,493/−17,057; PR #102 was 21 files, +19,343/−10,186). main has not moved since it opened, so it is not stale.
+- **Run 41636914490 (Monthly ATLAS refresh, 11-03 12:34, success, 24s):** pointer chain → ATLAS-2026.10.yaml; `::notice::Upstream ATLAS release is identical to the committed snapshot; nothing to do.` No PR.
+- **D146-2:** `d1462-pins` did not report before the session ended. [R] tree check: branch `ws3/d146-2-maestro-nist-pins-2026-10-29` on origin at `746d55e5` (7d9fc282 pins + REVISIONS row 4, 1c432743 tests, 45952ab9 docs/exporter text, 746d55e5 W1); worktree porcelain clean; 17 files +184/−27, includes data/stats.json and mappings/nist_ai_rmf.json. The specialist's scratch outputs (suite 1594 passed + 1 xfailed; STIX/MISP delta; schema/mutation fire proofs) are passed to the gate as **unattested** material. → red-reviewer dispatched with no specialist report; it verifies from the tree.
+
 - **Main CI on the ATLAS merge `eecb3fb0`: Validate success** (3.12 23:33:12→23:47:48Z, about 15 min; 3.13 green).
 
 ### 📋 docs-warden after ATLAS 2026.10 + D133-W (`eecb3fb0`), 2026-10-29: 0 high, 1 med, 2 low
