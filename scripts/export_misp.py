@@ -310,15 +310,14 @@ pinned taxonomy releases the tags refer to. Attributes of rows whose upstream
 source has stopped refreshing additionally carry
 `genai-incidents:source-freshness="stale"`, `genai-incidents:source-as-of="<date>"`
 and `genai-incidents:source-review-by="<date>"` (the row's own `source_freshness`
-marker; absent on every other row). Each event's `timestamp` is the newest
-`updated` date among its incidents (falling back to `added`, then the year's
-Jan 1), in unix seconds, plus the exporter's `EXPORTER_VERSION` seconds plus
-`(taxonomy revision - 1)` seconds. MISP therefore re-pulls an event when an
-incident's content fields change (`tier`, `quality_tier`, `corpus` and
-`content_license` are content fields and move `updated`), when the exporter
-changes, or when the pinned taxonomy versions change. A change to
-`source_freshness` alone does not move `updated`, so it surfaces only via an
-`EXPORTER_VERSION` bump.
+marker; absent on every other row). Each event's `timestamp` is the newest of its incidents' `updated` dates (each
+falling back to `added`; the year's Jan 1 only if none parse), in unix seconds,
+plus the exporter's `EXPORTER_VERSION` seconds plus `(taxonomy revision - 1)`
+seconds. MISP therefore re-pulls an event when an incident's content fields
+change (`tier`, `quality_tier`, `corpus` and `content_license` are content
+fields and move `updated`), when `EXPORTER_VERSION` is bumped, or when the
+pinned taxonomy versions change. A change to `source_freshness` alone does not
+move `updated`, so it surfaces only via an `EXPORTER_VERSION` bump.
 
 ## Subscribe (MISP)
 
