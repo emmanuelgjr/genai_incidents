@@ -514,14 +514,27 @@ fails when an exported field is in neither group. The version is one millisecond
 (`id`, `modified`) re-imports exactly the objects that changed. Known limit: two
 content changes to one entry on the same calendar day produce one `modified`.
 
-**A taxonomy pin change does not bump `EXPORTER_VERSION`; it appends a row to
-`scripts/taxonomy_versions.py` `REVISIONS` (since D133).** Any change to
+**A taxonomy pin change always appends a row to `scripts/taxonomy_versions.py`
+`REVISIONS` (since D133); it bumps `EXPORTER_VERSION` too only when the pinned
+value is also embedded in per-object content.** Any change to
 `taxonomy_versions` — a re-pin of any taxonomy, dated or not (OWASP ASI, VERIS
 and CAPEC carry no release date), or a newly pinned taxonomy — must append the
-new pin set as the next row in the same change. That moves the STIX `identity`
-`modified` by one millisecond and every MISP event `timestamp` by one second,
-and nothing else, because those are the only objects that carry the versions.
-`REVISIONS` is append-only: a published row is never edited, reordered or
+new pin set as the next row in the same change. The row moves the STIX
+`identity` `modified` by one millisecond and every MISP event `timestamp` by
+one second: the identity's `x_taxonomy_versions` and the events'
+`genai-incidents:taxonomy-*` machinetags are where the pin set is
+carried, and the revision term covers them. It does not move any other STIX
+object. One pinned value is embedded elsewhere today: the OWASP LLM edition
+(`taxonomy_versions.owasp_llm`, the crosswalk's `to_version`) is part of the
+`source_name` (`owasp-llm-top10-<edition>`) in the `external_references` of
+every incident SDO that carries an `owasp_llm` code (`scripts/export_stix.py`
+`_owasp_llm_source_name`). Incident SDOs carry no revision term, so an OWASP
+LLM re-pin is also a changed `source_name` and needs the STIX `EXPORTER_VERSION`
+bump listed above. No other pinned version value is embedded in STIX object
+content, and none in MISP attribute tags (those carry codes, not editions).
+Separately, an ATLAS re-pin that changes technique names changes `attack-pattern`
+content; those objects' `modified` follows the pinned ATLAS `release_date`
+(table above), not the revision. `REVISIONS` is append-only: a published row is never edited, reordered or
 removed (`tests/test_taxonomy_revisions_frozen.py`). An unregistered pin set
 makes `tv_revision()` raise, so the STIX and MISP exports and pytest fail
 (`validate` and `make build` do not check it). The STIX `identity` stamp
