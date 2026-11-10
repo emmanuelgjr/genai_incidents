@@ -14,6 +14,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 Refresh-PR independent CI: BOUNCE #1 (gate-prci on `125a19ee`), 2026-11-10 → specialist redispatched with defects + folded advisories
+**Specialist (testimony):**
+- `dispatch-pr-ci` is a separate job with only `actions: write`, no checkout and no `uses:`. It is the security-review correction: refresh holds no actions scope.
+- validate.yml gains workflow_dispatch, with an origin/main baseline that fails closed.
+- Suite 1596 + 1 xfailed.
+- Proof dispatches 42878980292 / 42878984927 were green and attached to SHA 39ba7afb.
+**Foreman pre-check [R]:**
+- PR #103 head 21ee342f has the same tree as 9ccc0f45 (4e358b25), and the push Validate there with base 7c34ddc8 succeeded. So a dispatched run on a refresh head is green.
+- **The pre-check missed D1.**
+**VERDICT: BOUNCE. DEFECTS:**
+1. dispatch-pr-ci's `if:` has an implicit success() over the needs chain (actions/runner#491). If cve-sweep fails, refresh still opens the PR (`!cancelled()`), but the dispatch is silently skipped with no warning. Fix: `!cancelled() && ...`.
+2. The structure test cannot catch `permissions: write-all` on refresh or at workflow level: it is a string, so `"actions" in ...` is False. The gate's mutations returned [].
+**Advisories, ALL folded into the fix:**
+- A1: the test also misses a dropped `-R`, a dropped GH_TOKEN and a vacuous `base=HEAD`.
+- A2: CHANGELOG conflict with main; keep both sections.
+- A3: the DATA_DICTIONARY.md:178 D140 table lacks a workflow_dispatch row.
+- A5: cpr outputs the PR number on not-updated too; reword.
+**Not folded (unprovable without a live run, D148-2):** whether GITHUB_TOKEN-dispatched runs are held, whether gh succeeds with only actions:write, and whether the runs appear under the PR's checks. The PR body hedges ("check they exist"). → **verify at the Sun 11-15 refresh.**
+**Gate evidence:**
+- Merge 7564f513 (f15f508c + 125a19ee): **1599 passed + 1 xfailed, 552 s**.
+- cpr source pinned at 5f6978fa: the PR number is set on created/updated/not-updated.
+- The validate fail-closed snippet was run under bash -e: missing origin/main gives rc 1.
+- The EEE was explained by the 580 s shell timeout against a 552 s run.
+
 ### ✅ Exporter docstring follow-up DONE: MERGED 2026-11-10 (gate-expdoc PASS on `371486b0`, first gate, 0 defects)
 WS6 distribution-engineer `expdoc`, branch `ws6/export-docstrings-2026-11-10`. It closes the D146-2 advisories' "stale export_stix/export_misp module docstrings".
 - **Foreman pre-check before the gate:** it found one imprecise sentence. "the per-SDO formula above (…attack-patterns, vulnerabilities)" applies only to the millisecond field, not to the date. Fixed before gating. CR=0 in both blobs.
