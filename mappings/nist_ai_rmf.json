@@ -1,6 +1,7 @@
 {
   "framework": "NIST AI Risk Management Framework",
-  "version": "1.0 (AI 100-1, January 2023)",
+  "version": "1.0",
+  "edition": "AI 100-1, January 2023",
   "url": "https://www.nist.gov/itl/ai-risk-management-framework",
   "functions": {
     "GOVERN": {

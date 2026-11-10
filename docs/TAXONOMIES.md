@@ -86,6 +86,8 @@ Failure-mode catalog focused on **agentic** systems — agents with planning loo
 
 Source: <https://www.nist.gov/itl/ai-risk-management-framework>
 
+Edition pinned here: **1.0**, NIST AI 100-1 of January 2023 (`mappings/nist_ai_rmf.json`: field `version` is `1.0`, field `edition` is the descriptive "AI 100-1, January 2023"; the machine-readable value is `taxonomy_versions.nist_ai_rmf` in `data/stats.json`).
+
 Risk-management framework, not a failure catalog. Four functions:
 
 | Function | Description |
@@ -113,18 +115,17 @@ Key LLM-era techniques used heavily in this dataset:
 
 | Technique | Name |
 |---|---|
-| `AML.T0010` | AI Supply Chain Compromise |
+| `AML.T0010` | Supply Chain Compromise |
 | `AML.T0018` | Manipulate AI Model |
-| `AML.T0020` | Poison Training Data |
+| `AML.T0020` | Training Data Poisoning |
 | `AML.T0024` | Exfiltration via AI Inference API |
 | `AML.T0048` | External Harms |
 | `AML.T0051` | LLM Prompt Injection (`.000` Direct, `.001` Indirect, `.002` Triggered) |
 | `AML.T0053` | AI Agent Tool Invocation |
 | `AML.T0054` | LLM Jailbreak |
-| `AML.T0056` | Extract LLM System Prompt |
-| `AML.T0057` | LLM Data Leakage |
 | `AML.T0066` | Retrieval Content Crafting |
 | `AML.T0070` | RAG Poisoning |
+| `AML.T0085` | Data from AI Services (`.002` Conversation Context and Memory, `.003` System Instructions; the successors of `AML.T0057` LLM Data Leakage and `AML.T0056` Extract LLM System Prompt, both retired in ATLAS 2026.10) |
 
 **Use it when:** you want to communicate the incident in adversarial-emulation terms — what an attacker is **doing**, not what is **broken**.
 
@@ -137,6 +138,8 @@ See `mappings/mitre_atlas.json` (pinned at ATLAS v2026.10; the machine-readable 
 Source: <https://genai.owasp.org/resource/genai-security-project-maestro/>
 
 Companion model that describes **where in the AI/agent architecture** an incident originates, impacts, or could be controlled. Used by the legacy `incidents.json` source and preserved on those entries.
+
+Edition pinned here: **1.0** (`mappings/maestro_layers.json`, field `version`; the machine-readable value is `taxonomy_versions.maestro` in `data/stats.json`).
 
 | Layer | Name |
 |---|---|

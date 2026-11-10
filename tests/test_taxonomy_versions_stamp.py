@@ -29,8 +29,12 @@ def _stix(monkeypatch, tv):
     return {o["id"]: o for o in s.build_bundle(_INC)["objects"]}
 
 
-def test_stix_only_identity_modified_moves(monkeypatch):
-    old, new = tvm.REVISIONS[0], tvm.REVISIONS[1]
+# Every registered transition (rows 1->2 D133, 2->3 ATLAS 2026.10, 3->4 D146-2).
+_PAIRS = list(zip(tvm.REVISIONS, tvm.REVISIONS[1:]))
+
+
+@pytest.mark.parametrize("old,new", _PAIRS)
+def test_stix_only_identity_modified_moves(monkeypatch, old, new):
     a, b = _stix(monkeypatch, old), _stix(monkeypatch, new)
     moved = {k for k in a if a[k]["modified"] != b[k]["modified"]}
     changed = {k for k in a if {x: y for x, y in a[k].items() if x != "modified"}
@@ -46,10 +50,11 @@ def test_stix_build_twice_identical(monkeypatch):
     assert s.build_bundle(_INC) == s.build_bundle(_INC)
 
 
-def test_misp_every_event_timestamp_moves(monkeypatch):
-    _use(monkeypatch, tvm.REVISIONS[0])
+@pytest.mark.parametrize("old_tv,new_tv", _PAIRS)
+def test_misp_every_event_timestamp_moves(monkeypatch, old_tv, new_tv):
+    _use(monkeypatch, old_tv)
     old = misp._event_meta(2026, _INC)
-    _use(monkeypatch, tvm.REVISIONS[1])
+    _use(monkeypatch, new_tv)
     new = misp._event_meta(2026, _INC)
     assert old["Tag"] != new["Tag"]
     assert int(new["timestamp"]) > int(old["timestamp"])

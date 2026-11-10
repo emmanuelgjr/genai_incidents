@@ -5,8 +5,9 @@ a literal in an exporter), so a re-pin of any taxonomy (e.g. the v2.13.0 OWASP
 ASI 2026 re-pin) flows into stats.json, the STIX bundle, the MISP manifest, the
 Hugging Face card and the pip package without touching any of them.
 
-    {"atlas": "2026.09", "owasp_llm": "2026", "owasp_asi": "2026",
-     "capec": null, "veris": "1.4.1", "owasp_dsgai": "2026"}
+    {"atlas": "2026.10", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": null, "veris": "1.4.1", "owasp_dsgai": "2026",
+     "maestro": "1.0", "nist_ai_rmf": "1.0"}
 
 Sources:
 
@@ -22,8 +23,14 @@ Sources:
                 ``scripts/build_cwe_capec.py`` is the place to start recording it.
 * veris      -- ``mappings/veris.json``                  ``version``
 * owasp_dsgai -- ``mappings/owasp_dsgai_2026.json``      ``version`` (companion
-                code set; added after v2.13.0 under user ruling D133. MAESTRO
-                and NIST AI RMF are not pinned here: neither was ruled in)
+                code set; added after v2.13.0 under user ruling D133)
+* maestro    -- ``mappings/maestro_layers.json``         ``version`` (the
+                ``maestro_layers`` field; added under user ruling D146-2)
+* nist_ai_rmf -- ``mappings/nist_ai_rmf.json``           ``version`` (the
+                ``nist_ai_rmf`` field; added under D146-2). A short machine
+                value ("1.0"); the descriptive "AI 100-1, January 2023" is the
+                file's ``edition``, kept out of the pin so the MISP machinetag
+                and ``x_taxonomy_versions`` carry a plain version string
 
 Offline, stdlib-only: imported by the deterministic build.
 """
@@ -44,6 +51,8 @@ SOURCES = (
     ("capec", "cwe_capec.json", "capec_version"),
     ("veris", "veris.json", "version"),
     ("owasp_dsgai", "owasp_dsgai_2026.json", "version"),
+    ("maestro", "maestro_layers.json", "version"),
+    ("nist_ai_rmf", "nist_ai_rmf.json", "version"),
 )
 
 
@@ -76,6 +85,10 @@ REVISIONS = (
     # 3 -- ATLAS 2026.10 re-pin
     {"atlas": "2026.10", "owasp_llm": "2026", "owasp_asi": "2026",
      "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026"},
+    # 4 -- D146-2: maestro and nist_ai_rmf added
+    {"atlas": "2026.10", "owasp_llm": "2026", "owasp_asi": "2026",
+     "capec": None, "veris": "1.4.1", "owasp_dsgai": "2026",
+     "maestro": "1.0", "nist_ai_rmf": "1.0"},
 )
 
 

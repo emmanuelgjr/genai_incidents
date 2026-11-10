@@ -297,7 +297,8 @@ incident's CVEs, reference links and title become tagged attributes
 (`genai-incidents:*`, `mitre-atlas:technique="…"`, and `veris:*` machinetags
 per the VERIS 1.4.1 crosswalk in `mappings/veris.json`). Every event (and its
 `manifest.json` entry) carries `genai-incidents:taxonomy-<name>="<version>"`
-tags (atlas, owasp-llm, owasp-asi, veris; capec once versioned) naming the
+tags (atlas, owasp-llm, owasp-asi, veris, owasp-dsgai, maestro, nist-ai-rmf;
+capec once versioned) naming the
 pinned taxonomy releases the tags refer to. Attributes of rows whose upstream
 source has stopped refreshing additionally carry
 `genai-incidents:source-freshness="stale"`, `genai-incidents:source-as-of="<date>"`

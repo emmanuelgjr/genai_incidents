@@ -286,7 +286,7 @@ def test_stats_json_carries_taxonomy_versions():
     stats = json.loads((ROOT / "data" / "stats.json").read_text(encoding="utf-8"))
     assert stats["taxonomy_versions"] == tvmod.taxonomy_versions()
     assert set(stats["taxonomy_versions"]) == {"atlas", "owasp_llm", "owasp_asi", "capec", "veris",
-                                               "owasp_dsgai"}
+                                               "owasp_dsgai", "maestro", "nist_ai_rmf"}
     assert stats["taxonomy_versions"]["atlas"] == atlas_pin.load_pin()["version"]
 
 
