@@ -9,7 +9,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ### Changed - independent CI on the weekly refresh PR (tooling only; data unchanged)
 
-- A PR opened with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so "Validate dataset" and the accessibility workflow sat at `action_required` on refresh PRs (e.g. #103) and reviewers merged with no CI run independent of the refresh job. `validate.yml` and `a11y.yml` (already dispatchable) now accept `workflow_dispatch`, and `auto-refresh.yml` dispatches both on `auto-refresh/data` after opening or updating the PR (job-level `actions: write`; a failed dispatch only warns). A dispatched validate run uses the tip of `main` as the override baseline, the equivalent of `HEAD^1` in a PR run. Test: `tests/test_auto_refresh_workflow.py`.
+- A PR opened with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so "Validate dataset" and the accessibility workflow sat at `action_required` on refresh PRs (e.g. #103) and reviewers merged with no CI run independent of the refresh job. `validate.yml` and `a11y.yml` (already dispatchable) now accept `workflow_dispatch`, and `auto-refresh.yml` dispatches both on `auto-refresh/data` after opening or updating the PR (a separate `dispatch-pr-ci` job holding only `actions: write`, so the `refresh` job that runs fetched ingest code never has it; a failed dispatch only warns). A dispatched validate run uses the tip of `main` as the override baseline, the equivalent of `HEAD^1` in a PR run. Test: `tests/test_auto_refresh_workflow.py`.
 
 ### Added - MAESTRO and NIST AI RMF pinned in `taxonomy_versions` (D146-2; data unchanged)
 

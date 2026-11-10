@@ -250,13 +250,6 @@ jobs:
     # fails fast at the step instead of consuming this budget.
     timeout-minutes: 40
     needs: cve-sweep
-    # Job-level permissions REPLACE the workflow-level block for this job, so all
-    # three are listed. actions: write is only for `gh workflow run` (independent
-    # CI dispatch step below); it grants no repo content access.
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: write
     # run even when the sweep job failed or was skipped: it is not a gate
     if: ${{ !cancelled() }}
     # Step outcomes the finalize job feeds to the source-health counter and the
@@ -264,6 +257,7 @@ jobs:
     outputs:
       aiaaic_outcome: ${{ steps.ingest_aiaaic.outcome }}
       kev_outcome: ${{ steps.ingest_kev.outcome }}
+      pr_number: ${{ steps.cpr.outputs.pull-request-number }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -608,18 +602,29 @@ jobs:
           PR: ${{ steps.cpr.outputs.pull-request-number }}
         run: gh pr edit "$PR" --remove-label needs-ruling || true
 
-      # Independent CI on the exact PR head. A PR opened/updated with GITHUB_TOKEN
-      # does not trigger pull_request workflows (runs sit at action_required), but
-      # GITHUB_TOKEN may trigger workflow_dispatch. Never blocks the PR (D148).
-      - name: Dispatch independent CI on the refresh branch
-        timeout-minutes: 5
-        if: steps.cpr.outputs.pull-request-number != ''
+  # Independent CI on the exact PR head. A PR opened/updated with GITHUB_TOKEN does
+  # not trigger pull_request workflows (runs sit at action_required), but
+  # GITHUB_TOKEN may trigger workflow_dispatch. This is a SEPARATE job so that
+  # `actions: write` is never held by the `refresh` job, which runs network-fetched
+  # ingest code and a third-party action. This job has no checkout, no `uses:`
+  # steps and no contents access. Nothing `needs` it (finalize does not), and its
+  # commands only warn on failure, so it can never block or flip the PR (D148).
+  dispatch-pr-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: refresh
+    if: ${{ needs.refresh.outputs.pr_number != '' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch validate and a11y on the refresh branch
+        timeout-minutes: 3
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           for wf in validate.yml a11y.yml; do
-            gh workflow run "$wf" --ref auto-refresh/data || echo "::warning::could not dispatch $wf on auto-refresh/data; the PR has no independent CI for it"
+            gh workflow run "$wf" --ref auto-refresh/data -R "$GITHUB_REPOSITORY" || echo "::warning::could not dispatch $wf on auto-refresh/data; the PR has no independent CI for it"
           done
 
   # D146-1: the SINGLE WRITER of the `refresh-state` branch. Runs after both the

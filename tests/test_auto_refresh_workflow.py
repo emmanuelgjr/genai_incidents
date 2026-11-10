@@ -190,29 +190,43 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
     import yaml
 
     problems = []
-    job = yaml.safe_load(text)["jobs"]["refresh"]
-    ids = [s.get("id") for s in job["steps"]]
-    step = next((s for s in job["steps"] if "gh workflow run" in s.get("run", "")), None)
-    if step is None:
-        return ["no step runs `gh workflow run`"]
-    if ids.index("cpr") >= job["steps"].index(step):
-        problems.append("dispatch step must come after the cpr step")
-    if "steps.cpr.outputs.pull-request-number != ''" not in str(step.get("if", "")):
-        problems.append("dispatch step must be guarded on a non-empty pull-request-number")
-    if step.get("continue-on-error") is not True:
-        problems.append("dispatch step must be continue-on-error (never blocks the PR)")
+    jobs = yaml.safe_load(text)["jobs"]
+    refresh = jobs["refresh"]
+    if "actions" in (refresh.get("permissions") or {}):
+        problems.append("the refresh job must not hold an actions permission")
+    if "actions" in (yaml.safe_load(text).get("permissions") or {}):
+        problems.append("the workflow-level block must not grant actions")
+    if "steps.cpr.outputs.pull-request-number" not in str((refresh.get("outputs") or {}).get("pr_number", "")):
+        problems.append("refresh must expose outputs.pr_number from the cpr step")
+    job = jobs.get("dispatch-pr-ci")
+    if job is None:
+        return problems + ["no dispatch-pr-ci job"]
+    if job.get("needs") != "refresh":
+        problems.append("dispatch job must need refresh")
+    if "needs.refresh.outputs.pr_number != ''" not in str(job.get("if", "")):
+        problems.append("dispatch job must be guarded on a non-empty pr_number")
+    if job.get("permissions") != {"actions": "write"}:
+        problems.append("dispatch job permissions must be exactly actions: write")
+    if not job.get("timeout-minutes"):
+        problems.append("dispatch job needs timeout-minutes")
+    steps = job["steps"]
+    if any("uses" in s for s in steps):
+        problems.append("dispatch job must have no uses: steps (no checkout, no third-party action)")
+    run = chr(10).join(s.get("run", "") for s in steps)
+    if "gh workflow run" not in run:
+        problems.append("dispatch job does not run `gh workflow run`")
     for wf in DISPATCHED:
-        if wf not in step["run"]:
+        if wf not in run:
             problems.append(f"{wf} not in the dispatch loop")
-    if "--ref auto-refresh/data" not in step["run"]:
+    if "--ref auto-refresh/data" not in run:
         problems.append("dispatch must target --ref auto-refresh/data")
-    if "|| echo \"::warning::" not in step["run"]:
+    if '|| echo "::warning::' not in run:
         problems.append("a failed dispatch must warn, not fail")
-    if (job.get("permissions") or {}).get("actions") != "write":
-        problems.append("refresh job needs job-level actions: write")
-    for k in ("contents", "pull-requests"):
-        if (job.get("permissions") or {}).get(k) != "write":
-            problems.append(f"job-level permissions replace the workflow block; {k}: write was lost")
+    if not all(s.get("continue-on-error") is True for s in steps):
+        problems.append("dispatch steps must be continue-on-error")
+    for name, j in jobs.items():
+        if "dispatch-pr-ci" in (j.get("needs") if isinstance(j.get("needs"), list) else [j.get("needs")]):
+            problems.append(f"{name} must not depend on dispatch-pr-ci")
     for label, body in (("validate.yml", validate_text), ("a11y.yml", a11y_text)):
         if "workflow_dispatch" not in (yaml.safe_load(body).get(True) or {}):  # PyYAML parses `on` as True
             problems.append(f"{label} has no workflow_dispatch trigger")
@@ -228,14 +242,27 @@ def test_refresh_dispatches_independent_ci():
 
 
 def test_ci_dispatch_check_fires():
-    good = WORKFLOW.read_text(encoding="utf-8")
+    nl = chr(10)
+    good = WORKFLOW.read_text(encoding="utf-8").replace(chr(13) + nl, nl)
     v = (WF_DIR / "validate.yml").read_text(encoding="utf-8")
     a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
-    assert check_ci_dispatch(good.replace("gh workflow run", "gh echo"), v, a)
-    assert any("guarded" in p for p in check_ci_dispatch(
-        good.replace("if: steps.cpr.outputs.pull-request-number != ''\n        continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf", "continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf"), v, a))
-    assert any("continue-on-error" in p for p in check_ci_dispatch(
-        good.replace("        continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf", "        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf"), v, a))
-    assert any("actions: write" in p for p in check_ci_dispatch(good.replace("      actions: write\n", ""), v, a))
-    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v.replace("  workflow_dispatch:\n", ""), a))
-    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v, a.replace("  workflow_dispatch:\n", "")))
+
+    def fires(text, needle):
+        assert any(needle in p for p in check_ci_dispatch(text, v, a)), needle
+
+    marker = "    needs: cve-sweep" + nl
+    assert marker in good
+    fires(good.replace(marker, marker + "    permissions:" + nl + "      actions: write" + nl, 1), "must not hold an actions")
+    fires(good.replace("gh workflow run", "gh echo"), "gh workflow run")
+    fires(good.replace("    if: ${{ needs.refresh.outputs.pr_number != '' }}" + nl, ""), "guarded")
+    perm = "    permissions:" + nl + "      actions: write" + nl
+    assert perm in good
+    fires(good.replace(perm, perm + "      contents: read" + nl, 1), "exactly actions: write")
+    step = "      - name: Dispatch validate and a11y on the refresh branch" + nl
+    assert step in good
+    fires(good.replace(step, "      - uses: actions/checkout@v6" + nl + step, 1), "no uses")
+    fires(good.replace(' || echo "::warning::could not dispatch', " # could not dispatch"), "warn")
+    fires(good.replace("      pr_number: ${{ steps.cpr.outputs.pull-request-number }}" + nl, ""), "pr_number")
+    fires(good.replace("    needs: [refresh, oecd-fetch]" + nl, "    needs: [refresh, oecd-fetch, dispatch-pr-ci]" + nl), "must not depend")
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v.replace("  workflow_dispatch:" + nl, ""), a))
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v, a.replace("  workflow_dispatch:" + nl, "")))
