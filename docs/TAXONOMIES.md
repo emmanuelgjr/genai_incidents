@@ -267,7 +267,7 @@ The frameworks overlap deliberately. A single incident often hits **several** co
 | OWASP LLM | `LLM01` (indirect prompt injection), `LLM02` (sensitive info disclosure), `LLM03` (excessive agency through connectors) |
 | OWASP ASI | `ASI01` (goal hijack), `ASI02` (tool misuse — connectors), `ASI09` (human-agent trust exploitation) |
 | NIST AI RMF | `MEASURE-2.7` (security testing gap), `MAP-3.5` (human oversight), `GOVERN-6.1` (third-party connector risk) |
-| MITRE ATLAS | `AML.T0051.001` (LLM Prompt Injection — indirect), `AML.T0057` (LLM Data Leakage), `AML.T0048` (External Harms) |
+| MITRE ATLAS | `AML.T0051.001` (LLM Prompt Injection — indirect), `AML.T0085.002` (Data from AI Services — Conversation Context and Memory), `AML.T0048` (External Harms) |
 | MAESTRO | `L3` origin (connectors), `L5` blind-spot (no telemetry to catch this), `L6` impact (compliance/data) |
 
 Don't pick favorites. Use them together.

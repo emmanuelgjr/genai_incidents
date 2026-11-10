@@ -7,6 +7,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Fixed - `REVISIONS` append-only is now tested; export-stamp docs corrected (D146-2 advisories A1/A3/A4; data unchanged)
+
+- `tests/test_taxonomy_revisions_frozen.py` freezes a sha256 per published `scripts/taxonomy_versions.py` `REVISIONS` row (rows 1-4) and fails if one is edited, reordered or removed, or if two rows are identical; appending a row needs no test edit (a second unfrozen row fails with the digest line to paste). `docs/VERSIONING.md` "What bumps what in the exports" now states that the STIX `identity` `modified` and MISP event `timestamp` carry `EXPORTER_VERSION + (revision - 1)` and that a taxonomy pin change appends a `REVISIONS` row instead of bumping `EXPORTER_VERSION`; the ShadowLeak example in `docs/TAXONOMIES.md` uses `AML.T0085.002` in place of the retired `AML.T0057`.
+
 ### Added - MAESTRO and NIST AI RMF pinned in `taxonomy_versions` (D146-2; data unchanged)
 
 - **What.** `taxonomy_versions` gains `maestro: "1.0"` (from `mappings/maestro_layers.json` `version`) and `nist_ai_rmf: "1.0"` (from `mappings/nist_ai_rmf.json` `version`), closing the asymmetry recorded under D133. It now reaches `data/stats.json`, `build_manifest.json`, `genai_incidents.taxonomy_versions()`, the STIX `identity` object's `x_taxonomy_versions`, the Hugging Face card and every MISP event (new machinetags `genai-incidents:taxonomy-maestro="1.0"` and `genai-incidents:taxonomy-nist-ai-rmf="1.0"`).

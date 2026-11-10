@@ -492,12 +492,12 @@ stamped:
 
 | Surface | Field | Rule |
 |---|---|---|
-| STIX incident SDO, its relationships | `modified` | the entry's `updated` date, with `scripts/export_stix.py` `EXPORTER_VERSION` in the millisecond field (`2026-01-04T00:00:00.001Z`); never earlier than `created` |
+| STIX incident SDO, its relationships | `modified` | the entry's `updated` date, with `scripts/export_stix.py` `EXPORTER_VERSION` alone (no revision term) in the millisecond field (`2026-01-04T00:00:00.001Z`); never earlier than `created` |
 | STIX `attack-pattern` | `modified` | the pinned ATLAS `release_date` (floor 2024-01-01), same version suffix |
 | STIX `vulnerability` | `modified` | constant (a CVE object's content is its id), same version suffix |
-| STIX `identity` (carries `x_taxonomy_versions`) | `modified` | newest of every incident's `updated` and the taxonomy release dates, same version suffix |
+| STIX `identity` (carries `x_taxonomy_versions`) | `modified` | newest of every incident's `updated` and the taxonomy release dates, with `EXPORTER_VERSION + (revision − 1)` in the millisecond field, where *revision* is the 1-based position of the current `taxonomy_versions` in `scripts/taxonomy_versions.py` `REVISIONS` (`tv_revision()`); the only STIX object that carries the revision term |
 | TAXII `manifest.json` | `version` / `date_added` | the object's `modified` / `created` (no separate state) |
-| MISP event + manifest | `timestamp` | newest `updated` among the event's incidents, in Unix seconds, plus `scripts/export_misp.py` `EXPORTER_VERSION` seconds |
+| MISP event + manifest | `timestamp` | newest `updated` among the event's incidents (fallback `added`, then Jan 1 of the event's year), in Unix seconds, plus `scripts/export_misp.py` `EXPORTER_VERSION + (revision − 1)` seconds, *revision* as for the STIX `identity` row (every event carries the taxonomy-version machinetags) |
 
 `updated` moves exactly when an entry's content fields change
 (`scripts/merge_and_dedupe.py` `_CONTENT_FIELDS`), so an entry with no content
@@ -505,8 +505,7 @@ change keeps a byte-identical SDO across builds.
 
 **Bump `EXPORTER_VERSION` (STIX and/or MISP) in the same change as any of:**
 a new or removed `x_` property or machinetag, a changed `source_name`/comment,
-a changed mapping from entry to object, a re-pin of a taxonomy that carries no
-release date (OWASP ASI, VERIS, CAPEC), or a re-derivation of a field the
+a changed mapping from entry to object, or a re-derivation of a field the
 exporter reads that is *not* in `_CONTENT_FIELDS` (`source_freshness` only:
 re-deriving it does not move `updated`; `tier`, `quality_tier`, `corpus` and
 `content_license` are content fields since D81 and do move it). `tests/test_export_modified.py::test_every_exported_entry_field_is_content_or_explicitly_declared`
@@ -514,6 +513,19 @@ fails when an exported field is in neither group. The version is one millisecond
 (STIX, range 0-999) or one second (MISP) per bump, so a consumer that dedupes on
 (`id`, `modified`) re-imports exactly the objects that changed. Known limit: two
 content changes to one entry on the same calendar day produce one `modified`.
+
+**A taxonomy pin change does not bump `EXPORTER_VERSION`; it appends a row to
+`scripts/taxonomy_versions.py` `REVISIONS` (since D133).** Any change to
+`taxonomy_versions` — a re-pin of any taxonomy, dated or not (OWASP ASI, VERIS
+and CAPEC carry no release date), or a newly pinned taxonomy — must append the
+new pin set as the next row in the same change. That moves the STIX `identity`
+`modified` by one millisecond and every MISP event `timestamp` by one second,
+and nothing else, because those are the only objects that carry the versions.
+`REVISIONS` is append-only: a published row is never edited, reordered or
+removed (`tests/test_taxonomy_revisions_frozen.py`). An unregistered pin set
+makes `tv_revision()` raise, so the STIX and MISP exports and pytest fail
+(`validate` and `make build` do not check it). The STIX `identity` stamp
+`EXPORTER_VERSION + (revision − 1)` must stay within 0-999.
 
 `build_manifest.json` (schema `schema/build_manifest.schema.json`) and `SHA256SUMS`
 are written only by `scripts/export_integrity.py` in export/release steps, never
