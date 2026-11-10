@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-10 — D152 executed: PR #103 merged (`9ccc0f45`), D146-2 merged onto the refreshed main
+**User directive 2026-11-10:** "incident count is stale refresh and fix any workflow". The foreman took this as the go-ahead for D152 step 1, which was reserved to the user's review of PR #103.
+- **Foreman per-entity review of PR #103 [R]** (the PR as regenerated 11-08, base `7c34ddc8` = main, so not stale). The comparison was ID-keyed between origin/main and origin/auto-refresh/data in data/incidents.json:
+  - 15,784 → 15,821 rows; **removed set EMPTY**; added exactly 37 (INC-17334..INC-17370), all `AIID-` source ids (D114 standing class).
+  - Among common rows, the only field that moved is `status_reason`, on 9 rows (4 cve-disputed and 5 cve-rejected re-stamped `as_of` 2026-10-09→2026-11-08); code and status are unchanged.
+  - ingest/cve_rejections.json: `checked` dates re-stamped, count 9,169 unchanged.
+  - Counted incident_count 15,745 → 15,782; landmark_count 2,025 → 2,062.
+  - Merged with a merge commit (same as PR #102).
+- **Why the count was stale, and the failing workflow:** no refresh PR had merged since #102 (2026-10-13). The Mon 11-09 `Refresh overdue alert` run (42648201965) failed by design (D63, 21-day threshold) and opened issue #104. That was the tripwire working, not a defect. It closes on its next green run (see below).
+- **Not a defect:** `Validate dataset` / `Site accessibility` on refresh PRs show `action_required`. These are bot-opened `pull_request` runs held for approval by GitHub. The refresh workflow itself runs schema validation and the full suite before it opens the PR. #102 merged under the same condition.
+- **D146-2 merge (D152 step 2)** of `ws3/d146-2-maestro-nist-pins-2026-10-29` @ `746d55e5` onto `9ccc0f45`, gated PASS 11-03:
+  - Git auto-merged data/stats.json and docs/DATASHEET.md with no conflict.
+  - **The build re-run on the merged tree** (parse_existing, merge_and_dedupe, render_markdown, render_docs_stats, validate, lint_atlas_ids) **left zero unstaged changes**, so the committed files are build output, not a hand merge.
+  - check_stats_drift clean; lint-atlas OK (71 ids, pin 2026.10).
+  - **Full suite on the committed merge `ae343a3f`: 1594 passed, 1 xfailed (558 s)**, the same as the gate's count. A first run on the *uncommitted* merge failed 1 test (test_unverified_real_corpus::test_manifest_counts_agree_with_the_corpus: "maestro is a required property"). That test builds its scratch tree from `git HEAD` via `git archive`, so it ran the pre-merge scripts against the new schema. It was a commit-before-test artifact, not a defect, and it passes on the committed merge.
+  - Porcelain empty (no strays); main CI on `9ccc0f45` green (Validate 14m35s, Pages, a11y, CodeQL).
+- **Next:** watch main CI on `ae343a3f`. Re-run Refresh overdue alert (workflow_dispatch) to close #104. Then step 7: docs-warden (counts + taxonomy_versions changed). Queue continues per the D146-2 advisories A1/A3/A4 and the 10-29 list.
+
+
 ### ⚖ D152, USER RULINGS 2026-11-03
 1. **Merge order: PR #103 first.** The user reviews and merges the weekly refresh PR #103. The foreman then merges D146-2 onto the refreshed main, rebuilding the conflicting data/stats.json and docs/DATASHEET.md via the build, not by hand, and runs a full suite on the result before pushing. D146-2 waits until then.
 2. **MAESTRO "1.0" is enough as is:** it is the repo's mapping-file version, with the existing TAXONOMIES.md:142 wording. Advisory A2 is closed with no follow-up.
