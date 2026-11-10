@@ -31,8 +31,11 @@ mapping from entry to SDO changes (a new `x_` property, a relabelled
 consumer that dedupes on (id, modified) then re-imports exactly the objects the
 exporter changed. `modified >= created` always holds (clamped).
 
-The per-SDO formula above (incident SDOs, relationships, attack-patterns,
-vulnerabilities) uses `EXPORTER_VERSION` alone. Only the `identity` SDO adds
+The date part of `modified` differs by object (incidents and their relationships:
+the entry's `updated`; attack-patterns: the pinned ATLAS release date;
+vulnerabilities: a constant), but the millisecond field of every object other
+than the `identity` (incident SDOs, relationships, attack-patterns,
+vulnerabilities) carries `EXPORTER_VERSION` alone. Only the `identity` SDO adds
 `+ (revision - 1)` to that millisecond field, where `revision` is the 1-based
 index of the current `taxonomy_versions()` in `REVISIONS`
 (scripts/taxonomy_versions.py, `tv_revision()`). A taxonomy pin change
