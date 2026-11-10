@@ -14,6 +14,40 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ Refresh-PR independent CI DONE: MERGED 2026-11-10 (`bd5c4764`; gate-prci re-gate PASS on `1114d853` after bounce #1)
+**What merged:**
+- auto-refresh.yml: `refresh` exposes `pr_number` and gains no extra permissions. A new `dispatch-pr-ci` job (`actions: write` only, `if: !cancelled() && pr_number != ''`) runs `gh workflow run validate.yml|a11y.yml --ref auto-refresh/data -R`, with a warning on failure.
+- validate.yml: accepts `workflow_dispatch`, using an origin/main baseline that is D141 fail-closed (`::error::`, then exit 1).
+- New `check_ci_dispatch` and a fire test; a DATA_DICTIONARY D140 row; CHANGELOG.
+
+**Gate verdict, pasted:** PASS, defects none, D1 and D2 closed.
+- **Full suite** on scratch merge 228bdc93 (e1316fd4 + 1114d853, clean): **1599 passed, 0 failed, 1 xfailed**, 535.83 s, exit 0.
+- **D1:** the remaining no-dispatch path is a human cancel only. That is visible, and the PR body says to check that the runs exist. A refresh timeout after cpr gives a failure, not cancelled(), so the job still runs.
+- **D2:** all of the gate's own mutations fired: refresh `write-all` and `read-all`, workflow-level `write-all` and `read-all`, the refresh flow-map holding actions, and the dispatch-job `write-all`. The unmutated workflow gives [].
+- **A1:** the validate baseline mutated to `HEAD^{commit}` fired. In bash -e, the fail-closed snippet gives rc 1 without origin/main and rc 0 with it.
+- **A3:** the DATA_DICTIONARY:187 row matches validate.yml.
+- **A5:** a11y.yml has a 0-line diff, and "created/updated/up to date" matches the pinned cpr source.
+- **Scope:** 5 files. Porcelain is empty in both trees. The gate ran one read-only `git fetch` and no live dispatches.
+
+**Foreman post-merge [R]:**
+- strays: porcelain empty in the main tree and in gi-wt-prci;
+- the merge `bd5c4764` has the same parents as the gate's scratch merge;
+- tests/test_auto_refresh_workflow.py + test_refresh_decouple_workflow.py: 11 passed;
+- check_stats_drift clean.
+
+**Gate advisories, queued for the WS4 follow-up bundle:** each is a mutation the check misses, and none breaks a criterion.
+1. OR in place of AND in the `if`;
+2. `GH_TOKEN: ""`;
+3. substring matches hit comments (the a11y loop entry, `--ref`);
+4. a new job with `actions: write`, so make "only dispatch-pr-ci may hold actions" a whole-workflow rule;
+5. the fail-closed check is a grep, so a `|| base=HEAD; true ||` bypass passes; execute the snippet in a test.
+
+**Still unproven until the Sun 11-15 refresh (D148-2):**
+- whether GITHUB_TOKEN-dispatched runs are held;
+- whether gh works with actions:write alone;
+- whether the runs show under the PR's checks;
+- whether outputs pass on from a failed refresh job.
+
 ### ✅ A6 MISP README timestamp text DONE: MERGED 2026-11-10 (re-gate PASS on `d586116f` after bounce #1)
 WS6 `expdoc`, branch `ws6/misp-readme-stamp-2026-11-10`. It is A6 from gate-expdoc: the generated feed README in export_misp.py, plus DATA_DICTIONARY.md:283.
 - **Bounce #1 (gate-mispreadme on d40df536):** 1 defect. "re-pulls … when the exporter changes" is false: only an EXPORTER_VERSION bump moves the stamp, and the paragraph contradicted itself. **Foreman note:** the foreman flagged this phrase as doubtful in its own gate brief but did not resolve it before gating. Lesson: resolve a pre-check doubt before gating; don't hand it to the gate.
