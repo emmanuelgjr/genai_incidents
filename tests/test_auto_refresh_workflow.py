@@ -256,6 +256,8 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
     run = strip_shell_comments(chr(10).join(s.get("run", "") for s in steps))
     if "gh workflow run" not in run:
         problems.append("dispatch job does not run `gh workflow run`")
+    elif not re.search("(?m)(?:^|;|&&|[|][|]|" + BS + "bdo" + BS + "b|" + BS + "bthen" + BS + "b)[ " + BS + "t]*gh workflow run" + BS + "b", run):
+        problems.append("`gh workflow run` must be at command position (no echo/:/printf/true prefix)")
     for wf in DISPATCHED:
         if wf not in run:
             problems.append(f"{wf} not in the dispatch loop")
@@ -416,6 +418,11 @@ def test_ci_dispatch_check_fires_comment_or_and_token_and_new_job():
     cond = "!cancelled() && needs.refresh.outputs.pr_number != ''"
     assert cond in good
     fires(good.replace(cond, "!cancelled() || needs.refresh.outputs.pr_number != ''"), v, "pure AND")
+    # (M6) neutered command: a prefix token makes `gh workflow run` an argument, not a command
+    gwr = 'gh workflow run "$wf"'
+    assert good.count(gwr) == 1
+    for prefix in ("echo ", ": ", "printf '%s' ", "true ", "cat <<< "):
+        fires(good.replace(gwr, prefix + gwr), v, "command position")
     # (b) empty token
     tok = "GH_TOKEN: ${{ github.token }}" + nl + "        run: |" + nl + "          for wf"
     assert good.count(tok) == 1
