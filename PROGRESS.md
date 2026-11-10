@@ -30,7 +30,12 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - check_stats_drift clean; lint-atlas OK (71 ids, pin 2026.10).
   - **Full suite on the committed merge `ae343a3f`: 1594 passed, 1 xfailed (558 s)**, the same as the gate's count. A first run on the *uncommitted* merge failed 1 test (test_unverified_real_corpus::test_manifest_counts_agree_with_the_corpus: "maestro is a required property"). That test builds its scratch tree from `git HEAD` via `git archive`, so it ran the pre-merge scripts against the new schema. It was a commit-before-test artifact, not a defect, and it passes on the committed merge.
   - Porcelain empty (no strays); main CI on `9ccc0f45` green (Validate 14m35s, Pages, a11y, CodeQL).
-- **Next:** watch main CI on `ae343a3f`. Re-run Refresh overdue alert (workflow_dispatch) to close #104. Then step 7: docs-warden (counts + taxonomy_versions changed). Queue continues per the D146-2 advisories A1/A3/A4 and the 10-29 list.
+- **Closure [R], 2026-11-10:**
+  - Main CI on `c73bb405` (D146-2 merge + board) green: Validate run 42876309209 success, plus Pages, a11y and CodeQL.
+  - The Refresh overdue alert, re-run by workflow_dispatch (42876344954), succeeded and **closed #104 itself**: "A refresh PR has merged within the threshold; closing."
+  - **docs-warden (step 7) at `c73bb405`: CLEAN, 0 new findings.** check_stats_drift and render_docs_stats --check are no-ops (re-derived). No live surface still shows 15,745 / 2,025. All 8 taxonomy_versions keys are present on every pin surface, and REVISIONS row 4 equals stats.json. It confirmed advisory A4 (VERSIONING.md:498 and :500 omit the `+ revision − 1` term; source scripts/taxonomy_versions.py:70-76, CHANGELOG.md:29), which stays queued for governance-scribe.
+  - The warden did not build STIX/MISP, so .004Z is inferred; the D146-2 gate measured it directly.
+- **Next (superseded by closure above):** watch main CI on `ae343a3f`. Re-run Refresh overdue alert (workflow_dispatch) to close #104. Then step 7: docs-warden (counts + taxonomy_versions changed). Queue continues per the D146-2 advisories A1/A3/A4 and the 10-29 list.
 
 
 ### ⚖ D152, USER RULINGS 2026-11-03
