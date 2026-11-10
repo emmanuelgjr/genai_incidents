@@ -14,6 +14,33 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 WS4 follow-ups bundle: BOUNCE #1 (gate-ws4f on `f8a6122d`), 2026-11-10 → specialist redispatched with verbatim text
+**The foreman's pre-check** (7 mutations, all firing after one fix round, plus the CHANGELOG and TEST-NET fixes) tested what the checks do. **It did not audit the completeness claims in the comment, CHANGELOG and test text.** All three defects are text overclaims:
+1. **validate.yml checkout comment.**
+   - It still claims to list every git-history reader, and that is false.
+   - It wrongly puts `git log --all` under GENAI_OVERRIDE_BASELINE. That call is in the D71 refresh gate `_load_gate_baseline` (merge_and_dedupe.py:2747), which runs on every build (:3776).
+   - It omits `git show HEAD:<file>` (:2735, :2796).
+   - It omits test_release_label.py:82, which reads a tag blob, so "both skip" is wrong.
+2. **The CHANGELOG overstates two checks.**
+   - The command-position regex accepts `do`/`then` anywhere: `echo do gh workflow run`, `echo then …`, an escaped `\;` and a quoted `;` all MISS.
+   - "GH_TOKEN must be the workflow token" is only a substring test: `"github.token"` as a literal and `secrets.PAT || github.token` both MISS.
+3. **A test comment.** It says the old grep check passed both fail-open mutants. That holds for m1 only; m2 (`exit 1`→`true`) was caught.
+
+**Gate evidence:**
+- Fast-forward over origin/main b9b505f7; 6 files, +491/−22; no data/ or scripts/ files; the workflow diff is comment-only.
+- **Full suite exit 0, 1618 collected.** The 3 targeted files: 29 passed, 0 skipped.
+- Bytes are clean: LF only, the regex built with chr(92).
+- **The gate's own mutations FIRED for criteria 3(a)(c)(d)(e), 4 and 5.** The executed-shell test reads the real run block: 5 mutants failed and it skips cleanly with no bash/git. Criterion 6 is met: no persist-credentials edits.
+
+**Advisories:**
+- The sendmsg assertion silently doesn't run on Windows (no sendmsg); it would fire on Linux CI.
+- The DNS test resolves `example.invalid` if the guard ever regresses.
+- `--threshold "4"` and `--threshold "$T"` fall back to the default.
+- a11y named only inside an echo string, and an `if false` dead branch, are missed (outside the criteria).
+- The gate did not run actionlint.
+
+**Redispatch:** verbatim replacement text for 1 and 3; for 2, the do/then anchoring is fixed and GH_TOKEN made an exact match, with the CHANGELOG narrowed to what the check proves. Before re-gating, the foreman re-runs the gate's own MISS mutants plus string checks.
+
 ### ✅ Refresh-PR independent CI DONE: MERGED 2026-11-10 (`bd5c4764`; gate-prci re-gate PASS on `1114d853` after bounce #1)
 **What merged:**
 - auto-refresh.yml: `refresh` exposes `pr_number` and gains no extra permissions. A new `dispatch-pr-ci` job (`actions: write` only, `if: !cancelled() && pr_number != ''`) runs `gh workflow run validate.yml|a11y.yml --ref auto-refresh/data -R`, with a warning on failure.
