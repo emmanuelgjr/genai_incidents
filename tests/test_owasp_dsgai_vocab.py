@@ -83,20 +83,59 @@ def _rows() -> list[dict]:
     return raw["incidents"] if isinstance(raw, dict) else raw
 
 
+def doc_mismatches(doc_text: str, rows: list[dict]) -> list[str]:
+    """The real comparison: docs/TAXONOMIES.md figures vs a recount of ``rows``.
+    Returns one line per mismatch; empty means the doc matches the corpus."""
+    doc = doc_figures(doc_text)
+    got = recount(rows)
+    out = []
+    if doc[0] != got[0]:
+        out.append(f"rows carrying a code: doc {doc[0]} != recount {got[0]}")
+    if doc[1] != got[1]:
+        out.append(f"code assignments: doc {doc[1]} != recount {got[1]}")
+    # codes with zero rows are absent from the recount; the doc lists them as 0
+    for c, n in doc[2].items():
+        if n != got[2].get(c, 0):
+            out.append(f"{c}: doc {n} != recount {got[2].get(c, 0)}")
+    for c in got[2]:
+        if c not in doc[2]:
+            out.append(f"{c}: in the corpus but not in the doc table")
+    return out
+
+
 def test_taxonomies_doc_dsgai_figures_match_corpus():
     doc = doc_figures(DOC.read_text(encoding="utf-8"))
     assert len(doc[2]) == 21
-    got = recount(_rows())
-    # codes with zero rows are absent from the recount; the doc lists them as 0
-    got_per = {c: got[2].get(c, 0) for c in doc[2]}
-    assert (doc[0], doc[1], doc[2]) == (got[0], got[1], got_per)
+    assert doc_mismatches(DOC.read_text(encoding="utf-8"), _rows()) == []
 
 
 def test_taxonomies_doc_figures_check_fires_on_drift():
-    """Planted drift: one altered count in the doc text must not match the recount."""
+    """Planted drift runs the REAL comparison; expected values are derived, not pinned.
+    Control first: the undrifted doc matches. Then each mutation must be reported."""
+    import re
+
     text = DOC.read_text(encoding="utf-8")
-    drifted = text.replace("| `DSGAI01` | Sensitive Data Leakage | 29 |", "| `DSGAI01` | Sensitive Data Leakage | 28 |")
+    rows = _rows()
+    assert doc_mismatches(text, rows) == []
+    # (1) bump the table count of the most-used code in the doc text (value read from the doc)
+    per = doc_figures(text)[2]
+    code = max(per, key=per.get)
+    row_re = re.compile(rf"^(\| `{code}` \|[^|]*\| )(\d+)( \|)$", re.M)
+    m = row_re.search(text)
+    assert m and int(m.group(2)) == per[code] > 0
+    drifted = row_re.sub(lambda mm: f"{mm.group(1)}{int(mm.group(2)) + 1}{mm.group(3)}", text, count=1)
     assert drifted != text
-    got = recount(_rows())
-    d = doc_figures(drifted)
-    assert d[2]["DSGAI01"] != got[2]["DSGAI01"]
+    assert doc_mismatches(drifted, rows) == [f"{code}: doc {per[code] + 1} != recount {per[code]}"]
+    # (2) corpus drift: drop that code from one carrying row; the unchanged doc must now disagree
+    import copy
+
+    rows2 = copy.deepcopy(rows)
+    victim = next(r for r in rows2 if code in (r.get("owasp_dsgai") or []))
+    victim["owasp_dsgai"] = [c for c in victim["owasp_dsgai"] if c != code]
+    out = doc_mismatches(text, rows2)
+    assert any(line.startswith(f"{code}:") for line in out) and len(out) >= 2  # per-code + assignments
+    # (3) coverage-sentence drift
+    sent = re.search(r"(\d+)( rows carry at least one code)", text)
+    assert sent
+    bumped = text.replace(sent.group(0), f"{int(sent.group(1)) + 1}{sent.group(2)}", 1)
+    assert any(line.startswith("rows carrying a code") for line in doc_mismatches(bumped, rows))
