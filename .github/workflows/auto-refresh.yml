@@ -257,6 +257,7 @@ jobs:
     outputs:
       aiaaic_outcome: ${{ steps.ingest_aiaaic.outcome }}
       kev_outcome: ${{ steps.ingest_kev.outcome }}
+      pr_number: ${{ steps.cpr.outputs.pull-request-number }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -494,7 +495,13 @@ jobs:
 
           Review the diff before merging — flag any unexpected mass deletions
           or large taxonomy shifts. Schema validation and the full unit-test
-          suite both ran green in this workflow before the PR was opened.
+          suite both ran green in this workflow before the PR was opened
+          (the same job that produced the data, so not independent). Because a
+          PR opened with the workflow token does not trigger `pull_request`
+          checks, the workflow also dispatches "Validate dataset" and
+          "Site accessibility + integrity (WS6-T5)" on `auto-refresh/data`; look for them
+          under the PR's checks and do not merge on a red or missing run
+          (dispatch failures only warn, so check they exist).
 
           BODY
           if [ -s "$RUNNER_TEMP/aiaaic-yield-override.md" ]; then
@@ -594,6 +601,33 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ steps.cpr.outputs.pull-request-number }}
         run: gh pr edit "$PR" --remove-label needs-ruling || true
+
+  # Independent CI on the exact PR head. A PR opened/updated with GITHUB_TOKEN does
+  # not trigger pull_request workflows (runs sit at action_required), but
+  # GITHUB_TOKEN may trigger workflow_dispatch. This is a SEPARATE job so that
+  # `actions: write` is never held by the `refresh` job, which runs network-fetched
+  # ingest code and a third-party action. This job has no checkout, no `uses:`
+  # steps and no contents access. Nothing `needs` it (finalize does not), and its
+  # commands only warn on failure, so it can never block or flip the PR (D148).
+  dispatch-pr-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: refresh
+    # !cancelled(): a bare `if` carries an implicit success() over the whole needs
+    # chain, so a failed cve-sweep (refresh still runs, `!cancelled()`) would skip this.
+    if: ${{ !cancelled() && needs.refresh.outputs.pr_number != '' }}
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch validate and a11y on the refresh branch
+        timeout-minutes: 3
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for wf in validate.yml a11y.yml; do
+            gh workflow run "$wf" --ref auto-refresh/data -R "$GITHUB_REPOSITORY" || echo "::warning::could not dispatch $wf on auto-refresh/data; the PR has no independent CI for it"
+          done
 
   # D146-1: the SINGLE WRITER of the `refresh-state` branch. Runs after both the
   # refresh job and the OECD job so it sees every source's outcome, but nothing

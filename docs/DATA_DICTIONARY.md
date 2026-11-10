@@ -184,6 +184,7 @@ aborts the build (nothing is written).
 | `atlas-refresh.yml`, `cve-enrich.yml` | `HEAD` (variable unset), same reasoning | as above |
 | PR CI (`validate.yml`, `pull_request`) | `HEAD^1`, the PR base of the merge commit | what the PR adds is new, so it must satisfy (a) or (b) against the base |
 | push to `main` (`validate.yml`) | `github.event.before`, the previous tip of `main` (correct for a multi-commit fast-forward push, where `HEAD^1` would already hold the override). There is no fallback: a new-branch push (all-zero SHA), a force-push whose old tip is gone from the clone, or an empty/missing `before` SHA makes the job fail with an `::error::` (fail closed, D141) | as PR CI |
+| dispatched CI (`validate.yml`, `workflow_dispatch`, run by `auto-refresh.yml`'s `dispatch-pr-ci` job on `auto-refresh/data`) | `origin/main`, the tip of `main` (what `HEAD^1` is in a PR run) | fails closed (`::error::`, exit 1) if `origin/main` does not resolve; there is no push `before` SHA and no fallback to `HEAD`. It checks out the branch head, not a merge with `main`, so it does not see interactions with newer `main` commits |
 
 The never-empty rule applies to retained rows too, and active rows keep the strict check. `fields_clear` runs after the pinned-ATLAS refresh that union-adds `mitre_atlas_tactics`, so a tactics clear holds; `updated` moves only on the net change. The "matches no entry" check runs after retention, so an upstream drop of a row never breaks the build.
 

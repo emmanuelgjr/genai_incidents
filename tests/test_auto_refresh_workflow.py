@@ -175,3 +175,132 @@ def test_refresh_budget_check_fires():
         "      - name: Refresh OECD AI Incidents Monitor" + nl + "        timeout-minutes: 65" + nl
         + "        run: python scripts/ingest_oecd_aim.py" + nl + kev, 1)
     assert any("must not run in the refresh job" in x for x in check_refresh_budget(back))
+
+
+# ---------------------------------------------------------------------------
+# Independent CI for the refresh PR. A PR opened with GITHUB_TOKEN does not
+# trigger pull_request workflows (runs stay action_required), so the refresh job
+# dispatches them (workflow_dispatch is the documented GITHUB_TOKEN exception).
+
+DISPATCHED = ("validate.yml", "a11y.yml")
+WF_DIR = WORKFLOW.parent
+
+
+def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str]:
+    import yaml
+
+    problems = []
+    jobs = yaml.safe_load(text)["jobs"]
+    refresh = jobs["refresh"]
+    top = yaml.safe_load(text)
+    # a string value (write-all, read-all, ...) is a violation: it grants every scope,
+    # including actions, and `"actions" in "write-all"` is False
+    for label, perms in (("the refresh job", refresh.get("permissions")), ("the workflow level", top.get("permissions"))):
+        if perms is not None and not isinstance(perms, dict):
+            problems.append(f"{label} permissions must be a mapping, not {perms!r}")
+        elif "actions" in (perms or {}):
+            problems.append(f"{label} must not hold an actions permission")
+    if "steps.cpr.outputs.pull-request-number" not in str((refresh.get("outputs") or {}).get("pr_number", "")):
+        problems.append("refresh must expose outputs.pr_number from the cpr step")
+    job = jobs.get("dispatch-pr-ci")
+    if job is None:
+        return problems + ["no dispatch-pr-ci job"]
+    if job.get("needs") != "refresh":
+        problems.append("dispatch job must need refresh")
+    cond = str(job.get("if", ""))
+    if "needs.refresh.outputs.pr_number != ''" not in cond:
+        problems.append("dispatch job must be guarded on a non-empty pr_number")
+    if "!cancelled()" not in cond:
+        problems.append("dispatch job if: needs !cancelled() (implicit success() would skip it when cve-sweep fails)")
+    if job.get("permissions") != {"actions": "write"}:
+        problems.append("dispatch job permissions must be exactly actions: write")
+    if not job.get("timeout-minutes"):
+        problems.append("dispatch job needs timeout-minutes")
+    steps = job["steps"]
+    if any("uses" in s for s in steps):
+        problems.append("dispatch job must have no uses: steps (no checkout, no third-party action)")
+    run = chr(10).join(s.get("run", "") for s in steps)
+    if "gh workflow run" not in run:
+        problems.append("dispatch job does not run `gh workflow run`")
+    for wf in DISPATCHED:
+        if wf not in run:
+            problems.append(f"{wf} not in the dispatch loop")
+    if '-R "$GITHUB_REPOSITORY"' not in run:
+        problems.append('dispatch must pass -R "$GITHUB_REPOSITORY" (no checkout, so gh has no repo context)')
+    if not all("GH_TOKEN" in (s.get("env") or {}) for s in steps if "gh workflow run" in s.get("run", "")):
+        problems.append("the dispatch step must set GH_TOKEN")
+    if "--ref auto-refresh/data" not in run:
+        problems.append("dispatch must target --ref auto-refresh/data")
+    if '|| echo "::warning::' not in run:
+        problems.append("a failed dispatch must warn, not fail")
+    if not all(s.get("continue-on-error") is True for s in steps):
+        problems.append("dispatch steps must be continue-on-error")
+    for name, j in jobs.items():
+        if "dispatch-pr-ci" in (j.get("needs") if isinstance(j.get("needs"), list) else [j.get("needs")]):
+            problems.append(f"{name} must not depend on dispatch-pr-ci")
+    for label, body in (("validate.yml", validate_text), ("a11y.yml", a11y_text)):
+        if "workflow_dispatch" not in (yaml.safe_load(body).get(True) or {}):  # PyYAML parses `on` as True
+            problems.append(f"{label} has no workflow_dispatch trigger")
+    remerge = validate_text.split("Re-merge from ingest sources", 1)[1].split("Validate incidents.json", 1)[0]
+    if '"$EVENT_NAME" = "workflow_dispatch"' not in remerge:
+        problems.append("validate.yml re-merge baseline does not handle workflow_dispatch (would fail closed)")
+    else:
+        branch = remerge.split('"$EVENT_NAME" = "workflow_dispatch"', 1)[1].split("else", 1)[0]
+        if "origin/main" not in branch or not re.search(r"base=.*origin/main", branch):
+            problems.append("the workflow_dispatch baseline must be assigned from origin/main")
+        if "exit 1" not in branch:
+            problems.append("the workflow_dispatch baseline must fail closed (exit 1)")
+    return problems
+
+
+def test_refresh_dispatches_independent_ci():
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8")
+    a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
+    assert check_ci_dispatch(WORKFLOW.read_text(encoding="utf-8"), v, a) == []
+
+
+def test_ci_dispatch_check_fires():
+    nl = chr(10)
+    good = WORKFLOW.read_text(encoding="utf-8").replace(chr(13) + nl, nl)
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8")
+    a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
+
+    def fires(text, needle):
+        assert any(needle in p for p in check_ci_dispatch(text, v, a)), needle
+
+    marker = "    needs: cve-sweep" + nl
+    assert marker in good
+    fires(good.replace(marker, marker + "    permissions:" + nl + "      actions: write" + nl, 1), "must not hold an actions")
+    fires(good.replace("gh workflow run", "gh echo"), "gh workflow run")
+    fires(good.replace("    if: ${{ !cancelled() && needs.refresh.outputs.pr_number != '' }}" + nl, ""), "guarded")
+    perm = "    permissions:" + nl + "      actions: write" + nl
+    assert perm in good
+    fires(good.replace(perm, perm + "      contents: read" + nl, 1), "exactly actions: write")
+    step = "      - name: Dispatch validate and a11y on the refresh branch" + nl
+    assert step in good
+    fires(good.replace(step, "      - uses: actions/checkout@v6" + nl + step, 1), "no uses")
+    fires(good.replace(' || echo "::warning::could not dispatch', " # could not dispatch"), "warn")
+    fires(good.replace("      pr_number: ${{ steps.cpr.outputs.pull-request-number }}" + nl, ""), "pr_number")
+    fires(good.replace("    needs: [refresh, oecd-fetch]" + nl, "    needs: [refresh, oecd-fetch, dispatch-pr-ci]" + nl), "must not depend")
+    fires(good.replace("if: ${{ !cancelled() && needs.refresh", "if: ${{ needs.refresh"), "!cancelled()")
+    # string permissions (write-all) at the refresh job and at the workflow level
+    fires(good.replace(marker, marker + "    permissions: write-all" + nl, 1), "must be a mapping")
+    top = "permissions:" + nl + "  contents: write" + nl + "  pull-requests: write" + nl
+    assert top in good
+    fires(good.replace(top, "permissions: write-all" + nl, 1), "must be a mapping")
+    fires(good.replace(top, "permissions: read-all" + nl, 1), "must be a mapping")
+    fires(good.replace(' -R "$GITHUB_REPOSITORY"', "", 1), "GITHUB_REPOSITORY")
+    tok = "        env:" + nl + "          GH_TOKEN: ${{ github.token }}" + nl + "        run: |" + nl + "          for wf"
+    assert tok in good
+    fires(good.replace(tok, "        run: |" + nl + "          for wf", 1), "GH_TOKEN")
+    # validate.yml baseline mutations
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v.replace("  workflow_dispatch:" + nl, ""), a))
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v, a.replace("  workflow_dispatch:" + nl, "")))
+    vn = v.replace(chr(13) + nl, nl)
+    vbase = "base=" + chr(34) + "$(git rev-parse --verify --quiet 'origin/main^{commit}')" + chr(34)
+    assert vbase in vn
+    assert any("origin/main" in p for p in check_ci_dispatch(good, vn.replace(vbase, 'base="HEAD"', 1), a))
+    vexit = "exit 1" + nl + "            }" + nl
+    assert vexit in vn
+    assert any("fail closed" in p for p in check_ci_dispatch(good, vn.replace(vexit, ":" + nl + "            }" + nl, 1), a))
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, vn.replace('"$EVENT_NAME" = "workflow_dispatch"', '"$EVENT_NAME" = "other"'), a))
