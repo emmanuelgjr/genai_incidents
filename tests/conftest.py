@@ -84,21 +84,41 @@ def _no_real_network(monkeypatch):
     names the host), so a test that is silently networked fails loudly instead
     of depending on whatever upstream publishes today. Subprocess tests are
     separate processes and are unaffected."""
+    import ipaddress
     import socket
 
     real_gai = socket.getaddrinfo
     real_connect = socket.socket.connect
     real_connect_ex = socket.socket.connect_ex
-    loopback = {"localhost", "127.0.0.1", "::1", "", None}
+    real_sendto = socket.socket.sendto
+    real_sendmsg = getattr(socket.socket, "sendmsg", None)
+
+    def is_loopback(host):
+        """str or bytes; any 127.0.0.0/8 or ::1 literal, 'localhost', empty or None."""
+        if host is None:
+            return True
+        if isinstance(host, (bytes, bytearray)):
+            try:
+                host = bytes(host).decode("ascii")
+            except UnicodeDecodeError:
+                return False
+        if not isinstance(host, str):
+            return False
+        if host in ("", "localhost"):
+            return True
+        try:
+            return ipaddress.ip_address(host).is_loopback
+        except ValueError:
+            return False
 
     def gai(host, *a, **k):
-        if host not in loopback:
+        if not is_loopback(host):
             raise NetworkAccessAttempted(f"network access attempted: DNS lookup of {host!r}")
         return real_gai(host, *a, **k)
 
-    def _guard(addr):
-        if isinstance(addr, tuple) and addr and addr[0] not in loopback:
-            raise NetworkAccessAttempted(f"network access attempted: connect to {addr!r}")
+    def _guard(addr, what="connect to"):
+        if isinstance(addr, tuple) and addr and not is_loopback(addr[0]):
+            raise NetworkAccessAttempted(f"network access attempted: {what} {addr!r}")
 
     def connect(self, addr):
         _guard(addr)
@@ -108,6 +128,20 @@ def _no_real_network(monkeypatch):
         _guard(addr)
         return real_connect_ex(self, addr)
 
+    def sendto(self, data, *args):
+        # sendto(data, address) or sendto(data, flags, address): UDP needs no connect()
+        _guard(args[-1] if args else None, "sendto")
+        return real_sendto(self, data, *args)
+
+    def sendmsg(self, buffers, *args):
+        # sendmsg(buffers[, ancdata[, flags[, address]]])
+        if len(args) >= 3:
+            _guard(args[2], "sendmsg to")
+        return real_sendmsg(self, buffers, *args)
+
     monkeypatch.setattr(socket, "getaddrinfo", gai)
     monkeypatch.setattr(socket.socket, "connect", connect)
     monkeypatch.setattr(socket.socket, "connect_ex", connect_ex)
+    monkeypatch.setattr(socket.socket, "sendto", sendto)
+    if real_sendmsg is not None:
+        monkeypatch.setattr(socket.socket, "sendmsg", sendmsg)
