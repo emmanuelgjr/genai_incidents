@@ -304,3 +304,59 @@ def test_ci_dispatch_check_fires():
     assert vexit in vn
     assert any("fail closed" in p for p in check_ci_dispatch(good, vn.replace(vexit, ":" + nl + "            }" + nl, 1), a))
     assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, vn.replace('"$EVENT_NAME" = "workflow_dispatch"', '"$EVENT_NAME" = "other"'), a))
+
+
+# ---- threshold <-> PR-warning text -------------------------------------------------
+SOURCE_HEALTH = Path(__file__).resolve().parents[1] / "scripts" / "check_source_health.py"
+BS = chr(92)
+
+
+def check_threshold_text(workflow_text: str, health_text: str) -> list[str]:
+    """The PR warning says "failed N weeks running". N must equal the effective
+    consecutive-failure threshold (the --threshold the workflow passes to
+    check_source_health.py, else its DEFAULT_THRESHOLD) and the cron must be weekly,
+    otherwise one failed refresh is not one week."""
+    import yaml
+
+    problems = []
+    said = re.findall(r"failed (\d+) weeks running", workflow_text)
+    if len(said) != 1:
+        return [f"expected exactly one 'failed N weeks running' sentence, found {len(said)}"]
+    d = re.search(r"(?m)^DEFAULT_THRESHOLD\s*=\s*(\d+)", health_text)
+    if not d:
+        return ["DEFAULT_THRESHOLD not found in check_source_health.py"]
+    call = re.search(r"python scripts/check_source_health[.]py((?:[^\n]*" + re.escape(BS) + r"\n)*[^\n]*)", workflow_text)
+    if not call:
+        return ["workflow does not invoke check_source_health.py"]
+    passed = re.search(r"--threshold[ =](\d+)", call.group(1))
+    effective = int(passed.group(1)) if passed else int(d.group(1))
+    if int(said[0]) != effective:
+        problems.append(f"PR text says {said[0]} weeks but the effective threshold is {effective}")
+    crons = [c["cron"] for c in (yaml.safe_load(workflow_text).get(True) or {}).get("schedule", [])]
+    if len(crons) != 1:
+        problems.append(f"expected one cron entry, found {len(crons)}")
+    else:
+        f = crons[0].split()
+        if not (len(f) == 5 and f[2] == "*" and f[3] == "*" and re.fullmatch(r"[0-6]", f[4])):
+            problems.append(f"cron {crons[0]!r} is not weekly, so 'N weeks' != N consecutive failures")
+    return problems
+
+
+def test_pr_text_weeks_match_effective_threshold():
+    wf = WORKFLOW.read_text(encoding="utf-8")
+    assert check_threshold_text(wf, SOURCE_HEALTH.read_text(encoding="utf-8")) == []
+
+
+def test_threshold_text_check_fires():
+    wf = WORKFLOW.read_text(encoding="utf-8").replace(chr(13) + chr(10), chr(10))
+    h = SOURCE_HEALTH.read_text(encoding="utf-8")
+    assert "DEFAULT_THRESHOLD = 3" in h and "failed 3 weeks running" in wf and 'cron: "0 4 * * 0"' in wf
+    assert any("effective threshold" in p for p in check_threshold_text(wf.replace("failed 3 weeks", "failed 4 weeks"), h))
+    assert any("effective threshold" in p for p in check_threshold_text(wf, h.replace("DEFAULT_THRESHOLD = 3", "DEFAULT_THRESHOLD = 2")))
+    call = "python scripts/check_source_health.py " + BS + chr(10)
+    assert call in wf
+    pad = "            "
+    assert any("effective threshold" in p for p in check_threshold_text(wf.replace(call, call + pad + "--threshold 5 " + BS + chr(10)), h))
+    # an explicit threshold equal to the text is fine (control: the check is not just always-red)
+    assert check_threshold_text(wf.replace(call, call + pad + "--threshold 3 " + BS + chr(10)), h) == []
+    assert any("not weekly" in p for p in check_threshold_text(wf.replace('"0 4 * * 0"', '"0 4 * * *"'), h))
