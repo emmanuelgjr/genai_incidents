@@ -36,8 +36,8 @@ current ``taxonomy_versions()`` in ``REVISIONS`` (scripts/taxonomy_versions.py,
 ``tv_revision()``), added because every event carries the taxonomy-version
 machinetags, so a taxonomy pin change appends a ``REVISIONS`` row and moves every
 event. The same value is the manifest timestamp. See docs/VERSIONING.md
-("What bumps what in the exports") for the full table. The feed is byte-stable across rebuilds.
-MISP decides whether to re-pull an
+("What bumps what in the exports") for the full table. The feed is byte-stable
+across rebuilds. MISP decides whether to re-pull an
 event by comparing the manifest timestamp with its stored copy, so the stamp
 MUST move when an event's content moves: it does, because `updated` moves
 exactly when an entry's content fields change (merge_and_dedupe.py
