@@ -24,7 +24,12 @@ jobs:
       # read historical data via `git show <commit>:data/incidents.json`
       # (test_precision_audit::test_reproduces_from_pinned_blob) and
       # `git show v2.10.0:...` (test_resolve_id_status); a shallow clone made
-      # both skip. No other step in this job reads git history.
+      # both skip. Other git-history readers in this job (all need the full
+      # history/tags this checkout fetches): the "Re-merge" step (`git rev-parse
+      # origin/main`, `git cat-file -e` on the push `before` SHA, and, via
+      # GENAI_OVERRIDE_BASELINE, merge_and_dedupe.py's `git rev-parse`/`git show
+      # <baseline>:<file>`/`git log --all`). The re-render drift step runs
+      # `git status`/`git diff` on the working tree only, not on history.
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
