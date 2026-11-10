@@ -14,6 +14,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D146-2 advisories A1+A3+A4 DONE: MERGED to main 2026-11-10 (re-gate PASS on `9ae951aa`, 0 defects)
+**User directive 2026-11-10: "don't let it bounce again - check first".** The foreman pre-checked the fix against the code before the re-gate:
+- **Independent embedding map [R]**: the only pin value embedded in per-object content without a revision term is the OWASP LLM edition in the STIX incident `source_name` (export_stix.py:235/:246-247). Relationships carry no source_name (:296-316). The identity and MISP taxonomy-* tags are covered by the revision term, and ATLAS attack-patterns follow release_date.
+- The new text matched the map, and the `:507` bump trigger exists.
+**Re-gate VERDICT: PASS. DEFECTS: none.** Evidence the gate measured on 9ae951aa:
+1. Scope: 861f6bcb..9ae951aa is CHANGELOG + VERSIONING only; nothing under scripts/tests/mappings/data.
+2. Its own per-object re-pin probe, two arms. Row appended only: identity .004→.005Z, incident `modified` UNCHANGED despite the changed external_references, MISP event +1 s, attribute tags unchanged, no other STIX object moved. Row plus STIX EXPORTER_VERSION bump: the incident moves .001→.002Z. The paragraph predicts exactly this.
+3. Each new sentence checked against the code (the "no other pinned version" and "none in MISP attribute tags" claims and the ATLAS sentence are all TRUE).
+4. D2 matches :90 and its own append mutation.
+5. Drift rc 0; lint rc 0; targeted 104 passed; doc-reading tests 165 passed.
+6. Full suite at 861f6bcb (code identical): 1597 passed + 1 xfailed **[R by gate]**. At 9ae951aa: the specialist's run **[A]**.
+**First gate (bounce #1) evidence, retained:**
+- Digests re-derived from first principles via ast.literal_eval + canonical JSON (rows e536081a/70e3f3a1/8d74c826/d374465c), unchanged in history since each row was added; row 1 == v2.13.0 stats.
+- Gate mutations: TYPE fails, ADDKEY fails, KEYORDER passes (correct), APPEND5 passes the frozen test.
+- A1 name matches pin 2026.10.
+**Merge:** foreman strays check, both worktrees' porcelain empty. `--no-ff` onto main. Post-merge: targeted 32 passed; drift clean.
+**Follow-ups (advisories):** stale export_stix/export_misp module docstrings; no rule yet for reverting to an earlier pin set; the newest REVISIONS row can be edited after publication (documented); one overlong VERSIONING line (cosmetic).
+
 ### 🔁 D146-2 advisories: BOUNCE #1 (gate-adv on `861f6bcb`), 2026-11-10 → specialist redispatched with the defects
 **Specialist (testimony):**
 - Suite 1597 passed + 1 xfailed.
