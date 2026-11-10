@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D146-2 advisories: BOUNCE #1 (gate-adv on `861f6bcb`), 2026-11-10 → specialist redispatched with the defects
+**Specialist (testimony):**
+- Suite 1597 passed + 1 xfailed.
+- A1: TAXONOMIES:270 → `AML.T0085.002`; the other ids are not deprecated.
+- A4: the revision term applies only to the STIX identity and MISP rows (premise corrected: incident/relationship/attack-pattern/vulnerability stamps use EXPORTER_VERSION alone).
+- A3: tests/test_taxonomy_revisions_frozen.py freezes rows 1-4 by sha256 and position; fire proofs M1-M7 reported.
+- Foreman [R]: branch on origin at 861f6bcb, 4 files; TAXONOMIES grep shows T0057 only at :128.
+**VERDICT: BOUNCE. DEFECTS:**
+1. VERSIONING.md:517-523 "a taxonomy pin change does not bump EXPORTER_VERSION ... nothing else" is false for an OWASP LLM re-pin. The owasp_llm edition is embedded in every incident SDO's source_name (export_stix.py:66-74/:235/:247), and incident SDOs have no revision term (:240). **Gate probe:** with to_version 2027 and row 5 appended, source_name owasp-llm-top10-2026→2027 while incident `modified` stayed `.001Z`. The new bold rule contradicts the :507 trigger.
+2. CHANGELOG.md:12 "appending a row needs no test edit" is false at repo level: the gate's append mutation failed test_taxonomy_pins_maestro_nist.py:90 (`tv_revision() == 4 == len(REVISIONS)`).
+**Advisories:**
+- The removed undated-re-pin clause loses nothing for ASI (constant source_name), VERIS (covered by the mapping trigger) or CAPEC (null pin; not exported).
+- Pre-existing: reverting to an earlier pin set is unsupported (tv_revision first-match plus the distinct-rows test); a rule is needed some day.
+- The newest unfrozen row can still be edited after publication without failing (documented limit).
+- Stale export_stix/export_misp module docstrings → follow-up.
+
 ### ▶ 2026-11-10 dispatches (main `8b03390e`), two worktrees in parallel on disjoint files
 - **D146-2 advisories A1+A3+A4** (WS3 schema-architect `d1462-adv`), branch `ws3/d146-2-advisories-2026-11-10`, worktree `C:/repos/gi-wt-d1462a`:
   - A1: the TAXONOMIES.md:270 ShadowLeak example moves AML.T0057 → AML.T0085.002;
