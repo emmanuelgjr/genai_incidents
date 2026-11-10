@@ -29,8 +29,15 @@ unrelated incidents per row.
 
 Determinism: event/attribute UUIDs are UUIDv5 and every ``timestamp`` is derived
 from the data -- an event's timestamp is the newest `updated` date among its
-incidents (UTC midnight, unix seconds) plus ``EXPORTER_VERSION`` seconds -- so
-the feed is byte-stable across rebuilds. MISP decides whether to re-pull an
+incidents (per incident falling back to `added`; the year's Jan 1 only if none
+parse), as UTC midnight unix seconds, plus ``EXPORTER_VERSION`` seconds plus
+``(revision - 1)`` seconds -- ``revision`` being the 1-based index of the
+current ``taxonomy_versions()`` in ``REVISIONS`` (scripts/taxonomy_versions.py,
+``tv_revision()``), added because every event carries the taxonomy-version
+machinetags, so a taxonomy pin change appends a ``REVISIONS`` row and moves every
+event. The same value is the manifest timestamp. See docs/VERSIONING.md
+("What bumps what in the exports") for the full table. The feed is byte-stable across rebuilds.
+MISP decides whether to re-pull an
 event by comparing the manifest timestamp with its stored copy, so the stamp
 MUST move when an event's content moves: it does, because `updated` moves
 exactly when an entry's content fields change (merge_and_dedupe.py

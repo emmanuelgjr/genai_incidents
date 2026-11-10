@@ -30,6 +30,17 @@ mapping from entry to SDO changes (a new `x_` property, a relabelled
 `source_name`), and every object moves forward by 1 ms per bump -- a STIX
 consumer that dedupes on (id, modified) then re-imports exactly the objects the
 exporter changed. `modified >= created` always holds (clamped).
+
+The per-SDO formula above (incident SDOs, relationships, attack-patterns,
+vulnerabilities) uses `EXPORTER_VERSION` alone. Only the `identity` SDO adds
+`+ (revision - 1)` to that millisecond field, where `revision` is the 1-based
+index of the current `taxonomy_versions()` in `REVISIONS`
+(scripts/taxonomy_versions.py, `tv_revision()`). A taxonomy pin change
+therefore appends a `REVISIONS` row, which moves the `identity` alone. If the
+pinned value is also embedded in per-object content (today: the OWASP LLM
+edition in the incident `source_name`, via `_owasp_llm_source_name`), it needs
+an `EXPORTER_VERSION` bump too, so those objects move. See docs/VERSIONING.md
+("What bumps what in the exports") for the full table.
 """
 
 from __future__ import annotations
