@@ -14,6 +14,63 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ Exporter docstring follow-up DONE: MERGED 2026-11-10 (gate-expdoc PASS on `371486b0`, first gate, 0 defects)
+WS6 distribution-engineer `expdoc`, branch `ws6/export-docstrings-2026-11-10`. It closes the D146-2 advisories' "stale export_stix/export_misp module docstrings".
+- **Foreman pre-check before the gate:** it found one imprecise sentence. "the per-SDO formula above (…attack-patterns, vulnerabilities)" applies only to the millisecond field, not to the date. Fixed before gating. CR=0 in both blobs.
+**VERDICT: PASS. DEFECTS: none.** Evidence the gate measured:
+- **Docstring-only, by an AST route.** AST-minus-docstrings is equal for both files; the full AST differs. A control mutation (`- 1`→`- 2`) was detected.
+- **Live build_bundle over 15,821 incidents, millisecond field by object type:** attack-pattern .001×54, relationship .001×40,532, vulnerability .001×9,132, incident .001×15,821, identity .004×1. 0 clamp cases.
+- **Tests and drift:** test_export_* 59 passed; drift clean. Every new sentence is consistent with VERSIONING.md:493-541 and the inline comments.
+**Advisories:**
+- A2: exact only "unless clamped" (0 cases today).
+- A4: the MISP fallback skips an incident with an unparseable `updated` (0 cases).
+- A5: "added because" wording (cosmetic).
+- **A6 follow-up:** the generated MISP README text at export_misp.py:313-316 still describes the event timestamp as the newest `updated` only.
+- A7: 81-column lines (cosmetic).
+
+### ✅ D146-2 advisories A1+A3+A4 DONE: MERGED to main 2026-11-10 (re-gate PASS on `9ae951aa`, 0 defects)
+**User directive 2026-11-10: "don't let it bounce again - check first".** The foreman pre-checked the fix against the code before the re-gate:
+- **Independent embedding map [R]**: the only pin value embedded in per-object content without a revision term is the OWASP LLM edition in the STIX incident `source_name` (export_stix.py:235/:246-247). Relationships carry no source_name (:296-316). The identity and MISP taxonomy-* tags are covered by the revision term, and ATLAS attack-patterns follow release_date.
+- The new text matched the map, and the `:507` bump trigger exists.
+**Re-gate VERDICT: PASS. DEFECTS: none.** Evidence the gate measured on 9ae951aa:
+1. Scope: 861f6bcb..9ae951aa is CHANGELOG + VERSIONING only; nothing under scripts/tests/mappings/data.
+2. Its own per-object re-pin probe, two arms. Row appended only: identity .004→.005Z, incident `modified` UNCHANGED despite the changed external_references, MISP event +1 s, attribute tags unchanged, no other STIX object moved. Row plus STIX EXPORTER_VERSION bump: the incident moves .001→.002Z. The paragraph predicts exactly this.
+3. Each new sentence checked against the code (the "no other pinned version" and "none in MISP attribute tags" claims and the ATLAS sentence are all TRUE).
+4. D2 matches :90 and its own append mutation.
+5. Drift rc 0; lint rc 0; targeted 104 passed; doc-reading tests 165 passed.
+6. Full suite at 861f6bcb (code identical): 1597 passed + 1 xfailed **[R by gate]**. At 9ae951aa: the specialist's run **[A]**.
+**First gate (bounce #1) evidence, retained:**
+- Digests re-derived from first principles via ast.literal_eval + canonical JSON (rows e536081a/70e3f3a1/8d74c826/d374465c), unchanged in history since each row was added; row 1 == v2.13.0 stats.
+- Gate mutations: TYPE fails, ADDKEY fails, KEYORDER passes (correct), APPEND5 passes the frozen test.
+- A1 name matches pin 2026.10.
+**Merge:** foreman strays check, both worktrees' porcelain empty. `--no-ff` onto main. Post-merge: targeted 32 passed; drift clean.
+**Follow-ups (advisories):** stale export_stix/export_misp module docstrings; no rule yet for reverting to an earlier pin set; the newest REVISIONS row can be edited after publication (documented); one overlong VERSIONING line (cosmetic).
+
+### 🔁 D146-2 advisories: BOUNCE #1 (gate-adv on `861f6bcb`), 2026-11-10 → specialist redispatched with the defects
+**Specialist (testimony):**
+- Suite 1597 passed + 1 xfailed.
+- A1: TAXONOMIES:270 → `AML.T0085.002`; the other ids are not deprecated.
+- A4: the revision term applies only to the STIX identity and MISP rows (premise corrected: incident/relationship/attack-pattern/vulnerability stamps use EXPORTER_VERSION alone).
+- A3: tests/test_taxonomy_revisions_frozen.py freezes rows 1-4 by sha256 and position; fire proofs M1-M7 reported.
+- Foreman [R]: branch on origin at 861f6bcb, 4 files; TAXONOMIES grep shows T0057 only at :128.
+**VERDICT: BOUNCE. DEFECTS:**
+1. VERSIONING.md:517-523 "a taxonomy pin change does not bump EXPORTER_VERSION ... nothing else" is false for an OWASP LLM re-pin. The owasp_llm edition is embedded in every incident SDO's source_name (export_stix.py:66-74/:235/:247), and incident SDOs have no revision term (:240). **Gate probe:** with to_version 2027 and row 5 appended, source_name owasp-llm-top10-2026→2027 while incident `modified` stayed `.001Z`. The new bold rule contradicts the :507 trigger.
+2. CHANGELOG.md:12 "appending a row needs no test edit" is false at repo level: the gate's append mutation failed test_taxonomy_pins_maestro_nist.py:90 (`tv_revision() == 4 == len(REVISIONS)`).
+**Advisories:**
+- The removed undated-re-pin clause loses nothing for ASI (constant source_name), VERIS (covered by the mapping trigger) or CAPEC (null pin; not exported).
+- Pre-existing: reverting to an earlier pin set is unsupported (tv_revision first-match plus the distinct-rows test); a rule is needed some day.
+- The newest unfrozen row can still be edited after publication without failing (documented limit).
+- Stale export_stix/export_misp module docstrings → follow-up.
+
+### ▶ 2026-11-10 dispatches (main `8b03390e`), two worktrees in parallel on disjoint files
+- **D146-2 advisories A1+A3+A4** (WS3 schema-architect `d1462-adv`), branch `ws3/d146-2-advisories-2026-11-10`, worktree `C:/repos/gi-wt-d1462a`:
+  - A1: the TAXONOMIES.md:270 ShadowLeak example moves AML.T0057 → AML.T0085.002;
+  - A4: the VERSIONING.md:493-500 export table gains the `+ (revision − 1)` term, and the superseded "bump EXPORTER_VERSION" rule is corrected;
+  - A3: a REVISIONS append-only frozen-digest test, with fire proofs.
+- **Refresh-PR independent CI** (WS4 pipeline-engineer `prci`), branch `ws4/refresh-pr-ci-dispatch-2026-11-10`, worktree `C:/repos/gi-wt-prci`:
+  - **Finding (foreman [R]):** bot-opened refresh PRs get their Validate/a11y `pull_request` runs held at `action_required`, so they never run. `gh pr checks 103` listed only CodeQL. Refresh PRs have therefore merged with no CI independent of the refresh job (agreement 6 form b), and the held runs flip to `failure` after merge.
+  - Fix: `workflow_dispatch` on validate/a11y, plus a non-blocking dispatch step after the cpr step (GITHUB_TOKEN may trigger workflow_dispatch). The proof is a dispatch on the specialist's own branch; per D148-2, no live dispatch of auto-refresh.
+
 ### ✅ 2026-11-10 — D152 executed: PR #103 merged (`9ccc0f45`), D146-2 merged onto the refreshed main
 **User directive 2026-11-10:** "incident count is stale refresh and fix any workflow". The foreman took this as the go-ahead for D152 step 1, which was reserved to the user's review of PR #103.
 - **Foreman per-entity review of PR #103 [R]** (the PR as regenerated 11-08, base `7c34ddc8` = main, so not stale). The comparison was ID-keyed between origin/main and origin/auto-refresh/data in data/incidents.json:

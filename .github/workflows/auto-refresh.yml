@@ -613,7 +613,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: refresh
-    if: ${{ needs.refresh.outputs.pr_number != '' }}
+    # !cancelled(): a bare `if` carries an implicit success() over the whole needs
+    # chain, so a failed cve-sweep (refresh still runs, `!cancelled()`) would skip this.
+    if: ${{ !cancelled() && needs.refresh.outputs.pr_number != '' }}
     permissions:
       actions: write
     steps:
