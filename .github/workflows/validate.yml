@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Independent CI for the weekly refresh PR. A PR opened with GITHUB_TOKEN
+  # (peter-evans/create-pull-request) does not trigger `pull_request` workflows
+  # (they sit at action_required), but GITHUB_TOKEN MAY trigger workflow_dispatch;
+  # auto-refresh.yml dispatches this on auto-refresh/data after opening the PR.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -51,6 +56,16 @@ jobs:
         run: |
           if [ "$EVENT_NAME" = "pull_request" ]; then
             base="HEAD^1"
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            # PR-equivalent baseline for a dispatched run on a branch: the tip of
+            # main (what HEAD^1 is in a pull_request merge commit). There is no
+            # push `before` SHA here. Fail closed if origin/main is unreadable.
+            # Note: a dispatched run checks out the branch head, not a merge
+            # with main, so it does not see interactions with newer main commits.
+            base="$(git rev-parse --verify --quiet 'origin/main^{commit}')" || {
+              echo "::error::workflow_dispatch baseline origin/main does not resolve (D141 fail-closed)"
+              exit 1
+            }
           else
             base="$PUSH_BEFORE"
             if [ -z "$base" ] \

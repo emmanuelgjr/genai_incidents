@@ -7,6 +7,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - independent CI on the weekly refresh PR (tooling only; data unchanged)
+
+- A PR opened with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so "Validate dataset" and the accessibility workflow sat at `action_required` on refresh PRs (e.g. #103) and reviewers merged with no CI run independent of the refresh job. `validate.yml` and `a11y.yml` (already dispatchable) now accept `workflow_dispatch`, and `auto-refresh.yml` dispatches both on `auto-refresh/data` after opening or updating the PR (job-level `actions: write`; a failed dispatch only warns). A dispatched validate run uses the tip of `main` as the override baseline, the equivalent of `HEAD^1` in a PR run. Test: `tests/test_auto_refresh_workflow.py`.
+
 ### Added - MAESTRO and NIST AI RMF pinned in `taxonomy_versions` (D146-2; data unchanged)
 
 - **What.** `taxonomy_versions` gains `maestro: "1.0"` (from `mappings/maestro_layers.json` `version`) and `nist_ai_rmf: "1.0"` (from `mappings/nist_ai_rmf.json` `version`), closing the asymmetry recorded under D133. It now reaches `data/stats.json`, `build_manifest.json`, `genai_incidents.taxonomy_versions()`, the STIX `identity` object's `x_taxonomy_versions`, the Hugging Face card and every MISP event (new machinetags `genai-incidents:taxonomy-maestro="1.0"` and `genai-incidents:taxonomy-nist-ai-rmf="1.0"`).

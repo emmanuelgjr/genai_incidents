@@ -175,3 +175,67 @@ def test_refresh_budget_check_fires():
         "      - name: Refresh OECD AI Incidents Monitor" + nl + "        timeout-minutes: 65" + nl
         + "        run: python scripts/ingest_oecd_aim.py" + nl + kev, 1)
     assert any("must not run in the refresh job" in x for x in check_refresh_budget(back))
+
+
+# ---------------------------------------------------------------------------
+# Independent CI for the refresh PR. A PR opened with GITHUB_TOKEN does not
+# trigger pull_request workflows (runs stay action_required), so the refresh job
+# dispatches them (workflow_dispatch is the documented GITHUB_TOKEN exception).
+
+DISPATCHED = ("validate.yml", "a11y.yml")
+WF_DIR = WORKFLOW.parent
+
+
+def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str]:
+    import yaml
+
+    problems = []
+    job = yaml.safe_load(text)["jobs"]["refresh"]
+    ids = [s.get("id") for s in job["steps"]]
+    step = next((s for s in job["steps"] if "gh workflow run" in s.get("run", "")), None)
+    if step is None:
+        return ["no step runs `gh workflow run`"]
+    if ids.index("cpr") >= job["steps"].index(step):
+        problems.append("dispatch step must come after the cpr step")
+    if "steps.cpr.outputs.pull-request-number != ''" not in str(step.get("if", "")):
+        problems.append("dispatch step must be guarded on a non-empty pull-request-number")
+    if step.get("continue-on-error") is not True:
+        problems.append("dispatch step must be continue-on-error (never blocks the PR)")
+    for wf in DISPATCHED:
+        if wf not in step["run"]:
+            problems.append(f"{wf} not in the dispatch loop")
+    if "--ref auto-refresh/data" not in step["run"]:
+        problems.append("dispatch must target --ref auto-refresh/data")
+    if "|| echo \"::warning::" not in step["run"]:
+        problems.append("a failed dispatch must warn, not fail")
+    if (job.get("permissions") or {}).get("actions") != "write":
+        problems.append("refresh job needs job-level actions: write")
+    for k in ("contents", "pull-requests"):
+        if (job.get("permissions") or {}).get(k) != "write":
+            problems.append(f"job-level permissions replace the workflow block; {k}: write was lost")
+    for label, body in (("validate.yml", validate_text), ("a11y.yml", a11y_text)):
+        if "workflow_dispatch" not in (yaml.safe_load(body).get(True) or {}):  # PyYAML parses `on` as True
+            problems.append(f"{label} has no workflow_dispatch trigger")
+    if "workflow_dispatch" not in validate_text.split("Re-merge from ingest sources", 1)[1].split("Validate incidents.json", 1)[0]:
+        problems.append("validate.yml re-merge baseline does not handle workflow_dispatch (would fail closed)")
+    return problems
+
+
+def test_refresh_dispatches_independent_ci():
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8")
+    a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
+    assert check_ci_dispatch(WORKFLOW.read_text(encoding="utf-8"), v, a) == []
+
+
+def test_ci_dispatch_check_fires():
+    good = WORKFLOW.read_text(encoding="utf-8")
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8")
+    a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
+    assert check_ci_dispatch(good.replace("gh workflow run", "gh echo"), v, a)
+    assert any("guarded" in p for p in check_ci_dispatch(
+        good.replace("if: steps.cpr.outputs.pull-request-number != ''\n        continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf", "continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf"), v, a))
+    assert any("continue-on-error" in p for p in check_ci_dispatch(
+        good.replace("        continue-on-error: true\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf", "        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          for wf"), v, a))
+    assert any("actions: write" in p for p in check_ci_dispatch(good.replace("      actions: write\n", ""), v, a))
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v.replace("  workflow_dispatch:\n", ""), a))
+    assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, v, a.replace("  workflow_dispatch:\n", "")))
