@@ -14,6 +14,15 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ▶ 2026-11-10 dispatches (main `8b03390e`), two worktrees in parallel on disjoint files
+- **D146-2 advisories A1+A3+A4** (WS3 schema-architect `d1462-adv`), branch `ws3/d146-2-advisories-2026-11-10`, worktree `C:/repos/gi-wt-d1462a`:
+  - A1: the TAXONOMIES.md:270 ShadowLeak example moves AML.T0057 → AML.T0085.002;
+  - A4: the VERSIONING.md:493-500 export table gains the `+ (revision − 1)` term, and the superseded "bump EXPORTER_VERSION" rule is corrected;
+  - A3: a REVISIONS append-only frozen-digest test, with fire proofs.
+- **Refresh-PR independent CI** (WS4 pipeline-engineer `prci`), branch `ws4/refresh-pr-ci-dispatch-2026-11-10`, worktree `C:/repos/gi-wt-prci`:
+  - **Finding (foreman [R]):** bot-opened refresh PRs get their Validate/a11y `pull_request` runs held at `action_required`, so they never run. `gh pr checks 103` listed only CodeQL. Refresh PRs have therefore merged with no CI independent of the refresh job (agreement 6 form b), and the held runs flip to `failure` after merge.
+  - Fix: `workflow_dispatch` on validate/a11y, plus a non-blocking dispatch step after the cpr step (GITHUB_TOKEN may trigger workflow_dispatch). The proof is a dispatch on the specialist's own branch; per D148-2, no live dispatch of auto-refresh.
+
 ### ✅ 2026-11-10 — D152 executed: PR #103 merged (`9ccc0f45`), D146-2 merged onto the refreshed main
 **User directive 2026-11-10:** "incident count is stale refresh and fix any workflow". The foreman took this as the go-ahead for D152 step 1, which was reserved to the user's review of PR #103.
 - **Foreman per-entity review of PR #103 [R]** (the PR as regenerated 11-08, base `7c34ddc8` = main, so not stale). The comparison was ID-keyed between origin/main and origin/auto-refresh/data in data/incidents.json:
