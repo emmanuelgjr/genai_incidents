@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ A6 MISP README timestamp text DONE: MERGED 2026-11-10 (re-gate PASS on `d586116f` after bounce #1)
+WS6 `expdoc`, branch `ws6/misp-readme-stamp-2026-11-10`. It is A6 from gate-expdoc: the generated feed README in export_misp.py, plus DATA_DICTIONARY.md:283.
+- **Bounce #1 (gate-mispreadme on d40df536):** 1 defect. "re-pulls … when the exporter changes" is false: only an EXPORTER_VERSION bump moves the stamp, and the paragraph contradicted itself. **Foreman note:** the foreman flagged this phrase as doubtful in its own gate brief but did not resolve it before gating. Lesson: resolve a pre-check doubt before gating; don't hand it to the gate.
+- **Fix:** foreman-supplied VERBATIM text (D150 pattern) plus a string check. The gate's advisory B (DATA_DICTIONARY:283 lacked the revision term) was folded in, and ASCII "-" now replaces a lone U+2212.
+**Re-gate VERDICT: PASS. DEFECTS: none.** Evidence the gate measured:
+- Each sentence checked against export_misp.py:102-118, taxonomy_versions.py:95-104 and merge_and_dedupe.py:2053-2069.
+- AST: with the _write_readme strings blanked the trees are equal; raw they are not (control).
+- Rendered README clean (braces 1/1, backticks balanced).
+- Tests: 57 passed + 1 xfailed (the pre-existing WS6-T9 marker). Drift clean. Scope: 2 files.
+**Advisories:** DATA_DICTIONARY:283 omits the Jan-1 fallback (never fires today); export_misp.py:313 is a 114-character line (cosmetic).
+
 ### 🔁 Refresh-PR independent CI: BOUNCE #1 (gate-prci on `125a19ee`), 2026-11-10 → specialist redispatched with defects + folded advisories
 **Specialist (testimony):**
 - `dispatch-pr-ci` is a separate job with only `actions: write`, no checkout and no `uses:`. It is the security-review correction: refresh holds no actions scope.
