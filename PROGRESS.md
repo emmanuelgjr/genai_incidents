@@ -14,6 +14,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ Exporter docstring follow-up DONE: MERGED 2026-11-10 (gate-expdoc PASS on `371486b0`, first gate, 0 defects)
+WS6 distribution-engineer `expdoc`, branch `ws6/export-docstrings-2026-11-10`. It closes the D146-2 advisories' "stale export_stix/export_misp module docstrings".
+- **Foreman pre-check before the gate:** it found one imprecise sentence. "the per-SDO formula above (…attack-patterns, vulnerabilities)" applies only to the millisecond field, not to the date. Fixed before gating. CR=0 in both blobs.
+**VERDICT: PASS. DEFECTS: none.** Evidence the gate measured:
+- **Docstring-only, by an AST route.** AST-minus-docstrings is equal for both files; the full AST differs. A control mutation (`- 1`→`- 2`) was detected.
+- **Live build_bundle over 15,821 incidents, millisecond field by object type:** attack-pattern .001×54, relationship .001×40,532, vulnerability .001×9,132, incident .001×15,821, identity .004×1. 0 clamp cases.
+- **Tests and drift:** test_export_* 59 passed; drift clean. Every new sentence is consistent with VERSIONING.md:493-541 and the inline comments.
+**Advisories:**
+- A2: exact only "unless clamped" (0 cases today).
+- A4: the MISP fallback skips an incident with an unparseable `updated` (0 cases).
+- A5: "added because" wording (cosmetic).
+- **A6 follow-up:** the generated MISP README text at export_misp.py:313-316 still describes the event timestamp as the newest `updated` only.
+- A7: 81-column lines (cosmetic).
+
 ### ✅ D146-2 advisories A1+A3+A4 DONE: MERGED to main 2026-11-10 (re-gate PASS on `9ae951aa`, 0 defects)
 **User directive 2026-11-10: "don't let it bounce again - check first".** The foreman pre-checked the fix against the code before the re-gate:
 - **Independent embedding map [R]**: the only pin value embedded in per-object content without a revision term is the OWASP LLM edition in the STIX incident `source_name` (export_stix.py:235/:246-247). Relationships carry no source_name (:296-316). The identity and MISP taxonomy-* tags are covered by the revision term, and ATLAS attack-patterns follow release_date.
