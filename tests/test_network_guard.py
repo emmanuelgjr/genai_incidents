@@ -14,7 +14,9 @@ def blocked():
     return pytest.raises(AssertionError, match="network access attempted")
 
 
-REMOTE_V4 = "93.184.216.34"
+# Unroutable documentation addresses: TEST-NET-1 (RFC 5737) and 2001:db8::/32 (RFC 3849),
+# so a guard regression cannot send a packet to a real host.
+REMOTE_V4 = "192.0.2.1"
 REMOTE_V6 = "2001:db8::1"
 
 
@@ -33,6 +35,8 @@ def test_loopback_hosts_resolve(host):
 def test_connect_variants_to_remote_raise():
     s4 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s6 = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    s4.settimeout(1)
+    s6.settimeout(1)  # bound the cost if a mutant lets a connect through
     try:
         with blocked():
             s4.connect((REMOTE_V4, 80))
