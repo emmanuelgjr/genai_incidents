@@ -14,6 +14,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🟢 Main CI GREEN on the SHA-pinned Actions (`4a31e025`, D134(ii) merge + board), 2026-11-11, and Dependabot is live
+- **[R] `gh run list`** on 4a31e025: Validate dataset ✅, Site accessibility + integrity ✅, Deploy GitHub Pages ✅, CodeQL ✅, Dependabot Updates ✅. This is the first live run of all 44 pinned `uses:`, and the proof no gate could give.
+- **Dependabot opened 5 PRs at once:**
+  - **#107** pypi-publish 1.14.2→1.14.3 (patch)
+  - **#108** create-pull-request 8.1.1→8.1.2 (patch)
+  - **#105** checkout 6.1.0→**7.0.1** (MAJOR)
+  - **#106** setup-chrome 1.7.3→**2.2.0** (MAJOR)
+  - **#109** configure-pages 5.0.0→**6.0.0** (MAJOR)
+- **None merged; foreman recommendation for the user:**
+  - merge the two patch PRs once their CI is green;
+  - hold the three majors for individual review (release notes + gated CI), since D134(ii) deliberately stayed within the current major;
+  - optionally add a Dependabot `ignore: update-types: ["version-update:semver-major"]` rule so majors arrive only on request.
+- Note: create-pull-request is also used by auto-refresh.yml; #108 touches the refresh job (D148-2: no live dispatch). Its first real exercise is the Sun 11-15 refresh.
+
 ### ✅ D134(ii) SHA-pin Actions + dependabot DONE: MERGED 2026-11-11 (`fd8ff9ca`; gate-d134ii re-gate PASS on `4eccf6e9` after bounce #1)
 **What merged** (13 files, +149/−40; 0 data/):
 - **Pins:** all **40** unpinned `uses:` lines are pinned (the ruling's "33" was stale; the workflows grew). Each is pinned to the current release of the same major as `@<sha> # vX.Y.Z`: checkout v6.1.0, setup-python v6.3.0, upload-artifact v4.6.2, download-artifact v4.3.0, setup-ruby v1.338.0, setup-chrome v1.7.3, upload-pages-artifact v3.0.1, setup-node v5.0.0, deploy-pages v4.0.5, configure-pages v5.0.0.
