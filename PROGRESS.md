@@ -14,6 +14,26 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D134(ii) SHA-pin Actions + dependabot: BOUNCE #1 (gate-d134ii on `144f2281`), 2026-11-11 → redispatched
+**Defect:**
+1. tests/test_actions_pinned.py:34 globs only `.github/workflows/*.yml`. A new `.github/workflows/new.yaml` with `uses: actions/checkout@v6` → 3 passed (MISS). A composite action `.github/actions/x/action.yml` → MISS. The docstring and CHANGELOG claim that any `uses:` fails. Neither file type exists today, so no pin is missing; the gap is in the guard.
+
+**Gate evidence (own route, git ls-remote with peel, not the gh API):**
+- All 10 pins equal the CURRENT target of the floating major ref (v1 of setup-ruby is a branch). Each is the highest vM.x.y of its major, so there is no behaviour delta.
+- **Workflows:** a masked-`uses:` diff is identical in all 10 (the mask was shown to fire on a control). 40 one-for-one same-action swaps.
+- **Coverage:** a YAML parse of .github/**/*.y*ml gives 44 `uses:`, all 40-hex.
+- **Full suite** on the merge with 9b53ee69: **1647 passed, 1 skipped, 1 xfailed.** actionlint rc 0.
+- **Mutations:** 5 fired; the `.yaml` workflow and the composite action missed (= the defect).
+- **dependabot.yml:** schema-valid.
+- **Scope and strays:** 0 data/ paths; no strays.
+
+**Advisories:**
+- The pre-existing pins are behind within their majors (create-pull-request v8.1.1 vs v8.1.3; pypi-publish v1.14.2 vs v1.14.3); Dependabot will raise these.
+- Leaving pip out is consistent with the literal ruling and is a candidate follow-up.
+- The test does not check that the comment matches the sha; Dependabot maintains that.
+
+**Foreman pre-check miss:** my mutations varied the `uses:` line shape, not file discovery.
+
 ### 🔍 D130-3a REPORTED `1b66e40e` (2026-11-11), held for rework before the gate; foreman method calls recorded
 **Specialist report (testimony):**
 - **Target list:** committed at `d95c874e` (`docs/audits/reference-audit-2026-11-11/derive_list.py` + list.json): 126 non-legacy R1∪R2 rows + 6 deferred = 132, in batches 0-4.
