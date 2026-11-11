@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D134(i) `load_incidents()` default: BOUNCE #1 (gate-d134i on `a422c174`), 2026-11-11 → specialist redispatched with verbatim text
+**Defects** (code and data correct; 3 text defects + 1 test gap):
+1. **Module docstring** (`__init__.py:4-5`) still says "Use :func:`load_incidents` for the full slim dataset". That is false under the new default.
+2. **DATA_DICTIONARY Access line (:280)** presents the new signature as the `pip install` behaviour. PyPI v2.13.0 has `load_incidents()` with no parameter, so `include_retracted=True` raises TypeError there. The README got the "not yet in a PyPI release" qualifier; this line did not.
+3. **CHANGELOG** says the `resolve_*()` docstrings changed. No `resolve_*` docstring hunk exists.
+4. **Test gap.** The gate's mutants M8 (query() skips unverified rows) and M9 (by_cve() drops retracted rows) pass all 87 tests. Only one retracted row is pinned, via by_id/query.
+
+**Gate evidence:**
+- **Merge onto 3046cd46:** only the CHANGELOG conflicted, resolved by keeping both entries.
+- **Full suite:** **1622 passed, 1 skipped, 1 xfailed.**
+- **Scope and data:** 5 files, 0 data/ paths. min.json is byte-identical between data/ and the package. 15,821 rows: none 15,760 / retracted (cve-rejected) 29 / disputed 22 / unverified (no-confirmed-source) 10; 15,821 − 29 − 10 = 15,782 = stats.
+- **Filter semantics** match check_stats_drift.py:251 and merge_and_dedupe.py:3975. The schema enum blocks unknown statuses.
+- **Drift gate fires:** planted retracted 29→30 gives rc 1, and unverified and incident_count plants are named.
+- **Live-surface sweep:** only defects 1 and 2 are stale.
+- **Mutants:** M4 killed; M3, M5 and M7 equivalent or harmless; M1 (the lru_cached list returned itself) and M2/M6 (order) unpinned.
+- **Strays:** none; HEADs attached.
+
+**Advisories** (cheap ones folded into the redispatch):
+- A1: pin that a fresh list is returned and that file order is kept.
+- A2: the docstring should say rows with no status are kept.
+- A3: "cut recipe becomes" → the identity dates from D130.
+- A4: README "the data files" → name data/incidents.json and the slim JSON, since the site's incidents.core.json drops these rows.
+- A5: a test that `_NOT_STANDING` equals scripts/entry_status.NOT_STANDING.
+- A6: the pyproject version is still 2.13.0 on main; that is for the next cut.
+
+**Foreman pre-check miss:** the foreman fixed the README "now" wording but did not sweep the other surface that had the same pip/main ambiguity (the DATA_DICTIONARY line), or the module docstring.
+**Redispatch:** verbatim text for defects 1-3; specified tests for defect 4 + A1/A5. Note: 0 unverified rows carry a CVE, so by_cve is pinned on a retracted row only. The foreman re-runs M1/M2/M8/M9 + string checks before re-gate.
+
 ### ✅ WS4 follow-ups bundle DONE: MERGED 2026-11-11 (`cc8c91e8`; gate-ws4f re-gate PASS on `588c064d` after bounce #1)
 **What merged** (6 files, +510/−26; no data/ or scripts/ changes; the workflow diff is comment-only):
 - **Threshold test:** `check_threshold_text` ties "failed 3 weeks running" to the effective threshold and the weekly cron.
