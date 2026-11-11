@@ -1,5 +1,7 @@
 """D134(ii): every workflow `uses:` is pinned to a full 40-hex commit SHA with a
-trailing `# vX...` release comment; dependabot keeps the pins moving."""
+trailing `# vX...` release comment; dependabot keeps the pins moving.
+
+The check covers `.github/workflows/*.y*ml` and `.github/actions/**/action.y*ml`."""
 
 from __future__ import annotations
 
@@ -30,11 +32,48 @@ def check_pins(name: str, text: str) -> list[str]:
     return problems
 
 
+def workflow_files(root: Path) -> list[Path]:
+    gh = root / ".github"
+    found = set()
+    for ext in ("yml", "yaml"):
+        found.update(gh.glob(f"workflows/*.{ext}"))
+        found.update(gh.glob(f"actions/**/action.{ext}"))
+    return sorted(found)
+
+
+def check_tree(root: Path) -> list[str]:
+    return [
+        p
+        for f in workflow_files(root)
+        for p in check_pins(f.relative_to(root).as_posix(), f.read_text(encoding="utf-8"))
+    ]
+
+
 def test_every_workflow_action_is_sha_pinned_with_version_comment():
-    files = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
-    assert files
-    problems = [p for f in files for p in check_pins(f.name, f.read_text(encoding="utf-8"))]
+    assert workflow_files(ROOT)
+    problems = check_tree(ROOT)
     assert not problems, "\n".join(problems)
+
+
+def test_workflow_file_discovery_covers_yaml_and_composite_actions(tmp_path):
+    names = [
+        ".github/workflows/a.yml",
+        ".github/workflows/b.yaml",
+        ".github/actions/x/action.yml",
+        ".github/actions/y/z/action.yaml",
+    ]
+    for n in names + [".github/workflows/readme.md"]:
+        f = tmp_path / n
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("# nothing\n", encoding="utf-8")
+    assert [f.relative_to(tmp_path).as_posix() for f in workflow_files(tmp_path)] == sorted(names)
+    assert check_tree(tmp_path) == []
+    bad = "      - uses: actions/checkout@v6\n"
+    (tmp_path / ".github/workflows/b.yaml").write_text(bad, encoding="utf-8")
+    (tmp_path / ".github/actions/x/action.yml").write_text(bad, encoding="utf-8")
+    problems = check_tree(tmp_path)
+    assert any(p.startswith(".github/workflows/b.yaml:") for p in problems)
+    assert any(p.startswith(".github/actions/x/action.yml:") for p in problems)
 
 
 def test_pin_check_fires():
