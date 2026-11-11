@@ -259443,6 +259443,11 @@
           "type": "research"
         },
         {
+          "title": "Training Verifiers to Solve Math Word Problems",
+          "url": "https://arxiv.org/abs/2110.14168",
+          "type": "research"
+        },
+        {
           "title": "Reverse Prompt Engineering for Fun and (no) Profit",
           "url": "https://lspace.swyx.io/p/reverse-prompt-eng",
           "type": "research"
@@ -1169631,8 +1169636,8 @@
       ],
       "references": [
         {
-          "title": "OpenClaw Security Risks: AI Agent Threats in SaaS - Reco",
-          "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
+          "title": "Reco Newsroom",
+          "url": "https://www.reco.ai/newsroom",
           "type": "vendor"
         }
       ],
@@ -1169645,7 +1169650,7 @@
         "openclaw"
       ],
       "added": "2026-05-16",
-      "updated": "2026-11-11",
+      "updated": "2026-10-06",
       "mitre_atlas_tactics": [
         "AML.TA0004",
         "AML.TA0005",
@@ -1169653,14 +1169658,14 @@
         "AML.TA0012",
         "AML.TA0015"
       ],
-      "quality_tier": "auto",
+      "quality_tier": "reviewed",
       "corpus": "security",
       "tier": "feed",
       "source_count": 2,
-      "confidence": "medium",
+      "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-11-11"
+      "last_seen": "2026-10-06"
     },
     {
       "id": "INC-02795",

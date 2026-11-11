@@ -38,7 +38,7 @@ def rule_of(rid, url):
             return why
     if url in ("https://arxiv.org/abs/2103.03874", "https://arxiv.org/abs/2402.06627"):
         return "R2 (arXiv id/title mismatch)"
-    return "not flagged itself: sibling background citation (ATLAS footnote [2]) removed with the flagged one, same defect"
+    return "unflagged"
 
 
 def outcome(rid):
@@ -48,6 +48,8 @@ def outcome(rid):
         return "fixed (replaced)"
     if rid in S.REMOVE:
         return "fixed (flagged reference removed)"
+    if S.KEPT.get(rid, {}).get("kind") == "deferred":
+        return "unchanged (deferred to WS4-T19)"
     return "unchanged (false positive)"
 
 
@@ -65,7 +67,7 @@ def audit():
         out.setdefault(outcome(r["id"]), []).append(r["id"])
     p("## Outcome (the 6 deferred rows + batch 1 of the D130-3 list = %d rows)\n" % len(rows))
     p("| outcome | rows | ids |\n|---|---|---|")
-    for k in ("fixed (flagged reference removed)", "fixed (replaced)", "unverified", "unchanged (false positive)"):
+    for k in ("fixed (flagged reference removed)", "fixed (replaced)", "unverified", "unchanged (false positive)", "unchanged (deferred to WS4-T19)"):
         ids = out.get(k, [])
         p(f"| {k} | {len(ids)} | {', '.join(ids)} |")
     p(f"| **total** | **{len(rows)}** | |\n")
@@ -140,6 +142,7 @@ def audit():
 def kept_section():
     K = json.loads((HERE / "kept-evidence-2026-11-11.json").read_text(encoding="utf-8"))
     t = K["tally"]
+    cands = [(r, u, w) for r, d in S.CANDIDATES.items() for u, w in d.items()]
     p = print
     p("## Evidence for the references the remove-rows kept (foreman rule C)\n")
     p("Rule as applied: **untouched references were fetched in full on rows with <= 15 kept references and sampled (first 5 + last 5 + 5 chosen "
@@ -149,19 +152,22 @@ def kept_section():
       "from the built rows and fails if a kept reference on a small row has no record, a large row's sample differs, or the tally disagrees "
       "(proved to fire by five mutations of a copy of the evidence file).\n")
     p(f"- Rows fully fetched: {t['rows_fully_fetched']}; rows sampled: {len(t['rows_sampled'])} ({', '.join(t['rows_sampled'])}).")
-    p(f"- **Tally ({t['fetched_total']} references fetched): evidenced {t['evidenced']} (HTTP 200 and an identifying token found: {t['match_kind']['id']} by CVE/GHSA id, {t['match_kind']['keyword']} by product keyword); dead-or-blocked {t['dead-or-blocked']} (kept, for the WS4 link-health task); page-without-token {t['page-without-token']} (HTTP 200, no token: kept, for review); removal candidates 0, no reference was removed on this evidence.**")
+    p(f"- **Tally ({t['fetched_total']} references fetched): evidenced {t['evidenced']} (HTTP 200 and an identifying token found: {t['match_kind']['id']} by CVE/GHSA id, {t['match_kind']['keyword']} by product keyword); dead-or-blocked {t['dead-or-blocked']} (kept, for the WS4 link-health task); page-without-token {t['page-without-token']} (HTTP 200, no token: kept, for review); removal candidates {len(cands)} (below); no reference was removed on this evidence.**")
     p("- Four NVD pages for INC-02347 returned HTTP 503 on the first pass and 200 on a retry; the committed record is the retry.\n")
     p("| row | kept | method | evidenced | dead-or-blocked | page-without-token |\n|---|---|---|---|---|---|")
     for rid, r in K["rows"].items():
         c = {k: sum(1 for x in r["references"] if x["outcome"] == k) for k in ("evidenced", "dead-or-blocked", "page-without-token")}
         p(f"| {rid} | {r['kept_references']} | {'all' if r['method']=='all' else 'sample of '+str(r['fetched'])} | {c['evidenced']} | {c['dead-or-blocked']} | {c['page-without-token']} |")
-    p("\nNot evidenced, by outcome (kept; none is an R1-shape index or homepage, so none is a removal candidate under the rule):\n")
+    p("\nNot evidenced, by outcome (all kept: the rule removes only an exact R1-shaped or R2-flagged reference, and none of these is):\n")
     for k, label in (("dead-or-blocked", "dead or blocked (4xx/5xx, robots refusal, error): WS4 link-health"), ("page-without-token", "HTTP 200 but no identifying token in the page text (redirect stubs, JS shells, wiki/bounty pages): review")):
         p(f"- {label}:")
         for rid, r in K["rows"].items():
             for x in r["references"]:
                 if x["outcome"] == k:
                     p(f"  - {rid} `{x['url'][:120]}` ({x['status']})")
+    p("\nRemoval CANDIDATES (kept, for user re-review; not removed):\n")
+    for r_, u_, w_ in cands:
+        p(f"- {r_} `{u_}`: {w_}.")
     p("\nNotable: `INC-01553` carries a malformed reference `https://https://github.com/ollama/ollama` (double scheme); `INC-04383`'s NCC Group URL now serves the research index.\n")
 
 
@@ -178,7 +184,10 @@ def corrections():
         fields = [f for f in ("references", "title", "description", "affected") if f in d]
         dem = f"`quality_tier` {t} -> auto (D130(c))" if "quality_tier" in d else "`quality_tier` already auto"
         derived = [f"`{f}`" for f in ("confidence", "tier") if f in d]
-        dm = ", `discovery_method` cleared (landmark-only label, D139(b))" if "discovery_method" in d else ""
+        dm = ""
+        if "discovery_method" in d:
+            dm = (", `discovery_method` cleared (landmark-only label, D139(b))" if rid == "INC-04207" else
+                  ", `discovery_method` cleared (same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects discovery_method outside the landmark tier; flagged for user re-review)")
         verb = "reference replaced" + (", title and description re-derived" if "description" in d else "") if rid in S.REPLACE else "flagged reference removed"
         urls = S.REMOVE.get(rid) or [S.REPLACE[rid]["old"]]
         why = "; ".join(f"{u}: {rule_of(rid, u)}, {fetched(u)}" for u in urls)

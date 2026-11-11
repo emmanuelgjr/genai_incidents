@@ -52,7 +52,10 @@ def build():
             # value is dropped; its text is kept in _d130_3a_prior_note.
             assert row["quality_tier"] == "curated" and not row.get("aiid_id") and row.get("corpus") != "ai-harm", rid
             dm = entry.pop("discovery_method")
-            entry["_d130_3a_prior_note"] = f"dropped discovery_method={dm!r} (D139(b)); the line's note read: " + entry.pop("_note")
+            ruling = ("(D139(b))" if rid == "INC-04207" else
+                      "(same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects "
+                      "discovery_method outside the landmark tier; flagged for user re-review)")
+            entry["_d130_3a_prior_note"] = f"dropped discovery_method={dm!r} {ruling}; the line's note read: " + entry.pop("_note")
             entry["_note"] = note
         else:
             entry["_d130_3a_note" if existing else "_note"] = note

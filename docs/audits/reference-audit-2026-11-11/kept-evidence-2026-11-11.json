@@ -5,12 +5,12 @@
  "tally": {
   "evidenced": 153,
   "dead-or-blocked": 23,
-  "page-without-token": 16,
+  "page-without-token": 17,
   "match_kind": {
    "id": 111,
    "keyword": 42
   },
-  "fetched_total": 192,
+  "fetched_total": 193,
   "rows_fully_fetched": 24,
   "rows_sampled": [
    "INC-01015",
@@ -1835,9 +1835,9 @@
    ]
   },
   "INC-04383": {
-   "kept_references": 4,
+   "kept_references": 5,
    "method": "all",
-   "fetched": 4,
+   "fetched": 5,
    "references": [
     {
      "url": "https://atlas.mitre.org/studies/AML.CS0016",
@@ -1848,6 +1848,18 @@
      "sha256": null,
      "error": "HTTPError: HTTP Error 404: Not Found",
      "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://arxiv.org/abs/2110.14168",
+     "fetched_via": "https://arxiv.org/abs/2110.14168",
+     "status": 200,
+     "title": "[2110.14168] Training Verifiers to Solve Math Word Problems",
+     "fetched_at": "2026-11-11T06:17:25Z",
+     "sha256": "ea9c1057f32796ff8181e23c8d06881d1afbfbbafca95b1b25a62491856e6e54",
+     "error": null,
+     "outcome": "page-without-token",
      "tokens_matched": [],
      "match_kind": null
     },

@@ -24,7 +24,7 @@ report, on the foreman's rule C. All changes are
 
 | step | rows |
 |---|---|
-| R1 or R2 rows in the detection report, at 589376db (re-derived: `r1()` verbatim + the report's 11 R2 rows) | 156 |
+| R1 or R2 rows in the detection report (run at c80b7e61; re-derived on the D130-2 base 589376db: `r1()` verbatim + the report's 11 R2 rows) | 156 |
 | minus D130-2's legacy-seed rows (`INC-<n>` / `LEGACY-INC-<n>`) | -30 |
 | = non-legacy R1/R2 rows | 126 |
 | same rule run on 64109452 | 126 non-legacy (125 trip R1; INC-04383 trips R2 only) |
@@ -45,9 +45,10 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 | outcome | rows | ids |
 |---|---|---|
 | fixed (flagged reference removed) | 29 | INC-01015, INC-01291, INC-01589, INC-02471, INC-02871, INC-04207, INC-00021, INC-01194, INC-01348, INC-01553, INC-01724, INC-02076, INC-02150, INC-02347, INC-02505, INC-02516, INC-02761, INC-02800, INC-02864, INC-03209, INC-03276, INC-03292, INC-03423, INC-04285, INC-04383, INC-04959, INC-05009, INC-05421, INC-05425 |
-| fixed (replaced) | 5 | INC-01600, INC-01641, INC-02498, INC-03212, INC-03248 |
+| fixed (replaced) | 4 | INC-01641, INC-02498, INC-03212, INC-03248 |
 | unverified | 2 | INC-00570, INC-03573 |
 | unchanged (false positive) | 2 | INC-00864, INC-05052 |
+| unchanged (deferred to WS4-T19) | 1 | INC-01600 |
 | **total** | **38** | |
 
 ## Per-row outcomes
@@ -66,7 +67,7 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 | INC-01194 | 1 | reviewed | fixed (flagged reference removed) | `https://trysixth.com/` (homepage) -> HTTP 200, title "Sixth" | reference(s) removed; demoted to auto |
 | INC-01348 | 1 | reviewed | fixed (flagged reference removed) | `https://www.llamaindex.ai/` (homepage) -> HTTP 200, title "LlamaIndex / AI Agents for Document OCR + Workflows" | reference(s) removed; demoted to auto |
 | INC-01553 | 1 | reviewed | fixed (flagged reference removed) | `https://ollama.com/` (homepage) -> HTTP 200, title "Ollama · Run AI models locally and in the cloud" | reference(s) removed; demoted to auto |
-| INC-01600 | 1 | reviewed | fixed (replaced) | `https://www.reco.ai/newsroom` (depth1-non-slug) -> HTTP 200, title "Reco Newsroom: AI Security News & Updates" | reference -> `https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now` (fetched 200, names the incident); description kept (supported by the page); demoted to auto |
+| INC-01600 | 1 | reviewed | unchanged (deferred to WS4-T19) | `https://www.reco.ai/newsroom` -> HTTP 200, title "Reco Newsroom: AI Security News & Updates" | unchanged, deferred (bounce #1 lesson i): the only on-topic source found, the Reco OpenClaw article, is already INC-01589's first reference, so re-pointing this row would create a duplicate; the row is likely a duplicate/over-merge of INC-01589 (the OpenClaw crisis; its source_ids also carry a second seed id). Its flagged reco.ai/newsroom reference stays as found. Routed to WS4-T19 and to user re-review. |
 | INC-01641 | 1 | reviewed | fixed (replaced) | `https://www.pillar.security/blog` (depth1-non-slug) -> HTTP 200, title "Pillar Blog / Latest stories about AI Security" | reference -> `https://www.pillar.security/blog/the-agent-security-paradox-when-trusted-commands-in-cursor-become-attack-vectors` (fetched 200, names the incident); description kept (supported by the page); demoted to auto |
 | INC-01724 | 1 | reviewed | fixed (flagged reference removed) | `https://raytha.com` (homepage) -> HTTP 200, title "Raytha: the open source .NET CMS for developers who ship" | reference(s) removed; demoted to auto |
 | INC-02076 | 1 | reviewed | fixed (flagged reference removed) | `https://www.kxan.com/driverless/` (depth1-non-slug) -> HTTP 403 | reference(s) removed; demoted to auto |
@@ -86,7 +87,7 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 | INC-03423 | 1 | reviewed | fixed (flagged reference removed) | `https://monica.im/desktop` (depth1-non-slug) -> HTTP 200, title "Monica - Your GPT AI Assistant Chrome Extension" | reference(s) removed; demoted to auto |
 | INC-03573 | 1 | reviewed | unverified | `https://www.anthropic.com/research` (depth1-non-slug) -> HTTP 200, title "Research \ Anthropic" | `status: unverified` (`no-confirmed-source`); references, title, tier untouched. The only reference is the publisher's research index (R1). Searched 2026-11-11 through fetch_once: anthropic.com/research, /news, /research/team/frontier-red-team, red.anthropic.com, /news/detecting-countering-misuse-aug-2025 and /news/building-safeguards-for-claude (all HTTP 200; none contains 'spear-phishing', 'spear phishing' or 'phishing' in a study of that name; the August 2025 misuse report names no such study); The Hacker News site search for 'Anthropic spear-phishing' and 'Anthropic Claude phishing' (reports of 2025-2026 Claude misuse, none a 2024 Frontier Threats Red Team spear-phishing scaling study). No search engine was available. The row also carries a second seed id (VTR-anthropic-election-influence-study-2024, an election-influence study) with no source either. Not found after this search; the search was limited to those routes. |
 | INC-04285 | 1 | reviewed | fixed (flagged reference removed) | `https://premiumaddons.com/change-log/` (depth1-non-slug) -> HTTP 200, title "Premium Addons PRO Changelog / Premium Addons for Elementor" | reference(s) removed; demoted to auto |
-| INC-04383 | 1 | reviewed | fixed (flagged reference removed) | `https://arxiv.org/abs/2103.03874` -> HTTP 200, title "[2103.03874] Measuring Mathematical Problem Solving With the MATH Data"; `https://arxiv.org/abs/2110.14168` -> HTTP 200, title "[2110.14168] Training Verifiers to Solve Math Word Problems" | reference(s) removed; demoted to auto |
+| INC-04383 | 1 | reviewed | fixed (flagged reference removed) | `https://arxiv.org/abs/2103.03874` -> HTTP 200, title "[2103.03874] Measuring Mathematical Problem Solving With the MATH Data" | reference(s) removed; demoted to auto |
 | INC-04959 | 1 | reviewed | fixed (flagged reference removed) | `https://www.oligo.security/shelltorch` (depth1-non-slug) -> HTTP 404 | reference(s) removed; demoted to auto |
 | INC-05009 | 1 | reviewed | fixed (flagged reference removed) | `https://docs.dependencytrack.org/changelog/` (depth1-non-slug) -> HTTP 200, title "Change Log / Dependency-Track" | reference(s) removed; demoted to auto |
 | INC-05052 | 1 | reviewed | unchanged (false positive) | `https://real-gradients.github.io/` -> HTTP 200, title "Real Attackers Don't Compute Gradients"; `https://arxiv.org/abs/2212.14315` -> HTTP 200, title "[2212.14315] "Real Attackers Don't Compute Gradients": Bridging the Ga" | R1/R2 false positive: the dedicated site and paper behind ATLAS case AML.CS0032 (screenshots of 100 evasive phishing webpages, MLSEC anti-phishing analysis); the R2 title-overlap flag is a token artefact of a generic row title. |
@@ -95,7 +96,7 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 
 ## Field-level delta (working agreement 2)
 
-Control = committed data at base 64109452; new = this branch's build. Entry count 15821 -> 15821; ID set equal: True; ID order equal: True; rows with any difference: 36 (= the 29 remove rows + 5 replace rows + 2 unverified rows); rows outside them with any difference: 0; unintended field moves: 0.
+Control = committed data at base 64109452; new = this branch's build. Entry count 15821 -> 15821; ID set equal: True; ID order equal: True; rows with any difference: 35 (= the 29 remove rows + 4 replace rows + 2 unverified rows); rows outside them with any difference: 0; unintended field moves: 0.
 
 Envelope / `data/stats.json` keys that moved (declared set; any other key would be a defect, and none moved):
 
@@ -109,21 +110,21 @@ Envelope / `data/stats.json` keys that moved (declared set; any other key would 
 | field | rows | kind | justification |
 |---|---|---|---|
 | `affected` | 1 (INC-03212) | intended | INC-03212: package names the source does not name dropped |
-| `confidence` | 21 | derived | `_derive_confidence`: curated/reviewed -> high; 2+ sources with a CVE stay high, 2+ sources or a CVE/CVSS give medium. Follows quality_tier only |
+| `confidence` | 20 | derived | `_derive_confidence`: curated/reviewed -> high; 2+ sources with a CVE stay high, 2+ sources or a CVE/CVSS give medium. Follows quality_tier only |
 | `description` | 2 (INC-02498, INC-03212) | intended | re-derived from the confirmed source; claims the source does not support dropped |
 | `discovery_method` | 3 (INC-02471, INC-02871, INC-04207) | intended | landmark-only label (integrity check): its override line is dropped for INC-04207 (D139(b)) and for INC-02471, INC-02871 (same mechanism, same reason; see Declared knock-ons) |
-| `last_seen` | 36 | derived | history stamp: content changed (build date) |
-| `quality_tier` | 33 | intended | ruling D130(c): every row whose reference is replaced or removed demotes to auto; never promoted. INC-03292 was already auto |
-| `references` | 34 | intended | the D130-3a change itself |
+| `last_seen` | 35 | derived | history stamp: content changed (build date) |
+| `quality_tier` | 32 | intended | ruling D130(c): every row whose reference is replaced or removed demotes to auto; never promoted. INC-03292 was already auto |
+| `references` | 33 | intended | the D130-3a change itself |
 | `status` | 2 (INC-00570, INC-03573) | intended | D130(b): unverified |
 | `status_reason` | 2 (INC-00570, INC-03573) | intended | {code: no-confirmed-source, as_of: 2026-11-11} |
 | `tier` | 6 (INC-01015, INC-01291, INC-01589, INC-02471, INC-02871, INC-04207) | derived | `_derive_tier`: curated -> landmark, so the 6 curated deferred rows (no aiid_id, corpus not ai-harm) become feed. Follows quality_tier only |
 | `title` | 2 (INC-02498, INC-03212) | intended | re-derived from the confirmed source so title and description agree (bounce lesson iii) |
-| `updated` | 36 | derived | history stamp: content changed (build date) |
+| `updated` | 35 | derived | history stamp: content changed (build date) |
 
 `tier` landmark -> feed on 6 rows: INC-01015, INC-01291, INC-01589, INC-02471, INC-02871, INC-04207. `landmark_count` 2062 -> 2056. INC-02076 (reviewed) is demoted but stays landmark through its `aiid_id`.
 
-`confidence` moved on 21 rows (INC-00021 high->medium, INC-01194 high->medium, INC-01600 high->medium, INC-01641 high->low, INC-02076 high->medium, INC-02498 high->medium, INC-02505 high->medium, INC-02516 high->medium, INC-02761 high->medium, INC-02800 medium->low, INC-03209 high->low, INC-03212 high->low, INC-03248 high->low, INC-03276 high->medium, INC-04207 high->medium, INC-04285 high->medium, INC-04383 high->low, INC-04959 high->medium, INC-05009 high->medium, INC-05421 high->low, INC-05425 high->low).
+`confidence` moved on 20 rows (INC-00021 high->medium, INC-01194 high->medium, INC-01641 high->low, INC-02076 high->medium, INC-02498 high->medium, INC-02505 high->medium, INC-02516 high->medium, INC-02761 high->medium, INC-02800 medium->low, INC-03209 high->low, INC-03212 high->low, INC-03248 high->low, INC-03276 high->medium, INC-04207 high->medium, INC-04285 high->medium, INC-04383 high->low, INC-04959 high->medium, INC-05009 high->medium, INC-05421 high->low, INC-05425 high->low).
 
 Full per-row before/after: `delta-2026-11-11.json`.
 
@@ -132,7 +133,7 @@ Full per-row before/after: `delta-2026-11-11.json`.
 Rule as applied: **untouched references were fetched in full on rows with <= 15 kept references and sampled (first 5 + last 5 + 5 chosen by `random.Random(<row id>).sample` over the rest) on larger rows.** Every fetch went through `ingest/common.fetch_once`; `nvd.nist.gov/vuln/<CVE>` and `osv.dev/vulnerability/<id>` are JavaScript shells, so the same record was fetched from the NVD 2.0 API (7 s per request) / the OSV API, and the evidence file names both URLs. `kept_refs.py` does the work; `verify.py` re-derives the selection from the built rows and fails if a kept reference on a small row has no record, a large row's sample differs, or the tally disagrees (proved to fire by five mutations of a copy of the evidence file).
 
 - Rows fully fetched: 24; rows sampled: 5 (INC-01015, INC-01291, INC-01348, INC-02347, INC-02864).
-- **Tally (192 references fetched): evidenced 153 (HTTP 200 and an identifying token found: 111 by CVE/GHSA id, 42 by product keyword); dead-or-blocked 23 (kept, for the WS4 link-health task); page-without-token 16 (HTTP 200, no token: kept, for review); removal candidates 0, no reference was removed on this evidence.**
+- **Tally (193 references fetched): evidenced 153 (HTTP 200 and an identifying token found: 111 by CVE/GHSA id, 42 by product keyword); dead-or-blocked 23 (kept, for the WS4 link-health task); page-without-token 17 (HTTP 200, no token: kept, for review); removal candidates 1 (below); no reference was removed on this evidence.**
 - Four NVD pages for INC-02347 returned HTTP 503 on the first pass and 200 on a retry; the committed record is the retry.
 
 | row | kept | method | evidenced | dead-or-blocked | page-without-token |
@@ -155,7 +156,7 @@ Rule as applied: **untouched references were fetched in full on rows with <= 15 
 | INC-03292 | 4 | all | 4 | 0 | 0 |
 | INC-03423 | 7 | all | 7 | 0 | 0 |
 | INC-04285 | 2 | all | 1 | 0 | 1 |
-| INC-04383 | 4 | all | 1 | 2 | 1 |
+| INC-04383 | 5 | all | 1 | 2 | 2 |
 | INC-04959 | 6 | all | 5 | 0 | 1 |
 | INC-05009 | 5 | all | 3 | 0 | 2 |
 | INC-05421 | 6 | all | 2 | 4 | 0 |
@@ -167,7 +168,7 @@ Rule as applied: **untouched references were fetched in full on rows with <= 15 
 | INC-02871 | 2 | all | 2 | 0 | 0 |
 | INC-04207 | 1 | all | 1 | 0 | 0 |
 
-Not evidenced, by outcome (kept; none is an R1-shape index or homepage, so none is a removal candidate under the rule):
+Not evidenced, by outcome (all kept: the rule removes only an exact R1-shaped or R2-flagged reference, and none of these is):
 
 - dead or blocked (4xx/5xx, robots refusal, error): WS4 link-health:
   - INC-01553 `https://https://github.com/ollama/ollama` (robots-refused)
@@ -206,10 +207,15 @@ Not evidenced, by outcome (kept; none is an R1-shape index or homepage, so none 
   - INC-02347 `https://csirt.divd.nl/CVE-2024-43656/` (200)
   - INC-02347 `https://csirt.divd.nl/CVE-2024-43657/` (200)
   - INC-04285 `https://www.wordfence.com/threat-intel/vulnerabilities/id/82e5fd9f-9a1f-4a4c-ac06-61bf65e3c8ab?source=cve` (200)
+  - INC-04383 `https://arxiv.org/abs/2110.14168` (200)
   - INC-04383 `https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks` (200)
   - INC-04959 `http://packetstormsecurity.com/files/175095/PyTorch-Model-Server-Registration-Deserialization-Remote-Code-Execution.html` (200)
   - INC-05009 `https://github.com/showdownjs/showdown/wiki/Markdown%27s-XSS-Vulnerability-%28and-how-to-mitigate-it%29` (200)
   - INC-05009 `https://github.com/showdownjs/showdown/wiki/Markdown's-XSS-Vulnerability-(and-how-to-mitigate-it)` (200)
+
+Removal CANDIDATES (kept, for user re-review; not removed):
+
+- INC-04383 `https://arxiv.org/abs/2110.14168`: off-topic sibling citation (ATLAS footnote [2], 'Training Verifiers to Solve Math Word Problems'): HTTP 200, does not name the incident; not R1-shaped and not R2-flagged, so kept.
 
 Notable: `INC-01553` carries a malformed reference `https://https://github.com/ollama/ollama` (double scheme); `INC-04383`'s NCC Group URL now serves the research index.
 
@@ -220,7 +226,7 @@ Notable: `INC-01553` carries a malformed reference `https://https://github.com/o
 - `landmark_count` 2,062 -> 2,056: the 6 curated deferred rows (INC-01015, INC-01291, INC-01589, INC-02471, INC-02871, INC-04207) are
   demoted to `quality_tier: auto`, which makes them `tier: feed` (`_derive_tier`: curated -> landmark; no `aiid_id`, corpus not `ai-harm`).
   INC-04207: tier landmark -> feed and confidence high -> medium, as the D139 gate advised.
-- `confidence` moves on 21 rows (`_derive_confidence`, follows the demotion only; the list is in the delta table).
+- `confidence` moves on 20 rows (`_derive_confidence`, follows the demotion only; the list is in the delta table).
 - **`discovery_method` on 3 rows, one more than the D139 premise.** The integrity check refuses `discovery_method` outside the
   landmark tier. INC-04207's value came only from its INC-030 override line (dropped, per D139(b)). INC-02471 and INC-02871 (both curated
   landmark, demoted) carried the same kind of label from their own CVE override entries ("Advisory credits ... as the finder"); once
@@ -252,6 +258,14 @@ rows kept their text; their labels are unaffected.
   per-row table above). aim.security is unfetchable under the fail-closed robots rule (robots.txt returns HTTP 403); INC-00570 may be
   re-checked if that host's robots.txt becomes verifiable. "Not found" here means not found by those routes, not proven absent.
 - Dead and blocked kept references (listed in the evidence section) are for the WS4 link-health task; none was removed.
+- **INC-01600 deferred (bounce #1, lesson i).** I first replaced its flagged `reco.ai/newsroom` with the Reco OpenClaw article, but that article is
+  INC-01589's first reference at base, so the row would have duplicated INC-01589. It is reverted: the built row is byte-identical to base 64109452
+  (flagged reference kept, tier unchanged) and is deferred to WS4-T19 and user re-review as a likely duplicate/over-merge of INC-01589.
+  Reverting needed the generated outputs reset to base before the rebuild: a rebuild over the previous working tree re-stamped `updated`/`last_seen`.
+- **INC-04383 removal candidate.** `https://arxiv.org/abs/2110.14168` (ATLAS footnote [2], GSM8K) is an off-topic sibling citation; it is kept
+  because the rule removes only an exact R1-shaped or R2-flagged reference. Listed for user re-review.
+- INC-01641 and INC-00868 are both CVE-2026-22708 (predates this branch): dedupe queue. INC-05425 and INC-05421 hold several blocked news
+  references (Arabic-language sites, robots): link-health first.
 - Existing refs the audit did not flag but met in passing: `research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks` (INC-04383) now
   serves an index page without the article; `lspace.swyx.io` could not be verified. Untouched.
 

@@ -542,7 +542,7 @@
       "_note": "discovery_method: Lakera blog: Lakera researcher Brett Gustafson discovered and responsibly reported the vulnerability, notifying Cursor on 2025-09-02. Source: https://www.lakera.ai/blog/cursor-vulnerability-cve-2025-59944 Reviewed 2026-07-03."
     },
     "CVE-2025-61590": {
-      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (D139(b)); the line's note read: discovery_method: Advisory credits section credits external researcher @MaccariTA as the finder of the workspace-file-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r Reviewed 2026-07-03.",
+      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects discovery_method outside the landmark tier; flagged for user re-review); the line's note read: discovery_method: Advisory credits section credits external researcher @MaccariTA as the finder of the workspace-file-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r Reviewed 2026-07-03.",
       "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://github.com/MaccariTA. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
       "quality_tier": "auto",
       "references_remove": [
@@ -550,7 +550,7 @@
       ]
     },
     "CVE-2025-61591": {
-      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (D139(b)); the line's note read: discovery_method: Advisory credits GitHub user @Y4tacker as the reporter of the MCP OAuth command-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq Reviewed 2026-07-03.",
+      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects discovery_method outside the landmark tier; flagged for user re-review); the line's note read: discovery_method: Advisory credits GitHub user @Y4tacker as the reporter of the MCP OAuth command-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq Reviewed 2026-07-03.",
       "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://github.com/Y4tacker. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
       "quality_tier": "auto",
       "references_remove": [
@@ -1351,11 +1351,10 @@
       ]
     },
     "ATLAS-AML.CS0016": {
-      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://arxiv.org/abs/2103.03874, https://arxiv.org/abs/2110.14168. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://arxiv.org/abs/2103.03874. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
       "quality_tier": "auto",
       "references_remove": [
-        "https://arxiv.org/abs/2103.03874",
-        "https://arxiv.org/abs/2110.14168"
+        "https://arxiv.org/abs/2103.03874"
       ]
     },
     "CVE-2023-43654": {
@@ -1406,17 +1405,6 @@
       "references_remove": [
         "https://openclaw.ai/blog"
       ]
-    },
-    "RES-openclaw-2026": {
-      "quality_tier": "auto",
-      "references": [
-        {
-          "title": "OpenClaw Security Risks: AI Agent Threats in SaaS - Reco",
-          "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
-          "type": "vendor"
-        }
-      ],
-      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Replaced reference: https://www.reco.ai/newsroom. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/."
     },
     "RES-pillar-cursor-cve-2026": {
       "quality_tier": "auto",

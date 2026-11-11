@@ -7,7 +7,7 @@ docs/audits/reference-audit-2026-10-15/derive_list.py. R2 (arXiv title/id mismat
 rows are the report's section 8 table "R2 all", reproduced as R2_ROWS. 9 of them are legacy rows (D130-2's); the two
 non-legacy ones are INC-04383 (R2 only) and INC-05052 (R2 and R1).
 
-Reconciliation (see reference-audit-2026-11-11.md): the report counted 156 R1-or-R2 rows at 589376db; 30 legacy rows were D130-2's.
+Reconciliation (see reference-audit-2026-11-11.md): the report counted 156 R1-or-R2 rows (run at c80b7e61, re-derived on the D130-2 base 589376db); 30 legacy rows were D130-2's.
 156 - 30 = 126 non-legacy rows (125 trip R1, plus INC-04383 which trips R2 only). At 64109452 the same 126 rows are
 still flagged (no refresh added or fixed any), so the list
 holds 126 + the 6 deferred (INC-01015, 01291, 01589, 02471, 02871, 04207) = 132 rows. Batches: 0 = the 6 deferred;

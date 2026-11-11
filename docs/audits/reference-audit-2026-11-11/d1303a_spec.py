@@ -35,7 +35,7 @@ REMOVE = {
     "INC-03292": ["https://phcode.dev/", "https://www.postbox-inc.com/"],
     "INC-03423": ["https://monica.im/desktop"],
     "INC-04285": ["https://premiumaddons.com/change-log/"],
-    "INC-04383": ["https://arxiv.org/abs/2103.03874", "https://arxiv.org/abs/2110.14168"],
+    "INC-04383": ["https://arxiv.org/abs/2103.03874"],
     "INC-04959": ["https://www.oligo.security/shelltorch"],
     "INC-05009": ["https://docs.dependencytrack.org/changelog/"],
     "INC-05421": ["http://abna24.com/b4xD"],
@@ -51,15 +51,12 @@ REMOVE = {
 DEFERRED6 = ["INC-01015", "INC-01291", "INC-01589", "INC-02471", "INC-02871", "INC-04207"]
 
 # --- single-reference rows whose only reference is a publisher index: whole-list replacement ----------------------
-RECO = "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now"
 PILLAR = "https://www.pillar.security/blog/the-agent-security-paradox-when-trusted-commands-in-cursor-become-attack-vectors"
 EMBRACE = "https://embracethered.com/blog/posts/2024/deepseek-ai-prompt-injection-to-xss-and-account-takeover/"
 UNIT42 = "https://unit42.paloaltonetworks.com/npm-supply-chain-attack/"
 SYSDIG = "https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes"
 
 REPLACE = {
-    "INC-01600": {"old": "https://www.reco.ai/newsroom",
-                  "ref": {"title": "OpenClaw Security Risks: AI Agent Threats in SaaS - Reco", "url": RECO, "type": "vendor"}},
     "INC-01641": {"old": "https://www.pillar.security/blog",
                   "ref": {"title": "The Agent Security Paradox: When Trusted Commands in Cursor Become Attack Vectors - Pillar Security (2026-01-14)",
                           "url": PILLAR, "type": "research"}},
@@ -100,12 +97,16 @@ KEPT = {
     "INC-05052": {"urls": ["https://real-gradients.github.io/", "https://arxiv.org/abs/2212.14315"],
                   "why": "R1/R2 false positive: the dedicated site and paper behind ATLAS case AML.CS0032 (screenshots of 100 evasive phishing webpages, MLSEC anti-phishing analysis); the R2 title-overlap flag is a token artefact of a generic row title."},
 }
+KEPT["INC-01600"] = {"urls": ["https://www.reco.ai/newsroom"], "kind": "deferred",
+                     "why": "unchanged, deferred (bounce #1 lesson i): the only on-topic source found, the Reco OpenClaw article, is already INC-01589's first reference, so re-pointing this row would create a duplicate; the row is likely a duplicate/over-merge of INC-01589 (the OpenClaw crisis; its source_ids also carry a second seed id). Its flagged reco.ai/newsroom reference stays as found. Routed to WS4-T19 and to user re-review."}
+# removal CANDIDATES: not removed (the rule removes only exact R1-shaped or R2-flagged references); for user re-review
+CANDIDATES = {"INC-04383": {"https://arxiv.org/abs/2110.14168":
+              "off-topic sibling citation (ATLAS footnote [2], 'Training Verifiers to Solve Math Word Problems'): HTTP 200, does not name the incident; not R1-shaped and not R2-flagged, so kept"}}
 # INC-02150 also keeps https://cellularsecurity.org/ransacked (names CVE-2024-24426); it is flagged R1 but is not removed.
 KEEP_ALSO = {"INC-02150": ["https://cellularsecurity.org/ransacked"]}
 
 # --- pages whose row-linking tokens export_evidence.py re-checks against the fetch cache -------------------------------
 EVIDENCE = {
-    RECO: ["OpenClaw", "135,000", "first major AI agent security crisis", "21,639", "ClawHub"],
     PILLAR: ["CVE-2026-22708", "Cursor", "prompt injection", "validation", "allowlist"],
     EMBRACE: ["DeepSeek", "userToken", "localStorage", "XSS", "Account Takeover"],
     UNIT42: ["Shai-Hulud", "hundreds of software packages", "LLM was used to generate the malicious bash script"],

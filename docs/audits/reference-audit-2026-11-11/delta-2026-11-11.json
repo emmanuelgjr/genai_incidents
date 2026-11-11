@@ -7859,40 +7859,6 @@
     "2026-11-11"
    ]
   },
-  "INC-01600": {
-   "confidence": [
-    "high",
-    "medium"
-   ],
-   "last_seen": [
-    "2026-10-06",
-    "2026-11-11"
-   ],
-   "quality_tier": [
-    "reviewed",
-    "auto"
-   ],
-   "references": [
-    [
-     {
-      "title": "Reco Newsroom",
-      "url": "https://www.reco.ai/newsroom",
-      "type": "vendor"
-     }
-    ],
-    [
-     {
-      "title": "OpenClaw Security Risks: AI Agent Threats in SaaS - Reco",
-      "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
-      "type": "vendor"
-     }
-    ]
-   ],
-   "updated": [
-    "2026-10-06",
-    "2026-11-11"
-   ]
-  },
   "INC-01641": {
    "confidence": [
     "high",
@@ -10191,6 +10157,11 @@
      {
       "title": "MITRE ATLAS — AML.CS0016",
       "url": "https://atlas.mitre.org/studies/AML.CS0016",
+      "type": "research"
+     },
+     {
+      "title": "Training Verifiers to Solve Math Word Problems",
+      "url": "https://arxiv.org/abs/2110.14168",
       "type": "research"
      },
      {
