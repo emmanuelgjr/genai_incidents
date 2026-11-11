@@ -14,6 +14,54 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ WS4 follow-ups bundle DONE: MERGED 2026-11-11 (`cc8c91e8`; gate-ws4f re-gate PASS on `588c064d` after bounce #1)
+**What merged** (6 files, +510/−26; no data/ or scripts/ changes; the workflow diff is comment-only):
+- **Threshold test:** `check_threshold_text` ties "failed 3 weeks running" to the effective threshold and the weekly cron.
+- **validate.yml:** the checkout comment names the git-history readers and is hedged as not exhaustive.
+- **`check_ci_dispatch`:**
+  - pure-AND `if`;
+  - exact GH_TOKEN;
+  - matching after comments are stripped;
+  - line-start `gh workflow run`;
+  - a whole-workflow actions rule;
+  - an executed `bash -e` test of validate.yml's baseline block (dispatch/push/pull_request).
+- **DSGAI test:** the planted-drift test runs the real `doc_mismatches`.
+- **conftest guard:** sendto/sendmsg, `ipaddress.is_loopback` (str and bytes), and new tests/test_network_guard.py on TEST-NET addresses only.
+- **persist-credentials:** report only.
+
+**Gate verdict, pasted:** PASS, defects none, D1–D3 closed.
+- **State:** scratch merge c86805e9 (588c064d onto c44b92f2).
+- **Full suite:** **1617 passed, 1 skipped (sendmsg, Windows), 1 xfailed**, rc 0, 9m32s.
+- **D2,** called through `check_ci_dispatch` directly:
+  - every command-position mutant fires, including `if false; then gh …` and a second echo line;
+  - every token mutant fires, including `secrets.MY_TOKEN`, `github.tokenx` and a removed GH_TOKEN;
+  - the tolerated forms (`secrets.GITHUB_TOKEN`, no-space, single-quoted) return [].
+- **D1:** every named reader exists as described: test_precision_audit:659, test_resolve_id_status:336-338, test_release_label:82, the Re-merge rev-parse/cat-file, `_baseline_blob`, `_run_refresh_gate` (unconditional, :3776) → :2735/:2747, and `_pair_inputs_changed` :2796.
+- **D3:** accurate.
+- **Bytes:** clean.
+
+**Gate advisories (follow-up candidates):**
+1. The elif at test_auto_refresh_workflow.py:260-261 appends a leftover second message.
+2. `git log --all` runs only when `git show HEAD:` fails in a non-shallow repo, so "on every build" is slightly broad.
+3. The line-start rule rejects valid one-line `; do gh …` and `X=1 gh …`; this is disclosed.
+4. The name test_udp_sendto_and_sendmsg_to_remote_raise is stale. sendmsg is not mutation-tested on Linux.
+5. Carried over: a workflow named only in echo text, quoted `--threshold` forms, and actionlint not run by the gate (the specialist ran it with `-shellcheck= -pyflakes=`, rc 0).
+
+**Foreman post-merge [R]:**
+- strays: porcelain empty in the main tree and gi-wt-ws4f;
+- merge parents identical to the gate's scratch merge;
+- 4 workflow/guard/DSGAI test files: 34 passed, 1 skipped;
+- check_stats_drift clean.
+
+**Foreman pre-check record:** 7 mutations, plus the gate's D2 MISS list and 6 string checks on the exact committed bytes, before the re-gate.
+
+**persist-credentials report** (specialist, report only):
+- No workflow sets it.
+- 8 jobs never use git over the network and could set `false`: a11y, validate, pages, huggingface, publish, release-assets, refresh-overdue-alert, cve-sweep.
+- oecd-fetch and finalize use it for a `git fetch origin refresh-state`.
+- The create-pull-request jobs (refresh, atlas-refresh, cve-enrich) need a throwaway-branch test first.
+- → future WS4 note, no change planned.
+
 ### 🔁 WS4 follow-ups bundle: BOUNCE #1 (gate-ws4f on `f8a6122d`), 2026-11-10 → specialist redispatched with verbatim text
 **The foreman's pre-check** (7 mutations, all firing after one fix round, plus the CHANGELOG and TEST-NET fixes) tested what the checks do. **It did not audit the completeness claims in the comment, CHANGELOG and test text.** All three defects are text overclaims:
 1. **validate.yml checkout comment.**
