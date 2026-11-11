@@ -7,6 +7,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Security - SHA-pin every GitHub Action and add dependabot (D134(ii); tooling only, data unchanged)
+
+- **What.** All 40 previously tag-pinned `uses:` lines in `.github/workflows/*.yml` (13 checkout, 13 setup-python, 6 upload-artifact, 2 download-artifact, and one each of setup-ruby, setup-chrome, upload-pages-artifact, setup-node, deploy-pages, configure-pages) are now `@<40-hex commit sha> # vX.Y.Z`, within the major already in use. The 4 already-pinned lines are unchanged. Each sha was resolved from its tag (annotated tags peeled to the commit) and re-checked with a second API call and a tag-to-sha compare.
+- **Dependabot.** New `.github/dependabot.yml` (`github-actions`, directory `/`, weekly) so the pins receive update PRs.
+- **Tests.** `tests/test_actions_pinned.py` fails on any `uses:` that is not a 40-hex sha with a trailing `# v` comment (local `./` and `docker://` exempt), across `.github/workflows/*.y*ml` and `.github/actions/**/action.y*ml`, and checks dependabot covers `github-actions`.
+
 ### Changed - PUBLIC BEHAVIOUR CHANGE: `load_incidents()` excludes `retracted` and `unverified` rows by default (D134(i); data unchanged)
 
 - **What.** `load_incidents(include_retracted: bool = False)`. By default it now drops rows whose `status` is `retracted` or `unverified`, so `len(load_incidents())` equals `incident_count` in `data/stats.json`. `disputed` rows are kept (they are counted in `incident_count`). `include_retracted=True` returns every row. The parameter keeps the ruled name although it also governs `unverified` rows. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged and still read every row; the `query()`, `by_id()` and `by_cve()` docstrings now say so. The slim `incidents.min.json` is unchanged and still carries every row.

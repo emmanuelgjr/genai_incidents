@@ -1,0 +1,8 @@
+# D134(ii): keep the SHA-pinned Actions current. Dependabot opens one PR per
+# update; the pin-and-comment format is enforced by tests/test_actions_pinned.py.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

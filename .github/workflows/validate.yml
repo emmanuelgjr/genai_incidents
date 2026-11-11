@@ -30,11 +30,11 @@ jobs:
       # on every build, `git show HEAD:<file>` and `git log --all` for the
       # D71 refresh gate. The list is not exhaustive: grep tests/ and scripts/
       # for git calls before making this checkout shallow.
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
