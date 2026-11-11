@@ -68,3 +68,8 @@ def test_controls_legit_shapes_load(tmp_path):
     assert m.load_source(_src(tmp_path, kev, "cisa_kev.json")) == []
     assert m.load_source(_src(tmp_path, {"states": ["x"], "incidents": []}, "cve_rejections.json")) == []
     assert m.load_source(_src(tmp_path, {"selected": [1], "entries_written": 3}, "w.provenance.json")) == []
+
+
+def test_a1_dict_and_scalar_non_row_values_do_not_count(tmp_path):
+    body = {"incidents": [], "meta": {"k": "v"}, "count": 3, "note": "x", "empty": []}
+    assert m.load_source(_src(tmp_path, body)) == []
