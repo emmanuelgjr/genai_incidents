@@ -14,6 +14,43 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D130-3a references batch 1 (+ the 6 D130-2 deferred rows) DONE: MERGED 2026-11-11 (`686f2f4b`; gate-d1303a re-gate PASS on `163d0e26` after bounce #1, plus prose-only `d1d97035`)
+**Verdict: PASS (re-gate), as sent by gate-d1303a.** DEFECTS: none. All 4 bounce-#1 defects are fixed, each checked by the gate's own route:
+1. INC-01600 at 163d0e26 equals 64109452 (whole-object compare), with no CORRECTIONS line and no override, recorded "unchanged (deferred to WS4-T19)".
+2. INC-04383 removes only 2103.03874. 2110.14168 is back in its base position, byte-equal, and listed as the 1 removal candidate.
+3. The INC-02471/02871 CORRECTIONS lines and both prior_notes now read "same mechanism as D139(b), which named only INC-04207; not separately ruled". INC-04207 keeps D139(b).
+4. The DATASHEET sentence is the gate's wording, verbatim, and links both audits. "re-derived wherever" appears in none of README, DATASHEET, index.html, export_huggingface.py, CHANGELOG or NOTICE-DATA.
+**Gate evidence [A, the gate's scripts in scratchpad/g/]:**
+- Fresh-clone build of 163d0e26, run twice: porcelain empty after each run, so a clean build reproduces the committed tree and the specialist's reset path is not needed. Drift clean.
+- Suite: 1648 passed, 1 skipped, 1 xfailed. The 8:53 wall time is the host sleeping.
+- Per-entity delta vs 64109452: 15,821 rows, ID order equal. 35 rows changed, 0 outside the targets; INC-00864, INC-01600 and INC-05052 unchanged.
+- Fields changed (rows): updated 35, last_seen 35, references 33, quality_tier 32, confidence 20, tier 6, discovery_method 3, status 2, status_reason 2, title 2, description 2, affected 1. Kept reference objects unchanged.
+- stats moved only incident 15,782→15,780, unverified 10→12, landmark 2,062→2,056.
+- Kept-reference tally recomputes to 193 = 153 evidenced / 23 dead-or-blocked / 17 page-without-token. The audit tables add up (29+4+2+2+1 = 38), and the CHANGELOG union is missing 0 lines.
+**Advisories:** both fixed before merge (prose-only `d1d97035`: audit "34"→33, "192"→193; the foreman checked the diff is exactly those 2 lines).
+**Foreman pre-check before re-gate [R]:**
+- an own delta script reproduced 35 rows and the per-field counts;
+- INC-01600 == base;
+- 04383 removed set = {2103.03874};
+- CHANGELOG union 0 missing;
+- DATASHEET sentence verbatim;
+- INC-030 = INC-04207 (source_ids), so its D139(b) note is correct.
+**Merge onto 5e63b18d [R], run on the merged tree in the main worktree:**
+- `--no-ff` merge, no conflicts (the branch already contained main).
+- The six build scripts left porcelain = 0.
+- check_stats_drift clean (5 surfaces).
+- **Full suite: 1648 passed, 1 skipped, 1 xfailed (8:46).** Porcelain = 0 afterwards.
+**Public figures now:** incident_count **15,780**, unverified 12, retracted 29, landmark 2,056. All 35 changes are agent-suggested and await USER RE-REVIEW per D130(c).
+**Carried follow-ups:**
+- INC-01600 → WS4-T19 (likely duplicate of INC-01589);
+- INC-01641/INC-00868 (same CVE-2026-22708, predates this branch) → dedupe queue;
+- INC-05421/INC-05425 → link-health first;
+- INC-04383 2110.14168 removal candidate → user;
+- INC-02471/02871 discovery_method clears (validator-forced, not ruled) → user re-review (already open decision 4);
+- keyword-only "evidenced" is weak; batches 2-4 brief to prefer id tokens.
+**Foreman stray note:** a foreman shell command hung on stdin and left a 0-byte `C:/repos/pass.md` OUTSIDE the repo; it was removed, and repo porcelain stayed 0.
+**Next:** D130-3b (batch 2, 32 rows), to a fresh pipeline-engineer.
+
 ### 🔁 D130-3a references batch 1: BOUNCE #1 (gate-d1303a on `4325eaad`), 2026-11-11 → redispatched to d1303a with exact fixes
 **Verdict: BOUNCE #1, as sent by gate-d1303a.** The foreman checked defects 1-3 against the tree itself before recording them [R]: `git show 64109452` vs the worktree; the reco.ai URL is on INC-01589 at base and on INC-01589+INC-01600 at the head; INC-04383 lost both 2103.03874 and 2110.14168; data/curation_overrides.json:545,553 carry "(D139(b))".
 1. **INC-01600 now duplicates INC-01589 (lesson i).** Its new only reference (reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now) is already INC-01589's first reference at base 64109452. Both rows are the OpenClaw crisis, and the URL is on no other row. Nothing in the audit, CORRECTIONS or CHANGELOG says so. Fix: revert the replacement and defer the row as a duplicate or over-merge (WS4-T19).
