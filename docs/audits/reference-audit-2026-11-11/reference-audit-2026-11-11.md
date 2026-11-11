@@ -240,7 +240,7 @@ Notable: `INC-01553` carries a malformed reference `https://https://github.com/o
 INC-02498 (title, description) and INC-03212 (title, description, affected). The classifier-derived labels (`attack_vector`, `severity`,
 `owasp_*`, `nist_ai_rmf`, `mitre_atlas*`, `category`, `tags`, ...) keep their base values on these two rows (the delta shows none moved)
 and may reflect the old wording: INC-02498 (was "session/token handling weakness", now prompt injection to XSS to token theft) and
-INC-03212 (was "LLM generated malicious scripts ... Crowdstrike, Postman, Zapier", now one bash script assessed LLM-generated). The other 34 changed
+INC-03212 (was "LLM generated malicious scripts ... Crowdstrike, Postman, Zapier", now one bash script assessed LLM-generated). The other 33 changed
 rows kept their text; their labels are unaffected.
 
 ## Observations and follow-ups (not actioned)
