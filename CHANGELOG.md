@@ -9,7 +9,7 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ### Changed - D138: ingest shape guards in `load_source` (tooling only; data unchanged)
 
-- `scripts/merge_and_dedupe.py` `load_source` now refuses (`[FATAL]`, `IngestParseError`) three more silent-drop shapes: a non-side dict whose row keys are all empty while a non-row key holds a non-empty list; a side file (`cisa_kev.json`, `cve_rejections.json`, `*.provenance.json`) holding a non-empty `incidents`/`entries`/`data` list; more than one non-empty row key; and a side-file name with a list payload.
+- `scripts/merge_and_dedupe.py` `load_source` now refuses (`[FATAL]`, `IngestParseError`) four more silent-drop shapes: a non-side dict whose row keys are all empty while a non-row key holds a non-empty list; a side file (`cisa_kev.json`, `cve_rejections.json`, `*.provenance.json`) holding a non-empty `incidents`/`entries`/`data` list; more than one non-empty row key; and a side-file name with a list payload.
 - Measured: every real `ingest/*.json` returns the same rows from the old and new `load_source` (28 files), and re-running the build scripts leaves `data/`, `docs/` and `src/` unchanged. New tests in `tests/test_d138_ingest_shape_guards.py`.
 
 ### Changed - WS4 follow-ups: tests and one workflow comment (data and pipeline behaviour unchanged)
