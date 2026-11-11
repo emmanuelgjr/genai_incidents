@@ -7,6 +7,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - PUBLIC BEHAVIOUR CHANGE: `load_incidents()` excludes `retracted` and `unverified` rows by default (D134(i); data unchanged)
+
+- **What.** `load_incidents(include_retracted: bool = False)`. By default it now drops rows whose `status` is `retracted` or `unverified`, so `len(load_incidents())` equals `incident_count` in `data/stats.json`. `disputed` rows are kept (they are counted in `incident_count`). `include_retracted=True` returns every row. The parameter keeps the ruled name although it also governs `unverified` rows. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged and still read every row; the `query()`, `by_id()` and `by_cve()` docstrings now say so. The slim `incidents.min.json` is unchanged and still carries every row.
+- **Consumer impact.** Code that called `load_incidents()` and counted or iterated rows now sees fewer rows (retracted + unverified; read both counts from `data/stats.json`, not from this entry). To restore the old result, call `load_incidents(include_retracted=True)`. The count identity (since D130) is `incident_count + retracted_count + unverified_count == len(all rows)`.
+- **Docs.** README opening and release text, `docs/DATA_DICTIONARY.md` Access line and the function docstring now state which statuses each accessor returns, and the README explains `retracted` / `unverified` and why `incident_count` is below the row count.
+
 ### Changed - D138: ingest shape guards in `load_source` (tooling only; data unchanged)
 
 - `scripts/merge_and_dedupe.py` `load_source` now refuses (`[FATAL]`, `IngestParseError`) four more silent-drop shapes: a non-side dict whose row keys are all empty while a non-row key holds a non-empty list; a side file (`cisa_kev.json`, `cve_rejections.json`, `*.provenance.json`) holding a non-empty `incidents`/`entries`/`data` list; more than one non-empty row key; and a side-file name with a list payload.
