@@ -14,6 +14,37 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D134(i) `load_incidents()` default DONE: MERGED 2026-11-11 (`5d49afb2`; gate-d134i re-gate PASS on `f609a802` after bounce #1)
+**What merged** (5 files, +153/−9; no data/):
+- **Package:** `load_incidents(include_retracted: bool = False)` drops `retracted` + `unverified` rows by default, so `len(load_incidents())` == `incident_count`. `disputed` is kept, and `include_retracted=True` returns every row. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged, with only their docstrings updated.
+- **Docs:** the README opening (a status/count explanation in stats markers, labelled "on `main`; not yet in a PyPI release") and the v2.12.0 sentence; the DATA_DICTIONARY Access line (v2.13.0 and earlier vs main); the module and function docstrings; a CHANGELOG PUBLIC BEHAVIOUR CHANGE entry.
+- **Tests:** tests/test_load_incidents_default.py, 10 tests.
+
+**Gate verdict, pasted:** PASS, defects none; D1–D4 closed.
+- **Full suite** on the merge onto 2bdeceaa: **1627 passed, 1 skipped, 1 xfailed.**
+- **D2:** checked across all 15 v* tags, which share the same no-argument `load_incidents()` returning every row.
+- **D4 mutants all fail tests:** M1 cached list (2), M2 reversed, M6 rotated, M8 query skips unverified, M9 by_cve drops non-standing, M11 by_id skips unverified, M12 an extra `_NOT_STANDING` value (caught by the equality test against scripts/entry_status), M13 a standing row dropped (3).
+- **Test comment** "all retracted rows carry CVEs, no unverified row does" is true: 29/29 and 0/10.
+- **Drift:** clean.
+- **Strays:** none.
+
+**Gate advisories:**
+- by_cve on an unverified row is not pinnable today.
+- The pyproject version is still 2.13.0 on main, for the next cut.
+
+**Open user question, carried:** should `query()` follow the new default? Specialist recommendation: yes, with `include_retracted=False`; by_id, by_cve and resolve_* stay unfiltered.
+
+**Foreman merge [R]:**
+- The merge base is ad3e96f7, which includes D138; the gate's base was 2bdeceaa.
+- CHANGELOG conflict resolved by keeping both sides in full, D134(i) first: 0 lines missing from either parent, 0 markers, 0 CR.
+- Strays: porcelain empty in the main tree and gi-wt-d134i.
+- **Full suite on 5d49afb2: 1644 passed, 1 skipped, 1 xfailed** (562 s).
+- 148 targeted tests passed; render_docs_stats was a no-op; drift clean.
+
+**docs-warden on 5d49afb2:** no high or medium findings. No live text contradicts the new behaviour, and every stats marker matches stats.json.
+- **F1 low:** the DATASHEET is still silent on retracted/unverified. That is the existing WS5 note, queued.
+- **F2 low → NEW WS6 note:** the HF card (scripts/export_huggingface.py:119-124) explains `unverified` but describes `retracted` only as "omitted". Add that it is outside incident_count and still resolves by ID.
+
 ### ✅ D138 ingest shape guards DONE: MERGED 2026-11-11 (`cc5ba86f`; gate-d138 PASS on `82da9d46`, first gate, 0 defects)
 **What merged** (3 files, +109/−1: `load_source` in merge_and_dedupe.py, the new tests/test_d138_ingest_shape_guards.py, CHANGELOG):
 - **A1:** a non-side dict with no non-empty row key while a non-row key holds a non-empty list refuses.
