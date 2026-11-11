@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ WS5 DATASHEET + README + HF card status note DONE: MERGED 2026-11-11 (`2b052def`; gate-ws5ds re-gate PASS on `1c63ba26` after bounce #1)
+**What merged** (4 files, +40/−4; no data/):
+- **DATASHEET Composition:** retracted and unverified rows are kept, not deleted, and sit outside incident_count; disputed rows are counted; the count identity, with stats markers.
+- **DATASHEET Limitations:** a new "Legacy-seed sourcing quality" bullet.
+- **README.md:25:** "never deleted" → "kept, not deleted".
+- **HF card:** explains `retracted`; both statuses still resolve by ID.
+- **CHANGELOG:** entry added.
+
+**Gate verdict, pasted:** PASS, defects none; D1–D3 closed.
+- **Data:** 15,821 rows (29 retracted, 10 unverified). "Never delet" is left only at README:154 ("Tombstones, never deletions", about IDs, which is accurate). The CHANGELOG tombstone claim matches all 1,084 id_deprecations records.
+- **Merge and drift:** clean merge onto d3f28010. The drift plant fires (rc 1), and render_docs_stats is a no-op.
+- **HF card:** renders with no stray placeholders; the JSONL has 15,782 rows.
+- **Full suite:** 1648 passed, 1 skipped, 1 xfailed.
+- **Strays:** none.
+
+**Gate advisory 1 → BLOCKING NOTE FOR THE D130-3a MERGE:**
+- The new DATASHEET sentence "its text is re-derived wherever the remaining sources do not support it" is true on main today.
+- Batch 1's 29 removal-only rows record only a token check on their kept references (153 evidenced / 23 dead / 16 no-token), not a text-support judgement. If batch 1 merges with that method, the sentence over-claims for those rows.
+- **Before merging D130-3a:** either (a) batch 1 records a text-support judgement for its removal-only rows, or (b) the DATASHEET sentence is narrowed to what was done. The batch-1 gate has been told.
+
+**Gate advisory 2 → NEW WS3 NOTE:** schema/incident.schema.json:216 (and the packaged copy) says "invariant 3: entries are never deleted; they are marked and keep resolving". It phrases the invariant rather than describing the data, but it shares the absolute form corrected here. schema-architect should consider "entries are not deleted in place; they are marked (status) or tombstoned (id_deprecations) and keep resolving".
+
+**Foreman post-merge [R]:**
+- strays: none in the main tree or gi-wt-ws5ds;
+- the merge has the same parents as the gate's scratch merge;
+- render_docs_stats no-op, drift clean;
+- HF + load_incidents tests: 14 passed.
+
 ### 🔁 WS5 DATASHEET + HF card status note: BOUNCE #1 (gate-ws5ds on `64790a1b`), 2026-11-11 → fresh scribe with verbatim text
 **Defects (three absolute or over-broad claims on a live surface):**
 1. **"Rows are never deleted."** (DATASHEET:25) is false. data/id_deprecations.json has 1,084 records whose `from` IDs are absent from incidents.json: 704 out-of-scope, 289 merged, 59 orphaned-source-retired, 9 unrecorded-drop, and 23 split/resplit/successor. Rows leave the file; tombstones remain. This is the same class as the D70 "never reused" correction. **README.md:25 carries the same sentence** (introduced by D134(i), and the gate missed it): folded into this fix as the same live-surface correction.
