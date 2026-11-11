@@ -14,6 +14,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 WS5 DATASHEET + HF card status note: BOUNCE #1 (gate-ws5ds on `64790a1b`), 2026-11-11 → fresh scribe with verbatim text
+**Defects (three absolute or over-broad claims on a live surface):**
+1. **"Rows are never deleted."** (DATASHEET:25) is false. data/id_deprecations.json has 1,084 records whose `from` IDs are absent from incidents.json: 704 out-of-scope, 289 merged, 59 orphaned-source-retired, 9 unrecorded-drop, and 23 split/resplit/successor. Rows leave the file; tombstones remain. This is the same class as the D70 "never reused" correction. **README.md:25 carries the same sentence** (introduced by D134(i), and the gate missed it): folded into this fix as the same live-surface correction.
+2. **"Where its references were replaced … the row's text is re-derived"** is true for D130-2 but false for batch 1 of the same ongoing audit: INC-01600/01641/03248 are replaced with the description kept, and 29 rows are removal-only with no re-derivation.
+3. **"the legacy seed (the earliest rows"**: first commit c105bd7a held 578 rows from 7 source groups, so the seed is only part of the earliest rows.
+
+**Gate evidence:**
+- The count identity holds: 15,782 + 29 + 10 = 15,821.
+- The retracted definition matches cve_rejections (29 all-rejected = 29 retracted).
+- The other sentences are true.
+- Planted retracted and unverified markers fire (rc 1).
+- The HF card renders with no stray braces. The JSONL has 15,782 rows with 0 retracted or unverified, and all 39 non-standing IDs resolve to themselves.
+- The CHANGELOG matches.
+- **Full suite: 1648 passed, 1 skipped, 1 xfailed.**
+- Scope: 3 files, no data/. No strays.
+
+**Advisories, folded in:**
+- "deterministic URL-shape and arXiv-id rules" → "rule-based", since R2 and R5 depend on fetches.
+- Make the HF unverified sentence symmetric ("still resolve by ID").
+
+**Merge-order note:** D130-3a also edits DATASHEET:25's incident_count marker, so expect a trivial re-render conflict.
+**Foreman pre-check miss:** I checked the sources the brief named, not the absolute "never deleted" against id_deprecations.
+
 ### 🟢 Main CI GREEN on the SHA-pinned Actions (`4a31e025`, D134(ii) merge + board), 2026-11-11, and Dependabot is live
 - **[R] `gh run list`** on 4a31e025: Validate dataset ✅, Site accessibility + integrity ✅, Deploy GitHub Pages ✅, CodeQL ✅, Dependabot Updates ✅. This is the first live run of all 44 pinned `uses:`, and the proof no gate could give.
 - **Dependabot opened 5 PRs at once:**
