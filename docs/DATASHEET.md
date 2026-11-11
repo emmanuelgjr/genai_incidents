@@ -22,7 +22,15 @@ Collection section below) as upstream sources rather than replacing them.
   as of this build — authoritative live count in
   [`data/stats.json`](../data/stats.json)), each an alleged
   real-world harm, disclosed vulnerability, threat report, or research/red-team
-  demonstration involving an AI system.
+  demonstration involving an AI system. Retracted and unverified rows are kept, not deleted. Rows whose CVEs
+  the CVE Program rejected are `status: retracted`
+  (<!-- stats:retracted_count -->29<!-- /stats:retracted_count -->), and rows with no confirmed
+  primary source are `status: unverified`
+  (<!-- stats:unverified_count -->10<!-- /stats:unverified_count -->). Both are kept in the full JSON
+  (`data/incidents.json`) and excluded from the headline count; `disputed` rows are counted.
+  So `incident_count + retracted_count + unverified_count` equals the number of rows in
+  `data/incidents.json`. Check `status` before relying on a row; absence means it stands
+  (see [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md)).
 - **Split:** `corpus` = `security` vs `ai-harm`; `category` distinguishes
   real-world from research/red-team/regulatory entries.
 - **Labels:** severity, attack_vector, and OWASP/NIST/ATLAS mappings — assigned
@@ -89,6 +97,26 @@ review, and the Heuristic labels bullet below for known gaps.
   unreported or non-English incidents.
 - **Heuristic labels:** `auto`-tier mappings are unreviewed; `attack_vector`
   `other` (~36%) reflects genuinely uncategorized harm incidents.
+- **Legacy-seed sourcing quality:** some rows, especially from the hand-written
+  legacy seed (among the earliest rows, whose `source_ids` carry `INC-<n>` or
+  `LEGACY-INC-<n>`), cite a generic page (a publisher or vendor homepage, a
+  conference or blog index) or an arXiv id that does not describe the incident,
+  rather than a page about the incident itself. A `reviewed` or `curated` tier on
+  such a row does not by itself mean its references were checked. An ongoing
+  reference audit detects these cases with rule-based URL-shape and arXiv-id
+  rules plus a check that figures in the description appear in the cited pages
+  (detection method: [`docs/audits/reference-detection-2026-10-14.md`](audits/reference-detection-2026-10-14.md)).
+  Where no confirmed source can be found, the row becomes `status: unverified`.
+  Where its flagged references were removed or replaced with fetched pages that name
+  the incident, its text is re-derived wherever the remaining sources do not support
+  it, and it is demoted to `quality_tier: auto`
+  pending human re-review (per-row record:
+  [`docs/audits/reference-audit-2026-10-15/`](audits/reference-audit-2026-10-15/reference-audit-2026-10-15.md);
+  public corrections: [`CORRECTIONS.md`](../CORRECTIONS.md)). Detection is
+  heuristic, so rows not yet audited or not flagged may still carry weak
+  references. Where sourcing matters, prefer `quality_tier` `reviewed` or `curated`
+  rows, check `status`, and open the cited references rather than trusting the row
+  text alone.
 - **Recency lag:** very recent CVEs may lack CVSS until NVD scores them.
 - **Scope drift:** broad sources (AIAAIC/OECD) include pre-LLM algorithmic harms.
 - **Untrusted free text (security):** `title`, `description`, `affected`,
