@@ -14,6 +14,42 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 D130-3a REPORTED `1b66e40e` (2026-11-11), held for rework before the gate; foreman method calls recorded
+**Specialist report (testimony):**
+- **Target list:** committed at `d95c874e` (`docs/audits/reference-audit-2026-11-11/derive_list.py` + list.json): 126 non-legacy R1∪R2 rows + 6 deferred = 132, in batches 0-4.
+- **Batch 0+1 outcomes (38 rows):** 29 fixed by removing the flagged reference; 5 fixed by replacement; 2 unverified (INC-00570, INC-03573); 2 unchanged false positives.
+- **Stats:** incident 15,782→15,780; unverified 10→12; landmark 2,062→2,056 (6 deferred curated rows → feed).
+- **Suite:** 1644 passed.
+
+**Foreman pre-check [R]** (own per-entity delta vs 64109452, independent of verify.py):
+- 15,821 rows, with the ID set and order identical;
+- **36 rows changed, all within the 38 targets, 0 outside**;
+- per-field counts identical to the specialist's;
+- no quality_tier promotion;
+- tier landmark→feed on exactly INC-01015/01291/01589/02471/02871/04207;
+- stats deltas as declared.
+INCIDENTS.md's 17k-line churn is the row-number column renumbering after 2 rows leave the count, which is legitimate generated output.
+
+**Gaps the foreman found, answered by the specialist:**
+- **(a)** The kept references on the 29 removal rows were NOT fetched. The D130-2 re-gate bar, "every kept reference is evidenced", was not applied.
+- **(b)** The INC-00570 search was incomplete. aim.security was robots-refused and the search engine served a bot challenge; no MSRC/NVD/news search was done. So the audit's "No other source found" overstated what was done.
+
+**⚖ Foreman method calls (within D130 scope; flagged to the user):**
+- **(a) Option C (specialist-recommended):**
+  - On changed rows with ≤15 kept references, fetch every kept reference.
+  - On larger rows (INC-01015: 443, INC-01291: 178, INC-01348: 120, …), fetch a deterministic sample: first 5 + last 5 + 5 seeded by row id.
+  - A dead or blocked reference is kept and listed for WS4 link-health ("dead is not wrong").
+  - A fetched reference about a different incident is a reported removal candidate, removed only if it has the exact R1 index/homepage shape.
+  - verify.py is extended to enforce this.
+- **(b)** Finish the INC-00570 search (MSRC/NVD for CVE-2025-32711 + variants, news coverage, researcher posts, and a corpus check for an existing EchoLeak row). Every unverified note lists exactly what was searched.
+
+**Beyond-ruling item for user re-review:** D139(b) named only INC-04207. Demoting INC-02471 and INC-02871 also required dropping their `discovery_method` override lines (landmark-only integrity check). The prior note text is kept in `_d130_3a_prior_note`.
+**Follow-ups:**
+- ATLAS case-study links (AML.CS0016, AML.CS0032, /studies) 404 → WS4 link-health task.
+- Over-merge stubs INC-02498/01600/03573 → WS4-T19.
+- Re-label INC-02498 and INC-03212 → a WS2 task like D130-2L.
+- tests/test_aiid_signal_provenance.py now skips references_remove and fields_clear (declared in CHANGELOG; the gate must check this).
+
 ### ✅ D134(i) `load_incidents()` default DONE: MERGED 2026-11-11 (`5d49afb2`; gate-d134i re-gate PASS on `f609a802` after bounce #1)
 **What merged** (5 files, +153/−9; no data/):
 - **Package:** `load_incidents(include_retracted: bool = False)` drops `retracted` + `unverified` rows by default, so `len(load_incidents())` == `incident_count`. `disputed` is kept, and `include_retracted=True` returns every row. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged, with only their docstrings updated.
