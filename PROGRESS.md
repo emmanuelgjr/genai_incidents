@@ -14,6 +14,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D130-3a references batch 1: BOUNCE #1 (gate-d1303a on `4325eaad`), 2026-11-11 → redispatched to d1303a with exact fixes
+**Verdict: BOUNCE #1, as sent by gate-d1303a.** The foreman checked defects 1-3 against the tree itself before recording them [R]: `git show 64109452` vs the worktree; the reco.ai URL is on INC-01589 at base and on INC-01589+INC-01600 at the head; INC-04383 lost both 2103.03874 and 2110.14168; data/curation_overrides.json:545,553 carry "(D139(b))".
+1. **INC-01600 now duplicates INC-01589 (lesson i).** Its new only reference (reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now) is already INC-01589's first reference at base 64109452. Both rows are the OpenClaw crisis, and the URL is on no other row. Nothing in the audit, CORRECTIONS or CHANGELOG says so. Fix: revert the replacement and defer the row as a duplicate or over-merge (WS4-T19).
+2. **INC-04383 lost a reference that was never flagged and is not R1-shaped**, https://arxiv.org/abs/2110.14168. R2 flagged only 2103.03874. Method call (a) says an off-topic page is reported as a candidate and removed only if it has the exact R1 shape. CORRECTIONS.md:46 admits it, but the audit table lists it as flagged, the knock-ons do not declare it, and the evidence section's "removal candidates 0" reads as covering it.
+3. **"D139(b)" is cited as authority for INC-02471 and INC-02871** (CORRECTIONS.md:18-19 and the two `_d130_3a_prior_note` texts on CVE-2025-61590/61591). D139(b) named only INC-04207. The forcing claim itself is TRUE: the gate restored discovery_method on both rows and validate.py exited 1, naming INC-02471 and INC-02871.
+4. **Merge blocker (the DATASHEET sentence, from the WS5 merge).** For the 29 removal-only rows the kept references were checked only for reachability plus an id or product-name token, on a sample for large rows (INC-01015 has 442). The gate's pick is **(c)**: replace the sentence with the gate's wording (in the redispatch brief) and add docs/audits/reference-audit-2026-11-11/ to the link.
+**Evidence the gate measured [A, the gate's own scripts in scratchpad/g/]:**
+- Merge suites: 1644 passed on f917fa42+4325eaad; 1648 passed, 1 skipped, 1 xfailed on 32daf87c+4325eaad (re-rendered).
+- The two build runs were identical (porcelain empty both times), drift clean.
+- An independent R1 gives the same 126 non-legacy rows (list.json batches 1-4).
+- Per-entity delta: 36 rows, 0 outside the 38 targets, and field counts exactly as claimed. Kept reference objects are byte-unchanged, there are no promotions, and landmark→feed applies to exactly the 6 deferred rows.
+- Stats: 15782→15780, unverified 10→12, landmark 2062→2056.
+- It re-fetched 10 removed and all 5 replacement references, re-fetched 7 evidenced and 3 no-token kept references, and the 192-reference tally (153 evidenced, 23 dead, 16 no-token) reproduced exactly.
+- The test change is necessary and sound. INC-00570 and INC-03573 unverified are correct.
+**Advisories:**
+- The audit says detection ran at 589376db; the report says c80b7e61. Fix the text.
+- INC-01641 and INC-00868 are the same CVE-2026-22708. This predates the branch; route it to the dedupe queue.
+- "Evidenced" on a product keyword alone is weak; batches 2-4 should prefer id tokens or say so.
+- INC-05425 and INC-05421 → link-health first.
+- INC-01553 has a `https://https://` reference.
+**Merge notes:** README and CHANGELOG conflict with 32daf87c (CHANGELOG union; README from HEAD, then re-render). The DATASHEET marker that moves is `unverified_count` 10→12, not incident_count.
+
 ### ✅ WS5 DATASHEET + README + HF card status note DONE: MERGED 2026-11-11 (`2b052def`; gate-ws5ds re-gate PASS on `1c63ba26` after bounce #1)
 **What merged** (4 files, +40/−4; no data/):
 - **DATASHEET Composition:** retracted and unverified rows are kept, not deleted, and sit outside incident_count; disputed rows are counted; the count identity, with stats markers.
