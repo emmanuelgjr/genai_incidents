@@ -1164,8 +1164,22 @@ def load_source(path: Path) -> list[dict]:
             f"[FATAL] cannot parse {path}: {type(e).__name__}: {e}; refusing to build "
             "(the source would silently drop to 0 rows). " + abort_sentence()
         )
+    if _is_ingest_side_file(path) and isinstance(data, list):
+        # D138 A3b: a side-file NAME with a list payload is a shape change, not rows.
+        raise IngestParseError(
+            f"[FATAL] {path} is a side file (dict by design) but its payload is a list; "
+            "refusing to build rather than load it as source rows (D138). " + abort_sentence()
+        )
     if isinstance(data, dict):
         if _is_ingest_side_file(path):
+            # D138 A2: a side file must carry no row key holding a non-empty list.
+            hit = [k for k in INGEST_ROW_KEYS if isinstance(data.get(k), list) and data[k]]
+            if hit:
+                raise IngestParseError(
+                    f"[FATAL] {path} is a side file but holds non-empty row key(s) {hit}; "
+                    "those rows would be silently dropped. Refusing to build (D138). "
+                    + abort_sentence()
+                )
             return []
         present = [k for k in INGEST_ROW_KEYS if k in data]
         if not present:
@@ -1181,7 +1195,21 @@ def load_source(path: Path) -> list[dict]:
                     f"[FATAL] {path}: row key '{k}' is {type(data[k]).__name__}, not a list of rows; "
                     "refusing to build (D131). " + abort_sentence()
                 )
-        data = next((data[k] for k in present if data[k]), [])
+        nonempty = [k for k in present if data[k]]
+        if len(nonempty) > 1:  # D138 A3a
+            raise IngestParseError(
+                f"[FATAL] {path}: more than one row key holds rows {nonempty}; loading one would "
+                "silently drop the other. Refusing to build (D138). " + abort_sentence()
+            )
+        if not nonempty:  # D138 A1: 0 rows while a non-row key carries a non-empty list
+            other = sorted(k for k, v in data.items() if k not in INGEST_ROW_KEYS and isinstance(v, list) and v)
+            if other:
+                raise IngestParseError(
+                    f"[FATAL] {path}: row key(s) {present} are empty but non-row key(s) {other} hold "
+                    "non-empty lists (a drifted row key?); would silently load as 0 rows. "
+                    "Refusing to build (D138). " + abort_sentence()
+                )
+        data = data[nonempty[0]] if nonempty else []
     if not isinstance(data, list):
         raise IngestParseError(
             f"[FATAL] {path} is not a list of rows (top-level is "
