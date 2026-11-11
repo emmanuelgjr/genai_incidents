@@ -256,7 +256,9 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
     run = strip_shell_comments(chr(10).join(s.get("run", "") for s in steps))
     if "gh workflow run" not in run:
         problems.append("dispatch job does not run `gh workflow run`")
-    elif not re.search("(?m)(?:^|;|&&|[|][|]|" + BS + "bdo" + BS + "b|" + BS + "bthen" + BS + "b)[ " + BS + "t]*gh workflow run" + BS + "b", run):
+    elif any(not re.match("[ " + BS + "t]*gh workflow run" + BS + "b", ln) for ln in run.splitlines() if "gh workflow run" in ln):
+        # conservative and lexical: every line naming the command must START with it
+        problems.append("`gh workflow run` must be at command position (line must start with the command)")
         problems.append("`gh workflow run` must be at command position (no echo/:/printf/true prefix)")
     for wf in DISPATCHED:
         if wf not in run:
@@ -265,9 +267,9 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
         problems.append('dispatch must pass -R "$GITHUB_REPOSITORY" (no checkout, so gh has no repo context)')
     for s_ in steps:
         if "gh workflow run" in s_.get("run", ""):
-            tok = str((s_.get("env") or {}).get("GH_TOKEN", ""))
-            if "github.token" not in tok and "secrets.GITHUB_TOKEN" not in tok:
-                problems.append("the dispatch step must set GH_TOKEN to the workflow token (github.token), not empty or another value")
+            tok = str((s_.get("env") or {}).get("GH_TOKEN", "")).strip()
+            if not re.fullmatch(r"[$][{][{]\s*(github[.]token|secrets[.]GITHUB_TOKEN)\s*[}][}]", tok):
+                problems.append("the dispatch step GH_TOKEN must be exactly ${{ github.token }} or ${{ secrets.GITHUB_TOKEN }}")
     if "--ref auto-refresh/data" not in run:
         problems.append("dispatch must target --ref auto-refresh/data")
     if '|| echo "::warning::' not in run:
@@ -421,12 +423,16 @@ def test_ci_dispatch_check_fires_comment_or_and_token_and_new_job():
     # (M6) neutered command: a prefix token makes `gh workflow run` an argument, not a command
     gwr = 'gh workflow run "$wf"'
     assert good.count(gwr) == 1
-    for prefix in ("echo ", ": ", "printf '%s' ", "true ", "cat <<< "):
+    for prefix in ("echo ", ": ", "printf '%s' ", "true ", "cat <<< ", "echo do ", "echo then ", "echo " + BS + "; "):
         fires(good.replace(gwr, prefix + gwr), v, "command position")
+    fires(good.replace(gwr, "echo '; " + gwr.replace(chr(34), "") + "'"), v, "command position")
     # (b) empty token
     tok = "GH_TOKEN: ${{ github.token }}" + nl + "        run: |" + nl + "          for wf"
     assert good.count(tok) == 1
-    fires(good.replace(tok, 'GH_TOKEN: ""' + nl + "        run: |" + nl + "          for wf"), v, "GH_TOKEN")
+    tail_ = nl + "        run: |" + nl + "          for wf"
+    for bad in ('""', '"github.token"', "${{ secrets.PAT || github.token }}", "${{ github.token }}x"):
+        fires(good.replace(tok, "GH_TOKEN: " + bad + tail_), v, "GH_TOKEN")
+    assert check_ci_dispatch(good.replace(tok, "GH_TOKEN: ${{secrets.GITHUB_TOKEN}}" + tail_), v, a) == []  # tolerated forms stay clean
     # (c) text only in a comment
     loop = "for wf in validate.yml a11y.yml; do"
     assert loop in good
@@ -550,7 +556,8 @@ def test_baseline_shell_block_executes(tmp_path):
     r = _run_baseline(script, with_origin, {"EVENT_NAME": "pull_request", "PUSH_BEFORE": ""})
     assert r.returncode == 0 and r.stdout == "HEAD^1"
 
-    # the old grep-based check passed these fail-open mutations; execution must catch them
+    # m1 (`|| base=HEAD; true || {`) passed the old grep-based check; m2
+    # (`exit 1` -> `true`) was already caught by it. Executing the block catches both.
     vbase = "base=" + chr(34) + "$(git rev-parse --verify --quiet 'origin/main^{commit}')" + chr(34) + " || {"
     assert vbase in script
     for mutated in (script.replace(vbase, vbase.replace(" || {", " || base=HEAD; true || {"), 1),

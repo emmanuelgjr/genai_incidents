@@ -72,9 +72,6 @@ def test_udp_sendto_and_sendmsg_to_remote_raise():
             u.sendto(b"x", (REMOTE_V4.encode(), 53))
         with blocked():
             u6.sendto(b"x", (REMOTE_V6, 53, 0, 0))
-        if hasattr(u, "sendmsg"):
-            with blocked():
-                u.sendmsg([b"x"], [], 0, (REMOTE_V4, 53))
     finally:
         u.close()
         u6.close()
@@ -128,3 +125,14 @@ def test_whole_loopback_block_is_loopback_not_just_127_0_0_1():
             pass  # refused / timed out / unroutable: not the guard
     finally:
         s.close()
+
+
+def test_udp_sendmsg_to_remote_raises():
+    u = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        if not hasattr(u, "sendmsg"):
+            pytest.skip("socket.sendmsg is not available on this platform")
+        with blocked():
+            u.sendmsg([b"x"], [], 0, (REMOTE_V4, 53))
+    finally:
+        u.close()
