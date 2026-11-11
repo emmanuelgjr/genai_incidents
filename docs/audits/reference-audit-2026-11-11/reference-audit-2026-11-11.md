@@ -9,9 +9,11 @@ row.
 Method (the D130-2 method, `docs/audits/reference-audit-2026-10-15/`): a URL is written into the corpus only if this session
 fetched it through `ingest/common.fetch_once` (robots.txt, per-host rate limit, identifying User-Agent; `fetch_evidence.py`) and
 the fetched page names the incident; `export_evidence.py` re-checks every token and aborts on a missing one. Discovery used
-direct URL guesses and the publishers' own index pages, fetched the same way; no search engine was available (the one tried
-served a bot challenge, not results). References that are only REMOVED need no replacement when the row keeps other
-references; references the row keeps untouched were not re-fetched (the audit covers the flagged URLs). All changes are
+direct URL guesses, the publishers' own index pages and publisher/news site-search pages, fetched the same way; no general search engine
+was usable (Bing returned unrelated pages, DuckDuckGo a bot challenge, Brave HTTP 429). References that are only REMOVED need no
+replacement when the row keeps other references. **Untouched (kept) references were fetched in full on rows with <= 15 kept references
+and sampled (method in the section "Evidence for the references the remove-rows kept") on larger rows**; this was added after the first
+report, on the foreman's rule C. All changes are
 `data/curation_overrides.json` entries generated from `d1303a_spec.py` by `build_overrides.py`; `data/incidents.json` and every other
 `data/*.json` is build output and was not edited.
 
@@ -59,7 +61,7 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 | INC-02871 | 0 | curated | fixed (flagged reference removed) | `https://github.com/Y4tacker` (depth1-non-slug) -> HTTP 200, title "Y4tacker (Y4tacker) · GitHub" | reference(s) removed; demoted to auto |
 | INC-04207 | 0 | curated | fixed (flagged reference removed) | `https://arxiv.org/abs/2402.06627` (R2 arXiv id/title mismatch) -> HTTP 200, title "[2402.06627] Feedback Loops With Language Models Drive In-Context Rewa" | reference(s) removed; demoted to auto |
 | INC-00021 | 1 | reviewed | fixed (flagged reference removed) | `http://trezor.com` (homepage) -> HTTP 200, title "Сейфы: лучшие модели и новинки ТРЕЗОР" | reference(s) removed; demoted to auto |
-| INC-00570 | 1 | reviewed | unverified | `https://www.aim.security/news` (depth1-non-slug) -> refused (robots.txt disallowed or unverifiable; fail-closed) | `status: unverified` (`no-confirmed-source`); references, title, tier untouched. The only reference is the publisher's news index (R1). aim.security robots.txt could not be verified (HTTP 403), so ingest/common.fetch_once refuses the host (fail-closed); no page naming 'continuing EchoLeak research and variants' was fetchable, and no other source was found. |
+| INC-00570 | 1 | reviewed | unverified | `https://www.aim.security/news` (depth1-non-slug) -> refused (robots.txt disallowed or unverifiable; fail-closed) | `status: unverified` (`no-confirmed-source`); references, title, tier untouched. The only reference is the publisher's news index (R1). Searched 2026-11-11 (all through fetch_once, or a search page where noted): aim.security/news and /lp/aim-labs-echoleak-blog-post and /sitemap.xml (robots.txt unverifiable, HTTP 403, so refused fail-closed); a web.archive.org snapshot of aim.security/news (lists EchoLeak, CurXecute and ASCII Smuggling items only, no 'variants' post); The Hacker News site search for 'EchoLeak', 'Aim Labs' and 'scope violation' (only the original EchoLeak coverage and Aim Labs' CurXecute Cursor RCE, CVE-2025-54135); the NVD 2.0 API keyword search 'EchoLeak' (0 results); BleepingComputer search for 'EchoLeak' (no results page content); Bing through WebFetch (returned unrelated 'AIM' pages) and DuckDuckGo (bot challenge). The only Aim Labs follow-up found is CurXecute, which is its own row INC-02469, and the original EchoLeak is INC-00924; pointing this row at either would create a duplicate. Nothing found names 'continued research into variants across multiple enterprise copilots'. Not found after this search; the search was limited to those routes. |
 | INC-00864 | 1 | reviewed | unchanged (false positive) | `https://cybersecuritynews.com/flowise-vulnerability/` -> HTTP 200, title "Critical Vulnerability In Flowise Allows Remote Command Execution Via " | R1 false positive: an article (one-hyphen slug) on the OX Security finding that Anthropic's MCP SDKs allow command execution; it names the incident. |
 | INC-01194 | 1 | reviewed | fixed (flagged reference removed) | `https://trysixth.com/` (homepage) -> HTTP 200, title "Sixth" | reference(s) removed; demoted to auto |
 | INC-01348 | 1 | reviewed | fixed (flagged reference removed) | `https://www.llamaindex.ai/` (homepage) -> HTTP 200, title "LlamaIndex / AI Agents for Document OCR + Workflows" | reference(s) removed; demoted to auto |
@@ -82,7 +84,7 @@ INC-05052 (the two non-legacy R2 rows) by ID order.
 | INC-03276 | 1 | reviewed | fixed (flagged reference removed) | `https://dotapp.uk` (homepage) -> HTTP 200, title "Try out the Dot beta" | reference(s) removed; demoted to auto |
 | INC-03292 | 1 | auto | fixed (flagged reference removed) | `https://phcode.dev/` (homepage) -> HTTP 200, title "Phoenix Code - Free Open Source Code Editor / Successor to Brackets"; `https://www.postbox-inc.com/` (homepage) -> HTTP 200, title "The Power Email App - Postbox" | reference(s) removed; already auto |
 | INC-03423 | 1 | reviewed | fixed (flagged reference removed) | `https://monica.im/desktop` (depth1-non-slug) -> HTTP 200, title "Monica - Your GPT AI Assistant Chrome Extension" | reference(s) removed; demoted to auto |
-| INC-03573 | 1 | reviewed | unverified | `https://www.anthropic.com/research` (depth1-non-slug) -> HTTP 200, title "Research \ Anthropic" | `status: unverified` (`no-confirmed-source`); references, title, tier untouched. The only reference is the publisher's research index (R1). anthropic.com/research and /news were fetched (200) and name no Frontier Threats Red Team spear-phishing scaling study; no other source was found. The row also carries a second seed id (an election-influence study) with no source. |
+| INC-03573 | 1 | reviewed | unverified | `https://www.anthropic.com/research` (depth1-non-slug) -> HTTP 200, title "Research \ Anthropic" | `status: unverified` (`no-confirmed-source`); references, title, tier untouched. The only reference is the publisher's research index (R1). Searched 2026-11-11 through fetch_once: anthropic.com/research, /news, /research/team/frontier-red-team, red.anthropic.com, /news/detecting-countering-misuse-aug-2025 and /news/building-safeguards-for-claude (all HTTP 200; none contains 'spear-phishing', 'spear phishing' or 'phishing' in a study of that name; the August 2025 misuse report names no such study); The Hacker News site search for 'Anthropic spear-phishing' and 'Anthropic Claude phishing' (reports of 2025-2026 Claude misuse, none a 2024 Frontier Threats Red Team spear-phishing scaling study). No search engine was available. The row also carries a second seed id (VTR-anthropic-election-influence-study-2024, an election-influence study) with no source either. Not found after this search; the search was limited to those routes. |
 | INC-04285 | 1 | reviewed | fixed (flagged reference removed) | `https://premiumaddons.com/change-log/` (depth1-non-slug) -> HTTP 200, title "Premium Addons PRO Changelog / Premium Addons for Elementor" | reference(s) removed; demoted to auto |
 | INC-04383 | 1 | reviewed | fixed (flagged reference removed) | `https://arxiv.org/abs/2103.03874` -> HTTP 200, title "[2103.03874] Measuring Mathematical Problem Solving With the MATH Data"; `https://arxiv.org/abs/2110.14168` -> HTTP 200, title "[2110.14168] Training Verifiers to Solve Math Word Problems" | reference(s) removed; demoted to auto |
 | INC-04959 | 1 | reviewed | fixed (flagged reference removed) | `https://www.oligo.security/shelltorch` (depth1-non-slug) -> HTTP 404 | reference(s) removed; demoted to auto |
@@ -125,6 +127,92 @@ Envelope / `data/stats.json` keys that moved (declared set; any other key would 
 
 Full per-row before/after: `delta-2026-11-11.json`.
 
+## Evidence for the references the remove-rows kept (foreman rule C)
+
+Rule as applied: **untouched references were fetched in full on rows with <= 15 kept references and sampled (first 5 + last 5 + 5 chosen by `random.Random(<row id>).sample` over the rest) on larger rows.** Every fetch went through `ingest/common.fetch_once`; `nvd.nist.gov/vuln/<CVE>` and `osv.dev/vulnerability/<id>` are JavaScript shells, so the same record was fetched from the NVD 2.0 API (7 s per request) / the OSV API, and the evidence file names both URLs. `kept_refs.py` does the work; `verify.py` re-derives the selection from the built rows and fails if a kept reference on a small row has no record, a large row's sample differs, or the tally disagrees (proved to fire by five mutations of a copy of the evidence file).
+
+- Rows fully fetched: 24; rows sampled: 5 (INC-01015, INC-01291, INC-01348, INC-02347, INC-02864).
+- **Tally (192 references fetched): evidenced 153 (HTTP 200 and an identifying token found: 111 by CVE/GHSA id, 42 by product keyword); dead-or-blocked 23 (kept, for the WS4 link-health task); page-without-token 16 (HTTP 200, no token: kept, for review); removal candidates 0, no reference was removed on this evidence.**
+- Four NVD pages for INC-02347 returned HTTP 503 on the first pass and 200 on a retry; the committed record is the retry.
+
+| row | kept | method | evidenced | dead-or-blocked | page-without-token |
+|---|---|---|---|---|---|
+| INC-00021 | 2 | all | 2 | 0 | 0 |
+| INC-01194 | 2 | all | 2 | 0 | 0 |
+| INC-01348 | 119 | sample of 15 | 14 | 0 | 1 |
+| INC-01553 | 11 | all | 8 | 1 | 2 |
+| INC-01724 | 4 | all | 4 | 0 | 0 |
+| INC-02076 | 14 | all | 8 | 6 | 0 |
+| INC-02150 | 12 | all | 12 | 0 | 0 |
+| INC-02347 | 17 | sample of 15 | 7 | 0 | 8 |
+| INC-02505 | 5 | all | 4 | 1 | 0 |
+| INC-02516 | 2 | all | 2 | 0 | 0 |
+| INC-02761 | 3 | all | 3 | 0 | 0 |
+| INC-02800 | 4 | all | 4 | 0 | 0 |
+| INC-02864 | 74 | sample of 15 | 15 | 0 | 0 |
+| INC-03209 | 2 | all | 1 | 1 | 0 |
+| INC-03276 | 3 | all | 2 | 1 | 0 |
+| INC-03292 | 4 | all | 4 | 0 | 0 |
+| INC-03423 | 7 | all | 7 | 0 | 0 |
+| INC-04285 | 2 | all | 1 | 0 | 1 |
+| INC-04383 | 4 | all | 1 | 2 | 1 |
+| INC-04959 | 6 | all | 5 | 0 | 1 |
+| INC-05009 | 5 | all | 3 | 0 | 2 |
+| INC-05421 | 6 | all | 2 | 4 | 0 |
+| INC-05425 | 5 | all | 1 | 4 | 0 |
+| INC-01015 | 442 | sample of 15 | 14 | 1 | 0 |
+| INC-01291 | 177 | sample of 15 | 15 | 0 | 0 |
+| INC-01589 | 9 | all | 7 | 2 | 0 |
+| INC-02471 | 2 | all | 2 | 0 | 0 |
+| INC-02871 | 2 | all | 2 | 0 | 0 |
+| INC-04207 | 1 | all | 1 | 0 | 0 |
+
+Not evidenced, by outcome (kept; none is an R1-shape index or homepage, so none is a removal candidate under the rule):
+
+- dead or blocked (4xx/5xx, robots refusal, error): WS4 link-health:
+  - INC-01553 `https://https://github.com/ollama/ollama` (robots-refused)
+  - INC-02076 `https://www.dailymail.co.uk/news/article-15607199/waymo-car-austin-terror-attack-shooting-victims.html` (403)
+  - INC-02076 `https://www.axios.com/local/austin/2026/03/02/waymo-vehicle-blocks-ems-austin-mass-shooting` (403)
+  - INC-02076 `https://www.kxan.com/investigations/city-of-austin-will-push-for-new-driverless-vehicle-legislation/` (403)
+  - INC-02076 `https://www.wkrn.com/news/local-news/nashville/new-video-shows-waymo-handling-busy-traffic-times-in-downtown-nashville/` (403)
+  - INC-02076 `https://www.ft.com/content/9c3da2e4-a938-45c4-8fb8-021aca5e66b8` (403)
+  - INC-02076 `https://www.koin.com/news/portland/self-driving-vehicle-company-waymo-will-launch-fleet-in-portland/` (403)
+  - INC-02505 `https://gist.github.com/Cristliu/216ddbadaf3258498c93d408683ecabd` (404)
+  - INC-03209 `https://atlas.mitre.org/studies/AML.CS0042` (404)
+  - INC-03276 `https://github.com/EDMPL/Vulnerability-Research/tree/main/CVE-2024-57783` (404)
+  - INC-04383 `https://atlas.mitre.org/studies/AML.CS0016` (404)
+  - INC-04383 `https://lspace.swyx.io/p/reverse-prompt-eng` (robots-refused)
+  - INC-05421 `https://www.aa.com.tr/ar/الدول-العربية/الحوثي-تعلن-استهداف-قاعدة-جوية-سعودية-بطائرة-مسيرة/2219972` (error)
+  - INC-05421 `https://www.tasnimnews.com/ar/news/2021/04/23/2489918/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%` (robots-refused)
+  - INC-05421 `https://www.tasnimnews.com/ar/news/2021/04/25/2490929/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%` (robots-refused)
+  - INC-05421 `https://www.alalamtv.net/news/5553693/سلاح-الجو-اليمني-المسير-يشن-هجومًا-على-قاعدة-الملك-خالد` (robots-refused)
+  - INC-05425 `https://www.tasnimnews.com/ar/news/2021/05/21/2507203/%d8%a7%d9%84%d8%b9%d9%85%db%8c%d8%af-%d8%b3%d8%b1%db%8c%d8%b9-%d8%` (robots-refused)
+  - INC-05425 `https://www.alalamtv.net/news/5605668/العميد-سريع-يعلن-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي` (robots-refused)
+  - INC-05425 `https://www.alahednews.com.lb/fastnewsdetails.php?fstid=120024` (404)
+  - INC-05425 `https://www.arabstoday.net/36/124022-الحوثيون-يعلنون-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي` (robots-refused)
+  - INC-01015 `https://www.vulncheck.com/advisories/flowise-auth-command-execution-and-sandbox-bypass-via-puppeteer-and-playwright-pack` (404)
+  - INC-01589 `https://x.com/0xacb/status/2016913750557651228` (robots-refused)
+  - INC-01589 `https://atlas.mitre.org/studies/AML.CS0050` (404)
+- HTTP 200 but no identifying token in the page text (redirect stubs, JS shells, wiki/bounty pages): review:
+  - INC-01348 `https://huntr.com/bounties/1bce0d61-ad03-4b22-bc32-8f99f92974e7` (200)
+  - INC-01553 `https://kb.cert.org/vuls/id/518910` (200)
+  - INC-01553 `https://huntr.com/bounties/172df98b-07cd-41ea-a628-366f8cd525c0` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43649/` (200)
+  - INC-02347 `https://csirt.divd.nl/DIVD-2024-00035/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43650/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43651/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43653/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43655/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43656/` (200)
+  - INC-02347 `https://csirt.divd.nl/CVE-2024-43657/` (200)
+  - INC-04285 `https://www.wordfence.com/threat-intel/vulnerabilities/id/82e5fd9f-9a1f-4a4c-ac06-61bf65e3c8ab?source=cve` (200)
+  - INC-04383 `https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks` (200)
+  - INC-04959 `http://packetstormsecurity.com/files/175095/PyTorch-Model-Server-Registration-Deserialization-Remote-Code-Execution.html` (200)
+  - INC-05009 `https://github.com/showdownjs/showdown/wiki/Markdown%27s-XSS-Vulnerability-%28and-how-to-mitigate-it%29` (200)
+  - INC-05009 `https://github.com/showdownjs/showdown/wiki/Markdown's-XSS-Vulnerability-(and-how-to-mitigate-it)` (200)
+
+Notable: `INC-01553` carries a malformed reference `https://https://github.com/ollama/ollama` (double scheme); `INC-04383`'s NCC Group URL now serves the research index.
+
 
 ## Declared knock-ons and headline deltas (bounce lesson iv)
 
@@ -160,8 +248,10 @@ rows kept their text; their labels are unaffected.
   the D130-2 follow-up g).
 - INC-00864's cybersecuritynews.com article and INC-05052's paper site were kept (R1/R2 false positives); INC-02150 keeps
   `https://cellularsecurity.org/ransacked` (fetched, names CVE-2024-24426) while its two homepages were removed.
-- INC-00570 is unverified only because aim.security is unfetchable under the fail-closed robots rule (HTTP 403 on robots.txt); it may be
-  re-checked if that host's robots.txt becomes verifiable.
+- INC-00570 and INC-03573 stay unverified after a second, wider search (the routes tried are listed in each row's override note and in the
+  per-row table above). aim.security is unfetchable under the fail-closed robots rule (robots.txt returns HTTP 403); INC-00570 may be
+  re-checked if that host's robots.txt becomes verifiable. "Not found" here means not found by those routes, not proven absent.
+- Dead and blocked kept references (listed in the evidence section) are for the WS4 link-health task; none was removed.
 - Existing refs the audit did not flag but met in passing: `research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks` (INC-04383) now
   serves an index page without the article; `lspace.swyx.io` could not be verified. Untouched.
 
@@ -172,6 +262,7 @@ python -I docs/audits/reference-audit-2026-11-11/derive_list.py            # 126
 python -I docs/audits/reference-audit-2026-11-11/build_overrides.py --check # overrides file == spec (exit 0)
 python scripts/parse_existing.py && python scripts/merge_and_dedupe.py && python scripts/render_markdown.py \
   && python scripts/render_docs_stats.py && python scripts/validate.py && python scripts/lint_atlas_ids.py   # build; git status clean afterwards
-python -I docs/audits/reference-audit-2026-11-11/verify.py                  # per-ID spec check, OK 0
+python -I docs/audits/reference-audit-2026-11-11/kept_refs.py plan          # the 192 kept-reference fetches (network: `fetch`, offline: `export`)
+python -I docs/audits/reference-audit-2026-11-11/verify.py                  # per-ID spec + kept-evidence check, OK 0
 python -I docs/audits/reference-audit-2026-11-11/delta.py                   # delta vs 64109452, unintended []
 ```

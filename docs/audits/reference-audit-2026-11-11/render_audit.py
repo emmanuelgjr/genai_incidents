@@ -133,7 +133,36 @@ def audit():
     p(f"`tier` landmark -> feed on {len(tiers)} rows: {', '.join(tiers)}. `landmark_count` {DELTA['stats']['landmark_count'][0]} -> {DELTA['stats']['landmark_count'][1]}. INC-02076 (reviewed) is demoted but stays landmark through its `aiid_id`.")
     conf = [rid for rid, d in DELTA["rows"].items() if "confidence" in d]
     p(f"\n`confidence` moved on {len(conf)} rows ({', '.join(c + ' ' + str(DELTA['rows'][c]['confidence'][0]) + '->' + str(DELTA['rows'][c]['confidence'][1]) for c in conf)}).")
-    p("\nFull per-row before/after: `delta-2026-11-11.json`.")
+    p("\nFull per-row before/after: `delta-2026-11-11.json`.\n")
+    kept_section()
+
+
+def kept_section():
+    K = json.loads((HERE / "kept-evidence-2026-11-11.json").read_text(encoding="utf-8"))
+    t = K["tally"]
+    p = print
+    p("## Evidence for the references the remove-rows kept (foreman rule C)\n")
+    p("Rule as applied: **untouched references were fetched in full on rows with <= 15 kept references and sampled (first 5 + last 5 + 5 chosen "
+      "by `random.Random(<row id>).sample` over the rest) on larger rows.** Every fetch went through `ingest/common.fetch_once`; "
+      "`nvd.nist.gov/vuln/<CVE>` and `osv.dev/vulnerability/<id>` are JavaScript shells, so the same record was fetched from the NVD 2.0 API "
+      "(7 s per request) / the OSV API, and the evidence file names both URLs. `kept_refs.py` does the work; `verify.py` re-derives the selection "
+      "from the built rows and fails if a kept reference on a small row has no record, a large row's sample differs, or the tally disagrees "
+      "(proved to fire by five mutations of a copy of the evidence file).\n")
+    p(f"- Rows fully fetched: {t['rows_fully_fetched']}; rows sampled: {len(t['rows_sampled'])} ({', '.join(t['rows_sampled'])}).")
+    p(f"- **Tally ({t['fetched_total']} references fetched): evidenced {t['evidenced']} (HTTP 200 and an identifying token found: {t['match_kind']['id']} by CVE/GHSA id, {t['match_kind']['keyword']} by product keyword); dead-or-blocked {t['dead-or-blocked']} (kept, for the WS4 link-health task); page-without-token {t['page-without-token']} (HTTP 200, no token: kept, for review); removal candidates 0, no reference was removed on this evidence.**")
+    p("- Four NVD pages for INC-02347 returned HTTP 503 on the first pass and 200 on a retry; the committed record is the retry.\n")
+    p("| row | kept | method | evidenced | dead-or-blocked | page-without-token |\n|---|---|---|---|---|---|")
+    for rid, r in K["rows"].items():
+        c = {k: sum(1 for x in r["references"] if x["outcome"] == k) for k in ("evidenced", "dead-or-blocked", "page-without-token")}
+        p(f"| {rid} | {r['kept_references']} | {'all' if r['method']=='all' else 'sample of '+str(r['fetched'])} | {c['evidenced']} | {c['dead-or-blocked']} | {c['page-without-token']} |")
+    p("\nNot evidenced, by outcome (kept; none is an R1-shape index or homepage, so none is a removal candidate under the rule):\n")
+    for k, label in (("dead-or-blocked", "dead or blocked (4xx/5xx, robots refusal, error): WS4 link-health"), ("page-without-token", "HTTP 200 but no identifying token in the page text (redirect stubs, JS shells, wiki/bounty pages): review")):
+        p(f"- {label}:")
+        for rid, r in K["rows"].items():
+            for x in r["references"]:
+                if x["outcome"] == k:
+                    p(f"  - {rid} `{x['url'][:120]}` ({x['status']})")
+    p("\nNotable: `INC-01553` carries a malformed reference `https://https://github.com/ollama/ollama` (double scheme); `INC-04383`'s NCC Group URL now serves the research index.\n")
 
 
 def corrections():

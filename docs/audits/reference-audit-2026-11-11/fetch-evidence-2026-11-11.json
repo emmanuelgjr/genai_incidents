@@ -368,6 +368,18 @@
    "tokens_unmatched": []
   },
   {
+   "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-54135",
+   "status": 200,
+   "title": "NVD - Home",
+   "fetched_at": "2026-11-11T03:55:29Z",
+   "sha256": "04d19671892cf3ce6997dfd940f08f87a59b76b2073c0d53955835d22badb070",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "CVE-2025-54135"
+   ]
+  },
+  {
    "url": "https://ollama.com/",
    "status": 200,
    "title": "Ollama · Run AI models locally and in the cloud",
@@ -438,6 +450,19 @@
    "tokens_unmatched": []
   },
   {
+   "url": "https://red.anthropic.com/",
+   "status": 200,
+   "title": "Frontier Red Team \\ Anthropic",
+   "fetched_at": "2026-11-11T03:55:42Z",
+   "sha256": "ced3b6b094e8c2b03927c2b958adcc48519050c51654c8a31b32b99d450a04e7",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "phishing",
+    "spear"
+   ]
+  },
+  {
    "url": "https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks/",
    "status": 200,
    "title": "Cyber Security Research | NCC Group",
@@ -464,6 +489,79 @@
    ]
   },
   {
+   "url": "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=EchoLeak",
+   "status": 200,
+   "title": null,
+   "fetched_at": "2026-11-11T03:55:03Z",
+   "sha256": "2828497d05b81156d71dcf79136b5914623a227900270c9c190a408412436d1f",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "EchoLeak",
+    "CVE-2025-32711"
+   ]
+  },
+  {
+   "url": "https://thehackernews.com/search?q=Aim+Labs",
+   "status": 200,
+   "title": "Search results for Aim Labs — Latest News, Reports & Analysis | The Hacker News",
+   "fetched_at": "2026-11-11T03:55:24Z",
+   "sha256": "d7241bafb54cbd386f24619f1bc25fc60c17edcacc03153c7e6aca54c324041c",
+   "error": null,
+   "tokens_matched": [
+    "Aim Labs"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://thehackernews.com/search?q=Anthropic+Claude+phishing",
+   "status": 200,
+   "title": "Search results for Anthropic Claude phishing — Latest News, Reports & Analysis | The Hacker News",
+   "fetched_at": "2026-11-11T03:55:40Z",
+   "sha256": "2032a0081c9cfac4730c118f7743ef9226cca13261fe938cc7862e103d408e17",
+   "error": null,
+   "tokens_matched": [
+    "phishing"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://thehackernews.com/search?q=Anthropic+spear-phishing",
+   "status": 200,
+   "title": "Search results for Anthropic spear-phishing — Latest News, Reports & Analysis | The Hacker News",
+   "fetched_at": "2026-11-11T03:55:38Z",
+   "sha256": "77d6891bb634344feaaae5b33cbb4d3ef7aee89bff4cb81d40267526457c367b",
+   "error": null,
+   "tokens_matched": [
+    "spear"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://thehackernews.com/search?q=EchoLeak",
+   "status": 200,
+   "title": "Search results for EchoLeak — Latest News, Reports & Analysis | The Hacker News",
+   "fetched_at": "2026-11-11T03:55:04Z",
+   "sha256": "4308ebefd34ebfd6771f7aaee25219be699d951cfd53f30e8e631b955f64d758",
+   "error": null,
+   "tokens_matched": [
+    "EchoLeak"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://thehackernews.com/search?q=scope+violation",
+   "status": 200,
+   "title": "Search results for scope violation — Latest News, Reports & Analysis | The Hacker News",
+   "fetched_at": "2026-11-11T03:55:26Z",
+   "sha256": "1c88faaa6cede78a58179db83c059c06fbdc35c8fbc92cd8bfa734169e089eae",
+   "error": null,
+   "tokens_matched": [
+    "scope violation"
+   ],
+   "tokens_unmatched": []
+  },
+  {
    "url": "https://trysixth.com/",
    "status": 200,
    "title": "Sixth",
@@ -481,6 +579,19 @@
    "sha256": "44ac6f3bc04f8a946e2a95e8c51cc1345e2cbd30bb73bcf0872e5131ca07c67a",
    "error": null,
    "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://web.archive.org/web/2026/https://www.aim.security/news",
+   "status": 200,
+   "title": "Aim | News",
+   "fetched_at": "2026-11-11T03:55:06Z",
+   "sha256": "1a04df2f1ffcf7ac66bf4517f9afc3ad8b8be3c4ae0d80df8b6b54eef04ecd99",
+   "error": null,
+   "tokens_matched": [
+    "EchoLeak",
+    "Aim"
+   ],
    "tokens_unmatched": []
   },
   {
@@ -508,6 +619,18 @@
    ]
   },
   {
+   "url": "https://www.aim.security/sitemap.xml",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:55:09Z",
+   "sha256": null,
+   "error": "refusing to fetch https://www.aim.security/sitemap.xml: robots.txt disallows it for User-Agent 'gena",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "echoleak"
+   ]
+  },
+  {
    "url": "https://www.anthropic.com/news",
    "status": 200,
    "title": "Newsroom \\ Anthropic",
@@ -519,6 +642,31 @@
     "spear-phishing",
     "spear phishing",
     "Frontier Threats"
+   ]
+  },
+  {
+   "url": "https://www.anthropic.com/news/building-safeguards-for-claude",
+   "status": 200,
+   "title": "Building safeguards for Claude \\ Anthropic",
+   "fetched_at": "2026-11-11T03:55:50Z",
+   "sha256": "79ee07b380d046396b11b8cdb317c2693b77d959196ef182c9b2c6c00d72a10c",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "phishing"
+   ]
+  },
+  {
+   "url": "https://www.anthropic.com/news/detecting-countering-misuse-aug-2025",
+   "status": 200,
+   "title": "Detecting and countering misuse of AI: August 2025 \\ Anthropic",
+   "fetched_at": "2026-11-11T03:55:49Z",
+   "sha256": "aa99ec374fe716e00f46bb8a7d61881da61b8d44336ebc39504d823425e9ffb4",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "spear",
+    "phishing"
    ]
   },
   {
@@ -534,6 +682,31 @@
     "spear phishing",
     "Frontier Threats",
     "election"
+   ]
+  },
+  {
+   "url": "https://www.anthropic.com/research/team/frontier-red-team",
+   "status": 200,
+   "title": "Frontier Red Team \\ Anthropic",
+   "fetched_at": "2026-11-11T03:55:44Z",
+   "sha256": "ced3b6b094e8c2b03927c2b958adcc48519050c51654c8a31b32b99d450a04e7",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "phishing",
+    "spear"
+   ]
+  },
+  {
+   "url": "https://www.bleepingcomputer.com/search/?q=EchoLeak",
+   "status": 200,
+   "title": "Search Results",
+   "fetched_at": "2026-11-11T03:55:28Z",
+   "sha256": "75947d59deed51eab1cb1412b5d530da3899e61a0b9f65d22acdaa2f474576f9",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "EchoLeak"
    ]
   },
   {

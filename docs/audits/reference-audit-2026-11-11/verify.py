@@ -17,9 +17,13 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "reference-audit-2026-10-15"))
 import d1303a_spec as S  # noqa: E402
 
+import kept_refs as K  # noqa: E402
+
 path = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO / "data" / "incidents.json"
+kept_path = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "kept-evidence-2026-11-11.json"
 base = json.loads(subprocess.run(["git", "show", f"{S.BASE}:data/incidents.json"], cwd=REPO, check=True,
                                  capture_output=True).stdout.decode("utf-8"))
 new = json.loads(path.read_text(encoding="utf-8"))
@@ -72,6 +76,28 @@ ev = json.loads((HERE / "fetch-evidence-2026-11-11.json").read_text(encoding="ut
 ok_urls = {p["url"] for p in ev["checked_pages"] if p["status"] == 200}
 for rid, sp in S.REPLACE.items():
     chk(sp["ref"]["url"] in ok_urls, f"{rid} new reference {sp['ref']['url']} has no 200 fetch evidence")
+# kept-reference evidence (foreman rule C): <=15 kept refs -> every one has a record; larger -> exactly the deterministic sample
+kept = json.loads(kept_path.read_text(encoding="utf-8"))
+chk(set(kept["rows"]) == set(S.REMOVE), "kept evidence rows != the remove rows")
+tl = {"evidenced": 0, "dead-or-blocked": 0, "page-without-token": 0}
+for rid in S.REMOVE:
+    refs = n[rid]["references"]
+    rec = kept["rows"].get(rid)
+    if rec is None:
+        continue
+    how, idx = K.selection(rid, refs)
+    want = [refs[i]["url"] for i in idx]
+    chk(rec["kept_references"] == len(refs), f"{rid} kept_references != built row")
+    chk(rec["method"] == how, f"{rid} method {rec['method']} != {how}")
+    chk([x["url"] for x in rec["references"]] == want, f"{rid} evidenced URLs differ from the {how} selection")
+    if len(refs) <= 15:
+        chk({x["url"] for x in rec["references"]} == {r["url"] for r in refs}, f"{rid} a kept reference has no evidence")
+    for x in rec["references"]:
+        chk(x["outcome"] in tl and x["status"] is not None and x["fetched_at"], f"{rid} bad record {x['url']}")
+        chk((x["outcome"] == "evidenced") == (x["status"] == 200 and bool(x["tokens_matched"])), f"{rid} outcome inconsistent {x['url']}")
+        if x["outcome"] in tl:
+            tl[x["outcome"]] += 1
+chk({k: kept["tally"][k] for k in tl} == tl, "tally does not equal the per-reference outcomes")
 print("FAIL" if fails else "OK", len(fails))
 for f in fails:
     print(" -", f)
