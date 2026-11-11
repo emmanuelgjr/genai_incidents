@@ -276,7 +276,7 @@ python -I docs/audits/reference-audit-2026-11-11/derive_list.py            # 126
 python -I docs/audits/reference-audit-2026-11-11/build_overrides.py --check # overrides file == spec (exit 0)
 python scripts/parse_existing.py && python scripts/merge_and_dedupe.py && python scripts/render_markdown.py \
   && python scripts/render_docs_stats.py && python scripts/validate.py && python scripts/lint_atlas_ids.py   # build; git status clean afterwards
-python -I docs/audits/reference-audit-2026-11-11/kept_refs.py plan          # the 192 kept-reference fetches (network: `fetch`, offline: `export`)
+python -I docs/audits/reference-audit-2026-11-11/kept_refs.py plan          # the 193 kept-reference fetches (network: `fetch`, offline: `export`)
 python -I docs/audits/reference-audit-2026-11-11/verify.py                  # per-ID spec + kept-evidence check, OK 0
 python -I docs/audits/reference-audit-2026-11-11/delta.py                   # delta vs 64109452, unintended []
 ```
