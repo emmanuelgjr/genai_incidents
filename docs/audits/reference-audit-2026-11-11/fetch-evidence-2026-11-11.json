@@ -1,0 +1,658 @@
+{
+ "fetched_via": "ingest/common.fetch_once (robots, rate limit, identifying User-Agent)",
+ "session": "2026-11-11",
+ "checked_pages": [
+  {
+   "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
+   "status": 200,
+   "title": "OpenClaw Security Risks: AI Agent Threats in SaaS",
+   "fetched_at": "2026-11-11T03:20:01Z",
+   "sha256": "adf64104c7c4c03e51efbd17817d8fa86e3d00dbbea94ecb9478aa924a29edf1",
+   "tokens_matched": [
+    "OpenClaw",
+    "135,000",
+    "first major AI agent security crisis",
+    "21,639",
+    "ClawHub"
+   ]
+  },
+  {
+   "url": "https://www.pillar.security/blog/the-agent-security-paradox-when-trusted-commands-in-cursor-become-attack-vectors",
+   "status": 200,
+   "title": "The Agent Security Paradox: When Trusted Commands in Cursor Become Attack Vectors",
+   "fetched_at": "2026-11-11T03:20:02Z",
+   "sha256": "8d63adb6795d3968400202867a3381f6caeb8c65542c52987434ca603e9a3c46",
+   "tokens_matched": [
+    "CVE-2026-22708",
+    "Cursor",
+    "prompt injection",
+    "validation",
+    "allowlist"
+   ]
+  },
+  {
+   "url": "https://embracethered.com/blog/posts/2024/deepseek-ai-prompt-injection-to-xss-and-account-takeover/",
+   "status": 200,
+   "title": "DeepSeek AI: From Prompt Injection To Account Takeover · Embrace The Red",
+   "fetched_at": "2026-11-11T03:20:03Z",
+   "sha256": "6cda2f2d90417f760230981d04a57b860a05e6915709e3b009d9eac94805167f",
+   "tokens_matched": [
+    "DeepSeek",
+    "userToken",
+    "localStorage",
+    "XSS",
+    "Account Takeover"
+   ]
+  },
+  {
+   "url": "https://unit42.paloaltonetworks.com/npm-supply-chain-attack/",
+   "status": 200,
+   "title": "\"Shai-Hulud\" Worm Compromises npm Ecosystem in Supply Chain Attack (Updated November 26)",
+   "fetched_at": "2026-11-11T03:20:05Z",
+   "sha256": "6067ce5a431a6a2d32ed8f1ed2fff99fa17bb2803c7879b1f5b49a7e18a0e8aa",
+   "tokens_matched": [
+    "Shai-Hulud",
+    "hundreds of software packages",
+    "LLM was used to generate the malicious bash script"
+   ]
+  },
+  {
+   "url": "https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes",
+   "status": 200,
+   "title": "AI-assisted cloud intrusion achieves admin access in 8 minutes | Sysdig",
+   "fetched_at": "2026-11-11T03:19:59Z",
+   "sha256": "1957e4a8b6e310b41a8e557ddf60d742355c0e08c3e35632cfb307ff1ff0a265",
+   "tokens_matched": [
+    "large language models",
+    "8 minutes",
+    "November 28, 2025",
+    "admin"
+   ]
+  },
+  {
+   "url": "https://cybersecuritynews.com/flowise-vulnerability/",
+   "status": 200,
+   "title": "Critical Vulnerability In Flowise Allows Remote Command Execution Via MCP Adapters",
+   "fetched_at": "2026-11-11T03:20:07Z",
+   "sha256": "cbb92d2bfb005f1176522142e00538f3e9ed2092cdc18bda41e10972cc3c8653",
+   "tokens_matched": [
+    "OX Security",
+    "Model Context Protocol",
+    "Anthropic"
+   ]
+  },
+  {
+   "url": "https://cellularsecurity.org/ransacked",
+   "status": 200,
+   "title": "Cellular Security | Florida Institute for Cybersecurity Research",
+   "fetched_at": "2026-11-11T03:20:10Z",
+   "sha256": "721cd721db337e98da37d2a964aba05b331f4e815ced59403cef2bbcb0d735e1",
+   "tokens_matched": [
+    "CVE-2024-24426",
+    "OpenAirInterface"
+   ]
+  },
+  {
+   "url": "https://real-gradients.github.io/",
+   "status": 200,
+   "title": "Real Attackers Don't Compute Gradients",
+   "fetched_at": "2026-11-11T03:20:11Z",
+   "sha256": "a2cabdc3d196e6236eadb261d1e4d401e9e8e65cd021b52c7ada14942fe5efea",
+   "tokens_matched": [
+    "phishing",
+    "evasive"
+   ]
+  }
+ ],
+ "other_fetches": [
+  {
+   "url": "http://abna24.com/b4xD",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:14:29Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "الملك خالد"
+   ]
+  },
+  {
+   "url": "http://abna24.com/b8b9",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:14:35Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "نجران"
+   ]
+  },
+  {
+   "url": "http://dify.com",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:17:36Z",
+   "sha256": null,
+   "error": "refusing to fetch http://dify.com: robots.txt disallows it for User-Agent 'genai_incidents/2.13.0 (+",
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "http://langchain-chatglm-webui.com",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:17:39Z",
+   "sha256": null,
+   "error": "refusing to fetch http://langchain-chatglm-webui.com: robots.txt disallows it for User-Agent 'genai_",
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "http://openairinterface.com",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:17:28Z",
+   "sha256": null,
+   "error": "refusing to fetch http://openairinterface.com: robots.txt disallows it for User-Agent 'genai_inciden",
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "http://trezor.com",
+   "status": 200,
+   "title": "Сейфы: лучшие модели и новинки ТРЕЗОР",
+   "fetched_at": "2026-11-11T03:17:14Z",
+   "sha256": "22fb42c623e648d56ffaa91a56bd0bb7c240f0f07e949d4b4829eb5d78733de5",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2103.03874",
+   "status": 200,
+   "title": "[2103.03874] Measuring Mathematical Problem Solving With the MATH Dataset",
+   "fetched_at": "2026-11-11T03:17:55Z",
+   "sha256": "b84bb6703b798c02389e7cb9f23f2e10bca4ecdfc431e7e15b69179cd152c864",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2110.14168",
+   "status": 200,
+   "title": "[2110.14168] Training Verifiers to Solve Math Word Problems",
+   "fetched_at": "2026-11-11T03:17:56Z",
+   "sha256": "ea9c1057f32796ff8181e23c8d06881d1afbfbbafca95b1b25a62491856e6e54",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://arxiv.org/abs/2212.14315",
+   "status": 200,
+   "title": "[2212.14315] \"Real Attackers Don't Compute Gradients\": Bridging the Gap Between Adversarial ML Research and Practice",
+   "fetched_at": "2026-11-11T03:14:28Z",
+   "sha256": "ca48b399fe0f0197fcbbd21bd221ebba34803ca131ad63a2c4b16f2bf2ccb560",
+   "error": null,
+   "tokens_matched": [
+    "attack"
+   ],
+   "tokens_unmatched": [
+    "phishing"
+   ]
+  },
+  {
+   "url": "https://arxiv.org/abs/2402.06627",
+   "status": 200,
+   "title": "[2402.06627] Feedback Loops With Language Models Drive In-Context Reward Hacking",
+   "fetched_at": "2026-11-11T03:18:05Z",
+   "sha256": "50a613ce90691e428119e4fa12afe80d7cb5d7f44bccb7915855e16b73a89e21",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://atlas.mitre.org/studies",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:15:14Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "AML.CS0016"
+   ]
+  },
+  {
+   "url": "https://atlas.mitre.org/studies/AML.CS0016",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:15:11Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "MathGPT"
+   ]
+  },
+  {
+   "url": "https://atlas.mitre.org/studies/AML.CS0032",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:14:59Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "phishing",
+    "Real Attackers"
+   ]
+  },
+  {
+   "url": "https://dify.ai",
+   "status": 200,
+   "title": "Dify - The Platform for Production-Ready Agentic Workflows",
+   "fetched_at": "2026-11-11T03:17:38Z",
+   "sha256": "7d6ab75197795fbb18bdcffd70ebe561eaf4da49ee4ab39e336628c716092cee",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://docs.dependencytrack.org/changelog/",
+   "status": 200,
+   "title": "Change Log | Dependency-Track",
+   "fetched_at": "2026-11-11T03:14:25Z",
+   "sha256": "7e379206d686a36081a7500b8cb6f65c29624f840705dbf6b36ff541b932e0a9",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "CVE-2022-39350"
+   ]
+  },
+  {
+   "url": "https://dotapp.uk",
+   "status": 200,
+   "title": "Try out the Dot beta",
+   "fetched_at": "2026-11-11T03:17:48Z",
+   "sha256": "00e7bee767e23945773f68ba60059605a77244faf4ec252728243e05161d4f0f",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://embracethered.com/blog/",
+   "status": 200,
+   "title": "Embrace The Red · Embrace The Red",
+   "fetched_at": "2026-11-11T03:13:14Z",
+   "sha256": "c2587a8d5cab0e05f9780df1208490ce356f5876266085d7e5687dd18e9c7fa3",
+   "error": null,
+   "tokens_matched": [
+    "DeepSeek",
+    "account takeover"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://flowiseai.com",
+   "status": 200,
+   "title": "Flowise - Build AI Agents, Visually",
+   "fetched_at": "2026-11-11T03:17:57Z",
+   "sha256": "20b4726c372146ab6ff2d01a5c82e7c30ca204e0e81cfe96dd48cd36dc1660d7",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/MaccariTA",
+   "status": 200,
+   "title": "MaccariTA (MaccariTA) · GitHub",
+   "fetched_at": "2026-11-11T03:18:02Z",
+   "sha256": "8874cb4dc6f272eacbc5e2e0fab28659312756fded46c3b7bbeb59f4f09fd782",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://github.com/Y4tacker",
+   "status": 200,
+   "title": "Y4tacker (Y4tacker) · GitHub",
+   "fetched_at": "2026-11-11T03:18:04Z",
+   "sha256": "58a47e26fe9ac5dc0e88762ba720e670e471331e6de26d52d94b338663babb4b",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://iocharger.com",
+   "status": 200,
+   "title": "OCPP EV Charger Manufacturer | Iocharger | Fleet Charging",
+   "fetched_at": "2026-11-11T03:17:32Z",
+   "sha256": "0f3e57d7bbc5c6972593bb9ece9c4c6b313000e6933319ee9c217edbdd83afb2",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://lspace.swyx.io/p/reverse-prompt-eng",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:15:17Z",
+   "sha256": null,
+   "error": "refusing to fetch https://lspace.swyx.io/p/reverse-prompt-eng: robots.txt disallows it for User-Agen",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "prompt"
+   ]
+  },
+  {
+   "url": "https://mattermost.com/security-updates",
+   "status": 200,
+   "title": "Security Updates | Mattermost Documentation",
+   "fetched_at": "2026-11-11T03:17:44Z",
+   "sha256": "07ff4baa37180b9ac68e9414bd96bf7c654f6e659fc07bc05d69f356d94d1619",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://monica.im/desktop",
+   "status": 200,
+   "title": "Monica - Your GPT AI Assistant Chrome Extension",
+   "fetched_at": "2026-11-11T03:17:52Z",
+   "sha256": "e8daefce60d1cc4c1888b25a0cfbde6dfa813ead3be6b3fa163af1cf3ef87aba",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://ollama.com/",
+   "status": 200,
+   "title": "Ollama · Run AI models locally and in the cloud",
+   "fetched_at": "2026-11-11T03:17:24Z",
+   "sha256": "e52250320f8da8e338e5ee29c8de74df1b8dbe71cc4c7b97017e7504162a16fa",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://openairinterface.org/",
+   "status": 200,
+   "title": "OpenAirInterface",
+   "fetched_at": "2026-11-11T03:17:30Z",
+   "sha256": "1784dac62d416c8a230425a18c338b9307f65156c6b9d2aef5330653e9db6c63",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://openclaw.ai/blog",
+   "status": 200,
+   "title": "Blog - OpenClaw",
+   "fetched_at": "2026-11-11T03:18:00Z",
+   "sha256": "c4a1ce52d8d1c9aa48cc5da3959f7d6c8c63479af3884a84a8103d067d118c55",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://phcode.dev/",
+   "status": 200,
+   "title": "Phoenix Code - Free Open Source Code Editor | Successor to Brackets",
+   "fetched_at": "2026-11-11T03:17:49Z",
+   "sha256": "7948fafd2f9fcaceac5d68a75c06b108e79c7f34828e409860924b0b622cd009",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://premiumaddons.com/change-log/",
+   "status": 200,
+   "title": "Premium Addons PRO Changelog | Premium Addons for Elementor",
+   "fetched_at": "2026-11-11T03:17:53Z",
+   "sha256": "7399c4f3b18d85c483e541640f77c1b3bf65cd65a4242f1b6dde0d1bbde2e7d3",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://python.langchain.com/docs/security/",
+   "status": 200,
+   "title": "LangChain overview - Docs by LangChain",
+   "fetched_at": "2026-11-11T03:17:41Z",
+   "sha256": "0759018942d31390e34a06ba6310cf128f6986d8627b86d4f4f2f88882c2cfb1",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://raytha.com",
+   "status": 200,
+   "title": "Raytha: the open source .NET CMS for developers who ship",
+   "fetched_at": "2026-11-11T03:17:25Z",
+   "sha256": "6e689c5c69402b082a8a6da33410c0d00f286b794f95fe2f2f93b3a002732637",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks/",
+   "status": 200,
+   "title": "Cyber Security Research | NCC Group",
+   "fetched_at": "2026-11-11T03:15:18Z",
+   "sha256": "0fb6d4fe66d9d822bb8af6128b760d7a82b8d5cf57c282c0f070288d1d0eda2f",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "prompt",
+    "injection"
+   ]
+  },
+  {
+   "url": "https://s.chinadailyhk.com/JV7f2i",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:14:43Z",
+   "sha256": null,
+   "error": "refusing to fetch https://s.chinadailyhk.com/JV7f2i: robots.txt disallows it for User-Agent 'genai_i",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "Sophia",
+    "Hanson"
+   ]
+  },
+  {
+   "url": "https://trysixth.com/",
+   "status": 200,
+   "title": "Sixth",
+   "fetched_at": "2026-11-11T03:17:21Z",
+   "sha256": "f40a0b1483aa361f352598e0167c72d2751155522815c1ca4ad87361395d39cb",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://unit42.paloaltonetworks.com/",
+   "status": 200,
+   "title": "Unit 42 - Latest Cybersecurity Research | Palo Alto Networks",
+   "fetched_at": "2026-11-11T03:26:18Z",
+   "sha256": "44ac6f3bc04f8a946e2a95e8c51cc1345e2cbd30bb73bcf0872e5131ca07c67a",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.aim.security/lp/aim-labs-echoleak-blog-post",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:19:56Z",
+   "sha256": null,
+   "error": "refusing to fetch https://www.aim.security/lp/aim-labs-echoleak-blog-post: robots.txt disallows it f",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "EchoLeak"
+   ]
+  },
+  {
+   "url": "https://www.aim.security/news",
+   "status": "robots-refused",
+   "title": null,
+   "fetched_at": "2026-11-11T03:19:53Z",
+   "sha256": null,
+   "error": "refusing to fetch https://www.aim.security/news: robots.txt disallows it for User-Agent 'genai_incid",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "EchoLeak"
+   ]
+  },
+  {
+   "url": "https://www.anthropic.com/news",
+   "status": 200,
+   "title": "Newsroom \\ Anthropic",
+   "fetched_at": "2026-11-11T03:19:52Z",
+   "sha256": "cd8092149c60ed313dc3d1a16aa77143da80a25206039c87e42085e43bf5224c",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "spear-phishing",
+    "spear phishing",
+    "Frontier Threats"
+   ]
+  },
+  {
+   "url": "https://www.anthropic.com/research",
+   "status": 200,
+   "title": "Research \\ Anthropic",
+   "fetched_at": "2026-11-11T03:19:50Z",
+   "sha256": "84cdda08233bfd423ce829a194f4e900a8fdd326565aee121e8cdf62bf28356d",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "spear-phishing",
+    "spear phishing",
+    "Frontier Threats",
+    "election"
+   ]
+  },
+  {
+   "url": "https://www.kxan.com/driverless/",
+   "status": 403,
+   "title": null,
+   "fetched_at": "2026-11-11T03:17:27Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 403: Forbidden",
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.langchain.com/",
+   "status": 200,
+   "title": "LangChain: the open agent platform to own your intelligence",
+   "fetched_at": "2026-11-11T03:17:59Z",
+   "sha256": "9a24601c33476350bb01aab9f9727a262df6c45d324f8b44202c4684cfbc4a34",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.llamaindex.ai/",
+   "status": 200,
+   "title": "LlamaIndex | AI Agents for Document OCR + Workflows",
+   "fetched_at": "2026-11-11T03:17:23Z",
+   "sha256": "2479bcf162ff31b89c21b7a37a7653047dc7a5feb7dbdd072d3402d4af96edbd",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.microsoft.com/en-us/security/blog/",
+   "status": 200,
+   "title": "Microsoft Security Blog",
+   "fetched_at": "2026-11-11T03:17:46Z",
+   "sha256": "0182f8c7424c036e845f1542597e0585bb7c3f96d885247ccdac7b2c600902bd",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/",
+   "status": 200,
+   "title": "Mitigating Skeleton Key, a new type of generative AI jailbreak technique | Microsoft Security Blog",
+   "fetched_at": "2026-11-11T03:18:07Z",
+   "sha256": "92ab1ea10ce4e6c9b111e2113e6e59412d28ed138878ead8ed5de291e69a14bf",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.oligo.security/shelltorch",
+   "status": 404,
+   "title": null,
+   "fetched_at": "2026-11-11T03:14:23Z",
+   "sha256": null,
+   "error": "HTTPError: HTTP Error 404: Not Found",
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "ShellTorch",
+    "CVE-2023-43654",
+    "TorchServe"
+   ]
+  },
+  {
+   "url": "https://www.pillar.security/blog",
+   "status": 200,
+   "title": "Pillar Blog | Latest stories about AI Security",
+   "fetched_at": "2026-11-11T03:26:15Z",
+   "sha256": "594a982c8829e96fae30724a4de73228630d8385f498eee84841c570ee332a12",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.postbox-inc.com/",
+   "status": 200,
+   "title": "The Power Email App - Postbox",
+   "fetched_at": "2026-11-11T03:17:51Z",
+   "sha256": "78c0405b8756ad6c173762a0ece85cc01c4a255de56adc089682b80b5686faee",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.reco.ai/newsroom",
+   "status": 200,
+   "title": "Reco Newsroom: AI Security News & Updates",
+   "fetched_at": "2026-11-11T03:26:12Z",
+   "sha256": "3eb3482e0463e60d0e129a76d4237b3eadfbc21c1773b86f4618d2e15f1f335f",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.startupdefense.io/mitre-atlas-case-studies/aml-cs0016-achieving-code-execution-in-mathgpt-via-prompt-injection-b05d5",
+   "status": 200,
+   "title": "Achieving Code Execution in MathGPT via Prompt Injection | MITRE ATLAS",
+   "fetched_at": "2026-11-11T03:15:28Z",
+   "sha256": "547020222e3c4d130874e1f6d55d907474b59f9249abc94e216a4fc80cbab4d8",
+   "error": null,
+   "tokens_matched": [
+    "MathGPT"
+   ],
+   "tokens_unmatched": []
+  },
+  {
+   "url": "https://www.sysdig.com/threat-research",
+   "status": 200,
+   "title": "Threat Research | Sysdig",
+   "fetched_at": "2026-11-11T03:19:57Z",
+   "sha256": "65e5d6a85a80300bab0658c653f20194edcaa4c6586bd90f4e62bcc3dbccd804",
+   "error": null,
+   "tokens_matched": [],
+   "tokens_unmatched": [
+    "large language"
+   ]
+  }
+ ]
+}

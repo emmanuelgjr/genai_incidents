@@ -22,7 +22,7 @@
 
 ---
 
-**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems. It pulls together AIID, OECD AIM, AIAAIC, MITRE ATLAS, NVD/GHSA/OSV, and researcher and vendor write-ups and maps them onto the same security taxonomies, so you can query and pivot across sources that don't share a schema. **Counts and statuses:** the headline count (<!-- stats:incident_count -->15,782<!-- /stats:incident_count -->) is the incidents that stand. Rows are never deleted: <!-- stats:retracted_count -->29<!-- /stats:retracted_count --> are `status: retracted` (their CVEs were rejected) and <!-- stats:unverified_count -->10<!-- /stats:unverified_count --> are `status: unverified` (no confirmed source), both outside that count, so `incident_count + retracted_count + unverified_count` equals the number of rows in `data/incidents.json` and the slim `incidents.min.json`. `disputed` rows are counted. **Python behaviour change (on `main`; not yet in a PyPI release, where `load_incidents()` still returns every row):** `load_incidents()` returns only rows that stand (it drops `retracted` and `unverified`, so its length equals `incident_count`); pass `include_retracted=True` for every row, as before. `query()`, `by_id()` and `by_cve()` still search every row.
+**genai_incidents** is a consolidated, machine-readable index of publicly disclosed security incidents, vulnerabilities, and red-team findings involving generative-AI and agentic-AI systems. It pulls together AIID, OECD AIM, AIAAIC, MITRE ATLAS, NVD/GHSA/OSV, and researcher and vendor write-ups and maps them onto the same security taxonomies, so you can query and pivot across sources that don't share a schema. **Counts and statuses:** the headline count (<!-- stats:incident_count -->15,780<!-- /stats:incident_count -->) is the incidents that stand. Rows are never deleted: <!-- stats:retracted_count -->29<!-- /stats:retracted_count --> are `status: retracted` (their CVEs were rejected) and <!-- stats:unverified_count -->12<!-- /stats:unverified_count --> are `status: unverified` (no confirmed source), both outside that count, so `incident_count + retracted_count + unverified_count` equals the number of rows in `data/incidents.json` and the slim `incidents.min.json`. `disputed` rows are counted. **Python behaviour change (on `main`; not yet in a PyPI release, where `load_incidents()` still returns every row):** `load_incidents()` returns only rows that stand (it drops `retracted` and `unverified`, so its length equals `incident_count`); pass `include_retracted=True` for every row, as before. `query()`, `by_id()` and `by_cve()` still search every row.
 
 | If you are… | …use it to |
 |---|---|
@@ -45,11 +45,11 @@
 
 <table>
 <tr>
-<td align="center"><b><!-- stats:incident_count -->15,782<!-- /stats:incident_count --></b><br><sub>incidents<br>of which <!-- stats:disputed_count -->22<!-- /stats:disputed_count --> CVE-disputed, still counted</sub></td>
-<td align="center"><b><!-- stats:landmark_count -->2,062<!-- /stats:landmark_count --></b><br><sub><code>tier: landmark</code></sub></td>
+<td align="center"><b><!-- stats:incident_count -->15,780<!-- /stats:incident_count --></b><br><sub>incidents<br>of which <!-- stats:disputed_count -->22<!-- /stats:disputed_count --> CVE-disputed, still counted</sub></td>
+<td align="center"><b><!-- stats:landmark_count -->2,056<!-- /stats:landmark_count --></b><br><sub><code>tier: landmark</code></sub></td>
 <td align="center"><b><!-- stats:year_min -->1983<!-- /stats:year_min -->–<!-- stats:year_max -->2026<!-- /stats:year_max --></b><br><sub>coverage</sub></td>
 <td align="center"><b>6</b><br><sub>taxonomies (4 core)</sub></td>
-<td align="center"><b>v<!-- stats:version -->2.13.0+main<!-- /stats:version --></b><br><sub>built <!-- stats:generated -->2026-11-08<!-- /stats:generated --></sub></td>
+<td align="center"><b>v<!-- stats:version -->2.13.0+main<!-- /stats:version --></b><br><sub>built <!-- stats:generated -->2026-11-11<!-- /stats:generated --></sub></td>
 </tr>
 </table>
 

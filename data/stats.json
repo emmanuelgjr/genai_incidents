@@ -1,11 +1,11 @@
 {
-  "incident_count": 15782,
+  "incident_count": 15780,
   "retracted_count": 29,
-  "unverified_count": 10,
+  "unverified_count": 12,
   "disputed_count": 22,
-  "landmark_count": 2062,
+  "landmark_count": 2056,
   "version": "2.13.0+main",
-  "generated": "2026-11-08",
+  "generated": "2026-11-11",
   "year_min": 1983,
   "year_max": 2026,
   "taxonomy_versions": {
