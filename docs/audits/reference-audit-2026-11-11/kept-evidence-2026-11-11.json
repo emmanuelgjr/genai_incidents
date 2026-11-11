@@ -1,0 +1,2903 @@
+{
+ "fetched_via": "ingest/common.fetch_once (robots, rate limit, identifying User-Agent)",
+ "session": "2026-11-11",
+ "rule": "untouched (kept) references were fetched in full on rows with <= 15 kept references and sampled on larger rows (first 5 + last 5 + 5 chosen by random.Random(row id).sample over the rest)",
+ "tally": {
+  "evidenced": 153,
+  "dead-or-blocked": 23,
+  "page-without-token": 17,
+  "match_kind": {
+   "id": 111,
+   "keyword": 42
+  },
+  "fetched_total": 193,
+  "rows_fully_fetched": 24,
+  "rows_sampled": [
+   "INC-01015",
+   "INC-01291",
+   "INC-01348",
+   "INC-02347",
+   "INC-02864"
+  ]
+ },
+ "rows": {
+  "INC-00021": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69893",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-69893",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:01Z",
+     "sha256": "a76d9118e94dc12ccc09ad0585b8b874c99157bfb74da4f826b2c0cdce1e3e37",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-69893"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://trezor.io/vulnerability/fix-side-channel-in-bip-39-mnemonic-processing-when-unlocked",
+     "fetched_via": "https://trezor.io/vulnerability/fix-side-channel-in-bip-39-mnemonic-processing-when-unlocked",
+     "status": 200,
+     "title": "Fix side-channel in BIP-39 mnemonic processing when unlocked | Trezor",
+     "fetched_at": "2026-11-11T03:57:08Z",
+     "sha256": "021fd8f0caea220003171c87b7a478a92f4c049d092908d8ec6273d54275a43b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Trezor"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-01194": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30310",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-30310",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:10Z",
+     "sha256": "025b6705137e841a84225b7c83edc7a5c7858fadf0cec64c10ba8283964a88d6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-30310"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/Secsys-FDU/LLM-Tool-Calling-CVEs/issues/12",
+     "fetched_via": "https://github.com/Secsys-FDU/LLM-Tool-Calling-CVEs/issues/12",
+     "status": 200,
+     "title": "Sixth Remote Code Execution Vulnerability · Issue #12 · Secsys-FDU/LLM-Tool-Calling-CVEs · GitHub",
+     "fetched_at": "2026-11-11T03:57:15Z",
+     "sha256": "78a618c18ab130797828b061153bb21a4bc0d4666607ce7eca358e1bd8eb169c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Sixth"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-01348": {
+   "kept_references": 119,
+   "method": "sample(first5+last5+5 seeded by row id)",
+   "fetched": 15,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-23751",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-23751",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:17Z",
+     "sha256": "a418c7b0d4c024751cb3d87085864b56e6cb7a81a9ae2a50e3eb2fe4cd2ee4b9",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-23751"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/run-llama/llama_index/issues/9957",
+     "fetched_via": "https://github.com/run-llama/llama_index/issues/9957",
+     "status": 200,
+     "title": "[Bug]: Text-to-SQL have serious SQL injection issue which can execute arbitary SQL statement · Issue #9957 · run-llama/llama_index · GitHub",
+     "fetched_at": "2026-11-11T03:57:22Z",
+     "sha256": "2e7fbe5228736f83b1122aa51842f9335b59803e790d959c4db38f887a7096fd",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-23751"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-2jxw-4hm4-6w87",
+     "fetched_via": "https://github.com/advisories/GHSA-2jxw-4hm4-6w87",
+     "status": 200,
+     "title": "SQL injection in llama-index · CVE-2024-23751 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T03:57:24Z",
+     "sha256": "b763147106632dd65017f03380e77120c00149c3f24797049043400cb83ff2c2",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-23751",
+      "GHSA-2JXW-4HM4-6W87"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/pypa/advisory-database/tree/main/vulns/llama-index/PYSEC-2024-12.yaml",
+     "fetched_via": "https://github.com/pypa/advisory-database/tree/main/vulns/llama-index/PYSEC-2024-12.yaml",
+     "status": 200,
+     "title": "advisory-database/vulns/llama-index/PYSEC-2024-12.yaml at main · pypa/advisory-database · GitHub",
+     "fetched_at": "2026-11-11T03:57:24Z",
+     "sha256": "a086d30eaa01198923f5a471b342f7cdf57e98b5dddebd9ce6a28c9eba5cda1c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-23751",
+      "PYSEC-2024-12"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-2jxw-4hm4-6w87",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-2jxw-4hm4-6w87",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:26Z",
+     "sha256": "f3988c37a31800974d869d0a75a98308341630a9a5704d692be8a24f013eb45e",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-23751",
+      "GHSA-2JXW-4HM4-6W87"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/pypa/advisory-database/tree/main/vulns/llama-index/PYSEC-2025-65.yaml",
+     "fetched_via": "https://github.com/pypa/advisory-database/tree/main/vulns/llama-index/PYSEC-2025-65.yaml",
+     "status": 200,
+     "title": "advisory-database/vulns/llama-index/PYSEC-2025-65.yaml at main · pypa/advisory-database · GitHub",
+     "fetched_at": "2026-11-11T03:57:28Z",
+     "sha256": "feba2430db101498cff0b664acba3d144cbdf916abf85fdf850c759710a29b0f",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-6209",
+      "PYSEC-2025-65"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-3wxx-q3gv-pvvv",
+     "fetched_via": "https://github.com/advisories/GHSA-3wxx-q3gv-pvvv",
+     "status": 200,
+     "title": "LlamaIndex vulnerable to DoS attack through uncontrolled recursive JSON parsing · CVE-2025-5472 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T03:57:29Z",
+     "sha256": "03c88012377449e5e7fdcacbb83ebd833b8f9fb1cf6cff567b4315bb3abfbbaa",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-5472",
+      "GHSA-3WXX-Q3GV-PVVV"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/run-llama/llama_index/compare/v0.10.37...v0.10.38",
+     "fetched_via": "https://github.com/run-llama/llama_index/compare/v0.10.37...v0.10.38",
+     "status": 200,
+     "title": "Comparing v0.10.37...v0.10.38 · run-llama/llama_index · GitHub",
+     "fetched_at": "2026-11-11T03:57:30Z",
+     "sha256": "07766d0b5a21b9abb19daeab86507367ba16f041755758b134e4948cee9acb83",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "llama_index"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-fxc2-8m62-m85x",
+     "fetched_via": "https://github.com/advisories/GHSA-fxc2-8m62-m85x",
+     "status": 200,
+     "title": "LlamaIndex includes an exec call for `import {cls_name}` · CVE-2024-45201 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T03:57:32Z",
+     "sha256": "9f21b989a657adfc7ec35d6cc83b8295c672841b92797c68a2f6a798a9542785",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-45201",
+      "GHSA-FXC2-8M62-M85X"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/PYSEC-2024-192",
+     "fetched_via": "https://api.osv.dev/v1/vulns/PYSEC-2024-192",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:32Z",
+     "sha256": "197b6d525c4ce761a14d896479a31c0e2249995e9de7bea69ab7fc5905a49a6b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-45201",
+      "PYSEC-2024-192"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-3098",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-3098",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:33Z",
+     "sha256": "9ff659dd0eac18ca6041394275c4ee356f99c0a73236db7858cd096bfd964227",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-3098"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://huntr.com/bounties/1bce0d61-ad03-4b22-bc32-8f99f92974e7",
+     "fetched_via": "https://huntr.com/bounties/1bce0d61-ad03-4b22-bc32-8f99f92974e7",
+     "status": 200,
+     "title": "huntr - The world's first bug bounty platform for AI/ML",
+     "fetched_at": "2026-11-11T03:57:33Z",
+     "sha256": "83dbd3cf4eb85369e4a9934b37471c3477af570cfdfbc1aca9c609ee74a8fbb2",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-wvpx-g427-q9wc",
+     "fetched_via": "https://github.com/advisories/GHSA-wvpx-g427-q9wc",
+     "status": 200,
+     "title": "llama-index-core Prompt Injection vulnerability leading to Arbitrary Code Execution · CVE-2024-3098 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T03:57:34Z",
+     "sha256": "86e981b4cdef7f3123826537cc5e798e81de67dfe5040e88d4cc2b9573189d2f",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-3098",
+      "GHSA-WVPX-G427-Q9WC"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-wvpx-g427-q9wc",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-wvpx-g427-q9wc",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:35Z",
+     "sha256": "5552f6bc85dfbaafc8f607901c11d4ae1d9b6143964d444d992f4c8eb5fb8720",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-3098",
+      "GHSA-WVPX-G427-Q9WC"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/PYSEC-2026-397",
+     "fetched_via": "https://api.osv.dev/v1/vulns/PYSEC-2026-397",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:35Z",
+     "sha256": "3fa1500d75df3c893cb502113be5099c7749a027d1faa9d595008201460a02f3",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-3098",
+      "PYSEC-2026-397"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-01553": {
+   "kept_references": 11,
+   "method": "all",
+   "fetched": 11,
+   "references": [
+    {
+     "url": "https://www.helpnetsecurity.com/2026/05/05/ollama-windows-vulnerabilities-cve-2026-42248-cve-2026-42249/",
+     "fetched_via": "https://www.helpnetsecurity.com/2026/05/05/ollama-windows-vulnerabilities-cve-2026-42248-cve-2026-42249/",
+     "status": 200,
+     "title": "Unpatched flaws turn Ollama's auto-updater into a persistent RCE vector, researchers say - Help Net Security",
+     "fetched_at": "2026-11-11T03:57:36Z",
+     "sha256": "815c65651f242966cdc0b5c0c5c570039b403afa8eb7e2747d58d46ff369f80b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-42248",
+      "CVE-2026-42249"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-42248",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-42248",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:37Z",
+     "sha256": "ad01af205a7bbb3631748cafee81aef0bb2c573287d213fcb17769df1a366bcc",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-42248"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://cert.pl/en/posts/2026/04/CVE-2026-42248/",
+     "fetched_via": "https://cert.pl/en/posts/2026/04/CVE-2026-42248/",
+     "status": 200,
+     "title": "Vulnerabilities in Ollama software | CERT Polska",
+     "fetched_at": "2026-11-11T03:57:40Z",
+     "sha256": "dceac89676a542993b80343ea0a64a4dc809ee9b8041c479675aafdd1c8003f4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-42248",
+      "CVE-2026-42249"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-5757",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-5757",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:41Z",
+     "sha256": "042ce662d5cb1805007499974e4d0f358649e938237b907823ea2bd3cd831bc5",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-5757"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://kb.cert.org/vuls/id/518910",
+     "fetched_via": "https://kb.cert.org/vuls/id/518910",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:47Z",
+     "sha256": "a9bca3cd63b40c03f9adc6c218638a9577adea7585912e822047cdb7e6f675d1",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-42249",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-42249",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:48Z",
+     "sha256": "c9345cba9771f2fcb144aa405e4808ecb0065acbcf73873843533d20edb34617",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-42248",
+      "CVE-2026-42249"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15514",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-15514",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:57:54Z",
+     "sha256": "63768892ddea75f15435f26bdad785288563eb0859f833073e331cef62fa37b6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-15514"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://https://github.com/ollama/ollama",
+     "fetched_via": "https://https://github.com/ollama/ollama",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:01Z",
+     "sha256": null,
+     "error": "refusing to fetch https://https://github.com/ollama/ollama: robots.txt disallows it for Us",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://huntr.com/bounties/172df98b-07cd-41ea-a628-366f8cd525c0",
+     "fetched_via": "https://huntr.com/bounties/172df98b-07cd-41ea-a628-366f8cd525c0",
+     "status": 200,
+     "title": "huntr - The world's first bug bounty platform for AI/ML",
+     "fetched_at": "2026-11-11T03:58:07Z",
+     "sha256": "39fb22ca936fb0d8b5fdb3974e6e84bf092944065e535134fe730070d8c8cbb5",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.vulncheck.com/advisories/ollama-multi-modal-image-processing-null-pointer-dereference",
+     "fetched_via": "https://www.vulncheck.com/advisories/ollama-multi-modal-image-processing-null-pointer-dereference",
+     "status": 200,
+     "title": "Ollama Multi-Modal Model Image Processing NULL Pointer Dereference | Advisories | VulnCheck",
+     "fetched_at": "2026-11-11T03:58:07Z",
+     "sha256": "a39b5c05a97105566469c4433541fc6c278e249d2f091fa3db29cf715a8b259c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-15514"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://access.redhat.com/security/cve/CVE-2025-15514",
+     "fetched_via": "https://access.redhat.com/security/cve/CVE-2025-15514",
+     "status": 200,
+     "title": "CVE-2025-15514 - Red Hat Customer Portal",
+     "fetched_at": "2026-11-11T03:58:08Z",
+     "sha256": "81464b3c5e42832ce10d62a9d8a6a2d079f1d2167e89cd946469e93d6d1aea1c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-15514"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-01724": {
+   "kept_references": 4,
+   "method": "all",
+   "fetched": 4,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69236",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-69236",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:10Z",
+     "sha256": "19fad646761ab91afa066c41370efea6ab05cdd48861f36ee3a0a1789111c34f",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-69236"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://cert.pl/en/posts/2026/03/CVE-2025-69236",
+     "fetched_via": "https://cert.pl/en/posts/2026/03/CVE-2025-69236",
+     "status": 200,
+     "title": "Vulnerabilities in Raytha software | CERT Polska",
+     "fetched_at": "2026-11-11T03:58:11Z",
+     "sha256": "00e1cc515b2af9a77bf1f8ac10fb6b1f31c6c210c2c0afea8167720689de9875",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-69236",
+      "CVE-2025-69237",
+      "CVE-2025-69241"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69237",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-69237",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:12Z",
+     "sha256": "f89cb06b4b894feccfec377f99bc95296e3f9d7d425a6c1bba75912260ad76dd",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-69236",
+      "CVE-2025-69237"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69241",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-69241",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:18Z",
+     "sha256": "a99df1d166c2ccaf20d63c0766058d01cb22bf509dc3657d4a442e8608970e40",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-69236",
+      "CVE-2025-69241"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-02076": {
+   "kept_references": 14,
+   "method": "all",
+   "fetched": 14,
+   "references": [
+    {
+     "url": "https://incidentdatabase.ai/cite/1543/",
+     "fetched_via": "https://incidentdatabase.ai/cite/1543/",
+     "status": 200,
+     "title": "Incident 1543: Waymo Robotaxi Reportedly Obstructed Ambulance Responding to Austin Mass Shooting",
+     "fetched_at": "2026-11-11T03:58:25Z",
+     "sha256": "3002791803e93a27ede20c8d4dc8c795dd3e979d3d7578df16dd46c5494edc8b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://oecd.ai/en/incidents/2026-03-02-bc30",
+     "fetched_via": "https://oecd.ai/en/incidents/2026-03-02-bc30",
+     "status": 200,
+     "title": "Waymo Robotaxi Impedes Emergency Response and Is Shot at During Austin Shootings - OECD.AI",
+     "fetched_at": "2026-11-11T03:58:26Z",
+     "sha256": "c07e81deb3a6397c7eaf3b7c4fbdd63d8a2310f769f80504cd416bdf078f1682",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.dailymail.co.uk/news/article-15607199/waymo-car-austin-terror-attack-shooting-victims.html",
+     "fetched_via": "https://www.dailymail.co.uk/news/article-15607199/waymo-car-austin-terror-attack-shooting-victims.html",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:28Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nypost.com/2026/03/01/us-news/video-shows-self-driving-waymo-car-blocking-emergency-vehicles-during-deadly-austin-shooting/",
+     "fetched_via": "https://nypost.com/2026/03/01/us-news/video-shows-self-driving-waymo-car-blocking-emergency-vehicles-during-deadly-austin-shooting/",
+     "status": 200,
+     "title": "Video shows self-driving Waymo car blocking emergency vehicles during deadly Austin shooting",
+     "fetched_at": "2026-11-11T03:58:30Z",
+     "sha256": "f48303c32728a5c7b7bd3d3e1833419f03ae6f4d4c2d5c69b6934cf5dc7d7fa2",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.cbsnews.com/sanfrancisco/news/waymo-execs-testify-san-francisco-city-hall-vehicles-actions-power-outage/",
+     "fetched_via": "https://www.cbsnews.com/sanfrancisco/news/waymo-execs-testify-san-francisco-city-hall-vehicles-actions-power-outage/",
+     "status": 200,
+     "title": "Waymo execs testify at San Francisco City Hall about their vehicles' actions during power outage - CBS San Francisco",
+     "fetched_at": "2026-11-11T03:58:32Z",
+     "sha256": "e13d2ebe85f7b6ab6ddfc76de3b8b606808465e0d57733e32b846c008cac54b7",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.tmz.com/2026/03/02/waymo-taxi-stops-ambulance-texas-mass-shooting-video/",
+     "fetched_via": "https://www.tmz.com/2026/03/02/waymo-taxi-stops-ambulance-texas-mass-shooting-video/",
+     "status": 200,
+     "title": "Waymo Car Blocks Ambulance Responding to Austin Mass Shooting, on Video",
+     "fetched_at": "2026-11-11T03:58:34Z",
+     "sha256": "02f673a01ad06d335ce62101c2f54c4de1b464a65cc1bc158e1909715ea9a164",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.breitbart.com/tech/2026/03/02/self-driving-waymo-ev-blocked-first-responders-at-austin-mass-shooting-scene/",
+     "fetched_via": "https://www.breitbart.com/tech/2026/03/02/self-driving-waymo-ev-blocked-first-responders-at-austin-mass-shooting-scene/",
+     "status": 200,
+     "title": "Self-Driving Waymo EV Blocked First Responders at Austin Mass Shooting Scene",
+     "fetched_at": "2026-11-11T03:58:35Z",
+     "sha256": "315f3c273f36b696ecc49149d8d550edce067a622060fc7d05b0da04e5eb7321",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.axios.com/local/austin/2026/03/02/waymo-vehicle-blocks-ems-austin-mass-shooting",
+     "fetched_via": "https://www.axios.com/local/austin/2026/03/02/waymo-vehicle-blocks-ems-austin-mass-shooting",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:37Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://oecd.ai/en/incidents/2026-04-28-c648",
+     "fetched_via": "https://oecd.ai/en/incidents/2026-04-28-c648",
+     "status": 200,
+     "title": "Waymo Robotaxi Blocks Ambulance in Austin, Raising Safety Concerns - OECD.AI",
+     "fetched_at": "2026-11-11T03:58:38Z",
+     "sha256": "a84b9aa4f72fd73ee6b69da0d74990c2421ba83f02eca8869d80045d1e3c2a4f",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.kxan.com/investigations/city-of-austin-will-push-for-new-driverless-vehicle-legislation/",
+     "fetched_via": "https://www.kxan.com/investigations/city-of-austin-will-push-for-new-driverless-vehicle-legislation/",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:39Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.statesman.com/business/technology/article/waymo-austin-6th-street-mass-shooting-ambulance-22227939.php",
+     "fetched_via": "https://www.statesman.com/business/technology/article/waymo-austin-6th-street-mass-shooting-ambulance-22227939.php",
+     "status": 200,
+     "title": "Waymo skips Austin meeting after car blocked ambulance during shooting",
+     "fetched_at": "2026-11-11T03:58:40Z",
+     "sha256": "e46b28e985f52a83ccbb057dc1ca2a37a79744e2beac00acf924644cb04fbbc6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Waymo"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.wkrn.com/news/local-news/nashville/new-video-shows-waymo-handling-busy-traffic-times-in-downtown-nashville/",
+     "fetched_via": "https://www.wkrn.com/news/local-news/nashville/new-video-shows-waymo-handling-busy-traffic-times-in-downtown-nashville/",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:42Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.ft.com/content/9c3da2e4-a938-45c4-8fb8-021aca5e66b8",
+     "fetched_via": "https://www.ft.com/content/9c3da2e4-a938-45c4-8fb8-021aca5e66b8",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:43Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.koin.com/news/portland/self-driving-vehicle-company-waymo-will-launch-fleet-in-portland/",
+     "fetched_via": "https://www.koin.com/news/portland/self-driving-vehicle-company-waymo-will-launch-fleet-in-portland/",
+     "status": 403,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:44Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 403: Forbidden",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-02150": {
+   "kept_references": 12,
+   "method": "all",
+   "fetched": 12,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24442",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24442",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:45Z",
+     "sha256": "41b7b584531c33f107a19d62d432f59d228b0a01e50d6959724c017d00736eee",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24442"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://cellularsecurity.org/ransacked",
+     "fetched_via": "https://cellularsecurity.org/ransacked",
+     "status": 200,
+     "title": "Cellular Security | Florida Institute for Cybersecurity Research",
+     "fetched_at": "2026-11-11T03:58:45Z",
+     "sha256": "721cd721db337e98da37d2a964aba05b331f4e815ced59403cef2bbcb0d735e1",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24426",
+      "CVE-2024-24442",
+      "CVE-2024-24443"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24444",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24444",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:46Z",
+     "sha256": "1ce9c01be93e65de6804c43b4ab63ecb30c5d508ddaa152bf1f739a26f68bac9",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24444"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24445",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24445",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:52Z",
+     "sha256": "7564f7c2b3f4a91999e911b0ed26871b24f8ebe9e1af059ada944168ae573f66",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24445"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24451",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24451",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:58:59Z",
+     "sha256": "7699c7ff3270f82d869fd6c837aa42598bdafb86ff5ae6a27fee536c3966d93d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24451"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24443",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24443",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:06Z",
+     "sha256": "2806fa36f9871d6c03e5475796f7fa4c5d872784311335d1d57e75ad55479efc",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24443"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24449",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24449",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:13Z",
+     "sha256": "6a918fdfcf5ee7eef96530aeeba2b7283eda739a77ecce462be2420231bd5682",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24449"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24450",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24450",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:20Z",
+     "sha256": "f0e70a4c1f6e332a3a6554a579368fbafcd87cf2124360497a997a0d54e310f6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24450"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24426",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24426",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:27Z",
+     "sha256": "7465ed47fadacb805c643fff52433acd700bc0c15c893eca77bdfa74b5fb00b0",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24426"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/OPENAIRINTERFACE/openair-epc-fed",
+     "fetched_via": "https://github.com/OPENAIRINTERFACE/openair-epc-fed",
+     "status": 200,
+     "title": "GitHub - openairinterface/openair-epc-fed: Federation of all Open-Air-CN components · GitHub",
+     "fetched_at": "2026-11-11T03:59:34Z",
+     "sha256": "71b18102a1f86a638e9c6edf1b58104ad35c01c07d23e8914665d25f9fbe8a01",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "OpenAirInterface"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/magma/magma",
+     "fetched_via": "https://github.com/magma/magma",
+     "status": 200,
+     "title": "GitHub - magma/magma: Platform for building access networks and modular network services · GitHub",
+     "fetched_at": "2026-11-11T03:59:35Z",
+     "sha256": "c36dc8be4922f6f6a5a6d778124bd39b529ecc9b4eb77a4c6e6a5246a9d4861b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "OpenAirInterface"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24446",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-24446",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:36Z",
+     "sha256": "4c962dd4987749378dc7b55467a3992310f9a13277b828b078e1661af24e3624",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-24446"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-02347": {
+   "kept_references": 17,
+   "method": "sample(first5+last5+5 seeded by row id)",
+   "fetched": 15,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43649",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43649",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:41Z",
+     "sha256": "2a47b266110e3f01947e56604f6c505b46d843f1f8dd85e24432a4c56be5e7d0",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43649"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43649/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43649/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T03:59:48Z",
+     "sha256": "a1c16f712c5a821ba1d1a70a9a23c4c0e09632f917e3eee8387262694046b1b2",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://csirt.divd.nl/DIVD-2024-00035/",
+     "fetched_via": "https://csirt.divd.nl/DIVD-2024-00035/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T03:59:50Z",
+     "sha256": "11678b78e2408ff8facafa1ed8fe6b58f8505e4f848231c62426fbe5cd0d94ed",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43650",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43650",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:51Z",
+     "sha256": "8c68c9809da8447333d6f837f59a73988bd00ba057ed78ae5a9c3cb6e9a3ae7d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43650"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43650/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43650/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T03:59:55Z",
+     "sha256": "0b86eee62c3a663f12a7046fe316ca021475e49d41550e99b71061c38f96973b",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43651/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43651/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T03:59:56Z",
+     "sha256": "aab78a845d6b503cb5e7fd85e42f10d4e7b9a352473d87ba135f38a51c3aca71",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43653",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43653",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T03:59:57Z",
+     "sha256": "1405cc4ffaa4b4f00e5a31a3e53a5f7b2b3ebc6ef263a403a06395c3968ed5b7",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43653"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43653/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43653/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T04:00:25Z",
+     "sha256": "6f8e0ced0e7a8bc3e6193d3fe097c39c7ce11acaa0ed3d9d8fd539a232d9682a",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43654",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43654",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:46Z",
+     "sha256": "61eb6c1e405583f313bec9e45d11fa15e72471cfccc8e949d4be41b8aae05b04",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43654"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43655",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43655",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:53Z",
+     "sha256": "682fc7115a56d8d06217d685acaebbf1e71ad3360e798c50de2b44daee465fd7",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43655"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43655/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43655/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T04:00:33Z",
+     "sha256": "845d1d0ba307650da97199a07bd56d6d3037a0336b4663253cbae38ab99ddf7e",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43656",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43656",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:08:00Z",
+     "sha256": "c640de0da06e433786910b1a5f6fc1b7b875ca29ae4f1f0bacd8a85241c9ab8b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43656"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43656/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43656/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T04:00:40Z",
+     "sha256": "cc08eedd320157f2b8f2803c3910e152649a084dbaa9f3727add65b2072afc16",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43657",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-43657",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:08:07Z",
+     "sha256": "7608fe1707b96364dc4fb9375691b24f3de1301f774999507dca4766e0ea625d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-43657"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://csirt.divd.nl/CVE-2024-43657/",
+     "fetched_via": "https://csirt.divd.nl/CVE-2024-43657/",
+     "status": 200,
+     "title": "Redirecting…",
+     "fetched_at": "2026-11-11T04:00:47Z",
+     "sha256": "71051dea4ec766907809a840abbecc17854b0b0ef3e92f3fe7587ee778235d0b",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-02505": {
+   "kept_references": 5,
+   "method": "all",
+   "fetched": 5,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-56157",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-56157",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:00:47Z",
+     "sha256": "f809c589c1be492191fcb3afe00defbd1d8afc40021f01816a1e9af2d457b87a",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-56157"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://gist.github.com/Cristliu/216ddbadaf3258498c93d408683ecabd",
+     "fetched_via": "https://gist.github.com/Cristliu/216ddbadaf3258498c93d408683ecabd",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:00:55Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://gist.github.com/Cristliu/298f51cbc72c45d91632cd0d65aa8161",
+     "fetched_via": "https://gist.github.com/Cristliu/298f51cbc72c45d91632cd0d65aa8161",
+     "status": 200,
+     "title": "CVE-2025-56157 Public Disclosure · GitHub",
+     "fetched_at": "2026-11-11T04:00:56Z",
+     "sha256": "7aad266db24c04a6b80283a256bc4d93d70818533356b523c77012d2913efb07",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-56157"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langgenius/dify",
+     "fetched_via": "https://github.com/langgenius/dify",
+     "status": 200,
+     "title": "GitHub - langgenius/dify: Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collaborative workspace. Deploy on cloud, VPC, or self-hosted, so teams move from prototype to production without rebuilding the stack. · GitHub",
+     "fetched_at": "2026-11-11T04:00:57Z",
+     "sha256": "b2d2b10452340bba8efb6b65ad0fb7a4cbd1f46313e54abdd5db5dffa22b2e49",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Dify"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/langgenius/dify/issues/15285",
+     "fetched_via": "https://github.com/langgenius/dify/issues/15285",
+     "status": 200,
+     "title": "PostgreSQL should not be exposed externally by default · Issue #15285 · langgenius/dify · GitHub",
+     "fetched_at": "2026-11-11T04:00:58Z",
+     "sha256": "e0d529164841d6b944a2fde38e0404c08aae1444fe18874810897e66b943c749",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Dify"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-02516": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-29720",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-29720",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:00:59Z",
+     "sha256": "74ba943e85ec5c2e3528055702adf3dbb9070d382c3e58e8831a13370dd387f6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-29720"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langgenius/dify/issues/15185",
+     "fetched_via": "https://github.com/langgenius/dify/issues/15185",
+     "status": 200,
+     "title": "Unauthorized SSRF vulnerability in controllers.console.remote_files.RemoteFileUploadApi · Issue #15185 · langgenius/dify · GitHub",
+     "fetched_at": "2026-11-11T04:01:05Z",
+     "sha256": "11056708ebe7b9678494bd9647b4fbbaa1ddc1a20bfacf146ab0f24bfc266ce9",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Dify"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-02761": {
+   "kept_references": 3,
+   "method": "all",
+   "fetched": 3,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-45150",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-45150",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:07Z",
+     "sha256": "f25115b3054f87cdf7d2c16e8762088e0f3eeb0bbcb7c91b668149bd45f66136",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-45150"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://gist.github.com/ycshao12/69a48551cc6c9cc69153d137afe9ecef",
+     "fetched_via": "https://gist.github.com/ycshao12/69a48551cc6c9cc69153d137afe9ecef",
+     "status": 200,
+     "title": "CVE-2025-45150 · GitHub",
+     "fetched_at": "2026-11-11T04:01:15Z",
+     "sha256": "227ed3f0ea68ff0529bca12138b76aa631ced99ae9ac2354294c17090a3ac3f5",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-45150"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/X-D-Lab/LangChain-ChatGLM-Webui",
+     "fetched_via": "https://github.com/X-D-Lab/LangChain-ChatGLM-Webui",
+     "status": 200,
+     "title": "GitHub - X-D-Lab/LangChain-ChatGLM-Webui: 基于LangChain和ChatGLM-6B等系列LLM的针对本地知识库的自动问答 · GitHub",
+     "fetched_at": "2026-11-11T04:01:16Z",
+     "sha256": "54396bfd762a7995cf0f79bc7d06801abac980b163f27010e25a7f678add707a",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "ChatGLM"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-02800": {
+   "kept_references": 4,
+   "method": "all",
+   "fetched": 4,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-46059",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-46059",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:17Z",
+     "sha256": "973d98f997fe77dde6983d03e10ff00e8f63bbd4b770c0ddf2dc4052db3daba5",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-46059"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/Jr61-star/CVEs/blob/main/CVE-2025-46059.md",
+     "fetched_via": "https://github.com/Jr61-star/CVEs/blob/main/CVE-2025-46059.md",
+     "status": 200,
+     "title": "CVEs/CVE-2025-46059.md at main · Jiangrong-W/CVEs · GitHub",
+     "fetched_at": "2026-11-11T04:01:18Z",
+     "sha256": "ca46b393dbf65e7f8466342627c876df74a21bb45a1a9008470ea704b34b26d6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-46059"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain-community/issues/217#issuecomment-3144824471",
+     "fetched_via": "https://github.com/langchain-ai/langchain-community/issues/217#issuecomment-3144824471",
+     "status": 200,
+     "title": "Remote malicious email injection which leads to control of the agent and forward the user's email · Issue #217 · langchain-ai/langchain-community · GitHub",
+     "fetched_at": "2026-11-11T04:01:20Z",
+     "sha256": "10d5d333927e925c58de17ee7183333855804b5f689bc0706a12754d6d68b623",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-46059"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain/issues/30833",
+     "fetched_via": "https://github.com/langchain-ai/langchain/issues/30833",
+     "status": 200,
+     "title": "Remote malicious email injection which leads to control of the agent and forward the user's email · Issue #217 · langchain-ai/langchain-community · GitHub",
+     "fetched_at": "2026-11-11T04:01:21Z",
+     "sha256": "8c08d240087450f008395def42649aa5dec2557eb15dbebee4a7c94216ad0f95",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-46059"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-02864": {
+   "kept_references": 74,
+   "method": "sample(first5+last5+5 seeded by row id)",
+   "fetched": 15,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4339",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-4339",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:23Z",
+     "sha256": "91208e840dae6bca6b2a1239d6b8c211bb385630cb8fd7d6f0a68ff7a7aca82c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-4339"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-9699",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-9699",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:24Z",
+     "sha256": "fe58e32b4ecf5362c4b7cf3fce09c2008da3efd15ab0db958b4a90f64e5d99f4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-9699"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28735",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-28735",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:31Z",
+     "sha256": "1785d1898794df209b4b5ae5a744d0d33f894beab2200431cc7229d3f8c403ab",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-28735"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-r5vf-grcx-5vqp",
+     "fetched_via": "https://github.com/advisories/GHSA-r5vf-grcx-5vqp",
+     "status": 200,
+     "title": "Mattermost allows authenticated users to gain access to private repositories · CVE-2026-28735 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:01:38Z",
+     "sha256": "15741a6598f1c5300d744d8ba07b6b4a5856648f79debbb0dbcd8a968c64507c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-28735",
+      "GHSA-R5VF-GRCX-5VQP"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost-plugin-github/commit/6e6b740c4852cdfa136ee0ced160da832285c353",
+     "fetched_via": "https://github.com/mattermost/mattermost-plugin-github/commit/6e6b740c4852cdfa136ee0ced160da832285c353",
+     "status": 200,
+     "title": "MM-67866 Improving connection logic (#980) · mattermost/mattermost-plugin-github@6e6b740 · GitHub",
+     "fetched_at": "2026-11-11T04:01:39Z",
+     "sha256": "d82e62703ede234167ae4687166d88631421f62e90ba974033ef86647cc26671",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost-plugin-boards/commit/57c5be5b6ef59d02dd72e35094d1fae8ba6e9619",
+     "fetched_via": "https://github.com/mattermost/mattermost-plugin-boards/commit/57c5be5b6ef59d02dd72e35094d1fae8ba6e9619",
+     "status": 200,
+     "title": "Validation to modify comments (#152) · mattermost/mattermost-plugin-boards@57c5be5 · GitHub",
+     "fetched_at": "2026-11-11T04:01:41Z",
+     "sha256": "f5079bdf23a6e706472683a6e38e448630c16d67c209461cf0acfc5c2ea35dcf",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost/commit/1346cf529aef0672c39a56ec10d1b8a9c8fb387d",
+     "fetched_via": "https://github.com/mattermost/mattermost/commit/1346cf529aef0672c39a56ec10d1b8a9c8fb387d",
+     "status": 200,
+     "title": "MM-67274: Fix panic in getBrowserVersion with empty User-Agent versio… · mattermost/mattermost@1346cf5 · GitHub",
+     "fetched_at": "2026-11-11T04:01:42Z",
+     "sha256": "aa3567dcc6271ba3eb2488844a9329db2e9c8f67a30ff5d9d52a9bc232d61440",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-2783",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2023-2783",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:42Z",
+     "sha256": "71a5e51e13cc8f5a7d12ebdd75fd7bd81fbcc6135c0bac75397f8dddb6ce3e81",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-2783"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-5ghq-28r7-qwfj",
+     "fetched_via": "https://github.com/advisories/GHSA-5ghq-28r7-qwfj",
+     "status": 200,
+     "title": "Mattermost Server does not restrict SAML certificate path for System Administrators · CVE-2017-18918 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:01:49Z",
+     "sha256": "648e4a46f69468936715fcbf752c48e49620f57e5e2d35196ed19f425521359d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2017-18918",
+      "GHSA-5GHQ-28R7-QWFJ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost/commit/a12e7fdca439948ab097431d68e8f59778fbab81",
+     "fetched_via": "https://github.com/mattermost/mattermost/commit/a12e7fdca439948ab097431d68e8f59778fbab81",
+     "status": 200,
+     "title": "PLT-5905 Fix saml certificates for 3.6 (#5842) · mattermost/mattermost@a12e7fd · GitHub",
+     "fetched_at": "2026-11-11T04:01:50Z",
+     "sha256": "6fe9beff5c3d2c76f23e0daf233c94413a50e3bce964c09cd66a53de5f98c399",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost/commit/d76946bdb545aba4088943fc523dabb459d22873",
+     "fetched_via": "https://github.com/mattermost/mattermost/commit/d76946bdb545aba4088943fc523dabb459d22873",
+     "status": 200,
+     "title": "PLT-7563 Fixed template handling to support more values (4.0) · mattermost/mattermost@d76946b · GitHub",
+     "fetched_at": "2026-11-11T04:01:51Z",
+     "sha256": "52418e7186487297620e60d04ac132bf2eb79a46354661a68f155c5004dc7473",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost/commit/f5167f3ba645b829f4c28530e13be6c3db967255",
+     "fetched_via": "https://github.com/mattermost/mattermost/commit/f5167f3ba645b829f4c28530e13be6c3db967255",
+     "status": 200,
+     "title": "PLT-7563 Fixed template handling to support more values (4.2) · mattermost/mattermost@f5167f3 · GitHub",
+     "fetched_at": "2026-11-11T04:01:52Z",
+     "sha256": "346e61a185d0865d7664c297b9f575ad53f8b5418f212cd9ee56aa0f238b4be6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-11077",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2016-11077",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:53Z",
+     "sha256": "76c99d8615c2c13e4990680e013d5ae35511a6c05776e96d38bebbe67b75de14",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2016-11077"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-mj8v-773w-5qhj",
+     "fetched_via": "https://github.com/advisories/GHSA-mj8v-773w-5qhj",
+     "status": 200,
+     "title": "Mattermost Server allows System Admin to modify LDAP account names and email addresses · CVE-2016-11077 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:01:55Z",
+     "sha256": "adc8b4c0954d9b411c92a20c4a5582b9d57ba261e526bef6412976ea2a9ece4d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2016-11077",
+      "GHSA-MJ8V-773W-5QHJ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/mattermost/mattermost/commit/5d7e34c94b56c4b0abb0c3d1702f2b5feb8d2904",
+     "fetched_via": "https://github.com/mattermost/mattermost/commit/5d7e34c94b56c4b0abb0c3d1702f2b5feb8d2904",
+     "status": 200,
+     "title": "Fixing ldap ability to modify user fields (#2868) · mattermost/mattermost@5d7e34c · GitHub",
+     "fetched_at": "2026-11-11T04:01:55Z",
+     "sha256": "c86bbb9603305f108f6e4be372b4ded3cd04b1ecfaa0d4cec7da51317c0789c1",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Mattermost"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-03209": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://atlas.mitre.org/studies/AML.CS0042",
+     "fetched_via": "https://atlas.mitre.org/studies/AML.CS0042",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:01:57Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.microsoft.com/en-us/security/blog/2025/11/03/sesameop-novel-backdoor-uses-openai-assistants-api-for-command-and-control/",
+     "fetched_via": "https://www.microsoft.com/en-us/security/blog/2025/11/03/sesameop-novel-backdoor-uses-openai-assistants-api-for-command-and-control/",
+     "status": 200,
+     "title": "SesameOp: Novel backdoor uses OpenAI Assistants API for command and control | Microsoft Security Blog",
+     "fetched_at": "2026-11-11T04:01:58Z",
+     "sha256": "1f08005a206a156dfc02b4de3b496429ca8681f8340ff259a469d6d4d3981c69",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "SesameOp"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-03276": {
+   "kept_references": 3,
+   "method": "all",
+   "fetched": 3,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-57783",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-57783",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:00Z",
+     "sha256": "141b946fb2fe4f348de900dd0a1dec5a7ddbe382748f312f414d87559912d9f8",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-57783"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/EDMPL/Vulnerability-Research/tree/main/CVE-2024-57783",
+     "fetched_via": "https://github.com/EDMPL/Vulnerability-Research/tree/main/CVE-2024-57783",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:00Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/alexpinel/Dot/issues/28",
+     "fetched_via": "https://github.com/alexpinel/Dot/issues/28",
+     "status": 200,
+     "title": "Vulnerability Report: Remote Code Execution in the Dot Desktop Application · Issue #28 · alexpinel/Dot · GitHub",
+     "fetched_at": "2026-11-11T04:02:00Z",
+     "sha256": "148d11f2f582ea471e9a86751902d209ec4e2338c4dbf7289379e6f7057cc10e",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Dot"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-03292": {
+   "kept_references": 4,
+   "method": "all",
+   "fetched": 4,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-5255",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-5255",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:02Z",
+     "sha256": "0dc911573eb9841873f2d550991f6ef7ddd16a7e28dd7b6b46fb6a6893e04dec",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-5255"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://cert.pl/en/posts/2025/06/tcc-bypass/",
+     "fetched_via": "https://cert.pl/en/posts/2025/06/tcc-bypass/",
+     "status": 200,
+     "title": "TCC Bypass vulnerabilities in two macOS applications | CERT Polska",
+     "fetched_at": "2026-11-11T04:02:08Z",
+     "sha256": "0a187bdba410227da2796e2933b9c00dfa55dd868eb31a62c0a989b8618fe415",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-5255",
+      "CVE-2025-5963"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/phcode-dev/phoenix-desktop/commit/ab5d5ffd04fbbab770c1ef6250cd0ec5323289c2",
+     "fetched_via": "https://github.com/phcode-dev/phoenix-desktop/commit/ab5d5ffd04fbbab770c1ef6250cd0ec5323289c2",
+     "status": 200,
+     "title": "fix: macos entitlements hardening · phcode-dev/phoenix-desktop@ab5d5ff · GitHub",
+     "fetched_at": "2026-11-11T04:02:09Z",
+     "sha256": "249bfca5995bffb16c5db25889abe8969bfda6326abdbf36e752fc412601bd14",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Phoenix"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-5963",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-5963",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:10Z",
+     "sha256": "0687f5f17d5ff2301b86742ec17019c0808ab380942241fd48f4b6a1ca04de73",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-5963"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-03423": {
+   "kept_references": 7,
+   "method": "all",
+   "fetched": 7,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-48140",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-48140",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:14Z",
+     "sha256": "1c016c0ad10ca6384ec4bdd029960ab988e68e2f54a9be89274d3ebbbde3a743",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-48140"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://chromewebstore.google.com/detail/monica-your-ai-copilot-po/ofpnmcalabcbjgholdjcjblkibolbppb?hl=en",
+     "fetched_via": "https://chromewebstore.google.com/detail/monica-your-ai-copilot-po/ofpnmcalabcbjgholdjcjblkibolbppb?hl=en",
+     "status": 200,
+     "title": "Monica: All-In-One AI Assist & Smartest AI Agent - Chrome Web Store",
+     "fetched_at": "2026-11-11T04:02:21Z",
+     "sha256": "670d0a27072e3ff7b79149762c60316b3c472e263b6178679ce27398d39b3281",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Monica"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/soursec/CVEs/tree/main/CVE-2024-48140",
+     "fetched_via": "https://github.com/soursec/CVEs/tree/main/CVE-2024-48140",
+     "status": 200,
+     "title": "CVEs/CVE-2024-48140 at main · soursec/CVEs · GitHub",
+     "fetched_at": "2026-11-11T04:02:24Z",
+     "sha256": "c11ad00a679bff1b45167435d8b85b4f427151d52e1ee5c275bf3caa20dc30c5",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-48140"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-48142",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-48142",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:24Z",
+     "sha256": "05bef5d652714f7d16efcaa431c9b5d1adee43bceabbb148c46c004e446140da",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-48142"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/soursec/CVEs/tree/main/CVE-2024-48142",
+     "fetched_via": "https://github.com/soursec/CVEs/tree/main/CVE-2024-48142",
+     "status": 200,
+     "title": "CVEs/CVE-2024-48142 at main · soursec/CVEs · GitHub",
+     "fetched_at": "2026-11-11T04:02:28Z",
+     "sha256": "67be0efcf2e066a760cca80b7cabca1082cc26dab4db1bc44e376d86b9433be4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-48142"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-45989",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-45989",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:29Z",
+     "sha256": "b2f7a3b727b71942c7c59f412e756bb8a5073f7c4d9fd6fcc88e9403a779bf50",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-45989"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/soursec/CVEs/tree/main/CVE-2024-45989",
+     "fetched_via": "https://github.com/soursec/CVEs/tree/main/CVE-2024-45989",
+     "status": 200,
+     "title": "CVEs/CVE-2024-45989 at main · soursec/CVEs · GitHub",
+     "fetched_at": "2026-11-11T04:02:35Z",
+     "sha256": "ccd7c2c251695399bf323babd5bafdeb54835ca2ca30456e8fdecf0bdc812dae",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-45989"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-04285": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-2238",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-2238",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:36Z",
+     "sha256": "7037628dab9e5b2b1df7523d0a3e2ce359228207b3db82663724f5c9410d44ea",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-2238"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://www.wordfence.com/threat-intel/vulnerabilities/id/82e5fd9f-9a1f-4a4c-ac06-61bf65e3c8ab?source=cve",
+     "fetched_via": "https://www.wordfence.com/threat-intel/vulnerabilities/id/82e5fd9f-9a1f-4a4c-ac06-61bf65e3c8ab?source=cve",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:42Z",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-04383": {
+   "kept_references": 5,
+   "method": "all",
+   "fetched": 5,
+   "references": [
+    {
+     "url": "https://atlas.mitre.org/studies/AML.CS0016",
+     "fetched_via": "https://atlas.mitre.org/studies/AML.CS0016",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:43Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://arxiv.org/abs/2110.14168",
+     "fetched_via": "https://arxiv.org/abs/2110.14168",
+     "status": 200,
+     "title": "[2110.14168] Training Verifiers to Solve Math Word Problems",
+     "fetched_at": "2026-11-11T06:17:25Z",
+     "sha256": "ea9c1057f32796ff8181e23c8d06881d1afbfbbafca95b1b25a62491856e6e54",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://lspace.swyx.io/p/reverse-prompt-eng",
+     "fetched_via": "https://lspace.swyx.io/p/reverse-prompt-eng",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:44Z",
+     "sha256": null,
+     "error": "refusing to fetch https://lspace.swyx.io/p/reverse-prompt-eng: robots.txt disallows it for",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks",
+     "fetched_via": "https://research.nccgroup.com/2022/12/05/exploring-prompt-injection-attacks",
+     "status": 200,
+     "title": "Cyber Security Research | NCC Group",
+     "fetched_at": "2026-11-11T04:02:45Z",
+     "sha256": "6da788996880c6f62684583ae81d313978a1bf8c409c568044cf267966c73182",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.startupdefense.io/mitre-atlas-case-studies/aml-cs0016-achieving-code-execution-in-mathgpt-via-prompt-injection-b05d5",
+     "fetched_via": "https://www.startupdefense.io/mitre-atlas-case-studies/aml-cs0016-achieving-code-execution-in-mathgpt-via-prompt-injection-b05d5",
+     "status": 200,
+     "title": "Achieving Code Execution in MathGPT via Prompt Injection | MITRE ATLAS",
+     "fetched_at": "2026-11-11T04:02:48Z",
+     "sha256": "547020222e3c4d130874e1f6d55d907474b59f9249abc94e216a4fc80cbab4d8",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "MathGPT"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  },
+  "INC-04959": {
+   "kept_references": 6,
+   "method": "all",
+   "fetched": 6,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-43654",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2023-43654",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:50Z",
+     "sha256": "cb289c03e5ecfc180fe4da760378c1386f5a7a563ee8cb2039c014217b486896",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-43654"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "http://packetstormsecurity.com/files/175095/PyTorch-Model-Server-Registration-Deserialization-Remote-Code-Execution.html",
+     "fetched_via": "http://packetstormsecurity.com/files/175095/PyTorch-Model-Server-Registration-Deserialization-Remote-Code-Execution.html",
+     "status": 200,
+     "title": "Packet Storm",
+     "fetched_at": "2026-11-11T04:02:50Z",
+     "sha256": "43f1e5bf0ca734a01cf0fe2a3b09ed4e8ba7f2d036df11a1dd7a1224a9309241",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/pytorch/serve/pull/2534",
+     "fetched_via": "https://github.com/pytorch/serve/pull/2534",
+     "status": 200,
+     "title": "Issue warning about allowed_urls when default value is used by namannandan · Pull Request #2534 · pytorch/serve · GitHub",
+     "fetched_at": "2026-11-11T04:02:54Z",
+     "sha256": "acc5488a1c78553bec0578dae6207c4a1b4550c2e85349e56c06ef91b98ed0c4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "TorchServe"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/pytorch/serve/releases/tag/v0.8.2",
+     "fetched_via": "https://github.com/pytorch/serve/releases/tag/v0.8.2",
+     "status": 200,
+     "title": "Release TorchServe v0.8.2 Release Notes · pytorch/serve · GitHub",
+     "fetched_at": "2026-11-11T04:02:55Z",
+     "sha256": "01967f6b0210e2d67c2f00bd22ea55d40360697d18792534c5c3e7d2c743e8ad",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "TorchServe"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/pytorch/serve/security/advisories/GHSA-8fxr-qfr9-p34w",
+     "fetched_via": "https://github.com/pytorch/serve/security/advisories/GHSA-8fxr-qfr9-p34w",
+     "status": 200,
+     "title": "TorchServe SSRF · Advisory · pytorch/serve · GitHub",
+     "fetched_at": "2026-11-11T04:02:55Z",
+     "sha256": "142661ee0c95a49743e72064cab9bb6f448c0c06d4968a7816e9c7e1c614140c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-43654",
+      "GHSA-8FXR-QFR9-P34W"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-8fxr-qfr9-p34w",
+     "fetched_via": "https://github.com/advisories/GHSA-8fxr-qfr9-p34w",
+     "status": 200,
+     "title": "TorchServe Server-Side Request Forgery vulnerability · CVE-2023-43654 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:02:56Z",
+     "sha256": "9a40f33e625e0abd494b1c5a1a0e51841ade56321f09fa99ddfe8af76e993c77",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-43654",
+      "GHSA-8FXR-QFR9-P34W"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-05009": {
+   "kept_references": 5,
+   "method": "all",
+   "fetched": 5,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-39350",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2022-39350",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:02:57Z",
+     "sha256": "9fefa7df367bbf10b0693502ce883067f0af960c9fb7f32b2fef8ea4bcbae955",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2022-39350"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/DependencyTrack/frontend/security/advisories/GHSA-c33w-pm52-mqvf",
+     "fetched_via": "https://github.com/DependencyTrack/frontend/security/advisories/GHSA-c33w-pm52-mqvf",
+     "status": 200,
+     "title": "Persistent Cross-Site-Scripting via Vulnerability Details · Advisory · DependencyTrack/frontend · GitHub",
+     "fetched_at": "2026-11-11T04:02:59Z",
+     "sha256": "21c085c8baafba1c824a0837b79c47def15fa3196e7b0be90696678a17d5180d",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2022-39350",
+      "GHSA-C33W-PM52-MQVF"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/showdownjs/showdown/wiki/Markdown%27s-XSS-Vulnerability-%28and-how-to-mitigate-it%29",
+     "fetched_via": "https://github.com/showdownjs/showdown/wiki/Markdown%27s-XSS-Vulnerability-%28and-how-to-mitigate-it%29",
+     "status": 200,
+     "title": "Markdown's XSS Vulnerability (and how to mitigate it) · showdownjs/showdown Wiki · GitHub",
+     "fetched_at": "2026-11-11T04:03:00Z",
+     "sha256": "2471f18cd1c204e5235a563f401780a260d501425b7d0b9f3164bccbb3e7ce43",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-c33w-pm52-mqvf",
+     "fetched_via": "https://github.com/advisories/GHSA-c33w-pm52-mqvf",
+     "status": 200,
+     "title": "@dependencytrack/frontend vulnerable to Persistent Cross-Site-Scripting via Vulnerability Details · CVE-2022-39350 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:03:01Z",
+     "sha256": "42d842ce14fccf9d0e3821507c41426de0d744d8375c958e4985563f21e1ddda",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2022-39350",
+      "GHSA-C33W-PM52-MQVF"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/showdownjs/showdown/wiki/Markdown's-XSS-Vulnerability-(and-how-to-mitigate-it)",
+     "fetched_via": "https://github.com/showdownjs/showdown/wiki/Markdown's-XSS-Vulnerability-(and-how-to-mitigate-it)",
+     "status": 200,
+     "title": "Markdown's XSS Vulnerability (and how to mitigate it) · showdownjs/showdown Wiki · GitHub",
+     "fetched_at": "2026-11-11T04:03:02Z",
+     "sha256": "860d210cafe849cb8b41357d56ea8e3778af455b48ae81182f9acf9f87ee7345",
+     "error": null,
+     "outcome": "page-without-token",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-05421": {
+   "kept_references": 6,
+   "method": "all",
+   "fetched": 6,
+   "references": [
+    {
+     "url": "https://oecd.ai/en/incidents/2021-04-21-e2e3",
+     "fetched_via": "https://oecd.ai/en/incidents/2021-04-21-e2e3",
+     "status": 200,
+     "title": "AI-Enabled Drones Used in Repeated Attacks on Saudi Military Base - OECD.AI",
+     "fetched_at": "2026-11-11T04:03:03Z",
+     "sha256": "815c8a2fc5ada4eb8b93e4d80f1e7d9cf247650c70b9db53c927de2748220ecd",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "سعود",
+      "خالد"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.aa.com.tr/ar/الدول-العربية/الحوثي-تعلن-استهداف-قاعدة-جوية-سعودية-بطائرة-مسيرة/2219972",
+     "fetched_via": "https://www.aa.com.tr/ar/الدول-العربية/الحوثي-تعلن-استهداف-قاعدة-جوية-سعودية-بطائرة-مسيرة/2219972",
+     "status": "error",
+     "title": null,
+     "fetched_at": "2026-11-11T04:03:04Z",
+     "sha256": null,
+     "error": "UnicodeEncodeError: 'ascii' codec can't encode characters in position 8-12: ordinal not in range(128)",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.tabnak.ir/ar/news/51006/%D8%B3%D9%84%D8%A7%D8%AD-%D8%A7%D9%84%D8%AC%D9%88-%D8%A7%D9%84%D9%85%D8%B3%D9%8A%D8%B1-%D8%A7%D9%84%D9%8A%D9%85%D9%86%D9%8A-%D9%8A%D8%B4%D9%86-%D8%A7%D9%84%D9%8A%D9%88%D9%85-%D8%AB%D8%A7%D9%86%D9%8A-%D9%87%D8%AC%D9%88%D9%85-%D8%B9%D9%84%D9%89-%D9%82%D8%A7%D8%B9%D8%AF%D8%A9-%D8%AC%D9%88%D9%8A%D8%A9-%D8%A8%D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%D8%A9",
+     "fetched_via": "https://www.tabnak.ir/ar/news/51006/%D8%B3%D9%84%D8%A7%D8%AD-%D8%A7%D9%84%D8%AC%D9%88-%D8%A7%D9%84%D9%85%D8%B3%D9%8A%D8%B1-%D8%A7%D9%84%D9%8A%D9%85%D9%86%D9%8A-%D9%8A%D8%B4%D9%86-%D8%A7%D9%84%D9%8A%D9%88%D9%85-%D8%AB%D8%A7%D9%86%D9%8A-%D9%87%D8%AC%D9%88%D9%85-%D8%B9%D9%84%D9%89-%D9%82%D8%A7%D8%B9%D8%AF%D8%A9-%D8%AC%D9%88%D9%8A%D8%A9-%D8%A8%D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%D8%A9",
+     "status": 200,
+     "title": "سلاح الجو المسير اليمني يشن اليوم ثاني هجوم على قاعدة جوية بالسعودية | تابناك",
+     "fetched_at": "2026-11-11T04:06:08Z",
+     "sha256": "5053ef40b11b7351cc14f334dd5bbde62c1b873a0726fbaa9b9eb79bfce69878",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "سعود",
+      "خالد"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.tasnimnews.com/ar/news/2021/04/23/2489918/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%8c%d9%85%d9%86%db%8c-%d8%a7%d9%84%d9%85%d8%b3%db%8c%d8%b1-%db%8c%d9%87%d8%a7%d8%ac%d9%85-%d8%a3%d9%87%d8%af%d8%a7%d9%81%d8%a7-%d8%b9%d8%b3%da%a9%d8%b1%db%8c%d8%a9-%d9%88%d8%ad%db%8c%d9%88%db%8c%d8%a9-%d9%81%db%8c-%d8%a7%d9%84%d8%b9%d9%85%d9%82-%d8%a7%d9%84%d8%b3%d8%b9%d9%88%d8%af%db%8c",
+     "fetched_via": "https://www.tasnimnews.com/ar/news/2021/04/23/2489918/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%8c%d9%85%d9%86%db%8c-%d8%a7%d9%84%d9%85%d8%b3%db%8c%d8%b1-%db%8c%d9%87%d8%a7%d8%ac%d9%85-%d8%a3%d9%87%d8%af%d8%a7%d9%81%d8%a7-%d8%b9%d8%b3%da%a9%d8%b1%db%8c%d8%a9-%d9%88%d8%ad%db%8c%d9%88%db%8c%d8%a9-%d9%81%db%8c-%d8%a7%d9%84%d8%b9%d9%85%d9%82-%d8%a7%d9%84%d8%b3%d8%b9%d9%88%d8%af%db%8c",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:12Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.tasnimnews.com/ar/news/2021/04/23/2489918/%d8%b3%d9%84%d8%a7",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.tasnimnews.com/ar/news/2021/04/25/2490929/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%8c%d9%85%d9%86%db%8c-%d8%a7%d9%84%d9%85%d8%b3%db%8c%d8%b1-%db%8c%d9%86%d9%81%d8%b0-%d8%b9%d9%85%d9%84%db%8c%d8%a9-%d9%87%d8%ac%d9%88%d9%85%db%8c%d8%a9-%d8%b9%d9%84%d9%89-%d9%82%d8%a7%d8%b9%d8%af%d8%a9-%d8%ae%d8%a7%d9%84%d8%af-%d8%a7%d9%84%d8%ac%d9%88%db%8c%d8%a9",
+     "fetched_via": "https://www.tasnimnews.com/ar/news/2021/04/25/2490929/%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%db%8c%d9%85%d9%86%db%8c-%d8%a7%d9%84%d9%85%d8%b3%db%8c%d8%b1-%db%8c%d9%86%d9%81%d8%b0-%d8%b9%d9%85%d9%84%db%8c%d8%a9-%d9%87%d8%ac%d9%88%d9%85%db%8c%d8%a9-%d8%b9%d9%84%d9%89-%d9%82%d8%a7%d8%b9%d8%af%d8%a9-%d8%ae%d8%a7%d9%84%d8%af-%d8%a7%d9%84%d8%ac%d9%88%db%8c%d8%a9",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:13Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.tasnimnews.com/ar/news/2021/04/25/2490929/%d8%b3%d9%84%d8%a7",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.alalamtv.net/news/5553693/سلاح-الجو-اليمني-المسير-يشن-هجومًا-على-قاعدة-الملك-خالد",
+     "fetched_via": "https://www.alalamtv.net/news/5553693/سلاح-الجو-اليمني-المسير-يشن-هجومًا-على-قاعدة-الملك-خالد",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:15Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.alalamtv.net/news/5553693/سلاح-الجو-اليمني-المسير-يشن-هجومًا",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-05425": {
+   "kept_references": 5,
+   "method": "all",
+   "fetched": 5,
+   "references": [
+    {
+     "url": "https://oecd.ai/en/incidents/2021-05-21-ab5c",
+     "fetched_via": "https://oecd.ai/en/incidents/2021-05-21-ab5c",
+     "status": 200,
+     "title": "AI-Enabled Saudi Combat Drone Shot Down in Yemen Conflict - OECD.AI",
+     "fetched_at": "2026-11-11T04:06:16Z",
+     "sha256": "7d298766aa8e7bb41bbc90e7947be4a189996df7130e3295593951379e7c31b5",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "سعود",
+      "نجران"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://www.tasnimnews.com/ar/news/2021/05/21/2507203/%d8%a7%d9%84%d8%b9%d9%85%db%8c%d8%af-%d8%b3%d8%b1%db%8c%d8%b9-%d8%a7%d9%84%d8%b7%d8%a7%d8%a6%d8%b1%d8%a9-%d8%a7%d9%84%d8%aa%db%8c-%d8%a3%d9%8f%d8%b3%d9%82%d8%b7%d8%aa-%d9%81%db%8c-%d9%86%d8%ac%d8%b1%d8%a7%d9%86-%d9%87%db%8c-%d9%85%d9%86-%d9%86%d9%88%d8%b9-wing-loong2-%d8%aa%d8%a7%d8%a8%d8%b9%d8%a9-%d9%84%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%d8%b3%d8%b9%d9%88%d8%af%db%8c",
+     "fetched_via": "https://www.tasnimnews.com/ar/news/2021/05/21/2507203/%d8%a7%d9%84%d8%b9%d9%85%db%8c%d8%af-%d8%b3%d8%b1%db%8c%d8%b9-%d8%a7%d9%84%d8%b7%d8%a7%d8%a6%d8%b1%d8%a9-%d8%a7%d9%84%d8%aa%db%8c-%d8%a3%d9%8f%d8%b3%d9%82%d8%b7%d8%aa-%d9%81%db%8c-%d9%86%d8%ac%d8%b1%d8%a7%d9%86-%d9%87%db%8c-%d9%85%d9%86-%d9%86%d9%88%d8%b9-wing-loong2-%d8%aa%d8%a7%d8%a8%d8%b9%d8%a9-%d9%84%d8%b3%d9%84%d8%a7%d8%ad-%d8%a7%d9%84%d8%ac%d9%88-%d8%a7%d9%84%d8%b3%d8%b9%d9%88%d8%af%db%8c",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:20Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.tasnimnews.com/ar/news/2021/05/21/2507203/%d8%a7%d9%84%d8%b9",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.alalamtv.net/news/5605668/العميد-سريع-يعلن-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي",
+     "fetched_via": "https://www.alalamtv.net/news/5605668/العميد-سريع-يعلن-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:21Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.alalamtv.net/news/5605668/العميد-سريع-يعلن-إسقاط-مقاتلة-تابع",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.alahednews.com.lb/fastnewsdetails.php?fstid=120024",
+     "fetched_via": "https://www.alahednews.com.lb/fastnewsdetails.php?fstid=120024",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:22Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://www.arabstoday.net/36/124022-الحوثيون-يعلنون-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي",
+     "fetched_via": "https://www.arabstoday.net/36/124022-الحوثيون-يعلنون-إسقاط-مقاتلة-تابعة-لسلاح-الجو-السعودي",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:26Z",
+     "sha256": null,
+     "error": "refusing to fetch https://www.arabstoday.net/36/124022-الحوثيون-يعلنون-إسقاط-مقاتلة-تابعة-",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    }
+   ]
+  },
+  "INC-01015": {
+   "kept_references": 442,
+   "method": "sample(first5+last5+5 seeded by row id)",
+   "fetched": 15,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-34267",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-34267",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:28Z",
+     "sha256": "7ed54f636a13e01c602cb2a89059eda501ccc3e64923760bdada53c95fe5721e",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-26319",
+      "CVE-2025-34267"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/FlowiseAI/Flowise/pull/5231",
+     "fetched_via": "https://github.com/FlowiseAI/Flowise/pull/5231",
+     "status": 200,
+     "title": "Chore/Disable Available Dep By Default by HenryHengZJ · Pull Request #5231 · FlowiseAI/Flowise · GitHub",
+     "fetched_at": "2026-11-11T04:06:35Z",
+     "sha256": "b45369c204aaf0ec84d73bbbfe8271c2dc68e148fc79d42badd05b2dd7175a9c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-34267"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-5w3r-f6gm-c25w",
+     "fetched_via": "https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-5w3r-f6gm-c25w",
+     "status": 200,
+     "title": "Flowise Authenticated Command Execution and Sandbox Bypass via Puppeteer and Playwright Packages · Advisory · FlowiseAI/Flowise · GitHub",
+     "fetched_at": "2026-11-11T04:06:37Z",
+     "sha256": "500a90457bf9f4364925630cbb3fafeb2a5e14143db416ed1c0b214d9f440be7",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-26319",
+      "GHSA-5W3R-F6GM-C25W"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://www.vulncheck.com/advisories/flowise-auth-command-execution-and-sandbox-bypass-via-puppeteer-and-playwright-packages",
+     "fetched_via": "https://www.vulncheck.com/advisories/flowise-auth-command-execution-and-sandbox-bypass-via-puppeteer-and-playwright-packages",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:39Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-r4hh-pcgx-j5r2",
+     "fetched_via": "https://github.com/advisories/GHSA-r4hh-pcgx-j5r2",
+     "status": 200,
+     "title": "Flowise: Authenticated Command Execution and Sandbox Bypass via Puppeteer and Playwright Packages · CVE-2025-34267 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:40Z",
+     "sha256": "0307ffc887a8c3614dbc9ebfcefbb952de05f4cf34d001311741b1daba9d63ac",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-26319",
+      "CVE-2025-34267",
+      "GHSA-R4HH-PCGX-J5R2"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-jv9m-vf54-chjj",
+     "fetched_via": "https://github.com/advisories/GHSA-jv9m-vf54-chjj",
+     "status": 200,
+     "title": "Flowise is vulnerable to arbitrary file write through its WriteFileTool · CVE-2025-61913 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:41Z",
+     "sha256": "dc9c8726c22fd6e9c2b85e546fa7cfc4696a7168741c47f08f93fa02840b2e92",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-61913",
+      "GHSA-JV9M-VF54-CHJJ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-jc5m-wrp2-qq38",
+     "fetched_via": "https://github.com/advisories/GHSA-jc5m-wrp2-qq38",
+     "status": 200,
+     "title": "Flowise Vulnerable to PII Disclosure on Unauthenticated Forgot Password Endpoint · GHSA-jc5m-wrp2-qq38 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:43Z",
+     "sha256": "4026c49a6fb60c604dcb176992f1d8f9c8e78a3afc8cc8e3a792f6eca0c87714",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "GHSA-JC5M-WRP2-QQ38"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-3prp-9gf7-4rxx",
+     "fetched_via": "https://github.com/advisories/GHSA-3prp-9gf7-4rxx",
+     "status": 200,
+     "title": "Flowise: Mass Assignment in DocumentStore Create Endpoint Leads to Cross-Workspace Object Takeover (IDOR) · CVE-2026-41277 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:44Z",
+     "sha256": "48d0f415bdcea932c0cda9bb4f2d93468dc59380bb86c7f1726df697c10d8e29",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-41277",
+      "GHSA-3PRP-9GF7-4RXX"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/danny-avila/LibreChat/security/advisories/GHSA-cxhj-j78r-p88f",
+     "fetched_via": "https://github.com/danny-avila/LibreChat/security/advisories/GHSA-cxhj-j78r-p88f",
+     "status": 200,
+     "title": "LibreChat MCP Stdio Remote Command Execution · Advisory · LibreChat-AI/LibreChat · GitHub",
+     "fetched_at": "2026-11-11T04:06:45Z",
+     "sha256": "f9487ff6d1a607eb54d431b2f1df05df04853a83b7766d99a60e682cb6fccd77",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-22252",
+      "GHSA-CXHJ-J78R-P88F"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-7944-7c6r-55vv",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-7944-7c6r-55vv",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:47Z",
+     "sha256": "e2d9a8429901371b27321f8b9cc84e477e93d92f17e9c435852d141f0a6ff805",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-57164",
+      "GHSA-7944-7C6R-55VV"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-858c-qxvx-rg9v",
+     "fetched_via": "https://github.com/advisories/GHSA-858c-qxvx-rg9v",
+     "status": 200,
+     "title": "Flowise Cross-site Scripting in /api/v1/chatflows-streaming/id · CVE-2024-37145 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:48Z",
+     "sha256": "7527102e0a33afec65edb34a3731c6083a291712c11282fe539af48fc374c021",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-37145",
+      "GHSA-858C-QXVX-RG9V"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-858c-qxvx-rg9v",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-858c-qxvx-rg9v",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:48Z",
+     "sha256": "2f603a031015880f6a1c9a32e4de8040d3dffdab0951186502cd8871359bad56",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-37145",
+      "GHSA-858C-QXVX-RG9V"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-37146",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-37146",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:49Z",
+     "sha256": "a721aaea0d44cf3105522fcce1a0a7bb3995e11a349c25e546dd82bf576297f4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-37146"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-wxm4-9f8p-gggv",
+     "fetched_via": "https://github.com/advisories/GHSA-wxm4-9f8p-gggv",
+     "status": 200,
+     "title": "Flowise Cross-site Scripting in/api/v1/credentials/id · CVE-2024-37146 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:52Z",
+     "sha256": "3ebe2ed2b3682ee673557ebacd396681d34465bdde3008e7e499133df811a194",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-37146",
+      "GHSA-WXM4-9F8P-GGGV"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-wxm4-9f8p-gggv",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-wxm4-9f8p-gggv",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:53Z",
+     "sha256": "79d546655201283d8759156ca671b4877b8aedff1a57712c724b492d4999640c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-37146",
+      "GHSA-WXM4-9F8P-GGGV"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-01291": {
+   "kept_references": 177,
+   "method": "sample(first5+last5+5 seeded by row id)",
+   "fetched": 15,
+   "references": [
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29374",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2023-29374",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:06:53Z",
+     "sha256": "7c5d1383ea620dc07fc873fcb3cfc879e999d399309d5bf51dcb085543d1232c",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-29374"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-fprp-p869-w6q2",
+     "fetched_via": "https://github.com/advisories/GHSA-fprp-p869-w6q2",
+     "status": 200,
+     "title": "LangChain vulnerable to code injection · CVE-2023-29374 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:06:57Z",
+     "sha256": "fa077d9505eb2f0aea19ab9f762397750674856d2d453e774ebb34fa85c6bd41",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-29374",
+      "GHSA-FPRP-P869-W6Q2"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/hwchase17/langchain/issues/1026",
+     "fetched_via": "https://github.com/hwchase17/langchain/issues/1026",
+     "status": 200,
+     "title": "Security concerns · Issue #1026 · langchain-ai/langchain · GitHub",
+     "fetched_at": "2026-11-11T04:06:58Z",
+     "sha256": "048f35d0dccc86a1914f1ba711e04732a0e555a92c03c425e74d85247d3032a8",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/hwchase17/langchain/issues/814",
+     "fetched_via": "https://github.com/hwchase17/langchain/issues/814",
+     "status": 200,
+     "title": "Exploiting llm-math (and likely PAL) and suggesting and alternative · Issue #814 · langchain-ai/langchain · GitHub",
+     "fetched_at": "2026-11-11T04:07:01Z",
+     "sha256": "99e9e2d833bda005f3d0ce1fc71e2c85090c982fe6a17dfe972d895be7a7ec52",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/hwchase17/langchain/pull/1119",
+     "fetched_via": "https://github.com/hwchase17/langchain/pull/1119",
+     "status": 200,
+     "title": "Patch LLMMathChain exec vulnerability by zachschillaci27 · Pull Request #1119 · langchain-ai/langchain · GitHub",
+     "fetched_at": "2026-11-11T04:07:03Z",
+     "sha256": "f435af0864962fc1c5627200d87ec69461d6964190c0d6b84d0a7be1d6feda75",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-gjjr-63x4-v8cq",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-gjjr-63x4-v8cq",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:05Z",
+     "sha256": "bf97c08178eafc1099c25a16c7f225c88660c05372075e2f445975a1d8f37832",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-36258",
+      "CVE-2023-44467",
+      "GHSA-GJJR-63X4-V8CQ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain/commit/604dfe2d99246b0c09f047c604f0c63eafba31e7",
+     "fetched_via": "https://github.com/langchain-ai/langchain/commit/604dfe2d99246b0c09f047c604f0c63eafba31e7",
+     "status": 200,
+     "title": "community[patch]: Force opt-in for WebResearchRetriever (CVE-2024-309… · langchain-ai/langchain@604dfe2 · GitHub",
+     "fetched_at": "2026-11-11T04:07:05Z",
+     "sha256": "a4c58d1402606a45af74c3c6b786ddeb7c51ec95f2c8e7f889b7ad44b06179a1",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2024-3095"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain/commit/77209f315efd13442ec51c67719ba37dfaa44511",
+     "fetched_via": "https://github.com/langchain-ai/langchain/commit/77209f315efd13442ec51c67719ba37dfaa44511",
+     "status": 200,
+     "title": "community[patch]: FAISS VectorStore deserializer should be opt-in (#2… · langchain-ai/langchain@77209f3 · GitHub",
+     "fetched_at": "2026-11-11T04:07:06Z",
+     "sha256": "694e3bf339e60b97d11c000fb053f32b7a6f44739de9116ba3cbd0a6964c1d5f",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/PYSEC-2023-109",
+     "fetched_via": "https://api.osv.dev/v1/vulns/PYSEC-2023-109",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:07Z",
+     "sha256": "284c08cd9f716f05fa8cb22e8ee9d4202d36c948408d7025de96f0566ad5e281",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-36188",
+      "PYSEC-2023-109"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-36189",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2023-36189",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:07Z",
+     "sha256": "1c4e20d929c062712e303eb5ec5a611889c4c2ff8e2b33044e27212afbc870a6",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-36189"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/pypa/advisory-database/tree/main/vulns/langchain/PYSEC-2023-92.yaml",
+     "fetched_via": "https://github.com/pypa/advisory-database/tree/main/vulns/langchain/PYSEC-2023-92.yaml",
+     "status": 200,
+     "title": "advisory-database/vulns/langchain/PYSEC-2023-92.yaml at main · pypa/advisory-database · GitHub",
+     "fetched_at": "2026-11-11T04:07:08Z",
+     "sha256": "61fca71fd239dfa0d495b71fbaa455f5820869ab2bad593a1dada386c9d9db56",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-34541",
+      "PYSEC-2023-92"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain/issues/4849",
+     "fetched_via": "https://github.com/langchain-ai/langchain/issues/4849",
+     "status": 200,
+     "title": "Arbitrary code execution in load_prompt · Issue #4849 · langchain-ai/langchain · GitHub",
+     "fetched_at": "2026-11-11T04:07:10Z",
+     "sha256": "7e12249cb7d4c2a206b31ba646932e27ec107f40dfd95d7decdbc2b6ab6d1d84",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/GHSA-6643-h7h5-x9wh",
+     "fetched_via": "https://api.osv.dev/v1/vulns/GHSA-6643-h7h5-x9wh",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:11Z",
+     "sha256": "9daa83bd13847f641acf41e7ef279b71f160d090f55de3171a5b31855117655b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-34541",
+      "GHSA-6643-H7H5-X9WH"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://github.com/langchain-ai/langchain/commit/fab24457bcf8ede882abd11419769c92bc4e7751",
+     "fetched_via": "https://github.com/langchain-ai/langchain/commit/fab24457bcf8ede882abd11419769c92bc4e7751",
+     "status": 200,
+     "title": "remove code (#8425) · langchain-ai/langchain@fab2445 · GitHub",
+     "fetched_at": "2026-11-11T04:07:11Z",
+     "sha256": "0e923412639c01323cbc7aec0bdeb3c96fbabb0afa26a5b4f4830e13f249dc26",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "LangChain"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://osv.dev/vulnerability/PYSEC-2023-92",
+     "fetched_via": "https://api.osv.dev/v1/vulns/PYSEC-2023-92",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:13Z",
+     "sha256": "b153315e46a3be75400f31a2e0b4a27d3bc68f4acbd738fc86b58b841ca67469",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2023-34541",
+      "PYSEC-2023-92"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-01589": {
+   "kept_references": 9,
+   "method": "all",
+   "fetched": 9,
+   "references": [
+    {
+     "url": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
+     "fetched_via": "https://www.reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now",
+     "status": 200,
+     "title": "OpenClaw Security Risks: AI Agent Threats in SaaS",
+     "fetched_at": "2026-11-11T04:07:13Z",
+     "sha256": "adf64104c7c4c03e51efbd17817d8fa86e3d00dbbea94ecb9478aa924a29edf1",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-25253"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25253",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-25253",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:14Z",
+     "sha256": "41caf957cbf4850944dfa6c35033a0d8734e7f417789916de160b374780251ec",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-25253"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://depthfirst.com/post/1-click-rce-to-steal-your-moltbot-data-and-keys",
+     "fetched_via": "https://depthfirst.com/post/1-click-rce-to-steal-your-moltbot-data-and-keys",
+     "status": 200,
+     "title": "1-Click RCE To Steal Your OpenClaw Data and Keys (CVE-2026-25253) | depthfirst",
+     "fetched_at": "2026-11-11T04:07:15Z",
+     "sha256": "685d67fcf5aa3e74d7185b4283cde803e45355a407d5d6af146ef658448be9c4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-25253"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://ethiack.com/news/blog/one-click-rce-moltbot",
+     "fetched_via": "https://ethiack.com/news/blog/one-click-rce-moltbot",
+     "status": 200,
+     "title": "One-click RCE on OpenClaw in under 2 hours with an Autonomous Hacking Agent | Ethiack",
+     "fetched_at": "2026-11-11T04:07:17Z",
+     "sha256": "c65463f3a90369dde6ffd00406f40eb17ce65e2fec75b5d5567d9c59d9fc3b2e",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "OpenClaw"
+     ],
+     "match_kind": "keyword"
+    },
+    {
+     "url": "https://github.com/openclaw/openclaw/security/advisories/GHSA-g8p2-7wf7-98mq",
+     "fetched_via": "https://github.com/openclaw/openclaw/security/advisories/GHSA-g8p2-7wf7-98mq",
+     "status": 200,
+     "title": "1-Click RCE via Authentication Token Exfiltration From gatewayUrl · Advisory · openclaw/openclaw · GitHub",
+     "fetched_at": "2026-11-11T04:07:21Z",
+     "sha256": "990efd7c0be2efa351ab29f3c6a5506488530dbad3780218e41b3a6071ed669a",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "GHSA-G8P2-7WF7-98MQ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://x.com/0xacb/status/2016913750557651228",
+     "fetched_via": "https://x.com/0xacb/status/2016913750557651228",
+     "status": "robots-refused",
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:21Z",
+     "sha256": null,
+     "error": "refusing to fetch https://x.com/0xacb/status/2016913750557651228: robots.txt disallows it ",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-g8p2-7wf7-98mq",
+     "fetched_via": "https://github.com/advisories/GHSA-g8p2-7wf7-98mq",
+     "status": 200,
+     "title": "OpenClaw/Clawdbot has 1-Click RCE via Authentication Token Exfiltration From gatewayUrl · CVE-2026-25253 · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:07:21Z",
+     "sha256": "815db800618fe09b6e2118db8362cf6196e1849fc8052a053699b0a8bbac5eee",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-25253",
+      "GHSA-G8P2-7WF7-98MQ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://atlas.mitre.org/studies/AML.CS0050",
+     "fetched_via": "https://atlas.mitre.org/studies/AML.CS0050",
+     "status": 404,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:22Z",
+     "sha256": null,
+     "error": "HTTPError: HTTP Error 404: Not Found",
+     "outcome": "dead-or-blocked",
+     "tokens_matched": [],
+     "match_kind": null
+    },
+    {
+     "url": "https://github.com/advisories/GHSA-r2c6-8jc8-g32w",
+     "fetched_via": "https://github.com/advisories/GHSA-r2c6-8jc8-g32w",
+     "status": 200,
+     "title": "Duplicate Advisory: 1-Click RCE via Authentication Token Exfiltration From gatewayUrl · GHSA-r2c6-8jc8-g32w · GitHub Advisory Database · GitHub",
+     "fetched_at": "2026-11-11T04:07:23Z",
+     "sha256": "a9e553e7772f01642a1709f882df7be6e1452c39bb943d454540d56c29dd8f82",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2026-25253",
+      "GHSA-R2C6-8JC8-G32W"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-02471": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r",
+     "fetched_via": "https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r",
+     "status": 200,
+     "title": "RCE via .code-workspace files using Prompt Injection · Advisory · cursor/cursor · GitHub",
+     "fetched_at": "2026-11-11T04:07:24Z",
+     "sha256": "e3bc4a7bc367ffad904b8f1ede9cab59beb9ef66e2ea3254aa63632867441246",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-61590",
+      "GHSA-XG6W-RMH5-R77R"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61590",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-61590",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:25Z",
+     "sha256": "faed40ef1033af8ac821d66eb0da534ababd827c4ebc512771ba46dbc275680b",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-61590"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-02871": {
+   "kept_references": 2,
+   "method": "all",
+   "fetched": 2,
+   "references": [
+    {
+     "url": "https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq",
+     "fetched_via": "https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq",
+     "status": 200,
+     "title": "Remote Code Execution in Cursor CLI via Cursor Agent MCP OAuth2 Communication · Advisory · cursor/cursor · GitHub",
+     "fetched_at": "2026-11-11T04:07:25Z",
+     "sha256": "2b03650f7086829a832b05bb0f678c4296042e22e770cfce700ba761310047e4",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-61591",
+      "GHSA-WJ33-264C-J9CQ"
+     ],
+     "match_kind": "id"
+    },
+    {
+     "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61591",
+     "fetched_via": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2025-61591",
+     "status": 200,
+     "title": null,
+     "fetched_at": "2026-11-11T04:07:26Z",
+     "sha256": "08b79e4ee5eed49ccb08f97fd0e1e1a8064e65e58b81f7ee20359f33bd028feb",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "CVE-2025-61591"
+     ],
+     "match_kind": "id"
+    }
+   ]
+  },
+  "INC-04207": {
+   "kept_references": 1,
+   "method": "all",
+   "fetched": 1,
+   "references": [
+    {
+     "url": "https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/",
+     "fetched_via": "https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/",
+     "status": 200,
+     "title": "Mitigating Skeleton Key, a new type of generative AI jailbreak technique | Microsoft Security Blog",
+     "fetched_at": "2026-11-11T04:07:32Z",
+     "sha256": "92ab1ea10ce4e6c9b111e2113e6e59412d28ed138878ead8ed5de291e69a14bf",
+     "error": null,
+     "outcome": "evidenced",
+     "tokens_matched": [
+      "Skeleton Key"
+     ],
+     "match_kind": "keyword"
+    }
+   ]
+  }
+ }
+}

@@ -171,7 +171,14 @@ def _build_surviving() -> list[dict]:
     normalized = [n for n in (m.normalize_entry(dict(r)) for r in all_raw) if n is not None]
     surviving, _ = m.dedupe_entries(normalized)
     # Step 4d of the real pipeline: curation overrides keyed by any member.
-    m.apply_curation_overrides(surviving, m._load_curation_overrides())
+    # references_remove / fields_clear (D139) are left out: they delete from a row AFTER every source's
+    # references are assembled, which this partial rebuild does not do (a listed URL can be absent here), and
+    # they cannot affect the description/title/provenance this test checks.
+    overrides = {
+        sid: {k: v for k, v in ov.items() if k not in m._DELETE_OVERRIDE_KEYS}
+        for sid, ov in m._load_curation_overrides().items()
+    }
+    m.apply_curation_overrides(surviving, overrides)
     return surviving
 
 

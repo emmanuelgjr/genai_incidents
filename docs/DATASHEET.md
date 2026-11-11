@@ -17,7 +17,7 @@ trackers (AIID, MIT AI Risk Repository, AVID, and others; see the
 Collection section below) as upstream sources rather than replacing them.
 
 ## Composition
-- **Instances:** consolidated incidents (<!-- stats:incident_count -->15,782<!-- /stats:incident_count -->,
+- **Instances:** consolidated incidents (<!-- stats:incident_count -->15,780<!-- /stats:incident_count -->,
   of which <!-- stats:disputed_count -->22<!-- /stats:disputed_count --> are CVE-disputed and still counted,
   as of this build — authoritative live count in
   [`data/stats.json`](../data/stats.json)), each an alleged
@@ -26,7 +26,7 @@ Collection section below) as upstream sources rather than replacing them.
   the CVE Program rejected are `status: retracted`
   (<!-- stats:retracted_count -->29<!-- /stats:retracted_count -->), and rows with no confirmed
   primary source are `status: unverified`
-  (<!-- stats:unverified_count -->10<!-- /stats:unverified_count -->). Both are kept in the full JSON
+  (<!-- stats:unverified_count -->12<!-- /stats:unverified_count -->). Both are kept in the full JSON
   (`data/incidents.json`) and excluded from the headline count; `disputed` rows are counted.
   So `incident_count + retracted_count + unverified_count` equals the number of rows in
   `data/incidents.json`. Check `status` before relying on a row; absence means it stands
@@ -107,11 +107,17 @@ review, and the Heuristic labels bullet below for known gaps.
   rules plus a check that figures in the description appear in the cited pages
   (detection method: [`docs/audits/reference-detection-2026-10-14.md`](audits/reference-detection-2026-10-14.md)).
   Where no confirmed source can be found, the row becomes `status: unverified`.
-  Where its flagged references were removed or replaced with fetched pages that name
-  the incident, its text is re-derived wherever the remaining sources do not support
-  it, and it is demoted to `quality_tier: auto`
-  pending human re-review (per-row record:
-  [`docs/audits/reference-audit-2026-10-15/`](audits/reference-audit-2026-10-15/reference-audit-2026-10-15.md);
+  Where its flagged references were removed or replaced, any replacement is a
+  fetched page that names the incident, and the row is demoted to `quality_tier:
+  auto` pending human re-review. Where the audit re-derived a row's title or
+  description from a confirmed source, the per-row record says so; where a flagged
+  reference was only removed, the references the row kept were fetched (in full, or
+  by a recorded sample on rows with many references) and checked for reachability
+  and an identifying id or product name, not for whether they support every claim in
+  the text.
+  (per-row records:
+  [`docs/audits/reference-audit-2026-10-15/`](audits/reference-audit-2026-10-15/reference-audit-2026-10-15.md),
+  [`docs/audits/reference-audit-2026-11-11/`](audits/reference-audit-2026-11-11/reference-audit-2026-11-11.md);
   public corrections: [`CORRECTIONS.md`](../CORRECTIONS.md)). Detection is
   heuristic, so rows not yet audited or not flagged may still carry weak
   references. Where sourcing matters, prefer `quality_tier` `reviewed` or `curated`

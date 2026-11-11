@@ -1,0 +1,1751 @@
+{
+ "base": "64109452",
+ "rows": [
+  {
+   "id": "INC-01015",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-01291",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.langchain.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-01589",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://openclaw.ai/blog",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-02471",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://github.com/MaccariTA",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-02871",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://github.com/Y4tacker",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-04207",
+   "rule": "R2",
+   "flagged": [],
+   "quality_tier": "curated",
+   "status": null,
+   "batch": 0
+  },
+  {
+   "id": "INC-00021",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://trezor.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-00570",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.aim.security/news",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-00864",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://cybersecuritynews.com/flowise-vulnerability/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01194",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://trysixth.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01348",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.llamaindex.ai/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01553",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://ollama.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01600",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.reco.ai/newsroom",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01641",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.pillar.security/blog",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-01724",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://raytha.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02076",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.kxan.com/driverless/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02150",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://openairinterface.com",
+     "homepage"
+    ],
+    [
+     "https://cellularsecurity.org/ransacked",
+     "depth1-non-slug"
+    ],
+    [
+     "https://openairinterface.org/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02347",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://iocharger.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02498",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://embracethered.com/blog/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02505",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://dify.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02516",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://dify.ai",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02761",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://langchain-chatglm-webui.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-02800",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://python.langchain.com/docs/security/",
+     "index-segments"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": "disputed",
+   "batch": 1
+  },
+  {
+   "id": "INC-02864",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://mattermost.com/security-updates",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03209",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.microsoft.com/en-us/security/blog/",
+     "index-segments"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03212",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://unit42.paloaltonetworks.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03248",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.sysdig.com/threat-research",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03276",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://dotapp.uk",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03292",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://phcode.dev/",
+     "homepage"
+    ],
+    [
+     "https://www.postbox-inc.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03423",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://monica.im/desktop",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-03573",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.anthropic.com/research",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-04285",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://premiumaddons.com/change-log/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-04383",
+   "rule": "R2",
+   "flagged": [],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-04959",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.oligo.security/shelltorch",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-05009",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://docs.dependencytrack.org/changelog/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-05052",
+   "rule": "R1+R2",
+   "flagged": [
+    [
+     "https://real-gradients.github.io/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-05421",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://abna24.com/b4xD",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-05425",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://abna24.com/b8b9",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 1
+  },
+  {
+   "id": "INC-05688",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://s.chinadailyhk.com/JV7f2i",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-05833",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.volkskrant.nl/gs-bb8cfe62",
+     "depth1-non-slug"
+    ],
+    [
+     "https://www.trouw.nl/gs-b58eb5b9",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-05879",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://keras.io/api/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": "disputed",
+   "batch": 2
+  },
+  {
+   "id": "INC-06360",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.parool.nl/gs-b2e923f8",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06373",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.ericswallace.com/imitation",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06400",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://s.chinadailyhk.com/VnYRb2",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06488",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://reut.rs/3dyplfJ",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06516",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://arab.news/26xht",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06520",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.parool.nl/gs-b44c5e2d",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06521",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.volkskrant.nl/gs-b1f609fa",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06535",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.volkskrant.nl/gs-bb9e3054",
+     "depth1-non-slug"
+    ],
+    [
+     "https://www.demorgen.be/gs-bd6d8bb0",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06536",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://unit42.paloaltonetworks.com/c2-traffic/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06544",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://usahitman.com/srobotpsychdamage",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06583",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://arab.news/6ay4w",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-06901",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://abna24.com/9zCK",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07096",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://ajel.sa/PV3Qk9",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07693",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://www.greensql.net/security",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07730",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://jailbreakbench.github.io/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07731",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.harmbench.org/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07734",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://safetyprompts.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-07747",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://factcheck.afp.com/doc.afp.com.B2GD2T3",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-08951",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://feehi.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09034",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://ramimac.me/teampcp",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09259",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://snipeitapp.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09383",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://github.com/YMFE",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09499",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://askbot.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09504",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://lavalite.org",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09554",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://heartex.com",
+     "homepage"
+    ],
+    [
+     "http://labelstud.io",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09887",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://docs.openmicroscopy.org/bio-formats",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09969",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://piranha.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09976",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.phpmyfaq.de",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-09994",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://memos.com",
+     "homepage"
+    ],
+    [
+     "http://usememos.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 2
+  },
+  {
+   "id": "INC-10038",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://invoice.secvuln.info",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10040",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://pretix.eu/about/en/security",
+     "index-segments"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10125",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://pdf2zh.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10137",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://piranhacms.org",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10209",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://deepseek.com",
+     "homepage"
+    ],
+    [
+     "https://youtu.be/IgQwy52FVT4",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": "disputed",
+   "batch": 3
+  },
+  {
+   "id": "INC-10423",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://kafka.apache.org/cve-list",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10502",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.opencms.org",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10669",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://umbraco.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": "disputed",
+   "batch": 3
+  },
+  {
+   "id": "INC-10892",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://directus.io",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10915",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://microweber.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-10920",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://securitylab.github.com/advisories",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11228",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://kyberslash.cr.yp.to",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11232",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.enhavo.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11291",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.qualys.com/security-advisories/",
+     "depth1-non-slug"
+    ],
+    [
+     "https://plugins.jenkins.io/qualys-pc/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11315",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://silverpeas.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11344",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://peps.python.org/pep-0506/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11363",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://pastebin.com/8K5Brwbq",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11374",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://dom4j.github.io/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": "retracted",
+   "batch": 3
+  },
+  {
+   "id": "INC-11379",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.openpolicyagent.org/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11417",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://pastebin.com/5MicRrr4",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11441",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://contrastsecurity.com",
+     "homepage"
+    ],
+    [
+     "https://github.com/EsotericSoftware",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11443",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://webiny.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11623",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://veracode.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11664",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://ureport.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11760",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://processwire.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11777",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://discuss.hashicorp.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11791",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://plugins.jenkins.io/DotCi/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11845",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://skywalking.apache.org/events/release-apache-skywalking-nodejs-0-5-1/",
+     "conference-index"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-11857",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://withknown.com/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-12020",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://crafter.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-12042",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://nukeviet.vn/en",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 3
+  },
+  {
+   "id": "INC-12062",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://tufangungor.github.io/0days",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12122",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://malloc.im/CakePHP-unserialize.txt",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12131",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://moinmo.in/SecurityFixes",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12185",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://codex.wordpress.org/Version_4.5.2",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12290",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://usn.ubuntu.com/3709-1/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12325",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://commonmark.thephpleague.com/changelog/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12380",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://moodle.org/security/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12396",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://usn.ubuntu.com/3921-1/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12403",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://bugs.tryton.org/issue2476",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12422",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://usn.ubuntu.com/658-1/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12541",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://neo4j.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-12566",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://rasa.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-13217",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.stimson.org/event/ai-and-scams-beyond-the-hype/",
+     "conference-index"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-14623",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.edoardoottavianelli.it/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "reviewed",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-14633",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://rosariosis.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-15042",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://kiro.dev/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-15047",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://antigravity.google/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-15356",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://keras.io",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-15562",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://github.com/LupinLin1",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-15841",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://openai.com/codex/",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16011",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://openai.com/codex",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16074",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.firecrawl.dev/",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16084",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://agno.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16086",
+   "rule": "R1",
+   "flagged": [
+    [
+     "http://gpt-researcher.com",
+     "homepage"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16227",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.ciena.com/product-security",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16228",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://www.ciena.com/product-security",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16621",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com/sunset",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16622",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com/sunset",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16623",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com/sunset",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16684",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com/sunset",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  },
+  {
+   "id": "INC-16703",
+   "rule": "R1",
+   "flagged": [
+    [
+     "https://flowiseai.com/sunset",
+     "depth1-non-slug"
+    ]
+   ],
+   "quality_tier": "auto",
+   "status": null,
+   "batch": 4
+  }
+ ]
+}

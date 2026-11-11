@@ -542,12 +542,20 @@
       "_note": "discovery_method: Lakera blog: Lakera researcher Brett Gustafson discovered and responsibly reported the vulnerability, notifying Cursor on 2025-09-02. Source: https://www.lakera.ai/blog/cursor-vulnerability-cve-2025-59944 Reviewed 2026-07-03."
     },
     "CVE-2025-61590": {
-      "discovery_method": "security-researcher",
-      "_note": "discovery_method: Advisory credits section credits external researcher @MaccariTA as the finder of the workspace-file-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r Reviewed 2026-07-03."
+      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects discovery_method outside the landmark tier; flagged for user re-review); the line's note read: discovery_method: Advisory credits section credits external researcher @MaccariTA as the finder of the workspace-file-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-xg6w-rmh5-r77r Reviewed 2026-07-03.",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://github.com/MaccariTA. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://github.com/MaccariTA"
+      ]
     },
     "CVE-2025-61591": {
-      "discovery_method": "security-researcher",
-      "_note": "discovery_method: Advisory credits GitHub user @Y4tacker as the reporter of the MCP OAuth command-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq Reviewed 2026-07-03."
+      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (same mechanism as D139(b), which named only INC-04207; not separately ruled -- validate.py rejects discovery_method outside the landmark tier; flagged for user re-review); the line's note read: discovery_method: Advisory credits GitHub user @Y4tacker as the reporter of the MCP OAuth command-injection issue. Source: https://github.com/cursor/cursor/security/advisories/GHSA-wj33-264c-j9cq Reviewed 2026-07-03.",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://github.com/Y4tacker. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://github.com/Y4tacker"
+      ]
     },
     "CVE-2025-64110": {
       "discovery_method": "security-researcher",
@@ -691,8 +699,12 @@
       "_note": "Batch-2 labeling (2026-07-04). Discovery: \"Our researchers discovered a novel generalization of jailbreak attacks, which we call Crescendo.\" (Microsoft's own security team) (https://www.microsoft.com/en-us/security/blog/2024/04/11/how-microsoft-discovers-and-mitigates-evolving-attacks-against-ai-guardrails/)"
     },
     "INC-030": {
-      "discovery_method": "security-researcher",
-      "_note": "Batch-2 labeling (2026-07-04). Discovery: Microsoft's own research team tested and disclosed the Skeleton Key jailbreak to affected vendors before publication (https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/)."
+      "_d130_3a_prior_note": "dropped discovery_method='security-researcher' (D139(b)); the line's note read: Batch-2 labeling (2026-07-04). Discovery: Microsoft's own research team tested and disclosed the Skeleton Key jailbreak to affected vendors before publication (https://www.microsoft.com/en-us/security/blog/2024/06/26/mitigating-skeleton-key-a-new-type-of-generative-ai-jailbreak-technique/).",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://arxiv.org/abs/2402.06627. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://arxiv.org/abs/2402.06627"
+      ]
     },
     "INC-088": {
       "discovery_method": "security-researcher",
@@ -1209,6 +1221,255 @@
         "as_of": "2026-10-15"
       },
       "_note": "D130-2: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: Row cites github.com/advisories (global advisory index, R1) and invicti.com/blog/web-security/prompt-injection-attacks/ (HTTP 404). The Embrace The Red Copilot Chat post (fetched 2026-10-15) is a different, already-recorded incident: it is the sole reference of INC-03808 (RES-etr-github-copilot-chat-2024), and the word \"Workspace\" does not occur in it. The first tranche re-pointed this row at it; reverted (bounce #1, defect 1). Discovery query (Brave, retry 2026-10-15): \"GitHub Copilot Workspace prompt injection repository README exfiltrate secrets\" -> CSO Online and Orca RoguePilot (Copilot in Codespaces, a later and different finding), Reddit threads, vendor guides; none documents a 2024 Copilot Workspace injection via README/comment files. Outcome: no confirmed source names the Copilot Workspace incident. Row is marked unverified; references and quality_tier untouched."
+    },
+    "CVE-2025-69893": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://trezor.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://trezor.com"
+      ]
+    },
+    "CVE-2026-30310": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://trysixth.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://trysixth.com/"
+      ]
+    },
+    "CVE-2024-12704": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://www.llamaindex.ai/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://www.llamaindex.ai/"
+      ]
+    },
+    "CVE-2025-15514": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://ollama.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://ollama.com/"
+      ]
+    },
+    "CVE-2025-69236": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://raytha.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://raytha.com"
+      ]
+    },
+    "AIID-1543": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://www.kxan.com/driverless/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://www.kxan.com/driverless/"
+      ]
+    },
+    "CVE-2024-24426": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://openairinterface.com, https://openairinterface.org/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://openairinterface.com",
+        "https://openairinterface.org/"
+      ]
+    },
+    "CVE-2024-43649": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://iocharger.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://iocharger.com"
+      ]
+    },
+    "CVE-2025-56157": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://dify.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://dify.com"
+      ]
+    },
+    "CVE-2025-29720": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://dify.ai. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://dify.ai"
+      ]
+    },
+    "CVE-2025-45150": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://langchain-chatglm-webui.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://langchain-chatglm-webui.com"
+      ]
+    },
+    "CVE-2025-46059": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://python.langchain.com/docs/security/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://python.langchain.com/docs/security/"
+      ]
+    },
+    "CVE-2016-11077": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://mattermost.com/security-updates. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://mattermost.com/security-updates"
+      ]
+    },
+    "ATLAS-AML.CS0042": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://www.microsoft.com/en-us/security/blog/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://www.microsoft.com/en-us/security/blog/"
+      ]
+    },
+    "CVE-2024-57783": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://dotapp.uk. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://dotapp.uk"
+      ]
+    },
+    "CVE-2025-5255": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://phcode.dev/, https://www.postbox-inc.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://phcode.dev/",
+        "https://www.postbox-inc.com/"
+      ]
+    },
+    "CVE-2024-45989": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://monica.im/desktop. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://monica.im/desktop"
+      ]
+    },
+    "CVE-2024-2238": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://premiumaddons.com/change-log/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://premiumaddons.com/change-log/"
+      ]
+    },
+    "ATLAS-AML.CS0016": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://arxiv.org/abs/2103.03874. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://arxiv.org/abs/2103.03874"
+      ]
+    },
+    "CVE-2023-43654": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://www.oligo.security/shelltorch. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://www.oligo.security/shelltorch"
+      ]
+    },
+    "CVE-2022-39350": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://docs.dependencytrack.org/changelog/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://docs.dependencytrack.org/changelog/"
+      ]
+    },
+    "OECD-AIM-2021-04-21-e2e3": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://abna24.com/b4xD. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://abna24.com/b4xD"
+      ]
+    },
+    "OECD-AIM-2021-05-21-ab5c": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): http://abna24.com/b8b9. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "http://abna24.com/b8b9"
+      ]
+    },
+    "CVE-2024-31621": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://flowiseai.com. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://flowiseai.com"
+      ]
+    },
+    "CVE-2023-29374": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://www.langchain.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://www.langchain.com/"
+      ]
+    },
+    "ATLAS-AML.CS0050": {
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Removed reference(s): https://openclaw.ai/blog. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/.",
+      "quality_tier": "auto",
+      "references_remove": [
+        "https://openclaw.ai/blog"
+      ]
+    },
+    "RES-pillar-cursor-cve-2026": {
+      "quality_tier": "auto",
+      "references": [
+        {
+          "title": "The Agent Security Paradox: When Trusted Commands in Cursor Become Attack Vectors - Pillar Security (2026-01-14)",
+          "url": "https://www.pillar.security/blog/the-agent-security-paradox-when-trusted-commands-in-cursor-become-attack-vectors",
+          "type": "research"
+        }
+      ],
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Replaced reference: https://www.pillar.security/blog. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/."
+    },
+    "RES-bing-copilot-zero-click-2024": {
+      "quality_tier": "auto",
+      "references": [
+        {
+          "title": "DeepSeek AI: From Prompt Injection To Account Takeover - Embrace The Red (2024-11-29)",
+          "url": "https://embracethered.com/blog/posts/2024/deepseek-ai-prompt-injection-to-xss-and-account-takeover/",
+          "type": "research"
+        }
+      ],
+      "title": "DeepSeek AI prompt injection to XSS and account takeover (Embrace The Red)",
+      "description": "Embrace The Red showed that DeepSeek's web chat could be driven by prompt injection to execute script in the page (XSS); the script could read the userToken stored in localStorage on chat.deepseek.com, which was all that was needed to take over a user's session.",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Replaced reference: https://embracethered.com/blog/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/."
+    },
+    "RES-unit42-shai-hulud-2025": {
+      "quality_tier": "auto",
+      "references": [
+        {
+          "title": "\"Shai-Hulud\" Worm Compromises npm Ecosystem in Supply Chain Attack - Unit 42",
+          "url": "https://unit42.paloaltonetworks.com/npm-supply-chain-attack/",
+          "type": "research"
+        }
+      ],
+      "title": "Shai-Hulud npm worm: malicious bash script assessed as LLM-generated (Unit 42)",
+      "description": "Unit 42 investigated the self-replicating Shai-Hulud npm worm, responsible for the compromise of hundreds of software packages, and assessed with moderate confidence that an LLM was used to generate the malicious bash script, based on its comments and emojis.",
+      "affected": "npm ecosystem (hundreds of compromised packages)",
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Replaced reference: https://unit42.paloaltonetworks.com/. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/."
+    },
+    "RES-sysdig-llm-cloud-attack-2025": {
+      "quality_tier": "auto",
+      "references": [
+        {
+          "title": "AI-assisted cloud intrusion achieves admin access in 8 minutes - Sysdig (2026-02-03)",
+          "url": "https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes",
+          "type": "research"
+        }
+      ],
+      "_note": "agent-suggested D130-3a reference remediation, 2026-11-11; pending user re-review. Replaced reference: https://www.sysdig.com/threat-research. quality_tier demoted to auto (never promoted). Evidence: docs/audits/reference-audit-2026-11-11/."
+    },
+    "RES-aim-echoleak-extension-2026": {
+      "status": "unverified",
+      "status_reason": {
+        "code": "no-confirmed-source",
+        "as_of": "2026-11-11"
+      },
+      "_note": "D130-3a: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: The only reference is the publisher's news index (R1). Searched 2026-11-11 (all through fetch_once, or a search page where noted): aim.security/news and /lp/aim-labs-echoleak-blog-post and /sitemap.xml (robots.txt unverifiable, HTTP 403, so refused fail-closed); a web.archive.org snapshot of aim.security/news (lists EchoLeak, CurXecute and ASCII Smuggling items only, no 'variants' post); The Hacker News site search for 'EchoLeak', 'Aim Labs' and 'scope violation' (only the original EchoLeak coverage and Aim Labs' CurXecute Cursor RCE, CVE-2025-54135); the NVD 2.0 API keyword search 'EchoLeak' (0 results); BleepingComputer search for 'EchoLeak' (no results page content); Bing through WebFetch (returned unrelated 'AIM' pages) and DuckDuckGo (bot challenge). The only Aim Labs follow-up found is CurXecute, which is its own row INC-02469, and the original EchoLeak is INC-00924; pointing this row at either would create a duplicate. Nothing found names 'continued research into variants across multiple enterprise copilots'. Not found after this search; the search was limited to those routes."
+    },
+    "VTR-anthropic-election-influence-study-2024": {
+      "status": "unverified",
+      "status_reason": {
+        "code": "no-confirmed-source",
+        "as_of": "2026-11-11"
+      },
+      "_note": "D130-3a: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: The only reference is the publisher's research index (R1). Searched 2026-11-11 through fetch_once: anthropic.com/research, /news, /research/team/frontier-red-team, red.anthropic.com, /news/detecting-countering-misuse-aug-2025 and /news/building-safeguards-for-claude (all HTTP 200; none contains 'spear-phishing', 'spear phishing' or 'phishing' in a study of that name; the August 2025 misuse report names no such study); The Hacker News site search for 'Anthropic spear-phishing' and 'Anthropic Claude phishing' (reports of 2025-2026 Claude misuse, none a 2024 Frontier Threats Red Team spear-phishing scaling study). No search engine was available. The row also carries a second seed id (VTR-anthropic-election-influence-study-2024, an election-influence study) with no source either. Not found after this search; the search was limited to those routes."
     }
   }
 }
