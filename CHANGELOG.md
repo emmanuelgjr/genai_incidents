@@ -7,6 +7,15 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - WS4 follow-ups: tests and one workflow comment (data and pipeline behaviour unchanged)
+
+- **Tests and test infrastructure only; no script, data or workflow logic changed.** The only edits outside `tests/` are a corrected comment in `.github/workflows/validate.yml` and this CHANGELOG entry.
+- `tests/test_auto_refresh_workflow.py`: new `check_threshold_text` ties the "failed N weeks running" sentence in the refresh PR body to the effective source-health threshold (the `--threshold` the workflow passes, else `DEFAULT_THRESHOLD` in `scripts/check_source_health.py`) and to a weekly cron.
+- `check_ci_dispatch` now strips shell comments before substring matching, requires the dispatch `if:` to be a pure AND of `!cancelled()` and the `pr_number` guard, requires `GH_TOKEN` to be exactly `${{ github.token }}` or `${{ secrets.GITHUB_TOKEN }}`, requires the `gh workflow run` line to start with the command (a lexical check, not a shell parser), and applies "only `dispatch-pr-ci` may hold an `actions` permission" to every job. A new test executes validate.yml's re-merge baseline shell block under bash in a scratch git repo for `workflow_dispatch`, `push` and `pull_request` (skipped when no usable bash+git exists).
+- `tests/test_owasp_dsgai_vocab.py`: the TAXONOMIES planted-drift test now runs the real doc-vs-recount comparison (`doc_mismatches`) with expected values derived from the doc and corpus instead of the literal 29.
+- `tests/conftest.py` network guard (D145): UDP `sendto`/`sendmsg` are guarded; loopback is decided by `ipaddress.ip_address(...).is_loopback` (all of 127.0.0.0/8 and `::1`) and accepts `bytes` hosts. `tests/test_network_guard.py` covers DNS, connect, connect_ex, create_connection, sendto, IPv6 and loopback.
+- `.github/workflows/validate.yml`: the checkout comment no longer claims no other step reads git history; it lists the readers.
+
 ### Changed - independent CI on the weekly refresh PR (tooling only; data unchanged)
 
 - A PR opened with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so "Validate dataset" and the accessibility workflow sat at `action_required` on refresh PRs (e.g. #103) and reviewers merged with no CI run independent of the refresh job. `validate.yml` now accepts `workflow_dispatch` (`a11y.yml` already did), and `auto-refresh.yml` dispatches both on `auto-refresh/data` whenever the run leaves an open refresh PR (created, updated, or already up to date) (a separate `dispatch-pr-ci` job holding only `actions: write`, so the `refresh` job that runs fetched ingest code never has it; a failed dispatch only warns). A dispatched validate run uses the tip of `main` as the override baseline, the equivalent of `HEAD^1` in a PR run. Test: `tests/test_auto_refresh_workflow.py`.

@@ -20,11 +20,16 @@ jobs:
       matrix:
         python-version: ["3.12", "3.13"]
     steps:
-      # Full history + tags (v2.13.0 item 5, D52 advisory): pinned-blob tests
-      # read historical data via `git show <commit>:data/incidents.json`
-      # (test_precision_audit::test_reproduces_from_pinned_blob) and
-      # `git show v2.10.0:...` (test_resolve_id_status); a shallow clone made
-      # both skip. No other step in this job reads git history.
+      # Full history + tags (v2.13.0 item 5, D52 advisory). Readers of git
+      # history in this job include, among others: pinned-blob and tag tests
+      # in the Unit tests step (e.g. test_precision_audit, test_resolve_id_status,
+      # test_release_label), which skip without full history or tags; the
+      # Re-merge step's `git rev-parse origin/main` and `git cat-file -e` on
+      # the push `before` SHA; and scripts/merge_and_dedupe.py, which reads
+      # `git show <baseline>:<file>` via GENAI_OVERRIDE_BASELINE (D140) and,
+      # on every build, `git show HEAD:<file>` and `git log --all` for the
+      # D71 refresh gate. The list is not exhaustive: grep tests/ and scripts/
+      # for git calls before making this checkout shallow.
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0

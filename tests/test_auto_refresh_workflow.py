@@ -186,6 +186,26 @@ DISPATCHED = ("validate.yml", "a11y.yml")
 WF_DIR = WORKFLOW.parent
 
 
+def strip_shell_comments(text: str) -> str:
+    """Drop `# ...` comments (own-line and trailing) from shell text, honouring quotes,
+    so substring checks cannot be satisfied by a comment."""
+    out = []
+    for line in text.splitlines():
+        quote = None
+        cut = len(line)
+        for i, ch in enumerate(line):
+            if quote:
+                if ch == quote:
+                    quote = None
+            elif ch in "\"'":
+                quote = ch
+            elif ch == "#" and (i == 0 or line[i - 1].isspace()):
+                cut = i
+                break
+        out.append(line[:cut])
+    return chr(10).join(out)
+
+
 def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str]:
     import yaml
 
@@ -202,15 +222,29 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
             problems.append(f"{label} must not hold an actions permission")
     if "steps.cpr.outputs.pull-request-number" not in str((refresh.get("outputs") or {}).get("pr_number", "")):
         problems.append("refresh must expose outputs.pr_number from the cpr step")
+    # whole-workflow rule: ONLY dispatch-pr-ci may hold an actions permission, and no
+    # other job may carry a string permission (write-all) that implies one
+    for name, j in jobs.items():
+        if name in ("refresh", "dispatch-pr-ci"):
+            continue  # refresh is checked above; dispatch-pr-ci is checked exactly below
+        jp = j.get("permissions")
+        if jp is not None and not isinstance(jp, dict):
+            problems.append(f"job {name} permissions must be a mapping, not {jp!r}")
+        elif "actions" in (jp or {}):
+            problems.append(f"job {name} must not hold an actions permission (only dispatch-pr-ci may)")
     job = jobs.get("dispatch-pr-ci")
     if job is None:
         return problems + ["no dispatch-pr-ci job"]
     if job.get("needs") != "refresh":
         problems.append("dispatch job must need refresh")
-    cond = str(job.get("if", ""))
-    if "needs.refresh.outputs.pr_number != ''" not in cond:
+    cond = str(job.get("if", "")).strip()
+    cond = re.sub(r"^\$\{\{|\}\}$", "", cond).strip()
+    terms = [t.strip() for t in cond.split("&&")]
+    if "||" in cond:
+        problems.append("dispatch job if: must be a pure AND (an OR lets it run without a PR)")
+    if "needs.refresh.outputs.pr_number != ''" not in terms:
         problems.append("dispatch job must be guarded on a non-empty pr_number")
-    if "!cancelled()" not in cond:
+    if "!cancelled()" not in terms:
         problems.append("dispatch job if: needs !cancelled() (implicit success() would skip it when cve-sweep fails)")
     if job.get("permissions") != {"actions": "write"}:
         problems.append("dispatch job permissions must be exactly actions: write")
@@ -219,16 +253,23 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
     steps = job["steps"]
     if any("uses" in s for s in steps):
         problems.append("dispatch job must have no uses: steps (no checkout, no third-party action)")
-    run = chr(10).join(s.get("run", "") for s in steps)
+    run = strip_shell_comments(chr(10).join(s.get("run", "") for s in steps))
     if "gh workflow run" not in run:
         problems.append("dispatch job does not run `gh workflow run`")
+    elif any(not re.match("[ " + BS + "t]*gh workflow run" + BS + "b", ln) for ln in run.splitlines() if "gh workflow run" in ln):
+        # conservative and lexical: every line naming the command must START with it
+        problems.append("`gh workflow run` must be at command position (line must start with the command)")
+        problems.append("`gh workflow run` must be at command position (no echo/:/printf/true prefix)")
     for wf in DISPATCHED:
         if wf not in run:
             problems.append(f"{wf} not in the dispatch loop")
     if '-R "$GITHUB_REPOSITORY"' not in run:
         problems.append('dispatch must pass -R "$GITHUB_REPOSITORY" (no checkout, so gh has no repo context)')
-    if not all("GH_TOKEN" in (s.get("env") or {}) for s in steps if "gh workflow run" in s.get("run", "")):
-        problems.append("the dispatch step must set GH_TOKEN")
+    for s_ in steps:
+        if "gh workflow run" in s_.get("run", ""):
+            tok = str((s_.get("env") or {}).get("GH_TOKEN", "")).strip()
+            if not re.fullmatch(r"[$][{][{]\s*(github[.]token|secrets[.]GITHUB_TOKEN)\s*[}][}]", tok):
+                problems.append("the dispatch step GH_TOKEN must be exactly ${{ github.token }} or ${{ secrets.GITHUB_TOKEN }}")
     if "--ref auto-refresh/data" not in run:
         problems.append("dispatch must target --ref auto-refresh/data")
     if '|| echo "::warning::' not in run:
@@ -241,7 +282,7 @@ def check_ci_dispatch(text: str, validate_text: str, a11y_text: str) -> list[str
     for label, body in (("validate.yml", validate_text), ("a11y.yml", a11y_text)):
         if "workflow_dispatch" not in (yaml.safe_load(body).get(True) or {}):  # PyYAML parses `on` as True
             problems.append(f"{label} has no workflow_dispatch trigger")
-    remerge = validate_text.split("Re-merge from ingest sources", 1)[1].split("Validate incidents.json", 1)[0]
+    remerge = strip_shell_comments(validate_text.split("Re-merge from ingest sources", 1)[1].split("Validate incidents.json", 1)[0])
     if '"$EVENT_NAME" = "workflow_dispatch"' not in remerge:
         problems.append("validate.yml re-merge baseline does not handle workflow_dispatch (would fail closed)")
     else:
@@ -304,3 +345,221 @@ def test_ci_dispatch_check_fires():
     assert vexit in vn
     assert any("fail closed" in p for p in check_ci_dispatch(good, vn.replace(vexit, ":" + nl + "            }" + nl, 1), a))
     assert any("workflow_dispatch" in p for p in check_ci_dispatch(good, vn.replace('"$EVENT_NAME" = "workflow_dispatch"', '"$EVENT_NAME" = "other"'), a))
+
+
+# ---- threshold <-> PR-warning text -------------------------------------------------
+SOURCE_HEALTH = Path(__file__).resolve().parents[1] / "scripts" / "check_source_health.py"
+BS = chr(92)
+
+
+def check_threshold_text(workflow_text: str, health_text: str) -> list[str]:
+    """The PR warning says "failed N weeks running". N must equal the effective
+    consecutive-failure threshold (the --threshold the workflow passes to
+    check_source_health.py, else its DEFAULT_THRESHOLD) and the cron must be weekly,
+    otherwise one failed refresh is not one week."""
+    import yaml
+
+    problems = []
+    said = re.findall(r"failed (\d+) weeks running", workflow_text)
+    if len(said) != 1:
+        return [f"expected exactly one 'failed N weeks running' sentence, found {len(said)}"]
+    d = re.search(r"(?m)^DEFAULT_THRESHOLD\s*=\s*(\d+)", health_text)
+    if not d:
+        return ["DEFAULT_THRESHOLD not found in check_source_health.py"]
+    call = re.search(r"python scripts/check_source_health[.]py((?:[^\n]*" + re.escape(BS) + r"\n)*[^\n]*)", workflow_text)
+    if not call:
+        return ["workflow does not invoke check_source_health.py"]
+    passed = re.search(r"--threshold[ =](\d+)", call.group(1))
+    effective = int(passed.group(1)) if passed else int(d.group(1))
+    if int(said[0]) != effective:
+        problems.append(f"PR text says {said[0]} weeks but the effective threshold is {effective}")
+    crons = [c["cron"] for c in (yaml.safe_load(workflow_text).get(True) or {}).get("schedule", [])]
+    if len(crons) != 1:
+        problems.append(f"expected one cron entry, found {len(crons)}")
+    else:
+        f = crons[0].split()
+        if not (len(f) == 5 and f[2] == "*" and f[3] == "*" and re.fullmatch(r"[0-6]", f[4])):
+            problems.append(f"cron {crons[0]!r} is not weekly, so 'N weeks' != N consecutive failures")
+    return problems
+
+
+def test_pr_text_weeks_match_effective_threshold():
+    wf = WORKFLOW.read_text(encoding="utf-8")
+    assert check_threshold_text(wf, SOURCE_HEALTH.read_text(encoding="utf-8")) == []
+
+
+def test_threshold_text_check_fires():
+    wf = WORKFLOW.read_text(encoding="utf-8").replace(chr(13) + chr(10), chr(10))
+    h = SOURCE_HEALTH.read_text(encoding="utf-8")
+    assert "DEFAULT_THRESHOLD = 3" in h and "failed 3 weeks running" in wf and 'cron: "0 4 * * 0"' in wf
+    assert any("effective threshold" in p for p in check_threshold_text(wf.replace("failed 3 weeks", "failed 4 weeks"), h))
+    assert any("effective threshold" in p for p in check_threshold_text(wf, h.replace("DEFAULT_THRESHOLD = 3", "DEFAULT_THRESHOLD = 2")))
+    call = "python scripts/check_source_health.py " + BS + chr(10)
+    assert call in wf
+    pad = "            "
+    assert any("effective threshold" in p for p in check_threshold_text(wf.replace(call, call + pad + "--threshold 5 " + BS + chr(10)), h))
+    # an explicit threshold equal to the text is fine (control: the check is not just always-red)
+    assert check_threshold_text(wf.replace(call, call + pad + "--threshold 3 " + BS + chr(10)), h) == []
+    assert any("not weekly" in p for p in check_threshold_text(wf.replace('"0 4 * * 0"', '"0 4 * * *"'), h))
+
+
+def test_ci_dispatch_check_fires_comment_or_and_token_and_new_job():
+    """Gate advisories (a)-(d) on check_ci_dispatch: each mutation must produce a problem."""
+    import yaml
+
+    nl = chr(10)
+    good = WORKFLOW.read_text(encoding="utf-8").replace(chr(13) + nl, nl)
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8").replace(chr(13) + nl, nl)
+    a = (WF_DIR / "a11y.yml").read_text(encoding="utf-8")
+    assert check_ci_dispatch(good, v, a) == []  # control: the unmutated pair is clean
+
+    def fires(text, vt, needle):
+        assert any(needle in p for p in check_ci_dispatch(text, vt, a)), needle
+
+    # (a) OR in place of AND
+    cond = "!cancelled() && needs.refresh.outputs.pr_number != ''"
+    assert cond in good
+    fires(good.replace(cond, "!cancelled() || needs.refresh.outputs.pr_number != ''"), v, "pure AND")
+    # (M6) neutered command: a prefix token makes `gh workflow run` an argument, not a command
+    gwr = 'gh workflow run "$wf"'
+    assert good.count(gwr) == 1
+    for prefix in ("echo ", ": ", "printf '%s' ", "true ", "cat <<< ", "echo do ", "echo then ", "echo " + BS + "; "):
+        fires(good.replace(gwr, prefix + gwr), v, "command position")
+    fires(good.replace(gwr, "echo '; " + gwr.replace(chr(34), "") + "'"), v, "command position")
+    # (b) empty token
+    tok = "GH_TOKEN: ${{ github.token }}" + nl + "        run: |" + nl + "          for wf"
+    assert good.count(tok) == 1
+    tail_ = nl + "        run: |" + nl + "          for wf"
+    for bad in ('""', '"github.token"', "${{ secrets.PAT || github.token }}", "${{ github.token }}x"):
+        fires(good.replace(tok, "GH_TOKEN: " + bad + tail_), v, "GH_TOKEN")
+    assert check_ci_dispatch(good.replace(tok, "GH_TOKEN: ${{secrets.GITHUB_TOKEN}}" + tail_), v, a) == []  # tolerated forms stay clean
+    # (c) text only in a comment
+    loop = "for wf in validate.yml a11y.yml; do"
+    assert loop in good
+    fires(good.replace(loop, "for wf in validate.yml; do # a11y.yml"), v, "a11y.yml not in the dispatch loop")
+    ref = ' --ref auto-refresh/data'
+    assert ref in good
+    fires(good.replace(ref, "", 1).replace(loop, "# --ref auto-refresh/data" + nl + "          " + loop), v, "--ref auto-refresh/data")
+    vbase = "base=" + chr(34) + "$(git rev-parse --verify --quiet 'origin/main^{commit}')" + chr(34)
+    assert vbase in v
+    fires(good, v.replace(vbase, "base=HEAD # base=origin/main", 1), "origin/main")
+    vexit = "exit 1" + nl + "            }" + nl
+    assert vexit in v
+    fires(good, v.replace(vexit, "# exit 1" + nl + "            }" + nl, 1), "fail closed")
+    # (d) a new job holding actions: write, with a checkout
+    extra = nl + "  sneaky:" + nl + "    runs-on: ubuntu-latest" + nl + "    permissions:" + nl + "      actions: write" + nl + "    steps:" + nl + "      - uses: actions/checkout@v6" + nl
+    mutated = good.rstrip(nl) + nl + extra
+    assert "sneaky" in yaml.safe_load(mutated)["jobs"]
+    fires(mutated, v, "only dispatch-pr-ci may")
+    fires(good.rstrip(nl) + nl + extra.replace("actions: write", "x: y").replace("    permissions:" + nl + "      x: y" + nl, "    permissions: write-all" + nl), v, "must be a mapping")
+
+
+# ---- execute the workflow_dispatch / push / pull_request baseline shell block ------
+def _baseline_script(validate_text: str) -> str:
+    """The `run:` of validate.yml's re-merge step up to (excluding) the export, with the
+    resolved baseline printed instead of running the python scripts."""
+    import yaml
+
+    steps = yaml.safe_load(validate_text)["jobs"]["validate"]["steps"]
+    run = next(s["run"] for s in steps if s.get("name") == "Re-merge from ingest sources")
+    head = run.split('export GENAI_OVERRIDE_BASELINE="$base"', 1)[0]
+    return head + 'printf %s "$base"' + chr(10)
+
+
+def _run_baseline(script: str, cwd, env_extra: dict):
+    import os
+    import subprocess
+
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid", **env_extra}
+    r = subprocess.run([_find_bash(), "-e", "-s"], input=script.encode(), cwd=cwd, env=env, capture_output=True)
+    r.stdout = r.stdout.decode()  # bytes in/out: text mode would turn LF into CRLF on Windows and break bash
+    return r
+
+
+def _find_bash():
+    """A bash that forwards the environment (on Windows `bash` on PATH is often WSL, which
+    does not, so prefer the bash next to Git for Windows). None if there is no usable one."""
+    import os
+    import shutil
+    import subprocess
+
+    cands = []
+    git = shutil.which("git")
+    if git:
+        root = os.path.dirname(os.path.dirname(git))
+        cands += [os.path.join(root, "bin", "bash.exe"), os.path.join(root, "usr", "bin", "bash.exe")]
+    cands.append(shutil.which("bash"))
+    for c in cands:
+        if not c or not os.path.exists(c):
+            continue
+        try:
+            r = subprocess.run([c, "-c", 'echo "$GI_PROBE"; git --version'], capture_output=True, text=True,
+                               timeout=30, env={**os.environ, "GI_PROBE": "ok"})
+        except Exception:
+            continue
+        if r.returncode == 0 and r.stdout.startswith("ok"):
+            return c
+    return None
+
+
+def _git_repo(path, with_origin_main: bool):
+    import subprocess
+
+    def g(*args):
+        subprocess.run(["git", *args], cwd=path, check=True, capture_output=True,
+                       env={**__import__("os").environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@e.invalid",
+                            "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@e.invalid"})
+
+    g("init", "-q")
+    for n in ("one", "two"):
+        (path / n).write_text(n)
+        g("add", n)
+        g("-c", "commit.gpgsign=false", "commit", "-qm", n)
+    if with_origin_main:
+        g("update-ref", "refs/remotes/origin/main", "HEAD")
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=path, capture_output=True, text=True).stdout.strip()
+
+
+def test_baseline_shell_block_executes(tmp_path):
+    import pytest
+
+    if _find_bash() is None:
+        pytest.skip("no usable bash+git available")
+    v = (WF_DIR / "validate.yml").read_text(encoding="utf-8").replace(chr(13) + chr(10), chr(10))
+    script = _baseline_script(v)
+    no_origin = tmp_path / "no_origin"
+    with_origin = tmp_path / "with_origin"
+    no_origin.mkdir()
+    with_origin.mkdir()
+    _git_repo(no_origin, False)
+    tip = _git_repo(with_origin, True)
+
+    # workflow_dispatch: fail closed without origin/main, resolve it with
+    def fails_closed(sc):
+        r_ = _run_baseline(sc, no_origin, {"EVENT_NAME": "workflow_dispatch", "PUSH_BEFORE": ""})
+        return r_.returncode != 0 and "workflow_dispatch baseline" in r_.stdout
+
+    assert fails_closed(script)
+    r = _run_baseline(script, with_origin, {"EVENT_NAME": "workflow_dispatch", "PUSH_BEFORE": ""})
+    assert r.returncode == 0 and r.stdout.strip() == tip, (r.returncode, r.stdout, r.stderr)
+
+    # push: valid before-SHA resolves; empty / all-zero / unknown SHA fail closed
+    first = __import__("subprocess").run(["git", "rev-parse", "HEAD^1"], cwd=with_origin, capture_output=True, text=True).stdout.strip()
+    r = _run_baseline(script, with_origin, {"EVENT_NAME": "push", "PUSH_BEFORE": first})
+    assert r.returncode == 0 and r.stdout.strip() == first, (r.returncode, r.stdout, r.stderr)
+    for bad in ("", "0" * 40, "1" * 40):
+        r = _run_baseline(script, with_origin, {"EVENT_NAME": "push", "PUSH_BEFORE": bad})
+        assert r.returncode != 0 and "D141" in r.stdout, (bad, r.returncode, r.stdout)
+
+    # pull_request: HEAD^1
+    r = _run_baseline(script, with_origin, {"EVENT_NAME": "pull_request", "PUSH_BEFORE": ""})
+    assert r.returncode == 0 and r.stdout == "HEAD^1"
+
+    # m1 (`|| base=HEAD; true || {`) passed the old grep-based check; m2
+    # (`exit 1` -> `true`) was already caught by it. Executing the block catches both.
+    vbase = "base=" + chr(34) + "$(git rev-parse --verify --quiet 'origin/main^{commit}')" + chr(34) + " || {"
+    assert vbase in script
+    for mutated in (script.replace(vbase, vbase.replace(" || {", " || base=HEAD; true || {"), 1),
+                    script.replace("exit 1", "true")):
+        assert not fails_closed(mutated)  # the fail-open mutant is detected by the executed check
