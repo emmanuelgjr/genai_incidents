@@ -123,7 +123,7 @@ Key fields per record (full reference in the data dictionary):
   GitHub, where they still resolve by ID.
   `status: unverified` means the row has no confirmed source (the maintainers could not confirm
   its references support it): it is excluded from the incident count, left out of this export,
-  and kept in the full JSON on GitHub.
+  and kept in the full JSON on GitHub, where it still resolves by ID.
 
 ### Source freshness
 
