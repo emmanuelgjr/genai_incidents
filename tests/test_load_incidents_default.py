@@ -53,3 +53,51 @@ def test_other_accessors_still_see_every_row():
     assert hidden["id"] not in {e["id"] for e in gi.load_incidents()}
     assert gi.by_id(hidden["id"]) == hidden
     assert any(e["id"] == hidden["id"] for e in gi.query(text=hidden["id"]))
+
+
+# --- gate bounce #1 additions (D4/A1/A5) ---
+import importlib.util
+
+
+def _is(status):
+    return [e for e in ALL if e.get("status") == status]
+
+
+def test_unverified_row_hidden_by_default_but_found_elsewhere():
+    row = _is("unverified")[0]
+    assert row["id"] not in {e["id"] for e in gi.load_incidents()}
+    assert gi.by_id(row["id"]) == row
+    assert any(e["id"] == row["id"] for e in gi.query(text=row["id"]))
+
+
+def test_by_cve_still_finds_a_retracted_row():
+    # All retracted rows carry CVEs and no unverified row does, so by_cve can
+    # only be pinned on a retracted row.
+    row = next(e for e in _is("retracted") if e.get("cve_ids"))
+    assert row["id"] not in {e["id"] for e in gi.load_incidents()}
+    assert any(e["id"] == row["id"] for e in gi.by_cve(row["cve_ids"][0]))
+
+
+def test_returned_lists_are_fresh_copies():
+    for kw in ({}, {"include_retracted": True}):
+        first = gi.load_incidents(**kw)
+        n = len(first)
+        first.append({"id": "INC-X"})
+        assert len(gi.load_incidents(**kw)) == n
+        del first[:5]
+        assert len(gi.load_incidents(**kw)) == n
+
+
+def test_default_order_is_source_order():
+    expected = [e for e in ALL if e.get("status") not in {"retracted", "unverified"}]
+    assert gi.load_incidents() == expected
+    assert gi.load_incidents(include_retracted=True) == ALL
+
+
+def test_not_standing_matches_the_build_constant():
+    spec = importlib.util.spec_from_file_location(
+        "entry_status_for_test", ROOT / "scripts" / "entry_status.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert gi._NOT_STANDING == mod.NOT_STANDING

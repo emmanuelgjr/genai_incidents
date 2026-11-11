@@ -2,7 +2,9 @@
 
 The dataset is shipped as package data (``incidents.min.json``); no
 network calls are made at import time. Use :func:`load_incidents` for
-the full slim dataset, or :func:`query` for filtered access.
+the rows that stand (it drops ``retracted`` and ``unverified`` rows unless
+called with ``include_retracted=True``), or :func:`query` for filtered access
+over every row.
 
 Example::
 
@@ -121,7 +123,8 @@ def load_incidents(include_retracted: bool = False) -> list[dict[str, Any]]:
     **Behaviour change (D134(i)).** By default this excludes rows whose
     ``status`` is ``retracted`` or ``unverified``, so ``len(load_incidents())``
     equals the published ``incident_count``. ``disputed`` rows stay (they are
-    counted in ``incident_count``). Earlier releases returned every row.
+    counted in ``incident_count``). Rows with no ``status`` (the usual case) are kept.
+    Earlier releases returned every row.
 
     ``include_retracted=True`` returns every row, retracted and unverified
     included (the old behaviour). The parameter name is kept as ruled even
