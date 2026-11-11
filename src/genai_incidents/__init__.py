@@ -110,9 +110,31 @@ def _load_deprecation_records() -> tuple[dict[str, Any], ...]:
     return tuple(json.loads(text).get("deprecations", []))
 
 
-def load_incidents() -> list[dict[str, Any]]:
-    """Return the full list of (slim) incident records."""
-    return list(_load_raw().get("incidents", []))
+#: ``status`` values that do not stand as published and are therefore outside
+#: ``incident_count`` (``data/stats.json``). ``disputed`` rows DO stand.
+_NOT_STANDING = frozenset({"retracted", "unverified"})
+
+
+def load_incidents(include_retracted: bool = False) -> list[dict[str, Any]]:
+    """Return the (slim) incident records that stand as published.
+
+    **Behaviour change (D134(i)).** By default this excludes rows whose
+    ``status`` is ``retracted`` or ``unverified``, so ``len(load_incidents())``
+    equals the published ``incident_count``. ``disputed`` rows stay (they are
+    counted in ``incident_count``). Earlier releases returned every row.
+
+    ``include_retracted=True`` returns every row, retracted and unverified
+    included (the old behaviour). The parameter name is kept as ruled even
+    though it governs ``unverified`` rows too.
+
+    ``query()``, ``by_id()``, ``by_cve()`` and the ``resolve_*`` helpers are
+    NOT filtered by this and read every row, so a retracted or unverified
+    row can be found by ID.
+    """
+    rows = _load_raw().get("incidents", [])
+    if include_retracted:
+        return list(rows)
+    return [e for e in rows if e.get("status") not in _NOT_STANDING]
 
 
 def load_schema() -> dict[str, Any]:
@@ -234,6 +256,10 @@ def query(
     It is a different axis from ``quality_tier`` (vetting level) — neither
     substitutes for the other.
 
+    **Returns every row, including ``retracted`` and ``unverified`` ones**
+    (unlike ``load_incidents()``, whose default excludes them). Filter on
+    ``status`` if you want only rows that stand.
+
     **Carry-in caveat (WS6-T9, 2026-09-18; corrected 2026-10-01):** this
     note originally said ``tier=`` matched nothing until the dataset was
     rebuilt. That is no longer true: the packaged ``incidents.min.json`` now
@@ -273,7 +299,10 @@ def query(
 
 
 def by_id(inc_id: str) -> dict[str, Any] | None:
-    """Return the incident with the given ``INC-NNNNN`` id, or ``None``."""
+    """Return the incident with the given ``INC-NNNNN`` id, or ``None``.
+
+    Searches every row, including ``retracted`` and ``unverified`` ones.
+    """
     for e in _load_raw().get("incidents", []):
         if e.get("id") == inc_id:
             return e
@@ -281,7 +310,10 @@ def by_id(inc_id: str) -> dict[str, Any] | None:
 
 
 def by_cve(cve: str) -> list[dict[str, Any]]:
-    """Return every incident that lists ``cve`` in ``cve_ids``."""
+    """Return every incident that lists ``cve`` in ``cve_ids``.
+
+    Includes ``retracted`` and ``unverified`` rows; check ``status``.
+    """
     cve_u = cve.strip().upper()
     return [e for e in _load_raw().get("incidents", []) if cve_u in (e.get("cve_ids") or [])]
 

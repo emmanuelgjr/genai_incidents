@@ -7,6 +7,12 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - PUBLIC BEHAVIOUR CHANGE: `load_incidents()` excludes `retracted` and `unverified` rows by default (D134(i); data unchanged)
+
+- **What.** `load_incidents(include_retracted: bool = False)`. By default it now drops rows whose `status` is `retracted` or `unverified`, so `len(load_incidents())` equals `incident_count` in `data/stats.json`. `disputed` rows are kept (they are counted in `incident_count`). `include_retracted=True` returns every row. The parameter keeps the ruled name although it also governs `unverified` rows. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged and still read every row; their docstrings now say so. The slim `incidents.min.json` is unchanged and still carries every row.
+- **Consumer impact.** Code that called `load_incidents()` and counted or iterated rows now sees fewer rows (retracted + unverified; read both counts from `data/stats.json`, not from this entry). To restore the old result, call `load_incidents(include_retracted=True)`. The cut recipe becomes `incident_count + retracted_count + unverified_count == len(all rows)`.
+- **Docs.** README opening and release text, `docs/DATA_DICTIONARY.md` Access line and the function docstring now state which statuses each accessor returns, and the README explains `retracted` / `unverified` and why `incident_count` is below the row count.
+
 ### Changed - independent CI on the weekly refresh PR (tooling only; data unchanged)
 
 - A PR opened with `GITHUB_TOKEN` does not trigger `pull_request` workflows, so "Validate dataset" and the accessibility workflow sat at `action_required` on refresh PRs (e.g. #103) and reviewers merged with no CI run independent of the refresh job. `validate.yml` now accepts `workflow_dispatch` (`a11y.yml` already did), and `auto-refresh.yml` dispatches both on `auto-refresh/data` whenever the run leaves an open refresh PR (created, updated, or already up to date) (a separate `dispatch-pr-ci` job holding only `actions: write`, so the `refresh` job that runs fetched ingest code never has it; a failed dispatch only warns). A dispatched validate run uses the tip of `main` as the override baseline, the equivalent of `HEAD^1` in a PR run. Test: `tests/test_auto_refresh_workflow.py`.
