@@ -14,6 +14,176 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔁 D130-3a references batch 1: BOUNCE #1 (gate-d1303a on `4325eaad`), 2026-11-11 → redispatched to d1303a with exact fixes
+**Verdict: BOUNCE #1, as sent by gate-d1303a.** The foreman checked defects 1-3 against the tree itself before recording them [R]: `git show 64109452` vs the worktree; the reco.ai URL is on INC-01589 at base and on INC-01589+INC-01600 at the head; INC-04383 lost both 2103.03874 and 2110.14168; data/curation_overrides.json:545,553 carry "(D139(b))".
+1. **INC-01600 now duplicates INC-01589 (lesson i).** Its new only reference (reco.ai/blog/openclaw-the-ai-agent-security-crisis-unfolding-right-now) is already INC-01589's first reference at base 64109452. Both rows are the OpenClaw crisis, and the URL is on no other row. Nothing in the audit, CORRECTIONS or CHANGELOG says so. Fix: revert the replacement and defer the row as a duplicate or over-merge (WS4-T19).
+2. **INC-04383 lost a reference that was never flagged and is not R1-shaped**, https://arxiv.org/abs/2110.14168. R2 flagged only 2103.03874. Method call (a) says an off-topic page is reported as a candidate and removed only if it has the exact R1 shape. CORRECTIONS.md:46 admits it, but the audit table lists it as flagged, the knock-ons do not declare it, and the evidence section's "removal candidates 0" reads as covering it.
+3. **"D139(b)" is cited as authority for INC-02471 and INC-02871** (CORRECTIONS.md:18-19 and the two `_d130_3a_prior_note` texts on CVE-2025-61590/61591). D139(b) named only INC-04207. The forcing claim itself is TRUE: the gate restored discovery_method on both rows and validate.py exited 1, naming INC-02471 and INC-02871.
+4. **Merge blocker (the DATASHEET sentence, from the WS5 merge).** For the 29 removal-only rows the kept references were checked only for reachability plus an id or product-name token, on a sample for large rows (INC-01015 has 442). The gate's pick is **(c)**: replace the sentence with the gate's wording (in the redispatch brief) and add docs/audits/reference-audit-2026-11-11/ to the link.
+**Evidence the gate measured [A, the gate's own scripts in scratchpad/g/]:**
+- Merge suites: 1644 passed on f917fa42+4325eaad; 1648 passed, 1 skipped, 1 xfailed on 32daf87c+4325eaad (re-rendered).
+- The two build runs were identical (porcelain empty both times), drift clean.
+- An independent R1 gives the same 126 non-legacy rows (list.json batches 1-4).
+- Per-entity delta: 36 rows, 0 outside the 38 targets, and field counts exactly as claimed. Kept reference objects are byte-unchanged, there are no promotions, and landmark→feed applies to exactly the 6 deferred rows.
+- Stats: 15782→15780, unverified 10→12, landmark 2062→2056.
+- It re-fetched 10 removed and all 5 replacement references, re-fetched 7 evidenced and 3 no-token kept references, and the 192-reference tally (153 evidenced, 23 dead, 16 no-token) reproduced exactly.
+- The test change is necessary and sound. INC-00570 and INC-03573 unverified are correct.
+**Advisories:**
+- The audit says detection ran at 589376db; the report says c80b7e61. Fix the text.
+- INC-01641 and INC-00868 are the same CVE-2026-22708. This predates the branch; route it to the dedupe queue.
+- "Evidenced" on a product keyword alone is weak; batches 2-4 should prefer id tokens or say so.
+- INC-05425 and INC-05421 → link-health first.
+- INC-01553 has a `https://https://` reference.
+**Merge notes:** README and CHANGELOG conflict with 32daf87c (CHANGELOG union; README from HEAD, then re-render). The DATASHEET marker that moves is `unverified_count` 10→12, not incident_count.
+
+### ✅ WS5 DATASHEET + README + HF card status note DONE: MERGED 2026-11-11 (`2b052def`; gate-ws5ds re-gate PASS on `1c63ba26` after bounce #1)
+**What merged** (4 files, +40/−4; no data/):
+- **DATASHEET Composition:** retracted and unverified rows are kept, not deleted, and sit outside incident_count; disputed rows are counted; the count identity, with stats markers.
+- **DATASHEET Limitations:** a new "Legacy-seed sourcing quality" bullet.
+- **README.md:25:** "never deleted" → "kept, not deleted".
+- **HF card:** explains `retracted`; both statuses still resolve by ID.
+- **CHANGELOG:** entry added.
+
+**Gate verdict, pasted:** PASS, defects none; D1–D3 closed.
+- **Data:** 15,821 rows (29 retracted, 10 unverified). "Never delet" is left only at README:154 ("Tombstones, never deletions", about IDs, which is accurate). The CHANGELOG tombstone claim matches all 1,084 id_deprecations records.
+- **Merge and drift:** clean merge onto d3f28010. The drift plant fires (rc 1), and render_docs_stats is a no-op.
+- **HF card:** renders with no stray placeholders; the JSONL has 15,782 rows.
+- **Full suite:** 1648 passed, 1 skipped, 1 xfailed.
+- **Strays:** none.
+
+**Gate advisory 1 → BLOCKING NOTE FOR THE D130-3a MERGE:**
+- The new DATASHEET sentence "its text is re-derived wherever the remaining sources do not support it" is true on main today.
+- Batch 1's 29 removal-only rows record only a token check on their kept references (153 evidenced / 23 dead / 16 no-token), not a text-support judgement. If batch 1 merges with that method, the sentence over-claims for those rows.
+- **Before merging D130-3a:** either (a) batch 1 records a text-support judgement for its removal-only rows, or (b) the DATASHEET sentence is narrowed to what was done. The batch-1 gate has been told.
+
+**Gate advisory 2 → NEW WS3 NOTE:** schema/incident.schema.json:216 (and the packaged copy) says "invariant 3: entries are never deleted; they are marked and keep resolving". It phrases the invariant rather than describing the data, but it shares the absolute form corrected here. schema-architect should consider "entries are not deleted in place; they are marked (status) or tombstoned (id_deprecations) and keep resolving".
+
+**Foreman post-merge [R]:**
+- strays: none in the main tree or gi-wt-ws5ds;
+- the merge has the same parents as the gate's scratch merge;
+- render_docs_stats no-op, drift clean;
+- HF + load_incidents tests: 14 passed.
+
+### 🔁 WS5 DATASHEET + HF card status note: BOUNCE #1 (gate-ws5ds on `64790a1b`), 2026-11-11 → fresh scribe with verbatim text
+**Defects (three absolute or over-broad claims on a live surface):**
+1. **"Rows are never deleted."** (DATASHEET:25) is false. data/id_deprecations.json has 1,084 records whose `from` IDs are absent from incidents.json: 704 out-of-scope, 289 merged, 59 orphaned-source-retired, 9 unrecorded-drop, and 23 split/resplit/successor. Rows leave the file; tombstones remain. This is the same class as the D70 "never reused" correction. **README.md:25 carries the same sentence** (introduced by D134(i), and the gate missed it): folded into this fix as the same live-surface correction.
+2. **"Where its references were replaced … the row's text is re-derived"** is true for D130-2 but false for batch 1 of the same ongoing audit: INC-01600/01641/03248 are replaced with the description kept, and 29 rows are removal-only with no re-derivation.
+3. **"the legacy seed (the earliest rows"**: first commit c105bd7a held 578 rows from 7 source groups, so the seed is only part of the earliest rows.
+
+**Gate evidence:**
+- The count identity holds: 15,782 + 29 + 10 = 15,821.
+- The retracted definition matches cve_rejections (29 all-rejected = 29 retracted).
+- The other sentences are true.
+- Planted retracted and unverified markers fire (rc 1).
+- The HF card renders with no stray braces. The JSONL has 15,782 rows with 0 retracted or unverified, and all 39 non-standing IDs resolve to themselves.
+- The CHANGELOG matches.
+- **Full suite: 1648 passed, 1 skipped, 1 xfailed.**
+- Scope: 3 files, no data/. No strays.
+
+**Advisories, folded in:**
+- "deterministic URL-shape and arXiv-id rules" → "rule-based", since R2 and R5 depend on fetches.
+- Make the HF unverified sentence symmetric ("still resolve by ID").
+
+**Merge-order note:** D130-3a also edits DATASHEET:25's incident_count marker, so expect a trivial re-render conflict.
+**Foreman pre-check miss:** I checked the sources the brief named, not the absolute "never deleted" against id_deprecations.
+
+### 🟢 Main CI GREEN on the SHA-pinned Actions (`4a31e025`, D134(ii) merge + board), 2026-11-11, and Dependabot is live
+- **[R] `gh run list`** on 4a31e025: Validate dataset ✅, Site accessibility + integrity ✅, Deploy GitHub Pages ✅, CodeQL ✅, Dependabot Updates ✅. This is the first live run of all 44 pinned `uses:`, and the proof no gate could give.
+- **Dependabot opened 5 PRs at once:**
+  - **#107** pypi-publish 1.14.2→1.14.3 (patch)
+  - **#108** create-pull-request 8.1.1→8.1.2 (patch)
+  - **#105** checkout 6.1.0→**7.0.1** (MAJOR)
+  - **#106** setup-chrome 1.7.3→**2.2.0** (MAJOR)
+  - **#109** configure-pages 5.0.0→**6.0.0** (MAJOR)
+- **None merged; foreman recommendation for the user:**
+  - merge the two patch PRs once their CI is green;
+  - hold the three majors for individual review (release notes + gated CI), since D134(ii) deliberately stayed within the current major;
+  - optionally add a Dependabot `ignore: update-types: ["version-update:semver-major"]` rule so majors arrive only on request.
+- Note: create-pull-request is also used by auto-refresh.yml; #108 touches the refresh job (D148-2: no live dispatch). Its first real exercise is the Sun 11-15 refresh.
+
+### ✅ D134(ii) SHA-pin Actions + dependabot DONE: MERGED 2026-11-11 (`fd8ff9ca`; gate-d134ii re-gate PASS on `4eccf6e9` after bounce #1)
+**What merged** (13 files, +149/−40; 0 data/):
+- **Pins:** all **40** unpinned `uses:` lines are pinned (the ruling's "33" was stale; the workflows grew). Each is pinned to the current release of the same major as `@<sha> # vX.Y.Z`: checkout v6.1.0, setup-python v6.3.0, upload-artifact v4.6.2, download-artifact v4.3.0, setup-ruby v1.338.0, setup-chrome v1.7.3, upload-pages-artifact v3.0.1, setup-node v5.0.0, deploy-pages v4.0.5, configure-pages v5.0.0.
+- **dependabot.yml:** `.github/dependabot.yml` (github-actions, "/", weekly).
+- **Guard test:** tests/test_actions_pinned.py covers `.github/workflows/*.y*ml` + `.github/actions/**/action.y*ml`.
+
+**Gate verdict, pasted:** PASS, defects none; defect 1 (file discovery) closed.
+- **Gate 1, own route (git ls-remote, peeled):** every pin equals its floating major's current target, so there is no behaviour delta. The 10 workflows are identical with `uses:` masked. 40 one-for-one swaps. dependabot.yml is valid.
+- **Re-gate mutations:** the `.yaml` workflow, a composite, a nested composite, the deploy-pages revert, discovery cut back to yml-only, and the composite glob removed all FIRE.
+- **Full suite** on the merge with f917fa42: **1648 passed, 1 skipped, 1 xfailed.**
+- **Strays:** none.
+
+**Advisories:**
+- The pre-existing pins (create-pull-request v8.1.1 vs v8.1.3; pypi-publish v1.14.2 vs v1.14.3) will get Dependabot PRs.
+- **pip in dependabot:** a candidate follow-up, recommended by the specialist and left to the user, since the ruling's literal text names only dependabot.yml.
+
+**Foreman pre-check:**
+- The 10 SHAs were checked by peeled tag lookup, each the highest release in its major.
+- 4 own test mutations fired.
+- My miss: I didn't vary file discovery, which caused the bounce.
+
+**Foreman post-merge [R]:**
+- strays: porcelain empty in the main tree and gi-wt-d134ii;
+- the merge has the same parents as the gate's merge (4eccf6e9 onto f917fa42);
+- the pin and workflow tests: 19 passed;
+- drift clean.
+
+### 🔁 D134(ii) SHA-pin Actions + dependabot: BOUNCE #1 (gate-d134ii on `144f2281`), 2026-11-11 → redispatched
+**Defect:**
+1. tests/test_actions_pinned.py:34 globs only `.github/workflows/*.yml`. A new `.github/workflows/new.yaml` with `uses: actions/checkout@v6` → 3 passed (MISS). A composite action `.github/actions/x/action.yml` → MISS. The docstring and CHANGELOG claim that any `uses:` fails. Neither file type exists today, so no pin is missing; the gap is in the guard.
+
+**Gate evidence (own route, git ls-remote with peel, not the gh API):**
+- All 10 pins equal the CURRENT target of the floating major ref (v1 of setup-ruby is a branch). Each is the highest vM.x.y of its major, so there is no behaviour delta.
+- **Workflows:** a masked-`uses:` diff is identical in all 10 (the mask was shown to fire on a control). 40 one-for-one same-action swaps.
+- **Coverage:** a YAML parse of .github/**/*.y*ml gives 44 `uses:`, all 40-hex.
+- **Full suite** on the merge with 9b53ee69: **1647 passed, 1 skipped, 1 xfailed.** actionlint rc 0.
+- **Mutations:** 5 fired; the `.yaml` workflow and the composite action missed (= the defect).
+- **dependabot.yml:** schema-valid.
+- **Scope and strays:** 0 data/ paths; no strays.
+
+**Advisories:**
+- The pre-existing pins are behind within their majors (create-pull-request v8.1.1 vs v8.1.3; pypi-publish v1.14.2 vs v1.14.3); Dependabot will raise these.
+- Leaving pip out is consistent with the literal ruling and is a candidate follow-up.
+- The test does not check that the comment matches the sha; Dependabot maintains that.
+
+**Foreman pre-check miss:** my mutations varied the `uses:` line shape, not file discovery.
+
+### 🔍 D130-3a REPORTED `1b66e40e` (2026-11-11), held for rework before the gate; foreman method calls recorded
+**Specialist report (testimony):**
+- **Target list:** committed at `d95c874e` (`docs/audits/reference-audit-2026-11-11/derive_list.py` + list.json): 126 non-legacy R1∪R2 rows + 6 deferred = 132, in batches 0-4.
+- **Batch 0+1 outcomes (38 rows):** 29 fixed by removing the flagged reference; 5 fixed by replacement; 2 unverified (INC-00570, INC-03573); 2 unchanged false positives.
+- **Stats:** incident 15,782→15,780; unverified 10→12; landmark 2,062→2,056 (6 deferred curated rows → feed).
+- **Suite:** 1644 passed.
+
+**Foreman pre-check [R]** (own per-entity delta vs 64109452, independent of verify.py):
+- 15,821 rows, with the ID set and order identical;
+- **36 rows changed, all within the 38 targets, 0 outside**;
+- per-field counts identical to the specialist's;
+- no quality_tier promotion;
+- tier landmark→feed on exactly INC-01015/01291/01589/02471/02871/04207;
+- stats deltas as declared.
+INCIDENTS.md's 17k-line churn is the row-number column renumbering after 2 rows leave the count, which is legitimate generated output.
+
+**Gaps the foreman found, answered by the specialist:**
+- **(a)** The kept references on the 29 removal rows were NOT fetched. The D130-2 re-gate bar, "every kept reference is evidenced", was not applied.
+- **(b)** The INC-00570 search was incomplete. aim.security was robots-refused and the search engine served a bot challenge; no MSRC/NVD/news search was done. So the audit's "No other source found" overstated what was done.
+
+**⚖ Foreman method calls (within D130 scope; flagged to the user):**
+- **(a) Option C (specialist-recommended):**
+  - On changed rows with ≤15 kept references, fetch every kept reference.
+  - On larger rows (INC-01015: 443, INC-01291: 178, INC-01348: 120, …), fetch a deterministic sample: first 5 + last 5 + 5 seeded by row id.
+  - A dead or blocked reference is kept and listed for WS4 link-health ("dead is not wrong").
+  - A fetched reference about a different incident is a reported removal candidate, removed only if it has the exact R1 index/homepage shape.
+  - verify.py is extended to enforce this.
+- **(b)** Finish the INC-00570 search (MSRC/NVD for CVE-2025-32711 + variants, news coverage, researcher posts, and a corpus check for an existing EchoLeak row). Every unverified note lists exactly what was searched.
+
+**Beyond-ruling item for user re-review:** D139(b) named only INC-04207. Demoting INC-02471 and INC-02871 also required dropping their `discovery_method` override lines (landmark-only integrity check). The prior note text is kept in `_d130_3a_prior_note`.
+**Follow-ups:**
+- ATLAS case-study links (AML.CS0016, AML.CS0032, /studies) 404 → WS4 link-health task.
+- Over-merge stubs INC-02498/01600/03573 → WS4-T19.
+- Re-label INC-02498 and INC-03212 → a WS2 task like D130-2L.
+- tests/test_aiid_signal_provenance.py now skips references_remove and fields_clear (declared in CHANGELOG; the gate must check this).
+
 ### ✅ D134(i) `load_incidents()` default DONE: MERGED 2026-11-11 (`5d49afb2`; gate-d134i re-gate PASS on `f609a802` after bounce #1)
 **What merged** (5 files, +153/−9; no data/):
 - **Package:** `load_incidents(include_retracted: bool = False)` drops `retracted` + `unverified` rows by default, so `len(load_incidents())` == `incident_count`. `disputed` is kept, and `include_retracted=True` returns every row. `query()`, `by_id()`, `by_cve()` and `resolve_*()` are unchanged, with only their docstrings updated.

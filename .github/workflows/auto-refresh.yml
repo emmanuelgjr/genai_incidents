@@ -63,8 +63,8 @@ jobs:
     outputs:
       sweep_outcome: ${{ steps.ingest_cve_rejections.outcome }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
           cache: pip
@@ -87,7 +87,7 @@ jobs:
 
       - name: Upload sweep output
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: cve-sweep-output
           path: sweep-out
@@ -128,8 +128,8 @@ jobs:
       # job result is `success` even when it failed.
       oecd_outcome: ${{ steps.ingest_oecd.outcome }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
           cache: pip
@@ -206,7 +206,7 @@ jobs:
       - name: Upload held OECD/AIID inputs (D42 review path)
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: held-oecd-aiid-inputs
           path: ${{ runner.temp }}/held-pair-inputs
@@ -220,7 +220,7 @@ jobs:
       - name: Upload OECD skip-probe rotation cursor
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: oecd-skip-probe-state
           path: ingest/_state/skip_probe_state.json
@@ -259,8 +259,8 @@ jobs:
       kev_outcome: ${{ steps.ingest_kev.outcome }}
       pr_number: ${{ steps.cpr.outputs.pull-request-number }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
           cache: pip
@@ -344,7 +344,7 @@ jobs:
       # artifact (sweep job died before upload) = keep the committed snapshot.
       - name: Download CVE sweep output
         timeout-minutes: 5
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: cve-sweep-output
           path: sweep-out
@@ -395,7 +395,7 @@ jobs:
       - name: Upload refresh-job hold stash (normally empty; the OECD bytes are in the oecd-fetch job artifact)
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: held-refresh-job-pair-inputs
           path: ${{ runner.temp }}/held-pair-inputs
@@ -549,7 +549,7 @@ jobs:
         timeout-minutes: 5
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: aiid-change-report
           path: ${{ runner.temp }}/aiid-change-report-full.md
@@ -667,8 +667,8 @@ jobs:
     # a failed or skipped upstream job is exactly when the counter matters
     if: ${{ !cancelled() }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
 
@@ -720,7 +720,7 @@ jobs:
       # as its own commit on `refresh-state`.
       - name: Download OECD skip-probe rotation cursor
         timeout-minutes: 5
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: oecd-skip-probe-state
           path: oecd-probe-state
