@@ -14,6 +14,40 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D138 ingest shape guards DONE: MERGED 2026-11-11 (`cc5ba86f`; gate-d138 PASS on `82da9d46`, first gate, 0 defects)
+**What merged** (3 files, +109/−1: `load_source` in merge_and_dedupe.py, the new tests/test_d138_ingest_shape_guards.py, CHANGELOG):
+- **A1:** a non-side dict with no non-empty row key while a non-row key holds a non-empty list refuses.
+- **A2:** a side file holding a non-empty incidents/entries/data list refuses.
+- **A3a:** more than one non-empty row key refuses.
+- **A3b:** a side-file name with a list payload refuses.
+- Every refusal is `[FATAL]` IngestParseError, names the file, and gives the job-aware abort_sentence once. D129/D131 behaviour is kept.
+
+**Gate verdict, pasted:** PASS, defects none.
+1. Matches the Option A text line by line, neither stricter nor looser.
+2. **"A1 non-side only" is necessary:** 3 real provenance files carry non-empty non-row lists (members_extracted=4, selected=55, candidates_for_curation=80). The cisa_kev and cve_rejections loaders read only their own keys.
+3. **Real tree:** all 23 non-side ingest files are bare lists, and no side file has a row key.
+4. **History:** all **98 unique ingest blobs** reachable from origin/main give 0 diffs between the base and new load_source.
+5. **Build run twice:** identical hash 659f13ed…b855, porcelain empty.
+6. **abort_sentence:** 6 refusals × 4 job modes = 24/24 correct.
+7. **The gate's own mutations:** 6 FIRED, 2 survived (see advisories 1 and 2).
+8. **Full suite on 82da9d46:** **1634 passed, 1 skipped, 1 xfailed.** On the merge with 2bdeceaa, the 3 ingest files: 66 passed.
+9. **Scope:** 3 files, 0 data/ paths, 0 CR.
+10. **CHANGELOG:** accurate.
+11. **Strays:** none.
+
+**Gate advisories (follow-up candidates):**
+1. No test pins that a side file with a `[]` payload refuses.
+2. The D138 tests check only the non-refresh abort wording; pin REFRESH_DID_NOT_SHIP for at least one refusal per rule.
+3. A3b is a silent mis-load, not a silent drop, so "silent-drop" is slightly loose.
+4. Out of scope: `_load_cisa_kev` and `_load_cve_rejections` don't type-guard `vulnerabilities`/`states`.
+
+**Foreman pre-check:** before gating, my own mutations caught one A1 coverage gap, fixed at a4f584cd. A CRLF working-copy rewrite was fixed before commit. The CHANGELOG "three"→"four" fix is at 82da9d46.
+**Foreman post-merge [R]:**
+- strays: porcelain empty in the main tree and gi-wt-d138;
+- the merge has the same parents as the gate's scratch merge (82da9d46 onto 2bdeceaa);
+- 3 ingest test files: 66 passed;
+- check_stats_drift clean.
+
 ### 🔁 D134(i) `load_incidents()` default: BOUNCE #1 (gate-d134i on `a422c174`), 2026-11-11 → specialist redispatched with verbatim text
 **Defects** (code and data correct; 3 text defects + 1 test gap):
 1. **Module docstring** (`__init__.py:4-5`) still says "Use :func:`load_incidents` for the full slim dataset". That is false under the new default.
