@@ -14,6 +14,33 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ D134(ii) SHA-pin Actions + dependabot DONE: MERGED 2026-11-11 (`fd8ff9ca`; gate-d134ii re-gate PASS on `4eccf6e9` after bounce #1)
+**What merged** (13 files, +149/−40; 0 data/):
+- **Pins:** all **40** unpinned `uses:` lines are pinned (the ruling's "33" was stale; the workflows grew). Each is pinned to the current release of the same major as `@<sha> # vX.Y.Z`: checkout v6.1.0, setup-python v6.3.0, upload-artifact v4.6.2, download-artifact v4.3.0, setup-ruby v1.338.0, setup-chrome v1.7.3, upload-pages-artifact v3.0.1, setup-node v5.0.0, deploy-pages v4.0.5, configure-pages v5.0.0.
+- **dependabot.yml:** `.github/dependabot.yml` (github-actions, "/", weekly).
+- **Guard test:** tests/test_actions_pinned.py covers `.github/workflows/*.y*ml` + `.github/actions/**/action.y*ml`.
+
+**Gate verdict, pasted:** PASS, defects none; defect 1 (file discovery) closed.
+- **Gate 1, own route (git ls-remote, peeled):** every pin equals its floating major's current target, so there is no behaviour delta. The 10 workflows are identical with `uses:` masked. 40 one-for-one swaps. dependabot.yml is valid.
+- **Re-gate mutations:** the `.yaml` workflow, a composite, a nested composite, the deploy-pages revert, discovery cut back to yml-only, and the composite glob removed all FIRE.
+- **Full suite** on the merge with f917fa42: **1648 passed, 1 skipped, 1 xfailed.**
+- **Strays:** none.
+
+**Advisories:**
+- The pre-existing pins (create-pull-request v8.1.1 vs v8.1.3; pypi-publish v1.14.2 vs v1.14.3) will get Dependabot PRs.
+- **pip in dependabot:** a candidate follow-up, recommended by the specialist and left to the user, since the ruling's literal text names only dependabot.yml.
+
+**Foreman pre-check:**
+- The 10 SHAs were checked by peeled tag lookup, each the highest release in its major.
+- 4 own test mutations fired.
+- My miss: I didn't vary file discovery, which caused the bounce.
+
+**Foreman post-merge [R]:**
+- strays: porcelain empty in the main tree and gi-wt-d134ii;
+- the merge has the same parents as the gate's merge (4eccf6e9 onto f917fa42);
+- the pin and workflow tests: 19 passed;
+- drift clean.
+
 ### 🔁 D134(ii) SHA-pin Actions + dependabot: BOUNCE #1 (gate-d134ii on `144f2281`), 2026-11-11 → redispatched
 **Defect:**
 1. tests/test_actions_pinned.py:34 globs only `.github/workflows/*.yml`. A new `.github/workflows/new.yaml` with `uses: actions/checkout@v6` → 3 passed (MISS). A composite action `.github/actions/x/action.yml` → MISS. The docstring and CHANGELOG claim that any `uses:` fails. Neither file type exists today, so no pin is missing; the gap is in the guard.
