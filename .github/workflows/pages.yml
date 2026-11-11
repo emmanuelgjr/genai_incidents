@@ -69,7 +69,7 @@ jobs:
         run: |
           pip install --quiet pillow
           python scripts/make_og_image.py
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       # Custom Jekyll build instead of actions/jekyll-build-pages: the managed
       # action pins the github-pages metagem whose jekyll-relative-links plugin
       # rewrites links across every page and took 400+ s at ~9k incident pages,
