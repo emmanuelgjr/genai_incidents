@@ -118,7 +118,9 @@ Key fields per record (full reference in the data dictionary):
 - `status` — present only on a row that is not standing as published (absence means it stands).
   {disputed} of the rows above carry `status: disputed`: every CVE record they rest on is
   listed by the CVE Program as published but disputed. They are **counted** in the {count}
-  and carry a lowered `confidence`; retracted and unverified rows are omitted from this export.
+  and carry a lowered `confidence`. `status: retracted` rows are those whose CVEs the CVE Program
+  rejected: they are outside the incident count, omitted from this export, and kept in the full JSON on
+  GitHub, where they still resolve by ID.
   `status: unverified` means the row has no confirmed source (the maintainers could not confirm
   its references support it): it is excluded from the incident count, left out of this export,
   and kept in the full JSON on GitHub.
