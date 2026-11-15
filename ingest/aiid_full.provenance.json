@@ -1,11 +1,11 @@
 {
   "source": "AIID official weekly snapshot",
   "snapshots_index_url": "https://incidentdatabase.ai/research/snapshots/",
-  "snapshot_filename": "backup-20261102100724.tar.bz2",
-  "snapshot_url": "https://pub-72b2b2fc36ec423189843747af98f80e.r2.dev/backup-20261102100724.tar.bz2",
-  "snapshot_sha256": "9a40b34e307d119e01907689e08595510bb4e4f03cca258efb3112b0fa10b6e5",
+  "snapshot_filename": "backup-20261109100729.tar.bz2",
+  "snapshot_url": "https://pub-72b2b2fc36ec423189843747af98f80e.r2.dev/backup-20261109100729.tar.bz2",
+  "snapshot_sha256": "c10825888fb716bb91a67319f3292324a7f962f68e6e82326aedd4d694a7aad0",
   "snapshot_license_txt": "Report contents are subject to their own intellectual property rights. Unless otherwise noted, the database is shared under (CC BY-SA 4.0). See: https://creativecommons.org/licenses/by-sa/4.0/",
-  "fetched_at": "2026-11-08",
+  "fetched_at": "2026-11-15",
   "members_extracted": [
     "mongodump_full_snapshot/classifications_MIT.csv",
     "mongodump_full_snapshot/duplicates.csv",
@@ -13,7 +13,7 @@
     "mongodump_full_snapshot/license.txt"
   ],
   "reports_collection_extracted": false,
-  "entries_written": 1702,
-  "entries_security_relevant": 1248,
+  "entries_written": 1715,
+  "entries_security_relevant": 1261,
   "entries_preserved_for_continuity": 454
 }
