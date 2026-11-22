@@ -1,9 +1,9 @@
 {
   "version": "2.13.0",
-  "generated": "2026-11-11",
+  "generated": "2026-11-22",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
-  "incident_count": 15780,
+  "incident_count": 15804,
   "retracted_count": 29,
   "unverified_count": 12,
   "incidents": [
@@ -138032,9 +138032,9 @@
       "date": "2007-07-26",
       "year": 2007,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #186: Algorithm Assessing Risk Faced by Victims of Gender Violence Misclassified Low-Risk Cases, Allegedly Leading to Homicide of Women and Children in Spain. Alleged deployer/developer: Government Of Spain, Spanish Ministry Of Interior, Spanish Secretary Of State For Security. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #186: Algorithm Assessing Risk Faced by Victims of Gender Violence Misclassified Low-Risk Cases, Allegedly Leading to Homicide of Women and Children in Spain. Alleged deployer/developer: Government Of Spain, Law Enforcement, Spanish Ministry Of Interior, Spanish Secretary Of State For Security. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "other",
-      "affected": "Government Of Spain, Spanish Ministry Of Interior, Spanish Secretary Of State For Security",
+      "affected": "Government Of Spain, Law Enforcement, Spanish Ministry Of Interior, Spanish Secretary Of State For Security",
       "severity": "Critical",
       "owasp_llm": [
         "LLM10"
@@ -138070,7 +138070,7 @@
         "mit-risk-domain:7-ai-system-safety-failures-and-limitations"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-13",
+      "updated": "2026-11-22",
       "aiid_id": 186,
       "mitre_atlas_tactics": [
         "AML.TA0005",
@@ -138083,7 +138083,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-13",
+      "last_seen": "2026-11-22",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -138760,9 +138760,9 @@
       "date": "2015-09-01",
       "year": 2015,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #195: Predictive Policing Program by Florida Sheriff’s Office Allegedly Violated Residents’ Rights and Targeted Children of Vulnerable Groups. Alleged deployer/developer: Pasco Sheriff's Office, Unknown. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #195: Predictive Policing Program by Florida Sheriff’s Office Allegedly Violated Residents’ Rights and Targeted Children of Vulnerable Groups. Alleged deployer/developer: Law Enforcement, Pasco Sheriff's Office. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "other",
-      "affected": "Pasco Sheriff's Office, Unknown",
+      "affected": "Law Enforcement, Pasco Sheriff's Office",
       "severity": "Critical",
       "owasp_llm": [
         "LLM10"
@@ -138871,20 +138871,20 @@
         "oecd-aim"
       ],
       "added": "2026-05-16",
-      "updated": "2026-07-31",
+      "updated": "2026-11-22",
       "aiid_id": 195,
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0011"
       ],
       "quality_tier": "reviewed",
-      "corpus": "ai-harm",
+      "corpus": "security",
       "tier": "landmark",
       "source_count": 3,
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-07-31",
+      "last_seen": "2026-11-22",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -191050,9 +191050,9 @@
       "date": "2025-01-13",
       "year": 2025,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #896: Alleged Misuse of Facial Recognition Technology by Law Enforcement Reportedly Leading to Wrongful Arrests and Violations of Investigative Standards. Alleged deployer/developer: Austin Police Department, Bradenton Florida Police Department, Clearview Ai, Coral Springs Florida Police Department, Detroit Police Department, Developers Of Mugshot Recognition Software, Evansville Indiana Police Department, Facial Recognition System Developers, Florence Kentucky Police Department. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #896: Alleged Misuse of Facial Recognition Technology by Law Enforcement Reportedly Leading to Wrongful Arrests and Violations of Investigative Standards. Alleged deployer/developer: Austin Police Department, Bradenton Florida Police Department, Clearview Ai, Coral Springs Florida Police Department, Detroit Police Department, Developers Of Mugshot Recognition Software, Evansville Indiana Police Department, Facial Recognition System Developers, Florence Kentucky Police Department, Law Enforcement, Police Departments, Police Departments In The United States. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "rce",
-      "affected": "Austin Police Department, Bradenton Florida Police Department, Clearview Ai, Coral Springs Florida Police Department, Detroit Police Department, Developers Of Mugshot Recognition Software, Evansville Indiana Police Department, Facial Recognition System Developers, Florence Kentucky Police Department",
+      "affected": "Austin Police Department, Bradenton Florida Police Department, Clearview Ai, Coral Springs Florida Police Department, Detroit Police Department, Developers Of Mugshot Recognition Software, Evansville Indiana Police Department, Facial Recognition System Developers, Florence Kentucky Police Department, Law Enforcement, Police Departments, Police Departments In The United States",
       "severity": "Critical",
       "owasp_llm": [
         "LLM10"
@@ -191096,7 +191096,7 @@
         "oecd"
       ],
       "added": "2026-05-16",
-      "updated": "2026-07-31",
+      "updated": "2026-11-22",
       "aiid_id": 896,
       "mitre_atlas_tactics": [
         "AML.TA0005",
@@ -191109,7 +191109,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-07-31",
+      "last_seen": "2026-11-22",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -227706,9 +227706,9 @@
       "date": "2024-11-23",
       "year": 2024,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1379: Florida Woman Reportedly Jailed After Ex-Boyfriend Allegedly Submitted AI-Fabricated Text Screenshot as Bond-Violation Evidence. Alleged deployer/developer: Eric R. Sims, Generative Ai Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1379: Florida Woman Reportedly Jailed After Ex-Boyfriend Allegedly Submitted AI-Fabricated Text Screenshot as Bond-Violation Evidence. Alleged deployer/developer: Eric R. Sims, Malicious Actors, Synthetic Image Generation Technology, Synthetic Media Creators, Synthetic Media Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "other",
-      "affected": "Eric R. Sims, Generative Ai Developers",
+      "affected": "Eric R. Sims, Malicious Actors, Synthetic Image Generation Technology, Synthetic Media Creators, Synthetic Media Generation Technology Developers",
       "severity": "Medium",
       "owasp_llm": [
         "LLM07"
@@ -227745,7 +227745,7 @@
         "mit-risk-domain:4-malicious-actors-misuse"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-11-22",
       "aiid_id": 1379,
       "mitre_atlas_tactics": [
         "AML.TA0003",
@@ -227758,7 +227758,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06",
+      "last_seen": "2026-11-22",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -234044,9 +234044,9 @@
       "date": "2026-03-24",
       "year": 2026,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1450: Florida Man Allegedly Used Purported Deepfake Video to Report Break-In of Deputy's Patrol Vehicle in Lake Mary. Alleged deployer/developer: Alexis Martinez Arizala, Deepfake Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1450: Florida Man Allegedly Used Purported Deepfake Video to Report Break-In of Deputy's Patrol Vehicle in Lake Mary. Alleged deployer/developer: Alexis Martinez Arizala, Deepfake Creators, Deepfake Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Synthetic Video Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "deepfake",
-      "affected": "Alexis Martinez Arizala, Deepfake Technology Developers",
+      "affected": "Alexis Martinez Arizala, Deepfake Creators, Deepfake Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Synthetic Video Generation Technology Developers",
       "severity": "High",
       "owasp_llm": [
         "LLM07",
@@ -234124,7 +234124,7 @@
         "oecd-aim"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-06",
+      "updated": "2026-11-22",
       "aiid_id": 1450,
       "mitre_atlas_tactics": [
         "AML.TA0003",
@@ -234138,7 +234138,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-06",
+      "last_seen": "2026-11-22",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -236138,9 +236138,9 @@
       "date": "2025-10-07",
       "year": 2025,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1479: ChatGPT-Generated Image of Nonexistent 'Homeless Man' Was Used in False St. Petersburg, Florida Burglary and Sexual Battery Reports. Alleged deployer/developer: Brooke Schinault, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1479: ChatGPT-Generated Image of Nonexistent 'Homeless Man' Was Used in False St. Petersburg, Florida Burglary and Sexual Battery Reports. Alleged deployer/developer: Brooke Schinault, Chatbot Developers, Chatbot Users, Large Language Model Developers, Malicious Actors, Openai, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "other",
-      "affected": "Brooke Schinault, Openai",
+      "affected": "Brooke Schinault, Chatbot Developers, Chatbot Users, Large Language Model Developers, Malicious Actors, Openai, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers",
       "severity": "Medium",
       "owasp_llm": [],
       "owasp_asi": [],
@@ -236158,7 +236158,7 @@
         "mit-risk-domain:4-malicious-actors-misuse"
       ],
       "added": "2026-05-16",
-      "updated": "2026-07-18",
+      "updated": "2026-11-22",
       "aiid_id": 1479,
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -236167,7 +236167,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-07-18"
+      "last_seen": "2026-11-22"
     },
     {
       "id": "INC-01712",
@@ -236427,9 +236427,9 @@
       "date": "2026-04-08",
       "year": 2026,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1484: Purportedly AI-Generated Image Reportedly Misled Daejeon Authorities Searching for Escaped Wolf Neukgu. Alleged deployer/developer: Openai, Unnamed 40 Year Old Man Arrested By Daejeon Police. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1484: Purportedly AI-Generated Image Reportedly Misled Daejeon Authorities Searching for Escaped Wolf Neukgu. Alleged deployer/developer: Chatbot Developers, Large Language Model Developers, Malicious Actors, Openai, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Unnamed 40 Year Old Man Arrested By Daejeon Police. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "rce",
-      "affected": "Openai, Unnamed 40 Year Old Man Arrested By Daejeon Police",
+      "affected": "Chatbot Developers, Large Language Model Developers, Malicious Actors, Openai, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Unnamed 40 Year Old Man Arrested By Daejeon Police",
       "severity": "High",
       "owasp_llm": [
         "LLM07",
@@ -236494,7 +236494,7 @@
         "oecd-aim"
       ],
       "added": "2026-06-09",
-      "updated": "2026-10-06",
+      "updated": "2026-11-22",
       "aiid_id": 1484,
       "mitre_atlas_tactics": [
         "AML.TA0003",
@@ -236507,7 +236507,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-06-09",
-      "last_seen": "2026-10-06"
+      "last_seen": "2026-11-22"
     },
     {
       "id": "INC-14459",
@@ -236895,9 +236895,9 @@
       "date": "2025-03-05",
       "year": 2025,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1490: ChatGPT Was Allegedly Consulted About Attack Options Before Teen Attempted to Stab Officer at Tira, Israel, Police Station. Alleged deployer/developer: Openai, Tira Israel Police Station Attempted Stabbing Suspect. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1490: ChatGPT Was Allegedly Consulted About Attack Options Before Teen Attempted to Stab Officer at Tira, Israel, Police Station. Alleged deployer/developer: Chatbot Developers, Chatbot Users, Large Language Model Developers, Openai, Tira Israel Police Station Attempted Stabbing Suspect. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "other",
-      "affected": "Openai, Tira Israel Police Station Attempted Stabbing Suspect",
+      "affected": "Chatbot Developers, Chatbot Users, Large Language Model Developers, Openai, Tira Israel Police Station Attempted Stabbing Suspect",
       "severity": "Medium",
       "owasp_llm": [],
       "owasp_asi": [],
@@ -236915,7 +236915,7 @@
         "mit-risk-domain:4-malicious-actors-misuse"
       ],
       "added": "2026-07-18",
-      "updated": "2026-07-18",
+      "updated": "2026-11-22",
       "aiid_id": 1490,
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -236924,7 +236924,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-07-18",
-      "last_seen": "2026-07-18"
+      "last_seen": "2026-11-22"
     },
     {
       "id": "INC-14463",
@@ -249146,11 +249146,11 @@
       "source_ids": [
         "AIID-1797"
       ],
-      "title": "OpenAI AI Agents Reportedly Flooded RubyGems Software Registry With Malicious Packages",
+      "title": "OpenAI AI Agents Reportedly Flooded RubyGems Software Registry with Malicious Packages",
       "date": "2026-05-11",
       "year": 2026,
       "category": "real-world",
-      "description": "AI Incident Database (AIID) entry #1797: OpenAI AI Agents Reportedly Flooded RubyGems Software Registry With Malicious Packages. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "description": "AI Incident Database (AIID) entry #1797: OpenAI AI Agents Reportedly Flooded RubyGems Software Registry with Malicious Packages. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
       "attack_vector": "supply-chain",
       "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
       "severity": "Medium",
@@ -249175,7 +249175,7 @@
         "aiid"
       ],
       "added": "2026-11-08",
-      "updated": "2026-11-08",
+      "updated": "2026-11-22",
       "aiid_id": 1797,
       "mitre_atlas_tactics": [
         "AML.TA0004"
@@ -249187,7 +249187,1086 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-11-08",
-      "last_seen": "2026-11-08"
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17371",
+      "source_ids": [
+        "AIID-1798"
+      ],
+      "title": "Purported AI Impersonations of Executives Allegedly Helped Defraud Companies Worldwide of About $129 Million",
+      "date": "2024-10-08",
+      "year": 2024,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1798: Purported AI Impersonations of Executives Allegedly Helped Defraud Companies Worldwide of About $129 Million. Alleged deployer/developer: Alleged Dollar129 Million Executive Impersonation Fraud Ring, Cybercriminals, Deepfake Creators, Guy Sheetrit, Impersonation Scammers, Jacob Soall, Scammers, Sharon Hazan, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "deepfake",
+      "affected": "Alleged Dollar129 Million Executive Impersonation Fraud Ring, Cybercriminals, Deepfake Creators, Guy Sheetrit, Impersonation Scammers, Jacob Soall, Scammers, Sharon Hazan, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM07"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5",
+        "MEASURE-2.8"
+      ],
+      "mitre_atlas": [
+        "AML.T0048",
+        "AML.T0048.003",
+        "AML.T0115.001"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1798",
+          "url": "https://incidentdatabase.ai/cite/1798/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1798,
+      "mitre_atlas_tactics": [
+        "AML.TA0003",
+        "AML.TA0011"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17372",
+      "source_ids": [
+        "AIID-1799"
+      ],
+      "title": "OpenAI AI Agents Reportedly Posted ChatGPT User Images to External Hosts in 53 Instances",
+      "date": "2026-09-25",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1799: OpenAI AI Agents Reportedly Posted ChatGPT User Images to External Hosts in 53 Instances. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1799",
+          "url": "https://incidentdatabase.ai/cite/1799/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1799,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17373",
+      "source_ids": [
+        "AIID-1800"
+      ],
+      "title": "OpenAI-Linked AI Agents Reportedly Repurposed Vanderbilt University's Restricted Link Shortener",
+      "date": "2026-06-18",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1800: OpenAI-Linked AI Agents Reportedly Repurposed Vanderbilt University's Restricted Link Shortener. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1800",
+          "url": "https://incidentdatabase.ai/cite/1800/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1800,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17374",
+      "source_ids": [
+        "AIID-1802"
+      ],
+      "title": "OpenAI Research Agent Reportedly Exposed a Researcher's GitHub Token in a Public Code Repository",
+      "date": "2026-05-27",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1802: OpenAI Research Agent Reportedly Exposed a Researcher's GitHub Token in a Public Code Repository. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1802",
+          "url": "https://incidentdatabase.ai/cite/1802/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1802,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17375",
+      "source_ids": [
+        "AIID-1803"
+      ],
+      "title": "OpenAI Research Agent Reportedly Compromised an Internal Chip-Design Server During an Evaluation",
+      "date": "2026-03-27",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1803: OpenAI Research Agent Reportedly Compromised an Internal Chip-Design Server During an Evaluation. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1803",
+          "url": "https://incidentdatabase.ai/cite/1803/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1803,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17376",
+      "source_ids": [
+        "AIID-1804"
+      ],
+      "title": "OpenAI Training Agent Reportedly Used an API Key Found on GitHub to Access a Data Service",
+      "date": "2026-05-15",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1804: OpenAI Training Agent Reportedly Used an API Key Found on GitHub to Access a Data Service. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "data-exfiltration",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
+      "severity": "High",
+      "owasp_llm": [
+        "LLM02",
+        "LLM10"
+      ],
+      "owasp_asi": [
+        "ASI03",
+        "ASI05"
+      ],
+      "nist_ai_rmf": [
+        "GOVERN-1.4",
+        "MEASURE-2.10",
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0012",
+        "AML.T0050",
+        "AML.T0085.002"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1804",
+          "url": "https://incidentdatabase.ai/cite/1804/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1804,
+      "mitre_atlas_tactics": [
+        "AML.TA0004",
+        "AML.TA0005",
+        "AML.TA0009",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17377",
+      "source_ids": [
+        "AIID-1805"
+      ],
+      "title": "Tencent-Linked AI Agents Reportedly Used Exposed Credentials to Retrieve Data From Alibaba's Mapping Service",
+      "date": "2026-10-04",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1805: Tencent-Linked AI Agents Reportedly Used Exposed Credentials to Retrieve Data From Alibaba's Mapping Service. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Large Language Model Developers, Tencent. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "data-exfiltration",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Large Language Model Developers, Tencent",
+      "severity": "High",
+      "owasp_llm": [
+        "LLM02",
+        "LLM10"
+      ],
+      "owasp_asi": [
+        "ASI03",
+        "ASI05"
+      ],
+      "nist_ai_rmf": [
+        "GOVERN-1.4",
+        "MEASURE-2.10",
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0012",
+        "AML.T0050",
+        "AML.T0085.002"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1805",
+          "url": "https://incidentdatabase.ai/cite/1805/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1805,
+      "mitre_atlas_tactics": [
+        "AML.TA0004",
+        "AML.TA0005",
+        "AML.TA0009",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17378",
+      "source_ids": [
+        "AIID-1806"
+      ],
+      "title": "OpenAI Training Agent Reportedly Retrieved Credentials and Restricted Data from a Government Statistics Website",
+      "date": "2026-06-17",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1806: OpenAI Training Agent Reportedly Retrieved Credentials and Restricted Data from a Government Statistics Website. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1806",
+          "url": "https://incidentdatabase.ai/cite/1806/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1806,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17379",
+      "source_ids": [
+        "AIID-1807"
+      ],
+      "title": "OpenAI Agent Reportedly Used a Wallet Without Permission to Pay Ethereum Test-Network Fees",
+      "date": "2026-06-26",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1807: OpenAI Agent Reportedly Used a Wallet Without Permission to Pay Ethereum Test-Network Fees. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Large Language Model Developers, Openai",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1807",
+          "url": "https://incidentdatabase.ai/cite/1807/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1807,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17380",
+      "source_ids": [
+        "AIID-1808"
+      ],
+      "title": "Defense Contractor's Personal AI Coding Agent Reportedly Sent U.S. Defense Department Credentials to a Third-party Website",
+      "date": "2026-10-29",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1808: Defense Contractor's Personal AI Coding Agent Reportedly Sent U.S. Defense Department Credentials to a Third-party Website. Alleged deployer/developer: Accenture, Accenture Employees, Ai Agent System Deployers, Ai Agent System Developers, Anthropic, Employees, Federal Contractors, Large Language Model Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Accenture, Accenture Employees, Ai Agent System Deployers, Ai Agent System Developers, Anthropic, Employees, Federal Contractors, Large Language Model Developers",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1808",
+          "url": "https://incidentdatabase.ai/cite/1808/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1808,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17381",
+      "source_ids": [
+        "AIID-1810"
+      ],
+      "title": "ARTEX Security Testing Agent Reportedly Accessed WorkOS's Internal Sales Tool Without Authorization and Retrieved Customer Data",
+      "date": "2026-10-25",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1810: ARTEX Security Testing Agent Reportedly Accessed WorkOS's Internal Sales Tool Without Authorization and Retrieved Customer Data. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Ai Researchers, Artex Developers, Large Language Model Developers, Security Researcher Whose Artex Agent Accessed Workos, Security Researchers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Ai Researchers, Artex Developers, Large Language Model Developers, Security Researcher Whose Artex Agent Accessed Workos, Security Researchers",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1810",
+          "url": "https://incidentdatabase.ai/cite/1810/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1810,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17382",
+      "source_ids": [
+        "AIID-1812"
+      ],
+      "title": "Google's Gemini Chatbot on a School-Issued Laptop Allegedly Helped a North Carolina Student Plan Suicide",
+      "date": "2026-03-17",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1812: Google's Gemini Chatbot on a School-Issued Laptop Allegedly Helped a North Carolina Student Plan Suicide. Alleged deployer/developer: Alphabet, Chatbot Developers, Chatbot Users, Google, Large Language Model Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "unsafe-advice",
+      "affected": "Alphabet, Chatbot Developers, Chatbot Users, Google, Large Language Model Developers",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [
+        "MEASURE-2.6"
+      ],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1812",
+          "url": "https://incidentdatabase.ai/cite/1812/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1812,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17383",
+      "source_ids": [
+        "AIID-1814"
+      ],
+      "title": "ChatGPT Allegedly Guided a Woman in Seattle, Washington, Through a Seizure Medication Taper Before Her Death",
+      "date": "2026-02-12",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1814: ChatGPT Allegedly Guided a Woman in Seattle, Washington, Through a Seizure Medication Taper Before Her Death. Alleged deployer/developer: Chatbot Developers, Chatbot Users, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Chatbot Developers, Chatbot Users, Large Language Model Developers, Openai",
+      "severity": "Critical",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1814",
+          "url": "https://incidentdatabase.ai/cite/1814/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1814,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17384",
+      "source_ids": [
+        "AIID-1815"
+      ],
+      "title": "Attacker Reportedly Used BOSSAI AI Agents to Extract Emergency Dispatch Records in Taipei, Taiwan",
+      "date": "2026-11-04",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1815: Attacker Reportedly Used BOSSAI AI Agents to Extract Emergency Dispatch Records in Taipei, Taiwan. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Cybercriminals, Hackers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Cybercriminals, Hackers",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1815",
+          "url": "https://incidentdatabase.ai/cite/1815/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1815,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17385",
+      "source_ids": [
+        "AIID-1816"
+      ],
+      "title": "Kentucky Police Detective Allegedly Relied on False AI Facial Recognition Match, Leading to Nebraska Man's Arrest and Detention",
+      "date": "2025-01-09",
+      "year": 2025,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1816: Kentucky Police Detective Allegedly Relied on False AI Facial Recognition Match, Leading to Nebraska Man's Arrest and Detention. Alleged deployer/developer: Facial Recognition System Developers, Florence Police Department (kentucky), Law Enforcement, Police Departments, Police Departments In The United States, Ryan Kilmer. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "privacy-violation",
+      "affected": "Facial Recognition System Developers, Florence Police Department (kentucky), Law Enforcement, Police Departments, Police Departments In The United States, Ryan Kilmer",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [
+        "AML.T0048"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1816",
+          "url": "https://incidentdatabase.ai/cite/1816/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1816,
+      "mitre_atlas_tactics": [
+        "AML.TA0011"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17386",
+      "source_ids": [
+        "AIID-1817"
+      ],
+      "title": "Hackers Reportedly Used Internal AI Tool in $6.34 Billion Breach of Cryptocurrency Exchange Binance",
+      "date": "2026-10-29",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1817: Hackers Reportedly Used Internal AI Tool in $6.34 Billion Breach of Cryptocurrency Exchange Binance. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Ai Software Developers, Cybercriminals, Government Of North Korea, Hackers, North Korean Threat Actors, Threat Actors. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "rce",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Ai Software Developers, Cybercriminals, Government Of North Korea, Hackers, North Korean Threat Actors, Threat Actors",
+      "severity": "Critical",
+      "owasp_llm": [
+        "LLM10"
+      ],
+      "owasp_asi": [
+        "ASI05"
+      ],
+      "nist_ai_rmf": [
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0050"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1817",
+          "url": "https://incidentdatabase.ai/cite/1817/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1817,
+      "mitre_atlas_tactics": [
+        "AML.TA0005"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17387",
+      "source_ids": [
+        "AIID-1818"
+      ],
+      "title": "ChatGPT Allegedly Advised Danish Tenant to Withhold Rent and Reinforced False Business Claims Before His Eviction in Vordingborg, Denmark",
+      "date": "2026-06-02",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1818: ChatGPT Allegedly Advised Danish Tenant to Withhold Rent and Reinforced False Business Claims Before His Eviction in Vordingborg, Denmark. Alleged deployer/developer: Chatbot Developers, Chatbot Users, Klaus Elmfelt Aerenlund, Large Language Model Developers, Openai. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "rce",
+      "affected": "Chatbot Developers, Chatbot Users, Klaus Elmfelt Aerenlund, Large Language Model Developers, Openai",
+      "severity": "High",
+      "owasp_llm": [
+        "LLM10"
+      ],
+      "owasp_asi": [
+        "ASI05"
+      ],
+      "nist_ai_rmf": [
+        "MEASURE-2.7"
+      ],
+      "mitre_atlas": [
+        "AML.T0050"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1818",
+          "url": "https://incidentdatabase.ai/cite/1818/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1818,
+      "mitre_atlas_tactics": [
+        "AML.TA0005"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17388",
+      "source_ids": [
+        "AIID-1821"
+      ],
+      "title": "Students at Guatemala City School Allegedly Created and Shared AI-Generated Nude Images of Female Classmates",
+      "date": "2024-08-09",
+      "year": 2024,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1821: Students at Guatemala City School Allegedly Created and Shared AI-Generated Nude Images of Female Classmates. Alleged deployer/developer: Adolescent Boys, Adolescents, Boys, Deepfake Creators, Deepfake Technology Developers, Men And Boys, Minors, Students, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "deepfake",
+      "affected": "Adolescent Boys, Adolescents, Boys, Deepfake Creators, Deepfake Technology Developers, Men And Boys, Minors, Students, Synthetic Image Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM07"
+      ],
+      "owasp_asi": [],
+      "nist_ai_rmf": [
+        "MEASURE-2.8"
+      ],
+      "mitre_atlas": [
+        "AML.T0115.001"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1821",
+          "url": "https://incidentdatabase.ai/cite/1821/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1821,
+      "mitre_atlas_tactics": [
+        "AML.TA0003"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17389",
+      "source_ids": [
+        "AIID-1822"
+      ],
+      "title": "Paraguay Convenience Store Customer Reportedly Accused of Theft and Denied Service After Facial Recognition False Match",
+      "date": "2025-03-02",
+      "year": 2025,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1822: Paraguay Convenience Store Customer Reportedly Accused of Theft and Denied Service After Facial Recognition False Match. Alleged deployer/developer: Biggie Express, Businesses Using Biometrics, Facial Recognition System Deployers, Facial Recognition System Developers, Surveillance Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "privacy-violation",
+      "affected": "Biggie Express, Businesses Using Biometrics, Facial Recognition System Deployers, Facial Recognition System Developers, Surveillance Technology Developers",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [
+        "AML.T0048"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1822",
+          "url": "https://incidentdatabase.ai/cite/1822/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1822,
+      "mitre_atlas_tactics": [
+        "AML.TA0011"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17390",
+      "source_ids": [
+        "AIID-1823"
+      ],
+      "title": "Weill Cornell Medicine Radiology Research in New York City Reportedly Used Patient Data in AI Tools Without Authorization",
+      "date": "2026-06-10",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1823: Weill Cornell Medicine Radiology Research in New York City Reportedly Used Patient Data in AI Tools Without Authorization. Alleged deployer/developer: Ai Software Developers, Healthcare Organizations, Research Institutions, Researchers, Weill Cornell Medicine. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "tool-abuse",
+      "affected": "Ai Software Developers, Healthcare Organizations, Research Institutions, Researchers, Weill Cornell Medicine",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM03"
+      ],
+      "owasp_asi": [
+        "ASI02"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5"
+      ],
+      "mitre_atlas": [
+        "AML.T0053"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1823",
+          "url": "https://incidentdatabase.ai/cite/1823/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1823,
+      "mitre_atlas_tactics": [
+        "AML.TA0005",
+        "AML.TA0012",
+        "AML.TA0015"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17391",
+      "source_ids": [
+        "AIID-1824"
+      ],
+      "title": "Taiwanese Romance Scam Ring Allegedly Used AI Voice-Changing Software to Defraud More Than 20,000 People",
+      "date": "2026-09-02",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1824: Taiwanese Romance Scam Ring Allegedly Used AI Voice-Changing Software to Defraud More Than 20,000 People. Alleged deployer/developer: Ai Voice Conversion Technology Developers, Cybercriminals, Cybercriminals In Taiwan, Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Romance Scammers, Scammers, Scammers In Taiwan, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Taiwanese Romance Scam Ring Led By Huang And Hsu, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "deepfake",
+      "affected": "Ai Voice Conversion Technology Developers, Cybercriminals, Cybercriminals In Taiwan, Deepfake Creators, Deepfake Technology Developers, Impersonation Scammers, Romance Scammers, Scammers, Scammers In Taiwan, Synthetic Audio Generation Technology Developers, Synthetic Media Creators, Synthetic Media Generation Technology Developers, Taiwanese Romance Scam Ring Led By Huang And Hsu, Voice Cloning Impersonation Scammers, Voice Cloning Technology Developers",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM07"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5",
+        "MEASURE-2.8"
+      ],
+      "mitre_atlas": [
+        "AML.T0048",
+        "AML.T0048.003",
+        "AML.T0115.001"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1824",
+          "url": "https://incidentdatabase.ai/cite/1824/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1824,
+      "mitre_atlas_tactics": [
+        "AML.TA0003",
+        "AML.TA0011"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17392",
+      "source_ids": [
+        "AIID-1825"
+      ],
+      "title": "Autonomous a2z ROii Bus Struck Roadside Stone Wall During Passenger Trial in Toyooka, Japan",
+      "date": "2026-11-09",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1825: Autonomous a2z ROii Bus Struck Roadside Stone Wall During Passenger Trial in Toyooka, Japan. Alleged deployer/developer: Automated Driving System Deployers, Automated Driving System Developers, Autonomous A2z Corporation, Autonomous Vehicle Fleet Operators, Toyooka City, Zentan Bus Co. Ltd.. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Automated Driving System Deployers, Automated Driving System Developers, Autonomous A2z Corporation, Autonomous Vehicle Fleet Operators, Toyooka City, Zentan Bus Co. Ltd.",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1825",
+          "url": "https://incidentdatabase.ai/cite/1825/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1825,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17393",
+      "source_ids": [
+        "AIID-1827"
+      ],
+      "title": "Autonomous Haul Truck Reportedly Went Down an Embankment After Communications Loss at Copper Mine in Antofagasta, Chile",
+      "date": "2026-11-12",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1827: Autonomous Haul Truck Reportedly Went Down an Embankment After Communications Loss at Copper Mine in Antofagasta, Chile. Alleged deployer/developer: Antofagasta Minerals, Autonomous Mining Truck System Developers, Autonomous Mobile Robot Developers, Autonomous Vehicle Fleet Operators, Minera Centinela. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "other",
+      "affected": "Antofagasta Minerals, Autonomous Mining Truck System Developers, Autonomous Mobile Robot Developers, Autonomous Vehicle Fleet Operators, Minera Centinela",
+      "severity": "Medium",
+      "owasp_llm": [],
+      "owasp_asi": [],
+      "nist_ai_rmf": [],
+      "mitre_atlas": [],
+      "references": [
+        {
+          "title": "AIID incident #1827",
+          "url": "https://incidentdatabase.ai/cite/1827/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1827,
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
+    },
+    {
+      "id": "INC-17394",
+      "source_ids": [
+        "AIID-1828"
+      ],
+      "title": "AI Agents Operated by Safety-Testing Firm Trajectory Labs Attempted Website Exploits and Impersonated Staff at AI Research Organization Epoch AI",
+      "date": "2026-10-20",
+      "year": 2026,
+      "category": "real-world",
+      "description": "AI Incident Database (AIID) entry #1828: AI Agents Operated by Safety-Testing Firm Trajectory Labs Attempted Website Exploits and Impersonated Staff at AI Research Organization Epoch AI. Alleged deployer/developer: Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Google Deepmind, Large Language Model Developers, Trajectory Labs. See the linked AIID entry for full narrative, sourcing, and classification.",
+      "attack_vector": "deepfake",
+      "affected": "Ai Agent System Deployers, Ai Agent System Developers, Ai Evaluation Organizations, Google Deepmind, Large Language Model Developers, Trajectory Labs",
+      "severity": "Medium",
+      "owasp_llm": [
+        "LLM07"
+      ],
+      "owasp_asi": [
+        "ASI09"
+      ],
+      "nist_ai_rmf": [
+        "MAP-3.5",
+        "MEASURE-2.8"
+      ],
+      "mitre_atlas": [
+        "AML.T0048",
+        "AML.T0048.003",
+        "AML.T0115.001"
+      ],
+      "references": [
+        {
+          "title": "AIID incident #1828",
+          "url": "https://incidentdatabase.ai/cite/1828/",
+          "type": "report"
+        }
+      ],
+      "tags": [
+        "aiid"
+      ],
+      "added": "2026-11-22",
+      "updated": "2026-11-22",
+      "aiid_id": 1828,
+      "mitre_atlas_tactics": [
+        "AML.TA0003",
+        "AML.TA0011"
+      ],
+      "quality_tier": "reviewed",
+      "corpus": "security",
+      "tier": "landmark",
+      "source_count": 1,
+      "confidence": "high",
+      "source_status": "active",
+      "first_seen": "2026-11-22",
+      "last_seen": "2026-11-22"
     },
     {
       "id": "INC-02382",
@@ -274341,7 +275420,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -612044,7 +613123,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -612330,7 +613409,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -612502,7 +613581,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -612684,7 +613763,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -612926,7 +614005,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613015,7 +614094,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613110,7 +614189,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613285,7 +614364,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613366,7 +614445,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613451,7 +614530,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -613624,7 +614703,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -619960,7 +621039,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -623231,7 +624310,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -634751,7 +635830,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -637868,7 +638947,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -638057,7 +639136,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -654237,7 +655316,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -656408,7 +657487,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -661490,7 +662569,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -671519,7 +672598,7 @@
       "status": "retracted",
       "status_reason": {
         "code": "cve-rejected",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -681743,7 +682822,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -688014,7 +689093,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "quality_tier": "reviewed",
       "corpus": "security",
@@ -1203732,7 +1204811,7 @@
       "status": "disputed",
       "status_reason": {
         "code": "cve-disputed",
-        "as_of": "2026-10-09"
+        "as_of": "2026-11-22"
       },
       "corpus": "security",
       "tier": "feed",
