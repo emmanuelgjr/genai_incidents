@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-25 — D156(a) REPORTED `c4b3bdca` (pushed, ls-remote equal) → GATE DISPATCHED (`gate-d156a`, worktree `C:/repos/gi-wt-gate-d156a`)
+**Specialist claims (testimony):**
+- Deliverables:
+  - new `scripts/check_corpus_flips.py` (exit 0 / 1 / 2; declared needs the same before/after; non-AIID flips are always undeclared);
+  - `aiid_change_report.py --out-json` sidecar (D120 had no machine-readable output);
+  - a workflow step, flag-never-block;
+  - 17 tests with 6 code mutants and 5 workflow mutants fired.
+- Runs: PR #110 gives 1 flip, declared; an empty declared set gives rc 1 naming INC-07572; control gives 0.
+- Suite 1679/1/1; validate and drift clean; no data change.
+
+**Foreman check [R]:**
+- 8 files.
+- `git diff --stat main...branch -- PROGRESS.md` is empty: the branch did not touch the board.
+- data/ingest/docs/data/src delta is empty.
+- 0 C0 control bytes in every touched file.
+
+**⚠ Design question for the user, raised by the specialist:**
+- The check would **not** have caught PR #110, because INC-07572 was in the D120 corpus table, so it counts as declared.
+- It catches only flips D120 does not show: non-AIID rows, or rows D120 missed.
+- If the goal is "a reviewer must look at every corpus flip", the declared line should also trigger needs-ruling, or name the IDs.
+- This is held for the user after the gate.
+
+**Gate concerns:**
+1. whether needs_ruling actually reaches the label logic (untested);
+2. `-e` abort on exit 1/2;
+3. uncapped sidecar size;
+4. whether the narrowed existing test weakened a guarantee.
+
 ### 🔍 2026-11-25 — D156(a) DISPATCHED (`pe-d156a`, fresh pipeline-engineer): undeclared corpus-flip check in auto-refresh
 **Setup.** User go-ahead "yes". Worktree `C:/repos/gi-wt-d156a`, branch `ws4/d156a-flipguard-ci-2026-11-25`, from `2b47d5ea`.
 
