@@ -14,6 +14,19 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-24 — USER RULING: Dependabot #111 MERGED (`446f6972`): tests/a11y npm security group
+**Scope is larger than the PR title says:**
+- minimatch 9.0.9 → 11.0.9; basic-ftp removed.
+- package.json direct dev-deps also move: lighthouse ^12.6.1 → ^13.6.0, puppeteer-core ^23.11.1 → ^25.18.1.
+
+**Foreman checks [R]:**
+- Every added lockfile `resolved` URL is registry.npmjs.org (0 others).
+- No added `hasInstallScript: true`.
+- The a11y run on the PR head (45534454706) actually exercised the new versions: axe 0 violations ×4 theme/viewport combinations; Lighthouse accessibility 100.0 (threshold 90).
+- validate 3.12/3.13 green.
+
+The change is test tooling only; no data or build path is touched.
+
 ### 🔍 2026-11-24 — label-scientist DISPATCHED (`ls-aiid-corpus`): AIID corpus classifier follow-ups (1) INC-07572 and (2) the AIID no-match default
 **Setup and scope**
 - User request: dispatch label-scientist on both follow-ups.
