@@ -14,6 +14,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ 2026-11-25 — USER RULING D157: D155 bounce #2 → "apply verbatim + string check" (Recommended)
+- pe-d155 applies the gate's three changes to `d155_counterfactual_apply.py` only:
+  - (a) a required output path, refusing in-place writes;
+  - (b) exit 1 unless the imported `scrape_aiid` has the fixed whole-word rce rule;
+  - (c) docstring corrected to "at the fix commit", with the right filename.
+- **No third gate.** The foreman does the string check (`git diff --stat` = that 1 file), a byte check, and a fire-proof in a scratch clone: the script must exit non-zero at `a4776e41` and refuse the in-place target at the fix commit.
+- Then merge before Sun 11-29.
+
 ### ↩️↩️ 2026-11-25 — D155 BOUNCE #2 (gate-d155 re-gate on `212dfefd`) → ESCALATED TO USER (protocol step 6)
 **Verdict: BOUNCE #2, as sent by gate-d155.** The audit doc now PASSES per entity. Every defect is in `scripts/audit/d155_counterfactual_apply.py`.
 
