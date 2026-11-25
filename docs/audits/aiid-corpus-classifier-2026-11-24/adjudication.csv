@@ -1,0 +1,135 @@
+# Adjudication of sample.csv (ref 8753a7fe, seed 20261124). Single annotator: label-scientist, 2026-11-24, from title + affected entity list only (AIID narrative is not in the repo). NOT a WS2-T2 two-annotator measurement; no kappa.
+# adjudicated_corpus = reading R1 (primary): DATA_DICTIONARY "security (exploit/vuln/misuse)" vs "ai-harm (societal harm without a security primitive)", with "misuse" = deliberate use of AI by a human actor against third parties, and synthetic media / CSAM counted as misuse because _SECURITY_KEYWORDS_FOR_CORPUS lists deepfake/voice clone/csam/scam/fraud and the merge comment says "a deepfake fraud is security". Security wins ties (_classify_corpus docstring).
+# r2_corpus = reading R2 (sensitivity): as R1, except synthetic-media/CSAM/disinformation harms with NO fraud, extortion or security primitive are ai-harm, following the "AI-harm vectors" block of _ATTACK_VECTOR_RULES (csam-generation, deepfake, misinformation listed as harm vectors). The repo states both; see audit section 3.1.
+# borderline = y where the call needed judgement beyond the stated definitions.
+id,adjudicated_corpus,r2_corpus,borderline,rationale
+INC-02342,ai-harm,ai-harm,n,attorney relied on AI-generated material in a brief; negligent reliance / hallucination; no adversary
+INC-02394,ai-harm,ai-harm,n,chatbot encouraged suicide; unsafe output
+INC-02506,ai-harm,ai-harm,n,company followed chatbot advice in a wrongful termination; no security primitive
+INC-02626,ai-harm,ai-harm,n,AI summary falsely implicated a musician; defamation by system error
+INC-02630,ai-harm,ai-harm,n,coding agent deleted user's drive; agent safety failure; no attacker or unauthorized access
+INC-03168,ai-harm,ai-harm,y,students used chatbots to cheat on an exam; dishonest use but no security primitive and no third-party victim of an attack
+INC-03173,ai-harm,ai-harm,y,AI image circulating amid job-interview reports; misinformation; title does not establish fraud
+INC-03227,ai-harm,ai-harm,n,book published with fabricated citations
+INC-03516,ai-harm,ai-harm,n,reporter published AI-generated fake quotes
+INC-03549,ai-harm,ai-harm,n,school-district chatbot failed; financial harm
+INC-03986,ai-harm,ai-harm,n,ad platform overspending
+INC-04096,ai-harm,ai-harm,n,utility-discount algorithm misallocation
+INC-04156,ai-harm,ai-harm,n,robotaxi honking glitch
+INC-04318,security,ai-harm,y,unauthorized AI impersonation (voice/likeness) of a comedian; deepfake = security under R1; no fraud so ai-harm under R2
+INC-04382,security,security,n,accidental exposure of 38TB of data; data exposure is a security primitive
+INC-04411,ai-harm,ai-harm,n,vehicle failed to yield; safety failure
+INC-04431,ai-harm,ai-harm,n,surveillance alert led to arrest of a student; deployer harm
+INC-04813,ai-harm,ai-harm,n,search panel showed AI image as an artist's work; misinformation by system
+INC-05026,ai-harm,ai-harm,n,autopilot fatal collision
+INC-05361,ai-harm,ai-harm,n,assisted-driving crash
+INC-05581,ai-harm,ai-harm,n,arrest based only on gunshot-detection alert
+INC-05618,ai-harm,ai-harm,n,ad recommender ignored a policy pause
+INC-05785,security,ai-harm,n,individual produced CSAM with AI; csam is a listed security keyword (R1); no fraud/security primitive (R2)
+INC-06096,ai-harm,ai-harm,n,driver-assist lane error
+INC-06191,ai-harm,ai-harm,n,deployer fined for collecting faces; privacy harm by deployer; no breach
+INC-06263,ai-harm,ai-harm,n,machine translation errors in asylum claims
+INC-06629,ai-harm,ai-harm,n,vaccine-allocation algorithm
+INC-06774,ai-harm,ai-harm,n,grade-calculation model
+INC-07153,ai-harm,ai-harm,y,firms charged for false claims about AI capability (AI washing); fraud about AI not by AI; no AI misuse or security primitive
+INC-07238,ai-harm,ai-harm,n,autopilot fatal collision
+INC-07302,ai-harm,ai-harm,n,automated moderation removed artworks
+INC-07382,security,security,n,twin defeated bank voice-ID authentication; authentication bypass
+INC-07413,ai-harm,ai-harm,n,collision-mitigation false positives
+INC-07495,ai-harm,ai-harm,n,game AI produced an imbalanced game
+INC-17325,ai-harm,ai-harm,y,attack planner queried a chatbot about ammunition; unsafe-advice (an AI-harm vector in _ATTACK_VECTOR_RULES); no exploit of the system
+INC-17357,security,security,n,attackers used a security-testing tool to steal data
+INC-17368,security,security,n,attacker used AI agents to breach a firm and access customer data
+INC-17375,security,security,n,research agent compromised an internal server
+INC-17383,ai-harm,ai-harm,n,chatbot guided a medication taper before a death; unsafe advice
+INC-17390,ai-harm,ai-harm,y,research group used patient data in AI tools without authorization; deployer privacy/policy violation; no breach or attacker
+INC-01695,security,security,n,AI nude images used for extortion
+INC-02260,security,ai-harm,n,influence operation using a deepfake
+INC-02286,security,ai-harm,n,AI-generated hoax video (deepfake creators in entity list); disinformation without fraud
+INC-02352,security,ai-harm,n,deepfake videos of ministers spreading false claims
+INC-02375,security,security,n,AI videos used in fake restaurant promotions (scam)
+INC-02551,security,ai-harm,n,CSAM investigation
+INC-02845,security,security,y,AI images submitted to win an award (fraud on the award process)
+INC-02850,security,security,n,malicious npm packages weaponize coding agents for exfiltration
+INC-02958,security,security,n,info-stealer malware via fraudulent AI platforms
+INC-03051,security,security,n,deepfake investment fraud
+INC-03055,security,security,n,deepfake investment-scam videos
+INC-03084,security,security,n,deepfake used for fraudulent treatment claims
+INC-03097,security,security,n,deepfake crypto scam
+INC-03098,security,ai-harm,n,deepfake in a misinformation campaign
+INC-03403,security,security,n,deepfake scams against businesses
+INC-03479,security,ai-harm,n,synthetic media spreading false disaster reports
+INC-03610,security,ai-harm,n,pornographic deepfake of a performer
+INC-03776,security,security,n,fake AI-generated law firms sent fake DMCA notices (fraud)
+INC-04114,security,ai-harm,n,AI video of a president in an influence campaign
+INC-04122,security,security,n,deepfake ticket scam
+INC-04329,security,ai-harm,y,broadcaster used a candidate deepfake without consent; no fraud
+INC-04356,security,security,n,CEO deepfaked to scam staff
+INC-04729,security,ai-harm,n,student generated nude images of classmates
+INC-04816,security,ai-harm,n,deepfake of a president announcing a draft
+INC-04818,security,ai-harm,n,avatar deepfake propaganda
+INC-04840,security,security,n,voice/identity manipulation in a fraud scheme
+INC-14464,ai-harm,ai-harm,n,chatbot MISCLASSIFIED a real video as a deepfake; system error; the deepfake keyword is a false trigger
+INC-14474,security,security,n,AI impersonation in a scam video
+INC-14482,security,ai-harm,n,AI image of an official meeting (disinformation)
+INC-17273,security,security,n,AI article impersonating a presenter to promote a scheme (scam)
+INC-01148,ai-harm,ai-harm,n,chatbot generated sexist abuse
+INC-01850,ai-harm,ai-harm,n,chatbot insulted a user
+INC-01914,security,ai-harm,y,politician posted an AI-generated video depicting real people as apes; synthetic depiction of real people = deepfake under R1
+INC-02296,ai-harm,ai-harm,n,AI search promoted extremist text
+INC-02886,ai-harm,ai-harm,n,chatbot facilitated suicide roleplay with teens
+INC-03223,ai-harm,ai-harm,n,video generator biased representations
+INC-03828,ai-harm,ai-harm,n,chatbot threatening response
+INC-04332,ai-harm,ai-harm,n,risk algorithm gender disparity
+INC-04489,ai-harm,ai-harm,n,search chatbot threatened users
+INC-04562,ai-harm,ai-harm,y,CSAM found in image-generator training data; dataset contamination; no actor misusing AI
+INC-04836,ai-harm,ai-harm,n,companion app lacked protection for minors
+INC-04844,ai-harm,ai-harm,n,facial recognition misidentified minority shoppers
+INC-05019,ai-harm,ai-harm,n,AI streamer toxic remarks
+INC-05029,security,ai-harm,y,real film clip doctored with generative AI to swap an actress's race; synthetic manipulation of real footage = deepfake under R1
+INC-05075,ai-harm,ai-harm,n,recommender popularity bias
+INC-05106,ai-harm,ai-harm,n,job-ad delivery bias
+INC-05107,ai-harm,ai-harm,n,facial-recognition wrongful arrest
+INC-05160,ai-harm,ai-harm,n,chatbot antisemitic output
+INC-05634,ai-harm,ai-harm,n,moderation failed to remove racist abuse
+INC-05862,ai-harm,ai-harm,n,accent-translation racial bias
+INC-07031,ai-harm,ai-harm,n,image-cropping bias
+INC-07180,ai-harm,ai-harm,n,ad delivery excluded by race/gender
+INC-07364,ai-harm,ai-harm,n,body scanners and transgender travellers
+INC-07366,ai-harm,ai-harm,n,harmful content exposure and a teen suicide
+INC-07412,ai-harm,ai-harm,n,toxicity classifier bias
+INC-07432,ai-harm,ai-harm,n,offensive user content shown as an ad
+INC-07478,ai-harm,ai-harm,n,biased image search results
+INC-07582,ai-harm,ai-harm,n,sham-marriage algorithm nationality disparity
+INC-07610,ai-harm,ai-harm,n,algorithmic pay variation for gig workers
+INC-07684,ai-harm,ai-harm,n,audit-selection algorithm racial disparity
+INC-00701,ai-harm,ai-harm,n,facial recognition used against an observer; government deployer harm; no breach
+INC-01178,ai-harm,ai-harm,n,resume-screening error
+INC-02389,ai-harm,ai-harm,n,chatbots reinforced delusions
+INC-02395,ai-harm,ai-harm,n,chatbot reinforced delusions before a murder-suicide
+INC-02635,ai-harm,ai-harm,n,chatbot reinforced delusions
+INC-02839,security,security,y,LLM scrapers overloaded open-source project infrastructure; abusive automated traffic (resource exhaustion)
+INC-03103,security,security,n,spyware deployed against journalists (malware)
+INC-03311,ai-harm,ai-harm,n,facial-recognition false-positive disparity
+INC-03398,ai-harm,ai-harm,y,military targeting systems with civilian harm; no exploit or adversarial misuse of the system
+INC-04054,ai-harm,ai-harm,n,weapons-scanner false positives
+INC-04422,ai-harm,ai-harm,n,traffic camera misidentification and fine
+INC-05085,ai-harm,ai-harm,n,image generator reinforced stereotypes
+INC-05456,ai-harm,ai-harm,n,employer forced AI cameras on drivers
+INC-07170,ai-harm,ai-harm,n,facial-recognition wrongful arrest
+INC-07530,ai-harm,ai-harm,n,driver-assist crash
+INC-07572,ai-harm,ai-harm,n,predictive policing violated residents' rights
+INC-07706,ai-harm,ai-harm,n,recidivism risk assessment
+INC-07737,ai-harm,ai-harm,n,chatbot reinforced stalking
+INC-08167,ai-harm,ai-harm,n,facial-recognition false arrest
+INC-08169,ai-harm,ai-harm,n,facial-recognition misidentification and arrest
+INC-17226,security,security,y,deputies misused licence-plate-reader data for non-law-enforcement purposes; insider misuse of access
+INC-17295,ai-harm,ai-harm,n,stale hot-list alert led to a detention
+INC-17298,ai-harm,ai-harm,n,plate misread led to a gunpoint stop
+INC-17300,ai-harm,ai-harm,n,chatbot misidentified cargo
+INC-17302,ai-harm,ai-harm,n,plate-reader alert led to a gunpoint detention
+INC-17303,ai-harm,ai-harm,n,plate-reader alerts led to repeated stops
+INC-17321,security,security,n,AI agents attempted to hack a federal archive website
+INC-17341,security,security,y,officer used a plate-reader system to track an estranged wife; insider misuse of access
+INC-17385,ai-harm,ai-harm,n,false facial-recognition match led to arrest
+INC-17387,ai-harm,ai-harm,n,chatbot advised a tenant to withhold rent; unsafe advice

@@ -1,6 +1,6 @@
 {
   "version": "2.13.0",
-  "generated": "2026-11-22",
+  "generated": "2026-11-25",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
   "incident_count": 15804,
@@ -138871,20 +138871,20 @@
         "oecd-aim"
       ],
       "added": "2026-05-16",
-      "updated": "2026-11-22",
+      "updated": "2026-11-25",
       "aiid_id": 195,
       "mitre_atlas_tactics": [
         "AML.TA0005",
         "AML.TA0011"
       ],
+      "corpus": "ai-harm",
       "quality_tier": "reviewed",
-      "corpus": "security",
       "tier": "landmark",
       "source_count": 3,
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-11-22",
+      "last_seen": "2026-11-25",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
