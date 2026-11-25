@@ -14,6 +14,44 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-25 — AIID corpus follow-ups: specialist work at `b1531a8e` (pushed by the foreman); GATE DISPATCHED (`gate-aiidcorpus`, detached worktree `C:/repos/gi-wt-gate-aiidcorpus`)
+**Idle-without-report occurrence (agreement 3).**
+- The specialist committed `b1531a8e` locally, then went idle twice with "suite running". It never pushed and never sent its report, after one re-prompt.
+- The foreman read the tree: the audit is 292 lines; §0–§7 are all present; the evidence CSV/JSON files, the audit script, the O1 override and the pinned test are all there.
+- The foreman pushed the branch (ls-remote = `b1531a8e`) and told the agent to stand down.
+- **No suite/validate/drift results were reported**, so the gate must measure them.
+
+**Deliverable (testimony until gated):** `docs/audits/aiid-corpus-classifier-2026-11-24.md`.
+
+Specialist findings: foreman premises refuted:
+- The INC-07572 flip comes from the keyword `"rce"` matching as a substring of "enfo**rce**ment"; no "law enforcement" keyword exists.
+- 16 of the 24 new rows are correctly `security`.
+- The base count is 1,436/1,645 at `8753a7fe`, not 1,411/1,621.
+- The OECD classifier shares the same keyword tuples.
+
+Specialist findings: estimated AIID corpus error:
+- About 45% under definition R1. 786 rows reach `security` only through the no-match default.
+
+Specialist findings: `rce` attack_vector artifact:
+- `scrape_aiid.py:156` has no word boundary. At least 38 of the 161 AIID `rce` labels are proven artifacts.
+- Fixing it needs a networked AIID re-ingest, which also moves OWASP/ATLAS/severity.
+
+**Options:**
+
+| option | what | rows moved | other effect | new-24 wrong |
+|---|---|---|---|---|
+| O0 | do nothing | none | none | 8/24 |
+| **O1** | INC-07572 override (implemented on the branch) | 1 | none | 8/24 |
+| O2 | `\brce\b` | 26 | landmark +12 | 8/24 |
+| O3 | no-match default → ai-harm | 786 | none | **14/24 (worse)** |
+| O5 | guarded default | 688 | none | 3/24 |
+| O6 | MIT risk-domain tags | 577 | none | 8/24 |
+
+- The specialist recommends O1 now.
+- For the mass relabel, it recommends a **definition ruling (R1 vs R2)** first, then O5/O6 or a hybrid, **not O3**.
+
+**Proposed CI wiring (not implemented):** a per-entity `flipguard` check in auto-refresh.
+
 ### ✅ 2026-11-24 — USER RULING: Dependabot #111 MERGED (`446f6972`): tests/a11y npm security group
 **Scope is larger than the PR title says:**
 - minimatch 9.0.9 → 11.0.9; basic-ftp removed.
