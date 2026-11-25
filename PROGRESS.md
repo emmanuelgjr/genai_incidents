@@ -14,6 +14,28 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-25 — D155 REPORTED `e07d302a` (pushed, ls-remote equal) → GATE DISPATCHED (`gate-d155`, worktree `C:/repos/gi-wt-gate-d155`)
+**Specialist claims (testimony).**
+- Changes:
+  - `:156` is now `rce`;
+  - `:202` uses `re.search(r"rce")`;
+  - 11 tests (6 fail on the old file);
+  - offline estimate: 40 title-proven artifact rows, 36 High→Medium, 124 not derivable offline;
+  - **no data moves on merge**: only the networked `ingest_aiid_snapshot.py` applies the rules.
+- **`:33` `SECURITY_KEYWORDS` is the AIID ADMISSION filter**, left unchanged. Bare substrings there include worm/hack/token/bias/agent. This is for a user ruling.
+- Other flawed rules, reported and not changed: `election`, severity `dead`, `pgd`/`fgsm`.
+- Counts: pytest 1661/1/1; validate and drift clean.
+
+**Foreman check [R]:**
+- `git diff --stat a4776e41 e07d302a`: 4 files, +124/−2.
+- The scrape_aiid diff is exactly the 2 rules.
+- 0 `` bytes in either file.
+
+**Foreman concerns sent to the gate:**
+1. 1,726/170/40/124/6 vs the audit's 1,645/161/38/118/5.
+2. Does the refresh re-apply the rules to EXISTING AIID rows, or only to new ones? If only new, D155 would not fix the 40.
+3. Will the D120 report show attack_vector/owasp/atlas/severity changes?
+
 ### 🔍 2026-11-25 — D155 DISPATCHED (`pe-d155`, pipeline-engineer): AIID `rce` whole-word fix in `scrape_aiid.py:156`/`:202`
 - **Worktree and branch:** worktree `C:/repos/gi-wt-d155`, branch `ws4/d155-aiid-rce-boundary-2026-11-25`, from `a4776e41`.
 - **Scope:** code, tests that fail on the old regex, and a dated delta/estimate audit.
