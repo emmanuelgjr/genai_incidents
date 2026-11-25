@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ↩️↩️ 2026-11-25 — D155 BOUNCE #2 (gate-d155 re-gate on `212dfefd`) → ESCALATED TO USER (protocol step 6)
+**Verdict: BOUNCE #2, as sent by gate-d155.** The audit doc now PASSES per entity. Every defect is in `scripts/audit/d155_counterfactual_apply.py`.
+
+**Defects:**
+1. **The check cannot fail if you follow its own recipe (agreement 6 form (a)).**
+   - The docstring says "run INSIDE a scratch clone at the base commit". The script imports `scrape_aiid` from the CWD, and at the base `a4776e41` that is the OLD classifier, so the rewrite is a no-op.
+   - The script still prints "34 reproducible / 7 not reproducible", word for word the same as when it works.
+   - Gate proof: at the base the snapshot has 0 rows content-changed; at the fix commit, 34.
+   - The doc's Method line (`e07d302a`) is right, but the docstring contradicts it and names the file "cf_apply.py".
+2. **The script rewrites the committed snapshot in place with no guard.**
+   - Line 37 writes `ingest/aiid_full.json` relative to the CWD. Gate proof: porcelain shows ` M ingest/aiid_full.json` after a run.
+   - In a real checkout, the next build would publish 34 rows of fabricated title-only labels.
+   - **The gate's suggested fix:**
+     - a required output path, never writing in place (or refuse without an explicit scratch flag);
+     - assert that the imported rules contain the `rce` pattern, else exit non-zero;
+     - correct the docstring to "at the fix commit".
+   - The gate offers **apply verbatim + string check**: about 6 lines, no new measurement.
+
+**Gate evidence [R]:**
+- The doc's 9 per-field ID SETS equal the gate's counterfactual, built from the REAL old `scrape_aiid.py` (the specialist reimplemented the old rules; the outputs match exactly). Counts: attack_vector 32, last_seen 34, mitre_atlas 18, tactics 17, nist 17, owasp_asi 32, owasp_llm 18, severity 12 (all High→Medium, same 12 IDs), updated 34.
+- The transitions match. Defects 2 and 3 from bounce 1 are fixed; stale terms appear only inside the Corrections quotes.
+- Neither new script touches the network; the diff script is read-only.
+- `scrape_aiid.py` and tests are unchanged since `e07d302a`, so the first gate's suite and fire-proof still hold.
+
+**Advisory:** the `offline_delta` keys are still named `title_proven` / `sev_high_title_proven` (stale label, values correct).
+
+**⏳ USER DECISION:** apply verbatim + string check / fix + full re-gate / drop the apply script from the branch. Deadline: the Sun 11-29 refresh.
+
 ### 🔍 2026-11-25 — D155 bounce-1 fix REPORTED `212dfefd` (pushed, ls-remote equal) → SCOPED RE-GATE sent to gate-d155
 **Foreman check [R]:** `git diff --stat e07d302a 212dfefd` shows only the doc, the label change in `d155_rce_offline_delta.py`, and 2 new audit scripts (`d155_counterfactual_apply.py`, `d155_counterfactual_diff.py`). `scrape_aiid.py` and tests are untouched. 0 control bytes in the doc.
 
