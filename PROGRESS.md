@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-25 — D156(a) bounce-1 + D158 fix REPORTED `7896c875` (pushed, ls-remote equal) → RE-GATE sent to gate-d156a
+**Foreman check [R]:** 6 files, +260/−78. No data/ingest/PROGRESS delta. 0 C0 control bytes.
+
+**Specialist claims (testimony):**
+- Crash handling: `except Exception` → 2; `needs_ruling=true` is written first in the non-clean branches; a `[ -s ]` guard sends a missing report to UNKNOWN.
+- Exit codes: 0 none / 1 any flip / 2 error.
+- PR body: a declared/UNDECLARED column; `--out-full-md` (uncapped list to the step summary).
+- Tests: bash tests under `-eo pipefail`, including the gate's env-only injection; fire-proofs F1–F5.
+- PR #110: 1 declared flip → rc 1 → needs_ruling.
+- Suite 1691/1/1.
+
+**Re-gate asks:**
+- rerun the env-only injection;
+- rerun the corrupted pair under D158;
+- fire F1, F3 and a gate-chosen mutant;
+- check the full-md summary write is safe;
+- check the test edit is marker-only;
+- run suite, validate and drift.
+
 ### ↩️ 2026-11-25 — D156(a) BOUNCE #1 (gate-d156a on `c4b3bdca`) + USER RULING D158 → redispatched to pe-d156a
 **Verdict: BOUNCE (bounce 1), as sent by gate-d156a.**
 
