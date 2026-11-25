@@ -17,8 +17,8 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 ### 🔍 2026-11-25 — D155 REPORTED `e07d302a` (pushed, ls-remote equal) → GATE DISPATCHED (`gate-d155`, worktree `C:/repos/gi-wt-gate-d155`)
 **Specialist claims (testimony).**
 - Changes:
-  - `:156` is now `rce`;
-  - `:202` uses `re.search(r"rce")`;
+  - `:156` is now `\brce\b`;
+  - `:202` uses `re.search(r"\brce\b")`;
   - 11 tests (6 fail on the old file);
   - offline estimate: 40 title-proven artifact rows, 36 High→Medium, 124 not derivable offline;
   - **no data moves on merge**: only the networked `ingest_aiid_snapshot.py` applies the rules.
@@ -29,7 +29,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 **Foreman check [R]:**
 - `git diff --stat a4776e41 e07d302a`: 4 files, +124/−2.
 - The scrape_aiid diff is exactly the 2 rules.
-- 0 `` bytes in either file.
+- 0 `\x08` bytes in either file.
 
 **Foreman concerns sent to the gate:**
 1. 1,726/170/40/124/6 vs the audit's 1,645/161/38/118/5.
