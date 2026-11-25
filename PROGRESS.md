@@ -14,6 +14,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ⚖ 2026-11-25 — USER RULINGS D153–D156 (AIID corpus rulings package, from `docs/audits/aiid-corpus-classifier-2026-11-24.md`)
+
+**D153, corpus definition = R1.**
+- `security` = exploit/vulnerability/security primitive, **or misuse**: a human deliberately using AI against third parties. That includes fraud, scams, impersonation, deepfakes (sexual deepfakes included), CSAM, influence ops and AI-enabled attacks.
+- Everything else is `ai-harm`. Ties go to security.
+- This matches `_SECURITY_KEYWORDS_FOR_CORPUS` and DATA_DICTIONARY "misuse". The `_ATTACK_VECTOR_RULES` "AI-harm vectors" comment (`merge_and_dedupe.py:608-612`) is the conflicting text. A future task should align or annotate it (docs-only, no relabel).
+
+**D154, mass relabel: SECOND ANNOTATOR FIRST.**
+- A two-annotator study under R1 with Cohen's kappa (WS2-T2 method) on the existing sample (and holdout) must confirm the error rate before any choice among O5 / O6 / hybrid.
+- **No mass relabel until that study is gated and the user rules on the option.**
+- O3 stays excluded.
+- Annotator-recruitment constraint: WS5-T2a drafts exist; a second human annotator is the user's to arrange. The specialist designs the protocol and packet; it does not self-annotate twice.
+
+**D155, AIID `rce` fix rides the weekly refresh.**
+- pipeline-engineer fixes `scrape_aiid.py:156` (and the `:202` seeding) to word-boundary matching, adds a test that fails on the old regex, and gets it gated.
+- The next scheduled refresh applies it. The refresh PR's D120 report shows the delta, including the OWASP/ATLAS/severity cascade, for the user's normal review.
+
+**D156, two follow-up tasks added (pipeline-engineer):**
+- (a) wire `flipguard` (per-entity undeclared-corpus-flip check) into auto-refresh against the PR base, with the declared list from the D120 change report;
+- (b) carry the OECD-persisted corpus through `merge_into` for the 164 AIID+OECD rows: design plus a field-level dry-run delta, gated. Note that under D153 / R1 the precedence rule must be stated.
+
 ### ✅ 2026-11-25 — AIID corpus audit + O1 DONE: re-gate PASS on `a0904667`, MERGED to main (`ea2574bc`)
 **Verdict: PASS (re-gate after bounce 1), as sent by gate-aiidcorpus.** DEFECTS: none.
 
