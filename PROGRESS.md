@@ -14,6 +14,65 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ↩️ 2026-11-25 — AIID corpus follow-ups: BOUNCE #1 (gate-aiidcorpus on `b1531a8e`); redispatched to a FRESH label-scientist
+**Verdict: BOUNCE (bounce 1), as sent by gate-aiidcorpus.** O1's data change is clean. Both defects are false statements in the do-not-regenerate audit, and each is refuted by the audit's own evidence.
+
+**Defects:**
+1. **§3.4 line 163: "generic | 11 rows" is wrong.** `new24.csv` has 10 generic rows: INC-17372, 17373, 17374, 17375, 17378, 17379, 17380, 17381, 17383, 17384. The tally is ok 10 / generic 10 / wrong 3 / unverifiable 1 = 24.
+2. **§3.2 line 121: "All of the extra errors come from sec-keyword" is false.** From R1 to R2, the sample's wrong counts move:
+   - sec-keyword 1→14 (about +248);
+   - default 33→35 (about +39);
+   - harm 2→0 (about −14).
+   The net is +273, which is right (746→1,019). This is an aggregate hiding a wrong breakdown.
+
+**Foreman check [R]:**
+- Defect 1: the `attack_vector_verdict` Counter on `new24.csv` gives {ok 10, generic 10, wrong 3, unverifiable 1}, with the 10 IDs as listed.
+- Defect 2: per-stratum, sample.csv `stored_corpus` against adjudication.csv `adjudicated_corpus` / `r2_corpus` gives:
+
+  | stratum | rows | R1 wrong | R2 wrong |
+  |---|---|---|---|
+  | default | 40 | 33 | 35 |
+  | sec-keyword | 30 | 1 | 14 |
+  | harm | 30 | 2 | 0 |
+  | rce-artifact | 30 | 25 | 25 |
+
+  This confirms the defect.
+
+**Gate evidence [R], measured by the gate:**
+- Suite: 1650 passed, 1 skipped, 1 xfailed (10m53s) in the gate worktree. validate rc 0, drift clean, ATLAS lint OK, porcelain empty.
+- Per-entity O1 delta, by the gate's own script against `8753a7fe`, across incidents.json and the 3 min copies:
+  - 15845→15845 rows, ID set and order equal;
+  - only INC-07572 changed (corpus security→ai-harm, updated/last_seen 11-22→11-25, key order);
+  - the only top-level change is `generated`; stats changes only `generated`; the only override change is the added key AIID-195.
+- Rebuild in a scratch clone: two rebuilds are byte-identical to the commit.
+- Control with the base overrides: INC-07572 returns to `security`, so the override is the sole cause.
+- Spot-checks hold:
+  - `rce` substring (merge_and_dedupe.py:771);
+  - before/after classification;
+  - INC-07572 is PR #110's only corpus flip;
+  - 1,436/1,645, with paths default 786 / sec-kw 573 / harm 209 / rce-artifact 77;
+  - scrape_aiid.py:156;
+  - merge_into has no corpus;
+  - the OECD tuples are shared;
+  - avscan 161 = 118 + 38 + 5.
+- Sample re-drawn from the seeds with the gate's own path function: exact match, main and holdout, disjoint.
+- Scoring reproduces 745.7 (R1) and 1019.3 (R2).
+- Independent O2 dry-run: the same 26 IDs, tier 12, landmark 2080→2092.
+- Both new tests fail on base data or the O2 patch and pass on restore.
+- The override follows the D139-M/D130-2L precedent.
+- Scope: 23 files, all accounted for.
+
+**Advisories:**
+1. The 164 AIID+OECD rows ignore the OECD-persisted corpus. This is pre-existing `merge_into` behaviour; propose it as a follow-up alongside the mass-relabel ruling.
+2. `dryrun-O1.json` `files_changed` = 3 (merge-only). The real build changes 8, and §7 is correct.
+3. flipguard is not wired into CI, and its proof table is [A].
+4. The §2 claim that the harm path is mostly the MIT discrimination tag is [A].
+5. Gate tree clean.
+
+**Specialist suite claim:** 1650/1/1 on `b1531a8e`, sent after the gate dispatch, testimony. It agrees with the gate's [R].
+
+**Redispatch:** per agreement 3 (original idle without report ×2), a FRESH label-scientist, text-only fix, on the same branch. The re-gate is to be a string check plus "nothing else in the diff changed".
+
 ### 🔍 2026-11-25 — AIID corpus follow-ups: specialist work at `b1531a8e` (pushed by the foreman); GATE DISPATCHED (`gate-aiidcorpus`, detached worktree `C:/repos/gi-wt-gate-aiidcorpus`)
 **Idle-without-report occurrence (agreement 3).**
 - The specialist committed `b1531a8e` locally, then went idle twice with "suite running". It never pushed and never sent its report, after one re-prompt.
