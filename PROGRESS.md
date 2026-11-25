@@ -14,6 +14,47 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-25 — AIID corpus audit + O1 DONE: re-gate PASS on `a0904667`, MERGED to main (`ea2574bc`)
+**Verdict: PASS (re-gate after bounce 1), as sent by gate-aiidcorpus.** DEFECTS: none.
+
+**Gate evidence [R]:**
+- `git diff --numstat b1531a8e a0904667` shows only the audit .md (9 lines added, 2 removed), so no suite rerun was needed.
+- §3.2 recomputed: 573×13/30 = 248.30; 786×2/40 = 39.30; 209×−2/30 = −13.93; net +273.67. This matches the 745.7→1019.3 scoring.
+- §3.4: generic = 10, with the 10 IDs as listed. The tally is ok 10 / generic 10 / wrong 3 / unverifiable 1 = 24.
+- The Corrections section quotes the old and new text verbatim and adds no wrong figure.
+- A grep finds no stale "11 rows" or "all of the extra" claim in the body.
+- The gate judged the in-place correction acceptable under agreement 4 because the record was pre-merge and the old text is preserved verbatim.
+
+**Carried from the first gate [A] (valid because only the .md changed):**
+- suite 1650/1/1;
+- validate, drift and lint clean;
+- per-entity delta (only INC-07572);
+- deterministic rebuild and the override-only control;
+- sample redraw;
+- test fire-proofs.
+
+**Foreman merge check [R]** (`--no-ff` onto `753a2b10`, no conflicts):
+- validate rc 0; drift clean; `tests/test_aiid_corpus_inc07572.py` 2 passed.
+- Per-entity check against HEAD^1: 15,845 rows, ID set equal, the only changed row is INC-07572 (corpus = ai-harm).
+- Porcelain empty, no strays.
+- `git diff --stat a0904667 HEAD` = PROGRESS.md + tests/a11y npm only, so the gate's suite covers the merged code.
+- Pushed; ls-remote = `ea2574bc`.
+
+**docs-warden not dispatched:** no published count, claim, licence text, taxonomy list or version changed. stats changed only `generated`.
+
+**Advisories carried (follow-ups, not yet tasks):**
+1. 164 AIID+OECD rows ignore the OECD-persisted corpus (`merge_into` does not carry it).
+2. `dryrun-O1.json` `files_changed` is 3 (merge-only); the real build changes 8, so do not cite the JSON.
+3. flipguard is not in CI; the proposal is to wire it into auto-refresh against the PR base with the D120 declared list.
+4. The §2 MIT-tag claim is [A].
+5. The `scrape_aiid.py:156` `\brce\b` fix needs a networked AIID re-ingest (it also moves OWASP/ATLAS/severity).
+
+**⏳ AWAITING USER (rulings package):**
+- (R-a) corpus definition: R1 vs R2 (§3.1);
+- (R-b) mass option: O5 / O6 / hybrid, not O3, with a second annotator before any mass relabel;
+- (R-c) the AIID `rce` re-ingest;
+- (R-d) whether to make flipguard-in-CI and the 164-row OECD-corpus carry tasks.
+
 ### ↩️ 2026-11-25 — AIID corpus follow-ups: BOUNCE #1 (gate-aiidcorpus on `b1531a8e`); redispatched to a FRESH label-scientist
 **Verdict: BOUNCE (bounce 1), as sent by gate-aiidcorpus.** O1's data change is clean. Both defects are false statements in the do-not-regenerate audit, and each is refuted by the audit's own evidence.
 
