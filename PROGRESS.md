@@ -14,6 +14,18 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-25 — D155 bounce-1 fix REPORTED `212dfefd` (pushed, ls-remote equal) → SCOPED RE-GATE sent to gate-d155
+**Foreman check [R]:** `git diff --stat e07d302a 212dfefd` shows only the doc, the label change in `d155_rce_offline_delta.py`, and 2 new audit scripts (`d155_counterfactual_apply.py`, `d155_counterfactual_diff.py`). `scrape_aiid.py` and tests are untouched. 0 control bytes in the doc.
+
+**Specialist counterfactual (testimony, same method as the gate):**
+- 34 rows: attack_vector 32, owasp_asi 32, owasp_llm 18, mitre_atlas 18, tactics 17, nist 17, severity 12, updated/last_seen 34.
+- 34 reproducible + 7 not.
+- The 6 rows are ransom-only.
+
+**Foreman concern sent to the gate:** `d155_counterfactual_apply.py:37` writes `ingest/aiid_full.json` relative to the CWD with no guard. Run in a real checkout, it would silently overwrite the snapshot.
+
+**User 2026-11-25: "fix all that is bouncing".** Standing instruction for this run: route every bounce to a fix, without asking.
+
 ### ↩️ 2026-11-25 — D155 BOUNCE #1 (gate-d155 on `e07d302a`): the audit doc only; code, tests and scope PASS
 **Verdict: BOUNCE, as sent by gate-d155.**
 
