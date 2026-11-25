@@ -1,0 +1,42 @@
+# Adjudication of holdout.csv (ref 8753a7fe, seed 20261125, strata default=30 rce-artifact=10, sample.csv ids excluded). Drawn AFTER the O5 candidate vocabulary was fixed, so it is out-of-sample for O5 (except INC-17377 and INC-17384, which are also in the new24 census that was read before O5 was written). Same annotator and readings as adjudication.csv.
+id,adjudicated_corpus,r2_corpus,borderline,rationale
+INC-00159,ai-harm,ai-harm,n,delivery robot crashed into a bus shelter
+INC-00577,ai-harm,ai-harm,n,GPS routed a van onto mudflats
+INC-02374,ai-harm,ai-harm,n,benefits AI rejecting claims improperly
+INC-02524,ai-harm,ai-harm,y,curation agent completed a task meant for a new contributor; no security primitive
+INC-02633,ai-harm,ai-harm,n,chatbot repetitive self-deprecating output bug
+INC-02883,ai-harm,ai-harm,y,chat app published personal chats users did not realise were public; design/UX privacy harm; no breach
+INC-02887,ai-harm,ai-harm,n,chatbot false claims; defamation suit
+INC-02982,ai-harm,ai-harm,n,false gun alert at a school
+INC-03022,security,ai-harm,n,officials shared AI-generated political video (synthetic-media disinformation)
+INC-03175,security,ai-harm,n,manipulated videos misrepresenting protests (synthetic-media disinformation)
+INC-03513,ai-harm,ai-harm,n,regulator probe of autopilot fatal crashes
+INC-03904,ai-harm,ai-harm,n,moderation AI flagged news sites as spam
+INC-03993,ai-harm,ai-harm,n,assistant gave unsafe medical advice
+INC-04380,ai-harm,ai-harm,n,robotaxi dragged a pedestrian
+INC-04946,ai-harm,ai-harm,n,copyright suit over unauthorized training; no security primitive
+INC-05035,ai-harm,ai-harm,n,driver-assist fatal crash
+INC-05445,ai-harm,ai-harm,n,factory robot injured an engineer
+INC-06079,ai-harm,ai-harm,n,driver-assist misidentified the moon
+INC-06928,ai-harm,ai-harm,n,delivery robot hit a car
+INC-07036,ai-harm,ai-harm,n,GDPR automated-profiling notice failure
+INC-07152,ai-harm,ai-harm,n,length-of-stay model cut off insurer payment
+INC-07326,ai-harm,ai-harm,n,plate-reader alert led to wrongful detention
+INC-07397,ai-harm,ai-harm,n,friend recommendations outed sex workers
+INC-07456,ai-harm,ai-harm,n,navigation app routed drivers into wildfires
+INC-07553,ai-harm,ai-harm,n,robotic surgery malfunctions
+INC-14461,ai-harm,ai-harm,y,chatbot used in planning a school stabbing; unsafe-advice, same call as INC-17325
+INC-17268,security,security,y,influence campaign targeting chatbot responses (manipulating model outputs, poisoning-like)
+INC-17306,security,security,n,AI agent attempted to hack a government website
+INC-17377,security,security,n,agents used exposed credentials to retrieve data
+INC-17384,security,security,n,attacker used AI agents to extract dispatch records
+INC-02724,ai-harm,ai-harm,n,facial-recognition misidentification during enforcement
+INC-02975,ai-harm,ai-harm,n,facial-recognition wrongful detention
+INC-03246,ai-harm,ai-harm,n,predictive-text error forced a test retake
+INC-03547,ai-harm,ai-harm,n,plate-recognition errors led to wrongful fines
+INC-03770,ai-harm,ai-harm,n,facial-recognition false matches triggered police checks
+INC-04040,ai-harm,ai-harm,y,broadcaster's AI edit altered a lawmaker's image; tool error, not deliberate misuse
+INC-04865,ai-harm,ai-harm,n,gunshot detection failed to alert
+INC-07494,ai-harm,ai-harm,n,state facial-recognition surveillance app; no breach
+INC-07705,ai-harm,ai-harm,n,missile system misfire at an ally jet
+INC-17319,ai-harm,ai-harm,n,brief struck for AI-fabricated citations

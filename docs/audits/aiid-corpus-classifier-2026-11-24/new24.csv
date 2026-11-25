@@ -1,0 +1,27 @@
+# Census (not a sample) of the 24 AIID rows refresh PR #110 added (INC-17371..INC-17394), ref 8753a7fe. Single annotator: label-scientist, 2026-11-24, title + affected entity list. Corpus readings R1/R2 as defined in adjudication.csv.
+# attack_vector_verdict: ok = consistent with the repo's vector vocabulary; wrong = contradicted by the committed text; generic = "other" where a specific vector exists (not an error claim, a missed label); unverifiable = decided by AIID's ephemeral description, which the repo never stores.
+id,adjudicated_corpus,r2_corpus,attack_vector_stored,attack_vector_verdict,note
+INC-17371,security,security,deepfake,ok,executive impersonation used to defraud companies
+INC-17372,security,security,other,generic,agents posted user images to external hosts (data exposure)
+INC-17373,security,security,other,generic,agents repurposed a restricted link shortener (unauthorized use of access)
+INC-17374,security,security,other,generic,agent exposed a GitHub token (credential exposure)
+INC-17375,security,security,other,generic,agent compromised an internal server
+INC-17376,security,security,data-exfiltration,ok,agent used a leaked API key to access a data service
+INC-17377,security,security,data-exfiltration,ok,agents used exposed credentials to retrieve data
+INC-17378,security,security,other,generic,agent retrieved credentials and restricted data
+INC-17379,security,security,other,generic,agent used a wallet without permission
+INC-17380,security,security,other,generic,coding agent sent defense credentials
+INC-17381,security,security,other,generic,security-testing agent accessed an internal tool without authorization
+INC-17382,ai-harm,ai-harm,unsafe-advice,ok,chatbot helped a student plan suicide
+INC-17383,ai-harm,ai-harm,other,generic,chatbot guided a medication taper before a death (unsafe-advice)
+INC-17384,security,security,other,generic,attacker used AI agents to extract dispatch records
+INC-17385,ai-harm,ai-harm,privacy-violation,ok,false facial-recognition match led to arrest; privacy-violation is the repo's facial-recognition vector
+INC-17386,security,security,rce,unverifiable,hackers used an internal AI tool in an exchange breach; title has no rce/remote-code/ransom term; value came from AIID's description
+INC-17387,ai-harm,ai-harm,rce,wrong,chatbot rent advice; rce comes from "reinforced" (scrape_aiid TAXONOMY_RULES regex rce has no word boundary); also carries LLM10/ASI05/AML.T0050 and severity High from the same artifact
+INC-17388,security,ai-harm,deepfake,ok,students made AI nude images of classmates
+INC-17389,ai-harm,ai-harm,privacy-violation,ok,facial-recognition false accusation of theft
+INC-17390,ai-harm,ai-harm,tool-abuse,wrong,research group used patient data in AI tools without authorization; tool-abuse is the agent tool-misuse vector (LLM03/ASI02/AML.T0053); this is a deployer privacy violation
+INC-17391,security,security,deepfake,ok,romance-scam ring used AI voice changing
+INC-17392,ai-harm,ai-harm,other,ok,autonomous bus struck a wall
+INC-17393,ai-harm,ai-harm,other,ok,autonomous haul truck left the road
+INC-17394,security,security,deepfake,wrong,agents attempted website exploits and impersonated staff; deepfake comes from the merge rule impersonat->deepfake; no synthetic media in the title

@@ -1470,6 +1470,10 @@
         "as_of": "2026-11-11"
       },
       "_note": "D130-3a: no confirmed source names this incident after a documented effort (agent-suggested; pending user re-review); references left as found, quality_tier untouched. Effort: The only reference is the publisher's research index (R1). Searched 2026-11-11 through fetch_once: anthropic.com/research, /news, /research/team/frontier-red-team, red.anthropic.com, /news/detecting-countering-misuse-aug-2025 and /news/building-safeguards-for-claude (all HTTP 200; none contains 'spear-phishing', 'spear phishing' or 'phishing' in a study of that name; the August 2025 misuse report names no such study); The Hacker News site search for 'Anthropic spear-phishing' and 'Anthropic Claude phishing' (reports of 2025-2026 Claude misuse, none a 2024 Frontier Threats Red Team spear-phishing scaling study). No search engine was available. The row also carries a second seed id (VTR-anthropic-election-influence-study-2024, an election-influence study) with no source either. Not found after this search; the search was limited to those routes."
+    },
+    "AIID-195": {
+      "corpus": "ai-harm",
+      "_note": "label-scientist 2026-11-24: pins INC-07572's base corpus (ai-harm). Refresh PR #110 flipped it to security only because the AIID deployer string gained 'Law Enforcement', and _classify_corpus's keyword 'rce' substring-matches 'enfo-rce-ment'. Agent-suggested, pending user re-review. Evidence: docs/audits/aiid-corpus-classifier-2026-11-24.md"
     }
   }
 }

@@ -1,0 +1,29 @@
+{
+ "rows_before": 15845,
+ "rows_after": 15845,
+ "ids_added": [],
+ "ids_removed": [],
+ "id_order_equal": true,
+ "fields": {},
+ "corpus_moves": {},
+ "derived_counts": {
+  "before": {
+   "incident_count": 15804,
+   "landmark_count": 2080
+  },
+  "after": {
+   "incident_count": 15804,
+   "landmark_count": 2080
+  }
+ },
+ "stats_changed": {},
+ "files_changed": [],
+ "corpus_moved_aiid": 0,
+ "corpus_moved_non_aiid": [],
+ "standing_corpus_after": {
+  "security": 15266,
+  "ai-harm": 538
+ },
+ "option": "O0",
+ "ref": "8753a7fe"
+}
