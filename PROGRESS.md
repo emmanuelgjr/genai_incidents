@@ -28,7 +28,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
    - In a real checkout, the next build would publish 34 rows of fabricated title-only labels.
    - **The gate's suggested fix:**
      - a required output path, never writing in place (or refuse without an explicit scratch flag);
-     - assert that the imported rules contain the `rce` pattern, else exit non-zero;
+     - assert that the imported rules contain the `\brce\b` pattern, else exit non-zero;
      - correct the docstring to "at the fix commit".
    - The gate offers **apply verbatim + string check**: about 6 lines, no new measurement.
 
