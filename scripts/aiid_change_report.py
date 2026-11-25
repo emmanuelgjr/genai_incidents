@@ -125,6 +125,12 @@ def render_md(d: dict) -> str:
     return "\n".join(L)
 
 
+def sidecar(d: dict) -> dict:
+    """Pure. The machine-readable form of the report (D156a). Unlike the markdown
+    it is never capped (MAX_ROWS_PER_FIELD / D123 apply to rendering only)."""
+    return {"schema": 1, "listed": d["listed"]}
+
+
 def _git_show(ref: str) -> dict:
     p = subprocess.run(["git", "show", f"{ref}:data/incidents.json"], cwd=ROOT, capture_output=True, check=True)
     return json.loads(p.stdout.decode("utf-8"))
@@ -136,6 +142,8 @@ def main() -> int:
     ap.add_argument("--after", default=str(ROOT / "data" / "incidents.json"))
     ap.add_argument("--out-md", help="the report as it goes into the PR body (capped, D123)")
     ap.add_argument("--out-full-md", help="the untruncated report (step summary / artifact)")
+    ap.add_argument("--out-json", help="machine-readable sidecar (D156a): the UNCAPPED per-field listed rows, "
+                    "read by scripts/check_corpus_flips.py as the declared set")
     a = ap.parse_args()
     d = diff(_git_show(a.before_ref), json.loads(Path(a.after).read_text(encoding="utf-8")))
     md = render_md(d)
@@ -143,6 +151,9 @@ def main() -> int:
         Path(a.out_full_md).write_text(md, encoding="utf-8", newline="\n")
     if a.out_md:
         Path(a.out_md).write_text(cap(md), encoding="utf-8", newline="\n")
+    if a.out_json:
+        Path(a.out_json).write_text(json.dumps(sidecar(d), indent=1, sort_keys=True) + "\n",
+                                    encoding="utf-8", newline="\n")
     print(md)
     print(f"[aiid-change-report] new={d['new_rows_total']} (aiid {d['new_aiid_rows']}) changed={d['changed_rows']}")
     return 0
