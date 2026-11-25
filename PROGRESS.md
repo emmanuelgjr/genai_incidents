@@ -14,6 +14,39 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-25 — D156(a)+D158 DONE: re-gate PASS on `7896c875`, MERGED to main (`8b6df9a9`)
+**Verdict: PASS, as sent by gate-d156a, judged against D158.** DEFECTS: none. Re-prompted once after about 8 h idle; the verdict then arrived.
+
+**Gate evidence [R]** (scratch clones at `7896c875`; real `retracted` block extracted via yaml, run under `bash --noprofile --norc -eo pipefail`, fake env):
+
+| check | result |
+|---|---|
+| (1) env-only crash injection | block rc 0; GITHUB_OUTPUT ends `needs_ruling=true`; UNKNOWN note in the body; exit 2 with no traceback |
+| (2) corrupted pair: INC-04853 non-AIID + INC-07566 AIID | rc 0; needs_ruling=true; table shows INC-04853 **UNDECLARED** first, then INC-07566 declared; "2 … 1 UNDECLARED, 1 declared" |
+| (2) control | count=0 / needs_ruling=false only; one-line body; no warning |
+| (3) mutants X1 / X2 / X3 / X5 | each fails tests (2 / 1 / 2 / 3) |
+| (3) mutant X4 | **survives** (see advisory A1) |
+| (4) writes | only RUNNER_TEMP / GITHUB_OUTPUT / STEP_SUMMARY, all `\|\| true`; no `uses:` changes; Guard unchanged |
+| (5) test_aiid_change_report | anchor-only change; strength re-proven by mutants |
+| (6) suite / validate / drift / YAML | 1691/1/1; validate rc 0; drift clean; YAML parses |
+| (7) PR #110 | 1 flip, declared, rc 1 → needs_ruling; control 0 |
+
+**Foreman merge check [R]** (`--no-ff` onto `6ad2f9b1`):
+- `git diff --stat 7896c875 HEAD` = PROGRESS.md only, so gated code equals merged code.
+- `git diff --quiet HEAD^1 HEAD -- data ingest docs/data src`: no data moved.
+- validate rc 0; drift clean; YAML ok; touched test files 70 passed, 1 xfailed; porcelain empty. Pushed.
+
+**docs-warden not dispatched:** no published count, claim or version changed. The CHANGELOG/SOURCE_LICENSES lines were gated.
+
+**Advisories carried (follow-up candidates, not started):**
+- **A1:** mutant X4 (the rc 0 `[ -s ]` guard dropped) survives. Add an `exit 0` no-file stub to the parametrized failure test.
+- **A2:** this step can append about 900 KB + 900 KB to the 1 MiB step summary. If it overflows, GitHub may drop the summary, and the flip list has no artifact. Upload `corpus-flips-full.md` as an artifact, or give the two writes a shared budget.
+- **A3:** the docstring line 2 still says "undeclared corpus-flip check".
+- **A4:** untested until live: the real Actions shell, duplicate-key last-wins, rendering.
+- **A5:** under D158 the declared column only affects display, not the flag.
+
+**Sun 11-29 refresh is the first live run of D155 + D156(a).** Expect about 34 D155 row changes (attack_vector/severity/OWASP/ATLAS), with no corpus flips predicted from D155. Any corpus flip will now label the PR needs-ruling.
+
 ### 🔍 2026-11-25 — D156(a) bounce-1 + D158 fix REPORTED `7896c875` (pushed, ls-remote equal) → RE-GATE sent to gate-d156a
 **Foreman check [R]:** 6 files, +260/−78. No data/ingest/PROGRESS delta. 0 C0 control bytes.
 
