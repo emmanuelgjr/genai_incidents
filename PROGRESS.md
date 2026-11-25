@@ -14,6 +14,48 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-25 — D155 DONE: MERGED to main (`d7017c5c`) via D157 (apply verbatim + foreman string check / fire-proof on `ca3158aa`)
+**String check [R]:**
+- `git diff --stat 212dfefd ca3158aa` = `scripts/audit/d155_counterfactual_apply.py` only (+12/−4).
+- 0 control bytes; the whole-word rce literal is present. The diff matches the gate's three changes exactly.
+
+**Fire-proof [R]** (scratch `--shared` clones):
+
+| run | result |
+|---|---|
+| the `ca3158aa` script inside an `a4776e41` clone | exit 1 "pre-D155 classifier"; porcelain 0 |
+| at `ca3158aa`, no arg | exit 2 |
+| target `ingest/aiid_full.json` | exit 2 |
+| aliased path `./ingest/../ingest/aiid_full.json` | exit 2 |
+| porcelain after the refusals | 0 |
+| real run to a scratch OUT | exit 0; porcelain 0; OUT vs ingest: 1,726 rows, **34 changed** (matches the gated counterfactual) |
+
+**Merge [R]** (`--no-ff` onto `f7f38f50`, no conflicts):
+- `git diff --quiet HEAD^1 HEAD -- data ingest docs/data src` = no change, **so NO DATA MOVED** (as gated).
+- validate rc 0; drift clean; D155 + INC-07572 tests 13 passed; porcelain empty.
+- `git diff --stat ca3158aa HEAD` = PROGRESS.md only, so the gated code equals the merged code.
+- Pushed; ls-remote = `d7017c5c`.
+
+**Effect at the Sun 11-29 refresh (gated counterfactual):** about 34 rows change from the title-derivable set:
+- severity High→Medium on 12;
+- attack_vector 32 (23 → other; 9 → privacy-violation/deepfake/algorithmic-bias/unsafe-advice);
+- owasp_asi 32, owasp_llm 18, mitre_atlas 18, tactics 17, nist 17.
+
+Plus an unknown share of the 124 description-decided rows and the 7 non-reproducible ones. The D120 report lists severity and attack_vector per row; owasp/atlas/nist appear as counts only.
+
+**docs-warden not dispatched:** no published count, claim or version changes at merge.
+
+**Follow-ups carried:**
+1. D120 `LISTED_FIELDS` += owasp_llm/owasp_asi/mitre_atlas, or a D155 attribution note on the refresh PR.
+2. The `ransom` rule's misfire on voice-scam rows (537/891/1615) → label-scientist.
+3. More bare substrings, for a user ruling:
+   - `:33` SECURITY_KEYWORDS admission (worm/hack/token/bias/agent);
+   - the `election` rule;
+   - severity `dead`;
+   - `pgd`/`fgsm`.
+4. AIRI co-source labels cannot be cleared by AIID refreshes (D154 scope).
+5. Stale `title_proven` key names in `d155_rce_offline_delta.py`.
+
 ### ⚖ 2026-11-25 — USER RULING D157: D155 bounce #2 → "apply verbatim + string check" (Recommended)
 - pe-d155 applies the gate's three changes to `d155_counterfactual_apply.py` only:
   - (a) a required output path, refusing in-place writes;
