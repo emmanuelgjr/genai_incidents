@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔍 2026-11-24 — label-scientist DISPATCHED (`ls-aiid-corpus`): AIID corpus classifier follow-ups (1) INC-07572 and (2) the AIID no-match default
+**Setup and scope**
+- User request: dispatch label-scientist on both follow-ups.
+- Worktree `C:/repos/gi-wt-aiidcorpus`, branch `ws2/aiid-corpus-followups-2026-11-24`, from `8753a7fe`.
+- **Phase A only:**
+  - root cause of the INC-07572 flip;
+  - sampled error rate of the AIID corpus/attack_vector labels;
+  - an option menu with a full field-level dry-run delta per option;
+  - a check that is proven to fire.
+- Optional: the INC-07572-only fix through the override or classifier path.
+- **No mass relabel or AIID-default change without a user ruling.**
+
+**Foreman's hypothesis (may be wrong; the specialist measures it):** `_classify_corpus` (`scripts/merge_and_dedupe.py:757`) defaults to `security` on no match and uses substring keywords.
+
+**Next step:** red-reviewer gates the report.
+
 ### ✅ 2026-11-24 — USER RULINGS: refresh PR #110 MERGED (`f6f3e36c`, incident_count 15,780 → 15,804) + Dependabot #105–#109 merged (`89a9825c`)
 **Why the count looked stale:**
 - The 11-15 and 11-22 refresh runs were both green. PR #110 sat unmerged for 9 days, and nothing in the pipeline was broken.
