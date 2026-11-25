@@ -14,6 +14,56 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ↩️ 2026-11-25 — D155 BOUNCE #1 (gate-d155 on `e07d302a`): the audit doc only; code, tests and scope PASS
+**Verdict: BOUNCE, as sent by gate-d155.**
+
+**Passed [R]:**
+- 4 files, +124/−2. `_SECURITY_KEYWORDS_FOR_CORPUS` and the OECD classifier are untouched. 0 control bytes.
+- Fire-proof: the new tests in a scratch clone at `a4776e41` give 6 failed / 5 passed; at `e07d302a`, 11 passed.
+- Suite 1661/1/1; validate and drift clean; porcelain empty; network guard present.
+- **"No data moves on merge" CONFIRMED:** full build chain at both SHAs, then `diff -rq` on data/ and README: no difference.
+
+**Defects (all in `docs/audits/d155-aiid-rce-boundary-2026-11-25.md`):**
+1. **The effect is stated at snapshot level, as if it were the published effect.**
+   - Gate counterfactual (scratch clone at `a4776e41`): fixed rules applied to the 34 title-reproducible candidates, then a refresh merge (`GENAI_REFRESH_RUN=1`), then a per-entity diff against the base build. **34 INC rows change:**
+
+     | field | rows |
+     |---|---|
+     | attack_vector | 32 |
+     | owasp_asi | 32 |
+     | owasp_llm | 18 |
+     | mitre_atlas | 18 |
+     | mitre_atlas_tactics | 17 |
+     | nist_ai_rmf | 17 |
+     | **severity** | **12, not 36** |
+     | updated / last_seen | 34 |
+
+   - Cause: `merge_into` keeps the max severity across co-sources, so the held AIRI rows (31 of 41 candidates) and OECD members mask the change. LLM10 and AML.T0050 survive on about half the rows (e.g. INC-07518 through its AIRI row).
+   - The doc never names nist_ai_rmf, tactics, updated or last_seen.
+   - Merge step 4b reclassifies "other": 9 of 32 rows land on privacy-violation / deepfake / algorithmic-bias / unsafe-advice.
+   - "The D120 report is the authority" is true only for the 124 description-decided rows (plus the 7 in defect 3).
+2. **"6 have a real term in the title" is false:** all 6 (AIID-537, 891, 1201, 1578, 1615, 1661) are `ransom` only. "Plus ransom rows" implies more rows that do not exist. **Foreman [R]:** a title regex on `ingest/aiid_full.json` gives real=False and ransom=True for all 6.
+3. **For 7 of the 40 "title-proven" rows, the old code on the title does NOT reproduce the stored labels** (AIID-444, 1008, 1106, 1204, 1414, 1431, 1588). They must be separated out.
+
+**Concern answers [R]:**
+1. **Reconciliation:** both documents are right, counting different universes. The snapshot has 1,726 AIID rows, 170 of them rce (124/40/6). The corpus has 1,645 INC rows, 161 of them rce (118/38/5). All snapshot ids are in the corpus; multi-AIID rows explain the gap.
+2. **D155 does take effect, partially:**
+   - `build_entry` re-runs `map_taxonomy`/`severity_for` on every kept row and rewrites `aiid_full.json`;
+   - D114 lifted the AIID snapshot;
+   - the D71 hold applies only when OECD inputs differ;
+   - but co-source masking (AIRI held/retired, OECD) limits the reach.
+3. **The D120 report** shows changed=34, with per-row severity and attack_vector; owasp/atlas/nist appear only as counts, and nothing attributes the changes to D155.
+
+**Advisories:**
+1. A follow-up task: add owasp_llm/owasp_asi/mitre_atlas to the D120 `LISTED_FIELDS`, or give the refresh PR a D155 attribution note.
+2. `ransom` → attack_vector rce/ASI05/ASI10 on voice-scam "fake ransom call" rows (537, 891, 1615) is semantically wrong. Label-scientist backlog.
+3. AIRI co-source labels can never be cleared by an AIID refresh, which matters for the D153/D154 relabel scope.
+4. The `:33` admission finding is confirmed.
+
+**Note:** the gate's counterfactual evidence is in the session scratchpad (`cfprep.out`, `cf-report-full.md`), which is ephemeral. The figures above are its durable record.
+
+**Redispatch:** to the SAME pe-d155 instance. It reported promptly and completely, so per agreement 3 this is a re-prompt. Doc-only fix.
+
 ### 🔍 2026-11-25 — D155 REPORTED `e07d302a` (pushed, ls-remote equal) → GATE DISPATCHED (`gate-d155`, worktree `C:/repos/gi-wt-gate-d155`)
 **Specialist claims (testimony).**
 - Changes:
