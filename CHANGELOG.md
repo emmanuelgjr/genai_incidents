@@ -198,6 +198,13 @@ Merged after the v2.13.0 tag (`e6eb3410`).
   limit (`scripts/cap_pr_body.py`).
 - **D121:** the AIID-side refusal stays fail-closed, and the abort message now says that
   AIAAIC, KEV and the CVE sweep did not ship.
+- **D156(a) / D158:** the refresh PR runs a per-entity corpus-flip check
+  (`scripts/check_corpus_flips.py`). Every existing row whose `corpus` changed against `main`
+  is listed in the PR body with its source ids, marked declared or UNDECLARED against the
+  D120 report (read from its new JSON sidecar, `aiid_change_report.py --out-json`), and flags
+  the PR `needs-ruling` (D158: corpus feeds the site filter and the exports). Added or removed
+  rows are not flips. If the check cannot run the PR is flagged with the state UNKNOWN. It does
+  not block, and the dataset is unchanged.
 
 ### Fixed - refresh drift gate and AIAAIC loud failure (tooling only)
 

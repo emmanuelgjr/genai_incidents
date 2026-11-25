@@ -16,13 +16,23 @@ Rows present at only one side (added / removed) are not flips: they are counted 
 printed but never reported as flips. (Additions and removals are covered by the
 D120 report's row counts and by the retraction report.)
 
-Flags, never blocks (D120 posture): the workflow turns exit 1 into needs-ruling.
-Exit 0 = no undeclared flip; 1 = at least one undeclared flip; 2 = the check could
-not run (bad/missing D120 JSON, unreadable base). Read-only: writes only --out-md.
-No network, no model call.
+D158 (user ruling 2026-11-25): EVERY corpus flip, declared or not, flags the PR
+needs-ruling and is listed in the PR body (corpus feeds the site filter and the
+exports; there are only a handful a week). The declared/undeclared distinction is
+kept as a column; undeclared flips are marked UNDECLARED and listed first because
+they are the worse case (D156a: PR #110's INC-07572 flipped through an upstream
+text edit).
+
+Flags, never blocks (D120 posture). Exit codes:
+  0  no flips                      (the workflow adds a one-line note, no needs-ruling)
+  1  one or more flips, any        (declared or not; needs-ruling)
+  2  the check could not run       (bad/missing sidecar, unreadable base, ANY other
+                                    exception; needs-ruling, state UNKNOWN)
+Whether any flip was undeclared is in the report and the last stdout line.
+Read-only: writes only --out-md / --out-full-md. No network, no model call.
 
     python scripts/check_corpus_flips.py --declared-json FILE [--before-ref HEAD]
-        [--after data/incidents.json] [--out-md FILE]
+        [--after data/incidents.json] [--out-md FILE] [--out-full-md FILE]
 """
 from __future__ import annotations
 
@@ -84,23 +94,26 @@ def compare(before: dict, after: dict, declared: dict[str, tuple]) -> dict:
             "added": len(set(a) - set(b)), "removed": len(set(b) - set(a))}
 
 
-def render_md(r: dict, ref: str) -> str:
-    n, bad = len(r["flips"]), r["undeclared"]
-    if not bad:
-        return (f"Corpus flips: {n}, all declared in the D120 report "
-                f"(rows added {r['added']} / removed {r['removed']} are not flips and are not checked here).\n")
-    L = ["### Undeclared corpus flips (D156a)", "",
-         f"**{len(bad)} existing row(s) changed `corpus` relative to `{ref}` without being declared in the D120 "
-         f"report** (of {n} flip(s) total). Per-entity check; the PR is labelled `needs-ruling`. The refresh was not "
-         "blocked. Review each row's title/description change before merging "
-         "(PR #110's INC-07572 flipped through an upstream text edit).", "",
-         "| entry | before | after | source ids |", "|---|---|---|---|"]
-    L += [f"| {f['id']} | {f['before']} | {f['after']} | {f['sources'].replace('|', '/')} |"
-          for f in bad[:MAX_ROWS]]
-    if len(bad) > MAX_ROWS:  # keep the PR body bounded (D123); the exact list is in the step summary / logs
-        L += [f"| ... {len(bad) - MAX_ROWS} more undeclared flips (compare `corpus` against `{ref}`) | | | |"]
-    L += ["", f"Declared flips: {n - len(bad)}. Rows added {r['added']} / removed {r['removed']} are not flips "
-          "and are not checked here.", ""]
+def render_md(r: dict, ref: str, max_rows: int | None = MAX_ROWS) -> str:
+    """Body copy is capped at max_rows table rows (D123); max_rows=None is the full list."""
+    flips, bad = r["flips"], r["undeclared"]
+    n = len(flips)
+    tail = (f"rows added {r['added']} / removed {r['removed']} are not flips and are not checked here")
+    if not n:
+        return f"Corpus flips: 0 ({tail}).\n"
+    ordered = bad + [f for f in flips if f["declared"]]  # undeclared first
+    L = ["### Corpus flips (D156a/D158 check)", "",
+         f"**{n} existing row(s) changed `corpus` relative to `{ref}`; {len(bad)} UNDECLARED, {n - len(bad)} declared** "
+         "in the D120 report. Every corpus change is flagged (D158): the PR is labelled `needs-ruling`. The refresh was "
+         "not blocked. Review each row's title/description change before merging (PR #110's INC-07572 flipped "
+         "through an upstream text edit).", "",
+         "| entry | before | after | source ids | D120 |", "|---|---|---|---|---|"]
+    shown = ordered if max_rows is None else ordered[:max_rows]
+    L += [f"| {f['id']} | {f['before']} | {f['after']} | {f['sources'].replace('|', '/')} | "
+          f"{'declared' if f['declared'] else '**UNDECLARED**'} |" for f in shown]
+    if len(shown) < n:
+        L += [f"| ... {n - len(shown)} more flips (the full list is in the run's step summary) | | | | |"]
+    L += ["", f"Rows added {r['added']} / removed {r['removed']} are not flips and are not checked here.", ""]
     return "\n".join(L)
 
 
@@ -112,30 +125,37 @@ def _git_show(ref: str) -> dict:
         raise CheckError(f"cannot read data/incidents.json at {ref}: {type(ex).__name__}") from ex
 
 
+def run(a) -> int:
+    declared = load_declared(a.declared_json)
+    try:
+        after = json.loads(Path(a.after).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as ex:
+        raise CheckError(f"cannot read {a.after}: {type(ex).__name__}") from ex
+    r = compare(_git_show(a.before_ref), after, declared)
+    md = render_md(r, a.before_ref)
+    if a.out_md:
+        Path(a.out_md).write_text(md, encoding="utf-8", newline="\n")
+    if a.out_full_md:
+        Path(a.out_full_md).write_text(render_md(r, a.before_ref, None), encoding="utf-8", newline="\n")
+    print(md)
+    print(f"[corpus-flips] flips={len(r['flips'])} undeclared={len(r['undeclared'])} "
+          f"added={r['added']} removed={r['removed']}")
+    return 1 if r["flips"] else 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--before-ref", default="HEAD")
     ap.add_argument("--after", default=str(ROOT / "data" / "incidents.json"))
     ap.add_argument("--declared-json", required=True, help="sidecar from aiid_change_report.py --out-json")
-    ap.add_argument("--out-md")
+    ap.add_argument("--out-md", help="PR-body copy (capped)")
+    ap.add_argument("--out-full-md", help="uncapped list (step summary)")
     a = ap.parse_args(argv)
     try:
-        declared = load_declared(a.declared_json)
-        try:
-            after = json.loads(Path(a.after).read_text(encoding="utf-8"))
-        except (OSError, ValueError) as ex:
-            raise CheckError(f"cannot read {a.after}: {type(ex).__name__}") from ex
-        r = compare(_git_show(a.before_ref), after, declared)
-    except CheckError as ex:
-        print(f"[corpus-flips] ERROR: {ex}", file=sys.stderr)
+        return run(a)
+    except Exception as ex:  # fail closed: ANY failure is exit 2, never a traceback's exit 1 (= "flips found")
+        print(f"[corpus-flips] ERROR: {type(ex).__name__}: {ex}", file=sys.stderr)
         return 2
-    md = render_md(r, a.before_ref)
-    if a.out_md:
-        Path(a.out_md).write_text(md, encoding="utf-8", newline="\n")
-    print(md)
-    print(f"[corpus-flips] flips={len(r['flips'])} undeclared={len(r['undeclared'])} "
-          f"added={r['added']} removed={r['removed']}")
-    return 1 if r["undeclared"] else 0
 
 
 if __name__ == "__main__":

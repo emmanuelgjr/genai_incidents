@@ -526,7 +526,8 @@ jobs:
           # value) and the refresh continues.
           if python scripts/aiid_change_report.py --before-ref HEAD \
                --out-md "$RUNNER_TEMP/aiid-change-report.md" \
-               --out-full-md "$RUNNER_TEMP/aiid-change-report-full.md"                --out-json "$RUNNER_TEMP/aiid-change-report.json"; then
+               --out-full-md "$RUNNER_TEMP/aiid-change-report-full.md" \
+               --out-json "$RUNNER_TEMP/aiid-change-report.json"; then
             # D123: the PR body gets the capped copy (GitHub's body limit is
             # 65,536 characters); the full report goes to the step summary
             # (1 MiB limit, so clipped at 900,000 bytes) and to an artifact.
@@ -542,31 +543,37 @@ jobs:
             } >> "$RUNNER_TEMP/pr-body.md"
             echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
           fi
-          # D156a: per-entity undeclared corpus-flip check (flag, never block).
-          # Every row present on main and in this build whose corpus changed must
-          # be listed in the D120 report's corpus table (read from its JSON
-          # sidecar, not its markdown). Any other flip - including every flip on
-          # a non-AIID row, which D120 never covers - flags the PR needs-ruling.
-          # Exit 0 clean, 1 undeclared flip(s), 2 the check could not run. Read-
-          # only: writes only under RUNNER_TEMP, never data/ or a held path.
+          # D156a + D158: per-entity corpus-flip check (flag, never block). EVERY
+          # row present on main and in this build whose corpus changed is listed
+          # in the PR body and flags the PR needs-ruling (D158: corpus feeds the
+          # site filter and the exports); the body marks each flip as declared in
+          # the D120 report (read from its JSON sidecar, not its markdown) or
+          # UNDECLARED. Exit 0 = no flips, 1 = flips found (any), 2 = the check
+          # could not run. Anything that is not provably "0 flips with a note
+          # written" is treated as UNKNOWN and flags needs-ruling, and
+          # needs_ruling=true is written BEFORE any step that could abort under
+          # -e. Read-only: writes only under RUNNER_TEMP, never data/ or a held path.
           flip_rc=0
-          python scripts/check_corpus_flips.py --before-ref HEAD             --declared-json "$RUNNER_TEMP/aiid-change-report.json"             --out-md "$RUNNER_TEMP/corpus-flips.md" || flip_rc=$?
-          if [ "$flip_rc" = "0" ]; then
-            { echo; cat "$RUNNER_TEMP/corpus-flips.md"; } >> "$RUNNER_TEMP/pr-body.md"
-          elif [ "$flip_rc" = "1" ]; then
-            echo "::warning::check_corpus_flips.py found corpus flips not declared in the D120 report; flagging the PR needs-ruling."
-            { echo; cat "$RUNNER_TEMP/corpus-flips.md"; } >> "$RUNNER_TEMP/pr-body.md"
-            cat "$RUNNER_TEMP/corpus-flips.md" >> "$GITHUB_STEP_SUMMARY" || true
+          python scripts/check_corpus_flips.py --before-ref HEAD \
+            --declared-json "$RUNNER_TEMP/aiid-change-report.json" \
+            --out-md "$RUNNER_TEMP/corpus-flips.md" \
+            --out-full-md "$RUNNER_TEMP/corpus-flips-full.md" || flip_rc=$?
+          if [ "$flip_rc" = "0" ] && [ -s "$RUNNER_TEMP/corpus-flips.md" ]; then
+            { echo; cat "$RUNNER_TEMP/corpus-flips.md"; } >> "$RUNNER_TEMP/pr-body.md" || true
+          elif [ "$flip_rc" = "1" ] && [ -s "$RUNNER_TEMP/corpus-flips.md" ]; then
             echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::check_corpus_flips.py found corpus flips (D158: every corpus change is flagged); flagging the PR needs-ruling."
+            { echo; cat "$RUNNER_TEMP/corpus-flips.md"; } >> "$RUNNER_TEMP/pr-body.md" || true
+            head -c 900000 "$RUNNER_TEMP/corpus-flips-full.md" >> "$GITHUB_STEP_SUMMARY" || true
           else
-            echo "::warning::check_corpus_flips.py could not run (exit $flip_rc); flagging the PR needs-ruling (unknown corpus-flip state)."
+            echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::check_corpus_flips.py could not run or wrote no report (exit $flip_rc); flagging the PR needs-ruling (unknown corpus-flip state)."
             {
               echo
-              echo "### Corpus flips (D156a undeclared-flip check)"
+              echo "### Corpus flips (D156a/D158 check)"
               echo
-              echo "**The corpus-flip check could not be run** (see the workflow run). Whether this refresh flipped any existing row's \`corpus\` without declaring it is UNKNOWN, so the PR is labelled \`needs-ruling\`; compare \`corpus\` per row against \`main\` by hand. The refresh was not blocked."
-            } >> "$RUNNER_TEMP/pr-body.md"
-            echo "needs_ruling=true" >> "$GITHUB_OUTPUT"
+              echo "**The corpus-flip check could not be run** (see the workflow run). Whether this refresh changed any existing row's \`corpus\` is UNKNOWN, so the PR is labelled \`needs-ruling\`; compare \`corpus\` per row against \`main\` by hand. The refresh was not blocked."
+            } >> "$RUNNER_TEMP/pr-body.md" || true
           fi
 
       # D123: the full, untruncated AIID change report (the PR body carries a

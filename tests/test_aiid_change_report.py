@@ -85,7 +85,7 @@ def check_wiring(text: str) -> list[str]:
     if "scripts/aiid_change_report.py" not in text:
         return ["workflow never runs scripts/aiid_change_report.py"]
     seg = text[text.index("scripts/aiid_change_report.py"):]
-    seg = seg[:seg.index("D156a: per-entity")]  # the D120 block only; D156a has its own tests
+    seg = seg[:seg.index("D156a + D158: per-entity")]  # the D120 block only; D156a has its own tests
     if 'cat "$RUNNER_TEMP/aiid-change-report.md"' not in seg or 'pr-body.md' not in seg:
         problems.append("report output is not appended to pr-body.md")
     if 'needs_ruling=true' not in seg:
@@ -106,6 +106,6 @@ def test_wiring_check_fires_when_the_append_or_the_flag_is_removed():
     seg_start = text.index("aiid_change_report.py failed")
     no_flag = text[:seg_start] + text[seg_start:].replace('echo "needs_ruling=true" >> "$GITHUB_OUTPUT"', "true", 1)
     assert any("needs-ruling" in p for p in check_wiring(no_flag))
-    aborts = text.replace("The refresh was not blocked.\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            echo \"needs_ruling=true\" >> \"$GITHUB_OUTPUT\"\n          fi\n          # D156a: per-entity",
-                          "x\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            exit 1\n          fi\n          # D156a: per-entity")
+    aborts = text.replace("The refresh was not blocked.\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            echo \"needs_ruling=true\" >> \"$GITHUB_OUTPUT\"\n          fi\n          # D156a + D158: per-entity",
+                          "x\"\n            } >> \"$RUNNER_TEMP/pr-body.md\"\n            exit 1\n          fi\n          # D156a + D158: per-entity")
     assert aborts != text and any("fail soft" in p for p in check_wiring(aborts))
