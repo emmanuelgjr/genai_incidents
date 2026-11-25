@@ -14,6 +14,34 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-24 — USER RULINGS: refresh PR #110 MERGED (`f6f3e36c`, incident_count 15,780 → 15,804) + Dependabot #105–#109 merged (`89a9825c`)
+**Why the count looked stale:**
+- The 11-15 and 11-22 refresh runs were both green. PR #110 sat unmerged for 9 days, and nothing in the pipeline was broken.
+- Merging a refresh PR is a user decision, so the count waits on that decision.
+- The D63 overdue alert did not fire because the refreshes themselves succeeded; only the merge was pending.
+
+**Review:** `docs/audits/refresh-pr-110-review-2026-11-24.md` (`42ca3d6e`). Foreman testimony, no red-reviewer gate (D112 precedent: the user reviews refresh PRs).
+
+**Per-entity delta [R]:**
+- Rows 15,821 → 15,845; 0 removed; +24 AIID-only rows (INC-17371..17394).
+- 33 existing rows changed:
+  - 9 AIID rows exactly match the D120 table;
+  - 24 CVE rows changed only `status_reason.as_of` (routine re-check: sweep 1,200/9,169, 0 state changes).
+- No OECD, AIRI or AIAAIC ingest file changed.
+
+**Checks:**
+- Dispatched Validate and a11y passed on head `42531400`.
+- The merged tree equals `42531400` plus the audit file only (`git diff --stat` shows 1 file), so that CI covers the merge.
+- On the merged tree: `validate.py`, `check_stats_drift.py` and `lint_atlas_ids.py` are clean.
+
+**Dependabot:**
+- Merged: checkout v7.0.1 (13 pins), setup-chrome v2.2.0, configure-pages v6.0.0, create-pull-request v8.1.2, pypi-publish v1.14.3.
+- **Live test pending:** the Sun 2026-11-29 scheduled refresh is the first run of checkout v7 + create-pull-request 8.1.2 on the PR-opening path. The next Pages deploy is the first run of configure-pages v6.
+
+**Follow-ups (label-scientist, not yet dispatched):**
+- (1) INC-07572 corpus ai-harm → security, from an upstream deployer-string change. This is description→classifier coupling (WS0-T3 shape) and probably a wrong label.
+- (2) All 24 new AIID rows got corpus `security`, including medical, facial-recognition and AV harms; INC-17387 (rent advice) is labelled `rce`. This is pre-existing: 1,411/1,621 AIID rows on main are `security`.
+
 ### ✅ D130-3a references batch 1 (+ the 6 D130-2 deferred rows) DONE: MERGED 2026-11-11 (`686f2f4b`; gate-d1303a re-gate PASS on `163d0e26` after bounce #1, plus prose-only `d1d97035`)
 **Verdict: PASS (re-gate), as sent by gate-d1303a.** DEFECTS: none. All 4 bounce-#1 defects are fixed, each checked by the gate's own route:
 1. INC-01600 at 163d0e26 equals 64109452 (whole-object compare), with no CORRECTIONS line and no override, recorded "unchanged (deferred to WS4-T19)".
