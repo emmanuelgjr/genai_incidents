@@ -118,7 +118,7 @@ Estimated wrong corpus labels across the 1645 AIID rows: 746 (45.3%)
 Weighted: security precision 49.0%; ai-harm precision 93.3%; ai-harm recall 21.0%
 ```
 
-Under R2 the estimate is 1,019 wrong (62.0%). All of the extra errors come from `sec-keyword`: 14 of 30 rows there are non-fraud deepfake, CSAM or disinformation.
+Under R2 the estimate is 1,019 wrong (62.0%). Most of the extra errors (about 248 of the net 273) come from `sec-keyword`: 14 of 30 rows there are non-fraud deepfake, CSAM or disinformation. `default` adds about 39 and `harm` removes about 14.
 
 The per-class confusion, population-weighted, R1:
 
@@ -160,7 +160,7 @@ attack_vector:
 | **wrong** | INC-17390 | `tool-abuse` (LLM03, ASI02, AML.T0053). It is the agent tool-misuse vector, but this is a deployer privacy violation. |
 | **wrong** | INC-17394 | `deepfake`. The merge rule `impersonat→deepfake` fires, but the agents impersonated staff with no synthetic media. |
 | **unverifiable** | INC-17386 | `rce`. The title has no rce, remote-code or ransom term. The value came from AIID's description, which the ingest uses only in memory and never stores (licence rule), so it cannot be re-derived offline. |
-| **generic** | 11 rows | `other` where a specific vector exists. That is a missed label, not a wrong one. |
+| **generic** | 10 rows | `other` where a specific vector exists. That is a missed label, not a wrong one. |
 
 Scale beyond the 24 new rows (`python scripts/audit/aiid_corpus_audit.py avscan`):
 
@@ -290,3 +290,10 @@ Every delta is enumerated and intended:
 Files changed: `INCIDENTS.md`, `README.md`, `data/curation_overrides.json`, `data/incidents.json`, `data/incidents.min.json`, `data/stats.json`, `docs/data/incidents.min.json` and `src/genai_incidents/data/incidents.min.json`. The first build of this tree with no override gave an empty porcelain, so the base reproduces.
 
 Aside, not acted on: the 164 AIID+OECD rows ignore the OECD-persisted corpus because `merge_into` does not carry it. 14 of them disagree with their OECD members after O1, and 15 did at base.
+
+## Corrections (gate bounce 1, 2026-11-25)
+
+The red-reviewer gate found two text errors before merge. Both were re-derived from the committed evidence and fixed in place. No data, script or test changed.
+
+1. §3.2. Old: "All of the extra errors come from `sec-keyword`: 14 of 30 rows there are non-fraud deepfake, CSAM or disinformation." New: "Most of the extra errors (about 248 of the net 273) come from `sec-keyword`: 14 of 30 rows there are non-fraud deepfake, CSAM or disinformation. `default` adds about 39 and `harm` removes about 14." Basis: from R1 to R2, the sample's wrong counts per stratum in `adjudication.csv` are sec-keyword 1→14 (+248.3 population-weighted), default 33→35 (+39.3), harm 2→0 (−13.9) and rce-artifact 25→25 (0). The unrounded net is +273.7, which matches 746→1,019 on the rounded totals.
+2. §3.4 attack_vector table. Old: "| **generic** | 11 rows |". New: "| **generic** | 10 rows |". Basis: `new24.csv` has 10 generic rows (INC-17372, 17373, 17374, 17375, 17378, 17379, 17380, 17381, 17383, 17384). The verdict tally is ok 10, generic 10, wrong 3, unverifiable 1, for a total of 24.
