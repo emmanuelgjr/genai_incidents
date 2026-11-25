@@ -1,9 +1,17 @@
-"""D155 counterfactual, step 1. Run INSIDE a scratch clone at the base commit: python cf_apply.py
-Rewrites ingest/aiid_full.json for the title-reproducible candidates using the FIXED rules; then run
+"""D155 counterfactual, step 1. Run INSIDE a scratch clone at the fix commit (D155 or later):
+python scripts/audit/d155_counterfactual_apply.py OUT.json
+Reads ingest/aiid_full.json and writes OUT.json (never in place) for the title-reproducible candidates using the FIXED rules; then the caller copies OUT.json over the scratch clone's ingest/aiid_full.json and runs
 parse_existing.py + GENAI_REFRESH_RUN=1 merge_and_dedupe.py and diff with d155_counterfactual_diff.py (base build saved as ../base_incidents.json)."""
-import json,re,sys
+import json,os,re,sys
+if len(sys.argv)!=2:
+    print('usage: d155_counterfactual_apply.py OUT.json (output path required)',file=sys.stderr); sys.exit(2)
+OUT=sys.argv[1]
+if os.path.realpath(OUT)==os.path.realpath('ingest/aiid_full.json'):
+    print('refusing to overwrite ingest/aiid_full.json in place',file=sys.stderr); sys.exit(2)
 sys.path.insert(0,'scripts')
 import scrape_aiid as new
+if not any(p.startswith(r'\brce') for p,*_ in new.TAXONOMY_RULES):
+    print('imported scrape_aiid is the pre-D155 classifier; run this script at the fix commit (D155 or later)',file=sys.stderr); sys.exit(1)
 rows=json.load(open('ingest/aiid_full.json',encoding='utf-8'))
 EMB=re.compile('rce'); REAL=re.compile(r'\brce\b|remote code|command injection|sandbox escape')
 # old-rule reference: new rules but with the old patterns
@@ -34,5 +42,5 @@ for r in rows:
     tx=new.map_taxonomy(e)
     r['owasp_llm'],r['owasp_asi'],r['mitre_atlas'],r['attack_vector']=tx['owasp_llm'],tx['owasp_asi'],tx['mitre_atlas'],tx['attack_vector']
     r['severity']=new.severity_for(e)
-json.dump(rows,open('ingest/aiid_full.json','w',encoding='utf-8'),indent=2,ensure_ascii=False)
+json.dump(rows,open(OUT,'w',encoding='utf-8'),indent=2,ensure_ascii=False)
 print(len(cand),'reproducible',cand);print(len(nonrep),'not reproducible',nonrep)
