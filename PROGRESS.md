@@ -14,6 +14,43 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ↩️ 2026-11-25 — D156(a) BOUNCE #1 (gate-d156a on `c4b3bdca`) + USER RULING D158 → redispatched to pe-d156a
+**Verdict: BOUNCE (bounce 1), as sent by gate-d156a.**
+
+**Defects:**
+1. **A checker crash fails OPEN.**
+   - `main()` catches only `CheckError`, so other exceptions give exit 1, the same code as "undeclared".
+   - The workflow's rc=1 branch then runs an unguarded `cat` of a file that was never written, so the step aborts under `-eo pipefail` (continue-on-error).
+   - The last `needs_ruling` is newly_retracted's `false`: the PR opens unlabelled, the stale-label removal fires, there is no D156a section, and the warning is wrong.
+   - Gate proof [R], env-only injection: block rc 1, GITHUB_OUTPUT `count=0 / needs_ruling=false`, 0 D156a lines.
+2. **No test catches it:** removing `|| flip_rc=$?` leaves the `check_wiring` functions passing (mutant M1).
+
+**Gate answers [R]:**
+- (1) The flag reaches the label logic. It is the same step id `retracted`, which drives create-label, the cpr `labels:` and stale removal; last-wins is the same assumption D120 already relies on.
+- (2) The call is guarded, so exit 1/2 does not abort by itself; only defect 1's path aborts.
+- (3) The sidecar is bounded by AIID rows (507 B on PR #110, at most about 1–2 MB), written only to RUNNER_TEMP, not in the body, not uploaded.
+
+**Other evidence [R]:**
+- 7 files (not 8, as reported); no data delta; no `uses:` added; audit script untouched.
+- The PR #110 pair matches the gate's own per-entity derivation.
+- Control 0. Missing sidecar → rc 2.
+- Corrupted pair (non-AIID INC-04853 plus AIID INC-07566) through the real extracted block: as specified.
+- The narrowed existing-test slice is **stricter** (mutant M2 caught; the old slice would have passed).
+- Suite 1679/1/1; validate and drift clean.
+
+**Advisories:**
+- The workflow `\` continuations collapsed to spaces (cosmetic; escape collapse).
+- The MAX_ROWS comment claims an uncapped list exists, which is false.
+- No CHANGELOG line.
+- Pre-existing: the needs-ruling label description is stale.
+
+**⚖ USER RULING D158 (2026-11-25): flag EVERY corpus change.**
+- Any corpus flip, declared or not, gives `needs_ruling=true` plus a PR section naming each one: ID, before→after, source ids, and whether it was declared.
+- Undeclared flips are visibly marked.
+- Rationale: a handful per week, and corpus feeds the site filter and exports. INC-07572 was declared-but-unread.
+
+**Redispatch:** to the SAME pe-d156a, which reported promptly and completely. Fix both defects (an `except Exception`→2, plus a `[ -s ]` guard with UNKNOWN fallback; a test run under `-eo pipefail` with a crashing stub, fire-proofed), implement D158, and fix the advisories (comment, CHANGELOG, continuations).
+
 ### 🔍 2026-11-25 — D156(a) REPORTED `c4b3bdca` (pushed, ls-remote equal) → GATE DISPATCHED (`gate-d156a`, worktree `C:/repos/gi-wt-gate-d156a`)
 **Specialist claims (testimony):**
 - Deliverables:
