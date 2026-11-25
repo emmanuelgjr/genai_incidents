@@ -153,7 +153,7 @@ TAXONOMY_RULES = [
     (r"deepfake|voice clone|voice cloning|impersonat", ["LLM07"], ["ASI09"], ["AML.T0048"], "other"),
     (r"data\s+(leak|breach)|leaked.*data|exposed.*data|api\s+key", ["LLM02"], ["ASI03"], ["AML.T0057"], "data-exfiltration"),
     (r"ransom", [], ["ASI05", "ASI10"], ["AML.T0048"], "rce"),
-    (r"rce|remote code|command injection|sandbox escape", ["LLM10"], ["ASI05"], ["AML.T0050"], "rce"),
+    (r"\brce\b|remote code|command injection|sandbox escape", ["LLM10"], ["ASI05"], ["AML.T0050"], "rce"),
     (r"ssrf", ["LLM10"], ["ASI02"], ["AML.T0049"], "ssrf"),
     (r"supply chain", ["LLM04"], ["ASI04"], ["AML.T0010"], "supply-chain"),
     (r"model (theft|extract)|model extraction", ["LLM02"], [], ["AML.T0024.002"], "model-extraction"),
@@ -199,7 +199,8 @@ def severity_for(entry: dict) -> str:
     text = (entry["title"] + " " + entry["description"]).lower()
     if any(k in text for k in ["killed", "dead", "fatal", "death", "ransom", "$1m", "millions", "billion"]):
         return "Critical"
-    if any(k in text for k in ["breach", "stolen", "leaked", "rce", "remote code", "exfiltrat"]):
+    # D155: bare "rce" matched inside "Reinforced"/"enforcement"/"source"; whole word only.
+    if any(k in text for k in ["breach", "stolen", "leaked", "remote code", "exfiltrat"]) or re.search(r"\brce\b", text):
         return "High"
     return "Medium"
 
