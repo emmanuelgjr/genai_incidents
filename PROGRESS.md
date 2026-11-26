@@ -92,6 +92,22 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 - **Docs-warden** is dispatched for the counts and licence surfaces.
 - **Still open:** the D163 purge confirmation (user); D165 labels follow-up; D167 main-red alert.
 
+**Update, post-merge:**
+- **Post-merge runs on 2c56658f:** Pages deploy SUCCESS (the live site now shows 15,990), a11y SUCCESS and CodeQL SUCCESS. Validate is still running.
+- **Docs-warden (warden-d161):** counts are CLEAN. check_stats_drift is clean; the 3 data copies each hold 16,031 rows (15,990 + 29 retracted + 12 unverified); version strings are 2.13.0 and consistent; §1.9, NOTICE-DATA and dep5 agree. Findings:
+  1. **Contradiction:** NOTICE-DATA:27-36 says "eleven" obligation sources and omits the ledger.
+  2. **Soft contradiction:** the DATASHEET:137-177 licence exceptions have no ledger MIT bullet.
+  3. **Soft contradiction:** the HF card licensing text (export_huggingface.py:164-200) has the same gap.
+  4. **Advisory:** the README:418-433 licence list omits it, as it already does for AVID.
+  5. **Stale:** the DATASHEET:45-49 source list.
+  6. **Stale:** the HF card sources line (export_huggingface.py:152-154), which also still names AIRI, retired by D108.
+  7. **Stale:** README:25 and README:196-215 source lists.
+  8. **Advisory:** data/source_freshness.json has no ledger entry.
+  9. **Advisory:** illustrative counts in ID_POLICY:189 and VERSIONING:206.
+  10. **Advisory:** a dead "12,500+" comment at app.js:277.
+  The rendered HF card output was not checked.
+- **D168 dispatched to distribution-engineer** (branch d168-hiai-docs-align, gi-wt-d168): fix 1–7, decide on 8, and touch 9–10 only if clearly dead. §1.9, NOTICE-DATA and dep5 are the source of truth, with no new licence claims. It must render the HF card and run the drift check and suite. It goes to the gate next.
+
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
 - **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
