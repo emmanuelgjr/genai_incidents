@@ -252,7 +252,7 @@ line must be true.
 |---|---|---|---|
 | R1 | Ship `NOTICE-DATA`, `LICENSE-DATA`, `LICENSES/Apache-2.0.txt` byte-identical in the HF bundle, release assets, Pages tree, taxii2/misp trees, STIX download; list them in manifests/SUMS | distribution-engineer (HF build is pipeline code: pipeline-engineer for `export_huggingface.py`, `package_release_assets.py`; workflows: distribution-engineer) | Yes, light: confirms conservative reading as policy |
 | R2 | Add `LICENSES/Apache-2.0.txt` (verbatim SPDX) and correct SOURCE_LICENSES 3.1 wording (header-only LICENSE, GitHub NOASSERTION) | governance (file, cell edit) | No |
-| R3 | [AMENDED, Update item D: license-files and wheel contents are already fine] Fix only the License-Expression MIT mislabel on PyPI metadata | distribution-engineer | Yes: the expression choice is the user's (SPDX lists `cve-tou`, so a valid expression exists) |
+| R3 | Fix PyPI metadata: `license` expression covering MIT code and CC-BY data, `license-files` including the notices; verify wheel contents [AMENDED, Update item D: license-files and wheel contents are already fine; only the License-Expression MIT mislabel on PyPI metadata remains] | distribution-engineer | No (metadata); yes if the SPDX expression is contested [AMENDED: Yes: the expression choice is the user's (SPDX lists `cve-tou`, so a valid expression exists)] |
 | R4 | Narrow NOTICE-DATA and dep5 sentence (section 5.1) | governance | No |
 | R5 | Mark the 109 curated AVID rows (rule in section 3 F3.2) | pipeline-engineer | Yes: data change on shipped rows (delta approval) |
 | R6 | No marker for the 81 ledger-reference rows; no extension to NVD/GHSA/OSV rows now | governance (record in SOURCE_LICENSES) | Yes: confirm "no" on both |
@@ -426,9 +426,11 @@ that discharges the obligation, and its absence does not mean a row is
 unencumbered. These rows carry no marker: rows built by
 scripts/ingest_cve_nvd_expanded.py from the NVD API, the GitHub Advisory
 Database or OSV; the AVID- rows of ingest/avid_owasp_incidents.json; and the
-other rows that cite the ledger. The upstream licence of the origin applies to
+other rows that cite the ledger, which carry no hackingincidents marker (some
+carry another source's marker). The upstream licence of the origin applies to
 them, and the notice duty is met only for copies that carry the notices in
 this file. Counts are audited in docs/SOURCE_LICENSES.md, not restated here."
+[Ledger clause superseded by §9, user ruling D170; replaced in place.]
 
 Variant A2, apply only after ALL of: R1 has landed and shipped (notice files
 in every distribution), R5 has landed (109 curated AVID rows marked), and the
@@ -437,7 +439,10 @@ notice "is this file, which is shipped with every distribution of the
 dataset" (this statement is checkable by R1's byte-equality test); the avid
 marker list adds "including the AVID- rows of
 ingest/avid_owasp_incidents.json"; the unmarked list drops that file and names
-GHSA CC BY 4.0 text as covered by the GitHub Advisory Database paragraph. The
+GHSA CC BY 4.0 text as covered by the GitHub Advisory Database paragraph; the
+ledger clause reads as in A1 as replaced by §9: "and the other rows that cite
+the ledger, which carry no hackingincidents marker (some carry another
+source's marker)" [superseded by §9 for the earlier wording]. The
 dep5 clause (L67-69) takes the same variant at the same time. Separately and
 independent of either variant: dep5 L57-72 says "eleven sources" and "seven of
 the other eight", omits the ledger, while NOTICE-DATA says twelve and "eight
@@ -530,11 +535,14 @@ the gate.
   is my own 2026-07-15 wording and should be corrected in place on that live
   row. NVD's FAQ uses the variant "uses data from the NVD API". NVD also says
   that if you modify the content you "may not attribute the source as the
-  NVD", which is in tension with the 1,500-character truncation at
-  `ingest_cve_nvd_expanded.py` L881 and L1111: a truncated description should
-  not be presented as NVD's text. This goes to the user as part of R7
-  (decision 4): (i) notice or no notice, (ii) which variant, (iii) whether
-  truncated NVD-origin descriptions need a "modified" statement.
+  NVD". NVD-origin descriptions are carried verbatim
+  (ingest_cve_nvd_expanded.py L600); the NVD-path title is derived (first
+  sentence, truncated to 177 characters, L572-575), so the modification rule
+  bears on titles, not descriptions. The 1,500-character truncation (L881,
+  L1111) applies to GHSA and OSV text and is covered by 5.2's Changes
+  statement. [Truncation sentence superseded by §9, user ruling D170.] This
+  goes to the user as part of R7 (decision 4): (i) notice or no notice, (ii)
+  which variant, (iii) whether NVD-derived titles need a "modified" statement.
 - R2. `reuse lint` reports Apache-2.0, CC-BY-4.0 and MIT all missing from
   `LICENSES/`, not only Apache-2.0. R2 becomes: add all three verbatim SPDX
   texts. (This also supplies the CC BY 4.0 full text next to the copy in
@@ -552,8 +560,43 @@ the gate.
 3. Re-presented per B: 3a no marker (81 ledger rows); 3b NVD rows notice only
    or mark; 3c GHSA CC BY 4.0 rows: notice now, schema ruling before any marker;
    3d 75 rows to identify.
-4. R7 as in E: NVD wording and the modification question, GHSA creator
-   wording, drop the unsupported OSV credits.
+4. R7 as in E: NVD wording and the modification question (whether NVD-derived
+   titles need a "modified" statement) [superseded by §9: earlier wording
+   concerned truncated descriptions], GHSA creator wording, drop the
+   unsupported OSV credits.
 5. R3: which SPDX expression for the PyPI metadata.
 
 No outreach is needed.
+
+## 9. Update 2026-11-26 (after gate bounce #2, user ruling D170: apply verbatim)
+
+Applied exactly as ruled; no other wording changed. Superseded lines in §8A,
+§8E and §8F are replaced in place and marked "[superseded by §9]".
+
+(i) Ledger clause, Variants A1 and A2. The superseded wording of A1 was "and
+the other rows that cite the ledger." (rows citing the ledger were said to
+carry no marker at all). That is false for some rows: six of the 81
+ledger-reference rows carry an `aiaaic` marker (gate): INC-04359, INC-03588,
+INC-14602, INC-03373, INC-03452 and INC-04711. The operative clause in both
+variants is now "and the other rows that cite the ledger, which carry no
+hackingincidents marker (some carry another source's marker)."
+
+(ii) NVD bullet (§8E). The earlier sentence tied the 1,500-character
+truncation to NVD descriptions. Correct: NVD-origin descriptions are carried
+verbatim (ingest_cve_nvd_expanded.py L600); the NVD-path title is derived
+(first sentence, truncated to 177 characters, L572-575), so the modification
+rule bears on titles, not descriptions. The 1,500-character truncation
+(L881, L1111) applies to GHSA and OSV text and is covered by 5.2's Changes
+statement.
+
+(iii) Decision 4(iii) (§8E and §8F): whether NVD-derived titles need a
+"modified" statement.
+
+(iv) R3 (section 4 table): the original text is restored inline per
+agreement 4 ("`license` expression covering MIT code and CC-BY data,
+`license-files` including the notices; verify wheel contents"; "No (metadata);
+yes if the SPDX expression is contested", preserved in git at e506d4e0), with
+the [AMENDED] marker and the amended text kept after it.
+
+Figures in (i) and the L572-575 and L600 references come from the gate's
+bounce; I did not re-derive them.
