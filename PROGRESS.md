@@ -14,6 +14,21 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔄 2026-11-26 — D160 USER RULING + D161 IN PROGRESS: ingest hackingincidents.ai, facts + link (pipeline-engineer)
+
+**D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
+- Ingest: **"Facts + link (Recommended)"**.
+- Outreach: **"I'll send it"**. The user sends docs/audits/D159-hackingincidents-outreach-draft-2026-11-25.md via X and adds the signature. The reply is non-blocking: it can only widen what we keep (for example `summary`), never narrow facts+link.
+
+**D161 dispatched to pipeline-engineer.** Branch `d161-hackingincidents-ingest`, worktree gi-wt-d161, based on `9019539d`. The brief requires:
+- a pinned site snapshot, plus provenance and a `--from-file` offline path, and NOT adding the source to auto-refresh yet;
+- `quote` and `summary` excluded; `confidence_reason` measured for publisher text and excluded unless it is clean;
+- URL- and aiid-join dedupe first: a match attaches as a reference and does not create a new INC row, REPORT-LEVEL rows attach to the parent, and the cairn pair is handled;
+- the U8 row going in as SOURCE_LICENSES §1.9 (level 3, exact `<date>` token, UTC note), with the MIT notice in NOTICE-DATA and .reuse/dep5 (the D159 gate advisories 1/5/6 are carried here);
+- the field-level delta in docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md, covering every changed existing row, the new-row label distributions, and a hand sample of 15;
+- proof that dedupe fires, with INC-17386 / aiid 1817 as the known positive;
+- no PR until the gate has passed and the user has reviewed the delta.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
