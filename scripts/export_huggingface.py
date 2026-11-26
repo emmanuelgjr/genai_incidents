@@ -150,7 +150,7 @@ which is authoritative; this is a summary of it.
 ## Sources & provenance
 
 Aggregated and de-duplicated from AIID, OECD AI Incidents and Hazards Monitor, AIAAIC, MITRE ATLAS,
-AVID, the hackingincidents.ai ledger of AI-assisted cyberattacks, MIT FutureTech AI Risk Repository
+AVID, the hackingincidents.ai ledger of AI-assisted cyberattacks, MIT AIRI Navigator
 (retired 2026-10-13; its rows are kept and marked stale), NVD / GitHub Security Advisories / OSV, garak,
 promptfoo, red-team benchmark catalogues, and researcher blogs / vendor threat reports.
 
@@ -195,9 +195,9 @@ summary-of-outcomes row (§1.5 covers the full licensing analysis), in the
 source repository.
 
 Rows sourced from the **hackingincidents.ai ledger** (Unsupervised Learning, Daniel Miessler)
-carry a narrower attribution obligation: rows whose `source_id` starts with `HIAI-`, and
-existing rows that gained ledger references (`content_license` source `hackingincidents`),
-carry facts and source links only; the ledger's quote, summary and other free text are not
+carry a narrower attribution obligation: rows whose `source_id` starts with `HIAI-` (these
+carry a row-level `content_license` source `hackingincidents`), and existing rows that
+gained ledger references (references only, no row-level marker), carry facts and source links only; the ledger's quote, summary and other free text are not
 reproduced. The operator publishes the data under the MIT licence (Copyright (c) 2025 Daniel
 Miessler) and asks for the citation "hackingincidents.ai, Unsupervised Learning, accessed
 `<date>`". See `NOTICE-DATA` and `docs/SOURCE_LICENSES.md` §1.9 in the source repository.
