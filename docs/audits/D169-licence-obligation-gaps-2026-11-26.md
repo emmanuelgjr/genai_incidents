@@ -24,6 +24,9 @@ docs/SOURCE_LICENSES.md.
 | F3 NOTICE-DATA sentence contradicts the data | Narrow the sentence or extend markers | **NARROW THE SENTENCE NOW. The gate's AVID arithmetic is mostly a mislabel: only 109 AVID rows are truly unmarked.** The 125 "wave12_avid but no marker" rows carry `description_source = cve-cna-via-avid` and, by construction, the `cve` marker (CNA text, CVE ToU), which is the correct marker for them. 79 + 125 + 109 = 313. The CVE gap (about 5,300 rows built from NVD/GHSA/OSV, unmarked) is real, but the obligation there is the dataset-level notice, not a marker. Extending markers to them is optional, large, and needs a ruling (section 3). |
 | F5 card summary names neither MIT exception | Add them | **CONFIRMED.** Proposed wording in section 5. Same defect in the card's `Licence:` line only; the Licensing section above it does name both MIT sources. |
 
+[SUPERSEDED IN PART, see Update 2026-11-26 (after gate bounce #1), item B:
+the paragraph below mis-sizes the unmarked CVE- rows as CNA text; most carry
+GHSA CC BY 4.0 text.]
 Premise checks. The gate's idea that CVE text might be public domain does not
 hold: NVD's own analysis fields are US-government work, but the descriptions
 are CNA-authored text that MITRE licenses under the CVE ToU, which is exactly
@@ -40,10 +43,10 @@ to the notice rather than the notice.
 
 | Surface | What it ships (licensed material) | Notice shipped? | Compliant? |
 |---|---|---|---|
-| Git repository / GitHub source archive (zip/tar on the release page) | Everything, plus ingest snapshots | `NOTICE-DATA`, `LICENSE`, `LICENSE-DATA`, `.reuse/dep5` at root | YES for CVE-ToU, MIT, CC-BY. Apache-2.0: notice present, full licence text absent (F6a) |
+| Git repository / GitHub source archive (zip/tar on the release page) | Everything, plus ingest snapshots | `NOTICE-DATA`, `LICENSE`, `LICENSE-DATA`, `.reuse/dep5` at root | [SUPERSEDED, Update item C] YES for CVE-ToU, MIT, CC-BY. Apache-2.0: notice present, full licence text absent (F6a). CORRECTED: NO for the GHSA CC BY 4.0 notice (absent from repo and NOTICE-DATA, F6b) and NO for the Apache-2.0 text |
 | Hugging Face dataset (export_huggingface.py L231-282) | `incidents.jsonl`: full dump of `stands()` rows: CVE-ToU text, AVID MIT, hackingincidents.ai MIT, ATLAS and garak Apache-2.0 text, AIAAIC titles (BY-SA marker), GHSA/OSV (CC-BY) | Card only; card says `NOTICE-DATA` "in the source repository" (L168, L204-217). The card inlines names ("Copyright (c) 2025 Daniel Miessler") but not the MIT permission text or the CVE ToU text | **NO** |
 | PyPI sdist | `data/incidents.min.json`, `src/.../incidents.min.json` | pyproject `[tool.hatch.build.targets.sdist] include` lists `LICENSE`, `LICENSE-DATA`, `NOTICE-DATA` (pyproject.toml L59-71) | YES for notices (Apache text: F6a) |
-| PyPI wheel | `src/genai_incidents/data/incidents.min.json` | **UNVERIFIED.** pyproject sets no `license-files`; wheel `include` is `src/genai_incidents/**` (L43-46). Hatchling may add root `LICEN[CS]E*`/`NOTICE*` files to `dist-info/licenses` by default; I could not build a wheel. Also `license = "MIT"` and the MIT classifier describe the package as MIT while it carries CC-BY data | **NO until verified**; metadata mislabel is a separate truthfulness defect |
+| PyPI wheel | `src/genai_incidents/data/incidents.min.json` | **UNVERIFIED.** pyproject sets no `license-files`; wheel `include` is `src/genai_incidents/**` (L43-46). Hatchling may add root `LICEN[CS]E*`/`NOTICE*` files to `dist-info/licenses` by default; I could not build a wheel. Also `license = "MIT"` and the MIT classifier describe the package as MIT while it carries CC-BY data | [REFUTED by gate-d169, Update item D: a scratch wheel and the published PyPI 2.13.0 wheel both ship dist-info/licenses/{LICENSE, LICENSE-DATA, NOTICE-DATA}] ~~NO until verified~~; CORRECTED: YES for notices, Apache-2.0 text still absent; the License-Expression MIT mislabel remains |
 | GitHub release assets (package_release_assets.py ASSETS L35-40) | `incidents.min.json`, `incidents.stix.json`, `taxii2.zip`, `misp-feed.zip`, manifest, SUMS | None of the six assets is a notice; the notice is on the release's source archive only | **NO** for the assets taken alone |
 | Website download `docs/data/incidents.min.json` plus core/shards (pages.yml L38-43) | Same rows | Footer links to the GitHub blob of NOTICE-DATA (index.html L92, L253); `docs/` holds no NOTICE-DATA or LICENSE-DATA (Glob, 2026-11-26) | **NO** (pointer only) |
 | STIX bundle (`docs/data/incidents.stix.json`) and TAXII static tree | Row descriptions as SDOs; `x_content_license` on marked rows only (export_stix.py L299-304) | No notice object or file | **NO** |
@@ -191,6 +194,8 @@ unverified. UNKNOWN is not resolved in the project's favour: treat them as
 AVID-derived. MIT requires the notice with the text; a marker is how the
 data says so row by row, and 109 rows is cheap to mark.
 
+[SUPERSEDED IN PART, Update item B: the sizing and "CNA text" characterisation
+in this paragraph are wrong for most rows; use the gate's per-row split.]
 CVE, unmarked: the rest of the 7,443 (about 5,300, not re-derived) came in
 through `scripts/ingest_cve_nvd_expanded.py` (NVD description verbatim,
 `"description": descr.strip()` L600; GHSA node description L819-881; OSV
@@ -247,13 +252,13 @@ line must be true.
 |---|---|---|---|
 | R1 | Ship `NOTICE-DATA`, `LICENSE-DATA`, `LICENSES/Apache-2.0.txt` byte-identical in the HF bundle, release assets, Pages tree, taxii2/misp trees, STIX download; list them in manifests/SUMS | distribution-engineer (HF build is pipeline code: pipeline-engineer for `export_huggingface.py`, `package_release_assets.py`; workflows: distribution-engineer) | Yes, light: confirms conservative reading as policy |
 | R2 | Add `LICENSES/Apache-2.0.txt` (verbatim SPDX) and correct SOURCE_LICENSES 3.1 wording (header-only LICENSE, GitHub NOASSERTION) | governance (file, cell edit) | No |
-| R3 | Fix PyPI metadata: `license` expression covering MIT code and CC-BY data, `license-files` including the notices; verify wheel contents | distribution-engineer | No (metadata); yes if the SPDX expression is contested |
+| R3 | [AMENDED, Update item D: license-files and wheel contents are already fine] Fix only the License-Expression MIT mislabel on PyPI metadata | distribution-engineer | Yes: the expression choice is the user's (SPDX lists `cve-tou`, so a valid expression exists) |
 | R4 | Narrow NOTICE-DATA and dep5 sentence (section 5.1) | governance | No |
 | R5 | Mark the 109 curated AVID rows (rule in section 3 F3.2) | pipeline-engineer | Yes: data change on shipped rows (delta approval) |
 | R6 | No marker for the 81 ledger-reference rows; no extension to NVD/GHSA/OSV rows now | governance (record in SOURCE_LICENSES) | Yes: confirm "no" on both |
 | R7 | NOTICE-DATA additions: NVD API notice and GHSA/OSV CC BY 4.0 notice (section 5.2) | governance | Yes: wording is the user's call |
 | R8 | Card edits: summary line and Licensing text (section 5.3); card also notes the bundle now ships the notices | pipeline-engineer (card is a string in `export_huggingface.py`) | No |
-| R9 | CORRECTIONS.md entry for releases through v2.13.0 | governance | Yes: public admission is the user's call |
+| R9 | [AMENDED, Update item D: name only HF, release assets, Pages and STIX/TAXII/MISP; NOT the wheel or Zenodo] CORRECTIONS.md entry for releases through v2.13.0 | governance | Yes: public admission is the user's call |
 | R10 | Site: serve `docs/NOTICE-DATA` and link relatively from `index.html` footer L92/L253 | distribution-engineer | No |
 
 Pipeline requirement (exact), for the foreman to route: in
@@ -268,6 +273,10 @@ removing one copy line.
 ## 5. Draft text (for owners to apply to live surfaces)
 
 ### 5.1 NOTICE-DATA, replacement for L380-384 (and the same clause in dep5 L67-69)
+
+[SUPERSEDED, Update item A: this draft states "shipped with every distribution"
+(false until R1) and that the avid marker covers the curated AVID- rows (false
+until R5). Do not apply as written; use the two variants in the Update.]
 
 Current: "the obligation is attribution or a notice that accompanies copies
 (CVE- and AVID-derived rows, and the HIAI- rows from the ledger, also carry a
@@ -290,6 +299,10 @@ ledger, carry no such marker; the notices in this file apply to them. Counts
 are audited in docs/SOURCE_LICENSES.md, not restated here."
 
 ### 5.2 NOTICE-DATA, two new paragraphs (wording for user approval)
+
+[AMENDED, Update item E: the PyPA and Go credits cover text the corpus does
+not carry; "GitHub, Inc." is unconfirmed; the NVD "requires" framing is
+overstated.]
 
 NVD: "NVD data. Rows built from the NVD API use it under the NVD terms of
 use, https://nvd.nist.gov/developers/terms-of-use. This product uses the NVD
@@ -382,3 +395,165 @@ No outreach is needed for any of these; nothing was ambiguous at the source.
    file went through WebFetch: `curl -s
    https://raw.githubusercontent.com/mitre-atlas/atlas-data/main/LICENSE |
    wc -l` (expect 13) and `grep -c "TERMS AND CONDITIONS"` (expect 0).
+
+## 8. Update 2026-11-26 (after gate bounce #1)
+
+Added after gate-d169 bounced the record on e506d4e0. The original text above
+is kept; superseded passages are marked inline. DO NOT REGENERATE. Figures
+attributed to the gate below were measured by the gate per row against the
+ingest files (exact description match); I did not and could not re-derive them
+(no shell). The gate confirmed row by row: F1 (HF, release assets, Pages,
+STIX/TAXII/MISP ship no notice), F2 (6 of the 81 rows already carry an
+`aiaaic` marker, so the overwrite risk is real), the F3 arithmetic
+313 = 79 + 125 + 109, ATLAS NOASSERTION, the NVD notice gap and F5.
+
+### A. NOTICE-DATA sentence: two variants, each with its precondition
+
+Replaces section 5.1, which contradicted my own F3 recommendation 1 ("NOW, no
+data change") by asserting two things not yet true.
+
+Variant A1, apply NOW. Precondition: none; true on main today. It claims
+neither that the notice ships with every copy (false until R1) nor that the
+curated AVID- rows are marked (false until R5):
+
+"the obligation is attribution or a notice that accompanies copies. Some rows
+also carry a row-level content_license marker as a convenience: rows whose
+surviving text came from the CVE Program's records through the cvelistV5
+ingest or through AVID's CVE-class records (source cve), rows whose text came
+from AVID's records through the AVID ingest (source avid), and the HIAI- rows
+from the ledger (source hackingincidents). The marker is not the mechanism
+that discharges the obligation, and its absence does not mean a row is
+unencumbered. These rows carry no marker: rows built by
+scripts/ingest_cve_nvd_expanded.py from the NVD API, the GitHub Advisory
+Database or OSV; the AVID- rows of ingest/avid_owasp_incidents.json; and the
+other rows that cite the ledger. The upstream licence of the origin applies to
+them, and the notice duty is met only for copies that carry the notices in
+this file. Counts are audited in docs/SOURCE_LICENSES.md, not restated here."
+
+Variant A2, apply only after ALL of: R1 has landed and shipped (notice files
+in every distribution), R5 has landed (109 curated AVID rows marked), and the
+GHSA paragraph of 5.2 is in NOTICE-DATA. Then replace the A1 clauses so: the
+notice "is this file, which is shipped with every distribution of the
+dataset" (this statement is checkable by R1's byte-equality test); the avid
+marker list adds "including the AVID- rows of
+ingest/avid_owasp_incidents.json"; the unmarked list drops that file and names
+GHSA CC BY 4.0 text as covered by the GitHub Advisory Database paragraph. The
+dep5 clause (L67-69) takes the same variant at the same time. Separately and
+independent of either variant: dep5 L57-72 says "eleven sources" and "seven of
+the other eight", omits the ledger, while NOTICE-DATA says twelve and "eight
+of the other nine". Governance should reconcile dep5 to NOTICE-DATA in the same
+edit (gate advisory).
+
+The HF-card text in 5.3 that says the three notice files "ship in this
+repository" is likewise a post-R1 variant: apply it only with R1.
+
+### B. The unmarked CVE- rows: corrected sizing (supersedes the premise
+paragraph after section 1 and the "CVE, unmarked" paragraph of F3)
+
+I called the roughly 5,300 unmarked rows "CNA-authored text ... the instrument
+NOTICE-DATA already invokes". That mis-sized them in the project's favour.
+The gate's per-row match, by exact description against the ingest files, splits
+the 5,293 unmarked `CVE-` source-id rows:
+
+| Origin of the surviving description | Rows | Licence |
+|---|---|---|
+| NVD (CVE Program) text | 1,903 | CVE Terms of Use (notice-bearing) |
+| GHSA advisory text | **3,315** | **CC BY 4.0** (GitHub Advisory Database) |
+| `cve_incidents` curated | 43 | unassessed here |
+| no match | 31 | unknown, treat as encumbered |
+| OWASP | 1 | CC BY-SA 4.0 round-up question (SOURCE_LICENSES 1.6) |
+
+A further 579 GHSA-text rows have no `CVE-` id (828 `GHSA-` id rows, all
+unmarked). Total: about 3,894 rows carry GHSA CC BY 4.0 text with no notice
+anywhere in the repo or its distributions. By row count that is the largest
+uncured obligation in this audit, not a side note: F6b is therefore a main
+finding, not an addendum. NVD text is the smaller group (1,903). GitHub is
+also a CNA, so a GHSA-text row that is also a CVE may carry both CC BY 4.0
+and the CVE Terms of Use.
+
+What stands from my analysis: the licences require a notice with the copy,
+not a per-row field, and the existing `cve` marker does not itself reproduce
+the licence. What changes: the argument "extension is optional" is weaker, for
+three reasons: (1) most unmarked rows are CC BY 4.0 text, which needs a
+licence notice and creator credit the corpus does not currently ship at all;
+(2) one `cve` marker would be wrong for them; (3) the one-object field cannot
+hold both obligations on a GitHub-CNA row.
+
+Decision 3 (R6) is therefore re-presented to the user with this split, not as
+a yes/no on "no markers":
+- 3a. 81 ledger-reference rows: no marker (6 already carry `aiaaic`; a
+  ledger marker would overwrite or conflict). Unchanged.
+- 3b. NVD/CVE-ToU-text rows (1,903): marker not required; notice shipping
+  (R1) discharges it. Marking is optional and big.
+- 3c. GHSA CC BY 4.0 rows (about 3,894): the notice must exist first (5.2),
+  in NOTICE-DATA and in every distribution. Whether to add a per-row marker
+  needs a schema ruling (single object versus array; a new `ghsa` source;
+  GitHub-CNA rows with two obligations). My recommendation: notice now, marker
+  only after that schema ruling.
+- 3d. 43 + 31 + 1 rows: owner pipeline-engineer to identify, then treat as
+  encumbered until assessed.
+
+### C. Surface table, "Git repository" row
+
+Corrected inline: NO for the GHSA CC BY 4.0 notice (absent from the repo and
+from NOTICE-DATA) and NO for the Apache-2.0 text. My earlier "YES for CC-BY"
+contradicted my own F6b.
+
+### D. Wheel and Zenodo: my wheel finding is REFUTED
+
+The gate built a scratch wheel and inspected the PUBLISHED PyPI 2.13.0 wheel:
+both ship `dist-info/licenses/{LICENSE, LICENSE-DATA, NOTICE-DATA}`, and the
+published NOTICE-DATA is byte-identical to v2.13.0's (sha256 prefix
+2d188ac23da54736). Zenodo record 23328791 also carries NOTICE-DATA. My
+"UNVERIFIED, so NO" was the conservative default, and it was wrong; I flagged
+it as unverified, but the surface table should not have asserted NO. Effects:
+the wheel row is YES for notices (Apache-2.0 text still absent); R3 shrinks to
+the `License-Expression: MIT` mislabel only (SPDX lists `cve-tou`, so a valid
+expression exists; the choice is the user's); R9's CORRECTIONS entry names
+only HF, the release assets, Pages and STIX/TAXII/MISP, not the wheel or
+Zenodo. The Zenodo row's "YES by construction, unverified" is now verified by
+the gate.
+
+### E. Advisories folded in
+
+- Section 5.2 credits. The OSV path contributes 0 surviving descriptions today
+  (304 osv-tagged rows, all carrying NVD or GHSA text, per the gate), so the
+  PyPA and Go Project credits would cover text we do not carry: drop them, or
+  make them conditional on an OSV-origin description existing. "GitHub, Inc."
+  as the credit holder is my inference and is UNCONFIRMED: GHSA's LICENSE.md
+  is the bare CC BY 4.0 legal code and its README says only "licensed under the
+  terms of the CC-BY 4.0 open source license" (a quote I carried in
+  SOURCE_LICENSES 2.3 and did not re-read here). Governance must confirm
+  the creator wording from the origin pages before applying.
+- NVD. NVD asks for the notice; it is not a licence condition. SOURCE_LICENSES
+  2.2 says the terms "require" a displayed notice, which overstates it. That
+  is my own 2026-07-15 wording and should be corrected in place on that live
+  row. NVD's FAQ uses the variant "uses data from the NVD API". NVD also says
+  that if you modify the content you "may not attribute the source as the
+  NVD", which is in tension with the 1,500-character truncation at
+  `ingest_cve_nvd_expanded.py` L881 and L1111: a truncated description should
+  not be presented as NVD's text. This goes to the user as part of R7
+  (decision 4): (i) notice or no notice, (ii) which variant, (iii) whether
+  truncated NVD-origin descriptions need a "modified" statement.
+- R2. `reuse lint` reports Apache-2.0, CC-BY-4.0 and MIT all missing from
+  `LICENSES/`, not only Apache-2.0. R2 becomes: add all three verbatim SPDX
+  texts. (This also supplies the CC BY 4.0 full text next to the copy in
+  LICENSE-DATA, which is already at the root.)
+- MISP. The gate reports `export_misp.py` L181-183 exports titles, including
+  GHSA summaries and AIAAIC titles. My "NO until red-reviewer checks, low
+  exposure" is replaced by a definite NO, and my "MISP carries no description"
+  inference from the schema text was too loose (no description, but titles).
+
+### F. Revised decisions for the user
+
+1. Policy: notice files ship in every copy (R1); CORRECTIONS entry naming only
+   HF, release assets, Pages and STIX/TAXII/MISP (R9).
+2. Mark the 109 curated AVID rows, or compare against avid-db first (R5).
+3. Re-presented per B: 3a no marker (81 ledger rows); 3b NVD rows notice only
+   or mark; 3c GHSA CC BY 4.0 rows: notice now, schema ruling before any marker;
+   3d 75 rows to identify.
+4. R7 as in E: NVD wording and the modification question, GHSA creator
+   wording, drop the unsupported OSV credits.
+5. R3: which SPDX expression for the PyPI metadata.
+
+No outreach is needed.
