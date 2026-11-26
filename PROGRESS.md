@@ -14,7 +14,29 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
-### 🔄 2026-11-26 — D169 IN PROGRESS: licensing review of distribution and notice gaps F1–F3, F5 (license-auditor)
+### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
+
+**Final gate (string-check under D170): PASS, no defects.**
+- All three string checks pass.
+- Wording (i), wording (ii) and the 4(iii) text match verbatim (counted on whitespace-normalised text).
+- R3's original was restored character for character, with its [AMENDED] marker.
+- The diff contains only the declared hunks.
+
+**Advisory:** the superseded §8E/§8F wording is summarised in §9, not quoted; the exact text survives at b554fdd9. Optional.
+
+**Merged to main.** The stray check found the main tree clean.
+
+**Open user decisions (§8F, with the R-table):**
+1. **R1 + R9:** notice files ship in every copy. The CORRECTIONS entry names HF, the release assets, Pages and STIX/TAXII/MISP.
+2. **R5:** mark the 109 curated AVID rows, or compare them against avid-db first.
+3. **R6:** 3a no marker on the 81 ledger rows; 3b NVD rows get the notice only, or a marker; 3c GHSA CC BY rows get the notice now, with a schema ruling before any marker; 3d identify the 75 rows.
+4. **R7:** NVD wording and whether NVD-derived titles need a "modified" statement; GHSA creator wording; drop the OSV credits.
+5. **R3:** the SPDX expression for the PyPI metadata.
+
+**No ruling needed** for R2 (Apache text plus the SOURCE_LICENSES 3.1 fix), R4 (narrow the sentence with the §8A A1 variant), R8 (card edits) and R10 (site NOTICE).
+
+---
+#### (history) D169 dispatch
 
 **User instruction (2026-11-26):** "yes, send license-auditor on F1-F3 and F5".
 - **F1:** the HF bundle ships no NOTICE-DATA, despite the MIT/AVID/ledger notice duty. The audit also covers PyPI, release assets, the site download, STIX/TAXII/MISP and Zenodo.
