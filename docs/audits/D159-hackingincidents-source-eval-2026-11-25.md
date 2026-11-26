@@ -92,6 +92,12 @@ JSON itself (a licence-in-data gap: the licence lives on the HTML pages and the 
 
 ## 3. DRAFT SOURCE_LICENSES row (do not paste into SOURCE_LICENSES.md until the ingest PR)
 
+> **SUPERSEDED 2026-11-26: do NOT copy this row. The row to copy is "Corrected
+> draft row (U8)" in the Update section at the end of this file.** Known-stale in
+> this original: *Ingested by* (repo copy; now site copy, U1), *Retrieval* (WebFetch
+> only; now the gate's raw curl check, U6/U8), *Scrape-permitted* (UNKNOWN; now Yes,
+> U6/U8), the field-list and overlap figures (U2, U7).
+
 ### 1.9 hackingincidents.ai ledger (Substrate `Data/AI-Hacking-Incidents`) - DRAFT, D159, 2026-11-25
 *Ingested by:* (proposed, not implemented) a fetch of the repo copy
 `Data/AI-Hacking-Incidents/incidents.json` through `ingest/common.py`.
@@ -115,6 +121,8 @@ JSON itself (a licence-in-data gap: the licence lives on the HTML pages and the 
   Suspected), `confidence_reason`, `summary`, `quote`, `sources[]` (title, publisher,
   url, date, verified_on, fetch_status, primary), `single_source_reason`,
   `enrichment` (models, model_named, harness, countries, country_basis, sectors).
+  **Incomplete as originally written: also `disclosed` (117 rows) and `activity`
+  (30 rows); see U6/A4.**
   Gaps relative to our schema: no CVE/CWE, no severity, no victim-count; actor,
   victim (`targets`), AI system (`models`/`harness`), attack type (`ai_role`) are
   present.
@@ -148,7 +156,7 @@ Legend: SAME = same event already in corpus; THEME = same theme, different event
 | 2 | artex-github-oauth-secrets-2026 | Microsoft blog | NOVEL (THEME: INC-17356 ARTEX/ConnectWise, a different incident) |
 | 3 | babidighost-jailbroken-agent-intrusions | playciso.com/blog/babidighost-... | NOVEL |
 | 4 | barracuda-cloud-artex-breach-2026 | news.risky.biz/risky-bulletin-hackers-accessed-barracudas-cloud/ | NOVEL |
-| 5 | bossai-ai-agent-campaign | Acronis | SAME-ish: INC (line 249763) "Attacker Reportedly Used BOSSAI AI Agents to Extract Emergency Dispatch Records in Taipei"; same campaign. Counted SAME. |
+| 5 | bossai-ai-agent-campaign | Acronis | SAME-ish: INC (line 249763) "Attacker Reportedly Used BOSSAI AI Agents to Extract Emergency Dispatch Records in Taipei"; same campaign. Counted SAME. **-> see U3: INC-17384** |
 | 6 | cairn-glm-deepseek-semiconductor-defense-2026 | unit42.paloaltonetworks.com/cairn-framework-ai-autonomous-attacks/ | THEME (INC-17344 Cairn "100 company websites" is a different incident) |
 | 7 | cairn-monai-label-university-intrusions | securityweek.com/amazon-china-linked-hackers-... | NOVEL (MONAI hits are unrelated CVE rows) |
 | 8 | chainstack-ai-campaign-breach-2026 | aithreat.io/cases/chainstack-... | NOVEL |
@@ -164,13 +172,13 @@ Legend: SAME = same event already in corpus; THEME = same theme, different event
 | 18 | sdny-ai-executive-impersonation-129m-2026 | justice.gov/... | NOVEL |
 | 19 | silent-lynx-ai-assisted-tajik-document-theft | CloudSEK | NOVEL |
 | 20 | strix-gambling-platform-compromise | coalitioninc.com/blog/security-labs/cyber-criminals-left-ai-hacking-tools-open-internet | NOVEL |
-| 21 | vapor-panda-artex-global-espionage | NBC News | SAME: INC (line 249017) "VAPOR PANDA ... ARTEX AI Agents" |
+| 21 | vapor-panda-artex-global-espionage | NBC News | SAME: INC (line 249017) "VAPOR PANDA ... ARTEX AI Agents" **-> see U3: INC-17367** |
 | 22 | 123-reg-ai-driven-intrusion-2026 | aithreat.io/cases/123-reg-... | NOVEL |
-| 23 | binance-hot-wallet-compromised-ai-tool-2026 | AI Incident Database | SAME: INC (line 249846) "Binance ... Internal AI Tool in $6.34 Billion Breach" |
-| 24 | claude-pentestgpt-argentine-healthcare | crowdstrike.com/en-us/blog/crowdstrike-uncovers-new-agentic-ai-campaigns/ | SAME: INC (line 249110) "AI Agents to Breach Healthcare Organizations ... Argentina" |
+| 23 | binance-hot-wallet-compromised-ai-tool-2026 | AI Incident Database | SAME: INC (line 249846) "Binance ... Internal AI Tool in $6.34 Billion Breach" **-> see U3: INC-17386** |
+| 24 | claude-pentestgpt-argentine-healthcare | crowdstrike.com/en-us/blog/crowdstrike-uncovers-new-agentic-ai-campaigns/ | SAME: INC (line 249110) "AI Agents to Breach Healthcare Organizations ... Argentina" **-> see U3: INC-17369** |
 | 25 | promptspy-android-gemini-agent | cloud.google.com/... ; welivesecurity.com/en/eset-research/promptspy-... | SAME: INC-00587 (OECD-AIM-2026-02-19-2f59) PromptSpy |
 | 26 | greyvibe-russia-nexus-genai-2026 | withsecure.com/en/resources-hub/w-labs/greyvibe/ | SAME: INC-07966 (OECD-AIM-2026-05-29-1dbb) GREYVIBE |
-| 27 | grok-bankrbot-morse-code-transfer-2026 | dexerto.com/... | SAME: INC with refs cryptoslate/cryptopolitan (Grok + Bankrbot Morse code, ~line 240630-240870) |
+| 27 | grok-bankrbot-morse-code-transfer-2026 | dexerto.com/... | SAME: INC with refs cryptoslate/cryptopolitan (Grok + Bankrbot Morse code, ~line 240630-240870) **-> see U3: INC-00196** |
 | 28 | sophos-ai-built-ransomware-toolkit-2026 | bleepingcomputer.com/... | NOVEL |
 | 29 | ta4922-silentrunloader-llm-malware-2026 | proofpoint.com/... | NOVEL |
 | 30 | unc6508-local-llm-in-victim-cloud-2026 | cloud.google.com/... from-prompting-to-autonomy | NOVEL |
@@ -256,3 +264,242 @@ only on fields we are holding out. Conservatism here means claiming fewer rights
 7. Check whether the `summary` strings are near-verbatim from the cited vendor
    pages (spot-check 10 summaries against their source text); this decides the
    hold on `summary`.
+
+---
+
+## Update 2026-11-26 (after gate bounce #1). Original text above is preserved; this update supersedes the named halves. Do-not-regenerate.
+
+### U1. Two datasets, not one (supersedes: VERDICT reason 2 "repo contains the same files"; section 2 rows "Data in repo" and "Bulk export"; section 6 condition 1; the draft row's *Ingested by:* line)
+
+Per gate measurement (attested [A] by gate-d159; I have no shell and did not
+re-measure):
+
+| | Site download (`hackingincidents.ai/incidents.json`) | Substrate repo copy (`Data/AI-Hacking-Incidents/incidents.json`) |
+|---|---|---|
+| `updated` | 2026-11-24 | 2026-11-17 |
+| rows | 298 | 286 |
+| size | 690,343 B | 664,189 B |
+| sources.json | 46,468 B | 55,789 B |
+
+The ID sets differ. The repo's `source.md` says the repo directory is an export of
+the site's separate repository and lags by design. My earlier "same files" and
+"same data with its history" statements were wrong: that was the `/data/` page's
+wording, which I repeated, and I read the repo directory listing (sizes) but not
+`source.md`. **All counts in sections 1-5 (298, 279 sources, 22 AIID, 34
+aithreat.io, 71.5%) describe the site copy**, not the repo copy.
+
+**Fetch-target decision (recommended; the user may overrule): the site copy
+`hackingincidents.ai/incidents.json`, with the repo's MIT LICENSE recorded as the
+licence basis.** Trade-off:
+- Repo copy: sits beside the MIT `LICENSE` file, so the grant is unambiguous for
+  those bytes, but it lags (here by 7 days, 12 rows) and has a different, larger
+  sources.json.
+- Site copy: current and is what the stated counts describe, but its licence
+  rests only on the site's sentence extending "the license of the Substrate
+  repository" to it, with no LICENSE file beside it and no licence key in the JSON.
+- Because we hold `quote`/`summary` out and carry only structured facts + links,
+  the exposure of relying on the site's sentence is small. Outreach question 1 now
+  asks the operator to confirm the MIT grant covers the site download.
+- Either way: commit the bytes verbatim with provenance (URL, `updated`, sha256),
+  record which copy, and state the lag in DATASHEET. A weekly cadence on the site
+  copy is sufficient.
+
+Corrected pointers: draft row *Ingested by:* = fetch of
+`https://hackingincidents.ai/incidents.json` through `ingest/common.py` (site
+copy, 298 rows at 2026-11-24); section 6 condition 1 reads the same; the "Data in
+repo" row is superseded by the table above. Red-reviewer check 3 should also diff
+the ID sets of the two copies.
+
+### U2. "Ingesting adds primary references" is refuted (supersedes: VERDICT reason 3 final sentence; section 5 paragraph "Our corpus cites news mirrors... would add primary references")
+
+My claim rested on 0 of 16 hand-picked URLs, from a **newest-heavy, non-random
+sample** (the first 25 are Nov 2026; the 7 SAME matches also skew to AIID rows
+added at the same snapshot). It does not generalise. Gate measurement, ledger-wide
+(attested [A], method: URLs normalised by stripping scheme, www, query, fragment
+and trailing slash, then matched against every `references[].url` in
+`data/incidents.json`): **70 of 298 ledger rows share at least one source URL
+with our corpus; 47 of those share a primary-flagged URL that is not an AIID
+link.** Top domains: cloud.google.com 11, cdn.openai.com 11, anthropic.com 7 +
+www-cdn.anthropic.com 3, microsoft.com 6; e.g. the GTIG
+`adversarial-misuse-generative-ai` page matches INC-02680 and
+`threat-actor-usage-of-ai-tools` matches INC-02637.
+
+Corrected statements: sample URL-level overlap is 0/16; ledger-wide URL-level
+overlap is 70/298 (23.5%) of rows, 47/298 (15.8%) via a non-AIID primary URL.
+Ingestion adds new primary references only where the corpus does not already
+cite them; the vendor-report class (Google, OpenAI, Anthropic, Microsoft) is
+already substantially cited, so dedupe-by-URL must precede ingest and the shared
+rows should gain the ledger as an additional reference, not a new INC. **I did not
+re-derive the 70/47 figure: I have no shell, and a rerun of my own grep method
+would be form (b) of the confirm-by-same-method failure anyway.** Red-reviewer
+check 5 already specifies an independent derivation; keep it, and run it on all
+298, not a sample. The 68% sample-novelty figure should be read as an
+upper bound for novelty; the URL-based ledger-wide figure (about 76% of rows with
+no shared URL, before event-level matching) is the better estimate and event-level
+overlap is at least as high as URL overlap for the same-event rows.
+
+### U3. Line-number locators replaced by stable IDs (supersedes section 5 rows 5, 21, 23, 24, 27)
+
+I re-read the five corpus rows by `id` in the worktree `data/incidents.json`
+(IDs verified present and titles as described; I did not verify row 27's ID, the
+gate's, beyond its presence below):
+
+| # | Ledger slug | Corpus row |
+|---|---|---|
+| 5 | bossai-ai-agent-campaign | INC-17384 (AIID-1815) BOSSAI, Taipei emergency dispatch |
+| 21 | vapor-panda-artex-global-espionage | INC-17367 (AIID-1794) VAPOR PANDA / ARTEX |
+| 23 | binance-hot-wallet-compromised-ai-tool-2026 | INC-17386 (AIID-1817) Binance internal AI tool |
+| 24 | claude-pentestgpt-argentine-healthcare | INC-17369 (AIID-1796) Argentina healthcare agents |
+| 27 | grok-bankrbot-morse-code-transfer-2026 | INC-00196 (AIID-1556, OECD-AIM-2026-05-04-4a73) Grok/Bankrbot |
+
+Other locators checked: rows 25 and 26 already used stable IDs (INC-00587,
+INC-07966); rows 2 and 6 cite INC-17356 and INC-17344 by ID. A grep of this file
+for "line" shows only the five rows above plus the phrase "deepfake/voice-clone
+lines" in section 4, which is a count of matching lines in a generated file and is
+**not a re-derivable figure**; treat it as indicative only.
+
+### U4. Jurisdiction caveat (supersedes section 1 "operator jurisdiction not established")
+
+Gate reports the maker is self-declared US-based. Attested [A] by gate-d159; not
+re-checked by me. Consequence: no UK/EU sui generis database right in the ledger
+as a database, consistent with the likely-not-applicable reading above. Red-reviewer
+check 6 is retained to cite the page that states it.
+
+### U5. Gate advisories folded in
+
+- facts + link only: confirmed as the right call.
+- MIT grant confirmed in raw HTML by the gate (the section 2 "Licence statement"
+  row, previously a WebFetch finding, is now verified; the "no ToS / rate limit"
+  absence finding remains subject to check 1).
+- The MIT notice ("Copyright (c) 2025 Daniel Miessler") goes into **both**
+  `NOTICE-DATA` and `.reuse/dep5` for the ledger-derived fields.
+- Excluding `quote` is strongly supported: 7 of 7 checked quotes are verbatim
+  vendor text (gate, attested [A]). Holding `summary` is supported.
+
+### U6. Second batch of gate advisories (2026-11-26; all measurements are the gate's, attested [A], none re-run by me)
+
+**A2, raw-HTML terms check (supersedes the section 2 "Rate limits / ToS UNKNOWN" row and the draft row's Scrape-permitted and Retrieval cells; U5's "remains subject to check 1" is now closed for these pages).**
+Gate method: `curl -sL` (all HTTP 200) of `/`, `/about/`, `/method/`,
+`/sources/`, `/submit/`, `/data/`, `/incidents/`, `/analysis/`, two incident
+pages and `sitemap.xml` (306 URLs: 8 sections + 298 incidents); tags stripped, then
+grepped for terms, licence/license, copyright, rate limit, scraping, permission,
+attribution. Result: **no terms, privacy, legal or rate-limit page, link or text.**
+The only "terms" hit is "remain under the publishers' terms". Raw robots.txt is
+exactly four lines (`User-agent: *`, `Allow: /`, blank, `Sitemap: ...sitemap.xml`);
+no Crawl-delay; served via Cloudflare; no rate-limit header. Verbatim `/data/`
+clause: *"The data is published under the license of the Substrate repository: MIT
+License, Copyright (c) 2025 Daniel Miessler. Short quotes from sources are credited
+to their publishers and remain under the publishers' terms. If you use the data,
+please cite it as hackingincidents.ai, Unsupervised Learning, accessed [date]"*.
+Corrected draft-row cells:
+- **Retrieval:** raw-HTML `curl -sL` check by gate-d159 on the pages above
+  (2026-11-26), not my WebFetch pass; GitHub API JSON for the repo licence.
+- **Scrape-permitted:** **Yes.** robots.txt `Allow: /` for all agents, no
+  Crawl-delay, no ToS or rate-limit text found in raw HTML; the dataset is offered
+  as a download. The "UNKNOWN, pending raw-HTML verification" wording is dropped.
+  The absence finding is raw-HTML verified, by the gate and not by me.
+  (The at-most-weekly cadence is our own choice, not the site's.)
+
+**A1, `summary` (supplements the hold; does not lift it).** Of 7 summaries
+checked, 6 are paraphrased (longest shared verbatim runs with the vendor text:
+9/6/0/4/7/5 words); `operation-asterix` shares a 14-word verbatim run with Rapid7
+(30% of its 8-gram run matches). Ledger-wide, 42 summaries share a run of 8+ words
+with their own verbatim `quote`, and 15 share 12+. **Pre-ingest rule: if summaries
+are ever admitted, a per-row verbatim-run filter is the minimum.** Unmeasured, to
+check before the ingest PR: whether `confidence_reason` embeds publisher text. All
+7 checked quotes are verbatim vendor text.
+
+**A3, jurisdiction (supersedes U4's wording).** GitHub API for user
+`danielmiessler`: location "San Francisco Bay Area", company "Unsupervised
+Learning"; Substrate is owned by that User account. **Self-declared US, not a legal
+address.** The E13 caveat moves from "unverified" to "self-declared US"; no further.
+
+**A4, field list (supplements section 4).** Also present: `disclosed` (117 rows)
+and `activity` (30 rows). `single_source_reason` is on 240 rows; every other field
+is on all 298.
+
+**A5, in-ledger near-duplicate (ingest dedupe item).**
+`cairn-monai-label-university-intrusion` (Cyware, 2026-11-21) and
+`cairn-monai-label-university-intrusions` (SecurityWeek). Collapse before ingest.
+(My sample row 7 listed only the plural slug; the singular is #292 in the listing
+I fetched.)
+
+**A6, noted, not a D159 fix.** Our-corpus dedupe candidate found during overlap:
+INC-03248 vs INC-01349 (the Sysdig AWS event). The foreman routes it separately.
+I did not examine those rows myself; this is the gate's observation.
+
+### U7. Gate's independent overlap sample and ledger-wide figures (2026-11-26; attested [A], not re-derived by me: no shell)
+
+**Two samples, both reported; they use different methods and neither replaces the other.**
+
+| | My sample (section 5) | Gate sample |
+|---|---|---|
+| Selection | first 25 newest + 6 from 300k-400k window; non-random | `random.Random(159).sample(sorted(site_ids), 32)` |
+| Matching | title-keyword grep + 16 URL greps; same-event only on named actor/campaign/victim | URL-set intersection, aiid_id join, IDF-weighted title Jaccard, distinctive-term grep, manual adjudication |
+| n | 31 | 32 |
+| Result | SAME 7, THEME 3, NOVEL 21 (68% novel) | SAME 7, REPORT-LEVEL 3, THEME 2, NOVEL 20 (**62.5% novel**, 22% event-level SAME) |
+
+The gate states its matcher was proven to fire on re-keyed INC-00587, INC-07966
+and INC-17344, and that a nonsense negative control did not match. My sample has
+no such proof of firing, so the gate's is the better estimate; mine is the
+newest-heavy upper bound already flagged in U2.
+
+Gate SAME matches (ledger slug to corpus ID): dnb-cfo-ceo-deepfake to INC-03122;
+tuxbot-v3 to INC-14583; fbi-ai-voice-senior-officials to INC-08175;
+apt42-gemini-phishing to INC-02680; sysdig-8-minutes to INC-03248;
+gtig-2fa-bypass-zero-day to INC-01107 (probable); jasper-sleet-faceswap to
+INC-08177 (umbrella).
+
+**New overlap class to name: REPORT-LEVEL.** Our corpus holds the parent vendor
+report as a single row, while the ledger splits it into several incidents (or the
+reverse). Gate REPORT-LEVEL matches: scopecreep to INC-03003; promptflux to
+INC-02637; openai-korean-xenorat to INC-03006. This is neither a duplicate nor
+novel. The ingest spec must give it its own disposition (default: attach the
+ledger row as a reference to the existing parent row; split only under a
+deliberate granularity decision) rather than let it fall through as "novel". The
+INC-08177 "umbrella" SAME raises the same granularity question, and the gate's A6
+finding (INC-03248 vs INC-01349) shows our corpus already holds internal
+duplicates of one such event.
+
+**Whole-ledger figures (gate):** 80 URL hits across 70 of 298 rows (agrees with
+U2); 47 rows with a primary-flagged non-AIID URL hit; all 22 AIID-citing rows join
+on aiid_id.
+
+**Site counts that re-derive (gate):** 424 source citations; 336 distinct URLs;
+153 domains; grades CONFIRMED 147, STRONG 110, SUSPECTED 41 (sums to 298, agrees
+with the method page); 222 rows have a primary source; every row has a `quote` and
+a `summary` (so the `quote` exclusion and `summary` hold apply to all 298);
+`sources.json` has 279 entries (swept 240, unreachable 26, cited 13; agrees with
+the Sources page).
+
+**Repo listing, supplement to U1 (gate):** the Substrate directory also contains
+`candidates.json`, `regrade.json`, `SUMMARY.md`, `update.ts` and `update.log`.
+`README.md` and `source.md` carry no data terms beyond the site's. This closes the
+gap I admitted earlier (I had not read them); the gate read them, I did not.
+
+**Effect on the recommendation:** none to the verdict; facts + link only stands.
+Expected ingest disposition from the gate sample: about 22% SAME and about 9%
+REPORT-LEVEL attach as references, about 6% THEME, about 62.5% novel. The
+ledger-wide URL-overlap check (70 of 298 rows) must run first in the ingest dedupe.
+
+### U8. Corrected draft row (the one to copy into SOURCE_LICENSES.md in the ingest PR; supersedes section 3 as a whole; 2026-11-26)
+
+The cells below fold in U1 (site copy is the fetch target), U2, U6, U7. Figures
+marked (gate) are the gate's measurements, not mine. Still a DRAFT: nothing
+here is pasted into `docs/SOURCE_LICENSES.md` until the ingest PR (invariant 10).
+
+#### 1.9 hackingincidents.ai ledger - DRAFT, D159, corrected 2026-11-26
+*Ingested by:* (proposed, not implemented) a fetch of
+`https://hackingincidents.ai/incidents.json` (the site copy: `updated` 2026-11-24,
+298 rows) through `ingest/common.py`, committed verbatim with provenance (URL,
+`updated`, sha256). Not the Substrate repo copy, which lags by design (`updated`
+2026-11-17, 286 rows, different ID set); see U1 for the trade-off.
+
+| Field | Value |
+|---|---|
+| License | **MIT (stated by the operator), applied to the data.** `https://hackingincidents.ai/data/`, verbatim: *"The data is published under the license of the Substrate repository: MIT License, Copyright (c) 2025 Daniel Miessler. Short quotes from sources are credited to their publishers and remain under the publishers' terms. If you use the data, please cite it as hackingincidents.ai, Unsupervised Learning, accessed [date]"*; `/about/` says the same. Repo `danielmiessler/Substrate`: GitHub API `license.spdx_id` = `MIT`, raw `LICENSE` "Copyright (c) 2025 Daniel Miessler". The MIT file sits beside the repo copy; the site copy's licence rests only on the site's sentence (no LICENSE file beside it, no licence key in the JSON). **Retrieval:** `curl -sL` raw HTML, all HTTP 200, of `/`, `/about/`, `/method/`, `/sources/`, `/submit/`, `/data/`, `/incidents/`, `/analysis/`, two incident pages and `sitemap.xml` (10 pages plus the sitemap; 306 URLs), tags stripped then grepped, performed by gate-d159 on 2026-11-26 (gate, attested; I did not run it); GitHub API JSON for the repo licence (structured). My own first pass was WebFetch (markdown) and is superseded. |
+| Scrape-permitted | **Yes.** Raw `robots.txt` is exactly four lines (`User-agent: *`, `Allow: /`, blank, `Sitemap: https://hackingincidents.ai/sitemap.xml`): no Crawl-delay, no Disallow. Raw-HTML grep for terms, licence/license, copyright, rate limit, scraping, permission and attribution on the pages above found **no terms, privacy, legal or rate-limit page, link or text**; the only "terms" hit is "remain under the publishers' terms". Served via Cloudflare; no rate-limit header. The dataset is offered as a download (`/incidents.json`, `/incidents.csv`). The absence of a ToS is verified in raw HTML for those pages only. Our own cadence: at most weekly, identifying User-Agent, via `ingest/common.py`. |
+| Redistribute-verbatim | **PARTIAL.** Operator-authored structured fields (id, title, date, actor, actor_type, nexus, targets, models, outcome, grade, source list) YES under MIT with the notice attached. **`quote` NO**: 7 of 7 checked quotes are verbatim vendor text (gate), and the site says quotes remain under publishers' terms; applies to all 298 rows, since every row has a quote. **`summary` HOLD**: 6 of 7 checked are paraphrase, but `operation-asterix` shares a 14-word verbatim run with Rapid7; ledger-wide 42 summaries share an 8+ word run with their own quote, 15 share 12+, maximum 24 (gate). **If `summary` is ever admitted, a per-row verbatim-run filter is the minimum, applied before ingest.** **`confidence_reason`: unmeasured** whether it embeds publisher text; to be checked before the ingest PR, and held out until it is. MIT is a software licence and its application to a dataset is not spelled out by the operator. Source titles and URLs: links are facts, kept as pointers. |
+| Relicense-compatible | **YES, with a carve-out** (same shape as ATLAS 3.1): MIT does not require share-alike but requires the copyright and permission notice to stay with the covered material, so it cannot be folded into a blanket "CC-BY-4.0, all rights ours". "Copyright (c) 2025 Daniel Miessler" and the MIT text go in `NOTICE-DATA` and `.reuse/dep5` for the ledger-derived fields; the CC-BY-4.0 grant covers only our own selection and annotation. Maker is self-declared US (GitHub profile: "San Francisco Bay Area", Unsupervised Learning; not a legal address), so no UK/EU database right is expected in the ledger as a database (E13 reasoning); unverified beyond self-declaration. Rows citing AIID inherit SOURCE_LICENSES 1.2a; the 34 incidents citing aithreat.io inherit unknown terms (link only, no aithreat prose). |
+| Action | **(a) compatible with carve-out for the structured fields; (c)-style handling for `quote` and `summary`** (id + url + our own offline-generated summary written from the primary sources, per the WS0-T3 rule: summaries generated offline, committed to `data/summaries/`, never produced during `make build`). Ingest conditions: dedupe against the corpus by URL first (70 of 298 rows share a URL; gate); REPORT-LEVEL matches attach as references to the parent row by default (U7); the in-ledger near-duplicate `cairn-monai-label-university-intrusion(s)` collapses; confidence grades are labelled third-party (71.5% grader agreement), never used as our ground truth. Non-blocking clarification email drafted, NOT sent (`docs/audits/D159-hackingincidents-outreach-draft-2026-11-25.md`). The user decides whether to ingest at all and whether to send. |
+| Date-checked | 2026-11-25 (site pages via WebFetch; GitHub API); 2026-11-26 (raw-HTML terms check and robots.txt by gate-d159) |
