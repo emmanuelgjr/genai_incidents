@@ -138,7 +138,7 @@ Redispatched to the specialist with defects 1–3 plus the AVID verbatim fix.
 
 **Update:** the bounce-1 fix is `15676481`, a new commit on 35b0aa40 (4 files, +22/−19). [R] The data/ diff from base is empty. [R] NOTICE-DATA count words now read: "twelve" at L27, L44 and L371, and "eight of the other nine" at L376. "eleven" no longer appears. Gate-d168 is re-gating, with a note to check that the row-marker sentence about AVID rows is true given F3 (79 of 313 marked).
 
-**Update: gate-d168 re-gate PASS on `15676481`, no defects. MERGED.**
+**Update: gate-d168 re-gate PASS on `15676481`, no defects. MERGED as `91cf157c`. Post-merge validate is green (45898233080; 6962d847 → 45898275872). D168 is final.**
 - **(1) Markers:** 186 HIAI rows are marked, 0 non-HIAI. Only the 3 corrected sentences remain.
 - **(2) NOTICE-DATA:** the arithmetic holds: 12 = AIM + AIAAIC + AIID + 9 others (8 in the covered group, including the ledger, plus the round-ups exception). The ledger's group placement is supported by §1.9.
 - **(3)** AIRI Navigator wording matches README:219 and §1.4.
