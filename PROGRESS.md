@@ -41,6 +41,29 @@ Evaluation only: no code or data changes. The deliverable is `docs/audits/D169-l
   4. approve the notice wording (credit holders unconfirmed).
 **Gate-d169 dispatched on e506d4e0** to run the §7 checks: per-row accounting, inspecting what each distribution surface actually ships (including a wheel build), fetching the licence texts raw, the F2 overwrite risk, and traceability of the draft texts.
 
+**Update: gate-d169 BOUNCE #1 on e506d4e0.** The direction holds. Confirmed per row [R]:
+- **F1:** HF, release assets, Pages, STIX/TAXII and MISP all ship NO notice.
+- **F2:** 6 of the 81 rows already carry an aiaaic marker, so the one-object conflict is real.
+- **F3 AVID arithmetic:** 313 = 79 + 125 + 109, by set equality.
+- ATLAS NOASSERTION, the NVD notice gap and F5.
+
+Defects:
+1. **§5.1's draft states future facts as now-true.** "Shipped with every distribution" holds only after R1; "the avid marker covers curated rows" holds only after R5.
+2. **The unmarked CVE rows were mis-sized in the project's favour.** The 5,293 unmarked CVE- rows split as NVD 1,903 / **GHSA (CC BY 4.0) 3,315** / curated 43 / no match 31 / OWASP 1. Add 579 GHSA-text rows with no CVE- id, giving **about 3,894 rows of GHSA CC BY text with no notice anywhere**. This is the largest uncured obligation.
+3. **The "Git repository YES for CC-BY" cell contradicts the doc's own F6b.**
+4. **The wheel finding is refuted.** The published PyPI 2.13.0 wheel ships LICENSE, LICENSE-DATA and NOTICE-DATA (byte-identical, sha256 prefix 2d188ac2…), and so does Zenodo 23328791. This overstated non-compliance. R3 reduces to the License-Expression mislabel, and the R9 CORRECTIONS entry must not name the wheel or Zenodo.
+
+Advisories:
+- **OSV credits:** OSV contributes 0 surviving descriptions, so the PyPA/Go credits cover nothing.
+- **"GitHub, Inc."** as credit holder is an inference.
+- **NVD:** it "asks" rather than requires, so SOURCE_LICENSES §2.2 overstates it. The "may not attribute if modified" clause is in tension with the 1,500-char truncation.
+- **reuse lint:** all 3 licence texts are missing, and dep5 L67-68 disagrees with NOTICE-DATA.
+- **MISP:** its NO is definite.
+
+**Gate stray:** a Windows path resolved against the drive root and created `C:\c\…\gate-d169uild\hf`. The foreman inspected it first (4 HF build files, 38 MB, created today, nothing else) and deleted it.
+
+Redispatched to the specialist as a dated update section.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
