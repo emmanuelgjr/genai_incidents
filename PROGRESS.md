@@ -35,6 +35,24 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 
 **No ruling needed** for R2 (Apache text plus the SOURCE_LICENSES 3.1 fix), R4 (narrow the sentence with the §8A A1 variant), R8 (card edits) and R10 (site NOTICE).
 
+**Post-merge validate is green:** run 45907498234 on bcfdd577.
+
+**D171 USER RULINGS (2026-11-26), all "(Recommended)":**
+1. **Notices: "Ship + correction".** R1: NOTICE-DATA, LICENSE-DATA and the Apache-2.0 text go in every copy (HF, release assets, Pages, STIX/TAXII/MISP). R9: a CORRECTIONS.md entry naming only those copies for releases through v2.13.0. It does not name the wheel or Zenodo.
+2. **AVID rows: "Compare text first".** R5: compare the 109 curated rows against avid-db, mark only the rows that reproduce AVID text, and record original-authored rows as such.
+3. **Markers: "Approve a–d".**
+   - (a) No marker on the 81 ledger-reference rows.
+   - (b) NVD-text rows are covered by the notice only.
+   - (c) GHSA CC BY rows get the notice now; any marker waits for a schema ruling.
+   - (d) Identify the 75 rows.
+4. **Wording: "Approve, MIT AND CC-BY-4.0".**
+   - R7: the §5.2 drafts as amended by §8E/§9. The NVD notice plus a "modified" statement for derived titles. A GHSA CC BY 4.0 notice, with the credit holder verified against GitHub's own wording before publishing. The PyPA and Go credits are dropped.
+   - R3: pyproject licence expression `MIT AND CC-BY-4.0`.
+
+**Routing:**
+- **D172** (one branch, consistent notice set): R1, R2, R3, R4, R7, R8, R9, R10.
+- **D173** (later): R5 and 3(d), a data task with a field-level delta.
+
 ---
 #### (history) D169 dispatch
 
