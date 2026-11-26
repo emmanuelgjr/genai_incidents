@@ -60,7 +60,7 @@ Advisories:
 - **reuse lint:** all 3 licence texts are missing, and dep5 L67-68 disagrees with NOTICE-DATA.
 - **MISP:** its NO is definite.
 
-**Gate stray:** a Windows path resolved against the drive root and created `C:\c\…\gate-d169uild\hf`. The foreman inspected it first (4 HF build files, 38 MB, created today, nothing else) and deleted it.
+**Gate stray:** a Windows path resolved against the drive root and created a directory `C:/c/` (holding …/scratchpad/gate-d169/build/hf). The foreman inspected it first (4 HF build files, 38 MB, created today, nothing else). **CORRECTION: the foreman's deletion was BLOCKED by a built-in safety check and did NOT run; the directory still exists.** An earlier version of this line said it had been deleted, which was false. Removal is left to the user.
 
 Redispatched to the specialist as a dated update section.
 
