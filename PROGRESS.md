@@ -14,7 +14,38 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
-### 🔄 2026-11-25 — D159 IN PROGRESS: evaluate new source hackingincidents.ai (license-auditor)
+### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
+
+**Gate verdict (re-gate): PASS, no blocking defects.**
+- **D1–D3 fixed.** U1's 12 site-only / 0 repo-only IDs re-derive. All five U3 IDs re-read by id match their AIID numbers: INC-17384=1815, INC-17367=1794, INC-17386=1817, INC-17369=1796, INC-00196=1556+OECD.
+- **Every "(gate)" figure matches what the gate measured**, and nothing is misattributed. The two cross-page claims in U7 (147/110/41; 139 of 279 sources) were checked by the gate now and hold.
+- **Agreement 4 holds.** db640873→8734375f deletes no original claim: the 5 §5 rows only gained pointers. The outreach draft was edited in place as allowed, Q1 is updated, and there is no PII.
+- **Scope:** the diff vs `f6ddd4ee` is the 2 files (+555). The gate wrote nothing.
+
+**Advisories, carried to the ingest PR or a later dated note:**
+1. The /data/ clause ends with an angle-bracket `<date>` token, not `[date]`. Copy the exact token into SOURCE_LICENSES.md.
+2. U2 calls 76% (228/298 with no shared URL) "the better estimate". It is a looser upper bound; 62.5% (U7) is the better one.
+3. U6 A5's "#292" position is wrong: the slugs are at positions 7 and 8. Immaterial.
+4. The original VERDICT block has no pointer to U1/U2.
+5. The U8 row heading must be level 3 (`###`) in SOURCE_LICENSES.md.
+6. U8's Date-checked: the gate fetched at local 2026-11-25, server time 2026-11-26 02:01 GMT. Add a UTC note.
+
+**Stray check:** main tree clean before the merge.
+
+**Open for user:**
+- (i) Ingest as facts+link? A yes means a pipeline-engineer build task with:
+  - a pinned site snapshot;
+  - URL-dedupe first, with the REPORT-LEVEL disposition;
+  - quote and summary excluded, and `confidence_reason` checked;
+  - the U8 row in the same PR;
+  - the MIT notice in NOTICE-DATA and .reuse/dep5;
+  - the D120-style field delta.
+- (ii) The outreach draft is non-blocking; the user sends via X if wanted.
+
+**Carried follow-up (gate A6):** our-corpus duplicate INC-03248 vs INC-01349 (Sysdig AWS "admin in 8 minutes"), an identity-key dedupe candidate.
+
+---
+#### (history) D159 dispatch, 2026-11-25
 
 **Update 2026-11-26: specialist reported; committed `db640873` on `d159-hackingincidents-eval`, pushed and verified.** Its proposed verdict is facts+link only, with an MIT notice carve-out. The `quote` field is not ingested, and `summary` is held until the operator answers. Outreach is drafted and non-blocking (via X, per `/submit/`; the user sends). Its own caveats:
 - its only fetch method was WebFetch, so the "no ToS" finding is method-suspect;
