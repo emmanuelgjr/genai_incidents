@@ -14,6 +14,20 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔄 2026-11-26 — D172 IN PROGRESS: ship licence notices in every copy and correct the notice texts (distribution-engineer)
+
+This implements D171 R1/R2/R3/R4/R7/R8/R9/R10 from the D169 audit. Branch `d172-notice-compliance`, worktree gi-wt-d172, base `1a4158e8`. The brief requires:
+- NOTICE-DATA, LICENSE-DATA and the Apache-2.0 text byte-identical in HF, the release assets, Pages and STIX/TAXII/MISP, with tests that are proven to fire;
+- the SPDX texts and a reuse lint run before and after;
+- pyproject `MIT AND CC-BY-4.0`, with the wheel inspected;
+- the NOTICE/dep5 marker sentence true AT HEAD (shipping is true after R1; the 109 AVID rows are still unmarked), and dep5's eleven fixed to twelve;
+- the NVD notice plus a titles-modified statement, with §2.2's "requires" changed to "asks";
+- the GHSA CC BY notice with the credit holder quoted from GitHub's own README/LICENSE (no invented "GitHub, Inc."), and the PyPA/Go credits dropped;
+- the HF card summary and Licensing text, rendered and checked;
+- a CORRECTIONS entry naming only HF, the release assets, Pages and STIX/TAXII/MISP;
+- the site serving NOTICE-DATA, with relative footer links.
+R5 and 3(d) are out of scope; they are D173. No data change.
+
 ### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
 
 **Final gate (string-check under D170): PASS, no defects.**
