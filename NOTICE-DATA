@@ -24,7 +24,7 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, eleven upstream sources carry an obligation
+As of this writing, twelve upstream sources carry an obligation
 detailed in full below: MITRE ATLAS and garak (Apache License 2.0
 text), the CVE Program and AVID (notices that must accompany copies),
 the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
@@ -32,8 +32,9 @@ for its codes and risk names), the OWASP GenAI Data Security Risks and
 Mitigations (DSGAI; CC BY-SA 4.0 attribution for its codes and titles),
 the OWASP Top 10 for LLM Applications and the OWASP Gen AI incident
 round-ups (CC BY-SA 4.0 attribution; see the OWASP paragraphs below),
-the AIAAIC Repository, the AI Incident Database (AIID), and the OECD AI
-Incidents and Hazards Monitor (AIM).
+the AIAAIC Repository, the AI Incident Database (AIID), the OECD AI
+Incidents and Hazards Monitor (AIM), and the hackingincidents.ai ledger
+(MIT, attribution; facts and links only).
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here, the
 per-source sections of docs/SOURCE_LICENSES.md are the authoritative
