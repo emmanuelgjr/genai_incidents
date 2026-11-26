@@ -55,6 +55,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - add tests that are proven to fire;
 - show the emitted outputs are byte-identical to 80217d42.
 
+**Update: D162 strip done. The branch was rewritten to `dad99db9`, a single commit on `9019539d`, force-with-lease on the feature branch only; origin is verified at dad99db9.**
+- **[R] foreman checks:**
+  - The only commit touching the snapshot is dad99db9.
+  - The committed snapshot has 0 hits each for `"quote"`, `"summary"`, `confidence_reason`, `"outcome"` and `verified_on`.
+  - data/incidents.json and stats.json have blob SHAs identical to 80217d42.
+  - 33 files changed; the worktree is clean.
+- **Snapshot:** 284,519 B, versus the raw 690,343 B, raw_sha256 e1e95518…, which is recorded.
+  - `--fetch` strips on the way in.
+  - `--from-file` accepts the stripped file, or the raw file verified against raw_sha256.
+  - 8 per-source bookkeeping keys are also dropped and listed in provenance `dropped_fields`.
+- **Tests:** 1720 passed, 2 skipped, 1 xfailed (30 D161 tests).
+- **Caveats:**
+  - The old commit 80217d42 and the raw blob remain in the LOCAL object store and reflog. The auto-mode classifier denied the specialist a gc, and the foreman is not doing it on the specialist's behalf.
+  - GitHub may keep 80217d42 reachable by SHA until its own GC. A support purge is the user's call if wanted.
+- **Gate-d161 dispatched on `dad99db9`.** It covers checks (a) to (h): a per-entity compare; a rebuild from base; its own seeded dedupe-recall sample; text leakage against a fresh raw download; history and committed-file text leakage; 15 hand-checked labels; merge_and_dedupe side effects; and the licence rows.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
