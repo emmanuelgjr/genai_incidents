@@ -14,6 +14,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔄 2026-11-26 — D169 IN PROGRESS: licensing review of distribution and notice gaps F1–F3, F5 (license-auditor)
+
+**User instruction (2026-11-26):** "yes, send license-auditor on F1-F3 and F5".
+- **F1:** the HF bundle ships no NOTICE-DATA, despite the MIT/AVID/ledger notice duty. The audit also covers PyPI, release assets, the site download, STIX/TAXII/MISP and Zenodo.
+- **F2:** whether the 81 rows with attached ledger references need a row-level marker.
+- **F3:** the NOTICE-DATA sentence "CVE- and AVID-derived rows carry a marker" is contradicted by the data (AVID 79/313 marked; CVE 2,150/7,443).
+- **F5:** the HF card summary licence line omits the MIT exceptions.
+
+Evaluation only: no code or data changes. The deliverable is `docs/audits/D169-licence-obligation-gaps-2026-11-26.md` on branch `d169-licence-obligations` (worktree gi-wt-d169, base 5720c248). It must include a per-surface compliance table and owner-tagged recommendations. Text fixes are drafts only. Next: the red-reviewer gate, then user rulings, then implementation tasks.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
