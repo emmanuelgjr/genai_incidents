@@ -55,18 +55,31 @@ Comment: This dataset aggregates entries from many upstream sources, each
  framing, and docs/audits/E23-aiid-marking-ruling-2026-07-30.md for
  the full reasoning.
  The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
- eleven sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
+ twelve sources NOTICE-DATA names as carrying an obligation. With AIAAIC and AIID, it is one of the three
  whose row text this project could not simply carry under the source's
  own licence grant. For each of the three, the text was either reduced
  to structural facts and a link, or its retained title was analysed as
  a separate copyright question (open for AIAAIC and AIM; resolved for
- AIID). For seven of the other eight named there (MITRE ATLAS, garak, the
+ AIID). For eight of the other nine named there (MITRE ATLAS, garak, the
  CVE Program, AVID, the OWASP Top 10 for Agentic Applications, OWASP
- GenAI Data Security Risks and Mitigations and the OWASP Top 10 for LLM
- Applications), the grant (for the five OWASP
- mapping files, the carve-out stanzas below) covers the material reproduced, and the obligation is attribution or a notice that accompanies copies
- (CVE- and AVID-derived rows also carry a row-level content_license
- marker). The eighth, the OWASP Gen AI incident round-ups, is an
+ GenAI Data Security Risks and Mitigations, the OWASP Top 10 for LLM
+ Applications and the hackingincidents.ai ledger), the grant (for the five OWASP
+ mapping files, the carve-out stanzas below) covers the material reproduced, and the obligation is attribution or a notice that accompanies copies.
+ Some rows also carry a row-level content_license marker as a
+ convenience: rows whose surviving text came from the CVE Program's
+ records through the cvelistV5 ingest or through AVID's CVE-class
+ records (source cve), rows whose text came from AVID's records through
+ the AVID ingest (source avid), and the HIAI- rows from the ledger
+ (source hackingincidents). The marker is not the mechanism that
+ discharges the obligation, and its absence does not mean a row is
+ unencumbered. These rows carry no marker: rows built by
+ scripts/ingest_cve_nvd_expanded.py from the NVD API, the GitHub
+ Advisory Database or OSV; the AVID- rows of
+ ingest/avid_owasp_incidents.json; and the other rows that cite the
+ ledger, which carry no hackingincidents marker (some carry another
+ source's marker). The upstream licence of the origin applies to them.
+ The notice duty is met by NOTICE-DATA, which ships with every copy of
+ the dataset distributed from this project's own channels. The ninth, the OWASP Gen AI incident round-ups, is an
  exception: two shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0
  round-up text up to and including v2.13.0 and were rewritten from their
  primary sources on 2026-10-13 (decision D97); see NOTICE-DATA and docs/SOURCE_LICENSES.md section 1.6.

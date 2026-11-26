@@ -7,7 +7,11 @@ name = "genai-incidents"
 version = "2.13.0"
 description = "Curated dataset of GenAI & agentic-AI security incidents mapped to OWASP LLM Top 10, OWASP Top 10 for Agentic Applications, NIST AI RMF, and MITRE ATLAS."
 readme = "README.md"
-license = "MIT"
+license = "MIT AND CC-BY-4.0"
+# Explicit (hatchling would default to LICENSE*/NOTICE* only): the wheel also
+# carries the Apache-2.0 text, because the bundled data embeds ATLAS/garak text
+# licensed under it (D172 R1/R3).
+license-files = ["LICENSE", "LICENSE-DATA", "NOTICE-DATA", "LICENSES/Apache-2.0.txt"]
 requires-python = ">=3.10"
 authors = [{ name = "Emmanuel G. Junior Rodrigues" }]
 keywords = [
@@ -23,7 +27,6 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Information Technology",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -68,4 +71,5 @@ include = [
   "CHANGELOG.md",
   "CITATION.cff",
   "NOTICE-DATA",
+  "LICENSES/**",
 ]

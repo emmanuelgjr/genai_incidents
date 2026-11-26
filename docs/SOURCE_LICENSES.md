@@ -271,11 +271,11 @@ Typhoon"), which are attributions by the vendor, not project inventions.
 
 | Field | Value |
 |---|---|
-| License | CVE/NVD records are U.S. government work (public domain domestically), but the NVD API imposes contractual usage terms independent of copyright: `nvd.nist.gov/developers/terms-of-use` (fetched 2026-07-15) requires a displayed notice — *"This product uses the NVD API but is not endorsed or certified by the NVD"* — states *"If you modify the content accessed through the API, you may not attribute the source as the NVD,"* and restricts API keys to the original requestor ("Keys should not be used by, or shared with, individuals or organizations other than the original requestor"). |
+| License | CVE/NVD records are U.S. government work (public domain domestically), but the NVD API imposes contractual usage terms independent of copyright: `nvd.nist.gov/developers/terms-of-use` (fetched 2026-07-15) asks for a displayed notice (it is a request in the terms, not a licence condition) — *"This product uses the NVD API but is not endorsed or certified by the NVD"* — states *"If you modify the content accessed through the API, you may not attribute the source as the NVD,"* and restricts API keys to the original requestor ("Keys should not be used by, or shared with, individuals or organizations other than the original requestor"). |
 | Scrape-permitted | **YES, within stated rate limits** — 5 req/30s unauthenticated, 50 req/30s with an API key; the ingest script already paces requests accordingly (`NVD_SLEEP`). |
 | Redistribute-verbatim | **YES** for unmodified content (public domain). Modified/derived text must not be presented as if it were still NVD's own text. |
 | Relicense-compatible | **YES.** |
-| Action | **(a) compatible, with one compliance gap:** the required attribution notice above is not displayed anywhere in this repo's docs, README, or site. See the exact remediation requirement in the report. |
+| Action | **(a) compatible.** The notice NVD asks for above is in `NOTICE-DATA` (D172), which ships with every distributed copy and is served from the site root; it is not repeated in the README. |
 | Date-checked | 2026-07-15 |
 
 ### 2.3 GitHub Security Advisory Database (GHSA)
@@ -340,7 +340,7 @@ is committed as `ingest/atlas/ATLAS-<release>.yaml` (currently 2026.10) with
 
 | Field | Value |
 |---|---|
-| License | **Apache License 2.0**, confirmed via `mitre-atlas/atlas-data` LICENSE file (fetched 2026-07-15): *"Copyright 2021-2026 MITRE. Licensed under the Apache License, Version 2.0."* |
+| License | **Apache License 2.0**, stated in the `mitre-atlas/atlas-data` LICENSE file (fetched 2026-07-15) in its header form only: *"Copyright 2021-2026 MITRE. Licensed under the Apache License, Version 2.0."* The upstream file is a 13-line header without the full licence terms, which is why the GitHub API reports its licence as `other` / `NOASSERTION` (checked 2026-11-26, D169 F6a). The grant is the standard Apache-2.0 notice; the full text this project ships is the SPDX `LICENSES/Apache-2.0.txt` (D172). |
 | Scrape-permitted | Yes for the HTTP path: the file is a published release artifact of a public repo under Apache-2.0, fetched via `ingest/common.py` (robots.txt for `raw.githubusercontent.com` fetched once per process and cached by `ingest/common.py`, then checked before every request; 1 s default spacing; up to four requests per run: the robots.txt, two ~20-byte pointers and the ~1.15 MB (1,154,660-byte for 2026.10) release, at most monthly). The case-study path (1) is a local clone: N/A. |
 | Redistribute-verbatim | **YES** under Apache-2.0 terms (case-study titles/descriptions are reproduced from the dist YAML; the whole release YAML is also committed verbatim under `ingest/atlas/`, covered by the `.reuse/dep5` stanza `ingest/atlas/ATLAS-*.yaml`: Apache-2.0, copyright 2021-2026 The MITRE Corporation, with MITRE's notice carried in `NOTICE-DATA`). |
 | Relicense-compatible | **YES, with a carve-out.** Apache-2.0 does not require share-alike, but it does require preserving the copyright/license notice on the covered material — MITRE's Apache-2.0 notice must stay attached to ATLAS-derived case-study text specifically; it cannot be silently folded into a blanket "CC-BY-4.0, all rights reserved by us" claim. |

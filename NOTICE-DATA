@@ -92,6 +92,32 @@ This is not the MITRE ATLAS notice above; that one is Apache License
 2.0 and concerns a different body of text. See the cvelistV5 row of
 docs/SOURCE_LICENSES.md (section 6.2).
 
+NVD API. Rows built from the NVD API by
+scripts/ingest_cve_nvd_expanded.py use it under the NVD terms of use,
+https://nvd.nist.gov/developers/terms-of-use. This product uses the NVD
+API but is not endorsed or certified by the NVD. Modified: the title of
+an NVD-derived row is this project's shortened text, not the NVD's: it
+is the first sentence of the NVD description, cut to its first 177
+characters followed by "..." when that sentence is longer than 180
+characters (scripts/ingest_cve_nvd_expanded.py), and it is not
+attributed to the NVD. NVD descriptions are carried as the API returns
+them, with surrounding whitespace trimmed and no other change.
+
+GitHub Advisory Database. Advisory text in rows built from the GitHub
+Advisory Database (ids GHSA-...) is licensed under the Creative Commons
+Attribution 4.0 license, https://creativecommons.org/licenses/by/4.0/
+(full text in LICENSE-DATA). GitHub's own terms say the attribution term
+may be fulfilled by linking to the GitHub Advisory Database at
+https://github.com/advisories or to individual GitHub Advisory Database
+records used, prefixed by https://github.com/advisories (GitHub Terms
+for Additional Products and Features, section "Advisory Database").
+Source: GitHub Advisory Database, https://github.com/advisories. Changes
+made: the advisory description is truncated to its first 1,500
+characters (scripts/ingest_cve_nvd_expanded.py). Rows carry the GHSA id
+in source_ids and a link to the advisory in references. GitHub names no
+other credit holder in the repository's README or LICENSE.md, and none
+is named here.
+
 AVID (AI Vulnerability Database) content. Records derived from the
 avidml/avid-db repository, https://github.com/avidml/avid-db, are used
 under the MIT License:
@@ -378,11 +404,25 @@ Program, AVID, the OWASP Top 10 for Agentic Applications, OWASP GenAI
 Data Security Risks and Mitigations, the OWASP Top 10 for LLM
 Applications and the hackingincidents.ai ledger), the grant covers the material reproduced
 (for the OWASP mapping files, subject to the carve-outs above), and the
-obligation is attribution or a notice that accompanies copies (CVE- and
-AVID-derived rows, and the HIAI- rows from the ledger, also carry a
-row-level content_license marker; the other rows that cite the ledger
-carry its references, facts and links, without that marker). The
-ninth, the OWASP Gen AI incident round-ups, is an exception: two
+obligation is attribution or a notice that accompanies copies. Some
+rows also carry a row-level content_license marker as a convenience:
+rows whose surviving text came from the CVE Program's records through
+the cvelistV5 ingest or through AVID's CVE-class records (source cve),
+rows whose text came from AVID's records through the AVID ingest
+(source avid), and the HIAI- rows from the ledger (source
+hackingincidents). The marker is not the mechanism that discharges the
+obligation, and its absence does not mean a row is unencumbered. These
+rows carry no marker: rows built by scripts/ingest_cve_nvd_expanded.py
+from the NVD API, the GitHub Advisory Database or OSV; the AVID- rows of
+ingest/avid_owasp_incidents.json; and the other rows that cite the
+ledger, which carry no hackingincidents marker (some carry another
+source's marker). The upstream licence of the origin applies to them.
+The notice duty is met by this file, which ships with every copy of the
+dataset distributed from this project's own channels (the repository,
+the PyPI package, the Zenodo record, the Hugging Face dataset, the
+GitHub release assets, the website, and the STIX, TAXII and MISP
+downloads), byte-identical to the repository's NOTICE-DATA. Counts are
+audited in docs/SOURCE_LICENSES.md, not restated here. The ninth, the OWASP Gen AI incident round-ups, is an exception: two
 shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
 up to and including v2.13.0 and were rewritten from their primary sources
 on 2026-10-13 (decision D97); see the round-up paragraph above.

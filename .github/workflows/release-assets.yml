@@ -5,6 +5,8 @@ name: Release assets (STIX / TAXII / MISP / manifest / SHA256SUMS)
 # had no build_manifest.json and no checksums at all. On each published release
 # this builds the export set from the tagged commit and attaches:
 #   incidents.stix.json  incidents.min.json  taxii2.zip  misp-feed.zip
+#   NOTICE-DATA  LICENSE-DATA  Apache-2.0.txt   (D172: licence notices, byte-identical
+#                                             to the repo root, listed in SHA256SUMS)
 #   build_manifest.json  SHA256SUMS
 # See scripts/package_release_assets.py. It adds assets only: it never edits the
 # release body, so the byte-verified notes (docs/VERSIONING.md step 7) are untouched.
@@ -49,6 +51,8 @@ jobs:
           python scripts/verify_data_integrity.py
       - name: Package the release assets
         run: python scripts/package_release_assets.py
+      - name: Verify the licence notices ship in the release set
+        run: python scripts/export_integrity.py verify-notices --out dist/release --flat
       - name: Verify the packaged SHA256SUMS
         run: (cd dist/release && sha256sum -c SHA256SUMS)
       - name: Upload to the release

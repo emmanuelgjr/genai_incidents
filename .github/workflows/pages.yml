@@ -15,6 +15,9 @@ on:
       - "scripts/export_integrity.py"
       - "schema/build_manifest.schema.json"
       - "data/stats.json"
+      - "NOTICE-DATA"
+      - "LICENSE-DATA"
+      - "LICENSES/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -39,6 +42,13 @@ jobs:
         run: |
           mkdir -p docs/data
           cp data/incidents.min.json docs/data/incidents.min.json
+      # D172 R1/R10: the Pages root serves the licence notices (docs/NOTICE-DATA,
+      # docs/LICENSE-DATA, docs/LICENSES/Apache-2.0.txt), copied from the repo
+      # root so there is one hand-maintained source. The site footers link to
+      # NOTICE-DATA relatively. The data/, taxii2/ and misp/ trees get their own
+      # copies, listed in their SHA256SUMS, from gen_data_integrity.py below.
+      - name: Copy the licence notices into the site root
+        run: python scripts/export_integrity.py notices --out docs
       - name: Split into a trimmed core payload + lazy per-year detail shards (WS6-T5, scale)
         run: python scripts/gen_docs_core_data.py
       # D132 re-gate A6: gate the served core payload BEFORE it is uploaded.
@@ -98,6 +108,14 @@ jobs:
             (cd "_site/$d" && sha256sum -c --quiet SHA256SUMS)
           done
           echo "built site matches SHA256SUMS in data/, taxii2/ and misp/"
+      # D172: the notices must be in the bytes Pages will serve, at the root
+      # (footer link target) and in each data tree, identical to the repo root.
+      - name: Verify the licence notices in the built site (_site)
+        run: |
+          python scripts/export_integrity.py verify-notices --out _site
+          for d in data taxii2 misp; do
+            python scripts/export_integrity.py verify-notices --out "_site/$d"
+          done
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: ./_site

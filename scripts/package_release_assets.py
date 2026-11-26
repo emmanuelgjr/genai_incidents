@@ -7,6 +7,10 @@ Reads the already-generated exports (``make stix taxii misp``) and writes to
     incidents.min.json    the slim dataset (byte-identical to data/)
     taxii2.zip            the static TAXII collection (docs/taxii2/)
     misp-feed.zip         the MISP feed (docs/misp/)
+    NOTICE-DATA           licence notices, byte-identical to the repo root (D172):
+    LICENSE-DATA          these three ride with every copy of the dataset; the
+    Apache-2.0.txt        Apache text is LICENSES/Apache-2.0.txt, flattened
+                          because a release upload has no directories
     build_manifest.json   commit, built_at, counts, taxonomy_versions
     SHA256SUMS            ``sha256sum -c`` over every file above
 
@@ -63,9 +67,15 @@ def package(out: Path = OUT, assets: list[tuple[str, Path]] | None = None, **man
         if not src.exists():
             raise SystemExit(f"{src} does not exist -- run `make stix taxii misp` first")
         if src.is_dir():
+            # the zipped tree must itself carry the notices (gen_data_integrity
+            # copies them in); refuse to ship a zip that does not.
+            errs = ei.notice_errors(src, label=name)
+            if errs:
+                raise SystemExit(chr(10).join(errs))
             deterministic_zip(src, out / name)
         else:
             shutil.copyfile(src, out / name)
+    ei.copy_notices(out, flat=True)
     ei.write_manifest(out, **manifest_kw)
     return ei.write_sums(out, "*")
 

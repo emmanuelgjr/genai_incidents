@@ -33,6 +33,8 @@ Usage::
     python scripts/export_integrity.py gen            # every existing served tree
     python scripts/export_integrity.py verify         # fail on any mismatch
     python scripts/export_integrity.py manifest --out PATH
+    python scripts/export_integrity.py notices --out DIR        # D172: licence notices
+    python scripts/export_integrity.py verify-notices --out DIR
 """
 
 from __future__ import annotations
@@ -52,6 +54,52 @@ SCHEMA_PATH = ROOT / "schema" / "build_manifest.schema.json"
 
 MANIFEST_NAME = "build_manifest.json"
 SUMS_NAME = "SHA256SUMS"
+
+# D172 (licence-notice compliance): every distributed copy of the dataset ships
+# these three files, byte-identical to the repo root. Paths are relative to the
+# repo root AND to each tree that carries them (HF bundle, docs/data, docs/taxii2,
+# docs/misp, the Pages root); the GitHub release assets are a flat upload, so
+# there the Apache text is the bare name in RELEASE_NOTICE_NAMES.
+NOTICE_FILES: tuple[str, ...] = ("NOTICE-DATA", "LICENSE-DATA", "LICENSES/Apache-2.0.txt")
+RELEASE_NOTICE_NAMES: dict[str, str] = {
+    "NOTICE-DATA": "NOTICE-DATA", "LICENSE-DATA": "LICENSE-DATA",
+    "LICENSES/Apache-2.0.txt": "Apache-2.0.txt",
+}
+
+
+def copy_notices(dest: Path, flat: bool = False, src_root: Path | None = None) -> list[str]:
+    """Copy the three notice files from the repo root into ``dest`` unchanged.
+    A missing source is a build failure, never a silent skip. Returns the
+    relative names written (sorted)."""
+    import shutil
+    src_root = src_root or ROOT
+    written = []
+    for rel in NOTICE_FILES:
+        src = src_root / rel
+        if not src.is_file():
+            raise SystemExit(f"notice file {rel} is missing from {src_root} -- cannot ship a copy of the dataset without it")
+        name = RELEASE_NOTICE_NAMES[rel] if flat else rel
+        out = dest / name
+        out.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, out)
+        written.append(name)
+    return sorted(written)
+
+
+def notice_errors(tree: Path, flat: bool = False, label: str | None = None) -> list[str]:
+    """Per-file errors: a notice file absent from ``tree`` or not byte-equal to
+    the repo-root original."""
+    label = label or tree.name
+    errs = []
+    for rel in NOTICE_FILES:
+        name = RELEASE_NOTICE_NAMES[rel] if flat else rel
+        p = tree / name
+        if not p.is_file():
+            errs.append(f"{label}/{name}: licence notice file missing (D172) -- run scripts/export_integrity.py gen")
+        elif p.read_bytes() != (ROOT / rel).read_bytes():
+            errs.append(f"{label}/{name}: not byte-identical to the repo-root {rel} (D172)")
+    return errs
+
 
 # Served trees and which files each SHA256SUMS covers. docs/data keeps its
 # historical "*.json only" rule (the site fetches JSON); the TAXII and MISP
@@ -154,7 +202,11 @@ def validate_manifest(m: dict) -> list[str]:
 
 
 def covered_files(tree: Path, pattern: str) -> list[Path]:
-    return sorted(p for p in tree.rglob(pattern) if p.is_file() and p.name != SUMS_NAME)
+    """Files matching ``pattern`` plus, always, the D172 notice files (so a
+    ``*.json``-only tree such as docs/data lists them in its SHA256SUMS too)."""
+    files = {p for p in tree.rglob(pattern) if p.is_file() and p.name != SUMS_NAME}
+    files |= {tree / rel for rel in NOTICE_FILES if (tree / rel).is_file()}
+    return sorted(files)
 
 
 def write_sums(tree: Path, pattern: str = "*") -> list[str]:
@@ -207,6 +259,7 @@ def gen_all(root: Path = ROOT, **manifest_kw) -> dict[str, int]:
     """Manifest then sums for every served tree that exists. Returns files hashed per tree."""
     out = {}
     for tree, pat in existing_trees(root):
+        copy_notices(tree)
         write_manifest(tree, **manifest_kw)
         out[tree.relative_to(root).as_posix()] = len(write_sums(tree, pat))
     if not out:
@@ -221,6 +274,7 @@ def verify_all(root: Path = ROOT) -> list[str]:
         return ["none of docs/data, docs/taxii2, docs/misp exists -- run the export steps first"]
     for tree, pat in trees:
         errors.extend(verify_sums(tree, pat))
+        errors.extend(notice_errors(tree))
         mp = tree / MANIFEST_NAME
         if not mp.exists():
             errors.append(f"{tree.name}/{MANIFEST_NAME} does not exist")
@@ -251,6 +305,12 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("gen")
     sub.add_parser("verify")
+    np_ = sub.add_parser("notices", help="copy the D172 licence notices into a directory (the Pages root)")
+    np_.add_argument("--out", required=True, type=Path)
+    np_.add_argument("--flat", action="store_true")
+    vp = sub.add_parser("verify-notices", help="fail unless a directory carries the notices byte-identically")
+    vp.add_argument("--out", required=True, type=Path)
+    vp.add_argument("--flat", action="store_true")
     mp = sub.add_parser("manifest")
     mp.add_argument("--out", required=True, type=Path)
     args = ap.parse_args(argv)
@@ -258,6 +318,16 @@ def main(argv: list[str] | None = None) -> int:
         for tree, n in gen_all().items():
             print(f"[export-integrity] {tree}: {MANIFEST_NAME} + {SUMS_NAME} over {n} file(s)")
         return 0
+    if args.cmd == "notices":
+        print(f"[export-integrity] notices -> {args.out}: " + ", ".join(copy_notices(args.out, flat=args.flat)))
+        return 0
+    if args.cmd == "verify-notices":
+        errs = notice_errors(args.out, flat=args.flat, label=str(args.out))
+        for e in errs:
+            print(f"::error::{e}")
+        if not errs:
+            print(f"[export-integrity] {args.out}: notice files present and byte-identical")
+        return 1 if errs else 0
     if args.cmd == "manifest":
         m = write_manifest(args.out)
         print(f"[export-integrity] wrote {args.out}: commit {m['commit'][:12]} built_at {m['built_at']}")

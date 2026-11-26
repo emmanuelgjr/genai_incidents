@@ -150,7 +150,7 @@ def test_sums_cover_stix_taxii_and_misp_files(site):
     mp = ei.parse_sums((site / "docs" / "misp" / "SHA256SUMS").read_text(encoding="utf-8"))
     assert {"manifest.json", "hashes.csv", "README.md", "build_manifest.json"} <= set(mp)
     events = [k for k in mp if re.fullmatch(r"[0-9a-f-]{36}\.json", k)]
-    assert len(events) == 2 and len(mp) == 6
+    assert len(events) == 2 and len(mp) == 6 + len(ei.NOTICE_FILES)  # D172: the notices are listed too
 
 
 def test_sums_are_standard_sha256sum_format_and_correct(site):
@@ -238,7 +238,8 @@ def test_release_assets_package_is_complete_verifiable_and_reproducible(site, tm
     lines = pra.package(tmp_path / "r1", assets, **kw)
     names = {l.split("  ")[1] for l in lines}
     assert names == {"incidents.stix.json", "incidents.min.json", "taxii2.zip",
-                     "misp-feed.zip", "build_manifest.json"}
+                     "misp-feed.zip", "build_manifest.json",
+                     "NOTICE-DATA", "LICENSE-DATA", "Apache-2.0.txt"}  # D172
     assert ei.verify_sums(tmp_path / "r1") == []
     assert ei.validate_manifest(json.loads((tmp_path / "r1" / "build_manifest.json").read_text(encoding="utf-8"))) == []
     pra.package(tmp_path / "r2", assets, **kw)
@@ -264,7 +265,8 @@ def test_huggingface_build_ships_manifest_and_sums(tmp_path):
     m = json.loads((tmp_path / ei.MANIFEST_NAME).read_text(encoding="utf-8"))
     assert ei.validate_manifest(m) == [] and m["incident_count"] == n == STATS["incident_count"]
     listed = ei.parse_sums((tmp_path / "SHA256SUMS").read_text(encoding="utf-8"))
-    assert set(listed) == {"incidents.jsonl", "README.md", "build_manifest.json"}
+    assert set(listed) == {"incidents.jsonl", "README.md", "build_manifest.json",
+                           "NOTICE-DATA", "LICENSE-DATA", "LICENSES/Apache-2.0.txt"}  # D172
 
 
 def test_package_build_manifest_is_none_when_unstamped_and_a_dict_when_stamped(monkeypatch, tmp_path):

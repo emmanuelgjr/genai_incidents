@@ -165,7 +165,7 @@ the datasheet for full scope, collection method, and limitations.
 ## Licensing
 
 Data is released under **CC BY 4.0** overall (`license: cc-by-4.0` above; see
-`LICENSE-DATA` and `NOTICE-DATA` in the source repository). A subset of entries that
+`LICENSE-DATA` and `NOTICE-DATA`, which ship in this repository beside `incidents.jsonl`). A subset of entries that
 cite the **AIAAIC Repository** — those whose description derives from
 AIAAIC's sheet (`description_source == "aiaaic"`) plus a smaller set of hand-curated
 rows whose title and categorical facts derive from AIAAIC directly (current count
@@ -204,6 +204,14 @@ Miessler) and asks for the citation "hackingincidents.ai, Unsupervised Learning,
 **AVID**'s MIT copyright and permission notice (`NOTICE-DATA`; `docs/SOURCE_LICENSES.md`
 §6.1) must likewise accompany copies of AVID-derived content.
 
+`NOTICE-DATA`, `LICENSE-DATA` and `LICENSES/Apache-2.0.txt` ship in this repository beside
+`incidents.jsonl`, byte-identical to the source repository's files and listed in
+`SHA256SUMS`. They carry the MITRE CVE Terms of Use notice, the AVID MIT notice, the
+hackingincidents.ai MIT notice, the Apache-2.0 notices for MITRE ATLAS and garak text,
+and the NVD API and GitHub Advisory Database (CC BY 4.0) notices, which must accompany any
+copy of the rows they cover. Row-level `content_license` markers are a convenience, not
+the mechanism: rows carrying NVD, GitHub Advisory Database or OSV text may carry none.
+
 Two entries (identified in `NOTICE-DATA`) carried description text taken from the
 **OWASP Gen AI Security Project incident round-ups** (**CC BY-SA 4.0**) in
 earlier releases; they were rewritten in the project's own wording on
@@ -221,10 +229,10 @@ in the source repository is the authoritative account.
 - **Code & issues:** <https://github.com/emmanuelgjr/genai_incidents>
 - **Field reference:** [`docs/DATA_DICTIONARY.md`](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATA_DICTIONARY.md)
 - **Provenance, scope & limitations:** [`docs/DATASHEET.md`](https://github.com/emmanuelgjr/genai_incidents/blob/main/docs/DATASHEET.md)
-- **Build provenance:** `build_manifest.json` (commit, build time, counts, taxonomy versions) and `SHA256SUMS` (`sha256sum -c`) ship beside `incidents.jsonl` in this repository
+- **Build provenance:** `build_manifest.json` (commit, build time, counts, taxonomy versions), `SHA256SUMS` (`sha256sum -c`) and the licence notice files `NOTICE-DATA`, `LICENSE-DATA` and `LICENSES/Apache-2.0.txt` ship beside `incidents.jsonl` in this repository
 - **Citation:** [`CITATION.cff`](https://github.com/emmanuelgjr/genai_incidents/blob/main/CITATION.cff) · DOI [10.5281/zenodo.20248675](https://doi.org/10.5281/zenodo.20248675) (Zenodo concept DOI, always resolves to the latest release)
 
-**Licence:** data **CC-BY-4.0** (with exceptions: see Licensing above for row-level AIAAIC obligations and the OWASP carve-outs), code MIT.
+**Licence:** data **CC-BY-4.0**, with exceptions that travel with specific rows or files: AIAAIC-citing rows carry a CC BY-SA 4.0 attribution/share-alike obligation (row-level `content_license`); rows or text derived from the CVE Program (CVE Terms of Use), AVID (MIT), the hackingincidents.ai ledger (MIT) and MITRE ATLAS and garak (Apache-2.0) carry upstream copyright and permission notices, reproduced in `NOTICE-DATA`, which ships in this repository with `LICENSE-DATA` and `LICENSES/Apache-2.0.txt`; the OWASP mapping files (CC BY-SA 4.0, not part of this dataset) are in the source repository. See Licensing above. Code MIT.
 """
 
 
@@ -277,6 +285,9 @@ def build(out_dir: Path) -> tuple[int, Path]:
     # v2.13.0 item 8: provenance + integrity ride with the upload (the whole
     # folder is pushed). Manifest first so the sums cover it.
     import export_integrity as ei
+    # D172 R1: the licence notices ride with the rows they cover. Copied before
+    # the manifest/sums so SHA256SUMS lists them; a missing source fails the build.
+    ei.copy_notices(out_dir)
     ei.write_manifest(out_dir)
     ei.write_sums(out_dir, "*")
     return len(incidents), jsonl
