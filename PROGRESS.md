@@ -29,6 +29,16 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - proof that dedupe fires, with INC-17386 / aiid 1817 as the known positive;
 - no PR until the gate has passed and the user has reviewed the delta.
 
+**Update 2026-11-26: specialist reported `80217d42` (pushed, verified by its ls-remote; the foreman re-checked the branch tree, which is clean and has 1 commit and 33 files).** Claimed results:
+- **Rows:** 187 new rows (INC-17395..17581); rows 15,845→16,032; incident_count 15,804→15,991.
+- **Attached instead of created:** 110 of 298 (22 by AIID join, 48 by URL, 40 by reviewed title; 38 of them REPORT-LEVEL). The cairn pair collapsed into one.
+- **Existing rows:** 80 changed, in references, updated and last_seen only. 0 removed, 0 corpus flips.
+- **Excluded fields:** `confidence_reason` was measured as NOT clean (15 rows with an 8+ word run, max 19), so it is excluded, as is `outcome` (max 14). The description is a deterministic template, max 7-word run. A sentinel test covers the excluded fields.
+- **Dedupe:** fires on aiid 1817 → INC-17386; a doctored copy creates a new row.
+- **Tests:** pytest 1717 passed, 2 skipped, 1 xfailed (27 new); validate 16032/16032; drift clean.
+- **Delta file:** docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md. Hand sample of 15: 12 sensible, 3 coarse, 0 wrong.
+**Open decision the specialist raised:** `ingest/snapshots/hackingincidents/incidents.json` (690,343 B) commits the fetched bytes VERBATIM, so 298 `quote` and `summary` strings would sit in the public repo, although they are never emitted. The alternative is a stripped snapshot plus the raw sha256 in provenance. The report was truncated at this point and the remainder has been requested.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
