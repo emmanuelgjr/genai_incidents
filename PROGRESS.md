@@ -91,6 +91,8 @@ Gate-d169 re-gating on b554fdd9.
 - **(ii) The §8E NVD bullet** is replaced with: verbatim descriptions (L600), derived titles (L572-575), and the 1,500-char truncation (L881/L1111) as GHSA/OSV-only, covered by §5.2. Decision 4(iii) becomes "whether NVD-derived titles need a 'modified' statement".
 - **Strings to check:** none of "other rows that cite the ledger." in §8A; "L881 and L1111" absent from the NVD bullet; "titles need" present in §8F.
 
+**D170 USER RULING (2026-11-26): "Apply verbatim + string check (Recommended)".** The specialist applies (i), (ii) and the decision-4(iii) text exactly, plus restoring R3's original inline, as §9 (dated). The gate re-checks only the string checks and that nothing else changed.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
