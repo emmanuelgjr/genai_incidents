@@ -153,6 +153,8 @@ Gate-d161 is re-gating on 9cf17a43.
 - a possible attack_vector value for AI-agent intrusion (61 rows are `other`).
 It needs its own field-level delta and gate.
 
+**Update:** N1 is fixed in `df06e983`. The foreman checked that the diff vs 9cf17a43 is 1 line in SOURCE_LICENSES.md, and the specialist's grep found no other stale live counts. merge-tree vs origin/main is clean. **PR #117 is open** and CI is running. Merge follows once checks pass.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
