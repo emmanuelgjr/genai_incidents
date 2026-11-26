@@ -1,0 +1,2096 @@
+{
+  "source": "https://hackingincidents.ai/",
+  "snapshot": {
+    "url": "https://hackingincidents.ai/incidents.json",
+    "copy": "site copy (not the lagging Substrate repo copy, D159 U1)",
+    "fetched_utc": "2026-11-26T14:49:46Z",
+    "updated": "2026-11-24",
+    "rows": 298,
+    "raw_sha256": "e1e95518f0157ed71f7a5973cd3c9b9058755d7407d27fbb0358b63d63cd5315",
+    "raw_bytes": 690343,
+    "file": "ingest/snapshots/hackingincidents/incidents.json",
+    "sha256": "d46b4217b1346bd7367632b48b6954dd4d5f422d05a56904be67bd1303b11c9a",
+    "bytes": 284519,
+    "stripped": true,
+    "kept_fields": [
+      "id",
+      "title",
+      "date",
+      "disclosed",
+      "activity",
+      "actor",
+      "actor_type",
+      "nexus",
+      "targets",
+      "ai_role",
+      "models",
+      "model_basis",
+      "autonomy",
+      "confidence",
+      "sources"
+    ],
+    "kept_source_fields": [
+      "title",
+      "publisher",
+      "url",
+      "primary"
+    ],
+    "dropped_fields": [
+      "confidence_reason",
+      "enrichment",
+      "outcome",
+      "quote",
+      "single_source_reason",
+      "sources.aggregator_only",
+      "sources.archive_url",
+      "sources.date",
+      "sources.fetch_status",
+      "sources.kind",
+      "sources.primary_via_party",
+      "sources.quote_found",
+      "sources.verified_on",
+      "summary"
+    ]
+  },
+  "license": "MIT License, Copyright (c) 2025 Daniel Miessler (stated at https://hackingincidents.ai/data/; third-party quotes remain under their publishers' terms)",
+  "citation": "hackingincidents.ai, Unsupervised Learning, accessed <date>",
+  "excluded_fields": [
+    "quote",
+    "summary",
+    "confidence_reason",
+    "outcome",
+    "single_source_reason",
+    "enrichment"
+  ],
+  "excluded_field_measurements": {
+    "confidence_reason": {
+      "max_run": 19,
+      "rows_ge_8": 15,
+      "rows_ge_12": 9
+    },
+    "outcome": {
+      "max_run": 14,
+      "rows_ge_8": 4,
+      "rows_ge_12": 1
+    },
+    "summary": {
+      "max_run": 24,
+      "rows_ge_8": 42,
+      "rows_ge_12": 15
+    },
+    "title": {
+      "max_run": 10,
+      "rows_ge_8": 3,
+      "rows_ge_12": 0
+    },
+    "actor": {
+      "max_run": 5,
+      "rows_ge_8": 0,
+      "rows_ge_12": 0
+    },
+    "targets": {
+      "max_run": 7,
+      "rows_ge_8": 0,
+      "rows_ge_12": 0
+    },
+    "nexus": {
+      "max_run": 2,
+      "rows_ge_8": 0,
+      "rows_ge_12": 0
+    },
+    "emitted_description_vs_quote": {
+      "rows": 187,
+      "max_run": 7
+    }
+  },
+  "stats": {
+    "new": 187,
+    "attached": 110,
+    "attached_event": 72,
+    "attached_report": 38,
+    "ledger_rows": 298,
+    "collapsed_inledger": 1,
+    "fold_exempt_urls": 11
+  },
+  "review": {
+    "collapsed_inledger": {
+      "cairn-monai-label-university-intrusion": "cairn-monai-label-university-intrusions"
+    },
+    "matches": [
+      {
+        "ledger": "bossai-ai-agent-campaign",
+        "target": "INC-17384",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.386,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "vapor-panda-artex-global-espionage",
+        "target": "INC-17367",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.532,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "binance-hot-wallet-compromised-ai-tool-2026",
+        "target": "INC-17386",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.616,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1817"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "chainalysis-offensive-agentic-breach-2026",
+        "target": "INC-17368",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.383,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "dutch-ai-bank-warning-recordings-fraud-2026",
+        "target": "INC-17361",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.448,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "storm-0940-artex-connectwise-2026",
+        "target": "INC-17356",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.506,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1781"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "cairn-ecommerce-intrusion-campaign",
+        "target": "INC-17344",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.484,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "aepd-first-agentic-ai-breach-spain-2026",
+        "target": "INC-17294",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.559,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "artex-south-korean-bank-intrusions",
+        "target": "INC-17357",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.531,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "greek-ai-cloned-relatives-voice-fraud-2026",
+        "target": "INC-17334",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.736,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1748"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "taiwan-romance-scam-ai-voice-changer-2026",
+        "target": "INC-17391",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.869,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "starmangalsutra-deepfake-director-transfers-2026",
+        "target": "INC-17227",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.508,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1596"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "taiwan-government-hermes-openclaw-2026",
+        "target": "INC-17261",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.74,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "thailand-finance-ministry-hermes-agent-2026",
+        "target": "INC-17275",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.539,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "tuxbot-v3-llm-built-botnet-2026",
+        "target": "INC-14583",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.523,
+        "shared_urls": [
+          "securityaffairs.com/195486/ai/tuxbot-v3-the-iot-botnet-built-with-ai-bugs-disclaimers-and-all.html",
+          "unit42.paloaltonetworks.com/tuxbot-v3-evolution-iot-botnet"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "jadepuffer-agentic-ransomware-langflow",
+        "target": "INC-14302",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.294,
+        "shared_urls": [
+          "theregister.com/security/2026/07/02/smooth-ai-criminal-drives-first-end-to-end-agentic-ransomware-attack/5266073"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "meta-ai-support-bot-instagram-takeovers-2026",
+        "target": "INC-14602",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.729,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "promptspy-android-gemini-agent",
+        "target": "INC-00587",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.505,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "claude-pentestgpt-argentine-healthcare",
+        "target": "INC-17369",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.396,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "grok-bankrbot-morse-code-transfer-2026",
+        "target": "INC-00196",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.654,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "kali365-phaas-ai-lures-2026",
+        "target": "INC-07898",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.491,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "marimo-exploit-llm-agent-database-exfil-2026",
+        "target": "INC-17276",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.847,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "outsider-enterprise-gemini-smishing-sites-2026",
+        "target": "INC-13073",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.756,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1534"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "singapore-pm-wong-deepfake-zoom-2026",
+        "target": "INC-01775",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.49,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "aurora-ransomware-cursor-claude-2026",
+        "target": "INC-17270",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.567,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1661"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "eviltokens-ai-augmented-phaas-bec-2026",
+        "target": "INC-00266",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.501,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "promptmink-claude-malicious-dependency-2026",
+        "target": "INC-00260",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.125,
+        "shared_urls": [
+          "reversinglabs.com/blog/claude-promptmink-malware-crypto"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "deepfake-applicant-tokyo-it-executive-2026",
+        "target": "INC-01697",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.508,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1421"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "deepload-ai-assisted-evasion-2026",
+        "target": "INC-00527",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.496,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "hackerbot-claw-github-actions-2026",
+        "target": "INC-01157",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.675,
+        "shared_urls": [
+          "datadoghq.com/blog/engineering/stopping-hackerbot-claw-with-bewaire"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "fideuram-intesa-voice-clone-95m-2026",
+        "target": "INC-17335",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.425,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "clawhavoc-malicious-openclaw-skills-2026",
+        "target": "INC-01365",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.642,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1368"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "fortigate-600-devices-ai-augmented-2026",
+        "target": "INC-00265",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.314,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "slopoly-hive0163-ransomware",
+        "target": "INC-00505",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.851,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "konni-ai-built-powershell-backdoor-2026",
+        "target": "INC-01541",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.429,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "mexico-government-claude-code-breach",
+        "target": "INC-07905",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.351,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "sysdig-ai-assisted-aws-admin-8-minutes",
+        "target": "INC-03248",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.313,
+        "shared_urls": [
+          "sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "quietvault-ai-credential-stealer-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "temp-zagros-gemini-malware-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "unc1069-masan-gemini-crypto-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "unc4899-pukchong-gemini-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "apt42-gemini-data-processing-agent-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "bandai-channel-teen-chatgpt-program-2025",
+        "target": "INC-14897",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.301,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "china-nexus-ctf-pretext-gemini-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "mimecast-centrelink-ai-phishing-2025",
+        "target": "INC-03114",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.271,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1275"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "voidlink-ai-built-linux-malware-framework",
+        "target": "INC-00520",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.302,
+        "shared_urls": [
+          "research.checkpoint.com/2026/voidlink-early-ai-generated-malware-framework"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "openai-korean-operators-xenorat-2025",
+        "target": "INC-03006",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "openai-russian-malware-tooling-2025",
+        "target": "INC-03006",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "openai-unk-droppitch-2025",
+        "target": "INC-03006",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "shai-hulud-npm-worm-llm-script",
+        "target": "INC-03212",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.769,
+        "shared_urls": [
+          "unit42.paloaltonetworks.com/npm-supply-chain-attack"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "gtg-1002-claude-code-espionage-2025",
+        "target": "INC-02426",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.682,
+        "shared_urls": [
+          "anthropic.com/news/disrupting-ai-espionage"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "postmark-mcp-malicious-mcp-server-2025",
+        "target": "INC-02849",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.643,
+        "shared_urls": [
+          "koi.security/blog/postmark-mcp-npm-malicious-backdoor-email-theft"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "crowdstrike-famous-chollima-deepfake-2025",
+        "target": "INC-02461",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.721,
+        "shared_urls": [
+          "crowdstrike.com/en-us/blog/crowdstrike-2025-threat-hunting-report-ai-weapon-target"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "apt41-gemini-osstun-c2-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "carding-store-claude-code-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "www-cdn.anthropic.com/b2a76c6f6992465c09a6f2fce282f6c0cea8c200.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "chinese-actor-claude-vietnam-critical-infrastructure-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "www-cdn.anthropic.com/b2a76c6f6992465c09a6f2fce282f6c0cea8c200.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "dprk-it-workers-claude-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.43,
+        "shared_urls": [
+          "anthropic.com/news/detecting-countering-misuse-aug-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "stealer-log-mcp-victim-profiling-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "www-cdn.anthropic.com/b2a76c6f6992465c09a6f2fce282f6c0cea8c200.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "amazon-q-vscode-wiper-prompt",
+        "target": "INC-02300",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.605,
+        "shared_urls": [
+          "404media.co/hacker-plants-computer-wiping-commands-in-amazons-ai-coding-agent",
+          "aws.amazon.com/security/security-bulletins/aws-2025-015"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "kimsuky-chatgpt-fake-military-id",
+        "target": "INC-02959",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.542,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "claude-code-data-extortion-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "anthropic.com/news/detecting-countering-misuse-aug-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "jasper-sleet-faceswap-voice-changing-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.177,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2025/06/30/jasper-sleet-north-korean-remote-it-workers-evolving-tactics-to-infiltrate-organizations"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "openai-dprk-deceptive-employment-2025",
+        "target": "INC-03003",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.112,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf"
+        ],
+        "alternates": [
+          "INC-02999"
+        ]
+      },
+      {
+        "ledger": "apt28-promptsteal-lamehug-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "bluenoroff-deepfake-zoom-crypto-2025",
+        "target": "INC-00698",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.597,
+        "shared_urls": [
+          "arcticwolf.com/resources/blog/bluenoroff-uses-clickfix-fileless-powershell-and-ai-generated-zoom-meetings-to-target-web3-sector"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "deepfake-zoom-crypto-analyst-takeover-2025",
+        "target": "INC-03157",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.544,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1111"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "promptflux-gemini-malware-2025",
+        "target": "INC-02637",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/threat-actor-usage-of-ai-tools"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "scopecreep-chatgpt-go-malware-2025",
+        "target": "INC-03003",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "vague-focus-chatgpt-social-engineering-2025",
+        "target": "INC-03003",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "vixen-keyhole-panda-chatgpt-2025",
+        "target": "INC-03003",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "wrong-number-task-scam-chatgpt-2025",
+        "target": "INC-03003",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.118,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "veriff-ceo-realtime-deepfake-whatsapp-2025",
+        "target": "INC-14465",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.568,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1502"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "wiles-impersonation-ai-voice-2025",
+        "target": "INC-03373",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.296,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "hk-ai-facial-composites-bank-checks-2025",
+        "target": "INC-02698",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.761,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1066"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "aixbt-agent-fraudulent-prompts-2025",
+        "target": "INC-02280",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.8,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1003"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "iot-camera-credential-scraping-2025",
+        "target": "INC-02320",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "anthropic.com/news/detecting-and-countering-malicious-uses-of-claude-march-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "novice-malware-builder-2025",
+        "target": "INC-02320",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "anthropic.com/news/detecting-and-countering-malicious-uses-of-claude-march-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "recruitment-fraud-language-sanitization-2025",
+        "target": "INC-02320",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "anthropic.com/news/detecting-and-countering-malicious-uses-of-claude-march-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "youtube-ceo-deepfake-creator-phishing-2025",
+        "target": "INC-03024",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.708,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/965"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "cambodia-romance-baiting-chatgpt-2025",
+        "target": "INC-02999",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.156,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-of-our-models-february-2025-update.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "kimsuky-bluenoroff-chatgpt-rdp-tooling-2025",
+        "target": "INC-02999",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.071,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-of-our-models-february-2025-update.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "storm-2139-azure-openai-llmjacking-2025",
+        "target": "INC-03812",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.442,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/955"
+        ],
+        "alternates": [
+          "INC-02902"
+        ]
+      },
+      {
+        "ledger": "apt42-gemini-phishing-2025",
+        "target": "INC-02680",
+        "basis": [
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.273,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/adversarial-misuse-generative-ai"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "apt43-public-ai-tools-research-2025",
+        "target": "INC-02680",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cloud.google.com/blog/topics/threat-intelligence/adversarial-misuse-generative-ai"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "brad-pitt-ai-images-romance-scam-2025",
+        "target": "INC-03452",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.497,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "dnb-cfo-ceo-deepfake-teams-2025",
+        "target": "INC-03122",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.792,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1246"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "hk-deepfake-dating-crypto-fraud-2025",
+        "target": "INC-02696",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.532,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "kaikatsu-frontier-teen-ai-program-breach-2025",
+        "target": "INC-02779",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.597,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/1295"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "no-code-ransomware-as-a-service-2025",
+        "target": "INC-08177",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "anthropic.com/news/detecting-countering-misuse-aug-2025"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "thai-pm-ai-voice-asean-leader-2025",
+        "target": "INC-03043",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.51,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/902"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "funksec-ai-assisted-ransomware",
+        "target": "INC-02219",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.54,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "meeten-ai-generated-brand-realst-2024",
+        "target": "INC-03975",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.437,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/870"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "nomani-deepfake-investment-scam-2024",
+        "target": "INC-03874",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.623,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/877"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "cyberav3ngers-chatgpt-plc-research-2024",
+        "target": "INC-04068",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_october-2024.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "storm-0817-chatgpt-android-malware-2024",
+        "target": "INC-04068",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.0,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_october-2024.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "sweetspecter-chatgpt-2024",
+        "target": "INC-04068",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.129,
+        "shared_urls": [
+          "cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_october-2024.pdf"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "cardin-kuleba-deepfake-zoom-2024",
+        "target": "INC-04196",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.395,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "ferrari-ceo-voice-clone-attempt-2024",
+        "target": "INC-03783",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.432,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "llmjacking-sysdig-bedrock-2024",
+        "target": "INC-08183",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.0,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/898",
+          "sysdig.com/blog/llmjacking-stolen-cloud-credentials-used-in-new-ai-attack"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "wisetech-ceo-deepfake-whatsapp-2024",
+        "target": "INC-04356",
+        "basis": [
+          "aiid",
+          "url"
+        ],
+        "level": "event",
+        "similarity": 0.634,
+        "shared_urls": [
+          "incidentdatabase.ai/cite/783"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "wpp-ceo-deepfake-meeting-attempt-2024",
+        "target": "INC-04359",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.567,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "lastpass-deepfake-ceo-voice-attempt-2024",
+        "target": "INC-04154",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.371,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "charcoal-typhoon-chatgpt-2024",
+        "target": "INC-04066",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.114,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2024/02/14/staying-ahead-of-threat-actors-in-the-age-of-ai",
+          "openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "crimson-sandstorm-chatgpt-2024",
+        "target": "INC-04066",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.114,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2024/02/14/staying-ahead-of-threat-actors-in-the-age-of-ai",
+          "openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "emerald-sleet-chatgpt-2024",
+        "target": "INC-04066",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.114,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2024/02/14/staying-ahead-of-threat-actors-in-the-age-of-ai",
+          "openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "forest-blizzard-chatgpt-2024",
+        "target": "INC-04066",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.114,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2024/02/14/staying-ahead-of-threat-actors-in-the-age-of-ai",
+          "openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "salmon-typhoon-chatgpt-2024",
+        "target": "INC-04066",
+        "basis": [
+          "url"
+        ],
+        "level": "report",
+        "similarity": 0.114,
+        "shared_urls": [
+          "microsoft.com/en-us/security/blog/2024/02/14/staying-ahead-of-threat-actors-in-the-age-of-ai",
+          "openai.com/index/disrupting-malicious-uses-of-ai-by-state-affiliated-threat-actors"
+        ],
+        "alternates": []
+      },
+      {
+        "ledger": "arup-hong-kong-deepfake-video-call-2024",
+        "target": "INC-03588",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.629,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "retool-deepfake-voice-vishing-2023",
+        "target": "INC-04615",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.402,
+        "shared_urls": [],
+        "alternates": []
+      },
+      {
+        "ledger": "kerala-deepfake-whatsapp-video-call-2023",
+        "target": "INC-04711",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.394,
+        "shared_urls": [],
+        "alternates": []
+      }
+    ],
+    "multi_candidate": [
+      {
+        "ledger": "openai-dprk-deceptive-employment-2025",
+        "chosen": "INC-03003",
+        "alternates": [
+          "INC-02999"
+        ]
+      },
+      {
+        "ledger": "storm-2139-azure-openai-llmjacking-2025",
+        "chosen": "INC-03812",
+        "alternates": [
+          "INC-02902"
+        ]
+      }
+    ],
+    "report_level": [
+      {
+        "ledger": "promptmink-claude-malicious-dependency-2026",
+        "target": "INC-00260",
+        "similarity": 0.125
+      },
+      {
+        "ledger": "quietvault-ai-credential-stealer-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "temp-zagros-gemini-malware-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "unc1069-masan-gemini-crypto-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "unc4899-pukchong-gemini-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "apt42-gemini-data-processing-agent-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "china-nexus-ctf-pretext-gemini-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "openai-korean-operators-xenorat-2025",
+        "target": "INC-03006",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "openai-russian-malware-tooling-2025",
+        "target": "INC-03006",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "openai-unk-droppitch-2025",
+        "target": "INC-03006",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "apt41-gemini-osstun-c2-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "carding-store-claude-code-2025",
+        "target": "INC-08177",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "chinese-actor-claude-vietnam-critical-infrastructure-2025",
+        "target": "INC-08177",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "stealer-log-mcp-victim-profiling-2025",
+        "target": "INC-08177",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "claude-code-data-extortion-2025",
+        "target": "INC-08177",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "jasper-sleet-faceswap-voice-changing-2025",
+        "target": "INC-08177",
+        "similarity": 0.177
+      },
+      {
+        "ledger": "openai-dprk-deceptive-employment-2025",
+        "target": "INC-03003",
+        "similarity": 0.112
+      },
+      {
+        "ledger": "apt28-promptsteal-lamehug-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "promptflux-gemini-malware-2025",
+        "target": "INC-02637",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "scopecreep-chatgpt-go-malware-2025",
+        "target": "INC-03003",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "vague-focus-chatgpt-social-engineering-2025",
+        "target": "INC-03003",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "vixen-keyhole-panda-chatgpt-2025",
+        "target": "INC-03003",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "wrong-number-task-scam-chatgpt-2025",
+        "target": "INC-03003",
+        "similarity": 0.118
+      },
+      {
+        "ledger": "iot-camera-credential-scraping-2025",
+        "target": "INC-02320",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "novice-malware-builder-2025",
+        "target": "INC-02320",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "recruitment-fraud-language-sanitization-2025",
+        "target": "INC-02320",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "cambodia-romance-baiting-chatgpt-2025",
+        "target": "INC-02999",
+        "similarity": 0.156
+      },
+      {
+        "ledger": "kimsuky-bluenoroff-chatgpt-rdp-tooling-2025",
+        "target": "INC-02999",
+        "similarity": 0.071
+      },
+      {
+        "ledger": "apt43-public-ai-tools-research-2025",
+        "target": "INC-02680",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "no-code-ransomware-as-a-service-2025",
+        "target": "INC-08177",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "cyberav3ngers-chatgpt-plc-research-2024",
+        "target": "INC-04068",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "storm-0817-chatgpt-android-malware-2024",
+        "target": "INC-04068",
+        "similarity": 0.0
+      },
+      {
+        "ledger": "sweetspecter-chatgpt-2024",
+        "target": "INC-04068",
+        "similarity": 0.129
+      },
+      {
+        "ledger": "charcoal-typhoon-chatgpt-2024",
+        "target": "INC-04066",
+        "similarity": 0.114
+      },
+      {
+        "ledger": "crimson-sandstorm-chatgpt-2024",
+        "target": "INC-04066",
+        "similarity": 0.114
+      },
+      {
+        "ledger": "emerald-sleet-chatgpt-2024",
+        "target": "INC-04066",
+        "similarity": 0.114
+      },
+      {
+        "ledger": "forest-blizzard-chatgpt-2024",
+        "target": "INC-04066",
+        "similarity": 0.114
+      },
+      {
+        "ledger": "salmon-typhoon-chatgpt-2024",
+        "target": "INC-04066",
+        "similarity": 0.114
+      }
+    ],
+    "title_candidates_not_matched": [
+      {
+        "ledger": "cyberstrikeai-education-intrusions-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-01927",
+            "similarity": 0.37
+          }
+        ]
+      },
+      {
+        "ledger": "dprk-facestealer-deepfake-crypto-theft-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02960",
+            "similarity": 0.3
+          }
+        ]
+      },
+      {
+        "ledger": "kerala-sitharaman-deepfake-investment-fraud",
+        "candidates": [
+          {
+            "inc_id": "INC-03056",
+            "similarity": 0.33
+          }
+        ]
+      },
+      {
+        "ledger": "kolkata-relative-voice-clone-fraud",
+        "candidates": [
+          {
+            "inc_id": "INC-03054",
+            "similarity": 0.36
+          },
+          {
+            "inc_id": "INC-14487",
+            "similarity": 0.33
+          }
+        ]
+      },
+      {
+        "ledger": "chatgpt-feature-clickfix-trojan-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02198",
+            "similarity": 0.4
+          }
+        ]
+      },
+      {
+        "ledger": "claudefix-shared-claude-chats-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02198",
+            "similarity": 0.4
+          },
+          {
+            "inc_id": "INC-07980",
+            "similarity": 0.34
+          }
+        ]
+      },
+      {
+        "ledger": "divd-zammad-agentic-zero-days-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02111",
+            "similarity": 0.33
+          }
+        ]
+      },
+      {
+        "ledger": "onyx-sleet-artex-and-ai-lures-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-01558",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "search-ad-phishing-gcp-billing-llmjacking-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-09775",
+            "similarity": 0.4
+          }
+        ]
+      },
+      {
+        "ledger": "seoul-artex-ring-90-organizations-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-14877",
+            "similarity": 0.32
+          }
+        ]
+      },
+      {
+        "ledger": "storm-3358-artex-financial-sector-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02854",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "unit42-latam-ai-tool-exfiltration-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-01927",
+            "similarity": 0.37
+          },
+          {
+            "inc_id": "INC-00287",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "mandiant-hijacked-ai-assistant-shai-hulud",
+        "candidates": [
+          {
+            "inc_id": "INC-08450",
+            "similarity": 0.38
+          },
+          {
+            "inc_id": "INC-03212",
+            "similarity": 0.36
+          }
+        ]
+      },
+      {
+        "ledger": "gtg-20006-russian-espionage-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02426",
+            "similarity": 0.31
+          }
+        ]
+      },
+      {
+        "ledger": "gtg-50014-shinyhunters-affiliates-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02255",
+            "similarity": 0.31
+          }
+        ]
+      },
+      {
+        "ledger": "gtg-50020-ai-supply-chain-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-13206",
+            "similarity": 0.32
+          }
+        ]
+      },
+      {
+        "ledger": "basin-castle-genai-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-00527",
+            "similarity": 0.3
+          }
+        ]
+      },
+      {
+        "ledger": "hk-ai-face-swap-id-bank-accounts-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02698",
+            "similarity": 0.66
+          },
+          {
+            "inc_id": "INC-00707",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "phantom-inc-gentlemen-ai-assisted-intrusions",
+        "candidates": [
+          {
+            "inc_id": "INC-01607",
+            "similarity": 0.34
+          },
+          {
+            "inc_id": "INC-01606",
+            "similarity": 0.34
+          }
+        ]
+      },
+      {
+        "ledger": "jadepuffer-ai-model-wiper-ransomware-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-14302",
+            "similarity": 0.31
+          }
+        ]
+      },
+      {
+        "ledger": "sapphire-sleet-rust-supply-chain-ai-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-00671",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "scmbanker-ref6045-llm-written-tooling-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02198",
+            "similarity": 0.4
+          }
+        ]
+      },
+      {
+        "ledger": "ai-agent-pentest-pretext-southeast-asia-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-03306",
+            "similarity": 0.37
+          },
+          {
+            "inc_id": "INC-00138",
+            "similarity": 0.34
+          }
+        ]
+      },
+      {
+        "ledger": "cyberxero-claude-code-pentagi-iab",
+        "candidates": [
+          {
+            "inc_id": "INC-10517",
+            "similarity": 0.3
+          }
+        ]
+      },
+      {
+        "ledger": "gambit-strix-cairn-hermes-retailer-skimmers",
+        "candidates": [
+          {
+            "inc_id": "INC-02854",
+            "similarity": 0.35
+          }
+        ]
+      },
+      {
+        "ledger": "laundry-bear-flowerbed-ai-assisted-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-15035",
+            "similarity": 0.32
+          }
+        ]
+      },
+      {
+        "ledger": "sysdig-vapt-ollama-reasoning-engine",
+        "candidates": [
+          {
+            "inc_id": "INC-08920",
+            "similarity": 0.37
+          }
+        ]
+      },
+      {
+        "ledger": "hk-deepfake-lost-id-cards-bank-checks-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02698",
+            "similarity": 0.65
+          }
+        ]
+      },
+      {
+        "ledger": "ai-enabled-device-code-phishing-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-00266",
+            "similarity": 0.33
+          }
+        ]
+      },
+      {
+        "ledger": "gtg-15001-ai-dating-app-scam-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-07824",
+            "similarity": 0.33
+          }
+        ]
+      },
+      {
+        "ledger": "prt-scan-github-actions-supply-chain-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-01157",
+            "similarity": 0.34
+          }
+        ]
+      },
+      {
+        "ledger": "ai-built-clickfix-sites-smartrat-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-02198",
+            "similarity": 0.4
+          }
+        ]
+      },
+      {
+        "ledger": "coral-sleet-ai-malware-development-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-00671",
+            "similarity": 0.31
+          }
+        ]
+      },
+      {
+        "ledger": "bizarre-bazaar-llm-endpoint-resale-2026",
+        "candidates": [
+          {
+            "inc_id": "INC-09192",
+            "similarity": 0.31
+          }
+        ]
+      },
+      {
+        "ledger": "clickfix-shared-ai-chats-atomic-2025",
+        "candidates": [
+          {
+            "inc_id": "INC-02198",
+            "similarity": 0.4
+          }
+        ]
+      },
+      {
+        "ledger": "revengehotels-llm-generated-infector-2025",
+        "candidates": [
+          {
+            "inc_id": "INC-01927",
+            "similarity": 0.37
+          }
+        ]
+      },
+      {
+        "ledger": "lovable-ai-builder-tycoon-phishing-2025",
+        "candidates": [
+          {
+            "inc_id": "INC-01357",
+            "similarity": 0.32
+          }
+        ]
+      },
+      {
+        "ledger": "vidoc-deepfake-candidates-2025",
+        "candidates": [
+          {
+            "inc_id": "INC-08920",
+            "similarity": 0.37
+          }
+        ]
+      },
+      {
+        "ledger": "hk-deepfake-romance-syndicate-360m-2024",
+        "candidates": [
+          {
+            "inc_id": "INC-02698",
+            "similarity": 0.39
+          }
+        ]
+      }
+    ],
+    "reviewed_but_url_matched_elsewhere": []
+  }
+}

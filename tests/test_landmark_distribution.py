@@ -459,6 +459,7 @@ REGISTERED_PRODUCERS = {
     "ingest_avid.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
     "ingest_cvelistv5.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
     "ingest_arxiv_oaipmh.py": "INTERNAL (ingest, reads the corpus only to skip rows already present)",
+    "ingest_hackingincidents.py": "INTERNAL (ingest, reads the corpus only to match ledger rows to existing rows; writes ingest/wave13_hackingincidents.*, no tier)",
     "migrate_oecd_description_reduction.py": "INTERNAL (one-shot migration over build inputs)",
     "migrate_owasp_llm_2026.py": "INTERNAL (one-shot migration over build inputs)",
     "lint_atlas_ids.py": "INTERNAL (CI lint: reads mitre_atlas/mitre_atlas_tactics only, writes nothing)",

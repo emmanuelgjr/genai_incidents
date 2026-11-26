@@ -1,0 +1,320 @@
+{
+ "updated": "2026-11-24",
+ "_note": "subset of the 2026-11-24 site copy; the text fields (quote, summary, confidence_reason, outcome, single_source_reason, enrichment) are replaced by SENTINEL strings so tests can prove they never reach an output; facts are verbatim",
+ "incidents": [
+  {
+   "id": "3am-affiliate-uk-school-suspected-ai-2026",
+   "title": "3AM ransomware affiliate hits a UK school estate; Bitdefender infers AI-generated commands",
+   "date": "2026-11",
+   "actor": "3AM ransomware affiliate",
+   "actor_type": "criminal",
+   "nexus": null,
+   "targets": "UK school estate",
+   "ai_role": [
+    "ops-automation"
+   ],
+   "models": [
+    "Unnamed LLM"
+   ],
+   "model_basis": "inferred",
+   "autonomy": "assist",
+   "outcome": "SENTINEL-OUTCOME-3am-affiliate-uk-school-suspected-ai-2026 publisher text that must never reach an output row",
+   "confidence": "STRONG",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-3am-affiliate-uk-school-suspected-ai-2026 publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-3am-affiliate-uk-school-suspected-ai-2026 publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-3am-affiliate-uk-school-suspected-ai-2026 publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "3AM ransomware affiliate hits a UK school estate in a suspected AI-assisted attack",
+     "publisher": "AI Threat Watch",
+     "url": "https://aithreat.io/cases/3am-ransomware-ai-uk-school/",
+     "date": "2026-11",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": false,
+     "quote_found": true
+    },
+    {
+     "title": "3AM hits European schools: a hybrid AI ransomware attack",
+     "publisher": "Bitdefender",
+     "url": "https://www.bitdefender.com/en-us/blog/businessinsights/3am-ransomware-hybrid-ai-attack",
+     "date": "2026-11",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-3am-affiliate-uk-school-suspected-ai-2026 publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "cairn-monai-label-university-intrusion",
+   "title": "Cairn agents reportedly gained root access to a university server",
+   "date": "2026-11",
+   "disclosed": "2026-11-21",
+   "actor": "Unidentified suspected China-linked attackers",
+   "actor_type": "unknown",
+   "nexus": "Suspected China link reported in secondary coverage",
+   "targets": "An unnamed university running a MONAI Label server",
+   "ai_role": [
+    "agentic-intrusion"
+   ],
+   "models": [
+    "Cairn"
+   ],
+   "model_basis": "unknown",
+   "autonomy": "autonomous",
+   "outcome": "SENTINEL-OUTCOME-cairn-monai-label-university-intrusion publisher text that must never reach an output row",
+   "confidence": "SUSPECTED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-cairn-monai-label-university-intrusion publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-cairn-monai-label-university-intrusion publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-cairn-monai-label-university-intrusion publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Cyware Daily Threat Intelligence, November 21, 2026",
+     "publisher": "Cyware",
+     "url": "https://www.cyware.com/resources/threat-briefings/daily-threat-briefing/cyware-daily-threat-intelligence-november-21-2026",
+     "date": "2026-11-21",
+     "verified_on": "2026-11-24",
+     "fetch_status": 200,
+     "primary": false,
+     "quote_found": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-cairn-monai-label-university-intrusion publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "cairn-monai-label-university-intrusions",
+   "title": "Cairn agents exploited a MONAI Label zero-day against university systems",
+   "date": "2026-11",
+   "disclosed": "2026-11-21",
+   "actor": "Unnamed suspected China-linked operator",
+   "actor_type": "unknown",
+   "nexus": "China, assessed by Amazon with moderate confidence",
+   "targets": "University systems in East Asia",
+   "ai_role": [
+    "vuln-research",
+    "agentic-intrusion"
+   ],
+   "models": [
+    "Cairn"
+   ],
+   "model_basis": "stated-by-researcher",
+   "autonomy": "autonomous",
+   "outcome": "SENTINEL-OUTCOME-cairn-monai-label-university-intrusions publisher text that must never reach an output row",
+   "confidence": "SUSPECTED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-cairn-monai-label-university-intrusions publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-cairn-monai-label-university-intrusions publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-cairn-monai-label-university-intrusions publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Amazon: China-Linked Hackers Used AI Agents to Exploit Medical Software Zero-Day",
+     "publisher": "SecurityWeek",
+     "url": "https://www.securityweek.com/amazon-china-linked-hackers-ai-agents-exploited-medical-software-zero-day/",
+     "date": "2026-11-21",
+     "verified_on": "2026-11-24",
+     "fetch_status": 200,
+     "primary": false,
+     "quote_found": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-cairn-monai-label-university-intrusions publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "binance-hot-wallet-compromised-ai-tool-2026",
+   "title": "Binance hot-wallet theft reached through a compromised internal AI tool",
+   "date": "2026-10",
+   "actor": "North Korean hackers (per the FBI)",
+   "actor_type": "nation-state",
+   "nexus": "North Korea",
+   "targets": "Binance (about US$6.34 billion affected, US$2.85 billion frozen or intercepted)",
+   "ai_role": [
+    "agent-hijack"
+   ],
+   "models": [
+    "Unnamed AI agents"
+   ],
+   "model_basis": "stated-by-victim",
+   "autonomy": "assist",
+   "outcome": "SENTINEL-OUTCOME-binance-hot-wallet-compromised-ai-tool-2026 publisher text that must never reach an output row",
+   "confidence": "SUSPECTED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-binance-hot-wallet-compromised-ai-tool-2026 publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-binance-hot-wallet-compromised-ai-tool-2026 publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-binance-hot-wallet-compromised-ai-tool-2026 publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Binance hot-wallet theft reached through a compromised internal AI tool",
+     "publisher": "AI Incident Database",
+     "url": "https://incidentdatabase.ai/cite/1817/",
+     "date": "2026-10",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": false,
+     "quote_found": true,
+     "aggregator_only": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-binance-hot-wallet-compromised-ai-tool-2026 publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "gtg-10007-exploit-foundry-2026",
+   "title": "Chinese operators ran an AI exploit foundry and agent swarms",
+   "date": "2026-09-10",
+   "disclosed": "2026-09-10",
+   "activity": "2026",
+   "actor": "GTG-10007",
+   "actor_type": "nation-state",
+   "nexus": "China",
+   "targets": "About fifty organizations including Southeast Asian government agencies",
+   "ai_role": [
+    "vuln-research",
+    "exploit-dev",
+    "recon",
+    "agentic-intrusion",
+    "malware-dev"
+   ],
+   "models": [
+    "Claude"
+   ],
+   "model_basis": "stated-by-vendor",
+   "autonomy": "autonomous",
+   "outcome": "SENTINEL-OUTCOME-gtg-10007-exploit-foundry-2026 publisher text that must never reach an output row",
+   "confidence": "CONFIRMED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-gtg-10007-exploit-foundry-2026 publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-gtg-10007-exploit-foundry-2026 publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-gtg-10007-exploit-foundry-2026 publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Detecting and countering misuse of AI: September 2026",
+     "publisher": "Anthropic",
+     "url": "https://www.anthropic.com/threat-intelligence-report-september-2026",
+     "date": "2026-09-10",
+     "kind": "primary",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": true,
+     "quote_found": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-gtg-10007-exploit-foundry-2026 publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "gtg-20006-russian-espionage-2026",
+   "title": "Midnight Blizzard-linked GTG-20006 automated espionage and malware rebuilds",
+   "date": "2026-09-10",
+   "disclosed": "2026-09-10",
+   "activity": "2026",
+   "actor": "GTG-20006 (consistent with Midnight Blizzard)",
+   "actor_type": "nation-state",
+   "nexus": "Russia",
+   "targets": "Ukrainian and European governments, defense, drone suppliers",
+   "ai_role": [
+    "recon",
+    "agentic-intrusion",
+    "malware-dev",
+    "evasion",
+    "phishing-content",
+    "ops-automation"
+   ],
+   "models": [
+    "Claude Code",
+    "Claude"
+   ],
+   "model_basis": "stated-by-vendor",
+   "autonomy": "autonomous",
+   "outcome": "SENTINEL-OUTCOME-gtg-20006-russian-espionage-2026 publisher text that must never reach an output row",
+   "confidence": "CONFIRMED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-gtg-20006-russian-espionage-2026 publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-gtg-20006-russian-espionage-2026 publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-gtg-20006-russian-espionage-2026 publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Detecting and countering misuse of AI: September 2026",
+     "publisher": "Anthropic",
+     "url": "https://www.anthropic.com/threat-intelligence-report-september-2026",
+     "date": "2026-09-10",
+     "kind": "primary",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": true,
+     "quote_found": true
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-gtg-20006-russian-espionage-2026 publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  },
+  {
+   "id": "scopecreep-chatgpt-go-malware-2025",
+   "title": "Russian-speaking actor builds ScopeCreep multi-stage Go malware with ChatGPT",
+   "date": "2025-06",
+   "actor": "Unnamed Russian-speaking actor (ScopeCreep)",
+   "actor_type": "criminal",
+   "nexus": "Russian-speaking; country attribution unestablished",
+   "targets": "Gamers who downloaded a trojanized Crosshair-X tool",
+   "ai_role": [
+    "malware-dev",
+    "evasion"
+   ],
+   "models": [
+    "ChatGPT"
+   ],
+   "model_basis": "stated-by-vendor",
+   "autonomy": "assist",
+   "outcome": "SENTINEL-OUTCOME-scopecreep-chatgpt-go-malware-2025 publisher text that must never reach an output row",
+   "confidence": "CONFIRMED",
+   "confidence_reason": "SENTINEL-CONFIDENCE_REASON-scopecreep-chatgpt-go-malware-2025 publisher text that must never reach an output row",
+   "summary": "SENTINEL-SUMMARY-scopecreep-chatgpt-go-malware-2025 publisher text that must never reach an output row",
+   "quote": "SENTINEL-QUOTE-scopecreep-chatgpt-go-malware-2025 publisher text that must never reach an output row",
+   "sources": [
+    {
+     "title": "Russian-speaking actor builds ScopeCreep multi-stage Go malware with ChatGPT",
+     "publisher": "OpenAI",
+     "url": "https://cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf",
+     "date": "2025-06",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": true,
+     "quote_found": true
+    },
+    {
+     "title": "OpenAI Operation ScopeCreep: Russian-speaking actor used ChatGPT to build and debug Windows malware and its C2 server",
+     "publisher": "AI Adoption",
+     "url": "https://aiadoption.org/record/ai-powered-cyber-attacks/",
+     "date": "2025-06",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": false
+    },
+    {
+     "title": "ScopeCreep: Russian-speaking actor built Windows malware with ChatGPT throwaway accounts",
+     "publisher": "AI Threat Watch",
+     "url": "https://aithreat.io/cases/openai-scopecreep-malware/",
+     "date": "2025-06",
+     "verified_on": "2026-11-20",
+     "fetch_status": 200,
+     "primary": false
+    }
+   ],
+   "single_source_reason": "SENTINEL-SINGLE_SOURCE_REASON-scopecreep-chatgpt-go-malware-2025 publisher text that must never reach an output row",
+   "enrichment": {
+    "sentinel": "SENTINEL-ENRICHMENT"
+   }
+  }
+ ]
+}

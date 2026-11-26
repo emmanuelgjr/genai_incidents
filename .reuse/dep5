@@ -108,6 +108,16 @@ Comment: This dataset aggregates entries from many upstream sources, each
  notice is in NOTICE-DATA and covers AVID-authored content only, not
  third-party material that an AVID record summarises. See
  docs/SOURCE_LICENSES.md sections 6.1 and 6.2.
+ .
+ hackingincidents.ai ledger content (rows with a HIAI- source_id, and the
+ ledger references attached to other rows) is used under the MIT License,
+ Copyright (c) 2025 Daniel Miessler, as stated by the operator at
+ https://hackingincidents.ai/data/ (citation requested: "hackingincidents.ai,
+ Unsupervised Learning, accessed <date>"); the full MIT permission notice is
+ in NOTICE-DATA. The grant covers the operator's own fields only: the
+ ledger's quote and summary text, which remain under their publishers'
+ terms, are not reproduced in the dataset. See docs/SOURCE_LICENSES.md
+ section 1.9.
 
 Files: mappings/owasp_asi_top10.json
 Copyright: OWASP Gen AI Security Project (risk codes and names)

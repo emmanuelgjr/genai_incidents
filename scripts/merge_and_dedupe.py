@@ -510,6 +510,11 @@ AGGREGATE_URL_PATTERNS: tuple[re.Pattern, ...] = (
     re.compile(r"^genai\.owasp\.org/\d{4}/\d{2}/\d{2}/[^?]*round-?up", re.IGNORECASE),
 )
 AGGREGATE_URL_KEYS: frozenset[str] = frozenset()
+# D161: normalized URLs that a source's own committed attach file (ingest/*.attach.json,
+# key ``fold_exempt_urls``) declares are cited by 2+ of its DISTINCT incidents (a vendor
+# report the source splits per actor). Same refusal as an aggregate page: sharing one is
+# not evidence of identity. Loaded once per main() run, before dedupe; empty otherwise.
+FOLD_EXEMPT_URLS: frozenset[str] = frozenset()
 
 
 def is_aggregate_url(normalized_url: str) -> bool:
@@ -517,6 +522,7 @@ def is_aggregate_url(normalized_url: str) -> bool:
     if not normalized_url:
         return False
     return (normalized_url in AGGREGATE_URL_KEYS
+            or normalized_url in FOLD_EXEMPT_URLS
             or any(p.search(normalized_url) for p in AGGREGATE_URL_PATTERNS))
 
 
@@ -1145,7 +1151,9 @@ INGEST_SIDE_FILES = frozenset({"cisa_kev.json", "cve_rejections.json"})  # own l
 
 
 def _is_ingest_side_file(path: Path) -> bool:
-    return path.name in INGEST_SIDE_FILES or path.name.endswith(".provenance.json")
+    # D161: *.attach.json is the reference-attachment side file (a dict by design).
+    return (path.name in INGEST_SIDE_FILES or path.name.endswith(".provenance.json")
+            or path.name.endswith(".attach.json"))
 
 
 def load_source(path: Path) -> list[dict]:
@@ -2395,6 +2403,74 @@ def dedupe_entries(
     return surviving, tombstones
 
 
+def _load_reference_attachments() -> tuple[list[dict], frozenset[str]]:
+    """D161: every ``ingest/*.attach.json`` -> (attachments, fold-exempt URL keys).
+    An attachment adds REFERENCES to an EXISTING row and changes nothing else on it.
+    A malformed file aborts (never a silent drop to zero attachments)."""
+    atts: list[dict] = []
+    exempt: set[str] = set()
+    for p in sorted(INGEST.glob("*.attach.json")) if INGEST.exists() else []:
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            raise IngestParseError(f"[FATAL] cannot parse {p}: {exc}; refusing to build. " + abort_sentence())
+        if not isinstance(data, dict) or not isinstance(data.get("attachments"), list):
+            raise IngestParseError(f"[FATAL] {p}: expected an object with an 'attachments' list. " + abort_sentence())
+        for a in data["attachments"]:
+            t = a.get("target") or {}
+            refs = a.get("references")
+            if not (t.get("inc_id") and t.get("source_ids") and isinstance(refs, list) and refs
+                    and all(isinstance(r, dict) and str(r.get("url", "")).startswith("http") for r in refs)):
+                raise IngestParseError(f"[FATAL] {p}: malformed attachment {str(a)[:120]}. " + abort_sentence())
+            atts.append(a)
+        exempt.update(u for u in data.get("fold_exempt_urls") or [] if isinstance(u, str) and u)
+        print(f"[{p.name:40s}] {len(data['attachments']):4d} attachments, {len(data.get('fold_exempt_urls') or [])} fold-exempt URLs")
+    return atts, frozenset(exempt)
+
+
+def _apply_reference_attachments(surviving: list[dict], attachments: list[dict]) -> dict[int, tuple[str, str]]:
+    """Append each attachment's references to the SURVIVING entry that holds one of the
+    target's source_ids. Only ``references`` is touched (a URL already on the row, by
+    ``normalize_url``, is skipped). Every attachment must land on exactly one entry or the
+    build aborts: a dangling attachment means the row it was written for is gone or was
+    re-clustered, and silently dropping it would be the accretion/loss this must not be.
+    Returns {id(entry): (expected INC id, attachment 'from')} for the post-id check."""
+    by_key: dict[str, list[dict]] = {}
+    for e in surviving:
+        for k in e.get("source_ids") or []:
+            by_key.setdefault(k, []).append(e)
+    expected: dict[int, tuple[str, str]] = {}
+    for a in attachments:
+        t = a["target"]
+        hits = {id(e): e for k in t["source_ids"] for e in by_key.get(k, [])}
+        if len(hits) != 1:
+            raise SystemExit(
+                f"[FATAL] reference attachment {a.get('from')} -> {t['inc_id']} resolves to "
+                f"{len(hits)} surviving entries via source_ids {t['source_ids']}; expected exactly 1. "
+                "The target row changed or was re-clustered: re-run the owning ingest. " + abort_sentence())
+        e = next(iter(hits.values()))
+        seen = {normalize_url(r.get("url", "")) for r in e.get("references") or []}
+        for r in a["references"]:
+            u = normalize_url(r["url"])
+            if u and u not in seen:
+                seen.add(u)
+                e.setdefault("references", []).append(
+                    {k: r[k] for k in ("title", "url", "type") if r.get(k)})
+        expected[id(e)] = (t["inc_id"], a.get("from", "?"))
+    return expected
+
+
+def _check_attachment_ids(surviving: list[dict], expected: dict[int, tuple[str, str]]) -> None:
+    """After INC ids are assigned: every attachment target must still be the INC id it
+    was written for (ids are append-only, so a mismatch is a wrong-row attach)."""
+    bad = [(w, exp, e.get("id")) for e in surviving
+           for exp, w in [expected.get(id(e), (None, None))] if exp and e.get("id") != exp]
+    if bad:
+        raise SystemExit(
+            f"[FATAL] {len(bad)} reference attachment(s) landed on a different INC id than recorded "
+            f"(first: {bad[0]}). Refusing to build. " + abort_sentence())
+
+
 class SplitAuthorizationError(SystemExit):
     """Raised by :func:`_check_split_authorization` to abort the build
     BEFORE any output file is written. Subclasses SystemExit so a plain
@@ -3288,6 +3364,8 @@ def main():
         print(f"[issue88-exclude] suppressed {_before - len(all_entries)} "
               f"out-of-scope source record(s) across {len(ISSUE88_EXCLUDE)} bucket(s)")
 
+    global FOLD_EXEMPT_URLS
+    attachments, FOLD_EXEMPT_URLS = _load_reference_attachments()
     surviving, tombstones = dedupe_entries(all_entries, prev_id_by_key)
     today_str = str(utc_today())
 
@@ -3340,6 +3418,16 @@ def main():
     if curation:
         applied = apply_curation_overrides(surviving, curation)
         print(f"[curation] applied {applied} override(s) from {CURATION_OVERRIDES_PATH.name}")
+
+    # 4d-bis) D161: reference attachments (ingest/*.attach.json) land AFTER curation
+    #     overrides: a `references` override freezes the whole list (two attachment
+    #     targets carry one), and attaching before it would have been silently
+    #     overwritten. Still before history stamping, so the added references count as a
+    #     content change. Aborts if an attachment cannot land on exactly one row.
+    attach_expected = _apply_reference_attachments(surviving, attachments)
+    if attachments:
+        print(f"[attach] {len(attachments)} reference attachment(s) applied to "
+              f"{len(attach_expected)} existing entr(ies)")
 
     # 4e) Flag CISA KEV (known-exploited) CVEs from the committed snapshot.
     #     Content fields, so set before history stamping. Deterministic:
@@ -3453,6 +3541,8 @@ def main():
                     {"from": extra, "into": e["id"], "reason": "merged", "date": today_str,
                      **_retired_fields(extra)}
                 )
+
+    _check_attachment_ids(surviving, attach_expected)
 
     # 6b) Record entries that lost a fight to a transitive merge.
     for ts_entry in tombstones:

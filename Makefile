@@ -1,4 +1,4 @@
-.PHONY: integrity verify-integrity package-manifest release-assets build validate lint-atlas atlas-fetch atlas-pin render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
+.PHONY: integrity verify-integrity package-manifest release-assets build validate lint-atlas atlas-fetch atlas-pin render merge install clean test stix taxii misp huggingface ingest-cve ingest-kev ingest-cve-rejections ingest-airi ingest-aiaaic ingest-aiid ingest-oecd-aim ingest-redteam ingest-avid ingest-hackingincidents ingest-cvelistv5 ingest-arxiv ingest-all render-docs-stats check-stats-drift docs-data verify-docs-data check-dead-filters a11y
 
 install:
 	pip install -r requirements.txt
@@ -193,6 +193,16 @@ ingest-aiid:
 # AVID (MIT): GitHub tarball of avidml/avid-db -> ingest/wave12_avid.json
 ingest-avid:
 	python scripts/ingest_avid.py
+
+# hackingincidents.ai ledger (MIT; D159/D160/D161: facts + link only). OFFLINE rebuild
+# from the pinned snapshot in ingest/snapshots/hackingincidents/ -- no network. Writes
+# ingest/wave13_hackingincidents.json (new rows), .attach.json (references attached to
+# existing rows) and .provenance.json. Same output whether run against the pre-ingest
+# corpus or after it (idempotent). Re-pinning from the live site is the only network
+# path, a deliberate and reviewed refresh that is not scheduled:
+#   python scripts/ingest_hackingincidents.py --fetch
+ingest-hackingincidents:
+	python scripts/ingest_hackingincidents.py
 
 # CVE Program record dump (CVE-TOU), AI-relevance filtered, huntr CNA tagged
 # inside it. Streams the ~620 MB baseline asset to ingest/_cache/ (gitignored).
