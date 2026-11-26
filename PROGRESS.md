@@ -35,6 +35,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 
 **CodeQL on #117:** 2 new high alerts, not yet triaged. Triage is required before the merge.
 
+**Update, CodeQL triage:** both alerts were `py/incomplete-url-substring-sanitization` at tests/test_ingest_hackingincidents.py:200 (`"cyware.com" in url`). They are test assertions, not real sanitization, but the foreman chose to fix rather than dismiss. The D161 specialist pushed `9bf4e891`:
+- hostname helpers `_host_is` and `_is_aiid_cite` in the test;
+- in the script, an AIID-cite regex anchored at scheme and host (urlsplit was avoided because of the test_network_chokepoint urllib grep).
+The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 69 targeted tests passing. **Gate-d161 is re-checking the post-PASS delta** 9cf17a43..9bf4e891: AIID join coverage, byte-identical outputs, and that the assertions fire. New CI is running on #117.
+
 ### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
