@@ -262,8 +262,12 @@ def _run_step(tmp_path, stub, mutate=None):
     real = Path(sys.executable).as_posix()
     head = "#!/bin/bash" + NL
     if stub is not None:
-        head += 'case "$*" in *check_corpus_flips.py*) ' + stub + " ;; esac" + NL
-    (bindir / "python").write_text(head + 'exec "' + real + '" "$@"' + NL, encoding="utf-8", newline=NL)
+        head += 'case "$*" in *check_corpus_flips.py*) touch "$RUNNER_TEMP/stub-ran"; ' + stub + " ;; esac" + NL
+    wrapper = bindir / "python"
+    wrapper.write_text(head + 'exec "' + real + '" "$@"' + NL, encoding="utf-8", newline=NL)
+    # Must be executable: Linux bash PATH lookup skips non-executable files (so the REAL python would
+    # run and the stub never fire); Windows Git Bash ignores the mode (D166).
+    wrapper.chmod(0o755)
     step = tmp_path / "step.sh"
     step.write_text(_step_script(mutate), encoding="utf-8", newline=NL)
     out, summ = tmp_path / "out", tmp_path / "summ"
@@ -273,6 +277,8 @@ def _run_step(tmp_path, stub, mutate=None):
                GITHUB_STEP_SUMMARY=summ.as_posix(), PATH=bindir.as_posix() + os.pathsep + os.environ["PATH"])
     p = subprocess.run([BASH, "--noprofile", "--norc", "-eo", "pipefail", step.as_posix()], cwd=ROOT, env=env,
                        capture_output=True, text=True, encoding="utf-8")
+    if stub is not None:  # agreement 6: a stub that never ran makes every verdict below vacuous (D166)
+        assert (rt / "stub-ran").exists(), "PATH wrapper never intercepted check_corpus_flips.py: " + p.stdout[-300:]
     lines = [x for x in out.read_text(encoding="utf-8").splitlines() if x.startswith("needs_ruling=")]
     body = (rt / "pr-body.md").read_text(encoding="utf-8") if (rt / "pr-body.md").exists() else ""
     return p, lines, body, summ.read_text(encoding="utf-8")
@@ -325,4 +331,11 @@ def test_step_harness_fires_on_mutants(tmp_path):
     # M2: no -s guard on the rc=1 branch -> a missing report is not routed to UNKNOWN
     r = _run_step(tmp_path / "m2", "exit 1", lambda t: t.replace(
         'elif [ "$flip_rc" = "1" ] && [ -s "$RUNNER_TEMP/corpus-flips.md" ]', 'elif [ "$flip_rc" = "1" ]'))
+    assert not _flags_unknown(r[0], r[1], r[2])
+    # M3: the fail-closed write removed from the UNKNOWN branch -> must not flag needs_ruling (D166)
+    nl = chr(10)
+    ind = " " * 12
+    nr = ind + 'echo "needs_ruling=true" >> "$GITHUB_OUTPUT"' + nl
+    warn = ind + 'echo "::warning::check_corpus_flips.py could not'
+    r = _run_step(tmp_path / "m3", "exit 2", lambda t: t.replace("else" + nl + nr + warn, "else" + nl + warn))
     assert not _flags_unknown(r[0], r[1], r[2])
