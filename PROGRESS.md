@@ -39,6 +39,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **Delta file:** docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md. Hand sample of 15: 12 sensible, 3 coarse, 0 wrong.
 **Open decision the specialist raised:** `ingest/snapshots/hackingincidents/incidents.json` (690,343 B) commits the fetched bytes VERBATIM, so 298 `quote` and `summary` strings would sit in the public repo, although they are never emitted. The alternative is a stripped snapshot plus the raw sha256 in provenance. The report was truncated at this point and the remainder has been requested.
 
+**Rest of the specialist report:**
+- **Dedupe recall < 100%.** Of a seeded 30 of 192 residual rows, 2 were missed duplicates (INC-17369, INC-02696). A looser scan found 3 more (wpp, wiles, dutch bank). All 5 were added to REVIEWED_MATCHES, and roughly 10 more are expected among the 187. The gate must draw its own sample.
+- **Cadence:** a manual `--fetch` about monthly, as a reviewed PR, never more often than weekly. Not added to auto-refresh.
+- **Surprises the specialist fixed:**
+  - Attachments were lost on INC-03212 and INC-03248, because a whole-list references curation override ran first. Attachments now apply after overrides.
+  - Attach idempotence bug (227/70 became 224/73 on rerun).
+  - Retained-prior trap: builds must start from base data/.
+  - `fold_exempt_urls` added for 11 vendor-report URLs, through D117 is_aggregate_url.
+- **Labels and corpus notes:** attack_vector comes from ledger ai_role where it maps, leaving 61 of 187 as `other` (there is no "AI-agent intrusion" value). INC-08183 is an over-merged row (titled Bard exfil, but it carries AIID-898 LLMjacking); this is pre-existing and carried.
+
+**D162 USER RULING (2026-11-26): "Strip it (Recommended)".** The committed snapshot drops quote, summary, confidence_reason, outcome, single_source_reason and enrichment. The raw sha256 is kept in provenance. Redispatched to the specialist to:
+- rebuild the branch so that the raw bytes never appear in its history (force-with-lease on the feature branch only);
+- update NOTICE-DATA, §1.9, the README and the delta;
+- add tests that are proven to fire;
+- show the emitted outputs are byte-identical to 80217d42.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
