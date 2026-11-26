@@ -24,6 +24,23 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 
 Evaluation only: no code or data changes. The deliverable is `docs/audits/D169-licence-obligation-gaps-2026-11-26.md` on branch `d169-licence-obligations` (worktree gi-wt-d169, base 5720c248). It must include a per-surface compliance table and owner-tagged recommendations. Text fixes are drafts only. Next: the red-reviewer gate, then user rulings, then implementation tasks.
 
+**Update: specialist reported; committed `e506d4e0` (pushed, verified; 384 lines, 0 control bytes, no PII).** Claims:
+- **F1 confirmed:** a repo pointer does not satisfy MIT / CVE ToU / Apache §4(a). Affected: HF, release assets, site download and the STIX/TAXII/MISP trees. The PyPI wheel is unverified. The sdist and Zenodo are compliant. Fix: ship NOTICE-DATA, LICENSE-DATA and the Apache-2.0 text in every copy.
+- **F2:** no marker for the 81 rows. content_license is a single object, so a marker could overwrite.
+- **F3:** the 125 "unmarked" AVID rows are cve-cna-via-avid with the `cve` marker. 313 = 79 + 125 + 109, so only the 109 curated rows are unmarked. Narrow the sentence; do not extend markers to about 5,300 NVD/GHSA/OSV rows.
+- **F5:** wording proposed.
+- **New findings:**
+  - The ATLAS upstream LICENSE is a 13-line header, and the repo has no Apache text.
+  - The NVD "not endorsed" notice is still absent.
+  - There is no GHSA/OSV CC BY notice.
+  - pyproject says `license = "MIT"`.
+- **User decisions proposed:**
+  1. notices in every copy, plus a CORRECTIONS entry for releases through v2.13.0;
+  2. the 109 AVID rows: mark them, or text-compare first;
+  3. no markers for the 81 or NVD/GHSA/OSV;
+  4. approve the notice wording (credit holders unconfirmed).
+**Gate-d169 dispatched on e506d4e0** to run the §7 checks: per-row accounting, inspecting what each distribution surface actually ships (including a wheel build), fetching the licence texts raw, the F2 overwrite risk, and traceability of the draft texts.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
