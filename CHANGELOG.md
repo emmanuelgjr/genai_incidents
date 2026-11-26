@@ -7,6 +7,10 @@ ingest expansions, patch bumps for routine refreshes and bug fixes.
 
 ## [Unreleased]
 
+### Changed - public licence and source-list surfaces aligned with the hackingincidents.ai source (D168)
+
+- `NOTICE-DATA` now counts twelve upstream sources with an obligation (adds the ledger); `README.md`, `docs/DATASHEET.md` and the Hugging Face card gain the ledger source entry and an MIT attribution exception bullet (and AVID's MIT notice bullet); the Hugging Face card and datasheet source lists now say the AIRI source is retired (2026-10-13, D108) with its rows kept and marked stale. No data change.
+
 ### Added - hackingincidents.ai ledger as a source (D159 evaluation, D160 ruling "Facts + link", D161): 186 new rows, 111 ledger incidents attached to existing rows as references
 
 - **What.** The ledger of cyberattacks in which the attacker used AI (Unsupervised Learning, MIT; the site copy of 2026-11-24, 298 incidents) is ingested from a pinned snapshot (`ingest/snapshots/hackingincidents/`, sha256, fetch time in UTC and licence string in `ingest/wave13_hackingincidents.provenance.json`) by `scripts/ingest_hackingincidents.py` (`make ingest-hackingincidents`, offline; `--fetch` is the only network path and is not scheduled). `incident_count` 15,804 -> 15,990; rows 15,845 -> 16,031 (+186, INC-17395 to INC-17580).

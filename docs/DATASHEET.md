@@ -43,7 +43,8 @@ Collection section below) as upstream sources rather than replacing them.
 
 ## Collection
 Aggregated from public, credible sources: AI Incident Database (AIID), AIAAIC,
-OECD AI Incidents Monitor, MIT AI Risk Repository, MITRE ATLAS, AVID, NVD +
+OECD AI Incidents Monitor, MIT AIRI Navigator (retired 2026-10-13; rows kept and marked
+stale), MITRE ATLAS, AVID, the hackingincidents.ai ledger of AI-assisted cyberattacks, NVD +
 GitHub Security Advisories + OSV.dev (AI/ML packages), CISA KEV, OWASP, vendor threat
 reports, and peer-reviewed venues (arXiv/USENIX/CCS/NDSS). Ingestion scripts
 live in [`scripts/`](../scripts); each source is re-pulled, normalized, then
@@ -161,6 +162,20 @@ review, and the Heuristic labels bullet below for known gaps.
   exceptions: `title`'s in `NOTICE-DATA`; `description`'s in
   [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md)'s OECD AIM
   summary-of-outcomes row (§1.5 covers the full licensing analysis).
+- **hackingincidents.ai-derived rows carry a narrower attribution obligation.**
+  Rows whose `source_id` starts with `HIAI-` (these carry a row-level `content_license`
+  source `hackingincidents`), and the 81 existing rows that gained ledger references
+  (references only, no row-level marker), carry facts and source links only from the hackingincidents.ai
+  ledger of AI-assisted cyberattacks (Unsupervised Learning, Daniel Miessler); the
+  ledger's quote, summary and other free text are not reproduced. The operator
+  publishes the data under the MIT licence (Copyright (c) 2025 Daniel Miessler) and
+  asks for the citation "hackingincidents.ai, Unsupervised Learning, accessed
+  `<date>`".
+  See `NOTICE-DATA` and [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §1.9.
+- **AVID-derived rows carry an MIT notice obligation.** AVID's MIT copyright and
+  permission notice (Copyright (c) 2022 AI Vulnerability Database (AVID)) must accompany
+  copies; it covers AVID-authored content only. See `NOTICE-DATA` and
+  [`docs/SOURCE_LICENSES.md`](SOURCE_LICENSES.md) §6.1.
 - **Five mapping files are CC BY-SA 4.0 in part.** `mappings/owasp_asi_top10.json`
   (OWASP ASI codes and risk names), `mappings/owasp_dsgai_2026.json` (the 21
   OWASP DSGAI codes and short risk titles; no OWASP description text),

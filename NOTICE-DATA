@@ -24,7 +24,7 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, eleven upstream sources carry an obligation
+As of this writing, twelve upstream sources carry an obligation
 detailed in full below: MITRE ATLAS and garak (Apache License 2.0
 text), the CVE Program and AVID (notices that must accompany copies),
 the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
@@ -32,15 +32,16 @@ for its codes and risk names), the OWASP GenAI Data Security Risks and
 Mitigations (DSGAI; CC BY-SA 4.0 attribution for its codes and titles),
 the OWASP Top 10 for LLM Applications and the OWASP Gen AI incident
 round-ups (CC BY-SA 4.0 attribution; see the OWASP paragraphs below),
-the AIAAIC Repository, the AI Incident Database (AIID), and the OECD AI
-Incidents and Hazards Monitor (AIM).
+the AIAAIC Repository, the AI Incident Database (AIID), the OECD AI
+Incidents and Hazards Monitor (AIM), and the hackingincidents.ai ledger
+(MIT, attribution; facts and links only).
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here, the
 per-source sections of docs/SOURCE_LICENSES.md are the authoritative
 account and take precedence over this file falling behind it. (Its
 "Summary of outcomes requiring escalation" table lists only the
 sources with an escalation, not every source with an obligation, and
-is not an enumeration of the eleven above.)
+is not an enumeration of the twelve above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -366,20 +367,22 @@ before it ships. See docs/SOURCE_LICENSES.md section 1.2a and
 docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
-The OECD AI Incidents and Hazards Monitor (AIM) is the last of the
-eleven sources above. With AIAAIC and AIID, it is one of the three
+The OECD AI Incidents and Hazards Monitor (AIM) is one of the
+twelve sources above. With AIAAIC and AIID, it is one of the three
 whose row text this project could not simply carry under the source's
 own licence grant. For each of the three, the text was either reduced
 to structural facts and a link, or its retained title was analysed as
 a separate copyright question (open for AIAAIC and AIM; resolved for
-AIID). For seven of the other eight (MITRE ATLAS, garak, the CVE
+AIID). For eight of the other nine (MITRE ATLAS, garak, the CVE
 Program, AVID, the OWASP Top 10 for Agentic Applications, OWASP GenAI
-Data Security Risks and Mitigations and the OWASP Top 10 for LLM
-Applications), the grant covers the material reproduced
+Data Security Risks and Mitigations, the OWASP Top 10 for LLM
+Applications and the hackingincidents.ai ledger), the grant covers the material reproduced
 (for the OWASP mapping files, subject to the carve-outs above), and the
 obligation is attribution or a notice that accompanies copies (CVE- and
-AVID-derived rows also carry a row-level content_license marker). The
-eighth, the OWASP Gen AI incident round-ups, is an exception: two
+AVID-derived rows, and the HIAI- rows from the ledger, also carry a
+row-level content_license marker; the other rows that cite the ledger
+carry its references, facts and links, without that marker). The
+ninth, the OWASP Gen AI incident round-ups, is an exception: two
 shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
 up to and including v2.13.0 and were rewritten from their primary sources
 on 2026-10-13 (decision D97); see the round-up paragraph above.
