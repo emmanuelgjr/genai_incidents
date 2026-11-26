@@ -151,6 +151,7 @@ Redispatched to the specialist with defects 1–3 plus the AVID verbatim fix.
   - CVE: 7,443 CVE- rows, of which 2,150 are marked.
 - **F5:** HF card L196 "Licence: data CC-BY-4.0 (with exceptions…)" names neither the MIT ledger nor AVID. It is incomplete, not false.
 - **F1 and F4** still open.
+- **Gate evidence correction** (from gate-d168, verdict unchanged): the row-level `content_license` marker totals are **cve 2171, avid 79, hackingincidents 186**. The first message garbled this line. Note that the 2,171 cve-marked rows include 21 rows outside the 7,443 CVE- source ids, and only 2,150 of the 7,443 are marked.
 
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
