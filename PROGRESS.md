@@ -64,6 +64,15 @@ Advisories:
 
 Redispatched to the specialist as a dated update section.
 
+**Update: bounce-1 fix `b554fdd9`** (+179/−4, new §8; pushed and verified; 0 control bytes).
+- **§8A:** §5.1 is marked do-not-apply. A1 is a now-true variant; A2 is the post-R1/R5 variant.
+- **§8B:** the gate's CVE split is used, with the GHSA CC-BY population of about 3,894 rows promoted to a main finding. Decision 3 becomes 3a–3d.
+- **§8C:** the repo row is NO for the GHSA notice and the Apache text.
+- **§8D:** the wheel finding is withdrawn, and R3/R9 are narrowed.
+- **§8E:** advisories folded in.
+- **§8F:** user decisions consolidated.
+Gate-d169 re-gating on b554fdd9.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
