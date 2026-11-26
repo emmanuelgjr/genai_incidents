@@ -28,6 +28,26 @@ This implements D171 R1/R2/R3/R4/R7/R8/R9/R10 from the D169 audit. Branch `d172-
 - the site serving NOTICE-DATA, with relative footer links.
 R5 and 3(d) are out of scope; they are D173. No data change.
 
+**Update: specialist reported `5ec4e580` (pushed, verified; 18 files, +660/−27; no data/ change; worktree clean).**
+- **Tests:** pytest 1736p/1s/1x, with 15 new notice tests proven to fire on removed copy steps. The YAML wiring test was NOT proven to fire.
+- **R1 surfaces:** HF, the release flat set, the taxii2/misp zips, the docs/data, taxii2 and misp trees, and the wheel/sdist all ship the 3 files. Pages root is CI-only.
+- **R2:** reuse lint goes from "Missing licenses: Apache-2.0, CC-BY-4.0, MIT" to "0".
+- **R3:** `MIT AND CC-BY-4.0`, plus an explicit license-files list. The MIT classifier is removed (beyond the brief).
+- **R7 GHSA credit:** quoted from GitHub's site-policy "Advisory Database" terms. No holder is named, because GitHub names none.
+- **R9:** the CORRECTIONS row names HF, the release assets, Pages and STIX/TAXII/MISP, and states that the wheel/sdist and Zenodo carried the files.
+- **R10:** NOTICE-DATA is generated into docs/ at Pages build (gitignored). It might be served as octet-stream.
+
+Gate-d172 dispatched, covering:
+- its own builds of every surface, with sha256 checks;
+- whether the YAML wiring test can fail;
+- R4 truth checked clause by clause against the data;
+- R7 quotes fetched raw;
+- R3 validity;
+- CORRECTIONS claims checked against the actual v2.13.0 and earlier release assets;
+- SPDX diffs;
+- Linux CI risks;
+- the effect of the gitignored file on a clean checkout.
+
 ### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
 
 **Final gate (string-check under D170): PASS, no defects.**
