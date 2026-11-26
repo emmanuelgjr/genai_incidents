@@ -71,6 +71,11 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
   - GitHub may keep 80217d42 reachable by SHA until its own GC. A support purge is the user's call if wanted.
 - **Gate-d161 dispatched on `dad99db9`.** It covers checks (a) to (h): a per-entity compare; a rebuild from base; its own seeded dedupe-recall sample; text leakage against a fresh raw download; history and committed-file text leakage; 15 hand-checked labels; merge_and_dedupe side effects; and the licence rows.
 
+**Update: gate-d161 BOUNCE #1 on `dad99db9` (the verdict came after one re-prompt; the gate had gone idle about 2.5 h after its suite finished).** Data, code, rebuild, leakage and dedupe all PASS on the gate's own measurements. Defects:
+1. **SOURCE_LICENSES §1.9 (Redistribute-verbatim cell, L246) is false.** It says the raw bytes "were never committed", but 80217d42 committed them as blob ea82f637, which equals `git hash-object` of a fresh download (sha256 e1e95518). The repo is PUBLIC, and `gh api …/commits/80217d42` still serves it with the snapshot listed as "added". D162's literal criterion (absent from branch history) is MET, and the delta doc §9.3 is worded correctly; §1.9 is a live surface and must state current fact (agreement 4). **Escalated to the user:** whether to ask GitHub Support to purge 80217d42, which is outward-facing and so the user's call.
+2. **§1.9 License cell (L244):** bare `<date>` inside an italic quote is stripped by the GFM sanitizer, so the rendered "verbatim" quote reads `accessed "`. Use a code span or `&lt;date&gt;`, as §1.5 L145 does.
+Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advisories, evidence, and why the two pytest runs differ) is pending.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
