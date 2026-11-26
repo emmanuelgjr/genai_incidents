@@ -14,6 +14,27 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔴 2026-11-26 — D166 IN PROGRESS: `validate` on main has been RED since the D156(a) merge (foreman miss)
+
+**Found while checking CI on PR #117.**
+- **Scope:** `validate` (ubuntu, py3.12/3.13) has failed on **every push to main since `8b6df9a9`** (D156(a) merge, 2026-11-25). That is 26 consecutive runs; the last green run is `6ad2f9b1`.
+- **The failures:** the same 6 tests fail on main and on PR #117, all in tests/test_check_corpus_flips.py: the step-harness tests (exit 1/7/2 unknown; real-crash unwritable report; flips found; no flips). In CI the harness gets `needs_ruling=false` and the REAL checker's output, not the stub's.
+- **Why no one saw it:** they pass on Windows/Git Bash, which is all that the specialist, gate-d156a, gate-d161 and the D161 runs used.
+- **Process failure:** the foreman merged D156(a) and recorded PASS without checking the post-merge CI on main, and then pushed 25 board commits without looking at their status. This is the agreement-6 failure shape: the gate never saw the check run on the platform where it matters.
+- **Lesson:** after any merge, check `gh run list --branch main` before recording it done.
+
+**Foreman hypothesis (unverified):** `_run_step` writes a PATH `python` wrapper without chmod +x. Linux bash skips non-executable files on PATH, so the stub never fires.
+
+**Dispatched:** pipeline-engineer (fresh instance), branch `d166-corpus-flips-linux`, worktree gi-wt-d166. The brief requires:
+- reproduce on Linux, using CI dispatch if needed;
+- fix the root cause;
+- prove the tests fire on Linux against a deliberately broken step;
+- **confirm whether the real auto-refresh step was ever at risk on ubuntu.** This is urgent: Sunday 2026-11-29 is its first live run.
+
+**Effect on PR #117:** its 6 failures are exactly main's, and every D161 test passed in CI (1716 passed). The foreman is holding the #117 merge until D166 lands, so that D161 merges on green.
+
+**CodeQL on #117:** 2 new high alerts, not yet triaged. Triage is required before the merge.
+
 ### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
