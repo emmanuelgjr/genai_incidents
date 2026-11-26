@@ -14,6 +14,17 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🔄 2026-11-25 — D159 IN PROGRESS: evaluate new source hackingincidents.ai (license-auditor)
+
+User asked to "add another ingest source https://hackingincidents.ai/incidents/". Per CLAUDE.md, license-auditor runs first on any proposed new source, so this step is evaluation only, with no ingest code and no data changes. The branch is `d159-hackingincidents-eval` (worktree gi-wt-d159, based on `f6ddd4ee`). The deliverable is `docs/audits/D159-hackingincidents-source-eval-2026-11-25.md`, covering:
+- operator, and whether it is a primary source or an aggregator;
+- ToS, license, robots and API (absence claims checked against raw HTML);
+- a draft SOURCE_LICENSES row, held in the audit until the ingest PR (invariant 10);
+- data shape and scope;
+- an overlap sample of 20 or more entries against data/incidents.json;
+- a recommendation.
+Any outreach is draft-only. Next: red-reviewer gate, then the user's ruling on whether to ingest, and only then a pipeline-engineer build task.
+
 ### ✅ 2026-11-25 — Dependabot #112–#116 merged (user: "merge")
 
 User asked to "resolve conflict PR". Foreman found **no conflicting PR**: #112–#116 were all MERGEABLE/CLEAN, and validate 3.12/3.13 passed on each (a11y also passed on #113 and #115). A sequential merge of all five onto `origin/main` (`aa1a0aae`) in a scratch worktree also went through with **0 conflicts**. User then said "merge".
