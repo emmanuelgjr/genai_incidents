@@ -44,6 +44,22 @@ Advisory (partial; the verdict was truncated and the remainder has been requeste
 
 All advisories were forwarded to the specialist with the bounce.
 
+**Gate-d159 evidence E1–E7 (part 2), condensed.** Scratch downloads are in the session scratchpad gate-d159/ and were not committed.
+- **E1:** curl -sL raw HTML of 10 pages, tags stripped, then grep. The only external links are offsecharnesses.ai and the Substrate tree.
+- **E2:** robots.txt via `cat -A`: 4 lines.
+- **E3:** GitHub API: Substrate licence MIT, owner type User. Contents listing includes incidents.json at 664,189 B. UPDATES.md reads "2026-11-17 Dataset created: 286 incidents". README and source.md: the site's repo is the source of record, Substrate is an export, and each quote must appear in the source.
+- **E4:** site incidents.json (690,343 B), updated 2026-11-24.
+  - 298 rows and 298 unique IDs; no licence key.
+  - Citations: AIID 22, OECD 0, AIAAIC 0, aithreat 34, NVD 0. 424 citations, 336 distinct URLs, 153 domains.
+  - Grades: CONFIRMED 147, STRONG 110, SUSPECTED 41. 222 rows have a primary source.
+  - The repo and site copies are not equal (the DEFECT 1 basis).
+- **E5:** seeded `random.Random(159).sample(ids,32)` with 4 matchers plus manual review. The matcher is proven to fire: re-keyed INC-00587, INC-07966 and INC-17344 self-match, and a nonsense negative control scores ≤0.098.
+  - Result: SAME 7, REPORT-LEVEL 3, THEME 2, NOVEL 20, i.e. 62.5% novel. The specialist had 68% on n=31.
+  - Whole ledger: 80 URL hits across 70 rows; 47 rows have a primary non-AIID hit.
+- **E6:** vendor-page n-gram check for summaries and quotes (results as in A1).
+- **E7:** SOURCE_LICENSES format grep.
+Evidence forwarded to the specialist.
+
 User asked to "add another ingest source https://hackingincidents.ai/incidents/". Per CLAUDE.md, license-auditor runs first on any proposed new source, so this step is evaluation only, with no ingest code and no data changes. The branch is `d159-hackingincidents-eval` (worktree gi-wt-d159, based on `f6ddd4ee`). The deliverable is `docs/audits/D159-hackingincidents-source-eval-2026-11-25.md`, covering:
 - operator, and whether it is a primary source or an aggregator;
 - ToS, license, robots and API (absence claims checked against raw HTML);
