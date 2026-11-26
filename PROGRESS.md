@@ -147,6 +147,12 @@ Gate-d161 is re-gating on 9cf17a43.
 
 **NEXT:** the N1 fix, then the USER reviews docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md before the PR. After merge: docs-warden (counts change 15,804→15,990).
 
+**D164 USER RULING (2026-11-26), after reviewing the delta summary:** "Merge, fix labels later (Recommended)". Once the N1 fix lands, open the PR and merge it, then run docs-warden. **New follow-up task D165 (label-scientist), not started:** label rules for AI-as-weapon rows. It covers:
+- severity (currently the Medium default on all 186);
+- the vector→OWASP/ATLAS seed (146/186 rows have no codes; data-exfil maps to LLM02 plus AML.T0085.002, which is semantically wrong);
+- a possible attack_vector value for AI-agent intrusion (61 rows are `other`).
+It needs its own field-level delta and gate.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
