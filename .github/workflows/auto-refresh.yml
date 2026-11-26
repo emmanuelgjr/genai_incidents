@@ -87,7 +87,7 @@ jobs:
 
       - name: Upload sweep output
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: cve-sweep-output
           path: sweep-out
@@ -206,7 +206,7 @@ jobs:
       - name: Upload held OECD/AIID inputs (D42 review path)
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: held-oecd-aiid-inputs
           path: ${{ runner.temp }}/held-pair-inputs
@@ -220,7 +220,7 @@ jobs:
       - name: Upload OECD skip-probe rotation cursor
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: oecd-skip-probe-state
           path: ingest/_state/skip_probe_state.json
@@ -395,7 +395,7 @@ jobs:
       - name: Upload refresh-job hold stash (normally empty; the OECD bytes are in the oecd-fetch job artifact)
         timeout-minutes: 5
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: held-refresh-job-pair-inputs
           path: ${{ runner.temp }}/held-pair-inputs
@@ -582,7 +582,7 @@ jobs:
         timeout-minutes: 5
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: aiid-change-report
           path: ${{ runner.temp }}/aiid-change-report-full.md
