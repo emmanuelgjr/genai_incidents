@@ -116,6 +116,26 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 - **Tests:** drift clean; targeted 62 passed; full suite 1721p/1s/1x.
 **Gate-d168 dispatched** to check: licence-claim traceability, the NOTICE count, an independently rendered HF card, AIRI consistency, the #8 reasoning, and that no dated records were edited.
 
+**Update: gate-d168 BOUNCE #1 on 35b0aa40.** Defects:
+1. **A false data claim: "the 81 attached rows carry content_license source hackingincidents"** (DATASHEET:172, README:424, export_huggingface.py:199). Measured: 186 rows carry it, and they are exactly the 186 HIAI rows; 0 non-HIAI rows do. The 81 changed only in references/updated/last_seen. **Origin: the foreman's D168 brief stated the false premise, and the specialist copied it.** Same lesson as before: brief agents that they may be wrong, and do not state data facts in a brief without measuring them.
+2. **NOTICE-DATA is half-fixed:** L27 says "twelve", but L44 still says "eleven", and L370-376 says "AIM is the last of the eleven … seven of the other eight".
+3. **The AIRI retirement is put on the wrong entity:** the HF card L153-154 and DATASHEET:46 say "MIT AI Risk Repository (retired …)", but D108 retired the **AIRI Navigator** ingest (§1.4, README:219). The Repository is upstream and still referenced (§1.2a).
+
+**Advisories:**
+- The AVID copyright is missing "(AVID)" (fixed in passing).
+- The HIAI licence text is otherwise traceable; AVID is traceable.
+- The #8 exemption reasoning is TRUE, but source_freshness.json's coverage.note now disagrees with DATA_DICTIONARY (no generator; left as is).
+- The app.js comment is accurate.
+- No dated records were edited.
+
+**New follow-ups (licensing, for the user or license-auditor):**
+- **(F1) The HF bundle ships no NOTICE-DATA,** although MIT and other notices "must accompany copies". It contains only README, jsonl, manifest and SHA256SUMS. This predates the task and affects AVID, HIAI, ATLAS and CVE.
+- **(F2)** The 81 attached rows carry MIT-covered ledger refs with no row-level marker.
+- **(F3)** AVID: 313 rows have an AVID- source id, but only 79 carry content_license avid.
+- **(F4)** source_freshness.json coverage.note omits the ledger.
+
+Redispatched to the specialist with defects 1–3 plus the AVID verbatim fix.
+
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
 - **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
