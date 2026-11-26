@@ -81,6 +81,17 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 
 **#117 merge is now gated only on D166:** main must be green, then #117 CI goes green.
 
+**Update: MERGED.**
+- **Before the merge:**
+  - D166 landed first (`3188cdff`), and **main validate went green** (run 45893733466). That ends the 30-run red streak.
+  - `gh pr update-branch 117` gave `a31ec783`, and all #117 checks passed: validate 3.12 and 3.13, a11y, CodeQL (the alerts are cleared) and Analyze ×3.
+  - [R] Since the gated `9bf4e891`, the branch had gained only main's PROGRESS.md and the D166 test file.
+- **Merged** as `2c56658f`. [R] data/stats.json on main gives incident_count 15990.
+- **Post-merge runs on 2c56658f** (validate, Pages, a11y, CodeQL) are being watched per the new rule. This entry is not final until they are green.
+- **Cleanup:** the D161 worktrees and the origin branch are deleted.
+- **Docs-warden** is dispatched for the counts and licence surfaces.
+- **Still open:** the D163 purge confirmation (user); D165 labels follow-up; D167 main-red alert.
+
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
 - **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
@@ -101,7 +112,7 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 
 **Gate-d166 dispatched on c5011615.** It covers: the CI logs read by the gate itself; the negative diffs; whether the stub-ran assertion can fail; an independent check of the real step's dependency on `python` on ubuntu; and any other failures hidden by 26 red runs.
 
-### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
+### ✅ 2026-11-26 — D160 USER RULING + D161 DONE: MERGED to main `2c56658f` (#117); incident_count 15,804 → 15,990: ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
 - Ingest: **"Facts + link (Recommended)"**.
