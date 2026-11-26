@@ -104,9 +104,9 @@
     }
   },
   "stats": {
-    "new": 187,
-    "attached": 110,
-    "attached_event": 72,
+    "new": 186,
+    "attached": 111,
+    "attached_event": 73,
     "attached_report": 38,
     "ledger_rows": 298,
     "collapsed_inledger": 1,
@@ -745,6 +745,17 @@
         "shared_urls": [
           "koi.security/blog/postmark-mcp-npm-malicious-backdoor-email-theft"
         ],
+        "alternates": []
+      },
+      {
+        "ledger": "s1ngularity-nx-ai-cli-weaponized",
+        "target": "INC-02850",
+        "basis": [
+          "reviewed-title"
+        ],
+        "level": "event",
+        "similarity": 0.275,
+        "shared_urls": [],
         "alternates": []
       },
       {

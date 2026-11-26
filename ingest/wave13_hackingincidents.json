@@ -7156,66 +7156,6 @@
     "disclosure_date": "2025-09-10"
   },
   {
-    "source_id": "HIAI-s1ngularity-nx-ai-cli-weaponized",
-    "title": "s1ngularity: Nx npm compromise runs victims' AI CLIs to hunt secrets",
-    "date": "2025-08-26",
-    "year": 2025,
-    "category": "real-world",
-    "description": "Ledger entry s1ngularity-nx-ai-cli-weaponized (hackingincidents.ai). Actor per the ledger: not identified; actor type unknown. Targets per the ledger: Developers installing malicious Nx npm versions; thousands of GitHub accounts. Dated 2025-08-26, disclosed 2025-08-27. AI use per the ledger: supply-chain compromise, agentic intrusion, reconnaissance; models named: Claude Code CLI, Gemini CLI, Amazon Q CLI (as stated by the researchers); autonomy level semi-autonomous. The ledger grades the evidence confirmed; that grade is the ledger operator's label, not this project's assessment. Facts and source links only: the ledger's narrative text and quotations are not reproduced.",
-    "attack_vector": "supply-chain",
-    "affected": "Developers installing malicious Nx npm versions; thousands of GitHub accounts",
-    "references": [
-      {
-        "title": "hackingincidents.ai ledger entry s1ngularity-nx-ai-cli-weaponized",
-        "url": "https://hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/",
-        "type": "reference"
-      },
-      {
-        "title": "StepSecurity: s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
-        "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware",
-        "type": "report"
-      },
-      {
-        "title": "Snyk: Nx npm malware coerces AI assistant CLIs into reconnaissance and exfiltration",
-        "url": "https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/",
-        "type": "reference"
-      },
-      {
-        "title": "Socket: Nx npm packages compromised in supply-chain attack weaponizing AI CLIs",
-        "url": "https://socket.dev/blog/nx-packages-compromised",
-        "type": "reference"
-      },
-      {
-        "title": "Okta: The s1ngularity attack: when attackers prompt your AI agents",
-        "url": "https://www.okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attackers-prompt-your-ai-agents-to/",
-        "type": "reference"
-      }
-    ],
-    "tags": [
-      "actor-unknown",
-      "ai-role-agentic-intrusion",
-      "ai-role-recon",
-      "ai-role-supply-chain",
-      "hackingincidents",
-      "ledger-grade-confirmed"
-    ],
-    "corpus": "security",
-    "quality_tier": "auto",
-    "description_provenance": "original",
-    "description_source": "hackingincidents",
-    "content_license": {
-      "source": "hackingincidents",
-      "license": "MIT",
-      "license_url": "https://github.com/danielmiessler/Substrate/blob/main/LICENSE",
-      "attribution": "hackingincidents.ai, Unsupervised Learning (Daniel Miessler)",
-      "attribution_url": "https://hackingincidents.ai/",
-      "obligations": [
-        "attribution"
-      ]
-    },
-    "disclosure_date": "2025-08-27"
-  },
-  {
     "source_id": "HIAI-ms-ai-obfuscated-svg-phishing",
     "title": "Credential phishing campaign with LLM-obfuscated SVG payload",
     "date": "2025-08-18",

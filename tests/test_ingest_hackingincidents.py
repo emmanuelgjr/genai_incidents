@@ -105,7 +105,7 @@ def test_committed_output_has_no_excluded_field_text():
     is the measurement taken on the raw bytes at strip time and recorded in provenance."""
     prov = json.loads((ROOT / "ingest" / "wave13_hackingincidents.provenance.json").read_text(encoding="utf-8"))
     m = prov["excluded_field_measurements"]
-    # Measured 2026-11-26 over the 187 emitted rows: max run 7. Runs near the bound are
+    # Measured 2026-11-26 over the 186 emitted rows: max run 7. Runs near the bound are
     # enumerated model names / actor labels (an 8-word run of "Claude Opus 4.5, Claude Haiku
     # 4.5, ..." was the one row that exceeded it before that row became an attachment), not prose.
     assert m["emitted_description_vs_quote"]["max_run"] < 8

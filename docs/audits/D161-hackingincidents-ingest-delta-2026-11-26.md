@@ -4,7 +4,7 @@
 
 ## 1. Verdict (first)
 
-The ingest adds **187 new rows** (1.18% of the 15,845-row base) and attaches **110 ledger incidents as references to 80 existing rows**. Those 80 rows change in exactly three fields (`references`, `updated`, `last_seen`); the other 15,765 base rows are byte-identical (per-entity compare, section 4). No row is removed, no ID is reused or re-pointed, `id_deprecations.json` is untouched, there are 0 corpus flips and 0 severity/date/title/attack_vector changes on existing rows. Scale is inside the 1.9% expectation: all 298 ledger rows are accounted for (187 new + 110 attached + 1 collapsed in-ledger twin = 298).
+The ingest adds **186 new rows** (1.17% of the 15,845-row base) and attaches **111 ledger incidents as references to 81 existing rows**. Those 81 rows change in exactly three fields (`references`, `updated`, `last_seen`); the other 15,764 base rows are byte-identical (per-entity compare, section 4). No row is removed, no ID is reused or re-pointed, `id_deprecations.json` is untouched, there are 0 corpus flips and 0 severity/date/title/attack_vector changes on existing rows. Scale is inside the 1.9% expectation: all 298 ledger rows are accounted for (186 new + 111 attached + 1 collapsed in-ledger twin = 298).
 
 Two things the reviewer should weigh, both stated plainly: (a) **event-level recall of the dedupe is not 100%**: a seeded sample of 30 of the then-remaining new rows contained 2 existing-row duplicates that neither URL nor AIID join found; both are now in the reviewed list, but a residual rate of the same order (roughly 5 to 10% of the new rows, unmeasured) is likely, see section 5.4; (b) **the pinned snapshot is stripped of the ledger's quote and summary text (D162)**, see section 9.
 
@@ -12,28 +12,28 @@ Two things the reviewer should weigh, both stated plainly: (a) **event-level rec
 
 | | before (base 9019539d) | after | delta |
 |---|---|---|---|
-| rows in `data/incidents.json` | 15,845 | 16,032 | +187 |
-| `incident_count` (stats.json) | 15,804 | 15,991 | +187 |
-| new INC IDs | | INC-17395 to INC-17581 (187, contiguous, appended after the previous maximum INC-17394) | |
+| rows in `data/incidents.json` | 15,845 | 16,031 | +186 |
+| `incident_count` (stats.json) | 15,804 | 15,990 | +186 |
+| new INC IDs | | INC-17395 to INC-17580 (186, contiguous, appended after the previous maximum INC-17394) | |
 | removed IDs | | 0 | |
 | `data/id_deprecations.json` | 1,084 records | unchanged (git diff empty) | 0 |
 | `retracted_count` / `unverified_count` / `disputed_count` | 29 / 12 / 22 | 29 / 12 / 22 | 0 |
 
-IDs are append-only: the new IDs are the next 187 integers after INC-17394; no existing ID moved.
+IDs are append-only: the new IDs are the next 186 integers after INC-17394; no existing ID moved.
 
 ## 3. Stats and derived surfaces
 
-`data/stats.json` changes, complete: `generated` 2026-11-25 -> 2026-11-26; `incident_count` 15804 -> 15991. `landmark_count` is unchanged (the new rows are `tier: feed`).
+`data/stats.json` changes, complete: `generated` 2026-11-25 -> 2026-11-26; `incident_count` 15804 -> 15990. `landmark_count` is unchanged (the new rows are `tier: feed`).
 
 Derived by the normal build (`render_markdown.py`, `render_docs_stats.py`), nothing hand-edited: `INCIDENTS.md`; `data/incidents.min.json` and its mirrors `docs/data/incidents.min.json` and `src/genai_incidents/data/incidents.min.json`; year shards `docs/incidents/2021.md`, `2023.md`, `2024.md`, `2025.md`, `2026.md` (existing rows whose references grew, plus the new rows by year); `docs/charts/*.svg`; the `stats:incident_count` and `stats:generated` markers in `README.md`, `docs/DATASHEET.md`, `docs/index.html` (`generated` 2026-11-25 -> 2026-11-26 is the build date, not a data change). `scripts/check_stats_drift.py`: clean.
 
-## 4. Existing rows that changed (80), field by field
+## 4. Existing rows that changed (81), field by field
 
-Per-entity comparison of the two `data/incidents.json` files (every key of every row at both sides): the changed-field sets are `['last_seen', 'references', 'updated']` on 80 rows. The other 15,765 rows compare equal on every field.
+Per-entity comparison of the two `data/incidents.json` files (every key of every row at both sides): the changed-field sets are `['last_seen', 'references', 'updated']` on 81 rows. The other 15,764 rows compare equal on every field.
 
 **Intended and justified.** `references`: the ledger's own page `https://hackingincidents.ai/incident/<slug>/` plus any ledger source URL not already on the row are appended (the existing references keep their order and are an exact prefix of the new list on every row; checked per row). `updated` and `last_seen` are set to the build date by `_apply_history`, because `references` is a content field (the same mechanism that bumps them on any refresh); no other field is a content change. Severity, date, title, description, attack_vector, corpus, tier, quality_tier, taxonomy fields, tags, source_ids: no change on any of the rows.
 
-References added in total: 212 across 80 rows. Note on two rows (INC-03212, INC-03248): they carry a whole-list `references` curation override (D130-3a); the attachment is applied AFTER curation overrides so it is not silently overwritten (section 8).
+References added in total: 217 across 81 rows. Note on two rows (INC-03212, INC-03248): they carry a whole-list `references` curation override (D130-3a); the attachment is applied AFTER curation overrides so it is not silently overwritten (section 8).
 
 | row | refs before -> after | `updated` / `last_seen` before -> after | ledger incidents attached | URLs added |
 |---|---|---|---|---|
@@ -63,6 +63,7 @@ References added in total: 212 across 80 rows. Note on two rows (INC-03212, INC-
 | INC-02698 | 2 -> 3 | 2026-10-13 -> 2026-11-26 / 2026-10-13 -> 2026-11-26 | hk-ai-facial-composites-bank-checks-2025 | hackingincidents.ai/incident/hk-ai-facial-composites-bank-checks-2025/ |
 | INC-02779 | 2 -> 3 | 2026-10-29 -> 2026-11-26 / 2026-10-29 -> 2026-11-26 | kaikatsu-frontier-teen-ai-program-breach-2025 | hackingincidents.ai/incident/kaikatsu-frontier-teen-ai-program-breach- |
 | INC-02849 | 2 -> 3 | 2026-10-06 -> 2026-11-26 / 2026-10-06 -> 2026-11-26 | postmark-mcp-malicious-mcp-server-2025 | hackingincidents.ai/incident/postmark-mcp-malicious-mcp-server-2025/ |
+| INC-02850 | 2 -> 7 | 2026-10-29 -> 2026-11-26 / 2026-10-29 -> 2026-11-26 | s1ngularity-nx-ai-cli-weaponized | hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/; stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-syst; snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malici; socket.dev/blog/nx-packages-compromised; okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attacke |
 | INC-02959 | 9 -> 14 | 2026-10-29 -> 2026-11-26 / 2026-10-29 -> 2026-11-26 | kimsuky-chatgpt-fake-military-id | hackingincidents.ai/incident/kimsuky-chatgpt-fake-military-id/; genians.co.kr/en/blog/threat_intelligence/deepfake; therecord.media/north-korea-kimsuky-hackers-phishing-fake-military-ids; infosecurity-magazine.com/news/ai-military-ids-north-korea/; gendigital.com/blog/insights/reports/threat-report-q3-2025 |
 | INC-02999 | 1 -> 5 | 2026-10-06 -> 2026-11-26 / 2026-10-06 -> 2026-11-26 | cambodia-romance-baiting-chatgpt-2025, kimsuky-bluenoroff-chatgpt-rdp-tooling-2025 | hackingincidents.ai/incident/cambodia-romance-baiting-chatgpt-2025/; aithreat.io/cases/openai-cambodia-romance-baiting/; hackingincidents.ai/incident/kimsuky-bluenoroff-chatgpt-rdp-tooling-20; aithreat.io/cases/openai-kimsuky-bluenoroff-rdp/ |
 | INC-03003 | 1 -> 14 | 2026-10-06 -> 2026-11-26 / 2026-10-06 -> 2026-11-26 | openai-dprk-deceptive-employment-2025, scopecreep-chatgpt-go-malware-2025, vague-focus-chatgpt-social-engineering-2025, vixen-keyhole-panda-chatgpt-2025, wrong-number-task-scam-chatgpt-2025 | hackingincidents.ai/incident/openai-dprk-deceptive-employment-2025/; koreaherald.com/article/10426133; cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-o; aithreat.io/cases/openai-dprk-employment-feb2025/; hackingincidents.ai/incident/scopecreep-chatgpt-go-malware-2025/; aiadoption.org/record/ai-powered-cyber-attacks/; aithreat.io/cases/openai-scopecreep-malware/; hackingincidents.ai/incident/vague-focus-chatgpt-social-engineering-20; aithreat.io/cases/openai-vague-focus/; hackingincidents.ai/incident/vixen-keyhole-panda-chatgpt-2025/; aithreat.io/cases/openai-vixen-keyhole-panda/; hackingincidents.ai/incident/wrong-number-task-scam-chatgpt-2025/; aithreat.io/cases/openai-wrong-number-task-scam/ |
@@ -125,7 +126,7 @@ References added in total: 212 across 80 rows. Note on two rows (INC-03212, INC-
 1. **AIID join:** a ledger source `incidentdatabase.ai/cite/N` against the corpus `aiid_id` / `AIID-N` source id.
 2. **Source URL:** a ledger source URL equal, after the merger's own `normalize_url`, to any corpus reference URL (aggregate pages never count).
 3. **Title:** `title_key` equal within +-1 year (0 hits).
-4. **Reviewed title matches** (`REVIEWED_MATCHES`): event twins that no key finds because the corpus row cites other articles (an OECD page, an AIAAIC row, another outlet). A candidate list (shared rare title tokens, idf-weighted similarity >= 0.30, year +-1) was generated and **every candidate was adjudicated by reading the ledger row and the corpus row**: 64 candidates in the first pass, 28 accepted and 36 rejected as same-theme-different-event; 12 further matches (4 events and the 3 report-level OpenAI rows from a looser pass over the same rows, 5 events from the seeded sample and scan of section 5.4). The candidates still unmatched after all of that (40) are kept in the provenance file under `title_candidates_not_matched`.
+4. **Reviewed title matches** (`REVIEWED_MATCHES`): event twins that no key finds because the corpus row cites other articles (an OECD page, an AIAAIC row, another outlet). A candidate list (shared rare title tokens, idf-weighted similarity >= 0.30, year +-1) was generated and **every candidate was adjudicated by reading the ledger row and the corpus row**: 64 candidates in the first pass, 28 accepted and 36 rejected as same-theme-different-event; 13 further matches (4 events and the 3 report-level OpenAI rows from a looser pass over the same rows, 5 events from the seeded sample and scan of section 5.4, and 1 from the gate's sample, `s1ngularity-nx-ai-cli-weaponized` = INC-02850). The candidates still unmatched after all of that (39) are kept in the provenance file under `title_candidates_not_matched`.
 
 Several candidates: AIID join beats URL, then higher title similarity, then more shared URLs, then lowest INC id; alternates recorded (2 rows: `openai-dprk-deceptive-employment-2025` -> INC-03003 over INC-02999, `storm-2139-azure-openai-llmjacking-2025` -> INC-03812 (AIID join) over INC-02902).
 
@@ -137,11 +138,11 @@ A match is **EVENT** when it came from an AIID join, a title match, a reviewed e
 
 | outcome | rows |
 |---|---|
-| new row | 187 |
+| new row | 186 |
 | attached, AIID join (+ URL) | 22 (all 22 AIID-citing ledger rows) |
 | attached, URL only, EVENT | 13 |
 | attached, URL only, REPORT | 35 |
-| attached, reviewed title match, EVENT | 37 |
+| attached, reviewed title match, EVENT | 38 |
 | attached, reviewed title match, REPORT | 3 |
 | collapsed into the surviving twin (in-ledger near-duplicate) | 1 |
 | **total** | **298** |
@@ -152,9 +153,9 @@ The D159 gate measured 70 of 298 sharing a URL (or AIID id) with the corpus; thi
 
 ### 5.4 Residual duplicates (recall)
 
-A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left after the first stages was read against its two closest corpus rows by title similarity: **2 of 30 were existing-row duplicates** (`claude-pentestgpt-argentine-healthcare` = INC-17369, `hk-deepfake-dating-crypto-fraud-2025` = INC-02696); both were added to the reviewed list. A looser scan of the remaining 55 candidates then found 3 more (`wpp-ceo-deepfake-meeting-attempt-2024` = INC-04359, `wiles-impersonation-ai-voice-2025` = INC-03373, `dutch-ai-bank-warning-recordings-fraud-2026` = INC-17361). Reading that as a rate: roughly 2/30 in an unbiased sample, so on the order of 10 further duplicate events may sit among the 187 new rows; the interval on n=30 is wide. These would be two rows for one event, not a data loss; a red-reviewer seeded sample is the right independent check, and the reviewed list is the mechanism for any it finds.
+A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left after the first stages was read against its two closest corpus rows by title similarity: **2 of 30 were existing-row duplicates** (`claude-pentestgpt-argentine-healthcare` = INC-17369, `hk-deepfake-dating-crypto-fraud-2025` = INC-02696); both were added to the reviewed list. A looser scan of the remaining 55 candidates then found 3 more (`wpp-ceo-deepfake-meeting-attempt-2024` = INC-04359, `wiles-impersonation-ai-voice-2025` = INC-03373, `dutch-ai-bank-warning-recordings-fraud-2026` = INC-17361). Reading that as a rate: roughly 2/30 in an unbiased sample, so on the order of 10 further duplicate events may sit among the 186 new rows; the interval on n=30 is wide. **Gate's independent measurement (seed 20261126, n=40, run on the data of dad99db9): 1 miss in 40** (`s1ngularity-nx-ai-cli-weaponized` = INC-02850, the Nx npm AI-coding-agents event, AIID 1210; INC-10278 is the GHSA row for the same event), Wilson 95% CI 0.4% to 12.9%, about 1 to 24 residual duplicates among the then-187 new rows. That row is now in the reviewed list, so the new rows go 187 -> 186 and the attachments 110 -> 111; the INC numbers of the new rows emitted after that row's position shift down by one (nothing is merged yet, so no published ID moved). The two estimates (2/30 mine, 1/40 the gate's) are compatible. These would be two rows for one event, not a data loss; a red-reviewer seeded sample is the right independent check, and the reviewed list is the mechanism for any it finds.
 
-### 5.5 The 110 attachments
+### 5.5 The 111 attachments
 
 | ledger slug | -> INC | level | basis | similarity |
 |---|---|---|---|---|
@@ -195,6 +196,7 @@ A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left aft
 | hk-ai-facial-composites-bank-checks-2025 | INC-02698 | event | aiid+url | 0.761 |
 | kaikatsu-frontier-teen-ai-program-breach-2025 | INC-02779 | event | aiid+url | 0.597 |
 | postmark-mcp-malicious-mcp-server-2025 | INC-02849 | event | url | 0.643 |
+| s1ngularity-nx-ai-cli-weaponized | INC-02850 | event | reviewed-title | 0.275 |
 | kimsuky-chatgpt-fake-military-id | INC-02959 | event | reviewed-title | 0.542 |
 | cambodia-romance-baiting-chatgpt-2025 | INC-02999 | report | url | 0.156 |
 | kimsuky-bluenoroff-chatgpt-rdp-tooling-2025 | INC-02999 | report | url | 0.071 |
@@ -271,30 +273,30 @@ A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left aft
 
 ## 6. The new rows
 
-187 rows, source id `HIAI-<slug>`, one INC per ledger incident (none folded: 187 distinct `HIAI-` ids on 187 rows; the merger's URL fold is disabled for the 11 report URLs the ledger cites from several incidents, section 8).
+186 rows, source id `HIAI-<slug>`, one INC per ledger incident (none folded: 186 distinct `HIAI-` ids on 186 rows; the merger's URL fold is disabled for the 11 report URLs the ledger cites from several incidents, section 8).
 
 | field | distribution |
 |---|---|
-| `corpus` | security: 187 (set explicitly: the ledger is cyberattacks by scope; the merger's own keyword scan agrees on all 187) |
-| `attack_vector` | other: 61, malware: 56, deepfake: 29, phishing: 24, ransomware: 6, agent-hijack: 5, supply-chain: 3, data-exfiltration: 2, jailbreak: 1 |
-| `severity` | Medium: 187 (the ledger has none; the schema default, not an assessment) |
-| `quality_tier` | auto: 187 (explicit, D43: machine-ingested, third-party grade) |
-| `confidence` (rule-derived) | low: 187 |
-| `tier` | feed: 187 |
-| `category` | real-world: 187 |
-| ledger grade (tag `ledger-grade-*`) | confirmed: 86, strong: 75, suspected: 26 |
-| `owasp_llm` | LLM07: 29, LLM03: 5, LLM04: 3, LLM02: 2, LLM01: 1 (147 rows have no OWASP code) |
+| `corpus` | security: 186 (set explicitly: the ledger is cyberattacks by scope; the merger's own keyword scan agrees on all 186) |
+| `attack_vector` | other: 61, malware: 56, deepfake: 29, phishing: 24, ransomware: 6, agent-hijack: 5, data-exfiltration: 2, supply-chain: 2, jailbreak: 1 |
+| `severity` | Medium: 186 (the ledger has none; the schema default, not an assessment) |
+| `quality_tier` | auto: 186 (explicit, D43: machine-ingested, third-party grade) |
+| `confidence` (rule-derived) | low: 186 |
+| `tier` | feed: 186 |
+| `category` | real-world: 186 |
+| ledger grade (tag `ledger-grade-*`) | confirmed: 85, strong: 75, suspected: 26 |
+| `owasp_llm` | LLM07: 29, LLM03: 5, LLM02: 2, LLM04: 2, LLM01: 1 (147 rows have no OWASP code) |
 | `owasp_asi` | none |
-| `mitre_atlas` | AML.T0115.001: 29, AML.T0053: 5, AML.T0010: 3, AML.T0085.002: 2, AML.T0051: 1 (40 rows have an ATLAS id) |
-| `nist_ai_rmf` / `maestro_layers` | 40 rows / 0 rows |
-| `description_provenance` / `description_source` / `content_license.source` | original / hackingincidents / hackingincidents (MIT, obligations: attribution), all 187 |
-| `disclosure_date` | on 66 rows (the ledger's `disclosed`) |
+| `mitre_atlas` | AML.T0115.001: 29, AML.T0053: 5, AML.T0085.002: 2, AML.T0010: 2, AML.T0051: 1 (39 rows have an ATLAS id) |
+| `nist_ai_rmf` / `maestro_layers` | 39 rows / 0 rows |
+| `description_provenance` / `description_source` / `content_license.source` | original / hackingincidents / hackingincidents (MIT, obligations: attribution), all 186 |
+| `disclosure_date` | on 65 rows (the ledger's `disclosed`) |
 
 ### 6.1 How the labels were produced, and what is weak
 
 `attack_vector` is set from the ledger's own structured `ai_role` list: the FIRST role that maps to a value already in the corpus vocabulary wins (`deepfake`, `phishing-content` -> phishing, `malware-dev`/`malware-runtime-llm`/`evasion` -> malware, `supply-chain`, `agent-hijack`); social-engineering and fraud are deliberately not mapped to phishing. The 61 rows whose roles map to nothing (agentic intrusion, recon, exploit development, vulnerability research, operations automation, data analysis, LLM-account hijacking: the AI-as-weapon cases that have no value in the vocabulary) stay `other` and then go through the merger's own title/description rules, which gave `ransomware` (6), `data-exfiltration` (2) and `jailbreak` (1) from the row titles and left 61 at `other`. **The corpus vocabulary has no value for "attacker used an AI agent to intrude", so about a third of the new rows are `other`; that is the honest answer, not a label to fix by forcing a value.** Why not let the merger's text rules label everything: run over title + description they would give 17 of the role-mapped rows a different value than their roles imply (phishing, ransomware, supply-chain, model-poisoning or deepfake: e.g. `model-poisoning` from the word "backdoor" in a malware row), where the AI is the weapon and not the target. Where the role-mapped value and the text rule disagree, the role wins (the merger respects an explicit non-`other` vector). OWASP/ATLAS codes come from the merger's existing seed rule keyed on the vector (29 deepfake rows get LLM07 and AML.T0115.001, exactly as the 1,224 existing deepfake rows do; malware/phishing/other rows get none); that is the established rule, not new labelling.
 
-### 6.2 Hand sample, 15 new rows (`random.seed(161)` over the 187)
+### 6.2 Hand sample, 15 new rows (`random.seed(161)` over the 186)
 
 | id | event | `attack_vector` | verdict |
 |---|---|---|---|
@@ -303,14 +305,14 @@ A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left aft
 | INC-17535 | APT42 uses Gemini (recon, phishing content, social engineering) | phishing | coarse: four roles, the first mappable one wins |
 | INC-17438 | n0n ransomware operator used an AI coding agent | malware | coarse: `ransomware` would be tighter; role mapping gave malware |
 | INC-17453 | Volta-Autodoxer infostealer adds LLM victim profiling | other | acceptable (a malware row, one data-analysis role) |
-| INC-17558 | GLOBAL GROUP ransomware AI chatbot negotiators | ransomware | sensible (title rule) |
+| INC-17558 | Koske Linux cryptominer, signs of AI-assisted development | malware | sensible |
 | INC-17546 | COINBAIT crypto-exchange phishing kit | phishing | sensible |
 | INC-17517 | Indonesian-speaking operator uses Claude Code against governments | other | sensible |
 | INC-17403 | Conti-linked group impersonated IT support with AI voice | deepfake | sensible |
-| INC-17574 | KnowBe4 hires North Korean IT worker, AI-enhanced photo | deepfake | sensible |
+| INC-17574 | Sophisticated AI-generated GitBook lures phishing the crypto industry | phishing | sensible |
 | INC-17518 | Nimbus Manticore MiniFast backdoor, AI-assisted coding | malware | sensible |
 | INC-17519 | Russian-speaking operators use Claude Code for CRM data theft | other | sensible |
-| INC-17581 | Mother believes fake kidnappers cloned her daughter's voice | deepfake | sensible |
+| INC-17576 | AsyncRAT campaign with GenAI-written VBScript and JavaScript | malware | sensible |
 | INC-17407 | Extortionist uses AI to analyse stolen files | other | sensible (not data-exfiltration: the AI is used after the theft) |
 | INC-17512 | DPRK and PRC clusters use Gemini and agent tools for vulnerability research | other | sensible |
 
@@ -349,9 +351,9 @@ A seeded random sample (`random.Random(161)`) of 30 of the 192 new rows left aft
 
 | check | result |
 |---|---|
-| per-entity compare, base vs head `data/incidents.json` | 80 rows changed, fields `references`, `last_seen`, `updated` only; 187 added; 0 removed |
-| `scripts/aiid_change_report.py --before-ref HEAD` | new rows 187 (new AIID rows 0); existing AIID-carrying rows changed 46 (7 also carry OECD ids); fields `last_seen`, `references`, `updated` only |
-| `scripts/check_corpus_flips.py --before-ref HEAD` | flips 0, undeclared 0, added 187, removed 0 |
+| per-entity compare, base vs head `data/incidents.json` | 81 rows changed, fields `references`, `last_seen`, `updated` only; 186 added; 0 removed |
+| `scripts/aiid_change_report.py --before-ref HEAD` | new rows 186 (new AIID rows 0); existing AIID-carrying rows changed 47 (7 also carry OECD ids); fields `last_seen`, `references`, `updated` only |
+| `scripts/check_corpus_flips.py --before-ref HEAD` | flips 0, undeclared 0, added 186, removed 0 |
 | `python scripts/validate.py` | 16032/16032 entries valid, 0 with errors; integrity: no duplicate keys, all deprecations resolve |
 | `python scripts/check_stats_drift.py` | clean |
 | `python scripts/lint_atlas_ids.py` | OK |

@@ -1427,6 +1427,46 @@
       ]
     },
     {
+      "from": "HIAI-s1ngularity-nx-ai-cli-weaponized",
+      "target": {
+        "inc_id": "INC-02850",
+        "source_ids": [
+          "AIID-1210"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry s1ngularity-nx-ai-cli-weaponized",
+          "url": "https://hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/",
+          "type": "reference"
+        },
+        {
+          "title": "StepSecurity: s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
+          "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware",
+          "type": "report"
+        },
+        {
+          "title": "Snyk: Nx npm malware coerces AI assistant CLIs into reconnaissance and exfiltration",
+          "url": "https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/",
+          "type": "reference"
+        },
+        {
+          "title": "Socket: Nx npm packages compromised in supply-chain attack weaponizing AI CLIs",
+          "url": "https://socket.dev/blog/nx-packages-compromised",
+          "type": "reference"
+        },
+        {
+          "title": "Okta: The s1ngularity attack: when attackers prompt your AI agents",
+          "url": "https://www.okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attackers-prompt-your-ai-agents-to/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
       "from": "HIAI-crowdstrike-famous-chollima-deepfake-2025",
       "target": {
         "inc_id": "INC-02461",

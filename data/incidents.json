@@ -3,7 +3,7 @@
   "generated": "2026-11-26",
   "description": "A consolidated, machine-readable index of GenAI and agentic AI security incidents. Every applicable entry is mapped to four core taxonomies: OWASP LLM Top 10 (2026), OWASP Top 10 for Agentic Applications, NIST AI RMF (AI 100-1), and MITRE ATLAS. A companion MAESTRO architectural-layer mapping is carried where the source provides it, and an experimental VERIS 1.4.1 crosswalk is computed at export time (see docs/TAXONOMIES.md).",
   "schema": "schema/incident.schema.json",
-  "incident_count": 15991,
+  "incident_count": 15990,
   "retracted_count": 29,
   "unverified_count": 12,
   "incidents": [
@@ -214642,6 +214642,31 @@
           "title": "AIRI Navigator — incident 1210",
           "url": "https://www.airi-navigator.com/incidents/1210",
           "type": "research"
+        },
+        {
+          "title": "hackingincidents.ai ledger entry s1ngularity-nx-ai-cli-weaponized",
+          "url": "https://hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/",
+          "type": "reference"
+        },
+        {
+          "title": "StepSecurity: s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
+          "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware",
+          "type": "report"
+        },
+        {
+          "title": "Snyk: Nx npm malware coerces AI assistant CLIs into reconnaissance and exfiltration",
+          "url": "https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/",
+          "type": "reference"
+        },
+        {
+          "title": "Socket: Nx npm packages compromised in supply-chain attack weaponizing AI CLIs",
+          "url": "https://socket.dev/blog/nx-packages-compromised",
+          "type": "reference"
+        },
+        {
+          "title": "Okta: The s1ngularity attack: when attackers prompt your AI agents",
+          "url": "https://www.okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attackers-prompt-your-ai-agents-to/",
+          "type": "reference"
         }
       ],
       "tags": [
@@ -214652,7 +214677,7 @@
         "mit-risk-domain:2-privacy-security"
       ],
       "added": "2026-05-16",
-      "updated": "2026-10-29",
+      "updated": "2026-11-26",
       "aiid_id": 1210,
       "mitre_atlas_tactics": [
         "AML.TA0004",
@@ -214669,7 +214694,7 @@
       "confidence": "high",
       "source_status": "active",
       "first_seen": "2026-05-16",
-      "last_seen": "2026-10-29",
+      "last_seen": "2026-11-26",
       "source_freshness": {
         "status": "stale",
         "as_of": "2026-05-31",
@@ -1413762,91 +1413787,6 @@
     {
       "id": "INC-17554",
       "source_ids": [
-        "HIAI-s1ngularity-nx-ai-cli-weaponized"
-      ],
-      "title": "s1ngularity: Nx npm compromise runs victims' AI CLIs to hunt secrets",
-      "date": "2025-08-26",
-      "year": 2025,
-      "category": "real-world",
-      "description": "Ledger entry s1ngularity-nx-ai-cli-weaponized (hackingincidents.ai). Actor per the ledger: not identified; actor type unknown. Targets per the ledger: Developers installing malicious Nx npm versions; thousands of GitHub accounts. Dated 2025-08-26, disclosed 2025-08-27. AI use per the ledger: supply-chain compromise, agentic intrusion, reconnaissance; models named: Claude Code CLI, Gemini CLI, Amazon Q CLI (as stated by the researchers); autonomy level semi-autonomous. The ledger grades the evidence confirmed; that grade is the ledger operator's label, not this project's assessment. Facts and source links only: the ledger's narrative text and quotations are not reproduced.",
-      "attack_vector": "supply-chain",
-      "affected": "Developers installing malicious Nx npm versions; thousands of GitHub accounts",
-      "severity": "Medium",
-      "owasp_llm": [
-        "LLM04"
-      ],
-      "owasp_asi": [],
-      "nist_ai_rmf": [
-        "GOVERN-6.1"
-      ],
-      "mitre_atlas": [
-        "AML.T0010"
-      ],
-      "references": [
-        {
-          "title": "hackingincidents.ai ledger entry s1ngularity-nx-ai-cli-weaponized",
-          "url": "https://hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/",
-          "type": "reference"
-        },
-        {
-          "title": "StepSecurity: s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
-          "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware",
-          "type": "report"
-        },
-        {
-          "title": "Snyk: Nx npm malware coerces AI assistant CLIs into reconnaissance and exfiltration",
-          "url": "https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/",
-          "type": "reference"
-        },
-        {
-          "title": "Socket: Nx npm packages compromised in supply-chain attack weaponizing AI CLIs",
-          "url": "https://socket.dev/blog/nx-packages-compromised",
-          "type": "reference"
-        },
-        {
-          "title": "Okta: The s1ngularity attack: when attackers prompt your AI agents",
-          "url": "https://www.okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attackers-prompt-your-ai-agents-to/",
-          "type": "reference"
-        }
-      ],
-      "tags": [
-        "actor-unknown",
-        "ai-role-agentic-intrusion",
-        "ai-role-recon",
-        "ai-role-supply-chain",
-        "hackingincidents",
-        "ledger-grade-confirmed"
-      ],
-      "added": "2026-11-26",
-      "updated": "2026-11-26",
-      "disclosure_date": "2025-08-27",
-      "description_provenance": "original",
-      "description_source": "hackingincidents",
-      "content_license": {
-        "source": "hackingincidents",
-        "license": "MIT",
-        "license_url": "https://github.com/danielmiessler/Substrate/blob/main/LICENSE",
-        "attribution": "hackingincidents.ai, Unsupervised Learning (Daniel Miessler)",
-        "attribution_url": "https://hackingincidents.ai/",
-        "obligations": [
-          "attribution"
-        ]
-      },
-      "corpus": "security",
-      "quality_tier": "auto",
-      "mitre_atlas_tactics": [
-        "AML.TA0004"
-      ],
-      "tier": "feed",
-      "source_count": 1,
-      "confidence": "low",
-      "source_status": "active",
-      "first_seen": "2026-11-26",
-      "last_seen": "2026-11-26"
-    },
-    {
-      "id": "INC-17555",
-      "source_ids": [
         "HIAI-ms-ai-obfuscated-svg-phishing"
       ],
       "title": "Credential phishing campaign with LLM-obfuscated SVG payload",
@@ -1413906,7 +1413846,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17556",
+      "id": "INC-17555",
       "source_ids": [
         "HIAI-kodane-npm-ai-written-solana-drainer-2025"
       ],
@@ -1413965,7 +1413905,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17557",
+      "id": "INC-17556",
       "source_ids": [
         "HIAI-lovable-ai-builder-tycoon-phishing-2025"
       ],
@@ -1414028,7 +1413968,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17558",
+      "id": "INC-17557",
       "source_ids": [
         "HIAI-global-group-ai-ransom-negotiator-2025"
       ],
@@ -1414087,7 +1414027,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17559",
+      "id": "INC-17558",
       "source_ids": [
         "HIAI-koske-ai-assisted-linux-cryptominer"
       ],
@@ -1414147,7 +1414087,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17560",
+      "id": "INC-17559",
       "source_ids": [
         "HIAI-v0-ai-built-phishing-sites-2025"
       ],
@@ -1414205,7 +1414145,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17561",
+      "id": "INC-17560",
       "source_ids": [
         "HIAI-open-webui-ai-generated-payload-2025"
       ],
@@ -1414263,7 +1414203,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17562",
+      "id": "INC-17561",
       "source_ids": [
         "HIAI-rubio-signal-ai-voice-impersonation-2025"
       ],
@@ -1414347,7 +1414287,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17563",
+      "id": "INC-17562",
       "source_ids": [
         "HIAI-fbi-ai-voice-senior-us-officials-2025"
       ],
@@ -1414426,7 +1414366,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17564",
+      "id": "INC-17563",
       "source_ids": [
         "HIAI-unit42-dprk-realtime-deepfake-interviews-2025"
       ],
@@ -1414501,7 +1414441,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17565",
+      "id": "INC-17564",
       "source_ids": [
         "HIAI-singapore-deepfake-zoom-finance-director-2025"
       ],
@@ -1414576,7 +1414516,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17566",
+      "id": "INC-17565",
       "source_ids": [
         "HIAI-hive0137-llm-phishing-2025"
       ],
@@ -1414634,7 +1414574,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17567",
+      "id": "INC-17566",
       "source_ids": [
         "HIAI-crosetto-voice-clone-italian-tycoons-2025"
       ],
@@ -1414704,7 +1414644,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17568",
+      "id": "INC-17567",
       "source_ids": [
         "HIAI-rakuten-mobile-teens-generative-ai-program-2025"
       ],
@@ -1414764,7 +1414704,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17569",
+      "id": "INC-17568",
       "source_ids": [
         "HIAI-vidoc-deepfake-candidates-2025"
       ],
@@ -1414838,7 +1414778,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17570",
+      "id": "INC-17569",
       "source_ids": [
         "HIAI-hk-deepfake-romance-syndicate-360m-2024"
       ],
@@ -1414907,7 +1414847,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17571",
+      "id": "INC-17570",
       "source_ids": [
         "HIAI-permiso-llmjacking-bedrock-roleplay-2024"
       ],
@@ -1414965,7 +1414905,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17572",
+      "id": "INC-17571",
       "source_ids": [
         "HIAI-wiz-ceo-deepfake-voice-attempt-2024"
       ],
@@ -1415034,7 +1414974,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17573",
+      "id": "INC-17572",
       "source_ids": [
         "HIAI-okta-dprk-it-contracting-genai-2024"
       ],
@@ -1415093,7 +1415033,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17574",
+      "id": "INC-17573",
       "source_ids": [
         "HIAI-knowbe4-dprk-fake-it-worker-2024"
       ],
@@ -1415167,7 +1415107,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17575",
+      "id": "INC-17574",
       "source_ids": [
         "HIAI-ai-generated-gitbook-lures-crypto-2024"
       ],
@@ -1415225,7 +1415165,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17576",
+      "id": "INC-17575",
       "source_ids": [
         "HIAI-black-basta-ai-deepfakes-vishing-2024"
       ],
@@ -1415294,7 +1415234,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17577",
+      "id": "INC-17576",
       "source_ids": [
         "HIAI-asyncrat-genai-vbscript-france"
       ],
@@ -1415358,7 +1415298,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17578",
+      "id": "INC-17577",
       "source_ids": [
         "HIAI-ta547-rhadamanthys-llm-powershell"
       ],
@@ -1415417,7 +1415357,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17579",
+      "id": "INC-17578",
       "source_ids": [
         "HIAI-hk-deepfake-loan-applications-2023"
       ],
@@ -1415485,7 +1415425,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17580",
+      "id": "INC-17579",
       "source_ids": [
         "HIAI-baotou-face-swap-video-call-fraud-2023"
       ],
@@ -1415554,7 +1415494,7 @@
       "last_seen": "2026-11-26"
     },
     {
-      "id": "INC-17581",
+      "id": "INC-17580",
       "source_ids": [
         "HIAI-destefano-voice-clone-fake-kidnapping-2023"
       ],

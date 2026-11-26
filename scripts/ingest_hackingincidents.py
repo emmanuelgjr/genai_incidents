@@ -10,7 +10,7 @@ U1).
 
 Outputs (all committed; ``make build`` reads only these, never the network):
 
-  ingest/snapshots/hackingincidents/incidents.json   the fetched bytes, verbatim
+  ingest/snapshots/hackingincidents/incidents.json   the STRIPPED snapshot (D162): only the fields this ingest reads
   ingest/wave13_hackingincidents.provenance.json     the pin: url, sha256, fetched
                                                      (UTC), ``updated``, rows,
                                                      licence string, run stats, review
@@ -177,6 +177,7 @@ REVIEWED_MATCHES = {
     "hk-deepfake-dating-crypto-fraud-2025": ("INC-02696", "event"),
     "wpp-ceo-deepfake-meeting-attempt-2024": ("INC-04359", "event"),
     "wiles-impersonation-ai-voice-2025": ("INC-03373", "event"),
+    "s1ngularity-nx-ai-cli-weaponized": ("INC-02850", "event"),  # Nx npm "AI coding agents" event, AIID 1210, 2025-08-21 (gate sample; INC-10278 is the GHSA row for the same event)
     "dutch-ai-bank-warning-recordings-fraud-2026": ("INC-17361", "event"),  # EUR 380,000, Netherlands, 2026-10 (second candidate pass)
     # the corpus holds the OpenAI October 2025 report as one row (INC-03006); the ledger
     # splits it per operation but cites the cdn PDF, not the page INC-03006 cites

@@ -11,8 +11,8 @@
 <rect x="220" y="80" width="45.9" height="14" fill="#0a58ca" rx="2"><title>Excessive Agency: 793</title></rect>
 <text x="271.9" y="91" fill="#666">793</text>
 <text x="212" y="113" text-anchor="end" fill="#333">LLM04 · Supply Chain</text>
-<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,292</title></rect>
-<text x="706.0" y="113" fill="#666">8,292</text>
+<rect x="220" y="102" width="480.0" height="14" fill="#0a58ca" rx="2"><title>Supply Chain: 8,291</title></rect>
+<text x="706.0" y="113" fill="#666">8,291</text>
 <text x="212" y="135" text-anchor="end" fill="#333">LLM05 · Data and Model Poisoning</text>
 <rect x="220" y="124" width="11.2" height="14" fill="#0a58ca" rx="2"><title>Data and Model Poisoning: 194</title></rect>
 <text x="237.2" y="135" fill="#666">194</text>
@@ -20,8 +20,8 @@
 <rect x="220" y="146" width="2.5" height="14" fill="#0a58ca" rx="2"><title>Unbounded Consumption: 43</title></rect>
 <text x="228.5" y="157" fill="#666">43</text>
 <text x="212" y="179" text-anchor="end" fill="#333">LLM07 · Misinformation</text>
-<rect x="220" y="168" width="148.5" height="14" fill="#0a58ca" rx="2"><title>Misinformation: 2,566</title></rect>
-<text x="374.5" y="179" fill="#666">2,566</text>
+<rect x="220" y="168" width="148.6" height="14" fill="#0a58ca" rx="2"><title>Misinformation: 2,566</title></rect>
+<text x="374.6" y="179" fill="#666">2,566</text>
 <text x="212" y="201" text-anchor="end" fill="#333">LLM08 · Hidden Context Exposure</text>
 <rect x="220" y="190" width="42.4" height="14" fill="#0a58ca" rx="2"><title>Hidden Context Exposure: 732</title></rect>
 <text x="268.4" y="201" fill="#666">732</text>
