@@ -14,7 +14,7 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
-### 🔄 2026-11-26 — D160 USER RULING + D161 IN PROGRESS: ingest hackingincidents.ai, facts + link (pipeline-engineer)
+### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
 - Ingest: **"Facts + link (Recommended)"**.
@@ -119,6 +119,33 @@ Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advi
 - the worktree is clean.
 
 Gate-d161 is re-gating on 9cf17a43.
+
+**Update: gate-d161 re-gate PASS on `9cf17a43`. No defects.** Evidence, all gate-run on 9cf17a43:
+- **(a) Per-entity compare:**
+  - +186 (INC-17395..17580, all single HIAI source_id) / −0;
+  - 81 rows changed, exactly {last_seen, references, updated}, with references a pure append;
+  - 111 attachments (event 73, report 38; url 48, reviewed-title 41, aiid+url 22) onto 81 targets, with the changed set equal to the target set;
+  - the independent recomputation of the references matches on 81/81;
+  - incident_count is 15,990 by recount.
+- **(b) Fresh scratch-clone rebuild from base:**
+  - byte-identical on 11 outputs;
+  - drift clean; aiid_change_report new 186 / changed 47; flips 0, undeclared 0;
+  - pytest 1721p / 1s / 1x / 0 failed.
+- **INC-02850** gains 5 references (the ledger page, stepsecurity, snyk, socket.dev, okta), and no s1ngularity row exists.
+- **ID shift:** max published ID is INC-17394 (main) / INC-17215 (v2.13.0), so no published ID moved, and id_deprecations is unchanged.
+- **§1.9 wording:** D1/D2/A4/A5 verified.
+- **History:** the snapshot is reachable only via dad99db9.
+- **Leakage:** description max run 7; 8+ runs only in kept headline titles.
+
+**Advisories:**
+- **N1:** §1.9 L248 says "187". Routed to the specialist as a text-only fix before the PR.
+- **N2:** carried follow-ups: the severity default; the vector→OWASP/ATLAS seed for AI-as-weapon rows (146/186 have no codes); the INC-08177 over-merge; residual dedupe of about 1–24 rows.
+- **N3:** a test-count skip difference that depends on the environment.
+- **N4:** correct §1.9 in place once the D163 purge is confirmed.
+
+**Stray check:** the main tree is clean.
+
+**NEXT:** the N1 fix, then the USER reviews docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md before the PR. After merge: docs-warden (counts change 15,804→15,990).
 
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
