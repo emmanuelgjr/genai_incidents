@@ -14,6 +14,234 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
+
+**Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
+- **(a) Diff:** test file only, +15/−2, one commit. No new skip or xfail.
+- **(b) CI logs:**
+  - Fix run 45890926182: the whole suite on 3.12 and 3.13, "1692 passed, 1 xfailed" each, all 15 steps green.
+  - neg-chmod 45890945513: the diff is exactly the chmod line; 7 failed with "PATH wrapper never intercepted".
+  - neg-flag 45890955373: the diff is exactly the auto-refresh.yml fail-closed line; 5 failed. The negative commits are still local, and origin shows only the fix branch.
+- **(c) The stub-ran assertion can fail** (shown by neg-chmod) and is correctly scoped: the None control passes. M3 checks itself. test_step_harness_fires_on_mutants had been passing vacuously before the fix.
+- **(d) The real step was never at risk.** The live refresh 45020991492 (2026-11-22) ran plain `python` from setup-python with no exit-127. The red runs' real-checker fall-through also shows the real step and checker behave correctly on Linux. Sunday 11-29 should give a real verdict.
+- **(e) No other test was hidden:** all 30 red main runs have an identical FAILED-set hash, "6 failed, 1686 passed".
+
+**Advisories:**
+- **A1:** the red streak was **30 runs**, not 26: from 45623512996 (8b6df9a9) to 45891212072. The last green run was 45621342950.
+- **A2:** 45888862138 was the PR #117 run, not a main run (the foreman mislabelled it).
+- **A3:** **the red streak also SKIPPED 7 later validate steps on main for about 1.5 days:** re-merge, schema, ATLAS lint, render-drift, stats drift, the XSS scan and the pip smoke test. All 7 ran green on the fix run, whose tree is main plus the test file.
+- **A4:** the negative runs proved the failure on 3.12 only, because 3.13 was fail-fast cancelled. Acceptable.
+- **A5:** the harness runs `bash -eo pipefail`, while the live step runs the default `bash -e`. No difference today.
+- **A6 → proposed follow-up D167:** a main-red alert, or a rule that no PASS is recorded while main is red.
+
+**Foreman process rule (adopted now):** after every merge, run `gh run list --branch main --workflow validate.yml --limit 1` and wait for green before recording DONE. A board commit made while main is red must say so.
+
+**Stray check:** the main tree was clean before the merge.
+
+---
+#### (history) D166 dispatch, 2026-11-26
+
+**Found while checking CI on PR #117.**
+- **Scope:** `validate` (ubuntu, py3.12/3.13) has failed on **every push to main since `8b6df9a9`** (D156(a) merge, 2026-11-25). That is 26 consecutive runs; the last green run is `6ad2f9b1`.
+- **The failures:** the same 6 tests fail on main and on PR #117, all in tests/test_check_corpus_flips.py: the step-harness tests (exit 1/7/2 unknown; real-crash unwritable report; flips found; no flips). In CI the harness gets `needs_ruling=false` and the REAL checker's output, not the stub's.
+- **Why no one saw it:** they pass on Windows/Git Bash, which is all that the specialist, gate-d156a, gate-d161 and the D161 runs used.
+- **Process failure:** the foreman merged D156(a) and recorded PASS without checking the post-merge CI on main, and then pushed 25 board commits without looking at their status. This is the agreement-6 failure shape: the gate never saw the check run on the platform where it matters.
+- **Lesson:** after any merge, check `gh run list --branch main` before recording it done.
+
+**Foreman hypothesis (unverified):** `_run_step` writes a PATH `python` wrapper without chmod +x. Linux bash skips non-executable files on PATH, so the stub never fires.
+
+**Dispatched:** pipeline-engineer (fresh instance), branch `d166-corpus-flips-linux`, worktree gi-wt-d166. The brief requires:
+- reproduce on Linux, using CI dispatch if needed;
+- fix the root cause;
+- prove the tests fire on Linux against a deliberately broken step;
+- **confirm whether the real auto-refresh step was ever at risk on ubuntu.** This is urgent: Sunday 2026-11-29 is its first live run.
+
+**Effect on PR #117:** its 6 failures are exactly main's, and every D161 test passed in CI (1716 passed). The foreman is holding the #117 merge until D166 lands, so that D161 merges on green.
+
+**CodeQL on #117:** 2 new high alerts, not yet triaged. Triage is required before the merge.
+
+**Update, CodeQL triage:** both alerts were `py/incomplete-url-substring-sanitization` at tests/test_ingest_hackingincidents.py:200 (`"cyware.com" in url`). They are test assertions, not real sanitization, but the foreman chose to fix rather than dismiss. The D161 specialist pushed `9bf4e891`:
+- hostname helpers `_host_is` and `_is_aiid_cite` in the test;
+- in the script, an AIID-cite regex anchored at scheme and host (urlsplit was avoided because of the test_network_chokepoint urllib grep).
+The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 69 targeted tests passing. **Gate-d161 is re-checking the post-PASS delta** 9cf17a43..9bf4e891: AIID join coverage, byte-identical outputs, and that the assertions fire. New CI is running on #117.
+
+**Update, D166 progress plus a security-review acknowledgement.**
+- **Fix branch:** `c5011615` on `d166-corpus-flips-linux` touches only tests/test_check_corpus_flips.py (+15/−2). It chmods the PATH python wrapper, asserts the stub fired, and adds an M3 mutant.
+- **Security review flag:** the automated review flagged `2e412a08` ("neg: drop fail-closed write", auto-refresh.yml −1 line) as a MEDIUM fail-open regression.
+- **[R] foreman check:** that commit is ONLY on the negative-control branch `origin/d166-neg-flag`. A second control, `d166-neg-chmod` (`d2158399`), is the same kind. Both were created as the brief's proof-it-fires CI evidence, and neither is in main or the fix branch.
+- **main is unaffected:** main's auto-refresh.yml still writes `needs_ruling=true` first in both the flips branch and the else branch.
+- **Not exploitable:** a scheduled workflow runs only on the default branch.
+- **Cleanup:** the specialist is told to record the run IDs and SHAs, then delete both negative branches on origin, and never merge from them.
+
+**Update: gate-d161 delta re-gate PASS on `9bf4e891`** (diff 9cf17a43..9bf4e891: 3 files, +25/−6, nothing undeclared).
+- **(a) AIID coverage:** all 22 incidentdatabase URLs in the snapshot are https, bare host, trailing slash. The old and new regexes disagree on 0 of them, and 22 AIID attachments survive. Wrong hosts are rejected: path-embedded, suffix-spoof, lookalike, query-embed, and /apps/.
+- **(b) Byte identity:** the offline ingest at 9bf4e891 is byte-identical on all 3 wave13 outputs. The gate disclosed that its first attempt ran at the wrong SHA; it discarded that run and redid it.
+- **(c) Tests fire:** mutating the 2 rewritten assertions gives 2 failed / 28 passed.
+- Not run: the full suite and the merge rebuild. These are unnecessary because the merge inputs are byte-identical.
+
+**#117 merge is now gated only on D166:** main must be green, then #117 CI goes green.
+
+**Update: D166 specialist reported `c5011615`.**
+- **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
+- **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
+- **The fix (test file only, +15/−2):**
+  - `chmod(0o755)` on the wrapper;
+  - each stub touches a `stub-ran` sentinel, and the harness asserts it;
+  - a new mutant M3 removes the UNKNOWN-branch fail-closed write.
+- **CI evidence, foreman-verified** with `gh run view`:
+
+  | Run | Branch | SHA | Result |
+  |---|---|---|---|
+  | 45890926182 | fix | c5011615 | success |
+  | 45890945513 | neg-chmod | d2158399 | failure |
+  | 45890955373 | neg-flag | 2e412a08 | failure |
+
+- **Negative branches:** deleted on origin; ls-remote shows only the fix branch.
+- **Real step on Ubuntu WSL:** fails closed (exit 2 / no report / unwritable report / flips all give needs_ruling=true; clean gives false). The step uses plain setup-python `python`, so the specialist says it was **never at risk**. Pytest was not run in WSL (no pip).
+
+**Gate-d166 dispatched on c5011615.** It covers: the CI logs read by the gate itself; the negative diffs; whether the stub-ran assertion can fail; an independent check of the real step's dependency on `python` on ubuntu; and any other failures hidden by 26 red runs.
+
+### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
+
+**D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
+- Ingest: **"Facts + link (Recommended)"**.
+- Outreach: **"I'll send it"**. The user sends docs/audits/D159-hackingincidents-outreach-draft-2026-11-25.md via X and adds the signature. The reply is non-blocking: it can only widen what we keep (for example `summary`), never narrow facts+link.
+
+**D161 dispatched to pipeline-engineer.** Branch `d161-hackingincidents-ingest`, worktree gi-wt-d161, based on `9019539d`. The brief requires:
+- a pinned site snapshot, plus provenance and a `--from-file` offline path, and NOT adding the source to auto-refresh yet;
+- `quote` and `summary` excluded; `confidence_reason` measured for publisher text and excluded unless it is clean;
+- URL- and aiid-join dedupe first: a match attaches as a reference and does not create a new INC row, REPORT-LEVEL rows attach to the parent, and the cairn pair is handled;
+- the U8 row going in as SOURCE_LICENSES §1.9 (level 3, exact `<date>` token, UTC note), with the MIT notice in NOTICE-DATA and .reuse/dep5 (the D159 gate advisories 1/5/6 are carried here);
+- the field-level delta in docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md, covering every changed existing row, the new-row label distributions, and a hand sample of 15;
+- proof that dedupe fires, with INC-17386 / aiid 1817 as the known positive;
+- no PR until the gate has passed and the user has reviewed the delta.
+
+**Update 2026-11-26: specialist reported `80217d42` (pushed, verified by its ls-remote; the foreman re-checked the branch tree, which is clean and has 1 commit and 33 files).** Claimed results:
+- **Rows:** 187 new rows (INC-17395..17581); rows 15,845→16,032; incident_count 15,804→15,991.
+- **Attached instead of created:** 110 of 298 (22 by AIID join, 48 by URL, 40 by reviewed title; 38 of them REPORT-LEVEL). The cairn pair collapsed into one.
+- **Existing rows:** 80 changed, in references, updated and last_seen only. 0 removed, 0 corpus flips.
+- **Excluded fields:** `confidence_reason` was measured as NOT clean (15 rows with an 8+ word run, max 19), so it is excluded, as is `outcome` (max 14). The description is a deterministic template, max 7-word run. A sentinel test covers the excluded fields.
+- **Dedupe:** fires on aiid 1817 → INC-17386; a doctored copy creates a new row.
+- **Tests:** pytest 1717 passed, 2 skipped, 1 xfailed (27 new); validate 16032/16032; drift clean.
+- **Delta file:** docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md. Hand sample of 15: 12 sensible, 3 coarse, 0 wrong.
+**Open decision the specialist raised:** `ingest/snapshots/hackingincidents/incidents.json` (690,343 B) commits the fetched bytes VERBATIM, so 298 `quote` and `summary` strings would sit in the public repo, although they are never emitted. The alternative is a stripped snapshot plus the raw sha256 in provenance. The report was truncated at this point and the remainder has been requested.
+
+**Rest of the specialist report:**
+- **Dedupe recall < 100%.** Of a seeded 30 of 192 residual rows, 2 were missed duplicates (INC-17369, INC-02696). A looser scan found 3 more (wpp, wiles, dutch bank). All 5 were added to REVIEWED_MATCHES, and roughly 10 more are expected among the 187. The gate must draw its own sample.
+- **Cadence:** a manual `--fetch` about monthly, as a reviewed PR, never more often than weekly. Not added to auto-refresh.
+- **Surprises the specialist fixed:**
+  - Attachments were lost on INC-03212 and INC-03248, because a whole-list references curation override ran first. Attachments now apply after overrides.
+  - Attach idempotence bug (227/70 became 224/73 on rerun).
+  - Retained-prior trap: builds must start from base data/.
+  - `fold_exempt_urls` added for 11 vendor-report URLs, through D117 is_aggregate_url.
+- **Labels and corpus notes:** attack_vector comes from ledger ai_role where it maps, leaving 61 of 187 as `other` (there is no "AI-agent intrusion" value). INC-08183 is an over-merged row (titled Bard exfil, but it carries AIID-898 LLMjacking); this is pre-existing and carried.
+
+**D162 USER RULING (2026-11-26): "Strip it (Recommended)".** The committed snapshot drops quote, summary, confidence_reason, outcome, single_source_reason and enrichment. The raw sha256 is kept in provenance. Redispatched to the specialist to:
+- rebuild the branch so that the raw bytes never appear in its history (force-with-lease on the feature branch only);
+- update NOTICE-DATA, §1.9, the README and the delta;
+- add tests that are proven to fire;
+- show the emitted outputs are byte-identical to 80217d42.
+
+**Update: D162 strip done. The branch was rewritten to `dad99db9`, a single commit on `9019539d`, force-with-lease on the feature branch only; origin is verified at dad99db9.**
+- **[R] foreman checks:**
+  - The only commit touching the snapshot is dad99db9.
+  - The committed snapshot has 0 hits each for `"quote"`, `"summary"`, `confidence_reason`, `"outcome"` and `verified_on`.
+  - data/incidents.json and stats.json have blob SHAs identical to 80217d42.
+  - 33 files changed; the worktree is clean.
+- **Snapshot:** 284,519 B, versus the raw 690,343 B, raw_sha256 e1e95518…, which is recorded.
+  - `--fetch` strips on the way in.
+  - `--from-file` accepts the stripped file, or the raw file verified against raw_sha256.
+  - 8 per-source bookkeeping keys are also dropped and listed in provenance `dropped_fields`.
+- **Tests:** 1720 passed, 2 skipped, 1 xfailed (30 D161 tests).
+- **Caveats:**
+  - The old commit 80217d42 and the raw blob remain in the LOCAL object store and reflog. The auto-mode classifier denied the specialist a gc, and the foreman is not doing it on the specialist's behalf.
+  - GitHub may keep 80217d42 reachable by SHA until its own GC. A support purge is the user's call if wanted.
+- **Gate-d161 dispatched on `dad99db9`.** It covers checks (a) to (h): a per-entity compare; a rebuild from base; its own seeded dedupe-recall sample; text leakage against a fresh raw download; history and committed-file text leakage; 15 hand-checked labels; merge_and_dedupe side effects; and the licence rows.
+
+**Update: gate-d161 BOUNCE #1 on `dad99db9` (the verdict came after one re-prompt; the gate had gone idle about 2.5 h after its suite finished).** Data, code, rebuild, leakage and dedupe all PASS on the gate's own measurements. Defects:
+1. **SOURCE_LICENSES §1.9 (Redistribute-verbatim cell, L246) is false.** It says the raw bytes "were never committed", but 80217d42 committed them as blob ea82f637, which equals `git hash-object` of a fresh download (sha256 e1e95518). The repo is PUBLIC, and `gh api …/commits/80217d42` still serves it with the snapshot listed as "added". D162's literal criterion (absent from branch history) is MET, and the delta doc §9.3 is worded correctly; §1.9 is a live surface and must state current fact (agreement 4). **Escalated to the user:** whether to ask GitHub Support to purge 80217d42, which is outward-facing and so the user's call.
+2. **§1.9 License cell (L244):** bare `<date>` inside an italic quote is stripped by the GFM sanitizer, so the rendered "verbatim" quote reads `accessed "`. Use a code span or `&lt;date&gt;`, as §1.5 L145 does.
+Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advisories, evidence, and why the two pytest runs differ) is pending.
+
+**Gate-d161 part 2: advisories and evidence (condensed).**
+- **A1 dedupe recall:** the gate's own seed 20261126, n=40, found 1 miss: s1ngularity-nx = INC-02850 (AIID 1210; INC-10278 is the GHSA row). Rate 2.5%, Wilson CI 0.4–12.9%, i.e. about 1–24 residual duplicates. Advisory, since a duplicate loses no data.
+- **A2:** 5 Anthropic Aug-2025 report-level attachments land on INC-08177 (an inherited over-merge). Same pattern on INC-02320/02999/02680.
+- **A3 labels:** corpus security 187; attack_vector other 61, malware 56, deepfake 29, phishing 24, … Weak points: severity Medium on all 187; the vector→OWASP/ATLAS seed is wrong for AI-as-weapon data-exfil (LLM02 + AML.T0085.002); 147/187 have no codes.
+- **A4:** kept titles and source titles share up to 17 words with quote/summary (headlines used as link labels).
+- **A5:** stale docstring at script L13 ("verbatim").
+- **A6:** 1721p/1s/1x vs the specialist's 1720p/2s/1x is an environment-dependent skip.
+- **A7:** the gate's only shared-repo write was a `git fetch`.
+- **The 3 pytest failures** were the gate's scratch setup (head code over base data/ restored from the index), not the branch. They show those tests fire on a mismatch.
+
+**Evidence (gate's own tools):**
+- **(a) Per-entity compare:** +187 / −0; 80 changed, exactly {last_seen, references, updated}, with references a pure append. The independent recomputation of the appended references matches on all 80. id_deprecations unchanged.
+- **(b) Scratch-clone rebuild from base:** byte-identical on 7 outputs, idempotent on a second pass. `--from-file` with the raw file reproduces the stripped sha. Dedupe fires (removing the key gives 188/109; the control gives 187/110).
+- **(d) Leakage:** fresh download sha = raw_sha256. Longest run against ALL rows' excluded text: description 7, every doc/test 3–6; 8+ runs only in kept titles (A4).
+- **(e)** The snapshot blob is reachable only via dad99db9.
+- **(g)** FOLD_EXEMPT_URLS has no effect on other sources today.
+- **(h)** Format OK apart from defect 2.
+
+**Redispatched to the specialist (bounce-1 fix), as a new commit on dad99db9:** defects 1–2, plus:
+- A1: add nx → INC-02850 to REVIEWED_MATCHES now, before merge, to avoid a tombstone later. Data changes 187→186 new and 110→111 attached; rebuild and regenerate the delta.
+- A5 docstring.
+- A4 sentence in §1.9.
+**Carried:** A2, and A3 as a proposed follow-up task (vector→taxonomy rules for AI-as-weapon rows, plus the severity default).
+
+**D163 USER RULING (2026-11-26):** "I'll request a purge". The user will contact GitHub Support to remove the cached commit 80217d42 from emmanuelgjr/genai_incidents. **Open item: confirm the purge.** Check that `gh api repos/emmanuelgjr/genai_incidents/commits/80217d42` returns 404/422. Until it does, §1.9 must keep its "may be retained" wording.
+
+**Update: bounce-1 fix `9cf17a43`, a new commit on dad99db9, pushed. Changes:**
+- D1: the §1.9 wording is corrected (80217d42 named; "may retain unless purged").
+- D2: `<date>` is now a code span.
+- A1: nx → INC-02850 added.
+- A4 and A5 done.
+
+**New figures:** 186 new rows (INC-17395..17580), 111 attached, 81 existing rows changed (references/last_seen/updated only), incident_count 15,990, rows 16,031. The specialist reports 1720p/2s/1x, validate 16031/16031, flips 0.
+
+**[R] foreman checks:**
+- the branch is 2 commits on 9019539d;
+- data has 16,031 rows;
+- INC-02850's last 3 references are snyk/socket.dev/okta;
+- the s1ngularity slug is in the attach file;
+- §1.9 L246 names 80217d42;
+- the worktree is clean.
+
+Gate-d161 is re-gating on 9cf17a43.
+
+**Update: gate-d161 re-gate PASS on `9cf17a43`. No defects.** Evidence, all gate-run on 9cf17a43:
+- **(a) Per-entity compare:**
+  - +186 (INC-17395..17580, all single HIAI source_id) / −0;
+  - 81 rows changed, exactly {last_seen, references, updated}, with references a pure append;
+  - 111 attachments (event 73, report 38; url 48, reviewed-title 41, aiid+url 22) onto 81 targets, with the changed set equal to the target set;
+  - the independent recomputation of the references matches on 81/81;
+  - incident_count is 15,990 by recount.
+- **(b) Fresh scratch-clone rebuild from base:**
+  - byte-identical on 11 outputs;
+  - drift clean; aiid_change_report new 186 / changed 47; flips 0, undeclared 0;
+  - pytest 1721p / 1s / 1x / 0 failed.
+- **INC-02850** gains 5 references (the ledger page, stepsecurity, snyk, socket.dev, okta), and no s1ngularity row exists.
+- **ID shift:** max published ID is INC-17394 (main) / INC-17215 (v2.13.0), so no published ID moved, and id_deprecations is unchanged.
+- **§1.9 wording:** D1/D2/A4/A5 verified.
+- **History:** the snapshot is reachable only via dad99db9.
+- **Leakage:** description max run 7; 8+ runs only in kept headline titles.
+
+**Advisories:**
+- **N1:** §1.9 L248 says "187". Routed to the specialist as a text-only fix before the PR.
+- **N2:** carried follow-ups: the severity default; the vector→OWASP/ATLAS seed for AI-as-weapon rows (146/186 have no codes); the INC-08177 over-merge; residual dedupe of about 1–24 rows.
+- **N3:** a test-count skip difference that depends on the environment.
+- **N4:** correct §1.9 in place once the D163 purge is confirmed.
+
+**Stray check:** the main tree is clean.
+
+**NEXT:** the N1 fix, then the USER reviews docs/audits/D161-hackingincidents-ingest-delta-2026-11-26.md before the PR. After merge: docs-warden (counts change 15,804→15,990).
+
+**D164 USER RULING (2026-11-26), after reviewing the delta summary:** "Merge, fix labels later (Recommended)". Once the N1 fix lands, open the PR and merge it, then run docs-warden. **New follow-up task D165 (label-scientist), not started:** label rules for AI-as-weapon rows. It covers:
+- severity (currently the Medium default on all 186);
+- the vector→OWASP/ATLAS seed (146/186 rows have no codes; data-exfil maps to LLM02 plus AML.T0085.002, which is semantically wrong);
+- a possible attack_vector value for AI-agent intrusion (61 rows are `other`).
+It needs its own field-level delta and gate.
+
+**Update:** N1 is fixed in `df06e983`. The foreman checked that the diff vs 9cf17a43 is 1 line in SOURCE_LICENSES.md, and the specialist's grep found no other stale live counts. merge-tree vs origin/main is clean. **PR #117 is open** and CI is running. Merge follows once checks pass.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
