@@ -76,6 +76,30 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 2. **§1.9 License cell (L244):** bare `<date>` inside an italic quote is stripped by the GFM sanitizer, so the rendered "verbatim" quote reads `accessed "`. Use a code span or `&lt;date&gt;`, as §1.5 L145 does.
 Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advisories, evidence, and why the two pytest runs differ) is pending.
 
+**Gate-d161 part 2: advisories and evidence (condensed).**
+- **A1 dedupe recall:** the gate's own seed 20261126, n=40, found 1 miss: s1ngularity-nx = INC-02850 (AIID 1210; INC-10278 is the GHSA row). Rate 2.5%, Wilson CI 0.4–12.9%, i.e. about 1–24 residual duplicates. Advisory, since a duplicate loses no data.
+- **A2:** 5 Anthropic Aug-2025 report-level attachments land on INC-08177 (an inherited over-merge). Same pattern on INC-02320/02999/02680.
+- **A3 labels:** corpus security 187; attack_vector other 61, malware 56, deepfake 29, phishing 24, … Weak points: severity Medium on all 187; the vector→OWASP/ATLAS seed is wrong for AI-as-weapon data-exfil (LLM02 + AML.T0085.002); 147/187 have no codes.
+- **A4:** kept titles and source titles share up to 17 words with quote/summary (headlines used as link labels).
+- **A5:** stale docstring at script L13 ("verbatim").
+- **A6:** 1721p/1s/1x vs the specialist's 1720p/2s/1x is an environment-dependent skip.
+- **A7:** the gate's only shared-repo write was a `git fetch`.
+- **The 3 pytest failures** were the gate's scratch setup (head code over base data/ restored from the index), not the branch. They show those tests fire on a mismatch.
+
+**Evidence (gate's own tools):**
+- **(a) Per-entity compare:** +187 / −0; 80 changed, exactly {last_seen, references, updated}, with references a pure append. The independent recomputation of the appended references matches on all 80. id_deprecations unchanged.
+- **(b) Scratch-clone rebuild from base:** byte-identical on 7 outputs, idempotent on a second pass. `--from-file` with the raw file reproduces the stripped sha. Dedupe fires (removing the key gives 188/109; the control gives 187/110).
+- **(d) Leakage:** fresh download sha = raw_sha256. Longest run against ALL rows' excluded text: description 7, every doc/test 3–6; 8+ runs only in kept titles (A4).
+- **(e)** The snapshot blob is reachable only via dad99db9.
+- **(g)** FOLD_EXEMPT_URLS has no effect on other sources today.
+- **(h)** Format OK apart from defect 2.
+
+**Redispatched to the specialist (bounce-1 fix), as a new commit on dad99db9:** defects 1–2, plus:
+- A1: add nx → INC-02850 to REVIEWED_MATCHES now, before merge, to avoid a tombstone later. Data changes 187→186 new and 110→111 attached; rebuild and regenerate the delta.
+- A5 docstring.
+- A4 sentence in §1.9.
+**Carried:** A2, and A3 as a proposed follow-up task (vector→taxonomy rules for AI-as-weapon rows, plus the severity default).
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
