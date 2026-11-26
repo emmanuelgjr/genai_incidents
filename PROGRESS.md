@@ -40,6 +40,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - in the script, an AIID-cite regex anchored at scheme and host (urlsplit was avoided because of the test_network_chokepoint urllib grep).
 The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 69 targeted tests passing. **Gate-d161 is re-checking the post-PASS delta** 9cf17a43..9bf4e891: AIID join coverage, byte-identical outputs, and that the assertions fire. New CI is running on #117.
 
+**Update, D166 progress plus a security-review acknowledgement.**
+- **Fix branch:** `c5011615` on `d166-corpus-flips-linux` touches only tests/test_check_corpus_flips.py (+15/−2). It chmods the PATH python wrapper, asserts the stub fired, and adds an M3 mutant.
+- **Security review flag:** the automated review flagged `2e412a08` ("neg: drop fail-closed write", auto-refresh.yml −1 line) as a MEDIUM fail-open regression.
+- **[R] foreman check:** that commit is ONLY on the negative-control branch `origin/d166-neg-flag`. A second control, `d166-neg-chmod` (`d2158399`), is the same kind. Both were created as the brief's proof-it-fires CI evidence, and neither is in main or the fix branch.
+- **main is unaffected:** main's auto-refresh.yml still writes `needs_ruling=true` first in both the flips branch and the else branch.
+- **Not exploitable:** a scheduled workflow runs only on the default branch.
+- **Cleanup:** the specialist is told to record the run IDs and SHAs, then delete both negative branches on origin, and never merge from them.
+
 ### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
