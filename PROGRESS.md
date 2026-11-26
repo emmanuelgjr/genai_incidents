@@ -93,7 +93,7 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 - **Still open:** the D163 purge confirmation (user); D165 labels follow-up; D167 main-red alert.
 
 **Update, post-merge:**
-- **Post-merge runs on 2c56658f:** Pages deploy SUCCESS (the live site now shows 15,990), a11y SUCCESS and CodeQL SUCCESS. Validate is still running.
+- **Post-merge runs on 2c56658f: ALL GREEN.** Validate 45895621425 success; Pages 45895621325 success (the live site shows 15,990); a11y 45895621277 success; CodeQL 45895621045 success. **D161 is final.**
 - **Docs-warden (warden-d161):** counts are CLEAN. check_stats_drift is clean; the 3 data copies each hold 16,031 rows (15,990 + 29 retracted + 12 unverified); version strings are 2.13.0 and consistent; §1.9, NOTICE-DATA and dep5 agree. Findings:
   1. **Contradiction:** NOTICE-DATA:27-36 says "eleven" obligation sources and omits the ledger.
   2. **Soft contradiction:** the DATASHEET:137-177 licence exceptions have no ledger MIT bullet.
