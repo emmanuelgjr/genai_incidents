@@ -60,6 +60,19 @@ All advisories were forwarded to the specialist with the bounce.
 - **E7:** SOURCE_LICENSES format grep.
 Evidence forwarded to the specialist.
 
+**Update 2026-11-26: bounce-1 fix committed as `8734375f`; pushed and verified on origin.** What it changed:
+- **U1:** the site copy (298 rows, 2026-11-24) is the fetch target. The licence basis is the repo's MIT LICENSE plus the site's extension sentence, with the trade-off stated. Outreach Q1 now asks whether MIT covers the site's downloads.
+- **U2:** the primary-reference claim is withdrawn, the gate's 70/47 figure is stated, and URL-dedupe runs first at ingest.
+- **U3:** stable IDs, with "→ see U3" pointers on the §5 rows.
+- **U6:** gate advisories A1–A5.
+- **U7:** the gate's seeded sample (62.5% novel), and the REPORT-LEVEL class, which defaults to attaching the ledger row as a reference to the parent.
+- **U8:** the corrected draft SOURCE_LICENSES row; the §3 original is marked SUPERSEDED.
+Checks:
+- The specialist re-derived none of the gate's figures (no shell); each is marked "(gate)".
+- The foreman verified in the tree: U1–U8 present, 5 pointers, 0 control bytes, no PII.
+- The diff vs `f6ddd4ee` is only the 2 files (+555).
+Gate-d159 re-gating on `8734375f`. A second bounce would go to the user.
+
 User asked to "add another ingest source https://hackingincidents.ai/incidents/". Per CLAUDE.md, license-auditor runs first on any proposed new source, so this step is evaluation only, with no ingest code and no data changes. The branch is `d159-hackingincidents-eval` (worktree gi-wt-d159, based on `f6ddd4ee`). The deliverable is `docs/audits/D159-hackingincidents-source-eval-2026-11-25.md`, covering:
 - operator, and whether it is a primary source or an aggregator;
 - ToS, license, robots and API (absence claims checked against raw HTML);
