@@ -14,6 +14,22 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### ✅ 2026-11-25 — Dependabot #112–#116 merged (user: "merge")
+
+User asked to "resolve conflict PR". Foreman found **no conflicting PR**: #112–#116 were all MERGEABLE/CLEAN, and validate 3.12/3.13 passed on each (a11y also passed on #113 and #115). A sequential merge of all five onto `origin/main` (`aa1a0aae`) in a scratch worktree also went through with **0 conflicts**. User then said "merge".
+
+| PR | bump | merge |
+|---|---|---|
+| #112 | upload-pages-artifact 3.0.1→5.0.0 | `33802ddd` |
+| #113 | setup-python 6.3.0→7.1.0 (all 10 workflows) | `8724a4d2` |
+| #114 | deploy-pages 4.0.5→5.0.1 | `d9527f00` |
+| #115 | upload-artifact 4.6.2→7.0.2 | `a96c0c52` |
+| #116 | download-artifact 4.3.0→8.0.2 | `836e72c9` |
+
+[R] Checked that `.github/workflows` on main pins only the new SHAs: deploy-pages v5.0.1 ×1, download-artifact v8.0.2 ×2, setup-python v7.1.0 ×13, upload-artifact v7.0.2 ×6, upload-pages-artifact v5.0.0 ×1.
+
+**Watch item:** auto-refresh, pages and publish do not run on PRs. Sunday 2026-11-29's scheduled refresh is therefore the first real run of these bumps, and also of D155 and D156(a). If it fails, triage action bumps (upload/download-artifact handoff, setup-python) separately from D155/D156(a) causes.
+
 ### ✅ 2026-11-25 — D156(a)+D158 DONE: re-gate PASS on `7896c875`, MERGED to main (`8b6df9a9`)
 **Verdict: PASS, as sent by gate-d156a, judged against D158.** DEFECTS: none. Re-prompted once after about 8 h idle; the verdict then arrived.
 
