@@ -56,6 +56,26 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 
 **#117 merge is now gated only on D166:** main must be green, then #117 CI goes green.
 
+**Update: D166 specialist reported `c5011615`.**
+- **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
+- **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
+- **The fix (test file only, +15/−2):**
+  - `chmod(0o755)` on the wrapper;
+  - each stub touches a `stub-ran` sentinel, and the harness asserts it;
+  - a new mutant M3 removes the UNKNOWN-branch fail-closed write.
+- **CI evidence, foreman-verified** with `gh run view`:
+
+  | Run | Branch | SHA | Result |
+  |---|---|---|---|
+  | 45890926182 | fix | c5011615 | success |
+  | 45890945513 | neg-chmod | d2158399 | failure |
+  | 45890955373 | neg-flag | 2e412a08 | failure |
+
+- **Negative branches:** deleted on origin; ls-remote shows only the fix branch.
+- **Real step on Ubuntu WSL:** fails closed (exit 2 / no report / unwritable report / flips all give needs_ruling=true; clean gives false). The step uses plain setup-python `python`, so the specialist says it was **never at risk**. Pytest was not run in WSL (no pip).
+
+**Gate-d166 dispatched on c5011615.** It covers: the CI logs read by the gate itself; the negative diffs; whether the stub-ran assertion can fail; an independent check of the real step's dependency on `python` on ubuntu; and any other failures hidden by 26 red runs.
+
 ### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
