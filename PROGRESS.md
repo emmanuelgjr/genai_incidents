@@ -16,6 +16,14 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 
 ### 🔄 2026-11-25 — D159 IN PROGRESS: evaluate new source hackingincidents.ai (license-auditor)
 
+**Update 2026-11-26: specialist reported; committed `db640873` on `d159-hackingincidents-eval`, pushed and verified.** Its proposed verdict is facts+link only, with an MIT notice carve-out. The `quote` field is not ingested, and `summary` is held until the operator answers. Outreach is drafted and non-blocking (via X, per `/submit/`; the user sends). Its own caveats:
+- its only fetch method was WebFetch, so the "no ToS" finding is method-suspect;
+- its incidents.json read was truncated;
+- it did not read the repo README;
+- the operator's jurisdiction is unverified;
+- the overlap sample (31 entries, 68% novel) is non-random.
+The stray check found only the two deliverables, with 0 control bytes and no user PII. Gate-d159 is dispatched on `db640873` to re-derive by a different route: raw-HTML curl, full JSON download, and a seeded random overlap sample with a proven-firing matcher.
+
 User asked to "add another ingest source https://hackingincidents.ai/incidents/". Per CLAUDE.md, license-auditor runs first on any proposed new source, so this step is evaluation only, with no ingest code and no data changes. The branch is `d159-hackingincidents-eval` (worktree gi-wt-d159, based on `f6ddd4ee`). The deliverable is `docs/audits/D159-hackingincidents-source-eval-2026-11-25.md`, covering:
 - operator, and whether it is a primary source or an aggregator;
 - ToS, license, robots and API (absence claims checked against raw HTML);
