@@ -14,7 +14,32 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
-### 🔴 2026-11-26 — D166 IN PROGRESS: `validate` on main has been RED since the D156(a) merge (foreman miss)
+### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
+
+**Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
+- **(a) Diff:** test file only, +15/−2, one commit. No new skip or xfail.
+- **(b) CI logs:**
+  - Fix run 45890926182: the whole suite on 3.12 and 3.13, "1692 passed, 1 xfailed" each, all 15 steps green.
+  - neg-chmod 45890945513: the diff is exactly the chmod line; 7 failed with "PATH wrapper never intercepted".
+  - neg-flag 45890955373: the diff is exactly the auto-refresh.yml fail-closed line; 5 failed. The negative commits are still local, and origin shows only the fix branch.
+- **(c) The stub-ran assertion can fail** (shown by neg-chmod) and is correctly scoped: the None control passes. M3 checks itself. test_step_harness_fires_on_mutants had been passing vacuously before the fix.
+- **(d) The real step was never at risk.** The live refresh 45020991492 (2026-11-22) ran plain `python` from setup-python with no exit-127. The red runs' real-checker fall-through also shows the real step and checker behave correctly on Linux. Sunday 11-29 should give a real verdict.
+- **(e) No other test was hidden:** all 30 red main runs have an identical FAILED-set hash, "6 failed, 1686 passed".
+
+**Advisories:**
+- **A1:** the red streak was **30 runs**, not 26: from 45623512996 (8b6df9a9) to 45891212072. The last green run was 45621342950.
+- **A2:** 45888862138 was the PR #117 run, not a main run (the foreman mislabelled it).
+- **A3:** **the red streak also SKIPPED 7 later validate steps on main for about 1.5 days:** re-merge, schema, ATLAS lint, render-drift, stats drift, the XSS scan and the pip smoke test. All 7 ran green on the fix run, whose tree is main plus the test file.
+- **A4:** the negative runs proved the failure on 3.12 only, because 3.13 was fail-fast cancelled. Acceptable.
+- **A5:** the harness runs `bash -eo pipefail`, while the live step runs the default `bash -e`. No difference today.
+- **A6 → proposed follow-up D167:** a main-red alert, or a rule that no PASS is recorded while main is red.
+
+**Foreman process rule (adopted now):** after every merge, run `gh run list --branch main --workflow validate.yml --limit 1` and wait for green before recording DONE. A board commit made while main is red must say so.
+
+**Stray check:** the main tree was clean before the merge.
+
+---
+#### (history) D166 dispatch, 2026-11-26
 
 **Found while checking CI on PR #117.**
 - **Scope:** `validate` (ubuntu, py3.12/3.13) has failed on **every push to main since `8b6df9a9`** (D156(a) merge, 2026-11-25). That is 26 consecutive runs; the last green run is `6ad2f9b1`.
