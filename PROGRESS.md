@@ -100,6 +100,8 @@ Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advi
 - A4 sentence in §1.9.
 **Carried:** A2, and A3 as a proposed follow-up task (vector→taxonomy rules for AI-as-weapon rows, plus the severity default).
 
+**D163 USER RULING (2026-11-26):** "I'll request a purge". The user will contact GitHub Support to remove the cached commit 80217d42 from emmanuelgjr/genai_incidents. **Open item: confirm the purge.** Check that `gh api repos/emmanuelgjr/genai_incidents/commits/80217d42` returns 404/422. Until it does, §1.9 must keep its "may be retained" wording.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
