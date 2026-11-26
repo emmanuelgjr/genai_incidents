@@ -138,6 +138,20 @@ Redispatched to the specialist with defects 1–3 plus the AVID verbatim fix.
 
 **Update:** the bounce-1 fix is `15676481`, a new commit on 35b0aa40 (4 files, +22/−19). [R] The data/ diff from base is empty. [R] NOTICE-DATA count words now read: "twelve" at L27, L44 and L371, and "eight of the other nine" at L376. "eleven" no longer appears. Gate-d168 is re-gating, with a note to check that the row-marker sentence about AVID rows is true given F3 (79 of 313 marked).
 
+**Update: gate-d168 re-gate PASS on `15676481`, no defects. MERGED.**
+- **(1) Markers:** 186 HIAI rows are marked, 0 non-HIAI. Only the 3 corrected sentences remain.
+- **(2) NOTICE-DATA:** the arithmetic holds: 12 = AIM + AIAAIC + AIID + 9 others (8 in the covered group, including the ledger, plus the round-ups exception). The ledger's group placement is supported by §1.9.
+- **(3)** AIRI Navigator wording matches README:219 and §1.4.
+- **(4)** The AVID copyright is verbatim.
+- Drift clean; targeted tests 43 passed; no dated records touched.
+
+**New and extended advisories, carried to the licensing review:**
+- **F3 extended:** NOTICE-DATA's pre-existing sentence "CVE- and AVID-derived rows … carry a row-level content_license marker" is over-broad.
+  - AVID: 313 rows, of which 79 are marked, 125 are wave12 rows without a marker, and 109 are curated avid_owasp rows without a marker.
+  - CVE: 7,443 CVE- rows, of which 2,150 are marked.
+- **F5:** HF card L196 "Licence: data CC-BY-4.0 (with exceptions…)" names neither the MIT ledger nor AVID. It is incomplete, not false.
+- **F1 and F4** still open.
+
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
 - **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
