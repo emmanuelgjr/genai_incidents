@@ -73,6 +73,24 @@ Redispatched to the specialist as a dated update section.
 - **§8F:** user decisions consolidated.
 Gate-d169 re-gating on b554fdd9.
 
+**Update: gate-d169 BOUNCE #2 on b554fdd9, so this ESCALATES to the user (two-bounce rule).** Defects:
+1. **§8A Variant A1, labelled "true on main today", says "the other rows that cite the ledger" carry no marker.** In fact 6 of the 81 carry `aiaaic`: INC-04359, 03588, 14602, 03373, 03452 and 04711. §8 states this itself elsewhere. A2 inherits the clause.
+2. **§8E's NVD-truncation premise is false.** L881 and L1111 are the GHSA and OSV paths. NVD descriptions are verbatim (L600; the gate measured all 1,903 as exact matches). Only the NVD-path *title* is derived (first sentence, truncated to 177 chars, L572-575). So decision 4(iii) asks the user to rule on something that does not happen.
+
+**Everything else passes:**
+- the §8B figures are exactly the gate's;
+- 3a–3d are consistent (75 = 43 + 31 + 1);
+- the Git-repo row, wheel withdrawal, R3/R9 narrowing and §8E advisories are correct;
+- the rest of A1 was verified true clause by clause;
+- the dep5 eleven-vs-twelve mismatch is confirmed.
+
+**Advisory:** the original R3 text was replaced rather than preserved inline (it has an [AMENDED] marker and survives at e506d4e0). Restore it.
+
+**Gate-proposed ruling:** apply verbatim plus a string check.
+- **(i) A1/A2:** "…and the other rows that cite the ledger, which carry no hackingincidents marker (some carry another source's marker)."
+- **(ii) The §8E NVD bullet** is replaced with: verbatim descriptions (L600), derived titles (L572-575), and the 1,500-char truncation (L881/L1111) as GHSA/OSV-only, covered by §5.2. Decision 4(iii) becomes "whether NVD-derived titles need a 'modified' statement".
+- **Strings to check:** none of "other rows that cite the ledger." in §8A; "L881 and L1111" absent from the NVD bullet; "titles need" present in §8F.
+
 ### ✅ 2026-11-26 — D166 DONE: gate-d166 PASS on `c5011615`, merged. Fixes main's red `validate` (red since the D156(a) merge)
 
 **Gate verdict: PASS, no defects.** Evidence (the gate's own reads):
