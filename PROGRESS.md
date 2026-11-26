@@ -108,6 +108,14 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
   The rendered HF card output was not checked.
 - **D168 dispatched to distribution-engineer** (branch d168-hiai-docs-align, gi-wt-d168): fix 1–7, decide on 8, and touch 9–10 only if clearly dead. §1.9, NOTICE-DATA and dep5 are the source of truth, with no new licence claims. It must render the HF card and run the drift check and suite. It goes to the gate next.
 
+**Update: D168 reported as `35b0aa40`, pushed. [R] 1 commit on 7b837da7; 7 files, +43/−10; worktree clean.**
+- **Findings 1–7** handled.
+- **Scope extended within the brief:** the AVID MIT attribution was added to README, DATASHEET and the HF card (the specialist cites SOURCE_LICENSES §6.1 and NOTICE-DATA). AIRI is worded "retired 2026-10-13; rows kept and marked stale" in the HF card and DATASHEET Collection.
+- **Finding 8:** source_freshness.json is NOT changed. It is deliberately exempt, since the registry covers only health-counted sources; the ledger was added to the DATA_DICTIONARY manual-inputs list instead.
+- **Finding 9:** the app.js comment is fixed.
+- **Tests:** drift clean; targeted 62 passed; full suite 1721p/1s/1x.
+**Gate-d168 dispatched** to check: licence-claim traceability, the NOTICE count, an independently rendered HF card, AIRI consistency, the #8 reasoning, and that no dated records were edited.
+
 **Update: D166 specialist reported `c5011615`.**
 - **Root cause:** confirmed. The PATH wrapper had no exec bit, and this was the only cause.
 - **Vacuous test:** `test_step_harness_fires_on_mutants` had been passing vacuously on Linux.
