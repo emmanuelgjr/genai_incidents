@@ -1,0 +1,2977 @@
+{
+  "version": 1,
+  "source": "hackingincidents",
+  "attachments": [
+    {
+      "from": "HIAI-bossai-ai-agent-campaign",
+      "target": {
+        "inc_id": "INC-17384",
+        "source_ids": [
+          "AIID-1815"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry bossai-ai-agent-campaign",
+          "url": "https://hackingincidents.ai/incident/bossai-ai-agent-campaign/",
+          "type": "reference"
+        },
+        {
+          "title": "Acronis: Acronis researchers uncover AI attack mesh targeting emergency services",
+          "url": "https://www.acronis.com/en/blog/posts/acronis-researchers-uncover-ai-attack-mesh-targeting-emergency-services/",
+          "type": "report"
+        },
+        {
+          "title": "machine.net: One hacker, a dozen AI agents, 11 countries: what two new attacks reveal about AI-powered hacking",
+          "url": "https://machine.net/news/acronis-bossai-ai-agent-mesh-abliterated-models-gitbook-breach/",
+          "type": "reference"
+        },
+        {
+          "title": "Acronis: BOSSAI: inside the AI attack mesh that targeted Taiwan's emergency services",
+          "url": "https://www.acronis.com/en/tru/posts/bossai-inside-the-ai-attack-mesh-that-targeted-taiwans-emergency-services/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-vapor-panda-artex-global-espionage",
+      "target": {
+        "inc_id": "INC-17367",
+        "source_ids": [
+          "AIID-1794"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry vapor-panda-artex-global-espionage",
+          "url": "https://hackingincidents.ai/incident/vapor-panda-artex-global-espionage/",
+          "type": "reference"
+        },
+        {
+          "title": "NBC News: Chinese hackers used DeepSeek and other AI tools in sweeping global cyberattacks, report finds",
+          "url": "https://www.nbcnews.com/tech/security/china-linked-hackers-used-ai-target-200-organizations-crowdstrike-says-rcna606343",
+          "type": "reference"
+        },
+        {
+          "title": "CyberScoop: Vapor Panda uses ARTEX with DeepSeek to compromise about 140 targets in 11 days",
+          "url": "https://cyberscoop.com/china-vapor-panda-agentic-ai-artex-campaign-crowdstrike/",
+          "type": "reference"
+        },
+        {
+          "title": "CrowdStrike: VAPOR PANDA uses AI-driven ARTEX framework to scale a global espionage campaign",
+          "url": "https://www.crowdstrike.com/en-us/blog/vapor-panda-uses-artex-to-scale-global-campaign/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-binance-hot-wallet-compromised-ai-tool-2026",
+      "target": {
+        "inc_id": "INC-17386",
+        "source_ids": [
+          "AIID-1817"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry binance-hot-wallet-compromised-ai-tool-2026",
+          "url": "https://hackingincidents.ai/incident/binance-hot-wallet-compromised-ai-tool-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-chainalysis-offensive-agentic-breach-2026",
+      "target": {
+        "inc_id": "INC-17368",
+        "source_ids": [
+          "AIID-1795"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry chainalysis-offensive-agentic-breach-2026",
+          "url": "https://hackingincidents.ai/incident/chainalysis-offensive-agentic-breach-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "BleepingComputer: Chainalysis discloses breach by an actor using 'offensive agentic techniques'",
+          "url": "https://www.bleepingcomputer.com/news/security/chainalysis-discloses-data-breach-from-offensive-agentic-techniques/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-dutch-ai-bank-warning-recordings-fraud-2026",
+      "target": {
+        "inc_id": "INC-17361",
+        "source_ids": [
+          "AIID-1788"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry dutch-ai-bank-warning-recordings-fraud-2026",
+          "url": "https://hackingincidents.ai/incident/dutch-ai-bank-warning-recordings-fraud-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "NL Times: AI-generated bank-warning recordings feed contactless-payment relay fraud in the Netherlands",
+          "url": "https://nltimes.nl/2026/10/21/police-arrest-two-suspects-ai-powered-bank-fraud-cost-victims-eu380000",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-storm-0940-artex-connectwise-2026",
+      "target": {
+        "inc_id": "INC-17356",
+        "source_ids": [
+          "AIID-1781"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry storm-0940-artex-connectwise-2026",
+          "url": "https://hackingincidents.ai/incident/storm-0940-artex-connectwise-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Microsoft: China-aligned Storm-0940 uses the ARTEX agentic framework against hundreds of organizations and a ConnectWise supply-chain compromise",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/10/21/storm-0940-uses-artex-agentic-ai-connectwise-supply-chain-compromise/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-cairn-ecommerce-intrusion-campaign",
+      "target": {
+        "inc_id": "INC-17344",
+        "source_ids": [
+          "AIID-1766"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry cairn-ecommerce-intrusion-campaign",
+          "url": "https://hackingincidents.ai/incident/cairn-ecommerce-intrusion-campaign/",
+          "type": "reference"
+        },
+        {
+          "title": "Tech Wire Asia: Hacker uses AI agents to breach over 100 company websites",
+          "url": "https://techwireasia.com/2026/10/ai-agents-cyberattacks-company-websites/",
+          "type": "reference"
+        },
+        {
+          "title": "NorForge: Inside Cairn",
+          "url": "https://norforge.com/blog/inside_cairn",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-aepd-first-agentic-ai-breach-spain-2026",
+      "target": {
+        "inc_id": "INC-17294",
+        "source_ids": [
+          "AIID-1693"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry aepd-first-agentic-ai-breach-spain-2026",
+          "url": "https://hackingincidents.ai/incident/aepd-first-agentic-ai-breach-spain-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "SecurityWeek: Spanish data protection authority publicises first breach carried out through an AI agent",
+          "url": "https://www.securityweek.com/first-agentic-ai-data-breach-reported-to-spanish-regulator/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-artex-south-korean-bank-intrusions",
+      "target": {
+        "inc_id": "INC-17357",
+        "source_ids": [
+          "AIID-1782"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry artex-south-korean-bank-intrusions",
+          "url": "https://hackingincidents.ai/incident/artex-south-korean-bank-intrusions/",
+          "type": "reference"
+        },
+        {
+          "title": "Flare: AI Models are Fueling a New Wave of Cybercrime: A Quantitative Analysis",
+          "url": "https://flare.io/learn/resources/blog/ai-models-cybercrime-quantitative-analysis",
+          "type": "reference"
+        },
+        {
+          "title": "SecurityWeek: China APT Uses AI Pentest Tool Artex in ConnectWise Attacks",
+          "url": "https://www.securityweek.com/china-apt-uses-ai-pentest-tool-artex-in-connectwise-attacks/",
+          "type": "reference"
+        },
+        {
+          "title": "CSIS: CSIS list: suspected AI-assisted attacks on 16 South Korean financial institutions expose about 100,000 records",
+          "url": "https://www.csis.org/programs/strategic-technologies-program/significant-cyber-incidents",
+          "type": "reference"
+        },
+        {
+          "title": "Censys: ARTEX: agentic asbestos",
+          "url": "https://censys.com/blog/artex-agentic-asbestos/",
+          "type": "reference"
+        },
+        {
+          "title": "Recorded Future: TAG-217 targets South Korean financial services with ARTEX",
+          "url": "https://www.recordedfuture.com/blog/tag-217-artex-south-korean-banks",
+          "type": "reference"
+        },
+        {
+          "title": "CrowdStrike: Unknown threat actor uses ARTEX to target South Korean finance",
+          "url": "https://www.crowdstrike.com/en-us/blog/unknown-threat-actor-uses-artex-to-target-south-korean-finance/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-greek-ai-cloned-relatives-voice-fraud-2026",
+      "target": {
+        "inc_id": "INC-17334",
+        "source_ids": [
+          "AIID-1748"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry greek-ai-cloned-relatives-voice-fraud-2026",
+          "url": "https://hackingincidents.ai/incident/greek-ai-cloned-relatives-voice-fraud-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-taiwan-romance-scam-ai-voice-changer-2026",
+      "target": {
+        "inc_id": "INC-17391",
+        "source_ids": [
+          "AIID-1824"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry taiwan-romance-scam-ai-voice-changer-2026",
+          "url": "https://hackingincidents.ai/incident/taiwan-romance-scam-ai-voice-changer-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Focus Taiwan: Taiwanese romance-scam ring used custom AI voice-changing software on more than 20,000 victims",
+          "url": "https://focustaiwan.tw/society/202609020019",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-starmangalsutra-deepfake-director-transfers-2026",
+      "target": {
+        "inc_id": "INC-17227",
+        "source_ids": [
+          "AIID-1596"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry starmangalsutra-deepfake-director-transfers-2026",
+          "url": "https://hackingincidents.ai/incident/starmangalsutra-deepfake-director-transfers-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-taiwan-government-hermes-openclaw-2026",
+      "target": {
+        "inc_id": "INC-17261",
+        "source_ids": [
+          "AIID-1646"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry taiwan-government-hermes-openclaw-2026",
+          "url": "https://hackingincidents.ai/incident/taiwan-government-hermes-openclaw-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "CyberScoop: Suspected Chinese hackers use open-source Hermes and OpenClaw agents against the Taiwanese government",
+          "url": "https://cyberscoop.com/near-autonomous-ai-attack-government-target-taiwan/",
+          "type": "reference"
+        },
+        {
+          "title": "CSIS: CSIS list: Taiwan detects an AI-assisted attack on government agencies using agents such as OpenClaw",
+          "url": "https://www.csis.org/programs/strategic-technologies-program/significant-cyber-incidents",
+          "type": "reference"
+        },
+        {
+          "title": "Dream: Inside a multi-agent AI framework used to compromise government entities in Asia",
+          "url": "https://www.dreamgroup.com/blog/inside-a-multi-agent-ai-framework-used-to-compromise-government-entities-in-asia",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-thailand-finance-ministry-hermes-agent-2026",
+      "target": {
+        "inc_id": "INC-17275",
+        "source_ids": [
+          "AIID-1669"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry thailand-finance-ministry-hermes-agent-2026",
+          "url": "https://hackingincidents.ai/incident/thailand-finance-ministry-hermes-agent-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "BleepingComputer: Hermes AI agent automates post-exploitation inside Thailand's Ministry of Finance",
+          "url": "https://www.bleepingcomputer.com/news/security/hermes-ai-agent-used-to-automate-attack-on-thai-finance-ministry/",
+          "type": "reference"
+        },
+        {
+          "title": "Hunt.io: Thailand's Ministry of Finance targeted with Hermes AI agent running unattended",
+          "url": "https://hunt.io/blog/thailand-ministry-finance-targeted-with-hermes-ai-agent",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-tuxbot-v3-llm-built-botnet-2026",
+      "target": {
+        "inc_id": "INC-14583",
+        "source_ids": [
+          "OECD-AIM-2026-07-15-98ee"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry tuxbot-v3-llm-built-botnet-2026",
+          "url": "https://hackingincidents.ai/incident/tuxbot-v3-llm-built-botnet-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-jadepuffer-agentic-ransomware-langflow",
+      "target": {
+        "inc_id": "INC-14302",
+        "source_ids": [
+          "AIID-1578",
+          "OECD-AIM-2026-07-01-2beb"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry jadepuffer-agentic-ransomware-langflow",
+          "url": "https://hackingincidents.ai/incident/jadepuffer-agentic-ransomware-langflow/",
+          "type": "reference"
+        },
+        {
+          "title": "Infosecurity Magazine: JadePuffer: first fully agentic ransomware per Sysdig",
+          "url": "https://www.infosecurity-magazine.com/news/researchers-first-agentic/",
+          "type": "reference"
+        },
+        {
+          "title": "Trend Micro: The signs were there: what the first autonomous ransomware case confirms (JADEPUFFER)",
+          "url": "https://www.trendmicro.com/en_us/research/26/g/autonomous-ransomware.html",
+          "type": "reference"
+        },
+        {
+          "title": "Sysdig: JADEPUFFER: agentic ransomware for automated database extortion",
+          "url": "https://www.sysdig.com/blog/jadepuffer-agentic-ransomware-for-automated-database-extortion",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-meta-ai-support-bot-instagram-takeovers-2026",
+      "target": {
+        "inc_id": "INC-14602",
+        "source_ids": [
+          "AIAAIC2267"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry meta-ai-support-bot-instagram-takeovers-2026",
+          "url": "https://hackingincidents.ai/incident/meta-ai-support-bot-instagram-takeovers-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Krebs on Security: Pro-Iran hackers abuse Meta's AI support assistant to seize Instagram accounts",
+          "url": "https://krebsonsecurity.com/2026/06/hackers-used-metas-ai-support-bot-to-seize-instagram-accounts/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-promptspy-android-gemini-agent",
+      "target": {
+        "inc_id": "INC-00587",
+        "source_ids": [
+          "OECD-AIM-2026-02-19-2f59"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry promptspy-android-gemini-agent",
+          "url": "https://hackingincidents.ai/incident/promptspy-android-gemini-agent/",
+          "type": "reference"
+        },
+        {
+          "title": "Google Threat Intelligence Group: GTIG AI Threat Tracker: Adversaries Leverage AI for Vulnerability Exploitation, Augmented Operations, and Initial Access",
+          "url": "https://cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access",
+          "type": "report"
+        },
+        {
+          "title": "ESET: PromptSpy ushers in the era of Android threats using GenAI",
+          "url": "https://www.welivesecurity.com/en/eset-research/promptspy-ushers-in-era-android-threats-using-genai/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-claude-pentestgpt-argentine-healthcare",
+      "target": {
+        "inc_id": "INC-17369",
+        "source_ids": [
+          "AIID-1796"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry claude-pentestgpt-argentine-healthcare",
+          "url": "https://hackingincidents.ai/incident/claude-pentestgpt-argentine-healthcare/",
+          "type": "reference"
+        },
+        {
+          "title": "CrowdStrike: CrowdStrike Uncovers New Agentic AI Campaigns",
+          "url": "https://www.crowdstrike.com/en-us/blog/crowdstrike-uncovers-new-agentic-ai-campaigns/",
+          "type": "report"
+        },
+        {
+          "title": "WIRED: AI Guardrails Aren’t Stopping Criminal Hackers",
+          "url": "https://www.wired.com/story/ai-guardrails-arent-stopping-criminal-hackers/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-grok-bankrbot-morse-code-transfer-2026",
+      "target": {
+        "inc_id": "INC-00196",
+        "source_ids": [
+          "AIID-1556",
+          "OECD-AIM-2026-05-04-4a73"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry grok-bankrbot-morse-code-transfer-2026",
+          "url": "https://hackingincidents.ai/incident/grok-bankrbot-morse-code-transfer-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Dexerto: Morse-code prompt makes Grok and Bankrbot transfer 3 billion DRB tokens",
+          "url": "https://www.dexerto.com/entertainment/x-user-tricks-grok-into-sending-them-200000-in-crypto-using-morse-code-3361036/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-kali365-phaas-ai-lures-2026",
+      "target": {
+        "inc_id": "INC-07898",
+        "source_ids": [
+          "OECD-AIM-2026-05-25-a280"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry kali365-phaas-ai-lures-2026",
+          "url": "https://hackingincidents.ai/incident/kali365-phaas-ai-lures-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "FBI: Kali365 phishing-as-a-service kit supplies AI-generated lures and Microsoft 365 token capture",
+          "url": "https://www.ic3.gov/PSA/2026/PSA260521",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-marimo-exploit-llm-agent-database-exfil-2026",
+      "target": {
+        "inc_id": "INC-17276",
+        "source_ids": [
+          "AIID-1670"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry marimo-exploit-llm-agent-database-exfil-2026",
+          "url": "https://hackingincidents.ai/incident/marimo-exploit-llm-agent-database-exfil-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Sysdig: Attacker uses an LLM agent after a marimo notebook exploit to exfiltrate an internal database",
+          "url": "https://www.sysdig.com/blog/ai-agent-at-the-wheel-how-an-attacker-used-llms-to-move-from-a-cve-to-an-internal-database-in-4-pivots",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-outsider-enterprise-gemini-smishing-sites-2026",
+      "target": {
+        "inc_id": "INC-13073",
+        "source_ids": [
+          "AIID-1534",
+          "OECD-AIM-2026-06-12-332c"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry outsider-enterprise-gemini-smishing-sites-2026",
+          "url": "https://hackingincidents.ai/incident/outsider-enterprise-gemini-smishing-sites-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-singapore-pm-wong-deepfake-zoom-2026",
+      "target": {
+        "inc_id": "INC-01775",
+        "source_ids": [
+          "OECD-AIM-2026-05-14-1081"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry singapore-pm-wong-deepfake-zoom-2026",
+          "url": "https://hackingincidents.ai/incident/singapore-pm-wong-deepfake-zoom-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Singapore Police Force: Footage from Zoom video conference involving impersonation of senior government officials",
+          "url": "https://www.police.gov.sg/media-hub/news/2026/05/20260516_footage_from_zoom_video_conference_involving_impersonation_of_senior_government_officials",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-aurora-ransomware-cursor-claude-2026",
+      "target": {
+        "inc_id": "INC-17270",
+        "source_ids": [
+          "AIID-1661"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry aurora-ransomware-cursor-claude-2026",
+          "url": "https://hackingincidents.ai/incident/aurora-ransomware-cursor-claude-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Gambit Security: Aurora ransomware targets ESXi, abuses Cursor Agent for exploitation",
+          "url": "https://gambit.security/blog-posts/aurora-ransomware-targets-esxi-abuses-cursor-agent-for-exploitation",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-eviltokens-ai-augmented-phaas-bec-2026",
+      "target": {
+        "inc_id": "INC-00266",
+        "source_ids": [
+          "OECD-AIM-2026-04-07-8b71"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry eviltokens-ai-augmented-phaas-bec-2026",
+          "url": "https://hackingincidents.ai/incident/eviltokens-ai-augmented-phaas-bec-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Sekoia: EvilTokens: an AI-augmented phishing-as-a-service for automating BEC fraud",
+          "url": "https://www.sekoia.com/blog/eviltokens-an-ai-augmented-phishing-as-a-service-for-automating-bec-fraud-part-2",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-promptmink-claude-malicious-dependency-2026",
+      "target": {
+        "inc_id": "INC-00260",
+        "source_ids": [
+          "OECD-AIM-2026-04-29-cda6"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry promptmink-claude-malicious-dependency-2026",
+          "url": "https://hackingincidents.ai/incident/promptmink-claude-malicious-dependency-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-deepfake-applicant-tokyo-it-executive-2026",
+      "target": {
+        "inc_id": "INC-01697",
+        "source_ids": [
+          "AIID-1421",
+          "OECD-AIM-2026-03-06-8766"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry deepfake-applicant-tokyo-it-executive-2026",
+          "url": "https://hackingincidents.ai/incident/deepfake-applicant-tokyo-it-executive-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-deepload-ai-assisted-evasion-2026",
+      "target": {
+        "inc_id": "INC-00527",
+        "source_ids": [
+          "OECD-AIM-2026-03-30-6ff7"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry deepload-ai-assisted-evasion-2026",
+          "url": "https://hackingincidents.ai/incident/deepload-ai-assisted-evasion-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "ReliaQuest: DeepLoad malware pairs ClickFix delivery with AI-generated evasion",
+          "url": "https://reliaquest.com/blog/threat-spotlight-deepload-malware-pairs-clickfix-delivery-with-ai-generated-evasion",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-hackerbot-claw-github-actions-2026",
+      "target": {
+        "inc_id": "INC-01157",
+        "source_ids": [
+          "EXT-2026-HACKERBOT-CLAW"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry hackerbot-claw-github-actions-2026",
+          "url": "https://hackingincidents.ai/incident/hackerbot-claw-github-actions-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "StepSecurity: hackerbot-claw: an AI-powered bot actively exploiting GitHub Actions",
+          "url": "https://www.stepsecurity.io/blog/hackerbot-claw-github-actions-exploitation",
+          "type": "report"
+        },
+        {
+          "title": "Pillar Security: Hackerbot-Claw: adversarial agent targets top GitHub repos",
+          "url": "https://www.pillar.security/blog/hackerbot-claw-adversarial-agent-targets-top-github-repos",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-fideuram-intesa-voice-clone-95m-2026",
+      "target": {
+        "inc_id": "INC-17335",
+        "source_ids": [
+          "AIID-1749"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry fideuram-intesa-voice-clone-95m-2026",
+          "url": "https://hackingincidents.ai/incident/fideuram-intesa-voice-clone-95m-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Gulf News: AI Voice-Cloning Scam Hits Italian Bank",
+          "url": "https://gulfnews.com/world/europe/ai-voice-cloning-scam-hits-italian-bank-fake-executives-trigger-95m-overseas-transfers-1.500688692",
+          "type": "reference"
+        },
+        {
+          "title": "ANSA: Fideuram fraud: Italian prosecutors link similar scams using voice cloning (ANSA)",
+          "url": "https://www.ansa.it/sito/notizie/cronaca/2026/09/25/truffa-da-395-milioni-allex-capo-di-fideuram-un-indagato_f747847d-aaa5-4f5f-9bee-1d476b6bea1e.html",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-clawhavoc-malicious-openclaw-skills-2026",
+      "target": {
+        "inc_id": "INC-01365",
+        "source_ids": [
+          "AIID-1368",
+          "OECD-AIM-2026-02-07-2e7c"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry clawhavoc-malicious-openclaw-skills-2026",
+          "url": "https://hackingincidents.ai/incident/clawhavoc-malicious-openclaw-skills-2026/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-fortigate-600-devices-ai-augmented-2026",
+      "target": {
+        "inc_id": "INC-00265",
+        "source_ids": [
+          "OECD-AIM-2026-02-21-9182"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry fortigate-600-devices-ai-augmented-2026",
+          "url": "https://hackingincidents.ai/incident/fortigate-600-devices-ai-augmented-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "Amazon: Russian-speaking actor uses commercial generative AI services to compromise over 600 FortiGate devices in 55 countries",
+          "url": "https://aws.amazon.com/blogs/security/ai-augmented-threat-actor-accesses-fortigate-devices-at-scale/",
+          "type": "report"
+        },
+        {
+          "title": "SecurityWeek: AWS: low-skilled actor used commercial LLMs to compromise more than 600 FortiGate appliances in 55 countries",
+          "url": "https://www.securityweek.com/hundreds-of-fortigate-firewalls-hacked-in-ai-powered-attacks-aws/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-slopoly-hive0163-ransomware",
+      "target": {
+        "inc_id": "INC-00505",
+        "source_ids": [
+          "OECD-AIM-2026-03-13-1b37"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry slopoly-hive0163-ransomware",
+          "url": "https://hackingincidents.ai/incident/slopoly-hive0163-ransomware/",
+          "type": "reference"
+        },
+        {
+          "title": "IBM X-Force: A Slopoly start to AI-enhanced ransomware attacks",
+          "url": "https://www.ibm.com/think/x-force/slopoly-start-ai-enhanced-ransomware-attacks",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-konni-ai-built-powershell-backdoor-2026",
+      "target": {
+        "inc_id": "INC-01541",
+        "source_ids": [
+          "OECD-AIM-2026-01-23-ebba"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry konni-ai-built-powershell-backdoor-2026",
+          "url": "https://hackingincidents.ai/incident/konni-ai-built-powershell-backdoor-2026/",
+          "type": "reference"
+        },
+        {
+          "title": "BleepingComputer: Konni targets blockchain engineers with an AI-built PowerShell backdoor",
+          "url": "https://www.bleepingcomputer.com/news/security/konni-hackers-target-blockchain-engineers-with-ai-built-malware/",
+          "type": "reference"
+        },
+        {
+          "title": "Check Point: KONNI adopts AI to generate PowerShell backdoors",
+          "url": "https://research.checkpoint.com/2026/konni-targets-developers-with-ai-malware/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-mexico-government-claude-code-breach",
+      "target": {
+        "inc_id": "INC-07905",
+        "source_ids": [
+          "OECD-AIM-2026-05-25-fde7"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry mexico-government-claude-code-breach",
+          "url": "https://hackingincidents.ai/incident/mexico-government-claude-code-breach/",
+          "type": "reference"
+        },
+        {
+          "title": "Gambit Security: The AI-Assisted Breach of Mexico's Government Infrastructure (technical report)",
+          "url": "https://gambit.security/ai-assisted-breach-of-mexicos-government-infrastructure",
+          "type": "report"
+        },
+        {
+          "title": "Engadget: Hacker used Anthropic's Claude chatbot to attack multiple government agencies in Mexico",
+          "url": "https://www.engadget.com/ai/hacker-used-anthropics-claude-chatbot-to-attack-multiple-government-agencies-in-mexico-171237255.html",
+          "type": "reference"
+        },
+        {
+          "title": "Trend Micro: Vibe hacking: two AI-augmented campaigns target government and financial sectors in Latin America",
+          "url": "https://www.trendmicro.com/en/research/26/e/vibe-hacking-two-ai-augmented-campaigns-target-government-and-financial-sectors-in-latin-america.html",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-sysdig-ai-assisted-aws-admin-8-minutes",
+      "target": {
+        "inc_id": "INC-03248",
+        "source_ids": [
+          "RES-sysdig-llm-cloud-attack-2025"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry sysdig-ai-assisted-aws-admin-8-minutes",
+          "url": "https://hackingincidents.ai/incident/sysdig-ai-assisted-aws-admin-8-minutes/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-quietvault-ai-credential-stealer-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry quietvault-ai-credential-stealer-2025",
+          "url": "https://hackingincidents.ai/incident/quietvault-ai-credential-stealer-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-temp-zagros-gemini-malware-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry temp-zagros-gemini-malware-2025",
+          "url": "https://hackingincidents.ai/incident/temp-zagros-gemini-malware-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: Iran's MuddyWater leaked C2 domain and encryption key to Gemini while debugging malware",
+          "url": "https://aithreat.io/cases/gtig-muddywater-gemini-opsec/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-unc1069-masan-gemini-crypto-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry unc1069-masan-gemini-crypto-2025",
+          "url": "https://hackingincidents.ai/incident/unc1069-masan-gemini-crypto-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-unc4899-pukchong-gemini-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry unc4899-pukchong-gemini-2025",
+          "url": "https://hackingincidents.ai/incident/unc4899-pukchong-gemini-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-apt42-gemini-data-processing-agent-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry apt42-gemini-data-processing-agent-2025",
+          "url": "https://hackingincidents.ai/incident/apt42-gemini-data-processing-agent-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-bandai-channel-teen-chatgpt-program-2025",
+      "target": {
+        "inc_id": "INC-14897",
+        "source_ids": [
+          "OECD-AIM-2026-07-06-ba3f"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry bandai-channel-teen-chatgpt-program-2025",
+          "url": "https://hackingincidents.ai/incident/bandai-channel-teen-chatgpt-program-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Record: Japanese 15-year-old arrested over Bandai Channel attack built with ChatGPT (46,812 subscriptions cancelled)",
+          "url": "https://therecord.media/japanese-teen-arrested-over-attack-disrupted-streaming-service",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-china-nexus-ctf-pretext-gemini-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry china-nexus-ctf-pretext-gemini-2025",
+          "url": "https://hackingincidents.ai/incident/china-nexus-ctf-pretext-gemini-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-mimecast-centrelink-ai-phishing-2025",
+      "target": {
+        "inc_id": "INC-03114",
+        "source_ids": [
+          "AIID-1275"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry mimecast-centrelink-ai-phishing-2025",
+          "url": "https://hackingincidents.ai/incident/mimecast-centrelink-ai-phishing-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-voidlink-ai-built-linux-malware-framework",
+      "target": {
+        "inc_id": "INC-00520",
+        "source_ids": [
+          "OECD-AIM-2026-01-19-90c0"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry voidlink-ai-built-linux-malware-framework",
+          "url": "https://hackingincidents.ai/incident/voidlink-ai-built-linux-malware-framework/",
+          "type": "reference"
+        },
+        {
+          "title": "The Register: An AI wrote VoidLink, the cloud-targeting Linux malware",
+          "url": "https://www.theregister.com/security/2026/01/20/an-ai-wrote-voidlink-the-cloud-targeting-linux-malware/5098300",
+          "type": "reference"
+        },
+        {
+          "title": "BleepingComputer: VoidLink cloud malware shows clear signs of being AI-generated",
+          "url": "https://www.bleepingcomputer.com/news/security/voidlink-cloud-malware-shows-clear-signs-of-being-ai-generated/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-openai-korean-operators-xenorat-2025",
+      "target": {
+        "inc_id": "INC-03006",
+        "source_ids": [
+          "RES-openai-oct2025",
+          "VTR-openai-oct2025-apt15",
+          "VTR-openai-oct2025-apt5",
+          "VTR-openai-oct2025-cambodia-myanmar-scams",
+          "VTR-openai-oct2025-dprk-xeno-rat",
+          "VTR-openai-oct2025-iuvm-anti-us"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry openai-korean-operators-xenorat-2025",
+          "url": "https://hackingincidents.ai/incident/openai-korean-operators-xenorat-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "OpenAI: Disrupting malicious uses of AI: October 2025 (report PDF)",
+          "url": "https://cdn.openai.com/threat-intelligence-reports/7d662b68-952f-4dfd-a2f2-fe55b041cc4a/disrupting-malicious-uses-of-ai-october-2025.pdf",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-openai-russian-malware-tooling-2025",
+      "target": {
+        "inc_id": "INC-03006",
+        "source_ids": [
+          "RES-openai-oct2025",
+          "VTR-openai-oct2025-apt15",
+          "VTR-openai-oct2025-apt5",
+          "VTR-openai-oct2025-cambodia-myanmar-scams",
+          "VTR-openai-oct2025-dprk-xeno-rat",
+          "VTR-openai-oct2025-iuvm-anti-us"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry openai-russian-malware-tooling-2025",
+          "url": "https://hackingincidents.ai/incident/openai-russian-malware-tooling-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "OpenAI: Disrupting malicious uses of AI: October 2025 (report PDF)",
+          "url": "https://cdn.openai.com/threat-intelligence-reports/7d662b68-952f-4dfd-a2f2-fe55b041cc4a/disrupting-malicious-uses-of-ai-october-2025.pdf",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-openai-unk-droppitch-2025",
+      "target": {
+        "inc_id": "INC-03006",
+        "source_ids": [
+          "RES-openai-oct2025",
+          "VTR-openai-oct2025-apt15",
+          "VTR-openai-oct2025-apt5",
+          "VTR-openai-oct2025-cambodia-myanmar-scams",
+          "VTR-openai-oct2025-dprk-xeno-rat",
+          "VTR-openai-oct2025-iuvm-anti-us"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry openai-unk-droppitch-2025",
+          "url": "https://hackingincidents.ai/incident/openai-unk-droppitch-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "OpenAI: Disrupting malicious uses of AI: October 2025 (report PDF)",
+          "url": "https://cdn.openai.com/threat-intelligence-reports/7d662b68-952f-4dfd-a2f2-fe55b041cc4a/disrupting-malicious-uses-of-ai-october-2025.pdf",
+          "type": "report"
+        },
+        {
+          "title": "Volexity: APT meets GPT: UTA0388 targeted operations with untamed LLMs",
+          "url": "https://www.volexity.com/blog/2025/10/08/apt-meets-gpt-targeted-operations-with-untamed-llms/",
+          "type": "reference"
+        },
+        {
+          "title": "Truesec: Chinese cyber espionage group leverages ChatGPT",
+          "url": "https://www.truesec.com/hub/blog/chinese-cyber-espionage-group-leverage-chatgpt",
+          "type": "reference"
+        },
+        {
+          "title": "Picus: GOVERSHELL campaigns: attacker likely LLM-assisted in malware and phishing",
+          "url": "https://www.picussecurity.com/resource/blog/revisiting-voldemort-healthkick-and-govershell-a-technical-retrospective",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-shai-hulud-npm-worm-llm-script",
+      "target": {
+        "inc_id": "INC-03212",
+        "source_ids": [
+          "RES-unit42-shai-hulud-2025"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry shai-hulud-npm-worm-llm-script",
+          "url": "https://hackingincidents.ai/incident/shai-hulud-npm-worm-llm-script/",
+          "type": "reference"
+        },
+        {
+          "title": "Palo Alto Networks Unit 42: 2026 Unit 42 Global Incident Response Report: Shai-Hulud scripts assessed LLM-generated",
+          "url": "https://www.paloaltonetworks.com/resources/research/unit-42-incident-response-report",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-gtg-1002-claude-code-espionage-2025",
+      "target": {
+        "inc_id": "INC-02426",
+        "source_ids": [
+          "AIID-1263",
+          "INC-083",
+          "LEGACY-INC-00123",
+          "RES-anthropic-disrupt-2026q1",
+          "RES-anthropic-disrupt-jp-2026",
+          "RES-anthropic-gtg1002-2025"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry gtg-1002-claude-code-espionage-2025",
+          "url": "https://hackingincidents.ai/incident/gtg-1002-claude-code-espionage-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Register: Chinese spies told Claude to break into about 30 critical organizations",
+          "url": "https://www.theregister.com/2025/11/13/chinese_spies_claude_attacks/",
+          "type": "reference"
+        },
+        {
+          "title": "CERT-EU: CERT-EU Threat Landscape Report 2025 notes a jailbroken agentic AI system directed against 30 entities",
+          "url": "https://www.cert.europa.eu/blog/threat-landscape-report-2025",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-postmark-mcp-malicious-mcp-server-2025",
+      "target": {
+        "inc_id": "INC-02849",
+        "source_ids": [
+          "LEGACY-INC-00136"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry postmark-mcp-malicious-mcp-server-2025",
+          "url": "https://hackingincidents.ai/incident/postmark-mcp-malicious-mcp-server-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-s1ngularity-nx-ai-cli-weaponized",
+      "target": {
+        "inc_id": "INC-02850",
+        "source_ids": [
+          "AIID-1210"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry s1ngularity-nx-ai-cli-weaponized",
+          "url": "https://hackingincidents.ai/incident/s1ngularity-nx-ai-cli-weaponized/",
+          "type": "reference"
+        },
+        {
+          "title": "StepSecurity: s1ngularity: Popular Nx Build System Package Compromised with Data-Stealing Malware",
+          "url": "https://www.stepsecurity.io/blog/supply-chain-security-alert-popular-nx-build-system-package-compromised-with-data-stealing-malware",
+          "type": "report"
+        },
+        {
+          "title": "Snyk: Nx npm malware coerces AI assistant CLIs into reconnaissance and exfiltration",
+          "url": "https://snyk.io/blog/weaponizing-ai-coding-agents-for-malware-in-the-nx-malicious-package/",
+          "type": "reference"
+        },
+        {
+          "title": "Socket: Nx npm packages compromised in supply-chain attack weaponizing AI CLIs",
+          "url": "https://socket.dev/blog/nx-packages-compromised",
+          "type": "reference"
+        },
+        {
+          "title": "Okta: The s1ngularity attack: when attackers prompt your AI agents",
+          "url": "https://www.okta.com/blog/threat-intelligence/the-s1ngularity-attack--when-attackers-prompt-your-ai-agents-to/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-crowdstrike-famous-chollima-deepfake-2025",
+      "target": {
+        "inc_id": "INC-02461",
+        "source_ids": [
+          "VTR-crowdstrike-deepseek-code-flaws-2025",
+          "VTR-crowdstrike-famous-chollima-2025"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry crowdstrike-famous-chollima-deepfake-2025",
+          "url": "https://hackingincidents.ai/incident/crowdstrike-famous-chollima-deepfake-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "Fortune: North Korean IT worker infiltrations exploded",
+          "url": "https://fortune.com/2025/08/04/north-korean-it-worker-infiltrations-exploded/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-apt41-gemini-osstun-c2-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry apt41-gemini-osstun-c2-2025",
+          "url": "https://hackingincidents.ai/incident/apt41-gemini-osstun-c2-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-carding-store-claude-code-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry carding-store-claude-code-2025",
+          "url": "https://hackingincidents.ai/incident/carding-store-claude-code-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-chinese-actor-claude-vietnam-critical-infrastructure-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry chinese-actor-claude-vietnam-critical-infrastructure-2025",
+          "url": "https://hackingincidents.ai/incident/chinese-actor-claude-vietnam-critical-infrastructure-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-dprk-it-workers-claude-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry dprk-it-workers-claude-2025",
+          "url": "https://hackingincidents.ai/incident/dprk-it-workers-claude-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-stealer-log-mcp-victim-profiling-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry stealer-log-mcp-victim-profiling-2025",
+          "url": "https://hackingincidents.ai/incident/stealer-log-mcp-victim-profiling-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-amazon-q-vscode-wiper-prompt",
+      "target": {
+        "inc_id": "INC-02300",
+        "source_ids": [
+          "ATLAS-AML.CS0047",
+          "LEGACY-INC-00145",
+          "LEGACY-INC-00227",
+          "RES-etr-amazonq-dns-2025"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry amazon-q-vscode-wiper-prompt",
+          "url": "https://hackingincidents.ai/incident/amazon-q-vscode-wiper-prompt/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-kimsuky-chatgpt-fake-military-id",
+      "target": {
+        "inc_id": "INC-02959",
+        "source_ids": [
+          "AIID-1208",
+          "OECD-AIM-2025-09-14-000b"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry kimsuky-chatgpt-fake-military-id",
+          "url": "https://hackingincidents.ai/incident/kimsuky-chatgpt-fake-military-id/",
+          "type": "reference"
+        },
+        {
+          "title": "Genians Security Center: AI-Driven Deepfake-Based Military ID Forgery APT Campaign",
+          "url": "https://www.genians.co.kr/en/blog/threat_intelligence/deepfake",
+          "type": "report"
+        },
+        {
+          "title": "The Record: North Korean operation uses ChatGPT to forge military IDs",
+          "url": "https://therecord.media/north-korea-kimsuky-hackers-phishing-fake-military-ids-chatgpt",
+          "type": "reference"
+        },
+        {
+          "title": "Infosecurity Magazine: Kimsuky used ChatGPT to make fake military ID images for phishing",
+          "url": "https://www.infosecurity-magazine.com/news/ai-military-ids-north-korea/",
+          "type": "reference"
+        },
+        {
+          "title": "Gen Digital: Gen Q3/2025 Threat Report: Kimsuky used ChatGPT to forge South Korean military IDs",
+          "url": "https://www.gendigital.com/blog/insights/reports/threat-report-q3-2025",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-claude-code-data-extortion-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry claude-code-data-extortion-2025",
+          "url": "https://hackingincidents.ai/incident/claude-code-data-extortion-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Hacker News: Claude Code used as a comprehensive attack platform against 17 organizations",
+          "url": "https://thehackernews.com/2025/08/anthropic-disrupts-ai-powered.html",
+          "type": "reference"
+        },
+        {
+          "title": "HiddenLayer: The first AI-powered cyber attack: Anthropic threat report walkthrough",
+          "url": "https://www.hiddenlayer.com/research/the-first-ai-powered-cyber-attack",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-jasper-sleet-faceswap-voice-changing-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry jasper-sleet-faceswap-voice-changing-2025",
+          "url": "https://hackingincidents.ai/incident/jasper-sleet-faceswap-voice-changing-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "Microsoft: AI as tradecraft: How threat actors operationalize AI",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/03/06/ai-as-tradecraft-how-threat-actors-operationalize-ai/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-openai-dprk-deceptive-employment-2025",
+      "target": {
+        "inc_id": "INC-03003",
+        "source_ids": [
+          "RES-openai-june2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry openai-dprk-deceptive-employment-2025",
+          "url": "https://hackingincidents.ai/incident/openai-dprk-deceptive-employment-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "Korea Herald: OpenAI says it banned accounts potentially linked to N. Korea over deceptive employment scheme",
+          "url": "https://www.koreaherald.com/article/10426133",
+          "type": "reference"
+        },
+        {
+          "title": "OpenAI: OpenAI bans accounts behind a likely DPRK-linked deceptive hiring scheme",
+          "url": "https://cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-of-our-models-february-2025-update.pdf",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: OpenAI disrupts North Korean IT-worker accounts writing fake resumes and interview scripts",
+          "url": "https://aithreat.io/cases/openai-dprk-employment-feb2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-apt28-promptsteal-lamehug-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry apt28-promptsteal-lamehug-2025",
+          "url": "https://hackingincidents.ai/incident/apt28-promptsteal-lamehug-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Hacker News: CERT-UA Discovers LAMEHUG Malware Linked to APT28, Using LLM for Phishing Campaign",
+          "url": "https://thehackernews.com/2025/07/cert-ua-discovers-lamehug-malware.html",
+          "type": "reference"
+        },
+        {
+          "title": "Picus: LameHug: first publicly documented malware integrating an LLM",
+          "url": "https://www.picussecurity.com/resource/blog/lamehug-the-first-publicly-documented-case-of-a-malware-integrating-a-llm",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-bluenoroff-deepfake-zoom-crypto-2025",
+      "target": {
+        "inc_id": "INC-00698",
+        "source_ids": [
+          "OECD-AIM-2026-04-27-000a"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry bluenoroff-deepfake-zoom-crypto-2025",
+          "url": "https://hackingincidents.ai/incident/bluenoroff-deepfake-zoom-crypto-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "BleepingComputer: North Korean hackers deepfake execs in Zoom call to spread Mac malware",
+          "url": "https://www.bleepingcomputer.com/news/security/north-korean-hackers-deepfake-execs-in-zoom-call-to-spread-mac-malware/",
+          "type": "reference"
+        },
+        {
+          "title": "Huntress: Inside BlueNoroff Web3 intrusion analysis",
+          "url": "https://www.huntress.com/blog/inside-bluenoroff-web3-intrusion-analysis",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-deepfake-zoom-crypto-analyst-takeover-2025",
+      "target": {
+        "inc_id": "INC-03157",
+        "source_ids": [
+          "AIID-1111"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry deepfake-zoom-crypto-analyst-takeover-2025",
+          "url": "https://hackingincidents.ai/incident/deepfake-zoom-crypto-analyst-takeover-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-promptflux-gemini-malware-2025",
+      "target": {
+        "inc_id": "INC-02637",
+        "source_ids": [
+          "RES-gtig-nov2025",
+          "VTR-google-gtig-fruitshell-2025",
+          "VTR-google-gtig-promptflux-2025",
+          "VTR-google-gtig-promptlock-2025",
+          "VTR-google-gtig-promptsteal-apt28-2025",
+          "VTR-google-gtig-quietvault-2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry promptflux-gemini-malware-2025",
+          "url": "https://hackingincidents.ai/incident/promptflux-gemini-malware-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-scopecreep-chatgpt-go-malware-2025",
+      "target": {
+        "inc_id": "INC-03003",
+        "source_ids": [
+          "RES-openai-june2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry scopecreep-chatgpt-go-malware-2025",
+          "url": "https://hackingincidents.ai/incident/scopecreep-chatgpt-go-malware-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Adoption: OpenAI Operation ScopeCreep: Russian-speaking actor used ChatGPT to build and debug Windows malware and its C2 server",
+          "url": "https://aiadoption.org/record/ai-powered-cyber-attacks/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: ScopeCreep: Russian-speaking actor built Windows malware with ChatGPT throwaway accounts",
+          "url": "https://aithreat.io/cases/openai-scopecreep-malware/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-vague-focus-chatgpt-social-engineering-2025",
+      "target": {
+        "inc_id": "INC-03003",
+        "source_ids": [
+          "RES-openai-june2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry vague-focus-chatgpt-social-engineering-2025",
+          "url": "https://hackingincidents.ai/incident/vague-focus-chatgpt-social-engineering-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: VAGue Focus: China-linked accounts used ChatGPT to social-engineer US officials and press",
+          "url": "https://aithreat.io/cases/openai-vague-focus/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-vixen-keyhole-panda-chatgpt-2025",
+      "target": {
+        "inc_id": "INC-03003",
+        "source_ids": [
+          "RES-openai-june2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry vixen-keyhole-panda-chatgpt-2025",
+          "url": "https://hackingincidents.ai/incident/vixen-keyhole-panda-chatgpt-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: OpenAI bans APT15 and APT5 accounts using ChatGPT for pentest automation and US recon",
+          "url": "https://aithreat.io/cases/openai-vixen-keyhole-panda/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-wrong-number-task-scam-chatgpt-2025",
+      "target": {
+        "inc_id": "INC-03003",
+        "source_ids": [
+          "RES-openai-june2025"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry wrong-number-task-scam-chatgpt-2025",
+          "url": "https://hackingincidents.ai/incident/wrong-number-task-scam-chatgpt-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: Cambodia-based task scam uses ChatGPT to write lures in six languages",
+          "url": "https://aithreat.io/cases/openai-wrong-number-task-scam/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-veriff-ceo-realtime-deepfake-whatsapp-2025",
+      "target": {
+        "inc_id": "INC-14465",
+        "source_ids": [
+          "AIID-1502"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry veriff-ceo-realtime-deepfake-whatsapp-2025",
+          "url": "https://hackingincidents.ai/incident/veriff-ceo-realtime-deepfake-whatsapp-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-wiles-impersonation-ai-voice-2025",
+      "target": {
+        "inc_id": "INC-03373",
+        "source_ids": [
+          "AIAAIC2003"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry wiles-impersonation-ai-voice-2025",
+          "url": "https://hackingincidents.ai/incident/wiles-impersonation-ai-voice-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "Yahoo News: US looking into attempt to impersonate Trump chief of staff Susie Wiles",
+          "url": "https://www.yahoo.com/news/us-looking-attempt-impersonate-trump-023644868.html",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-hk-ai-facial-composites-bank-checks-2025",
+      "target": {
+        "inc_id": "INC-02698",
+        "source_ids": [
+          "AIID-1066"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry hk-ai-facial-composites-bank-checks-2025",
+          "url": "https://hackingincidents.ai/incident/hk-ai-facial-composites-bank-checks-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-aixbt-agent-fraudulent-prompts-2025",
+      "target": {
+        "inc_id": "INC-02280",
+        "source_ids": [
+          "AIID-1003"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry aixbt-agent-fraudulent-prompts-2025",
+          "url": "https://hackingincidents.ai/incident/aixbt-agent-fraudulent-prompts-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-iot-camera-credential-scraping-2025",
+      "target": {
+        "inc_id": "INC-02320",
+        "source_ids": [
+          "VTR-anthropic-mar2025-credential-stuffing",
+          "VTR-anthropic-mar2025-influence-as-a-service",
+          "VTR-anthropic-mar2025-novice-malware",
+          "VTR-anthropic-mar2025-recruitment-fraud"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry iot-camera-credential-scraping-2025",
+          "url": "https://hackingincidents.ai/incident/iot-camera-credential-scraping-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-novice-malware-builder-2025",
+      "target": {
+        "inc_id": "INC-02320",
+        "source_ids": [
+          "VTR-anthropic-mar2025-credential-stuffing",
+          "VTR-anthropic-mar2025-influence-as-a-service",
+          "VTR-anthropic-mar2025-novice-malware",
+          "VTR-anthropic-mar2025-recruitment-fraud"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry novice-malware-builder-2025",
+          "url": "https://hackingincidents.ai/incident/novice-malware-builder-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-recruitment-fraud-language-sanitization-2025",
+      "target": {
+        "inc_id": "INC-02320",
+        "source_ids": [
+          "VTR-anthropic-mar2025-credential-stuffing",
+          "VTR-anthropic-mar2025-influence-as-a-service",
+          "VTR-anthropic-mar2025-novice-malware",
+          "VTR-anthropic-mar2025-recruitment-fraud"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry recruitment-fraud-language-sanitization-2025",
+          "url": "https://hackingincidents.ai/incident/recruitment-fraud-language-sanitization-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-youtube-ceo-deepfake-creator-phishing-2025",
+      "target": {
+        "inc_id": "INC-03024",
+        "source_ids": [
+          "AIID-965"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry youtube-ceo-deepfake-creator-phishing-2025",
+          "url": "https://hackingincidents.ai/incident/youtube-ceo-deepfake-creator-phishing-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-cambodia-romance-baiting-chatgpt-2025",
+      "target": {
+        "inc_id": "INC-02999",
+        "source_ids": [
+          "VTR-openai-feb2025-bot-management-cn",
+          "VTR-openai-feb2025-kimsuky-thallium",
+          "VTR-openai-feb2025-peerreview",
+          "VTR-openai-feb2025-romance-baiting-cambodia",
+          "VTR-openai-feb2025-sponsored-discontent"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry cambodia-romance-baiting-chatgpt-2025",
+          "url": "https://hackingincidents.ai/incident/cambodia-romance-baiting-chatgpt-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: Cambodia-based romance-baiting scam uses ChatGPT for multilingual lures",
+          "url": "https://aithreat.io/cases/openai-cambodia-romance-baiting/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-kimsuky-bluenoroff-chatgpt-rdp-tooling-2025",
+      "target": {
+        "inc_id": "INC-02999",
+        "source_ids": [
+          "VTR-openai-feb2025-bot-management-cn",
+          "VTR-openai-feb2025-kimsuky-thallium",
+          "VTR-openai-feb2025-peerreview",
+          "VTR-openai-feb2025-romance-baiting-cambodia",
+          "VTR-openai-feb2025-sponsored-discontent"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry kimsuky-bluenoroff-chatgpt-rdp-tooling-2025",
+          "url": "https://hackingincidents.ai/incident/kimsuky-bluenoroff-chatgpt-rdp-tooling-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Threat Watch: Kimsuky and BlueNoroff used ChatGPT to debug RDP brute-force code and research intrusion",
+          "url": "https://aithreat.io/cases/openai-kimsuky-bluenoroff-rdp/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-storm-2139-azure-openai-llmjacking-2025",
+      "target": {
+        "inc_id": "INC-03812",
+        "source_ids": [
+          "AIID-955",
+          "OECD-AIM-2025-01-10-b096"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry storm-2139-azure-openai-llmjacking-2025",
+          "url": "https://hackingincidents.ai/incident/storm-2139-azure-openai-llmjacking-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "Microsoft: Storm-2139 network steals Azure OpenAI customer credentials and resells access to bypass safeguards",
+          "url": "https://blogs.microsoft.com/on-the-issues/2025/02/27/disrupting-cybercrime-abusing-gen-ai/",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-apt42-gemini-phishing-2025",
+      "target": {
+        "inc_id": "INC-02680",
+        "source_ids": [
+          "VTR-google-gtig-apt42-iran-2025",
+          "VTR-google-gtig-dprk-apt-2025",
+          "VTR-google-gtig-prc-apt-2025",
+          "VTR-google-tag-coldriver-2024"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry apt42-gemini-phishing-2025",
+          "url": "https://hackingincidents.ai/incident/apt42-gemini-phishing-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-apt43-public-ai-tools-research-2025",
+      "target": {
+        "inc_id": "INC-02680",
+        "source_ids": [
+          "VTR-google-gtig-apt42-iran-2025",
+          "VTR-google-gtig-dprk-apt-2025",
+          "VTR-google-gtig-prc-apt-2025",
+          "VTR-google-tag-coldriver-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry apt43-public-ai-tools-research-2025",
+          "url": "https://hackingincidents.ai/incident/apt43-public-ai-tools-research-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-brad-pitt-ai-images-romance-scam-2025",
+      "target": {
+        "inc_id": "INC-03452",
+        "source_ids": [
+          "AIAAIC1875"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry brad-pitt-ai-images-romance-scam-2025",
+          "url": "https://hackingincidents.ai/incident/brad-pitt-ai-images-romance-scam-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Guardian: French TV show pulled after ridicule of woman who fell for AI Brad Pitt",
+          "url": "https://www.theguardian.com/world/2025/jan/14/french-tv-show-pulled-ridicule-woman-fell-ai-brad-pitt",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-dnb-cfo-ceo-deepfake-teams-2025",
+      "target": {
+        "inc_id": "INC-03122",
+        "source_ids": [
+          "AIID-1246"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry dnb-cfo-ceo-deepfake-teams-2025",
+          "url": "https://hackingincidents.ai/incident/dnb-cfo-ceo-deepfake-teams-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-hk-deepfake-dating-crypto-fraud-2025",
+      "target": {
+        "inc_id": "INC-02696",
+        "source_ids": [
+          "AIID-921"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry hk-deepfake-dating-crypto-fraud-2025",
+          "url": "https://hackingincidents.ai/incident/hk-deepfake-dating-crypto-fraud-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "The Standard: Hong Kong syndicate used AI deepfake video calls in dating-platform crypto fraud (31 arrested, 14 prosecuted)",
+          "url": "https://www.thestandard.com.hk/news/article/324116/Police-charge-nine-more-in-34m-deepfake-crypto-scam",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-kaikatsu-frontier-teen-ai-program-breach-2025",
+      "target": {
+        "inc_id": "INC-02779",
+        "source_ids": [
+          "AIID-1295"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry kaikatsu-frontier-teen-ai-program-breach-2025",
+          "url": "https://hackingincidents.ai/incident/kaikatsu-frontier-teen-ai-program-breach-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-no-code-ransomware-as-a-service-2025",
+      "target": {
+        "inc_id": "INC-08177",
+        "source_ids": [
+          "AIID-1021",
+          "AIID-1118",
+          "AIID-1201",
+          "EXT-2025-DPRK-RANSOMWARE-SALES",
+          "INC-110",
+          "LEGACY-INC-00222"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry no-code-ransomware-as-a-service-2025",
+          "url": "https://hackingincidents.ai/incident/no-code-ransomware-as-a-service-2025/",
+          "type": "reference"
+        },
+        {
+          "title": "AI Adoption: Anthropic GTG-5004: cybercriminal used Claude to develop, market and distribute ransomware variants",
+          "url": "https://aiadoption.org/record/ai-powered-cyber-attacks/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-thai-pm-ai-voice-asean-leader-2025",
+      "target": {
+        "inc_id": "INC-03043",
+        "source_ids": [
+          "AIID-902"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry thai-pm-ai-voice-asean-leader-2025",
+          "url": "https://hackingincidents.ai/incident/thai-pm-ai-voice-asean-leader-2025/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-funksec-ai-assisted-ransomware",
+      "target": {
+        "inc_id": "INC-02219",
+        "source_ids": [
+          "AIID-897"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry funksec-ai-assisted-ransomware",
+          "url": "https://hackingincidents.ai/incident/funksec-ai-assisted-ransomware/",
+          "type": "reference"
+        },
+        {
+          "title": "Check Point: FunkSec: alleged top ransomware group powered by AI",
+          "url": "https://research.checkpoint.com/2025/funksec-alleged-top-ransomware-group-powered-by-ai/",
+          "type": "report"
+        },
+        {
+          "title": "SecurityWeek: FunkSec ransomware likely created with AI help by an inexperienced developer",
+          "url": "https://www.securityweek.com/emerging-funksec-ransomware-developed-using-ai/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-meeten-ai-generated-brand-realst-2024",
+      "target": {
+        "inc_id": "INC-03975",
+        "source_ids": [
+          "AIID-870"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry meeten-ai-generated-brand-realst-2024",
+          "url": "https://hackingincidents.ai/incident/meeten-ai-generated-brand-realst-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-nomani-deepfake-investment-scam-2024",
+      "target": {
+        "inc_id": "INC-03874",
+        "source_ids": [
+          "AIID-877"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry nomani-deepfake-investment-scam-2024",
+          "url": "https://hackingincidents.ai/incident/nomani-deepfake-investment-scam-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "ESET: ESET Threat Report H2 2024",
+          "url": "https://web-assets.esetstatic.com/wls/en/papers/threat-reports/eset-threat-report-h22024.pdf",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-cyberav3ngers-chatgpt-plc-research-2024",
+      "target": {
+        "inc_id": "INC-04068",
+        "source_ids": [
+          "RES-openai-influence-oct2024",
+          "VTR-openai-a2z-2024",
+          "VTR-openai-stop-news-2024",
+          "VTR-openai-sweetspecter-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry cyberav3ngers-chatgpt-plc-research-2024",
+          "url": "https://hackingincidents.ai/incident/cyberav3ngers-chatgpt-plc-research-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-storm-0817-chatgpt-android-malware-2024",
+      "target": {
+        "inc_id": "INC-04068",
+        "source_ids": [
+          "RES-openai-influence-oct2024",
+          "VTR-openai-a2z-2024",
+          "VTR-openai-stop-news-2024",
+          "VTR-openai-sweetspecter-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry storm-0817-chatgpt-android-malware-2024",
+          "url": "https://hackingincidents.ai/incident/storm-0817-chatgpt-android-malware-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-sweetspecter-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04068",
+        "source_ids": [
+          "RES-openai-influence-oct2024",
+          "VTR-openai-a2z-2024",
+          "VTR-openai-stop-news-2024",
+          "VTR-openai-sweetspecter-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry sweetspecter-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/sweetspecter-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-cardin-kuleba-deepfake-zoom-2024",
+      "target": {
+        "inc_id": "INC-04196",
+        "source_ids": [
+          "AIID-777",
+          "AIID-805"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry cardin-kuleba-deepfake-zoom-2024",
+          "url": "https://hackingincidents.ai/incident/cardin-kuleba-deepfake-zoom-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "NBC News: Sen. Ben Cardin says he was targeted by apparent deepfake call",
+          "url": "https://www.nbcnews.com/politics/congress/ben-cardin-targeted-apparent-deep-fake-call-dmytro-kuleba-rcna172776",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-ferrari-ceo-voice-clone-attempt-2024",
+      "target": {
+        "inc_id": "INC-03783",
+        "source_ids": [
+          "AIID-966"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry ferrari-ceo-voice-clone-attempt-2024",
+          "url": "https://hackingincidents.ai/incident/ferrari-ceo-voice-clone-attempt-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "Jalopnik: Ferrari Exec Nearly Duped By Deepfake Voice Of CEO Benedetto Vigna In Scam Attempt",
+          "url": "https://www.jalopnik.com/ferrari-exec-nearly-duped-by-deepfake-voice-of-ceo-bene-1851608088/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-llmjacking-sysdig-bedrock-2024",
+      "target": {
+        "inc_id": "INC-08183",
+        "source_ids": [
+          "AIID-898",
+          "ATLAS-AML.CS0029",
+          "ATLAS-AML.CS0030",
+          "ATLAS-AML.CS0031",
+          "ATLAS-RESEARCH-ProjectGradio",
+          "EXT-2024-HF-MALICIOUS-MODELS"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry llmjacking-sysdig-bedrock-2024",
+          "url": "https://hackingincidents.ai/incident/llmjacking-sysdig-bedrock-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-wisetech-ceo-deepfake-whatsapp-2024",
+      "target": {
+        "inc_id": "INC-04356",
+        "source_ids": [
+          "AIID-783"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "aiid",
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry wisetech-ceo-deepfake-whatsapp-2024",
+          "url": "https://hackingincidents.ai/incident/wisetech-ceo-deepfake-whatsapp-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-wpp-ceo-deepfake-meeting-attempt-2024",
+      "target": {
+        "inc_id": "INC-04359",
+        "source_ids": [
+          "AIAAIC-wpp-ceo-deepfake",
+          "AIAAIC1483"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry wpp-ceo-deepfake-meeting-attempt-2024",
+          "url": "https://hackingincidents.ai/incident/wpp-ceo-deepfake-meeting-attempt-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "The Guardian: CEO of world's biggest ad firm targeted by deepfake scam",
+          "url": "https://www.theguardian.com/technology/article/2024/may/10/ceo-wpp-deepfake-scam",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-lastpass-deepfake-ceo-voice-attempt-2024",
+      "target": {
+        "inc_id": "INC-04154",
+        "source_ids": [
+          "AIID-1100"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry lastpass-deepfake-ceo-voice-attempt-2024",
+          "url": "https://hackingincidents.ai/incident/lastpass-deepfake-ceo-voice-attempt-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "LastPass: Attempted Audio Deepfake Call Targets LastPass Employee",
+          "url": "https://blog.lastpass.com/posts/2024/04/attempted-audio-deepfake-call-targets-lastpass-employee",
+          "type": "report"
+        },
+        {
+          "title": "Hackread: LastPass employee targeted with deepfake CEO audio on WhatsApp",
+          "url": "https://hackread.com/lastpass-deepfake-scam-ceo-impersonation-thwarted/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-charcoal-typhoon-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04066",
+        "source_ids": [
+          "RES-openai-disrupting-feb-2024",
+          "VTR-microsoft-charcoal-typhoon-2024",
+          "VTR-microsoft-crimson-sandstorm-2024",
+          "VTR-microsoft-emerald-sleet-2024",
+          "VTR-microsoft-forest-blizzard-2024",
+          "VTR-microsoft-salmon-typhoon-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry charcoal-typhoon-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/charcoal-typhoon-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-crimson-sandstorm-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04066",
+        "source_ids": [
+          "RES-openai-disrupting-feb-2024",
+          "VTR-microsoft-charcoal-typhoon-2024",
+          "VTR-microsoft-crimson-sandstorm-2024",
+          "VTR-microsoft-emerald-sleet-2024",
+          "VTR-microsoft-forest-blizzard-2024",
+          "VTR-microsoft-salmon-typhoon-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry crimson-sandstorm-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/crimson-sandstorm-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-emerald-sleet-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04066",
+        "source_ids": [
+          "RES-openai-disrupting-feb-2024",
+          "VTR-microsoft-charcoal-typhoon-2024",
+          "VTR-microsoft-crimson-sandstorm-2024",
+          "VTR-microsoft-emerald-sleet-2024",
+          "VTR-microsoft-forest-blizzard-2024",
+          "VTR-microsoft-salmon-typhoon-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry emerald-sleet-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/emerald-sleet-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-forest-blizzard-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04066",
+        "source_ids": [
+          "RES-openai-disrupting-feb-2024",
+          "VTR-microsoft-charcoal-typhoon-2024",
+          "VTR-microsoft-crimson-sandstorm-2024",
+          "VTR-microsoft-emerald-sleet-2024",
+          "VTR-microsoft-forest-blizzard-2024",
+          "VTR-microsoft-salmon-typhoon-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry forest-blizzard-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/forest-blizzard-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-salmon-typhoon-chatgpt-2024",
+      "target": {
+        "inc_id": "INC-04066",
+        "source_ids": [
+          "RES-openai-disrupting-feb-2024",
+          "VTR-microsoft-charcoal-typhoon-2024",
+          "VTR-microsoft-crimson-sandstorm-2024",
+          "VTR-microsoft-emerald-sleet-2024",
+          "VTR-microsoft-forest-blizzard-2024",
+          "VTR-microsoft-salmon-typhoon-2024"
+        ]
+      },
+      "level": "report",
+      "basis": [
+        "url"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry salmon-typhoon-chatgpt-2024",
+          "url": "https://hackingincidents.ai/incident/salmon-typhoon-chatgpt-2024/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-arup-hong-kong-deepfake-video-call-2024",
+      "target": {
+        "inc_id": "INC-03588",
+        "source_ids": [
+          "AIAAIC-arup-25m-cfo",
+          "AIAAIC1321"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry arup-hong-kong-deepfake-video-call-2024",
+          "url": "https://hackingincidents.ai/incident/arup-hong-kong-deepfake-video-call-2024/",
+          "type": "reference"
+        },
+        {
+          "title": "CNN: Arup revealed as victim of $25 million deepfake scam involving Hong Kong employee",
+          "url": "https://edition.cnn.com/2024/05/16/tech/arup-deepfake-scam-loss-hong-kong-intl-hnk/index.html",
+          "type": "report"
+        },
+        {
+          "title": "CNN: Arup confirmed as the victim of the Hong Kong deepfake video-call fraud (CNN)",
+          "url": "https://edition.cnn.com/2024/05/16/tech/arup-deepfake-scam-loss-hong-kong-intl-hnk/",
+          "type": "reference"
+        },
+        {
+          "title": "Cyber Security Agency of Singapore: Singapore CSA advisory cites the CFO deepfake video-conference fraud",
+          "url": "https://www.csa.gov.sg/alerts-and-advisories/advisories/ad-2024-006/",
+          "type": "reference"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-retool-deepfake-voice-vishing-2023",
+      "target": {
+        "inc_id": "INC-04615",
+        "source_ids": [
+          "AIID-567"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry retool-deepfake-voice-vishing-2023",
+          "url": "https://hackingincidents.ai/incident/retool-deepfake-voice-vishing-2023/",
+          "type": "reference"
+        },
+        {
+          "title": "Retool: Retool: MFA isn't MFA",
+          "url": "https://retool.com/blog/mfa-isnt-mfa",
+          "type": "report"
+        }
+      ]
+    },
+    {
+      "from": "HIAI-kerala-deepfake-whatsapp-video-call-2023",
+      "target": {
+        "inc_id": "INC-04711",
+        "source_ids": [
+          "AIAAIC1059"
+        ]
+      },
+      "level": "event",
+      "basis": [
+        "reviewed-title"
+      ],
+      "references": [
+        {
+          "title": "hackingincidents.ai ledger entry kerala-deepfake-whatsapp-video-call-2023",
+          "url": "https://hackingincidents.ai/incident/kerala-deepfake-whatsapp-video-call-2023/",
+          "type": "reference"
+        },
+        {
+          "title": "Hindustan Times: Kerala man loses ₹40k to AI-enabled deep-fake fraud",
+          "url": "https://www.hindustantimes.com/india-news/deepfake-scammers-trick-indian-man-into-transferring-money-police-investigating-multi-million-rupee-scam-101689622291654.html",
+          "type": "reference"
+        }
+      ]
+    }
+  ],
+  "fold_exempt_urls": [
+    "aiadoption.org/record/ai-powered-cyber-attacks",
+    "anthropic.com/threat-intelligence-report-september-2026",
+    "cloud.google.com/blog/topics/threat-intelligence/agentic-threat-activity-crosses-a-significant-threshold",
+    "cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access",
+    "cloud.google.com/blog/topics/threat-intelligence/distillation-experimentation-integration-ai-adversarial-use",
+    "cloud.google.com/blog/topics/threat-intelligence/from-prompting-to-autonomy-the-evolution-of-adversarial-ai",
+    "cloud.google.com/security/resources/ai-risk-and-resilience-2026",
+    "crowdstrike.com/en-us/blog/crowdstrike-uncovers-new-agentic-ai-campaigns",
+    "microsoft.com/en-us/security/blog/2026/10/29/tracking-ai-adoption-in-north-korean-threat-actor-tradecraft",
+    "security.ftmq.com/story/kolkata-cyber-frauds-steal-over-18-lakh-rupees-using-artificial-3c7b6b",
+    "trendaisecurity.com/en-us/resources-insights/deep-research/2026-h1-apt-report-how-apts-are-weaponizing-trust-in-the-age-of-ai"
+  ]
+}

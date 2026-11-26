@@ -125,6 +125,52 @@ AVID record summarises. See the AVID row of docs/SOURCE_LICENSES.md
 (section 6.1), including which rows of ingest/avid_owasp_incidents.json
 it does and does not cover.
 
+hackingincidents.ai ledger (Unsupervised Learning, Daniel Miessler). Rows
+whose source_id starts with HIAI-, and the ledger references attached to
+other rows by ingest/wave13_hackingincidents.attach.json, carry facts
+(slug, title, dates, actor, targets, AI roles and models, the ledger's
+confidence grade) and source links taken from
+https://hackingincidents.ai/incidents.json, which the operator publishes
+under the licence of the Substrate repository:
+
+  MIT License
+
+  Copyright (c) 2025 Daniel Miessler
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation files
+  (the "Software"), to deal in the Software without restriction,
+  including without limitation the rights to use, copy, modify, merge,
+  publish, distribute, sublicense, and/or sell copies of the Software,
+  and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+Requested citation (the site's data page): "hackingincidents.ai,
+Unsupervised Learning, accessed <date>"; the data was fetched on
+2026-11-26 (UTC). The ledger states that short quotes from its sources
+remain under the publishers' terms: the ledger's quote and summary text
+(and its confidence-reason and outcome text) are NOT reproduced in the
+dataset, and the confidence grades are the operator's own labels, not
+this project's assessment. The MIT grant covers the operator's own
+fields only, not the third-party sources the ledger links to.
+The pinned input snapshot, ingest/snapshots/hackingincidents/incidents.json,
+is stripped of that text (it keeps only the facts and source links the
+ingest reads; the raw download's sha256 is in
+ingest/wave13_hackingincidents.provenance.json). See the hackingincidents.ai row of docs/SOURCE_LICENSES.md
+(section 1.9).
+
 OWASP Top 10 for Agentic Applications (ASI). The risk codes ASI01-ASI10
 and the ten risk names are from "OWASP Top 10 For Agentic Applications
 2026" (Version 2026 / December 2025) by the OWASP Gen AI Security
