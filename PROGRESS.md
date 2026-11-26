@@ -102,6 +102,24 @@ Neither defect touches data, so there is no rebuild. Part 2 of the verdict (advi
 
 **D163 USER RULING (2026-11-26):** "I'll request a purge". The user will contact GitHub Support to remove the cached commit 80217d42 from emmanuelgjr/genai_incidents. **Open item: confirm the purge.** Check that `gh api repos/emmanuelgjr/genai_incidents/commits/80217d42` returns 404/422. Until it does, §1.9 must keep its "may be retained" wording.
 
+**Update: bounce-1 fix `9cf17a43`, a new commit on dad99db9, pushed. Changes:**
+- D1: the §1.9 wording is corrected (80217d42 named; "may retain unless purged").
+- D2: `<date>` is now a code span.
+- A1: nx → INC-02850 added.
+- A4 and A5 done.
+
+**New figures:** 186 new rows (INC-17395..17580), 111 attached, 81 existing rows changed (references/last_seen/updated only), incident_count 15,990, rows 16,031. The specialist reports 1720p/2s/1x, validate 16031/16031, flips 0.
+
+**[R] foreman checks:**
+- the branch is 2 commits on 9019539d;
+- data has 16,031 rows;
+- INC-02850's last 3 references are snyk/socket.dev/okta;
+- the s1ngularity slug is in the attach file;
+- §1.9 L246 names 80217d42;
+- the worktree is clean.
+
+Gate-d161 is re-gating on 9cf17a43.
+
 ### ✅ 2026-11-26 — D159 DONE (evaluation): gate-d159 PASS on `8734375f`, merged to main. Awaiting USER RULING on ingest
 
 **Gate verdict (re-gate): PASS, no blocking defects.**
