@@ -31,6 +31,19 @@ The stray check found only the two deliverables, with 0 control bytes and no use
 
 Advisory (partial; the verdict was truncated and the remainder has been requested): facts+link is judged the right call. The MIT grant was confirmed in raw HTML. The maker is self-declared US-based. The MIT notice goes into NOTICE-DATA and .reuse/dep5. Excluding `quote` is strongly supported: 7 of 7 checked quotes are verbatim vendor text. Holding `summary` is supported.
 
+**Gate-d159 advisories, full text (resent part 1), condensed:**
+- **A1 summary:** 6 of 7 checked summaries are paraphrased. operation-asterix shares a 14-word verbatim run with Rapid7. Ledger-wide, 42 summaries share an 8+ word run with their quote, and 15 share a 12+ word run. If summaries are ever admitted, a per-row verbatim-run filter is the minimum. Whether `confidence_reason` embeds publisher text is unmeasured.
+- **A2 raw-HTML check:** curl -sL on 10 pages plus the sitemap (306 URLs) found no terms, privacy, legal or rate-limit page. The licence clause is verbatim on /data/. robots.txt is 4 lines with Allow: / and no Crawl-delay.
+- **A3 jurisdiction:** the GitHub user location is "San Francisco Bay Area", i.e. self-declared US.
+- **A4:** the audit's field list omits `disclosed` (117 rows) and `activity` (30 rows).
+- **A5:** near-duplicate inside the ledger: the cairn-monai pair.
+- **A6:** our-corpus dedupe candidate INC-03248 vs INC-01349 (the Sysdig AWS event). This is a carried follow-up and not part of D159.
+- **A7:** the draft row format is OK.
+- **A8:** the outreach draft has no PII and is NOT SENT.
+- **A9:** the diff is only the 2 files; the gate wrote nothing.
+
+All advisories were forwarded to the specialist with the bounce.
+
 User asked to "add another ingest source https://hackingincidents.ai/incidents/". Per CLAUDE.md, license-auditor runs first on any proposed new source, so this step is evaluation only, with no ingest code and no data changes. The branch is `d159-hackingincidents-eval` (worktree gi-wt-d159, based on `f6ddd4ee`). The deliverable is `docs/audits/D159-hackingincidents-source-eval-2026-11-25.md`, covering:
 - operator, and whether it is a primary source or an aggregator;
 - ToS, license, robots and API (absence claims checked against raw HTML);
