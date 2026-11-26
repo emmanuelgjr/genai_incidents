@@ -17,6 +17,7 @@ import hashlib
 import json
 import sys
 import urllib.request
+from urllib.parse import urlsplit
 from pathlib import Path
 
 import pytest
@@ -27,6 +28,15 @@ import merge_and_dedupe as M
 ROOT = Path(__file__).resolve().parents[1]
 FIX = ROOT / "tests" / "fixtures" / "hackingincidents" / "ledger_sample.json"
 SENTINEL = "SENTINEL-"
+
+
+def _host_is(url: str, domain: str) -> bool:
+    h = (urlsplit(url).hostname or "").lower()
+    return h == domain or h.endswith("." + domain)
+
+
+def _is_aiid_cite(url: str) -> bool:
+    return _host_is(url, "incidentdatabase.ai") and urlsplit(url).path.startswith("/cite/")
 
 
 @pytest.fixture(autouse=True)
@@ -117,7 +127,7 @@ def test_committed_output_has_no_excluded_field_text():
 # ---------------------------------------------------------------------------
 def _binance_corpus():
     x = _row("binance-hot-wallet-compromised-ai-tool-2026")
-    cite = next(s["url"] for s in x["sources"] if "incidentdatabase.ai/cite/" in s["url"])
+    cite = next(s["url"] for s in x["sources"] if _is_aiid_cite(s["url"]))
     n = int(cite.rstrip("/").rsplit("/", 1)[1])
     return x, n, [_corpus_row("INC-17386", "Hackers Reportedly Used Internal AI Tool in Breach of Crypto Exchange",
                               aiid=n, urls=[cite])]
@@ -131,7 +141,7 @@ def test_aiid_join_attaches_instead_of_creating():
     (a,) = attach["attachments"]
     assert a["target"]["inc_id"] == "INC-17386" and a["level"] == "event" and "aiid" in a["basis"]
     assert a["references"][0]["url"] == "https://hackingincidents.ai/incident/" + x["id"] + "/"
-    assert not any("incidentdatabase.ai/cite/" in r["url"] for r in a["references"])  # already on the row
+    assert not any(_is_aiid_cite(r["url"]) for r in a["references"])  # already on the row
 
 
 def test_dedupe_check_fires_doctored_copy_creates_a_row():
@@ -197,7 +207,7 @@ def test_cairn_pair_collapses_to_one_row_keeping_both_pages_and_sources():
     urls = [q["url"] for q in cairn[0]["references"]]
     assert "https://hackingincidents.ai/incident/cairn-monai-label-university-intrusion/" in urls
     assert "https://hackingincidents.ai/incident/cairn-monai-label-university-intrusions/" in urls
-    assert any("cyware.com" in u for u in urls) and any("securityweek.com" in u for u in urls)
+    assert any(_host_is(u, "cyware.com") for u in urls) and any(_host_is(u, "securityweek.com") for u in urls)
     assert review["collapsed_inledger"] == {
         "cairn-monai-label-university-intrusion": "cairn-monai-label-university-intrusions"}
     assert stats["collapsed_inledger"] == 1

@@ -295,6 +295,15 @@ def _clean(s) -> str:
     return re.sub(r"\s+", " ", str(s or "")).strip()
 
 
+_AIID_CITE_RE = re.compile(r"^https?://(?:[a-z0-9-]+[.])*incidentdatabase[.]ai(?::[0-9]+)?/cite/([0-9]+)", re.I)
+
+
+def _aiid_cite_number(url: str):
+    """Match object (group 1 = the AIID number) for an AI Incident Database cite URL: anchored at
+    the scheme and host (the host must be incidentdatabase.ai or a subdomain), not a substring."""
+    return _AIID_CITE_RE.match((url or "").strip())
+
+
 def _rel(path: Path) -> str:
     try:
         return str(path.relative_to(ROOT)).replace(chr(92), "/")
@@ -516,7 +525,7 @@ class CorpusMatcher:
 
         for s in x.get("sources") or []:
             url = s.get("url") or ""
-            m = re.search(r"incidentdatabase\.ai/cite/(\d+)", url)
+            m = _aiid_cite_number(url)
             if m:
                 for eid in self.aiid.get(m.group(1), ()):
                     slot(eid)["aiid"] = True
@@ -611,7 +620,7 @@ def build(ledger_rows: list[dict], corpus: list[dict], prev_attached: set[tuple[
         refs = [page_ref(x["id"])] + [page_ref(c) for c in absorbed]
         for r in source_refs(x) + extra_src:
             nu = normalize_url(r["url"])
-            if nu and nu not in have and not re.search(r"incidentdatabase\.ai/cite/", r["url"]):
+            if nu and nu not in have and not _aiid_cite_number(r["url"]):
                 have.add(nu)
                 refs.append(r)
         attachments.append({
