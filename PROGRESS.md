@@ -48,6 +48,14 @@ The specialist reports 3 files and +24/−5, wave13 outputs md5-identical, and 6
 - **Not exploitable:** a scheduled workflow runs only on the default branch.
 - **Cleanup:** the specialist is told to record the run IDs and SHAs, then delete both negative branches on origin, and never merge from them.
 
+**Update: gate-d161 delta re-gate PASS on `9bf4e891`** (diff 9cf17a43..9bf4e891: 3 files, +25/−6, nothing undeclared).
+- **(a) AIID coverage:** all 22 incidentdatabase URLs in the snapshot are https, bare host, trailing slash. The old and new regexes disagree on 0 of them, and 22 AIID attachments survive. Wrong hosts are rejected: path-embedded, suffix-spoof, lookalike, query-embed, and /apps/.
+- **(b) Byte identity:** the offline ingest at 9bf4e891 is byte-identical on all 3 wave13 outputs. The gate disclosed that its first attempt ran at the wrong SHA; it discarded that run and redid it.
+- **(c) Tests fire:** mutating the 2 rewritten assertions gives 2 failed / 28 passed.
+- Not run: the full suite and the merge rebuild. These are unnecessary because the merge inputs are byte-identical.
+
+**#117 merge is now gated only on D166:** main must be green, then #117 CI goes green.
+
 ### ✅ 2026-11-26 — D160 USER RULING + D161 GATE PASS (awaiting user delta review): ingest hackingincidents.ai, facts + link (pipeline-engineer)
 
 **D160 (user, 2026-11-26, answering the AskUserQuestion that followed the D159 PASS):**
