@@ -275,7 +275,7 @@ Typhoon"), which are attributions by the vendor, not project inventions.
 | Scrape-permitted | **YES, within stated rate limits** — 5 req/30s unauthenticated, 50 req/30s with an API key; the ingest script already paces requests accordingly (`NVD_SLEEP`). |
 | Redistribute-verbatim | **YES** for unmodified content (public domain). Modified/derived text must not be presented as if it were still NVD's own text. |
 | Relicense-compatible | **YES.** |
-| Action | **(a) compatible.** The notice NVD asks for above is in `NOTICE-DATA` (D172), which ships with every distributed copy and is served from the site root; it is not repeated in the README. |
+| Action | **(a) compatible.** The notice NVD asks for above is reproduced in `NOTICE-DATA` (D172); it is not repeated in the README. The notice duty is met only for copies that carry `NOTICE-DATA`; copies built by this project's tooling from D172 on include it. |
 | Date-checked | 2026-07-15 |
 
 ### 2.3 GitHub Security Advisory Database (GHSA)

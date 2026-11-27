@@ -24,9 +24,10 @@ relicense-compatibility status is recorded in docs/SOURCE_LICENSES.md
 and governs wherever it is more restrictive than the CC BY 4.0 grant in
 LICENSE-DATA.
 
-As of this writing, twelve upstream sources carry an obligation
+As of this writing, thirteen upstream sources carry an obligation
 detailed in full below: MITRE ATLAS and garak (Apache License 2.0
 text), the CVE Program and AVID (notices that must accompany copies),
+the GitHub Advisory Database (CC BY 4.0 notice and credit),
 the OWASP Top 10 for Agentic Applications (CC BY-SA 4.0 attribution
 for its codes and risk names), the OWASP GenAI Data Security Risks and
 Mitigations (DSGAI; CC BY-SA 4.0 attribution for its codes and titles),
@@ -35,13 +36,16 @@ round-ups (CC BY-SA 4.0 attribution; see the OWASP paragraphs below),
 the AIAAIC Repository, the AI Incident Database (AIID), the OECD AI
 Incidents and Hazards Monitor (AIM), and the hackingincidents.ai ledger
 (MIT, attribution; facts and links only).
+The NVD API is listed separately: NVD asks for a displayed notice, which
+is reproduced below; it is a request in the NVD terms of use, not a
+licence condition.
 This list is maintained by hand and is added to as new sources
 resolve; if a source you are looking for is not named here, the
 per-source sections of docs/SOURCE_LICENSES.md are the authoritative
 account and take precedence over this file falling behind it. (Its
 "Summary of outcomes requiring escalation" table lists only the
 sources with an escalation, not every source with an obligation, and
-is not an enumeration of the twelve above.)
+is not an enumeration of the thirteen above.)
 
 Two verbatim text bodies embedded in this dataset are Apache License
 2.0, not the CC BY 4.0 grant in LICENSE-DATA, and are not relicensed by
@@ -96,27 +100,34 @@ NVD API. Rows built from the NVD API by
 scripts/ingest_cve_nvd_expanded.py use it under the NVD terms of use,
 https://nvd.nist.gov/developers/terms-of-use. This product uses the NVD
 API but is not endorsed or certified by the NVD. Modified: the title of
-an NVD-derived row is this project's shortened text, not the NVD's: it
-is the first sentence of the NVD description, cut to its first 177
-characters followed by "..." when that sentence is longer than 180
-characters (scripts/ingest_cve_nvd_expanded.py), and it is not
-attributed to the NVD. NVD descriptions are carried as the API returns
-them, with surrounding whitespace trimmed and no other change.
+an NVD-derived row is this project's text, not the NVD's, and is not
+attributed to the NVD. It takes one of two forms. Ingest form: the first
+sentence of the NVD description, cut to its first 177 characters
+followed by "..." when that sentence is longer than 180 characters
+(scripts/ingest_cve_nvd_expanded.py). Rewritten form: for many rows the
+build (scripts/merge_and_dedupe.py, maybe_rewrite_cve_title) replaces
+that title with "<product> — <vector> (CVE-...)", for example
+"Langflow — Vulnerability (CVE-2026-33760)", with an em dash in the
+data. NVD descriptions are carried as the API returns them, with
+surrounding whitespace trimmed and no other change.
 
 GitHub Advisory Database. Advisory text in rows built from the GitHub
-Advisory Database (ids GHSA-...) is licensed under the Creative Commons
-Attribution 4.0 license, https://creativecommons.org/licenses/by/4.0/
-(full text in LICENSE-DATA). GitHub's own terms say the attribution term
-may be fulfilled by linking to the GitHub Advisory Database at
+Advisory Database is licensed under the Creative Commons Attribution 4.0
+license, https://creativecommons.org/licenses/by/4.0/ (full text in
+LICENSE-DATA). GitHub's own terms say the attribution term may be
+fulfilled by linking to the GitHub Advisory Database at
 https://github.com/advisories or to individual GitHub Advisory Database
 records used, prefixed by https://github.com/advisories (GitHub Terms
 for Additional Products and Features, section "Advisory Database").
-Source: GitHub Advisory Database, https://github.com/advisories. Changes
-made: the advisory description is truncated to its first 1,500
-characters (scripts/ingest_cve_nvd_expanded.py). Rows carry the GHSA id
-in source_ids and a link to the advisory in references. GitHub names no
-other credit holder in the repository's README or LICENSE.md, and none
-is named here.
+Source: GitHub Advisory Database, https://github.com/advisories. Rows
+carry a link to the advisory in references, which is the attribution
+GitHub's terms accept; rows built from a GHSA record that has no CVE id
+also carry the GHSA id in source_ids. Changes made: the advisory
+description is truncated to its first 1,500 characters
+(scripts/ingest_cve_nvd_expanded.py), and the advisory title may be cut
+to 200 characters or rewritten by the build. GitHub names no other
+credit holder in the repository's README or LICENSE.md, and none is
+named here.
 
 AVID (AI Vulnerability Database) content. Records derived from the
 avidml/avid-db repository, https://github.com/avidml/avid-db, are used
@@ -394,13 +405,13 @@ docs/audits/E23-aiid-marking-ruling-2026-07-30.md for the full
 reasoning.
 
 The OECD AI Incidents and Hazards Monitor (AIM) is one of the
-twelve sources above. With AIAAIC and AIID, it is one of the three
+thirteen sources above. With AIAAIC and AIID, it is one of the three
 whose row text this project could not simply carry under the source's
 own licence grant. For each of the three, the text was either reduced
 to structural facts and a link, or its retained title was analysed as
 a separate copyright question (open for AIAAIC and AIM; resolved for
-AIID). For eight of the other nine (MITRE ATLAS, garak, the CVE
-Program, AVID, the OWASP Top 10 for Agentic Applications, OWASP GenAI
+AIID). For nine of the other ten (MITRE ATLAS, garak, the CVE
+Program, the GitHub Advisory Database, AVID, the OWASP Top 10 for Agentic Applications, OWASP GenAI
 Data Security Risks and Mitigations, the OWASP Top 10 for LLM
 Applications and the hackingincidents.ai ledger), the grant covers the material reproduced
 (for the OWASP mapping files, subject to the carve-outs above), and the
@@ -416,13 +427,11 @@ rows carry no marker: rows built by scripts/ingest_cve_nvd_expanded.py
 from the NVD API, the GitHub Advisory Database or OSV; the AVID- rows of
 ingest/avid_owasp_incidents.json; and the other rows that cite the
 ledger, which carry no hackingincidents marker (some carry another
-source's marker). The upstream licence of the origin applies to them.
-The notice duty is met by this file, which ships with every copy of the
-dataset distributed from this project's own channels (the repository,
-the PyPI package, the Zenodo record, the Hugging Face dataset, the
-GitHub release assets, the website, and the STIX, TAXII and MISP
-downloads), byte-identical to the repository's NOTICE-DATA. Counts are
-audited in docs/SOURCE_LICENSES.md, not restated here. The ninth, the OWASP Gen AI incident round-ups, is an exception: two
+source's marker). The upstream licence of the origin applies to
+them, and the notice duty is met only for copies that carry the notices
+in this file. Copies built by this project's tooling from this change
+on include NOTICE-DATA, LICENSE-DATA and LICENSES/Apache-2.0.txt. Counts are
+audited in docs/SOURCE_LICENSES.md, not restated here. The tenth, the OWASP Gen AI incident round-ups, is an exception: two
 shipped entries (INC-02646, INC-03233) carried CC BY-SA 4.0 round-up text
 up to and including v2.13.0 and were rewritten from their primary sources
 on 2026-10-13 (decision D97); see the round-up paragraph above.

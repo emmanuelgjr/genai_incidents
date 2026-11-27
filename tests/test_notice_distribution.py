@@ -174,7 +174,8 @@ def test_pages_root_notices_come_from_the_cli_step_the_workflow_runs(tmp_path):
 def test_pages_workflow_copies_and_verifies_the_notices_and_footers_link_relatively():
     wf = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
     assert "export_integrity.py notices --out docs" in wf
-    assert "verify-notices --out _site" in wf and '"_site/$d"' in wf
+    assert "verify-notices --out _site" + chr(10) in wf   # the root check, not just the loop's "_site/$d"
+    assert 'verify-notices --out "_site/$d"' in wf
     rel = (ROOT / ".github" / "workflows" / "release-assets.yml").read_text(encoding="utf-8")
     assert "verify-notices --out dist/release --flat" in rel
     index = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
@@ -203,3 +204,28 @@ def test_pyproject_declares_mit_and_cc_by_and_ships_the_apache_text():
     assert proj["license"] == "MIT AND CC-BY-4.0"
     assert "NOTICE-DATA" in proj["license-files"] and "LICENSES/Apache-2.0.txt" in proj["license-files"]
     assert not any(c.startswith("License ::") for c in proj["classifiers"])
+
+
+# --- live notice text must stay true at head (gate-d172 bounce #1) -----------------------
+
+
+def _flat(path: str) -> str:
+    return " ".join((ROOT / path).read_text(encoding="utf-8").split())
+
+
+@pytest.mark.parametrize("path", ["NOTICE-DATA", ".reuse/dep5"])
+def test_notice_text_makes_no_claim_about_already_published_copies(path):
+    t = _flat(path).lower()
+    assert "the notice duty is met only for copies that carry the notices" in t
+    assert "from this change on include" in t
+    for bad in ("ships with every copy", "distributed from this project's own channels", "the Zenodo record, the Hugging Face"):
+        assert bad not in t, bad
+
+
+def test_source_counts_are_arithmetically_consistent():
+    t = _flat("NOTICE-DATA")
+    assert "thirteen upstream sources carry an obligation" in t
+    assert "one of the thirteen sources above" in t and "For nine of the other ten" in t
+    assert "twelve" not in t.lower().replace("twelve months", "")
+    d = _flat(".reuse/dep5")
+    assert "thirteen sources NOTICE-DATA names" in d and "nine of the other ten" in d

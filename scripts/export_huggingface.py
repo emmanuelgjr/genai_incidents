@@ -176,8 +176,8 @@ machine-readable `content_license` field (`source`, `license`, `attribution`,
 `obligations`) naming AIAAIC as the attribution target; redistributing or adapting
 one of those rows' content should honor that row's attribution and share-alike
 obligation. A separate, open question about an EU/UK *sui generis* database right
-over the AIAAIC extraction is tracked in the source repository's `NOTICE-DATA` and
-`docs/SOURCE_LICENSES.md` (§1.1) and is **not** resolved by this row-level marker.
+over the AIAAIC extraction is tracked in `NOTICE-DATA` (shipped in this repository) and in the source
+repository's `docs/SOURCE_LICENSES.md` (§1.1) and is **not** resolved by this row-level marker.
 
 Rows sourced from the **OECD AI Incidents and Hazards Monitor (AIM)** carry a
 narrower, separate obligation: `description` on those rows is reduced to
@@ -200,7 +200,7 @@ carry a row-level `content_license` source `hackingincidents`), and existing row
 gained ledger references (references only, no row-level marker), carry facts and source links only; the ledger's quote, summary and other free text are not
 reproduced. The operator publishes the data under the MIT licence (Copyright (c) 2025 Daniel
 Miessler) and asks for the citation "hackingincidents.ai, Unsupervised Learning, accessed
-`<date>`". See `NOTICE-DATA` and `docs/SOURCE_LICENSES.md` §1.9 in the source repository.
+`<date>`". See `NOTICE-DATA` (shipped in this repository) and `docs/SOURCE_LICENSES.md` §1.9 in the source repository.
 **AVID**'s MIT copyright and permission notice (`NOTICE-DATA`; `docs/SOURCE_LICENSES.md`
 §6.1) must likewise accompany copies of AVID-derived content.
 
@@ -222,7 +222,7 @@ repository (`mappings/owasp_asi_top10.json`, `mappings/owasp_dsgai_2026.json`,
 `CC-BY-SA-4.0 AND CC-BY-4.0` for the OWASP codes, names or titles and (LLM files) description
 text; they are not part of this dataset. The `ingest/` upstream snapshots in the source
 repository keep their own upstream terms and are not shipped here. `NOTICE-DATA`
-in the source repository is the authoritative account.
+(shipped in this repository) is the authoritative account.
 
 ## Links
 

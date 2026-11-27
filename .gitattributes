@@ -15,6 +15,9 @@
 *.css           text eol=lf
 *.js            text eol=lf
 *.txt           text eol=lf
+NOTICE-DATA     text eol=lf
+LICENSE-DATA    text eol=lf
+LICENSE         text eol=lf
 *.sh            text eol=lf
 Makefile        text eol=lf
 .gitignore      text eol=lf
