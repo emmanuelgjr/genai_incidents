@@ -62,6 +62,17 @@ Gate-d172 dispatched, covering:
 - GHSA titles are also cut to 200 chars or rewritten.
 - The extensionless file is likely served as octet-stream.
 - The stray C:\c predates this gate.
+
+**D174 USER RULINGS (2026-11-27), all "(Recommended)":**
+1. **Disclosure: "Full history".** CORRECTIONS states exactly what was verified:
+   - v2.0.0–v2.8.0 had no NOTICE-DATA on any channel;
+   - the 2.12.0/2.13.0 wheel, sdist and Zenodo carried NOTICE-DATA and LICENSE-DATA, but not the Apache text;
+   - HF, the release assets, Pages and STIX/TAXII/MISP never did;
+   - intermediate versions are verified or else named as unverified.
+2. **Count: "Thirteen + NVD separate".** GHSA is the 13th obligation source, and NVD is listed separately as a displayed notice on request.
+3. **Republish: "Republish HF now".** After D172 merges and main is green, the foreman manually dispatches huggingface.yml so the live HF dataset carries the notices. Release assets wait for the next release. The notice text must stay true before the republish (A1 clause, scoped to "from this change on").
+
+Redispatched to the specialist with defects 1–5 under these rulings, plus the eol=lf and card-consistency advisories.
 ### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
 
 **Final gate (string-check under D170): PASS, no defects.**
