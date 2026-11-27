@@ -14,6 +14,25 @@ The foreman's premise check is `docs/audits/v2.13.0-premise-check-2026-10-06.md`
 - **⚖ D53, USER RULING 2026-10-09 (item 7 bounce #2): "Fix + full re-gate".** The user chose this over the foreman's recommended "apply verbatim + string check". The specialist fixes R3 and re-reads the whole memo for other occurrence-as-row uses and false corrections-note claims. A **fresh** red-reviewer then gates the whole memo.
 - **Item 6:** bounce #1 fixes are at `3e8ed477` (pushed). They cover the `status` field + retirement cost, the 0 / 1,382 split with B1 redefined as an overlay strip, and the browse/CSV channel plus a new **option C** (re-ingest, presented and not recommended). Because of item 7's false corrections note, the re-gate is a full pass that checks the note's claims against the body, not only the diff.
 
+### 🧭 2026-11-27 — USER GOAL: "finish this release" → cut **v2.14.0**
+
+**Scope:** everything on main since v2.13.0 (78 non-board merges), plus D172 once it is gated and merged.
+
+**Plan (VERSIONING.md):**
+1. **Step 1:** draft the notes and gate them before any bump.
+2. **Step 2:** bump the five version strings, as listed in VERSIONING step 2, including the ingest request-header version literal and its two quotes in INGESTION_CONDUCT.md. Promote CHANGELOG [Unreleased].
+3. **Step 3:** build → commit → mark_release → rebuild, with the field-level no-row-change check.
+4. **Step 4:** the drift check.
+5. **Step 5:** the prose sweep, including methods.md:116 and the README Latest-release paragraph trap. a11y must be green.
+6. **Pre-publish gate**, then **step 6:** tag the merge commit.
+7. **Step 7:** publish the Release, then byte-verify the body.
+8. **Step 8:** the Zenodo DOI, then the step-8b notes re-sync.
+9. **Step 9:** registries (PyPI, HF `genai-incidents`, release assets with `sha256sum -c`, Pages STIX/TAXII).
+
+**D174 republish:** the release's huggingface.yml run republishes HF with the notices. If the cut slips, the foreman dispatches it manually after D172 merges, as ruled.
+
+**Step 1 dispatched in parallel with D172:** distribution-engineer is drafting docs/releases/v2.14.0.md on `release/v2.14.0-notes` (worktree gi-wt-notes). The D172 section is marked PENDING until D172 merges. The count identity must include unverified_count, and the drafter must list the carried "next release" items.
+
 ### 🔄 2026-11-26 — D172 IN PROGRESS: ship licence notices in every copy and correct the notice texts (distribution-engineer)
 
 This implements D171 R1/R2/R3/R4/R7/R8/R9/R10 from the D169 audit. Branch `d172-notice-compliance`, worktree gi-wt-d172, base `1a4158e8`. The brief requires:
