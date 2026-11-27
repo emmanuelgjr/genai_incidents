@@ -92,6 +92,16 @@ Gate-d172 dispatched, covering:
 3. **Republish: "Republish HF now".** After D172 merges and main is green, the foreman manually dispatches huggingface.yml so the live HF dataset carries the notices. Release assets wait for the next release. The notice text must stay true before the republish (A1 clause, scoped to "from this change on").
 
 Redispatched to the specialist with defects 1–5 under these rulings, plus the eol=lf and card-consistency advisories.
+
+**Update: bounce-1 fix `3c7807e2`, on 5ec4e580; pushed and verified.**
+- **D1:** the A1 ending is restored, scoped to "copies built … from this change on". There is no republish claim, and a new test guards it.
+- **D2:** GHSA attribution via the reference link; the id is claimed for GHSA-only rows only; the 200-char cut and title rewrites are added.
+- **D3:** both NVD title forms.
+- **D4: CORRECTIONS full history.** The specialist inspected all 15 PyPI releases: **2.0.0–2.8.0** carry LICENSE and LICENSE-DATA only; **2.9.0–2.13.0** also carry NOTICE-DATA; none carries the Apache text. Zenodo 2.9.0–2.12.0 is named as uninspected.
+- **D5:** "thirteen", with NVD separate, "nine of the other ten", and an arithmetic test.
+- **Advisories:** eol=lf in .gitattributes; HF card consistency; the wiring test tightened.
+- **Results:** pytest 1739p/1s/1x; drift clean; no data change.
+Gate-d172 re-gating, including verifying 2.9.0/2.10.0 and sampling release assets.
 ### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
 
 **Final gate (string-check under D170): PASS, no defects.**
