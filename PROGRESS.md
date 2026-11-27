@@ -48,6 +48,20 @@ Gate-d172 dispatched, covering:
 - Linux CI risks;
 - the effect of the gitignored file on a clean checkout.
 
+**Update: gate-d172 BOUNCE #1 on 5ec4e580.** R1's mechanics are correct and proven to fire. Every copy is byte-identical to the committed blob in docs/, data, taxii2, misp, the release flat set, both zips, HF and the wheel; all SUMS pass `sha256sum -c`. 1736p on a clean clone. Defects:
+1. **The shipping clause is false at head for HF and the release assets** (NOTICE-DATA ~L419, dep5, the §2.2 cell). The live HF tree and the v2.13.0 assets have no notices, and the workflows run only on the next release (the release workflow checks out the tag). It also departs from the ruled R4 = §8A A1, whose closing clause "the notice duty is met only for copies that carry the notices in this file" was dropped. Fix: restore A1 or scope the sentence to copies built from D172 on.
+2. **GHSA: "Rows carry the GHSA id in source_ids" is false.** 1,107 of 1,135 GHSA-text rows have no GHSA id; 1,134 carry the advisories link.
+3. **The NVD title mechanism is incomplete.** 849 of 1,737 NVD-text titles are rewritten by merge_and_dedupe.py:822-868 to "<product> — <vector> (CVE-…)".
+4. **The CORRECTIONS "wheel/sdist and Zenodo did carry the notice files" is too broad.** NOTICE-DATA did not exist before cfd8e3e1 (2026-07-17), so v2.0.0–v2.8.0 had none on ANY channel: 10 of 15 PyPI releases, and their Zenodo versions. No wheel ever carried the Apache text. **This needs a user call on disclosure scope.**
+5. **"Twelve sources" is stale within the same file:** the new GHSA and NVD paragraphs are not in the L27-37 list. Thirteen or fourteen? **This needs a user call on wording.**
+
+**Advisories:**
+- The YAML wiring test fires on line deletion; 2 mutants survive, but each has a runtime backstop proven to fire.
+- Add `eol=lf` for NOTICE-DATA, LICENSE-DATA and LICENSE: a Windows-built copy would be CRLF.
+- HF card L179/L203 still say "in the source repository".
+- GHSA titles are also cut to 200 chars or rewritten.
+- The extensionless file is likely served as octet-stream.
+- The stray C:\c predates this gate.
 ### ✅ 2026-11-26 — D169 DONE: licensing review merged to main (gate-d169 string-check PASS on `b9a02898` after bounce #2; user ruling D170). Awaiting USER RULINGS on §8F
 
 **Final gate (string-check under D170): PASS, no defects.**
